@@ -1,0 +1,270 @@
+.container123 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+}
+
+
+
+
+
+.loader {
+ width: 70px;
+ height: 70px;
+ position: absolute;
+ transform: skew(15deg);
+ transform: rotate(50deg);
+ border: 8px solid transparent;
+ box-sizing: border-box;
+ border-radius: 10%;
+ /* background: linear-gradient(90deg, red,black,rgb(251, 255, 0),black, green, rgb(5, 142, 233),black); */
+ background: linear-gradient(40deg, rgba(6, 6, 2, 1) 2%, rgba(255, 255, 0, 1) 28%, rgba(23, 7, 6, 1) 29%, rgba(227, 22, 0, 1) 48%, rgba(10, 9, 1, 1) 50%, rgba(17, 177, 22, 1) 64%, rgba(0, 0, 0, 1) 69%, rgba(4, 150, 251, 1) 88%);
+ background-size: 200% 200%;
+ -webkit-mask: linear-gradient(#030303 0 0) padding-box, linear-gradient(#030303 0 0);
+ mask-composite: exclude;
+ -webkit-mask-composite: destination-out;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.loadernew {
+ width: 70px;
+ height: 70px;
+ position: absolute;
+ transform: skew(15deg);
+ transform: rotate(50deg);
+ border: 8px solid transparent;
+ box-sizing: border-box;
+ border-radius: 10%;
+ /* background: linear-gradient(90deg, red,black,rgb(251, 255, 0),black, green, rgb(5, 142, 233),black);
+  */
+ background: linear-gradient(40deg, rgba(6, 6, 2, 1) 2%, rgba(255, 255, 0, 1) 28%, rgba(23, 7, 6, 1) 29%, rgba(227, 22, 0, 1) 48%, rgba(10, 9, 1, 1) 50%, rgba(17, 177, 22, 1) 64%, rgba(0, 0, 0, 1) 69%, rgba(4, 150, 251, 1) 88%);
+ background-size: 200% 200%;
+ -webkit-mask: linear-gradient(#030303 0 0) padding-box, linear-gradient(#0c0808 0 0);
+ mask-composite: exclude;
+ -webkit-mask-composite: destination-out;
+
+}
+
+.shadow {
+ position: absolute;
+ bottom: 46.4%;
+ left: 51%;
+ width: 100px;
+ height: 8px;
+ background: #030303c4;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 10000);
+ border-radius: 50%;
+ transform: translateX(-50%);
+ z-index: 0;
+ /* Ensure shadow is below the loader */
+}
+
+
+
+.loader {
+ top: 40%;
+ left: 47%;
+ animation: gradientAnimation 1s linear infinite alternate-reverse;
+}
+
+.loadernew {
+ top: 40%;
+ left: 50%;
+ animation: gradientAnimationNew 1s linear infinite alternate-reverse;
+}
+
+@keyframes gradientAnimation {
+ 0% {
+   background-position: 0% 50%;
+ }
+
+ 100% {
+   background-position: 100% 50%;
+ }
+}
+
+@keyframes gradientAnimationNew {
+ 0% {
+   background-position: 100% 50%;
+ }
+
+ 100% {
+   background-position: 0% 50%;
+ }
+}
+
+
+
+@media (min-width: 1401px) and (max-width: 1800px) {
+
+ .loader {
+   width: 70px;
+
+   height: 70px;
+   top: 40%;
+   left: 45%;
+
+ }
+
+ .loadernew {
+   width: 70px;
+
+   height: 70px;
+   top: 40%;
+   left: 48%;
+
+ }
+
+ .shadow {
+   top: 50%;
+   left: 48.5%;
+   width: 100px;
+   height: 8px;
+ }
+}
+
+/* For mobile phones */
+
+@media (min-width: 1201px) and (max-width: 1400px) {
+
+ .loader {
+   width: 70px;
+
+   height: 70px;
+   top: 40%;
+   left: 45%;
+
+ }
+
+ .loadernew {
+   width: 70px;
+
+   height: 70px;
+   top: 40%;
+   left: 48%;
+
+ }
+
+ .shadow {
+   top: 52%;
+   left: 49%;
+   width: 100px;
+   height: 8px;
+ }
+}
+
+
+/* For desktops and laptops */
+@media (min-width: 992px) and (max-width: 1199px) {
+
+ .loader {
+   width: 70px;
+
+   height: 70px;
+   top: 40%;
+   left: 40%;
+
+ }
+
+ .loadernew {
+   width: 70px;
+
+   height: 70px;
+   top: 40%;
+   left: 44%;
+
+ }
+
+ .shadow {
+   top: 50.5%;
+   left: 45%;
+   width: 100px;
+   height: 8px;
+ }
+}
+
+/* For tablets and small desktops */
+@media (min-width: 768px) and (max-width: 991px) {
+
+ .loader {
+   width: 60px;
+
+   height: 60px;
+   top: 40%;
+   left: 40%;
+
+ }
+
+ .loadernew {
+   width: 60px;
+
+   height: 60px;
+   top: 40%;
+   left: 44%;
+
+ }
+
+ .shadow {
+   top: 52.5%;
+   left: 46%;
+   width: 100px;
+   height: 8px;
+ }
+
+}
+
+/* For mobile phones */
+@media (min-width: 481px) and (max-width: 767px) {
+ .loader {
+   width: 40px;
+
+   height: 40px;
+   top: 40%;
+   left: 40%;
+
+ }
+
+ .loadernew {
+   width: 40px;
+
+   height: 40px;
+   top: 40%;
+   left: 44%;
+
+ }
+
+ .shadow {
+   top: 54%;
+   left: 46%;
+   width: 100px;
+   height: 8px;
+ }
+}
+
+@media (max-width: 480px) {
+ .loader {
+   width: 60px;
+
+   height: 60px;
+   top: 40%;
+   left: 40%;
+
+ }
+
+ .loadernew {
+   width: 60px;
+
+   height: 60px;
+   top: 40%;
+   left: 47%;
+
+ }
+
+ .shadow {
+   top: 52.5%;
+   left: 50%;
+   width: 100px;
+   height: 8px;
+ }
+}

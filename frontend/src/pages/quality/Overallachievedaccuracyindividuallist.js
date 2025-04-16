@@ -1,0 +1,1326 @@
+import CloseIcon from '@mui/icons-material/Close';
+import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
+import ImageIcon from '@mui/icons-material/Image';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton, List, ListItem, ListItemText, MenuItem, Paper, Popover, Select, Table, TableBody, TableContainer, TableHead, TextField, Typography } from "@mui/material";
+import Switch from '@mui/material/Switch';
+import axios from "axios";
+import domtoimage from 'dom-to-image';
+import { saveAs } from "file-saver";
+import "jspdf-autotable";
+import moment from "moment-timezone";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from "react-icons/fa";
+import { ThreeDots } from "react-loader-spinner";
+import { useReactToPrint } from "react-to-print";
+import AggregatedSearchBar from '../../components/AggregatedSearchBar';
+import AggridTable from "../../components/AggridTable";
+import { handleApiError } from "../../components/Errorhandling";
+import ExportData from "../../components/ExportData";
+import Headtitle from "../../components/Headtitle";
+import MessageAlert from "../../components/MessageAlert";
+import PageHeading from "../../components/PageHeading";
+import { StyledTableCell, StyledTableRow } from "../../components/Table";
+import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
+import { userStyle } from "../../pageStyle";
+import { SERVICE } from "../../services/Baseservice";
+
+function OverallAchievedAccuracyIndividualList() {
+    const [openPopupMalert, setOpenPopupMalert] = useState(false);
+    const [popupContentMalert, setPopupContentMalert] = useState("");
+    const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+    const handleClickOpenPopupMalert = () => {
+        setOpenPopupMalert(true);
+    };
+    const handleClosePopupMalert = () => {
+        setOpenPopupMalert(false);
+    };
+    const [filteredRowData, setFilteredRowData] = useState([]);
+    const [filteredChanges, setFilteredChanges] = useState(null);
+
+    const [overallItems, setOverallItems] = useState([]);
+    const pathname = window.location.pathname;
+    const [employees, setEmployees] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [getIndexData, setGetIndexData] = useState("");
+    const [searchedString, setSearchedString] = useState("")
+    const { isUserRoleAccess, isUserRoleCompare, pageName, setPageName, isAssignBranch,
+        buttonStyles } = useContext(
+            UserRoleAccessContext
+        );
+
+    const [isHandleChange, setIsHandleChange] = useState(false);
+    const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+        ? isAssignBranch?.map((data) => ({
+            branch: data.branch,
+            company: data.company,
+            unit: data.unit,
+        }))
+        : isAssignBranch
+            ?.filter((data) => {
+                let fetfinalurl = [];
+
+                if (
+                    data?.modulenameurl?.length !== 0 &&
+                    data?.submodulenameurl?.length !== 0 &&
+                    data?.mainpagenameurl?.length !== 0 &&
+                    data?.subpagenameurl?.length !== 0 &&
+                    data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
+                ) {
+                    fetfinalurl = data.subsubpagenameurl;
+                } else if (
+                    data?.modulenameurl?.length !== 0 &&
+                    data?.submodulenameurl?.length !== 0 &&
+                    data?.mainpagenameurl?.length !== 0 &&
+                    data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
+                ) {
+                    fetfinalurl = data.subpagenameurl;
+                } else if (
+                    data?.modulenameurl?.length !== 0 &&
+                    data?.submodulenameurl?.length !== 0 &&
+                    data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
+                ) {
+                    fetfinalurl = data.mainpagenameurl;
+                } else if (
+                    data?.modulenameurl?.length !== 0 &&
+                    data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
+                ) {
+                    fetfinalurl = data.submodulenameurl;
+                } else if (data?.modulenameurl?.length !== 0) {
+                    fetfinalurl = data.modulenameurl;
+                } else {
+                    fetfinalurl = [];
+                }
+
+                const remove = [
+                    window.location.pathname?.substring(1),
+                    window.location.pathname,
+                ];
+                return fetfinalurl?.some((item) => remove?.includes(item));
+            })
+            ?.map((data) => ({
+                branch: data.branch,
+                company: data.company,
+                unit: data.unit,
+            }));
+    const getapi = async () => {
+        let userchecks = axios.post(`${SERVICE.CREATE_USERCHECKS}`, {
+            headers: {
+                Authorization: `Bearer ${auth.APIToken}`,
+            },
+            empcode: String(isUserRoleAccess?.empcode),
+            companyname: String(isUserRoleAccess?.companyname),
+            pagename: String("Overall Achieved Accuracy Individual List"),
+            commonid: String(isUserRoleAccess?._id),
+            date: String(new Date()),
+
+            addedby: [
+                {
+                    name: String(isUserRoleAccess?.username),
+                    date: String(new Date()),
+                },
+            ],
+        });
+
+    }
+
+    useEffect(() => {
+        getapi();
+    }, []);
+
+    //Datatable
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const { auth } = useContext(AuthContext);
+    //Delete model
+    const [isDeleteOpen, setisDeleteOpen] = useState(false);
+    const handleClickOpendel = () => {
+        setisDeleteOpen(true);
+    };
+    const handleCloseDel = () => {
+        setisDeleteOpen(false);
+    };
+    const [isBankdetail, setBankdetail] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
+    // page refersh reload
+    const handleCloseFilterMod = () => {
+        setIsFilterOpen(false);
+    };
+    const handleClosePdfFilterMod = () => {
+        setIsPdfFilterOpen(false);
+    };
+    const gridRefTable = useRef(null);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [updatedFieldEmployee, setUpdatedFieldEmployee] = useState([]);
+    const [searchQueryManage, setSearchQueryManage] = useState("");
+    const [copiedData, setCopiedData] = useState('');
+
+
+    const gridRefTableImg = useRef(null);
+    // image
+    const handleCaptureImage = () => {
+        if (gridRefTableImg.current) {
+            domtoimage.toBlob(gridRefTableImg.current)
+                .then((blob) => {
+                    saveAs(blob, "Overall Achieved Accuracy Individual List.png");
+                })
+                .catch((error) => {
+                    console.error("dom-to-image error: ", error);
+                });
+        }
+    };
+
+    const handleSelectionChange = (newSelection) => {
+        setSelectedRows(newSelection.selectionModel);
+    };
+    // view model
+    const [openview, setOpenview] = useState(false);
+    const handleClickOpenview = () => {
+        setOpenview(true);
+    };
+    const handleCloseview = () => {
+        setOpenview(false);
+    };
+    //Delete model
+    const [isDeleteOpenalert, setIsDeleteOpenalert] = useState(false);
+    const handleCloseModalert = () => {
+        setIsDeleteOpenalert(false);
+    };
+    // Manage Columns
+    const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null)
+    const handleOpenManageColumns = (event) => {
+        setAnchorEl(event.currentTarget);
+        setManageColumnsOpen(true);
+    };
+    const handleCloseManageColumns = () => {
+        setManageColumnsOpen(false);
+        setSearchQueryManage("")
+    };
+    const open = Boolean(anchorEl);
+    const id = open ? 'simple-popover' : undefined;
+    const getRowClassName = (params) => {
+        if ((selectedRows).includes(params.row.editid)) {
+            return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
+        }
+        return ''; // Return an empty string for other rows
+    };
+    // Show All Columns & Manage Columns 
+    const initialColumnVisibility = {
+        serialNumber: true,
+        checkbox: true,
+        date: true,
+        project: true,
+        vendor: true,
+        queue: true,
+        loginid: true,
+        company: true,
+        branch: true,
+        unit: true,
+        team: true,
+        employeename: true,
+        accuracy: true,
+        totalfield: true,
+        actions: true,
+    };
+    const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
+    // get single row to view....
+    const getinfoCode = async (e) => {
+        setOverallList((prev) => ({
+            ...prev, ...e
+        }))
+        handleClickOpenInfo();
+    };
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    // Edit model
+    const handleClickOpenEdit = () => {
+        setIsEditOpen(true);
+    };
+    const handleCloseModEdit = (e, reason) => {
+        if (reason && reason === "backdropClick") return;
+        setIsEditOpen(false);
+    };
+    const [allWorkStationOpt, setAllWorkStationOpt] = useState([]);
+    const [primaryWorkStation, setPrimaryWorkStation] = useState("Select Primary Workstation");
+    const [workStationOpt, setWorkStationOpt] = useState([]);
+    const [updateWorkStation, setUpdateworkStation] = useState([]);
+    const [filteredWorkStation, setFilteredWorkStation] = useState([]);
+    const [selectedOptionsWorkStation, setSelectedOptionsWorkStation] = useState([]);
+    const [maxSelections, setMaxSelections] = useState(0);
+    const [empaddform, setEmpaddform] = useState({
+        company: "",
+        branch: "",
+        unit: "",
+        floor: "",
+        workstation: "Please Select Work Station",
+    });
+    let [valueWorkStation, setValueWorkStation] = useState("");
+    const [overallList, setOverallList] = useState({
+        date: "",
+        project: "",
+        vendor: "",
+        queue: "",
+        loginid: "",
+        accuracy: "",
+        totalfield: "",
+        company: "",
+        branch: "",
+        unit: "",
+        team: "",
+        employeename: "",
+    });
+    //get all employees list details
+    const fetchAchievedAccuracyIndividual = async () => {
+        setPageName(!pageName)
+
+        try {
+            // let res_employee = await axios.get(SERVICE.GETACHEIVEDACCURACYINDIVIDUAL, {
+            //     headers: {
+            //         Authorization: `Bearer ${auth.APIToken}`,
+            //     },
+            // });
+            // let data_emp = res_employee?.data?.achievedaccuracyindividual.flatMap((data) => {
+            //     return data.uploaddata.map((item) => {
+            //         return {
+            //             id: item._id,
+            //             date: item.date,
+            //             project: item.project,
+            //             vendor: item.vendor,
+            //             queue: item.queue,
+            //             loginid: item.loginid,
+            //             accuracy: item.accuracy,
+            //             totalfield: item.totalfield,
+            //             projectvendor: item.vendor.replace("_", "-")
+            //         }
+            //     })
+            // });
+            // let users = await axios.get(SERVICE.USERALLLIMIT)
+            // let definedUsers = users.data.users.map((data) => {
+            //     return {
+            //         employeename: data.companyname,
+            //         company: data.company,
+            //         branch: data.branch,
+            //         unit: data.unit,
+            //         team: data.team,
+            //     }
+            // })
+            // let res = await axios.get(SERVICE.ALL_CLIENTUSERIDDATA);
+            // let allottedList = res.data.clientuserid.filter((data) => {
+            //     return data.allotted === "allotted"
+            // })
+            // let finalAllottedList = allottedList.map((data) => {
+            //     let foundData = definedUsers.find((item) => item.employeename === data.empname)
+            //     return {
+            //         company: foundData?.company,
+            //         branch: foundData?.branch,
+            //         unit: foundData?.unit,
+            //         team: foundData?.team,
+            //         employeename: foundData?.employeename,
+            //         date: data?.date,
+            //         loginid: data?.userid,
+            //         projectvendor: data?.projectvendor
+            //     }
+            // })
+            // // first Data to show
+            // let allottedCombinedData = finalAllottedList.map((data) => {
+            //     let foundData = data_emp.find((item) =>
+            //     (item.loginid === data.loginid
+            //         &&
+            //         moment(item.date).format("YYYY-MM-DD") === moment(data.date).format("YYYY-MM-DD") &&
+            //         item.projectvendor === data.projectvendor
+            //     ));
+            //     if (foundData) {
+            //         return {
+            //             id: foundData.id,
+            //             date: foundData.date,
+            //             project: foundData.project,
+            //             vendor: foundData.vendor,
+            //             queue: foundData.queue,
+            //             loginid: foundData.loginid,
+            //             accuracy: foundData.accuracy,
+            //             totalfield: foundData.totalfield,
+            //             company: data.company,
+            //             branch: data.branch,
+            //             unit: data.unit,
+            //             team: data.team,
+            //             employeename: data.employeename,
+            //         };
+            //     } else {
+            //         return null;
+            //     }
+            // }).filter(item => item !== null)
+
+            // let unAllottedCombinedData = data_emp.filter((data) => {
+            //     let notfounddata = allottedCombinedData.some((item) => item.id === data.id);
+            //     if (!notfounddata) {
+            //         return {
+            //             id: data.id,
+            //             date: data.date,
+            //             project: data.project,
+            //             vendor: data.vendor,
+            //             queue: data.queue,
+            //             loginid: data.loginid,
+            //             accuracy: data.accuracy,
+            //             totalfield: data.totalfield,
+            //             company: null,
+            //             branch: null,
+            //             unit: null,
+            //             team: null,
+            //             employeename: null,
+            //         };
+            //     }
+            // });
+            // let toShowList = [...allottedCombinedData, ...unAllottedCombinedData]
+            //     .filter(item => {
+            //         if (item.company) {
+            //             return accessbranch.some(branch =>
+            //                 branch.company === item.company &&
+            //                 branch.branch === item.branch &&
+            //                 branch.unit === item.unit
+            //             );
+            //         }
+            //         return true; // Return the item if company is null
+            //     });
+
+
+            // let unAllottedList = res.data.clientuserid.filter((data) => {
+            //     return data.allotted === "unallotted"
+            // })
+            // Fetch all data concurrently
+            const [resEmployee, usersRes, clientUserDataRes] = await Promise.all([
+                axios.get(SERVICE.GETACHEIVEDACCURACYINDIVIDUAL, {
+                    headers: { Authorization: `Bearer ${auth.APIToken}` },
+                }),
+                axios.get(SERVICE.USERALLLIMIT),
+                axios.get(SERVICE.ALL_CLIENTUSERIDDATA),
+            ]);
+
+            // Process achieved accuracy individual data
+            const dataEmp = resEmployee.data.achievedaccuracyindividual.flatMap((data) =>
+                data.uploaddata.map((item) => ({
+                    id: item._id,
+                    date: item.date,
+                    project: item.project,
+                    vendor: item.vendor,
+                    queue: item.queue,
+                    loginid: item.loginid,
+                    accuracy: item.accuracy,
+                    totalfield: item.totalfield,
+                    projectvendor: item.vendor.replace("_", "-"),
+                }))
+            );
+
+            // Create a Map for defined users for efficient lookup
+            const definedUsersMap = new Map(
+                usersRes.data.users.map((user) => [
+                    user.companyname,
+                    {
+                        company: user.company,
+                        branch: user.branch,
+                        unit: user.unit,
+                        team: user.team,
+                        employeename: user.companyname,
+                    },
+                ])
+            );
+
+            // Filter for allotted client user ID data
+            const allottedList = clientUserDataRes.data.clientuserid.filter((data) => data.allotted === "allotted");
+
+            // Map allotted list with defined users for final data structure
+            const finalAllottedList = allottedList.map((data) => {
+                const foundData = definedUsersMap.get(data.empname);
+                return {
+                    company: foundData?.company,
+                    branch: foundData?.branch,
+                    unit: foundData?.unit,
+                    team: foundData?.team,
+                    employeename: foundData?.employeename,
+                    date: data.date,
+                    loginid: data.userid,
+                    projectvendor: data.projectvendor,
+                };
+            });
+
+            // Combine allotted data with dataEmp by matching conditions
+            const allottedCombinedData = finalAllottedList.reduce((acc, data) => {
+                const foundData = dataEmp.find(
+                    (item) =>
+                        item.loginid === data.loginid &&
+                        moment(item.date).isSame(moment(data.date), "day") &&
+                        item.projectvendor === data.projectvendor
+                );
+                if (foundData) {
+                    acc.push({
+                        ...foundData,
+                        company: data.company,
+                        branch: data.branch,
+                        unit: data.unit,
+                        team: data.team,
+                        employeename: data.employeename,
+                    });
+                }
+                return acc;
+            }, []);
+
+            // Use Set to track allotted IDs for filtering unAllottedCombinedData
+            const allottedIds = new Set(allottedCombinedData.map((item) => item.id));
+            const unAllottedCombinedData = dataEmp
+                .filter((data) => !allottedIds.has(data.id))
+                .map((data) => ({
+                    ...data,
+                    company: null,
+                    branch: null,
+                    unit: null,
+                    team: null,
+                    employeename: null,
+                }));
+
+            // Filter and combine data for final display based on accessbranch conditions
+            const toShowList = [...allottedCombinedData, ...unAllottedCombinedData].filter((item) => {
+                if (item.company) {
+                    return accessbranch.some(
+                        (branch) =>
+                            branch.company === item.company &&
+                            branch.branch === item.branch &&
+                            branch.unit === item.unit
+                    );
+                }
+                return true; // Include item if company is null
+            });
+
+            // Filter unallotted client user data
+            const unAllottedList = clientUserDataRes.data.clientuserid.filter((data) => data.allotted === "unallotted");
+            const itemsWithSerialNumber = toShowList?.map((item, index) => ({ ...item, serialNumber: index + 1, date: moment(item.date).format("DD-MM-YYYY"), }));
+
+            
+            setEmployees(itemsWithSerialNumber);
+            setBankdetail(true);
+        } catch (err) { setBankdetail(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+
+    };
+    // page refersh reload code
+    const handleBeforeUnload = (event) => {
+        event.preventDefault();
+        event.returnValue = ""; // This is required for Chrome support
+    };
+
+
+    useEffect(() => {
+        const beforeUnloadHandler = (event) => handleBeforeUnload(event);
+        window.addEventListener("beforeunload", beforeUnloadHandler);
+        return () => {
+            window.removeEventListener("beforeunload", beforeUnloadHandler);
+        };
+    }, []);
+    const [employeesArray, setEmployeesArray] = useState([])
+    const fetchAchievedAccuracyIndividualArray = async () => {
+        setPageName(!pageName)
+        try {
+            let res_employee = await axios.get(SERVICE.GETACHEIVEDACCURACYINDIVIDUAL, {
+                headers: {
+                    Authorization: `Bearer ${auth.APIToken}`,
+                },
+            });
+            let data_emp = res_employee?.data?.achievedaccuracyindividual.flatMap((data) => {
+                return data.uploaddata.map((item) => {
+                    return {
+                        id: item._id,
+                        date: item.date,
+                        project: item.project,
+                        vendor: item.vendor,
+                        queue: item.queue,
+                        loginid: item.loginid,
+                        accuracy: item.accuracy,
+                        totalfield: item.totalfield,
+                        projectvendor: item.vendor.replace("_", "-")
+                    }
+                })
+            });
+            let users = await axios.get(SERVICE.USERALLLIMIT)
+            let definedUsers = users.data.users.map((data) => {
+                return {
+                    employeename: data.companyname,
+                    company: data.company,
+                    branch: data.branch,
+                    unit: data.unit,
+                    team: data.team,
+                }
+            })
+            let res = await axios.get(SERVICE.ALL_CLIENTUSERIDDATA);
+            let allottedList = res.data.clientuserid.filter((data) => {
+                return data.allotted === "allotted"
+            })
+            let finalAllottedList = allottedList.map((data) => {
+                let foundData = definedUsers.find((item) => item.employeename === data.empname)
+                return {
+                    company: foundData?.company,
+                    branch: foundData?.branch,
+                    unit: foundData?.unit,
+                    team: foundData?.team,
+                    employeename: foundData?.employeename,
+                    date: data?.date,
+                    loginid: data?.userid,
+                    projectvendor: data?.projectvendor
+                }
+            })
+            // first Data to show
+            let allottedCombinedData = finalAllottedList.map((data) => {
+                let foundData = data_emp.find((item) =>
+                (item.loginid === data.loginid
+                    &&
+                    moment(item.date).format("YYYY-MM-DD") === moment(data.date).format("YYYY-MM-DD") &&
+                    item.projectvendor === data.projectvendor
+                ));
+                if (foundData) {
+                    return {
+                        id: foundData.id,
+                        date: foundData.date,
+                        project: foundData.project,
+                        vendor: foundData.vendor,
+                        queue: foundData.queue,
+                        loginid: foundData.loginid,
+                        accuracy: foundData.accuracy,
+                        totalfield: foundData.totalfield,
+                        company: data.company,
+                        branch: data.branch,
+                        unit: data.unit,
+                        team: data.team,
+                        employeename: data.employeename,
+                    };
+                } else {
+                    return null;
+                }
+            }).filter(item => item !== null);
+            let unAllottedCombinedData = data_emp.filter((data) => {
+                let notfounddata = allottedCombinedData.some((item) => item.id === data.id);
+                if (!notfounddata) {
+                    return {
+                        id: data.id,
+                        date: data.date,
+                        project: data.project,
+                        vendor: data.vendor,
+                        queue: data.queue,
+                        loginid: data.loginid,
+                        accuracy: data.accuracy,
+                        totalfield: data.totalfield,
+                        company: null,
+                        branch: null,
+                        unit: null,
+                        team: null,
+                        employeename: null,
+                    };
+                }
+            });
+            let toShowList = [...allottedCombinedData, ...unAllottedCombinedData]
+            let unAllottedList = res.data.clientuserid.filter((data) => {
+                return data.allotted === "unallotted"
+            })
+            setEmployeesArray(toShowList.map((item, index) => ({
+                ...item,
+                date: moment(item.date).format("DD-MM-YYYY"),
+            })));
+            // setBankdetail(true);
+        } catch (err) { setBankdetail(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    };
+    useEffect(() => {
+        fetchAchievedAccuracyIndividualArray()
+    }, [isFilterOpen])
+    const [indexGet, setIndexGet] = useState();
+    const delAddemployee = async () => {
+        setPageName(!pageName)
+        try {
+            let del = await axios.put(`${SERVICE.USER_SINGLE_PWD}/${boredit}`, {
+                headers: {
+                    Authorization: `Bearer ${auth.APIToken}`,
+                },
+                workstation: updateWorkStation,
+            });
+            await fetchAchievedAccuracyIndividual();
+            setPage(1);
+            setShowAlert(
+                <>
+                    <ErrorOutlineOutlinedIcon
+                        sx={{ fontSize: "100px", color: "orange" }}
+                    />
+                    <p style={{ fontSize: "20px", fontWeight: 900 }}>
+                        {"Removed Successfully"}
+                    </p>
+                </>
+            );
+            handleClickOpenerr();
+        } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    };
+    // company multi select
+    const handleEmployeesChange = (options) => {
+        // If employeecount is greater than 0, limit the selections
+        if (maxSelections > 0) {
+            // Limit the selections to the maximum allowed
+            options = options.slice(0, (maxSelections - 1));
+        }
+        // Update the disabled property based on the current selections and employeecount
+        const updatedOptions = filteredWorkStation.map((option) => ({
+            ...option,
+            disabled:
+                (maxSelections - 1) > 0 &&
+                options.length >= (maxSelections - 1) &&
+                !options.find(
+                    (selectedOption) => selectedOption.value === option.value
+                ),
+        }));
+        setValueWorkStation(options.map((a, index) => a.value));
+        setSelectedOptionsWorkStation(options);
+        setFilteredWorkStation(updatedOptions);
+    };
+    const customValueRendererEmployees = (
+        valueWorkStation,
+        _filteredWorkStation
+    ) => {
+        return valueWorkStation.length ? (
+            valueWorkStation.map(({ label }) => label).join(", ")
+        ) : (
+            <span style={{ color: "hsl(0, 0%, 20%)" }}>Select Secondary Work Station</span>
+        );
+    };
+    const fetchWorkStation = async () => {
+        setPageName(!pageName)
+        try {
+            let res = await axios.get(SERVICE.WORKSTATION, {
+                headers: {
+                    Authorization: `Bearer ${auth.APIToken}`,
+                },
+            });
+            const result = res?.data?.locationgroupings.flatMap((item) => {
+                return item.combinstation.flatMap((combinstationItem) => {
+                    return combinstationItem.subTodos.length > 0
+                        ? combinstationItem.subTodos.map(
+                            (subTodo) =>
+                                subTodo.subcabinname +
+                                "(" +
+                                item.branch +
+                                "-" +
+                                item.floor +
+                                ")"
+                        )
+                        : [
+                            combinstationItem.cabinname +
+                            "(" +
+                            item.branch +
+                            "-" +
+                            item.floor +
+                            ")",
+                        ];
+                });
+            });
+            setWorkStationOpt(res?.data?.locationgroupings);
+            setAllWorkStationOpt(
+                result.flat()?.map((d) => ({
+                    ...d,
+                    label: d,
+                    value: d,
+                }))
+            );
+        } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    };
+    useEffect(() => {
+        fetchWorkStation();
+    }, []);
+    //Boardingupadate updateby edit page...
+    let updateby = empaddform?.updatedby;
+    let addedby = empaddform?.addedby;
+    let username = isUserRoleAccess.username;
+    //edit post call.
+    let boredit = empaddform?._id;
+    // info model
+    const [openInfo, setOpeninfo] = useState(false);
+    const handleCloseinfo = () => { setOpeninfo(false); };
+    const handleClickOpenInfo = () => {
+        setOpenview(true);
+    }
+    // Error Popup model
+    const [isErrorOpen, setIsErrorOpen] = useState(false);
+    const [showAlert, setShowAlert] = useState();
+    const handleClickOpenerr = () => {
+        setIsErrorOpen(true);
+    };
+    const handleCloseerr = () => {
+        setIsErrorOpen(false);
+    };
+    //  PDF
+    let exportColumnNames = ["Date", "Project", "Vendor", "Queue", "Loginid", "Company", "Branch", "Unit", "Team", "Employeename", "Accuracy", "Totalfield"];
+    let exportRowValues = ["date", "project", "vendor", "queue", "loginid", "company", "branch", "unit", "team", "employeename", "accuracy", "totalfield"];
+    // Excel
+    const fileName = "Overall Achieved Accuracy Individual List";
+    //print...
+    const componentRef = useRef();
+    const handleprint = useReactToPrint({
+        content: () => componentRef.current,
+        documentTitle: "Overall Achieved Accuracy Individual List",
+        pageStyle: "print",
+    });
+    useEffect(() => {
+        fetchAchievedAccuracyIndividual();
+    }, []);
+    //table entries ..,.
+    const [items, setItems] = useState([]);
+    const addSerialNumber = (datas) => {
+
+        setItems(datas);
+        setOverallItems(datas);
+    };
+    useEffect(() => {
+        addSerialNumber(employees);
+    }, [employees]);
+    //Datatable
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+        setSelectedRows([]);
+        setSelectAllChecked(false)
+    };
+    const handlePageSizeChange = (event) => {
+        setPageSize(Number(event.target.value));
+        setSelectedRows([]);
+        setSelectAllChecked(false)
+        setPage(1);
+    };
+    //datatable....
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
+    // Split the search query into individual terms
+    const searchTerms = searchQuery.toLowerCase().split(" ");
+    // Modify the filtering logic to check each term
+    const filteredDatas = items?.filter((item) => {
+        return searchTerms.every((term) =>
+            Object.values(item).join(" ").toLowerCase().includes(term)
+        );
+    });
+    const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
+    const totalPages = Math.ceil(employees.length / pageSize);
+    const visiblePages = Math.min(totalPages, 3);
+    const firstVisiblePage = Math.max(1, page - 1);
+    const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
+    const pageNumbers = [];
+    for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
+        pageNumbers.push(i);
+    }
+    const [selectAllChecked, setSelectAllChecked] = useState(false);
+    const CheckboxHeader = ({ selectAllChecked, onSelectAll }) => (
+        <div>
+            <Checkbox
+                checked={selectAllChecked}
+                onChange={onSelectAll}
+            />
+        </div>
+    );
+    const columnDataTable = [
+        
+        {
+            field: "serialNumber", headerName: "SNo",
+            flex: 0, width: 75, hide: !columnVisibility.serialNumber, headerClassName: "bold-header", pinned: 'left',
+
+        },
+        { field: "date", headerName: "Date", flex: 0, width: 200, hide: !columnVisibility.date, headerClassName: "bold-header", pinned: 'left' },
+        { field: "project", headerName: "Project", flex: 0, width: 200, hide: !columnVisibility.project, headerClassName: "bold-header", pinned: 'left' },
+        { field: "vendor", headerName: "Vendor", flex: 0, width: 200, hide: !columnVisibility.vendor, headerClassName: "bold-header" },
+        { field: "queue", headerName: "Queue", flex: 0, width: 200, hide: !columnVisibility.queue, headerClassName: "bold-header" },
+        { field: "loginid", headerName: "Login ID", flex: 0, width: 200, hide: !columnVisibility.loginid, headerClassName: "bold-header" },
+        { field: "company", headerName: "Company", flex: 0, width: 100, hide: !columnVisibility.company, headerClassName: "bold-header" },
+        { field: "branch", headerName: "Branch", flex: 0, width: 200, hide: !columnVisibility.branch, headerClassName: "bold-header" },
+        { field: "unit", headerName: "Unit", flex: 0, width: 100, hide: !columnVisibility.unit, headerClassName: "bold-header" },
+        { field: "team", headerName: "Team", flex: 0, width: 100, hide: !columnVisibility.team, headerClassName: "bold-header" },
+        { field: "employeename", headerName: "Employee Name", flex: 0, width: 100, hide: !columnVisibility.employeename, headerClassName: "bold-header" },
+        { field: "accuracy", headerName: "Accuracy", flex: 0, width: 100, hide: !columnVisibility.accuracy, headerClassName: "bold-header" },
+        { field: "totalfield", headerName: "Total Field", flex: 0, width: 100, hide: !columnVisibility.totalfield, headerClassName: "bold-header" },
+        {
+            field: "actions",
+            headerName: "Action",
+            flex: 0,
+            width: 100,
+            minHeight: '40px !important',
+            sortable: false,
+            hide: !columnVisibility.actions,
+            headerClassName: "bold-header",
+            // Assign Bank Detail
+            cellRenderer: (params) => (
+                <Grid sx={{ display: 'flex' }}>
+                    {isUserRoleCompare?.includes("voverallacheivedaccuracyindividuallist") && (
+                        <Button
+                            sx={userStyle.buttonedit}
+                            onClick={() => {
+
+                                getinfoCode(params.data);
+                            }}
+                        >
+                            <VisibilityOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonview} />
+                        </Button>
+                    )}
+                    &ensp;
+                </Grid>
+            ),
+        },
+    ]
+    const rowDataTable = filteredData.map((item, index) => {
+        return {
+            serialNumber: item.serialNumber,
+            id: item.id,
+            date: item.date,
+            project: item.project,
+            vendor: item.vendor,
+            queue: item.queue,
+            loginid: item.loginid,
+            company: item.company,
+            branch: item.branch,
+            unit: item.unit,
+            team: item.team,
+            employeename: item.employeename,
+            accuracy: item.accuracy,
+            totalfield: item.totalfield
+        }
+    });
+    const rowsWithCheckboxes = rowDataTable.map((row) => ({
+        ...row,
+        // Create a custom field for rendering the checkbox
+        checkbox: selectedRows.includes(row.id),
+    }));
+    // Show All Columns functionality
+    const handleShowAllColumns = () => {
+        const updatedVisibility = { ...columnVisibility };
+        for (const columnKey in updatedVisibility) {
+            updatedVisibility[columnKey] = true;
+        }
+        setColumnVisibility(updatedVisibility);
+    };
+    useEffect(() => {
+        // Save column visibility to localStorage whenever it changes
+        localStorage.setItem("columnVisibility", JSON.stringify(columnVisibility));
+    }, [columnVisibility]);
+    useEffect(() => {
+        // Retrieve column visibility from localStorage (if available)
+        const savedVisibility = localStorage.getItem("columnVisibility");
+        if (savedVisibility) {
+            setColumnVisibility(JSON.parse(savedVisibility));
+        }
+    }, []);
+
+    // // Function to filter columns based on search query
+    const filteredColumns = columnDataTable.filter((column) =>
+        column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
+    );
+    // Manage Columns functionality
+    const toggleColumnVisibility = (field) => {
+        setColumnVisibility((prevVisibility) => ({
+            ...prevVisibility,
+            [field]: !prevVisibility[field],
+        }));
+    };
+    // JSX for the "Manage Columns" popover content
+    const manageColumnsContent = (
+        <Box style={{ padding: "10px", minWidth: "325px", '& .MuiDialogContent-root': { padding: '10px 0' } }} >
+            <Typography variant="h6">Manage Columns</Typography>
+            <IconButton
+                aria-label="close"
+                onClick={handleCloseManageColumns}
+                sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                }}
+            >
+                <CloseIcon />
+            </IconButton>
+            <Box sx={{ position: 'relative', margin: '10px' }}>
+                <TextField
+                    label="Find column"
+                    variant="standard"
+                    fullWidth
+                    value={searchQueryManage}
+                    onChange={(e) => setSearchQueryManage(e.target.value)}
+                    sx={{ marginBottom: 5, position: 'absolute', }}
+                />
+            </Box><br /><br />
+            <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+                <List sx={{ overflow: 'auto', height: '100%', }}>
+                    {filteredColumns.map((column) => (
+                        <ListItem key={column.field}>
+                            <ListItemText sx={{ display: 'flex' }}
+                                primary={
+                                    <Switch sx={{ marginTop: "-5px" }} size="small"
+                                        checked={columnVisibility[column.field]}
+                                        onChange={() => toggleColumnVisibility(column.field)}
+                                    />
+                                }
+                                secondary={(column.field === "checkbox") ? "Checkbox" : column.headerName}
+                            />
+                        </ListItem>
+                    ))}
+                </List>
+            </DialogContent>
+            <DialogActions>
+                <Grid container>
+                    <Grid item md={4}>
+                        <Button
+                            variant="text"
+                            sx={{ textTransform: 'none', }}
+                            onClick={() => setColumnVisibility(initialColumnVisibility)}
+                        >
+                            Show All
+                        </Button>
+                    </Grid>
+                    <Grid item md={4}></Grid>
+                    <Grid item md={4}>
+                        <Button
+                            variant="text"
+                            sx={{ textTransform: 'none' }}
+                            onClick={() => {
+                                const newColumnVisibility = {};
+                                columnDataTable.forEach((column) => {
+                                    newColumnVisibility[column.field] = false; // Set hide property to true
+                                });
+                                setColumnVisibility(newColumnVisibility);
+                            }}
+                        >
+                            Hide All
+                        </Button>
+                    </Grid>
+                </Grid>
+            </DialogActions>
+        </Box>
+    );
+    const [fileFormat, setFormat] = useState('')
+    return (
+        <Box>
+            {/* ****** Header Content ****** */}
+            <Headtitle title={"OVERALL ACHIEVED ACCURACY INDIVIDUAL LIST"} />
+            <PageHeading
+                title="Overall Achieved Accuracy Individual List"
+                modulename="Quality"
+                submodulename="Accuracy"
+                mainpagename="Overall Acheived Accuracy Individual List"
+                subpagename=""
+                subsubpagename=""
+            />
+
+            <br />
+            {isUserRoleCompare?.includes("loverallacheivedaccuracyindividuallist") && (
+                <>
+                    <Box sx={userStyle.container}>
+                        { /* ******************************************************EXPORT Buttons****************************************************** */}
+                        <Grid item xs={8}>
+                            <Typography sx={userStyle.importheadtext}>Overall Achieved Accuracy Individual List</Typography>
+                        </Grid>
+                        <br />
+                        <Grid container spacing={2} style={userStyle.dataTablestyle}>
+                            <Grid item md={2} xs={12} sm={12}>
+                                <Box>
+                                    <label >Show entries:</label>
+                                    <Select id="pageSizeSelect" value={pageSize}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                style: {
+                                                    maxHeight: 180,
+                                                    width: 80,
+                                                },
+                                            },
+                                        }}
+                                        onChange={handlePageSizeChange} sx={{ width: "77px" }}>
+                                        <MenuItem value={1}>1</MenuItem>
+                                        <MenuItem value={5}>5</MenuItem>
+                                        <MenuItem value={10}>10</MenuItem>
+                                        <MenuItem value={25}>25</MenuItem>
+                                        <MenuItem value={50}>50</MenuItem>
+                                        <MenuItem value={100}>100</MenuItem>
+                                        <MenuItem value={(employees?.length)}>All</MenuItem>
+                                    </Select>
+                                </Box>
+                            </Grid>
+                            <Grid item md={6} xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                <Box >
+                                    {isUserRoleCompare?.includes("exceloverallacheivedaccuracyindividuallist") && (
+                                        <>
+                                            <Button onClick={(e) => {
+                                                setIsFilterOpen(true)
+                                                fetchAchievedAccuracyIndividualArray()
+                                                setFormat("xl")
+                                            }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
+                                        </>
+                                    )}
+                                    {isUserRoleCompare?.includes("csvoverallacheivedaccuracyindividuallist") && (
+                                        <>
+                                            <Button onClick={(e) => {
+                                                setIsFilterOpen(true)
+                                                fetchAchievedAccuracyIndividualArray()
+                                                setFormat("csv")
+                                            }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
+                                        </>
+                                    )}
+                                    {isUserRoleCompare?.includes("printoverallacheivedaccuracyindividuallist") && (
+                                        <>
+                                            <Button sx={userStyle.buttongrp} onClick={handleprint}>&ensp;<FaPrint />&ensp;Print&ensp;</Button>
+                                        </>
+                                    )}
+                                    {isUserRoleCompare?.includes("pdfoverallacheivedaccuracyindividuallist") && (
+                                        <>
+                                            <Button sx={userStyle.buttongrp}
+                                                onClick={() => {
+                                                    setIsPdfFilterOpen(true)
+                                                    fetchAchievedAccuracyIndividualArray()
+                                                }}
+                                            ><FaFilePdf />&ensp;Export to PDF&ensp;</Button>
+                                        </>
+                                    )}
+                                    {isUserRoleCompare?.includes("imageoverallacheivedaccuracyindividuallist") && (
+                                        <Button sx={userStyle.buttongrp}
+                                            onClick={handleCaptureImage}> <ImageIcon sx={{ fontSize: "15px" }} />  &ensp;Image&ensp; </Button>
+                                    )}
+                                </Box >
+                            </Grid>
+                            <Grid item md={4} xs={6} sm={6}>
+                                <AggregatedSearchBar columnDataTable={columnDataTable} setItems={setItems} addSerialNumber={addSerialNumber} setPage={setPage} maindatas={employees} setSearchedString={setSearchedString}
+                                    searchQuery={searchQuery}
+                                    setSearchQuery={setSearchQuery}
+                                    paginated={false}
+                                    totalDatas={overallItems}
+                                />
+                            </Grid>
+                        </Grid>
+                        <br />
+                        <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>Show All Columns</Button>&ensp;
+                        <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>Manage Columns</Button>&ensp;
+                        <br /><br />
+                        {!isBankdetail ?
+                            <>
+                                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                    <ThreeDots
+                                        height="80"
+                                        width="80"
+                                        radius="9"
+                                        color="#1976d2"
+                                        ariaLabel="three-dots-loading"
+                                        wrapperStyle={{}}
+                                        wrapperClassName=""
+                                        visible={true}
+                                    />
+                                </Box>
+                            </>
+                            :
+                            <>
+                                <AggridTable
+                                    rowDataTable={rowDataTable}
+                                    columnDataTable={columnDataTable}
+                                    columnVisibility={columnVisibility}
+                                    page={page}
+                                    setPage={setPage}
+                                    pageSize={pageSize}
+                                    totalPages={totalPages}
+                                    setColumnVisibility={setColumnVisibility}
+                                    isHandleChange={isHandleChange}
+                                    items={items}
+                                    selectedRows={selectedRows}
+                                    setSelectedRows={setSelectedRows}
+                                    gridRefTable={gridRefTable}
+                                    paginated={false}
+                                    filteredDatas={filteredDatas}
+                                    handleShowAllColumns={handleShowAllColumns}
+                                    setFilteredRowData={setFilteredRowData}
+                                    filteredRowData={filteredRowData}
+                                    setFilteredChanges={setFilteredChanges}
+                                    filteredChanges={filteredChanges}
+                                    gridRefTableImg={gridRefTableImg}
+                                    itemsList={overallItems}
+                                />
+                            </>}
+                    </Box>
+                </>
+            )}
+            {/* Manage Column */}
+            <Popover
+                id={id}
+                open={isManageColumnsOpen}
+                anchorEl={anchorEl}
+                onClose={handleCloseManageColumns}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                {manageColumnsContent}
+            </Popover>
+            {/* view model */}
+            <Dialog
+                open={openview}
+                onClose={handleClickOpenview}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                maxWidth='md'
+            >
+                <Box sx={{ padding: '20px 50px' }}>
+                    <>
+                        <Typography sx={userStyle.HeaderText}>View Overall Achieved Accuracy Individual List</Typography>
+                        <br /><br />
+                        <Grid container spacing={2}>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Date</Typography>
+                                    <Typography>{overallList.date}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl size="small" fullWidth>
+                                    <Typography variant="h6"> Project</Typography>
+                                    <Typography>{overallList.project}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Vendor</Typography>
+                                    <Typography>{overallList.vendor}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Queue</Typography>
+                                    <Typography>{overallList.queue}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Login ID</Typography>
+                                    <Typography>{overallList.loginid}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Company</Typography>
+                                    <Typography>{overallList.company}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Branch</Typography>
+                                    <Typography>{overallList.branch}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Unit</Typography>
+                                    <Typography>{overallList.unit}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Team</Typography>
+                                    <Typography>{overallList.team}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Employee Name</Typography>
+                                    <Typography>{overallList.employeename}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Accuracy</Typography>
+                                    <Typography>{overallList.accuracy}</Typography>
+                                </FormControl>
+                            </Grid>
+                            <Grid item md={4} xs={12} sm={12} >
+                                <FormControl fullWidth size="small" >
+                                    <Typography variant="h6">Total Field</Typography>
+                                    <Typography>{overallList.totalfield}</Typography>
+                                </FormControl>
+                            </Grid>
+                        </Grid>
+                        <br /> <br /> <br /> <br />
+                        <Grid container spacing={2}>
+                            <Button variant="contained" color="primary" onClick={handleCloseview} sx={buttonStyles.btncancel}> Back </Button>
+                        </Grid>
+                    </>
+                </Box>
+            </Dialog>
+            <Dialog
+                open={isErrorOpen}
+                onClose={handleCloseerr}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+                    <Typography variant="h6">{showAlert}</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" color="error" onClick={handleCloseerr}>
+                        ok
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* print layout */}
+            <TableContainer component={Paper} sx={userStyle.printcls}>
+                <Table aria-label="simple table" id="branch" ref={componentRef}>
+                    <TableHead sx={{ fontWeight: "600" }}>
+                        <StyledTableRow>
+                            <StyledTableCell>SI.NO</StyledTableCell>
+                            <StyledTableCell>Date</StyledTableCell>
+                            <StyledTableCell>Project</StyledTableCell>
+                            <StyledTableCell>Vendor</StyledTableCell>
+                            <StyledTableCell>Queue</StyledTableCell>
+                            <StyledTableCell>Login ID</StyledTableCell>
+                            <StyledTableCell>Accuracy</StyledTableCell>
+                            <StyledTableCell>Totalfield</StyledTableCell>
+                            <StyledTableCell>Company</StyledTableCell>
+                            <StyledTableCell>Branch</StyledTableCell>
+                            <StyledTableCell>Unit</StyledTableCell>
+                            <StyledTableCell>Team</StyledTableCell>
+                            <StyledTableCell>Employeename</StyledTableCell>
+                        </StyledTableRow>
+                    </TableHead>
+                    <TableBody>
+                        {rowDataTable &&
+                            rowDataTable.map((row, index) => (
+                                <StyledTableRow key={index}>
+                                    <StyledTableCell>{index + 1}</StyledTableCell>
+                                    <StyledTableCell>{row.date} </StyledTableCell>
+                                    <StyledTableCell> {row.project}</StyledTableCell>
+                                    <StyledTableCell> {row.vendor}</StyledTableCell>
+                                    <StyledTableCell> {row.queue}</StyledTableCell>
+                                    <StyledTableCell> {row.loginid}</StyledTableCell>
+                                    <StyledTableCell> {row.accuracy}</StyledTableCell>
+                                    <StyledTableCell> {row.totalfield}</StyledTableCell>
+                                    <StyledTableCell> {row.company}</StyledTableCell>
+                                    <StyledTableCell> {row.branch}</StyledTableCell>
+                                    <StyledTableCell> {row.unit}</StyledTableCell>
+                                    <StyledTableCell> {row.team}</StyledTableCell>
+                                    <StyledTableCell> {row.employeename}</StyledTableCell>
+                                </StyledTableRow>
+                            ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <ExportData
+                isFilterOpen={isFilterOpen}
+                handleCloseFilterMod={handleCloseFilterMod}
+                fileFormat={fileFormat}
+                setIsFilterOpen={setIsFilterOpen}
+                isPdfFilterOpen={isPdfFilterOpen}
+                setIsPdfFilterOpen={setIsPdfFilterOpen}
+                handleClosePdfFilterMod={handleClosePdfFilterMod}
+                filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
+                itemsTwo={employeesArray ?? []}
+                filename={"Overall Achieved Accuracy Individual List"}
+                exportColumnNames={exportColumnNames}
+                exportRowValues={exportRowValues}
+                componentRef={componentRef}
+            />
+            <MessageAlert
+                openPopup={openPopupMalert}
+                handleClosePopup={handleClosePopupMalert}
+                popupContent={popupContentMalert}
+                popupSeverity={popupSeverityMalert}
+            />
+        </Box>
+    );
+}
+
+export default OverallAchievedAccuracyIndividualList;

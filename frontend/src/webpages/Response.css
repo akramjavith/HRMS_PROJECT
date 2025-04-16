@@ -1,0 +1,140 @@
+@import url(https://fonts.googleapis.com/css?family=Kaushan+Script|Source+Sans+Pro);
+
+* {
+    box-sizing: border-box;
+    /* outline:1px solid ;*/
+}
+
+.container {
+    background: #ffffff !important;
+    background: linear-gradient(to bottom, #ffffff 0%, #e1e8ed 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e1e8ed', GradientType=0);
+    height: 100% !important;
+    margin: 0 !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+
+}
+
+.wrapper-1 {
+    width: 100% !important;
+    height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.wrapper-2 {
+    padding: 30px !important;
+    text-align: center !important;
+}
+
+h1 {
+    font-family: 'Kaushan Script', cursive !important;
+    font-size: 4em !important;
+    letter-spacing: 3px !important;
+    color: #fab316 !important;
+    margin: 0 !important;
+    margin-bottom: 20px !important;
+    text-shadow: -1px -2px 3px rgba(17, 17, 17, 0.3) !important;
+}
+
+.wrapper-2 p {
+    margin: 0 !important;
+    font-size: 1.3em !important;
+    color: #aaa !important;
+    font-family: 'Source Sans Pro', sans-serif !important;
+    letter-spacing: 1px !important;
+}
+
+.go-home {
+    color: #fff !important;
+    background: #5a483a !important;
+    border: none !important;
+    padding: 10px 50px !important;
+    margin: 30px 0 !important;
+    border-radius: 30px !important;
+    text-transform: capitalize !important;
+    box-shadow: 0 10px 16px 1px rgba(174, 199, 251, 1) !important;
+}
+
+.footer-like {
+    margin-top: auto !important;
+    background: #D7E6FE !important;
+    padding: 6px !important;
+    text-align: center !important;
+}
+
+.footer-like p {
+    margin: 0 !important;
+    padding: 4px !important;
+    color: #5892FF !important;
+    font-family: 'Source Sans Pro', sans-serif !important;
+    letter-spacing: 1px !important;
+}
+
+.footer-like p a {
+    text-decoration: none !important;
+    color: #5892FF !important;
+    font-weight: 600 !important;
+}
+
+@media (min-width:360px) {
+    h1 {
+        font-size: 4.5em !important;
+    }
+
+    .go-home {
+        margin-bottom: 20px !important;
+    }
+}
+
+@media (min-width:600px) {
+    /* .content {
+        max-width: 1000px !important;
+        margin: 0 auto !important;
+    } */
+
+    .wrapper-1 {
+        height: initial !important;
+        max-width: 620px !important;
+        margin: 0 auto !important;
+        margin-top: 50px !important;
+        box-shadow: 4px 8px 40px 8px rgba(88, 146, 255, 0.2) !important;
+    }
+
+}
+
+.icon {
+    font-size: 2em;
+    /* or specify the size of the image */
+    /* Animation properties */
+    animation-name: shake !important;
+    animation-duration: 5s !important;
+    animation-iteration-count: infinite !important;
+    animation-iteration-count: 1 !important;
+    height: 150px !important;
+    width: auto !important;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateY(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateY(5px);
+    }
+}

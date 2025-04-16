@@ -1,0 +1,103 @@
+/* .indicatorwebsite {
+  height: auto;
+  background-image: url("../images/sidebarbg.jpg");
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+}
+
+.indicatorwebsite li {
+  margin-top: 30px;
+  list-style-type: none;
+  margin-right: 10px;
+  color: #6076d1;
+  text-align: left !important;
+  cursor: pointer;
+  font-family: "Jost", sans-serif;
+  font-weight: bold;
+}
+
+.indicatorwebsite li.active {
+  color: #f7f7f7;
+}
+
+.indicatorverticalwebsite {
+  background-image: url("../images/sidebarbg.jpg");
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.indicatorverticalwebsite li {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  list-style-type: none !important;
+  color: #6076d1;
+  text-align: left !important;
+  cursor: pointer;
+  font-family: "Jost", sans-serif;
+  font-weight: bold;
+  display: flex !important;
+  justify-content: space-evenly;
+
+  @media only screen and (max-width: 500px) {
+    /* font-size: 10px; */
+  /* }
+}
+
+.indicatorverticalwebsite li.active {
+  color: #f7f7f7;
+} */ 
+
+.indicatorwebsite {
+  height: auto;
+  background-image: url("../images/sidebarbg.jpg");
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+}
+
+.indicatorwebsite li {
+  margin-top: 30px;
+  list-style-type: none;
+  margin-right: 10px;
+  color: #6076d1;
+  text-align: left !important;
+  cursor: pointer;
+  font-family: "Jost", sans-serif;
+  font-weight: bold;
+}
+
+.indicatorwebsite li.active {
+  color: #f7f7f7;
+}
+
+.indicatorverticalwebsite {
+  background-image: url("../images/sidebarbg.jpg");
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.indicatorverticalwebsite li {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  list-style-type: none !important;
+  color: #6076d1;
+  text-align: left !important;
+  cursor: pointer;
+  font-family: "Jost", sans-serif;
+  font-weight: bold;
+  display: flex !important;
+  justify-content: space-evenly;
+
+  @media only screen and (max-width: 500px) {
+    /* font-size: 10px; */
+  }
+}
+
+.indicatorverticalwebsite li.active {
+  color: #f7f7f7;
+}

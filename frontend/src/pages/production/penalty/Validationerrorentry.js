@@ -31,6 +31,7 @@ import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 
 function ValidationErroEntry() {
     const [loaderList, setLoaderList] = useState(false);
+    const [loaderListnew, setLoaderListnew] = useState(false);
     const [filterList, setFilterList] = useState([]);
     const [loginIdOptFilter, setClientLoginIDOptFilter] = useState([]);
 

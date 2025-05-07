@@ -19,6 +19,9 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import moment from "moment-timezone";
 import { useLoading } from "./ApiStatusContext";
 import { SERVICE } from "../services/Baseservice";
+import Calculator from './Calculator';
+import { BiCalculator } from 'react-icons/bi';
+import { navbarStyle } from "./Stylenavbar";
 
 const ITEM_HEIGHT = 40;
 const ITEM_PADDING_TOP = 8;
@@ -35,12 +38,18 @@ const Navnew = ({ headerHeight }) => {
 
   const { auth, setAuth } = useContext(AuthContext);
 
+  const [anchorElcal, setAnchorElcal] = useState(null);
+  const opencal = Boolean(anchorElcal);
+  const handleClickcal = (event) => { setAnchorElcal(event.currentTarget); };
+  const handleClosecal = () => { setAnchorElcal(null); };
+
   const {
     isUserRoleAccess,
     isUserRoleCompare,
     setIsAssignBranch,
     isAssignBranch,
     listPageAccessMode,
+    buttonStyles
   } = useContext(UserRoleAccessContext);
 
   const { v4: uuidv4 } = require('uuid');
@@ -948,7 +957,7 @@ const Navnew = ({ headerHeight }) => {
     return valueCateEdit.map(({ label }) => label).join(", ");
   };
 
-  console.log(isUserRoleCompare?.includes("lnoticeperiodscheduledmeetinglist"))
+  console.log(buttonStyles?.navbar?.backgroundColor,"color")
 
   return (
     <>
@@ -1185,6 +1194,36 @@ const Navnew = ({ headerHeight }) => {
               </MenuItem>
             }
           </Menu>
+         {/* calculator */}
+            <Button
+              id="demo-customized-button"
+              aria-controls={opencal ? 'demo-customized-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={opencal ? 'true' : undefined}
+              disableElevation
+              onClick={handleClickcal}
+              sx={{...navbarStyle.navbarrightbtn,marginTop:"3px"}}
+            >
+              <BiCalculator></BiCalculator>
+            </Button>
+
+
+            <Menu
+              id="demo-customized-menu"
+              MenuListProps={{
+                'aria-labelledby': 'demo-customized-button',
+              }}
+              sx={{top:"22px",transition:"none"}}
+              anchorEl={anchorElcal}
+              open={opencal}
+              onClose={handleClosecal}
+            >
+              <MenuItem disableRipple
+              >
+                <Calculator />
+              </MenuItem>
+            </Menu>
+         {/* calculator */}
           <Stack direction="row" spacing={2} sx={{ cursor: "pointer" }}>
             <div>
               <Box

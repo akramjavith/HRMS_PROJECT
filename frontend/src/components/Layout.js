@@ -267,7 +267,7 @@ const Layout = () => {
         sx={{
           position: "fixed",
           top: showNavbar ? 85 : 20,
-          right: showNavbar ? 250 : 48,
+          right: showNavbar ? 300 : 58,
           zIndex: 1499,
           transition: 'margin-top 1s ease, right 1s ease',
 
@@ -296,7 +296,7 @@ const Layout = () => {
         <FormControlLabel sx={{
           position: "fixed",
           top: showNavbar ? 85 : 20,
-          right: showNavbar ? 202 : 0,
+          right: showNavbar ? 252 : 0,
           zIndex: 1499,
           transition: 'margin-top 1s ease, right 1s ease',
         }}
@@ -308,7 +308,7 @@ const Layout = () => {
       {
         showScroll && (
           <Button onClick={handleScroll} sx={{
-            position: "fixed", bottom: 30, right: 30,
+            position: "fixed", bottom: 30, right: 40,
             // zIndex: 2000, 
             color: "black",
             minWidth: '50px',

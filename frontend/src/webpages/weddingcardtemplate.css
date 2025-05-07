@@ -1,0 +1,226 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
+
+@font-face {
+    font-family: Cookie;
+    src: url(Cookie-Regular.ttf);
+  }
+  
+  @font-face {
+    font-family: Poppins;
+    src: url(Poppins-ExtraLight.ttf);
+  }
+  #weddingdivtwo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+  #wedding-card {
+    position: relative;
+    width: 500px;
+    height: 520px;
+    background-image: url(weddingtemplate.png);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+  }
+  .companylogowedding {
+    position: absolute;
+    top: 15px;
+    right: 195px;
+  }
+  
+  .companylogowedding img {
+    width: 95px;
+    height: 95px;
+  }
+  #profileImgwedding {
+    position: absolute;
+    top: 220px;
+    left: 175px;
+    display: flex;
+    flex-direction: column;
+  }
+  #profileImgwedding img {
+    transform: rotate(0deg); 
+    width: 150px;
+    height: 150px;
+    border-radius: 3px;
+  }
+  
+  .usernamewedding {
+    transform: rotate(0deg); 
+    text-align: center;
+    font-family: "League Spartan" , cursive;
+    font-weight: 900;
+    font-style: bold;
+    font-size: 20px;
+    margin-top: 5px;
+  }
+  
+  .bdaydobwedding {
+    position: absolute;
+    text-align: center;
+    bottom: 110px;
+    left: 22px;
+    width: 460px;
+    font-family: "League Spartan" , serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    word-spacing: 1px;
+    margin-bottom: 1px;
+  }
+  .bdaywisheswedding {
+    position: absolute;
+    text-align: center;
+    bottom: 48px;
+    left: 84px;
+    width: 360px;
+    font-family: "League Spartan" , serif;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    word-spacing: 1px;
+  }
+  
+  .bdayfootertextwedding {
+    position: absolute;
+    bottom: 10px;
+    left: 220px;
+    font-family: "League Spartan" , serif;
+  }
+  
+  .download-button-wrapper {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+  }
+  
+  .download-button-wrapper button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .download-button-wrapper button:hover {
+    background-color: #45a049;
+  }
+  
+  /* Media Queries for Tablet View */
+  @media only screen and (max-width: 768px) {
+    #wedding-card {
+      width: 400px;
+      height: 450px;
+    }
+  
+    .companylogowedding {
+      position: absolute;
+      top: 30px;
+      right: 150px;
+    }
+    .companylogowedding img {
+      width: 80px;
+      height: 80px;
+    }
+  
+    #profileImgwedding {
+      position: absolute;
+      top: 190px;
+      left: 147px;
+    }
+    #profileImgwedding img {
+      width: 110px;
+      height: 110px;
+    }
+  
+    .usernamewedding {
+      font-size: 18px;
+    }
+  
+    .bdaydobwedding {
+      width: 360px;
+      font-size: 16px;
+    }
+    .bdaywisheswedding {
+      width: 300px;
+      font-size: 16px;
+      left: 60px;
+      bottom: 62px;
+    }
+  
+    .bdayfootertextwedding {
+      left: 160px;
+      bottom: 35px;
+    }
+  }
+  
+  /* Media Queries for Mobile View */
+  @media only screen and (max-width: 480px) {
+    #wedding-card {
+      width: 300px;
+      height: 380px;
+      margin-top: 150px;
+    }
+    .companylogowedding {
+      position: absolute;
+      top: 45px;
+      right: 115px;
+    }
+    .companylogowedding img {
+      width: 55px;
+      height: 55px;
+    }
+  
+    #profileImgwedding {
+      top: 165px;
+      left: 110px;
+      gap: 5px;
+    }
+  
+    #profileImgwedding img {
+      width: 90px;
+      height: 90px;
+    }
+  
+    .usernamewedding {
+      font-size: 12px;
+      margin-top: 0px;
+    }
+  
+    .bdaydobwedding {
+      width: 260px;
+      font-size: 12px;
+      letter-spacing: 0px;
+      word-spacing: 0px;
+      bottom: 96px;
+      left: 24px;
+    }
+    .bdaywisheswedding {
+      width: 200px;
+      font-size: 12px;
+      letter-spacing: 0px;
+      word-spacing: 0px;
+      bottom: 61px;
+      left: 60px;
+    }
+  
+    .bdayfootertextwedding {
+      left: 124px;
+      bottom: 40px;
+      font-size: 12px;
+    }
+  
+    .download-button-wrapper {
+      position: fixed;
+      top: 0px;
+      right: 0px;
+      z-index: 1000;
+    }
+  }

@@ -1,0 +1,190 @@
+@font-face {
+  font-family: Cookie;
+  src: url(Cookie-Regular.ttf);
+}
+
+@font-face {
+  font-family: Poppins;
+  src: url(Poppins-ExtraLight.ttf);
+}
+#birthdaydiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+#birthday-card {
+  position: relative;
+  width: 500px;
+  height: 520px;
+  background-image: url(birthdaypost3.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+}
+.companylogo {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+}
+
+.companylogo img {
+  width: 90px;
+  height: 90px;
+}
+#profileImg {
+  position: absolute;
+  top: 130px;
+  left: 40px;
+  display: flex;
+  flex-direction: column;
+}
+#profileImg img {
+  transform: rotate(2deg);
+  width: 185px;
+  height: 185px;
+}
+
+.username {
+  transform: rotate(2deg);
+  text-align: center;
+  font-family: "Cookie", cursive;
+  font-weight: 900;
+  font-style: bold;
+  font-size: 20px;
+}
+
+.bdaywishes {
+  position: absolute;
+  text-align: center;
+  bottom: 80px;
+  left: 30px;
+  width: 460px;
+  font-family: Poppins, serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  word-spacing: 1px;
+}
+
+.bdayfootertext {
+  position: absolute;
+  bottom: 10px;
+  left: 220px;
+}
+
+.download-button-wrapper {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+}
+
+.download-button-wrapper button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.download-button-wrapper button:hover {
+  background-color: #45a049;
+}
+
+/* Media Queries for Tablet View */
+@media only screen and (max-width: 768px) {
+  #birthday-card {
+    width: 400px;
+    height: 450px;
+  }
+
+  .companylogo {
+    position: absolute;
+    top: 30px;
+  }
+  .companylogo img {
+    width: 70px;
+    height: 70px;
+  }
+
+  #profileImg {
+    position: absolute;
+    top: 120px;
+    left: 30px;
+  }
+  #profileImg img {
+    width: 150px;
+    height: 150px;
+  }
+
+  .username {
+    font-size: 18px;
+  }
+
+  .bdaywishes {
+    width: 360px;
+    font-size: 16px;
+  }
+
+  .bdayfootertext {
+    left: 160px;
+    bottom: 35px;
+  }
+}
+
+/* Media Queries for Mobile View */
+@media only screen and (max-width: 480px) {
+  #birthday-card {
+    width: 300px;
+    height: 380px;
+    margin-top: 150px;
+  }
+  .companylogo {
+    position: absolute;
+    top: 45px;
+    right: 10px;
+  }
+  .companylogo img {
+    width: 55px;
+    height: 55px;
+  }
+
+  #profileImg {
+    top: 110px;
+    left: 25px;
+    gap: 5px;
+  }
+
+  #profileImg img {
+    width: 110px;
+    height: 110px;
+  }
+
+  .username {
+    font-size: 14px;
+  }
+
+  .bdaywishes {
+    width: 260px;
+    font-size: 14px;
+    letter-spacing: 0px;
+    word-spacing: 0px;
+    bottom: 70px;
+  }
+
+  .bdayfootertext {
+    left: 120px;
+    bottom: 40px;
+  }
+
+  .download-button-wrapper {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    z-index: 1000;
+  }
+}

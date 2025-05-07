@@ -1,0 +1,27 @@
+.multistep-css {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.indicatorpage {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.indicatorpage li {
+    list-style-type: none;
+    margin-right: 10px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.indicatorpage li.active {
+    color: #1976d2;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+}

@@ -1,0 +1,321 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
+
+@font-face {
+    font-family: Cookie;
+    src: url(Cookie-Regular.ttf);
+}
+
+@font-face {
+    font-family: Poppins;
+    src: url(Poppins-ExtraLight.ttf);
+}
+
+#weddingtempdivtwo2nos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+#wedding-cardtwo2nos {
+    position: relative;
+    width: 500px;
+    height: 520px;
+    background-image: url(weddingtemplate.png);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+}
+
+.weddinglogotwo2nos {
+    position: absolute;
+    top: 15px;
+    right: 195px;
+}
+
+.weddinglogotwo2nos img {
+    width: 95px;
+    height: 95px;
+}
+
+#weddingImgtwo2nos {
+    position: absolute;
+    top: 220px;
+    left: 270px;
+    display: flex;
+    flex-direction: column;
+}
+
+#weddingImgtwo2nos img {
+    transform: rotate(0deg);
+    width: 150px;
+    height: 150px;
+    border-radius: 3px;
+}
+
+#profileImgweddingtwo2nos {
+    position: absolute;
+    top: 220px;
+    left: 80px;
+    display: flex;
+    flex-direction: column;
+}
+
+#profileImgweddingtwo2nos img {
+    transform: rotate(0deg);
+    width: 150px;
+    height: 150px;
+    border-radius: 3px;
+}
+
+.usernametwowedding2nos {
+    transform: rotate(0deg);
+    text-align: center;
+    font-family: "League Spartan", cursive;
+    font-weight: 900;
+    font-style: bold;
+    font-size: 20px;
+    margin-top: 5px;
+}
+
+.weddingdobtwo2nos {
+    position: absolute;
+    bottom: -16px;
+    left: -150px;
+    width: 460px;
+    font-family: "League Spartan", serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    word-spacing: 1px;
+    margin-bottom: 1px;
+}
+
+.weddingdobtwotwo2nos {
+    position: absolute;
+    text-align: start;
+    bottom: -16px;
+    left: 230px;
+    width: 460px;
+    font-family: "League Spartan", serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    word-spacing: 1px;
+    margin-bottom: 1px;
+}
+
+.weddingwishestwo2nos {
+    position: absolute;
+    text-align: center;
+    bottom: 48px;
+    left: 84px;
+    width: 360px;
+    font-family: "League Spartan", serif;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    word-spacing: 1px;
+}
+
+.weddingfootertexttwo2nos {
+    position: absolute;
+    bottom: 10px;
+    left: 220px;
+    font-family: "League Spartan", serif;
+
+}
+
+.download-button-wrapper {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+}
+
+.download-button-wrapper button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.download-button-wrapper button:hover {
+    background-color: #45a049;
+}
+
+/* Media Queries for Tablet View */
+@media only screen and (max-width: 768px) {
+    #wedding-cardtwo2nos {
+        width: 400px;
+        height: 450px;
+    }
+
+    .weddinglogotwo2nos {
+        position: absolute;
+        top: 30px;
+        right: 150px;
+    }
+
+    .weddinglogotwo2nos img {
+        width: 80px;
+        height: 80px;
+    }
+
+    #weddingImgtwo2nos {
+        position: absolute;
+        top: 190px;
+        left: 230px;
+    }
+
+    #weddingImgtwo2nos img {
+        width: 110px;
+        height: 110px;
+    }
+
+    #profileImgweddingtwo2nos {
+        position: absolute;
+        top: 190px;
+        left: 60px;
+    }
+
+    #profileImgweddingtwo2nos img {
+        width: 110px;
+        height: 110px;
+    }
+
+    .usernametwowedding2nos {
+        font-size: 12px;
+        text-align: center;
+
+    }
+
+    .weddingdobtwotwo2nos {
+        width: 360px;
+        font-size: 12px;
+        position: absolute;
+        left: 195px;
+        bottom: -15px;
+    }
+
+    .weddingdobtwo2nos {
+        width: 360px;
+        font-size: 12px;
+        position: absolute;
+        left: -150px;
+        bottom: -15px;
+    }
+
+    .weddingwishestwo2nos {
+        width: 300px;
+        font-size: 16px;
+        left: 60px;
+        bottom: 62px;
+    }
+
+    .weddingfootertexttwo2nos {
+        left: 160px;
+        bottom: 35px;
+        font-size: 14px;
+    }
+}
+
+/* Media Queries for Mobile View */
+@media only screen and (max-width: 480px) {
+    #wedding-cardtwo2nos {
+        width: 300px;
+        height: 380px;
+        margin-top: 150px;
+    }
+
+    .weddinglogotwo2nos {
+        position: absolute;
+        top: 45px;
+        right: 115px;
+    }
+
+    .weddinglogotwo2nos img {
+        width: 55px;
+        height: 55px;
+    }
+
+    #weddingImgtwo2nos {
+        top: 165px;
+        left: 175px;
+        gap: 5px;
+    }
+
+    #weddingImgtwo2nos img {
+        width: 80px;
+        height: 80px;
+    }
+
+    #profileImgweddingtwo2nos {
+        top: 165px;
+        left: 55px;
+        gap: 5px;
+    }
+
+    #profileImgweddingtwo2nos img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .usernametwowedding2nos {
+        font-size: 12px;
+        top: -10px;
+        margin-top: 0px;
+    }
+
+    .usernametwotwo2nos {
+        font-size: 12px;
+        top: -10px;
+        right: 10px;
+        margin-top: 0px;
+    }
+
+    .weddingdobtwo2nos {
+        width: 260px;
+        font-size: 12px;
+        letter-spacing: 0px;
+        word-spacing: 0px;
+        bottom: -10px;
+        left: -110px;
+    }
+
+    .weddingdobtwotwo2nos {
+        width: 260px;
+        font-size: 12px;
+        letter-spacing: 0px;
+        word-spacing: 0px;
+        bottom: -10px;
+        left: 135px;
+    }
+
+
+    .weddingwishestwo2nos {
+        width: 200px;
+        font-size: 12px;
+        letter-spacing: 0px;
+        word-spacing: 0px;
+        bottom: 61px;
+        left: 60px;
+    }
+
+    .weddingfootertexttwo2nos {
+        left: 120px;
+        bottom: 40px;
+        font-size: 14px;
+    }
+
+    .download-button-wrapper {
+        position: fixed;
+        top: 0px;
+        right: 0px;
+        z-index: 1000;
+    }
+}

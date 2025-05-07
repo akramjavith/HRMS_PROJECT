@@ -1,0 +1,33 @@
+
+export const Hierarchymodulelist = [
+    { label: "Human Resources", value: "Human Resources", module: "Human Resources", submodule: "HR", mainpage: "Shift Details", subpage: "Team Shift Verification", endpage: "Team Shift Verification" },
+    { label: "Human Resources", value: "Human Resources", module: "Human Resources", submodule: "HR", mainpage: "Employee", subpage: "Employee Update Details", subsubpage: "Team Workstation", endpage: "Team Workstation" },
+    { label: "Human Resources", value: "Human Resources", module: "Human Resources", submodule: "HR", mainpage: "Employee", subpage: "Employee Status Details", subsubpage: "Team Login Status", endpage: "Team Login Status" },
+    { label: "Human Resources", value: "Human Resources", module: "Human Resources", submodule: "HR", mainpage: "Employee", subpage: "Employee Status Details", subsubpage: "Team Long Absent Restriction List", endpage: "Team Long Absent Restriction List" },
+    { label: "Human Resources", value: "Human Resources", module: "Human Resources", submodule: "HR", mainpage: "Attendance", subpage: "Attendance Individual", subsubpage: "Team Attendance Status", endpage: "Team Attendance Status" },
+    { label: "Human Resources", value: "Human Resources", module: "Human Resources", submodule: "HR", mainpage: "Employee", subpage: "Employee Details", subsubpage: "Hierarchy Remote Employee List", endpage: "Hierarchy Remote Employee List" },
+    { label: "Queue Priorities", value: "Queue Priorities", module: "Queue Priorities", submodule: "Work Order Consolidated Hierarchy", mainpage: "Primary Hierarchy WorkOrder List", subpage: "", subsubpage: "", endpage: "Primary Hierarchy WorkOrder List" },
+    { label: "Queue Priorities", value: "Queue Priorities", module: "Queue Priorities", submodule: "Work Order Consolidated Hierarchy", mainpage: "Secondary Hierarchy WorkOrder List", subpage: "", subsubpage: "", endpage: "Secondary Hierarchy WorkOrder List" },
+    { label: "Queue Priorities", value: "Queue Priorities", module: "Queue Priorities", submodule: "Work Order Consolidated Hierarchy", mainpage: "Tertiary Hierarchy WorkOrder List", subpage: "", subsubpage: "", endpage: "Tertiary Hierarchy WorkOrder List" },
+    { label: "Queue Priorities", value: "Queue Priorities", module: "Queue Priorities", submodule: "Work Order Consolidated Hierarchy", mainpage: "Other Hierarchy WorkOrder List", subpage: "", subsubpage: "", endpage: "Other Hierarchy WorkOrder List" },
+    { label: "Queue Priorities", value: "Queue Priorities", module: "Queue Priorities", submodule: "Work Order Consolidated Hierarchy", mainpage: "Consolidated(primary/secondary/tertiary) Hierarchy WorkOrder List", subpage: "", subsubpage: "", endpage: "Consolidated(primary/secondary/tertiary) Hierarchy WorkOrder List" },
+    { label: "Queue Priorities", value: "Queue Priorities", module: "Queue Priorities", submodule: "Work Order Consolidated Hierarchy", mainpage: "Consolidated All Hierarchy WorkOrder List", subpage: "", subsubpage: "", endpage: "Consolidated All Hierarchy WorkOrder List" },
+    { label: "Production", value: "Production", module: "Production", submodule: "Manual Entry", mainpage: "Production Manual Entry Filter", subpage: "", subsubpage: "", endpage: "Production Manual Entry Filter" },
+    { label: "Production", value: "Production", module: "Production", submodule: "Reports", mainpage: "Original", subpage: "Team Login Allot", subsubpage: "", endpage: "Team Login Allot" },
+    { label: "Quality", value: "Quality", module: "Quality", submodule: "Penalty", mainpage: "Process Penalty", subpage: "Error Invalid Approval", subsubpage: "", endpage: "Error Invalid Approval" },
+    { label: "Quality", value: "Quality", module: "Quality", submodule: "Penalty", mainpage: "Process Penalty", subpage: "Error Valid Approval", subsubpage: "", endpge: "Error Valid Approval" },
+    { label: "Quality", value: "Quality", module: "Quality", submodule: "Penalty", mainpage: "Process Penalty", subpage: "Error Upload Confirm", subsubpage: "", endpage: "Error Upload Confirm" },
+    { label: "Quality", value: "Quality", module: "Quality", submodule: "Penalty", mainpage: "Penalty Waiver", subpage: "Waiver Employee Forward", subsubpage: "", endpage: "Waiver Employee Forward" },
+    { label: "Quality", value: "Quality", module: "Quality", submodule: "Penalty", mainpage: "Penalty Waiver", subpage: "Approval Employee Waiver", subsubpage: "", endpage: "Approval Employee Waiver" },
+    { label: "Quality", value: "Quality", module: "Quality", submodule: "Penalty", mainpage: "Penalty Waiver", subpage: "Client Error Forward", subsubpage: "", endpage: "Client Error Forward" },
+    { label: "Quality", value: "Quality", module: "Quality", submodule: "Penalty", mainpage: "Penalty Waiver", subpage: "Client Error Waiver Approval", subsubpage: "", endpage: "Client Error Waiver Approval" },
+    { label: "PayRoll", value: "PayRoll", module: "PayRoll", submodule: "PayRoll Creation", mainpage: "Fix Salary Date", subpage: "", subsubpage: "", endpage: "Fix Salary Date" },
+    { label: "PayRoll", value: "PayRoll", module: "PayRoll", submodule: "PayRoll Creation", mainpage: "Fix Hold Salary Date", subpage: "", subsubpage: "", endpage: "Fix Hold Salary Date" },
+    { label: "Task", value: "Task", module: "Task", submodule: "Task Hierarchy Reports", mainpage: "", subpage: "", subsubpage: "", endpage: "Task Hierarchy Reports" },
+    { label: "Training", value: "Training", module: "Training", submodule: "Training Hierarchy Reports", mainpage: "", subpage: "", subsubpage: "", endpage: "Training Hierarchy Reports" },
+    { label: "Tickets", value: "Tickets", module: "Tickets", submodule: "Raise Ticket", mainpage: "My Actionable Ticket", subpage: "", subsubpage: "", endpage: "My Actionable Ticket" },
+    { label: "Settings", value: "Settings", module: "Settings", submodule: "Team Credentials", mainpage: "", subpage: "", subsubpage: "", endpage: "Team Credentials" },
+    { label: "Asset", value: "Asset", module: "Asset", submodule: "Asset Register", mainpage: "Team Asset Acceptance List", subpage: "", subsubpage: "", endpage: "Team Asset Acceptance List" },
+
+
+]

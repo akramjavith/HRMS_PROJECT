@@ -1,0 +1,390 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
+
+@font-face {
+  font-family: Cookie;
+  src: url(Cookie-Regular.ttf);
+}
+
+@font-face {
+  font-family: Poppins;
+  src: url(Poppins-ExtraLight.ttf);
+}
+
+#birthdaydivtwo3nos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+#birthday-cardtwo3nos {
+  position: relative;
+  width: 500px;
+  height: 520px;
+  background-image: url(bdaytemplatetwo.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+}
+
+.companylogotwo3nos {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+}
+
+.companylogotwo3nos img {
+  width: 90px;
+  height: 90px;
+  font-family: "League Spartan", serif;
+
+}
+
+#profileImgtwo3nos {
+  position: absolute;
+  top: 220px;
+  left: 330px;
+  display: flex;
+  flex-direction: column;
+  font-family: "League Spartan", serif;
+
+}
+
+#profileImgtwo3nos img {
+  transform: rotate(0deg);
+  width: 100px;
+  height: 100px;
+  border-radius: 3px;
+  font-family: "League Spartan", serif;
+
+}
+
+#profileImgtwotwo3nos {
+  position: absolute;
+  top: 220px;
+  left: 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+#profileImgtwotwo3nos img {
+  transform: rotate(0deg);
+  width: 100px;
+  height: 100px;
+  border-radius: 3px;
+  font-family: "League Spartan", serif;
+}
+
+#profileImgtwothree3nos {
+  position: absolute;
+  top: 280px;
+  left: 205px;
+  display: flex;
+  flex-direction: column;
+
+}
+
+#profileImgtwothree3nos img {
+  transform: rotate(0deg);
+  width: 100px;
+  height: 100px;
+  border-radius: 3px;
+  font-family: "League Spartan", serif;
+
+}
+
+.usernametwo3nos {
+  transform: rotate(0deg);
+  text-align: center;
+  font-family: "League Spartan", serif;
+  font-weight: 900;
+  font-style: bold;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.bdaydobtwo3nos {
+  position: absolute;
+  bottom: -16px;
+  left: -240px;
+  width: 460px;
+  font-family: "League Spartan", serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  word-spacing: 1px;
+  margin-bottom: 1px;
+}
+
+.bdaydobtwotwo3nos {
+  position: absolute;
+  text-align: start;
+  bottom: -16px;
+  left: 258px;
+  width: 460px;
+  font-family: "League Spartan", serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  word-spacing: 1px;
+  margin-bottom: 1px;
+}
+
+.bdaydobtwothree3nos {
+  position: absolute;
+  text-align: start;
+  bottom: -16px;
+  left: 7px;
+  width: 460px;
+  font-family: "League Spartan", serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  word-spacing: 1px;
+  margin-bottom: 1px;
+}
+
+.bdaywishestwo3nos {
+  position: absolute;
+  text-align: center;
+  bottom: 65px;
+  left: 30px;
+  width: 460px;
+  font-family: "League Spartan", serif;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  word-spacing: 1px;
+}
+
+.bdayfootertexttwo3nos {
+  position: absolute;
+  bottom: 10px;
+  left: 220px;
+}
+
+.download-button-wrapper {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+}
+
+.download-button-wrapper button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.download-button-wrapper button:hover {
+  background-color: #45a049;
+}
+
+/* Media Queries for Tablet View */
+@media only screen and (max-width: 768px) {
+  #birthday-cardtwo3nos {
+    width: 400px;
+    height: 450px;
+  }
+
+  .companylogotwo3nos {
+    position: absolute;
+    top: 30px;
+  }
+
+  .companylogotwo3nos img {
+    width: 70px;
+    height: 70px;
+  }
+
+  #profileImgtwo3nos {
+    position: absolute;
+    top: 190px;
+    left: 270px;
+  }
+
+  #profileImgtwo3nos img {
+    width: 110px;
+    height: 110px;
+  }
+
+  #profileImgtwotwo3nos {
+    position: absolute;
+    top: 190px;
+    left: 20px;
+  }
+
+  #profileImgtwotwo3nos img {
+    width: 110px;
+    height: 110px;
+  }
+
+  #profileImgtwothree3nos {
+    position: absolute;
+    top: 190px;
+    left: 146px;
+  }
+
+  #profileImgtwothree3nos img {
+    width: 110px;
+    height: 110px;
+  }
+
+  .usernametwo3nos {
+    font-size: 12px;
+    text-align: center;
+
+  }
+
+  .bdaydobtwotwo3nos {
+    width: 360px;
+    font-size: 12px;
+    position: absolute;
+    left: 265px;
+    bottom: -15px;
+  }
+
+  .bdaydobtwo3nos {
+    width: 360px;
+    font-size: 12px;
+    position: absolute;
+    left: -230px;
+    bottom: -15px;
+  }
+
+  .bdaydobtwothree3nos {
+    width: 360px;
+    font-size: 12px;
+    position: absolute;
+    bottom: -15px;
+    left: 19px;
+  }
+
+  .bdaywishestwo3nos {
+    width: 360px;
+    font-size: 16px;
+  }
+
+  .bdayfootertexttwo3nos {
+    left: 160px;
+    bottom: 35px;
+    font-size: 14px;
+  }
+}
+
+/* Media Queries for Mobile View */
+@media only screen and (max-width: 480px) {
+  #birthday-cardtwo3nos {
+    width: 300px;
+    height: 380px;
+    margin-top: 150px;
+  }
+
+  .companylogotwo3nos {
+    position: absolute;
+    top: 45px;
+    right: 10px;
+  }
+
+  .companylogotwo3nos img {
+    width: 55px;
+    height: 55px;
+  }
+
+  #profileImgtwo3nos {
+    top: 165px;
+    left: 205px;
+    gap: 5px;
+  }
+
+  #profileImgtwo3nos img {
+    width: 80px;
+    height: 80px;
+  }
+  #profileImgtwotwo3nos {
+    top: 165px;
+    left: 15px;
+    gap: 5px;
+  }
+
+  #profileImgtwotwo3nos img {
+    width: 80px;
+    height: 80px;
+  }
+
+  #profileImgtwothree3nos {
+    top: 165px;
+    left: 110px;
+    gap: 5px;
+  }
+
+  #profileImgtwothree3nos img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .usernametwo3nos {
+    font-size: 10px;
+    top: -10px;
+    margin-top: 0px;
+  }
+
+  .usernametwotwo3nos {
+    font-size: 12px;
+    top: -10px;
+    right: 10px;
+    margin-top: 0px;
+  }
+
+  .bdaydobtwo3nos {
+    width: 260px;
+    font-size: 10px;
+    letter-spacing: 0px;
+    word-spacing: 0px;
+    bottom: -10px;
+    left: -175px;
+  }
+  .bdaydobtwotwo3nos {
+    width: 260px;
+    font-size: 10px;
+    letter-spacing: 0px;
+    word-spacing: 0px;
+    bottom: -10px;
+    left: 110px;
+  }
+  .bdaydobtwothree3nos {
+    width: 260px;
+    font-size: 10px;
+    letter-spacing: 0px;
+    word-spacing: 0px;
+    bottom: -10px;
+    left: 108px;
+  }
+  
+
+  .bdaywishestwo3nos {
+    width: 260px;
+    font-size: 14px;
+    letter-spacing: 0px;
+    word-spacing: 0px;
+    bottom: 70px;
+  }
+
+  .bdayfootertexttwo3nos {
+    left: 120px;
+    bottom: 40px;
+    font-size: 14px;
+  }
+
+  .download-button-wrapper {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    z-index: 1000;
+  }
+}

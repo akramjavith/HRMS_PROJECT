@@ -1,0 +1,45 @@
+.multistep-form {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .indicator {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 45px;
+  }
+ 
+  .indicator li {
+    list-style-type: none;
+    margin-right: 10px;
+    color: #ccc;
+    cursor: pointer;
+  }
+  
+  .indicator li.active {
+    color: #1976d2;
+  }
+
+  .indicatoremployee {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 45px;
+  }
+ 
+  .indicatoremployee li {
+    list-style-type: none;
+    margin-right: 10px;
+    color: #ccc;
+    cursor: pointer;
+  }
+  
+  .indicatoremployee li.active {
+    color: #1976d2;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 10px;
+  }

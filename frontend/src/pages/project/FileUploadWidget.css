@@ -1,0 +1,38 @@
+.file-upload-widget {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 300px;
+}
+
+.file-upload-widget-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.file-upload-widget-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-upload-widget-file {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.file-upload-widget-file-remove {
+  color: red;
+  cursor: pointer;
+}
+
+.play-once {
+  animation: playOnce 1s; /* Adjust the duration if needed */
+  animation-iteration-count: 1;
+}
+
+@keyframes playOnce {
+  to {
+    transform: scale(1);
+  }
+}

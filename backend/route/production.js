@@ -617,11 +617,11 @@ productionRoute.route('/productionmanualentrydupecheck').post(productionManaulDu
 
 
 // penalty client error
-const { getAllPenaltyClientError, addPenaltyClientError, deletePenaltyClientError, getSinglePenaltyClientError, updatePenaltyClientError } = require("../controller/modules/penalty/penaltyclienterror");
+const { getAllPenaltyClientError, addPenaltyClientError, deletePenaltyClientError, getSinglePenaltyClientError, updatePenaltyClientError,getAllPenaltyClientErrorForDateFilterWithAsgnBranch } = require("../controller/modules/penalty/penaltyclienterror");
 productionRoute.route("/penaltyclienterror").post(getAllPenaltyClientError);
 productionRoute.route("/penaltyclienterror/new").post(addPenaltyClientError);
 productionRoute.route("/penaltyclienterror/:id").delete(deletePenaltyClientError).get(getSinglePenaltyClientError).put(updatePenaltyClientError);
-
+productionRoute.route("/penaltyclienterrordatefilterwithasgnbranch").post(getAllPenaltyClientErrorForDateFilterWithAsgnBranch);
 
 const { getAllAcpointCalculation, acpointCalculationSort, updateAcpointCalculation, acpointCalculationAssignBranch, deleteAcpointCalculation, getSingleAcpointCalculation, addAcpointCalculation } = require("../controller/modules/production/acpointscalculation");
 productionRoute.route("/acpointcalculation").get(getAllAcpointCalculation);
@@ -710,6 +710,14 @@ productionRoute.route("/validokentry").post(getAllValidOkEntry);
 productionRoute.route("/validokentryalert").post(getAllValidOkEntryAlert);
 
 
+//Penaltywaivermaster Route
+const { getAllPenaltywaivermaster, updatePenaltywaivermaster, deletePenaltywaivermaster, getSinglePenaltywaivermaster, addPenaltywaivermaster, getAllPenaltywaivermasterForClientErrorRestrictions, getAllPenaltywaivermasterForClientErrorRestrictionsApprovalPage, getAllPenaltywaivermasterForPenaltyOverAllRestrictions } = require("../controller/modules/penalty/penaltywaivermaster");
+productionRoute.route("/penaltywaivermasters").get(getAllPenaltywaivermaster);
+productionRoute.route("/penaltywaivermaster/new").post(addPenaltywaivermaster);
+productionRoute.route("/penaltywaivermaster/:id").get(getSinglePenaltywaivermaster).put(updatePenaltywaivermaster).delete(deletePenaltywaivermaster);
+productionRoute.route("/penaltywaivermastersforclienterrorrestrictions").post(getAllPenaltywaivermasterForClientErrorRestrictions);
+productionRoute.route("/penaltywaivermastersforclienterrorrestrictionsapprovalpage").post(getAllPenaltywaivermasterForClientErrorRestrictionsApprovalPage);
+productionRoute.route("/penaltywaivermastersforpenaltyoverallrestrictions").post(getAllPenaltywaivermasterForPenaltyOverAllRestrictions);
 
 //Wavier Percentage Route
 const { getAllWavierpercentage, updateWavierpercentage, addWavierpercentage, getSingleWavierpercentage, deleteWavierpercentage } = require("../controller/modules/penalty/wavierpercentage");
@@ -795,10 +803,11 @@ productionRoute.route("/getdaypointidbydatetemp").post(getDayPointIdByDateTemp);
 
 //payrunlist
 //  training details backend route
-const { addPayrunList, deletePayrunList, updateInnerDataSingleUserRerun, getAllPayrunListConsolidatedDate, getAllPayrunListConsolidatedDateTemp,
+const { addPayrunList, checkIsPayRunGenerated,deletePayrunList, updateInnerDataSingleUserRerun, getAllPayrunListConsolidatedDate, getAllPayrunListConsolidatedDateTemp,
   deletePayrunBulkData, getPayrunBulkDataExcel, getBankReleasePayrunListMonthwise, checkPayRunIsCreatedForPenaltyDayUpload, checkIsPayRunGeneratedFromTo,
   payRunListSentSalaryFixDate, confirmConsolidatedReleaseSave, confirmHoldReleaseSave, updateRemoveReject, fixHoldSalaryReject, undoFieldNameConfirmListFix, confirmFixHoldSalaryLogUpdate, confirmFixHoldSalaryDate, confirmFixSalaryDate, fetchPayRunListDataMonthwise, updateInnerDataSingleUserWaiver, updatePayrunListInnerData, checkPayRunIsCreated, undoPayrunListInnerData, getAllPayrunList, getAllPayrunListLimited, getSinglePayrunList, updatePayrunList } = require("../controller/modules/production/payrunlist");
 productionRoute.route("/payrunlists").get(getAllPayrunList);
+productionRoute.route('/checkispayrungenerated').post(checkIsPayRunGenerated);
 productionRoute.route("/payrunlistsconsolidateddate").post(getAllPayrunListConsolidatedDate);
 productionRoute.route("/payrunlistsconsolidateddatetemp").post(getAllPayrunListConsolidatedDateTemp);
 productionRoute.route("/payrunlist/new").post(addPayrunList);
@@ -934,7 +943,18 @@ productionRoute.route("/othertaskuploadslimitedfilter").post(getAllOtherTaskUplo
 productionRoute.route("/getuniqidfromdateproduploadother").post(getUniqidFromDateOtherTaskupload);
 productionRoute.route("/othertaskuploadlastthree").get(OtherTaskUploadLastThree);
 
-
+// client error month amount
+const { getAllClienterrormonthamounts, addClienterrormonthamounts, deleteClienterrormonthamounts, getSingleClienterrormonthamounts, updateClienterrormonthamounts, getAllClientErrorMonthAmountConsolidate, getAllClientErrorWaiver, getAllClientErrorForwardHierarchyFilter, getAllClientErrorWaiverApprovalHierarchyWithDateFilter, getAllClientErrorWaiverApprovalHierarchyWithDateFilterNanTable, getDepartmentBasedOnDateFilter, getAllClientErrorOverallReport } = require("../controller/modules/penalty/clienterrormonthamount");
+productionRoute.route("/clienterrormonthamount").get(getAllClienterrormonthamounts);
+productionRoute.route("/clienterrormonthamount/new").post(addClienterrormonthamounts);
+productionRoute.route("/clienterrormonthamount/:id").delete(deleteClienterrormonthamounts).get(getSingleClienterrormonthamounts).put(updateClienterrormonthamounts);
+productionRoute.route("/clienterrormonthamountconsolidate").post(getAllClientErrorMonthAmountConsolidate);
+productionRoute.route("/clienterrorwaiver").post(getAllClientErrorWaiver);
+productionRoute.route("/clienterrorforwardhierarchy").post(getAllClientErrorForwardHierarchyFilter);
+productionRoute.route("/clienterrorwaiverapprovalhierarchywithdate").post(getAllClientErrorWaiverApprovalHierarchyWithDateFilter);
+productionRoute.route("/clienterrorwaiverapprovalhierarchywithdatenantable").post(getAllClientErrorWaiverApprovalHierarchyWithDateFilterNanTable);
+productionRoute.route("/getdepartmentmonthsetbasedondatefilter").post(getDepartmentBasedOnDateFilter);
+productionRoute.route("/clienterroroverallreport").post(getAllClientErrorOverallReport);
 
 
 //othertask original upload backend route

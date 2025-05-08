@@ -97,3 +97,36 @@ exports.deletePenaltyClientError = catchAsyncErrors(async (req, res, next) => {
     }
     return res.status(200).json({ message: "Deleted successfully" });
 });
+
+
+// date filter with assign branch
+exports.getAllPenaltyClientErrorForDateFilterWithAsgnBranch = catchAsyncErrors(async (req, res, next) => {
+    const { assignbranch, fromdate, todate } = req.body;
+
+    const query = {
+        $and: [
+            {
+                $or: assignbranch.map(item => ({
+                    company: item.company,
+                    branch: item.branch,
+                    unit: item.unit
+                }))
+            },
+            { date: { $gte: fromdate, $lte: todate } }
+        ]
+    };
+
+    let penaltyclienterror;
+    try {
+        penaltyclienterror = await PenaltyClientError.find(query);
+    } catch (err) {
+        return next(new ErrorHandler("Records not found!", 404));
+    }
+    if (!penaltyclienterror) {
+        return next(new ErrorHandler("Data not found!", 404));
+    }
+
+    return res.status(200).json({
+        penaltyclienterror,
+    });
+});

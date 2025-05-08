@@ -30,7 +30,7 @@ const keys = [
 	{ id: 'divide', class: 'operator', value: '/' },
 	{ id: 'dot', class: 'number', value: '.' },
 	{ id: '0', class: 'number', value: '0' },
-	
+	{ id: '%', class: 'number', value: '%' },
 	{ id: 'calc', class: 'function', value: '=' }
 ];
 

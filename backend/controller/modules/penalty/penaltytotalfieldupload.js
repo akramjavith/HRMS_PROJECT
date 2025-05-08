@@ -11,8 +11,8 @@ const catchAsyncErrors = require("../../../middleware/catchAsyncError");
 const moment = require("moment");
 const Penaltydayupload = require("../../../model/modules/penalty/penaltydayupload");
 const DepartmentMonth = require("../../../model/modules/departmentmonthset");
-// const Penaltywaivermaster = require("../../../model/modules/penalty/penaltywaivermaster");
-const Penaltywaivermaster = [];
+const Penaltywaivermaster = require("../../../model/modules/penalty/penaltywaivermaster");
+// const Penaltywaivermaster = [];
 
 // get All Penaltytotalfieldupload => /api/Penaltytotalfieldupload
 exports.getAllPenaltytotalfieldupload = catchAsyncErrors(async (req, res, next) => {
@@ -4253,731 +4253,819 @@ exports.getAllValidOkEntryAlert = catchAsyncErrors(async (req, res, next) => {
 
 exports.getAllValidOkEntry = catchAsyncErrors(async (req, res, next) => {
     let finalvalue;
-
+  
     try {
-        const { date } = req.body.date;
-        let querypenalty = {
-            iseditedtotal: "true",
-            date: req.body.date,
-        };
-        let querynotconfirm = {
-            $or: [{ iseditedtotal: { $ne: "true" } }, { isedited: { $ne: "true" } }],
-            date: req.body.date,
-        };
-        let userQuery = {
-            enquirystatus: {
-                $nin: ["Enquiry Purpose"],
-            },
-            $or: [{ reasondate: { $exists: false } }, { reasondate: { $eq: "" } }, { reasondate: { $gte: date } }],
-        };
-        let logidQuery = {
-            loginallotlog: { $exists: true, $ne: [] },
-        };
-        // console.log(req.body, "date1");
-
-        let deptMonthQuery = {
-            fromdate: { $lte: date },
-            todate: { $gte: date },
-        };
-        // console.log(querypenalty, "querypenalty");
-        const [PENATY_TOTAL_FIELD, loginids, usersAll, depMonthSet, errorControls, WAIVER_MASTER, PENALTY_NOT_CONFIRM_COUNT, PENALTY_DAY_COUNT] = await Promise.all([
-            Penaltytotalfieldupload.find(querypenalty).lean(),
-            ClientUserid.find(logidQuery, { empname: 1, userid: 1, projectvendor: 1, loginallotlog: 1 }).lean(),
-            Users.find(userQuery, {
-                companyname: 1,
-                empcode: 1,
-                company: 1,
-                departmentlog: 1,
-                unit: 1,
-                branch: 1,
-                team: 1,
-                username: 1,
-                processlog: 1,
-                shifttiming: 1,
-                department: 1,
-                doj: 1,
-                process: 1,
-                assignExpLog: 1,
-                shiftallot: 1,
-                boardingLog: 1,
-                intStartDate: 1,
-            }).lean(),
-            DepartmentMonth.find(deptMonthQuery, { department: 1, year: 1, month: 1, monthname: 1, fromdate: 1, todate: 1, totaldays: 1 }).lean(),
-            PenaltyErrorControl.find({ islock: "Open" }, { projectvendor: 1, process: 1, mode: 1, rate: 1, islock: 1 }).lean(),
-            Penaltywaivermaster.find().lean(),
-            Penaltytotalfieldupload.countDocuments(querynotconfirm).lean(),
-            Penaltytotalfieldupload.countDocuments({ date: req.body.date }).lean(),
-        ]);
-
-        let users = usersAll.map((item) => {
-            let findUserDepartment = item.department;
-            let findUserTeam = item.team;
-            let findUserProcess = item.process;
-            let findexpval = item.experience;
-
-            const dojDate = item.boardingLog.length > 0 ? item.boardingLog[0].startdate : item.doj;
-
-            // Handling team change with boardingLog
-            if (item.boardingLog && item.boardingLog.length > 0) {
-                // Check if there's any team change
-                const teamChangeLog = item.boardingLog.filter((log) => log.logcreation !== "shift" && log.ischangeteam === true);
-
-                if (teamChangeLog.length > 0) {
-                    // Sort by startdate descending
-                    const sortedTeamLog = teamChangeLog.sort((a, b) => {
-                        // First, compare startdate
-                        const startDateComparison = new Date(b.startdate) - new Date(a.startdate);
-                        if (startDateComparison !== 0) {
-                            return startDateComparison;
-                        }
-
-                        // If startdate is the same, compare createdat
-                        return b.updateddatetime - a.updateddatetime;
-                    });
-
-                    // Find the relevant team change based on the 'date'
-                    const findTeam = sortedTeamLog.find((log) => new Date(date) >= new Date(log.startdate));
-                    findUserTeam = findTeam ? findTeam.team : item.team;
+      const { date } = req.body;
+      let querypenalty = {
+        iseditedtotal: "true",
+        date: req.body.date,
+      };
+      let querynotconfirm = {
+        iseditedtotal: { $ne: "true" },
+        // $or: [{ iseditedtotal: { $ne: "true" } }, { isedited: { $ne: "true" } }],
+        date: req.body.date,
+      };
+      let userQuery = {
+        enquirystatus: {
+          $nin: ["Enquiry Purpose"],
+        },
+        $or: [{ reasondate: { $exists: false } }, { reasondate: { $eq: "" } }, { reasondate: { $gte: date } }],
+      };
+      let logidQuery = {
+        loginallotlog: { $exists: true, $ne: [] },
+      };
+      // console.log(req.body, "date1");
+  
+      let deptMonthQuery = {
+        fromdate: { $lte: date },
+        todate: { $gte: date },
+      };
+      // console.log(querypenalty, "querypenalty");
+      const [PENATY_TOTAL_FIELD, loginids, usersAll, depMonthSet, errorControls, WAIVER_MASTER, PENALTY_NOT_CONFIRM_COUNT, PENALTY_DAY_COUNT] = await Promise.all([
+        Penaltytotalfieldupload.find(querypenalty).lean(),
+        ClientUserid.find(logidQuery, { empname: 1, userid: 1, projectvendor: 1, loginallotlog: 1 }).lean(),
+        Users.find(userQuery, {
+          companyname: 1,
+          empcode: 1,
+          company: 1,
+          departmentlog: 1,
+          unit: 1,
+          branch: 1,
+          team: 1,
+          username: 1,
+          processlog: 1,
+          shifttiming: 1,
+          department: 1,
+          doj: 1,
+          process: 1,
+          assignExpLog: 1,
+          shiftallot: 1,
+          boardingLog: 1,
+          intStartDate: 1,
+        }).lean(),
+        DepartmentMonth.find(deptMonthQuery, { department: 1, year: 1, month: 1, monthname: 1, fromdate: 1, todate: 1, totaldays: 1 }).lean(),
+        PenaltyErrorControl.find({ islock: "Open" }, { projectvendor: 1, process: 1, mode: 1, rate: 1, islock: 1 }).lean(),
+        Penaltywaivermaster.find().lean(),
+        Penaltytotalfieldupload.find(querynotconfirm, { projectvendor: 1, queuename: 1, loginid: 1, errorcount: 1, totalfields: 1, date: 1, autocount: 1 }).lean(),
+      ]);
+  
+      let users = usersAll.map((item) => {
+        let findUserDepartment = item.department;
+        let findUserTeam = item.team;
+        let findUserProcess = item.process;
+        let findexpval = item.experience;
+  
+        const dojDate = item.boardingLog.length > 0 ? item.boardingLog[0].startdate : item.doj;
+  
+        // Handling team change with boardingLog
+        if (item.boardingLog && item.boardingLog.length > 0) {
+          // Check if there's any team change
+          const teamChangeLog = item.boardingLog.filter((log) => log.logcreation !== "shift" && log.ischangeteam === true);
+  
+          if (teamChangeLog.length > 0) {
+            // Sort by startdate descending
+            const sortedTeamLog = teamChangeLog.sort((a, b) => {
+              // First, compare startdate
+              const startDateComparison = new Date(b.startdate) - new Date(a.startdate);
+              if (startDateComparison !== 0) {
+                return startDateComparison;
+              }
+  
+              // If startdate is the same, compare createdat
+              return b.updateddatetime - a.updateddatetime;
+            });
+  
+            // Find the relevant team change based on the 'date'
+            const findTeam = sortedTeamLog.find((log) => new Date(date) >= new Date(log.startdate));
+            findUserTeam = findTeam ? findTeam.team : item.team;
+          }
+        }
+  
+        // Handling department change with departmentlog
+        if (item.departmentlog && item.departmentlog.length > 0) {
+          if (item.departmentlog.length > 1) {
+            // Sort department logs by startdate descending
+            const sortedDepartmentLog = item.departmentlog.sort((a, b) => {
+              // First, compare startdate
+              const startDateComparison = new Date(b.startdate) - new Date(a.startdate);
+              if (startDateComparison !== 0) {
+                return startDateComparison;
+              }
+  
+              // If startdate is the same, compare createdat
+              return b.updateddatetime - a.updateddatetime;
+            });
+  
+            // Find the relevant department change based on the 'date'
+            const findDept = sortedDepartmentLog.length > 1 && sortedDepartmentLog.map((item) => item.department).includes("Internship") ? sortedDepartmentLog.filter((item) => item.department != "Internship").find((dept) => new Date(date) >= new Date(dept.startdate)) : sortedDepartmentLog.find((dept) => new Date(date) >= new Date(dept.startdate));
+            findUserDepartment = findDept ? findDept.department : item.department;
+          } else if (item.departmentlog.length === 1) {
+            findUserDepartment = new Date(date) >= new Date(item.departmentlog[0].startdate) ? item.departmentlog[0].department : item.department;
+          } else {
+            findUserDepartment = item.department;
+          }
+        }
+  
+        if (item && item.processlog) {
+          const groupedByMonthProcs = {};
+  
+          // Group items by month
+          item.processlog &&
+            item.processlog
+              ?.sort((a, b) => {
+                return new Date(a.date) - new Date(b.date);
+              })
+              ?.forEach((d) => {
+                const monthYear = d.date?.split("-").slice(0, 2).join("-");
+                if (!groupedByMonthProcs[monthYear]) {
+                  groupedByMonthProcs[monthYear] = [];
                 }
-            }
-
-            // Handling department change with departmentlog
-            if (item.departmentlog && item.departmentlog.length > 0) {
-                if (item.departmentlog.length > 1) {
-                    // Sort department logs by startdate descending
-                    const sortedDepartmentLog = item.departmentlog.sort((a, b) => {
-                        // First, compare startdate
-                        const startDateComparison = new Date(b.startdate) - new Date(a.startdate);
-                        if (startDateComparison !== 0) {
-                            return startDateComparison;
-                        }
-
-                        // If startdate is the same, compare createdat
-                        return b.updateddatetime - a.updateddatetime;
-                    });
-
-                    // Find the relevant department change based on the 'date'
-                    const findDept = sortedDepartmentLog.length > 1 && sortedDepartmentLog.map((item) => item.department).includes("Internship") ? sortedDepartmentLog.filter((item) => item.department != "Internship").find((dept) => new Date(date) >= new Date(dept.startdate)) : sortedDepartmentLog.find((dept) => new Date(date) >= new Date(dept.startdate));
-                    findUserDepartment = findDept ? findDept.department : item.department;
-                } else if (item.departmentlog.length === 1) {
-                    findUserDepartment = new Date(date) >= new Date(item.departmentlog[0].startdate) ? item.departmentlog[0].department : item.department;
-                } else {
-                    findUserDepartment = item.department;
-                }
-            }
-
-            if (item && item.processlog) {
-                const groupedByMonthProcs = {};
-
-                // Group items by month
-                item.processlog &&
-                    item.processlog
-                        ?.sort((a, b) => {
-                            return new Date(a.date) - new Date(b.date);
-                        })
-                        ?.forEach((d) => {
-                            const monthYear = d.date?.split("-").slice(0, 2).join("-");
-                            if (!groupedByMonthProcs[monthYear]) {
-                                groupedByMonthProcs[monthYear] = [];
-                            }
-                            groupedByMonthProcs[monthYear].push(d);
-                        });
-
-                // Extract the last item of each group
-                const lastItemsForEachMonthPros = Object.values(groupedByMonthProcs).map((group) => group[group.length - 1]);
-
-                // Filter the data array based on the month and year
-                lastItemsForEachMonthPros.sort((a, b) => {
-                    return new Date(a.date) - new Date(b.date);
-                });
-                // Find the first item in the sorted array that meets the criteria
-
-                for (let i = 0; i < lastItemsForEachMonthPros.length; i++) {
-                    const date = lastItemsForEachMonthPros[i].date;
-
-                    if (new Date(req.body.date) >= new Date(date)) {
-                        findUserProcess = lastItemsForEachMonthPros[i];
-                    } else {
-                        break;
-                    }
-                }
-            }
-            const groupedByMonth = {};
-            if (item.assignExpLog && item.assignExpLog.length > 0) {
-                const findMonthStartDate = depMonthSet.find((data) => new Date(date) >= new Date(data.fromdate) && new Date(date) <= new Date(data.todate) && data.department == findUserDepartment);
-                let findDate = findMonthStartDate ? findMonthStartDate.fromdate : date;
-                item.assignExpLog &&
-                    item.assignExpLog.length > 0 &&
-                    item.assignExpLog
-                        .filter((d) => d.expmode != "Auto" && d.expmode != "Manual")
-                        .sort((a, b) => {
-                            return new Date(a.updatedate) - new Date(b.updatedate);
-                        })
-                        .forEach((item) => {
-                            const monthYear = item.updatedate?.split("-").slice(0, 2).join("-");
-                            if (!groupedByMonth[monthYear]) {
-                                groupedByMonth[monthYear] = [];
-                            }
-                            groupedByMonth[monthYear].push(item);
-                        });
-
-                // Extract the last item of each group
-                const lastItemsForEachMonth = Object.values(groupedByMonth).map((group) => group[group.length - 1]);
-
-                // Find the first item in the sorted array that meets the criteria
-
-                // Find the first item in the sorted array that meets the criteria
-                let filteredItem = null;
-
-                for (let i = 0; i < lastItemsForEachMonth.length; i++) {
-                    const date1 = lastItemsForEachMonth[i].updatedate;
-
-                    if (date >= date1) {
-                        filteredItem = lastItemsForEachMonth[i];
-                    } else {
-                        break;
-                    }
-                }
-
-                let modevalue = filteredItem;
-
-                const calculateMonthsBetweenDates = (startDate, endDate) => {
-                    if (startDate && endDate) {
-                        const start = new Date(startDate);
-                        const end = new Date(endDate);
-
-                        let years = end.getFullYear() - start.getFullYear();
-                        let months = end.getMonth() - start.getMonth();
-                        let days = end.getDate() - start.getDate();
-
-                        // Convert years to months
-                        months += years * 12;
-
-                        // Adjust for negative days
-                        if (days < 0) {
-                            months -= 1; // Subtract a month
-                            days += new Date(end.getFullYear(), end.getMonth(), 0).getDate(); // Add days of the previous month
-                        }
-
-                        // Adjust for days 15 and above
-                        if (days >= 15) {
-                            months += 1; // Count the month if 15 or more days have passed
-                        }
-
-                        return months <= 0 ? 0 : months;
-                    }
-
-                    return 0; // Return 0 if either date is missing
-                };
-
-                // Calculate difference in months between findDate and item.doj
-                let differenceInMonths, differenceInMonthsexp, differenceInMonthstar;
-                if (modevalue) {
-                    //findexp end difference yes/no
-                    if (modevalue.endexp === "Yes") {
-                        differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, modevalue.endexpdate);
-                        //  Math.floor((new Date(modevalue.endexpdate) - new Date(item.doj)) / (30 * 24 * 60 * 60 * 1000));
-                        if (modevalue.expmode === "Add") {
-                            differenceInMonthsexp += parseInt(modevalue.expval);
-                        } else if (modevalue.expmode === "Minus") {
-                            differenceInMonthsexp -= parseInt(modevalue.expval);
-                        } else if (modevalue.expmode === "Fix") {
-                            differenceInMonthsexp = parseInt(modevalue.expval);
-                        }
-                    } else {
-                        differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, findDate);
-                        // Math.floor((new Date(findDate) - new Date(item.doj)) / (30 * 24 * 60 * 60 * 1000));
-                        if (modevalue.expmode === "Add") {
-                            differenceInMonthsexp += parseInt(modevalue.expval);
-                        } else if (modevalue.expmode === "Minus") {
-                            differenceInMonthsexp -= parseInt(modevalue.expval);
-                        } else if (modevalue.expmode === "Fix") {
-                            differenceInMonthsexp = parseInt(modevalue.expval);
-                        } else {
-                            // differenceInMonths = parseInt(modevalue.expval);
-                            differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, findDate);
-                        }
-                    }
-
-                    //findtar end difference yes/no
-                    if (modevalue.endtar === "Yes") {
-                        differenceInMonthstar = calculateMonthsBetweenDates(item.doj, modevalue.endtardate);
-                        //  Math.floor((new Date(modevalue.endtardate) - new Date(item.doj)) / (30 * 24 * 60 * 60 * 1000));
-                        if (modevalue.expmode === "Add") {
-                            differenceInMonthstar += parseInt(modevalue.expval);
-                        } else if (modevalue.expmode === "Minus") {
-                            differenceInMonthstar -= parseInt(modevalue.expval);
-                        } else if (modevalue.expmode === "Fix") {
-                            differenceInMonthstar = parseInt(modevalue.expval);
-                        }
-                    } else {
-                        differenceInMonthstar = calculateMonthsBetweenDates(item.doj, findDate);
-                        if (modevalue.expmode === "Add") {
-                            differenceInMonthstar += parseInt(modevalue.expval);
-                        } else if (modevalue.expmode === "Minus") {
-                            differenceInMonthstar -= parseInt(modevalue.expval);
-                        } else if (modevalue.expmode === "Fix") {
-                            differenceInMonthstar = parseInt(modevalue.expval);
-                        } else {
-                            // differenceInMonths = parseInt(modevalue.expval);
-                            differenceInMonthstar = calculateMonthsBetweenDates(item.doj, findDate);
-                        }
-                    }
-
-                    differenceInMonths = calculateMonthsBetweenDates(item.doj, findDate);
-                    if (modevalue.expmode === "Add") {
-                        differenceInMonths += parseInt(modevalue.expval);
-                    } else if (modevalue.expmode === "Minus") {
-                        differenceInMonths -= parseInt(modevalue.expval);
-                    } else if (modevalue.expmode === "Fix") {
-                        differenceInMonths = parseInt(modevalue.expval);
-                    } else {
-                        // differenceInMonths = parseInt(modevalue.expval);
-                        differenceInMonths = calculateMonthsBetweenDates(item.doj, findDate);
-                    }
-                } else {
-                    differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, findDate);
-                    differenceInMonthstar = calculateMonthsBetweenDates(item.doj, findDate);
-                    differenceInMonths = calculateMonthsBetweenDates(item.doj, findDate);
-                }
-                // console.log(differenceInMonthstar, modevalue, 'differenceInMonthstar');
-                findexpval = differenceInMonthstar < 1 ? "00" : differenceInMonthstar <= 9 ? "0" + differenceInMonthstar : differenceInMonthstar;
-            }
-            let findUserProcessFinal = findUserProcess ? findUserProcess.process : item.process;
-
-            return {
-                ...item,
-                department: findUserDepartment,
-                team: findUserTeam,
-                process: findUserProcessFinal,
-                exp: findexpval,
-                dojDate: dojDate,
-            };
-        });
-        // console.log(PENATY_TOTAL_FIELD.length, "PENATY_TOTAL_FIELD");
-        // Step 1: Flatten the loginallotlog array and include user info
-        let logs = loginids.flatMap((user) =>
-            user.loginallotlog.map((log) => ({
-                userid: user.userid,
-                projectvendor: user.projectvendor,
-                date: log.date,
-                time: log.time,
-                empname: log.empname,
-                empcode: log.empcode,
-                enddate: log.enddate ? log.enddate : null,
-            }))
-        );
-        // console.log(logs.length, "log");
-        // Step 2: Sort logs by date and time (ascending order)
-        logs.sort((a, b) => {
-            if (a.date === b.date) {
-                return a.time.localeCompare(b.time);
-            }
+                groupedByMonthProcs[monthYear].push(d);
+              });
+  
+          // Extract the last item of each group
+          const lastItemsForEachMonthPros = Object.values(groupedByMonthProcs).map((group) => group[group.length - 1]);
+  
+          // Filter the data array based on the month and year
+          lastItemsForEachMonthPros.sort((a, b) => {
             return new Date(a.date) - new Date(b.date);
-        });
-
-        // Step 3: Calculate the enddate for each log (except the last log for each userid)
-        const userLogsMap = {};
-        logs.forEach((log) => {
-            if (!userLogsMap[log.userid]) {
-                userLogsMap[log.userid] = {};
+          });
+          // Find the first item in the sorted array that meets the criteria
+  
+          for (let i = 0; i < lastItemsForEachMonthPros.length; i++) {
+            const date = lastItemsForEachMonthPros[i].date;
+  
+            if (new Date(req.body.date) >= new Date(date)) {
+              findUserProcess = lastItemsForEachMonthPros[i];
+            } else {
+              break;
             }
-
-            if (!userLogsMap[log.userid][log.projectvendor]) {
-                userLogsMap[log.userid][log.projectvendor] = [];
-            }
-
-            userLogsMap[log.userid][log.projectvendor].push(log);
-        });
-
-        Object.values(userLogsMap).forEach((userLogs) => {
-            Object.values(userLogs).forEach((logsArray) => {
-                logsArray.forEach((log, idx) => {
-                    if (idx < logsArray.length - 1) {
-                        log.enddate = logsArray[idx + 1].date;
-                    }
-                });
-            });
-        });
-
-        // Step 4: Filter logs based on input date
-        const filteredLogs = logs.filter((log) => {
-            return new Date(log.date) <= new Date(req.body.date) && (!log.enddate || new Date(log.enddate) >= new Date(req.body.date));
-        });
-
-        // Step 5: Sort the filtered logs by date and time (descending order)
-        filteredLogs.sort((a, b) => {
-            if (a.date === b.date) {
-                return b.time.localeCompare(a.time);
-            }
-            return new Date(b.date) - new Date(a.date);
-        });
-
-        const penaltyerroruploads = await PenaltyErrorUpload.aggregate([
-            {
-                $match: { date: req.body.date },
-            },
-            {
-                $lookup: {
-                    from: "penaltyerrortypes",
-                    let: { projectvendor: "$projectvendor", process: "$process", errortype: "$errortype", status: "$status" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [{ $eq: ["$projectvendor", "$$projectvendor"] }, { $eq: ["$process", "$$process"] }, { $eq: ["$errortype", "$$errortype"] }, { $eq: ["$status", "$$status"] }],
-                                },
-                            },
-                        },
-                        {
-                            $project: {
-                                _id: 0,
-                                penaltycalculation: 1,
-                            },
-                        },
-                    ],
-                    as: "penaltyerrortypes",
-                },
-            },
-            {
-                $addFields: {
-                    penaltycalculation: {
-                        $ifNull: [{ $arrayElemAt: ["$penaltyerrortypes.penaltycalculation", 0] }, "No"],
-                    },
-                },
-            },
-            {
-                $group: {
-                    _id: {
-                        projectvendor: "$projectvendor",
-                        process: "$process",
-                        loginid: "$loginid",
-                        date: "$date",
-                    },
-                    movedstatus: {
-                        $sum: { $cond: { if: "$movedstatus", then: 1, else: 0 } },
-                    },
-                    penalty: {
-                        $sum: { $cond: { if: { $eq: ["$penaltycalculation", "Yes"] }, then: 1, else: 0 } },
-                    },
-                    nonpenalty: {
-                        $sum: { $cond: { if: { $eq: ["$penaltycalculation", "No"] }, then: 1, else: 0 } },
-                    },
-                    validatestatus: { $push: { $ifNull: ["$validatestatus", false] } },
-                    editedcount: { $push: { $ifNull: ["$editedcount", 0] } },
-                    rejectarray: {
-                        $push: {
-                            $cond: [{ $isArray: "$rejectarray" }, { $size: "$rejectarray" }, 0],
-                        },
-                    },
-                },
-            },
-            {
-                $project: {
-                    _id: 0,
-                    projectvendor: "$_id.projectvendor",
-                    process: "$_id.process",
-                    loginid: "$_id.loginid",
-                    rejectarray: 1,
-                    movedstatus: 1,
-                    validatestatus: 1,
-                    penalty: 1,
-                    editedcount: 1,
-                    nonpenalty: 1,
-                },
-            },
-        ]);
-
-        const bulkerroruploads = await BulkErrorUpload.aggregate([
-            {
-                $match: { dateformatted: req.body.date },
-            },
-            {
-                $lookup: {
-                    from: "penaltyerrortypes",
-                    let: { projectvendor: "$projectvendor", process: "$process", errortype: "$errortype", status: "$status" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [{ $eq: ["$projectvendor", "$$projectvendor"] }, { $eq: ["$process", "$$process"] }, { $eq: ["$errortype", "$$errortype"] }, { $eq: ["$status", "$$status"] }],
-                                },
-                            },
-                        },
-                        {
-                            $project: {
-                                _id: 0,
-                                penaltycalculation: 1,
-                            },
-                        },
-                    ],
-                    as: "penaltyerrortypes",
-                },
-            },
-            {
-                $addFields: {
-                    penaltycalculation: {
-                        $ifNull: [{ $arrayElemAt: ["$penaltyerrortypes.penaltycalculation", 0] }, "No"],
-                    },
-                },
-            },
-            {
-                $group: {
-                    _id: {
-                        projectvendor: "$projectvendor",
-                        process: "$process",
-                        loginid: "$loginid",
-                        date: "$date",
-                        mode: "$mode",
-                    },
-                    mode: { $first: "$mode" },
-                    movedstatus: {
-                        $sum: { $cond: { if: "$movedstatus", then: 1, else: 0 } },
-                    },
-                    penalty: {
-                        $sum: { $cond: { if: { $eq: ["$penaltycalculation", "Yes"] }, then: 1, else: 0 } },
-                    },
-                    nonpenalty: {
-                        $sum: { $cond: { if: { $eq: ["$penaltycalculation", "No"] }, then: 1, else: 0 } },
-                    },
-                    validatestatus: { $push: { $ifNull: ["$validatestatus", false] } },
-                    editedcount: { $push: { $ifNull: ["$editedcount", 0] } },
-                    rejectarray: {
-                        $push: {
-                            $cond: [{ $isArray: "$rejectarray" }, { $size: "$rejectarray" }, 0],
-                        },
-                    },
-                },
-            },
-            {
-                $project: {
-                    _id: 0,
-                    projectvendor: "$_id.projectvendor",
-                    process: "$_id.process",
-                    loginid: "$_id.loginid",
-                    rejectarray: 1,
-                    movedstatus: 1,
-                    validatestatus: 1,
-                    penalty: 1,
-                    mode: 1,
-                    editedcount: 1,
-                    nonpenalty: 1,
-                },
-            },
-        ]);
-
-        // console.log(PENATY_TOTAL_FIELD, "penaltyerroruploads");
-
-        const finalResult = PENATY_TOTAL_FIELD.map((upload) => {
-            const loginInfo = filteredLogs.filter((login) => login.userid === upload.loginid && login.projectvendor === upload.projectvendor);
-
-            const errorUploadsInd = penaltyerroruploads.filter((item) => item.process == upload.queuename && item.loginid === upload.loginid && item.projectvendor === upload.projectvendor);
-            const bulkerrorUploads = bulkerroruploads.filter((item) => item.process == upload.queuename && item.loginid === upload.loginid && item.projectvendor === upload.projectvendor);
-
-            const errorUploads = [...errorUploadsInd, ...bulkerrorUploads];
-            //Final
-            const errorUploadsMovedCount = errorUploads.reduce((sum, data) => sum + (data.movedstatus || 0), 0);
-            const errorUploadsPenaltyCount = errorUploads.reduce((sum, data) => sum + (data.penalty || 0), 0);
-            const errorUploadsNonPenaltyCount = errorUploads.reduce((sum, data) => sum + (data.nonpenalty || 0), 0);
-
-            const rejectArrays = errorUploads.length > 0 ? errorUploads.flatMap((data) => data.rejectarray) : [];
-            const findrejectCount1 = rejectArrays.length > 0 ? rejectArrays.filter((d) => d == 1).length : 0;
-            const findrejectCount2 = rejectArrays.length > 0 ? rejectArrays.filter((d) => d == 2).length : 0;
-            const findrejectCount3 = rejectArrays.length > 0 ? rejectArrays.filter((d) => d == 3).length : 0;
-            const findrejectCount4 = rejectArrays.length > 0 ? rejectArrays.filter((d) => d == 4).length : 0;
-
-            const EditedArrays = errorUploads.length > 0 ? errorUploads.flatMap((data) => data.editedcount) : [];
-            const findEditedCount1 = EditedArrays.length > 0 ? EditedArrays.filter((d) => d == 1).length : 0;
-            const findEditedCount2 = EditedArrays.length > 0 ? EditedArrays.filter((d) => d == 2).length : 0;
-            const findEditedCount3 = EditedArrays.length > 0 ? EditedArrays.filter((d) => d == 3).length : 0;
-            const findEditedCount4 = EditedArrays.length > 0 ? EditedArrays.filter((d) => d == 4).length : 0;
-
-            // console.log(findrejectCount1, rejectArrays, rejectStatus, "rejectCounts");
-            let loginallot = loginInfo ? loginInfo : [];
-
-            let filteredDataDateTime = null;
-
-            if (loginallot.length > 0) {
-                const groupedByDateTime = {};
-
-                loginallot.forEach((item) => {
-                    const dateTime = item.date + " " + item.time;
-                    if (!groupedByDateTime[dateTime]) {
-                        groupedByDateTime[dateTime] = [];
-                    }
-                    groupedByDateTime[dateTime].push(item);
-                });
-
-                // Extract the last item of each group
-                const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
-
-                // Sort the last items by date and time
-                lastItemsForEachDateTime.sort((a, b) => {
-                    return new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time);
-                });
-
-                // Find the first item in the sorted array that meets the criteria
-                for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
-                    const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
-                    // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
-                    let datevalsplitfinal = `${upload.date}`;
-                    if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
-                        filteredDataDateTime = lastItemsForEachDateTime[i];
-                    } else {
-                        break;
-                    }
+          }
+        }
+        const groupedByMonth = {};
+        if (item.assignExpLog && item.assignExpLog.length > 0) {
+          const findMonthStartDate = depMonthSet.find((data) => new Date(date) >= new Date(data.fromdate) && new Date(date) <= new Date(data.todate) && data.department == findUserDepartment);
+          let findDate = findMonthStartDate ? findMonthStartDate.fromdate : date;
+          item.assignExpLog &&
+            item.assignExpLog.length > 0 &&
+            item.assignExpLog
+              .filter((d) => d.expmode != "Auto" && d.expmode != "Manual")
+              .sort((a, b) => {
+                return new Date(a.updatedate) - new Date(b.updatedate);
+              })
+              .forEach((item) => {
+                const monthYear = item.updatedate?.split("-").slice(0, 2).join("-");
+                if (!groupedByMonth[monthYear]) {
+                  groupedByMonth[monthYear] = [];
                 }
+                groupedByMonth[monthYear].push(item);
+              });
+  
+          // Extract the last item of each group
+          const lastItemsForEachMonth = Object.values(groupedByMonth).map((group) => group[group.length - 1]);
+  
+          // Find the first item in the sorted array that meets the criteria
+  
+          // Find the first item in the sorted array that meets the criteria
+          let filteredItem = null;
+  
+          for (let i = 0; i < lastItemsForEachMonth.length; i++) {
+            const date1 = lastItemsForEachMonth[i].updatedate;
+  
+            if (date >= date1) {
+              filteredItem = lastItemsForEachMonth[i];
+            } else {
+              break;
             }
-
-            let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : "";
-
-            const userInfo = users.find((user) => user.companyname === logininfoname);
-
-            let getprocessCode = userInfo ? userInfo.process : "";
-            const NAME = userInfo ? userInfo.companyname : "";
-            const EMPCODE = userInfo ? userInfo.empcode : "";
-            const COMPANY = userInfo ? userInfo.company : "";
-            const UNIT = userInfo ? userInfo.unit : "";
-            const BRANCH = userInfo ? userInfo.branch : "";
-            const DOJ = userInfo ? userInfo.doj : "";
-            const DOJDATE = userInfo ? userInfo.dojDate : "";
-            const TEAM = userInfo ? userInfo.team : "";
-            const EXP = userInfo ? userInfo.exp : "";
-            const DEPARTMENT = userInfo ? userInfo.department : "";
-
-            const getWaiverPercentage = WAIVER_MASTER.find(
-                (d) =>
-                    (d.company == COMPANY || d.company == "All") &&
-                    (d.branch == BRANCH || d.branch == "All") &&
-                    (d.employee == NAME || d.employee == "All") &&
-                    (d.processcode == getprocessCode?.slice(0, 3) || d.processcode == "All") &&
-                    (d.process == upload.process || d.process == "All") &&
-                    new Date(req.body.date) >= new Date(d.fromdate) &&
-                    new Date(req.body.date) <= new Date(d.todate)
-            );
-            const WaiverPercentage = getWaiverPercentage ? Number(getWaiverPercentage.waiverpercentageupto) : 0;
-
-            // console.log(WAIVER_MASTER.length, getWaiverPercentage, "waiverperocetage");
-            const bulkkeyingcnt = bulkerrorUploads.filter((d) => d.mode === "Bulkkeying").length;
-            const bulkuploadcnt = bulkerrorUploads.filter((d) => d.mode === "Bulkupload").length;
-
-            const validatedArrays = errorUploads.length > 0 ? errorUploads.flatMap((data) => data.validatestatus) : [];
-            const validatedCount = validatedArrays.filter((d) => d === "true").length;
-            const notValidatedCount = validatedArrays.filter((d) => d == "false").length;
-
-            const getRate = (mode) => {
-                const found = errorControls.find((d) => d.mode === mode && d.projectvendor === upload.projectvendor && d.process === upload.queuename);
-                return found ? Number(found.rate) : 0;
-            };
-
-            const Bulk_Keying_Amt = getRate("Bulk_Keying") * bulkkeyingcnt;
-            const Bulk_Upload_Amt = getRate("Bulk_Upload") * bulkuploadcnt;
-            const Reject1_Amt = getRate("Reject1") * findrejectCount1;
-            const Reject2_Amt = getRate("Reject2") * findrejectCount2;
-            const Reject3_Amt = getRate("Reject3") * findrejectCount3;
-            const Reject4_Amt = getRate("Reject4") * findrejectCount4;
-            const Edited1_Amt = getRate("Edited1") * findEditedCount1;
-            const Edited2_Amt = getRate("Edited2") * findEditedCount2;
-            const Edited3_Amt = getRate("Edited3") * findEditedCount3;
-            const Edited4_Amt = getRate("Edited4") * findEditedCount4;
-            const NotValidated_Amt = getRate("Not Validate") * notValidatedCount;
-
-            const netError = Bulk_Upload_Amt + Bulk_Keying_Amt + Edited1_Amt + Edited2_Amt + Edited3_Amt + Edited4_Amt + Reject1_Amt + Reject2_Amt + Reject3_Amt + Reject4_Amt + NotValidated_Amt;
-
-            const Percentage = Number(((netError / Number(upload.totalfields)) * WaiverPercentage).toFixed(2));
-
-            const Amount = Number((netError * Percentage).toFixed(2));
-
-            return {
-                loginid: upload.loginid,
-                vendorname: upload.projectvendor,
-                process: upload.queuename,
-                date: upload.date,
-                totalfield: upload.totalfields,
-                autoerror: upload.autocount,
-                manualerror: upload.manualerror,
-                uploaderror: upload.errorcount,
-                moved: errorUploadsMovedCount,
-                notupload: Number(upload.manualerror) - Number(upload.errorcount),
-                penalty: errorUploadsPenaltyCount,
-                nonpenalty: errorUploadsNonPenaltyCount,
-                bulkupload: bulkuploadcnt,
-                bulkkeying: bulkkeyingcnt,
-                edited1: findEditedCount1,
-                edited2: findEditedCount2,
-                edited3: findEditedCount3,
-                edited4: findEditedCount4,
-                reject1: findrejectCount1,
-                reject2: findrejectCount2,
-                reject3: findrejectCount3,
-                reject4: findrejectCount4,
-                notvalidate: notValidatedCount,
-                validateerror: validatedCount,
-                waivererror: WaiverPercentage,
-                neterror: netError,
-                per: WaiverPercentage,
-                percentage: Percentage,
-                amount: Amount,
-                name: NAME,
-                empcode: EMPCODE,
-                company: COMPANY,
-
-                unit: UNIT,
-                branch: BRANCH,
-                doj: DOJ,
-                dojDate: DOJDATE,
-                team: TEAM,
-
-                exp: EXP,
-                department: DEPARTMENT,
-                processcode: getprocessCode,
-            };
+          }
+  
+          let modevalue = filteredItem;
+  
+          const calculateMonthsBetweenDates = (startDate, endDate) => {
+            if (startDate && endDate) {
+              const start = new Date(startDate);
+              const end = new Date(endDate);
+  
+              let years = end.getFullYear() - start.getFullYear();
+              let months = end.getMonth() - start.getMonth();
+              let days = end.getDate() - start.getDate();
+  
+              // Convert years to months
+              months += years * 12;
+  
+              // Adjust for negative days
+              if (days < 0) {
+                months -= 1; // Subtract a month
+                days += new Date(end.getFullYear(), end.getMonth(), 0).getDate(); // Add days of the previous month
+              }
+  
+              // Adjust for days 15 and above
+              if (days >= 15) {
+                months += 1; // Count the month if 15 or more days have passed
+              }
+  
+              return months <= 0 ? 0 : months;
+            }
+  
+            return 0; // Return 0 if either date is missing
+          };
+  
+          // Calculate difference in months between findDate and item.doj
+          let differenceInMonths, differenceInMonthsexp, differenceInMonthstar;
+          if (modevalue) {
+            //findexp end difference yes/no
+            if (modevalue.endexp === "Yes") {
+              differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, modevalue.endexpdate);
+              //  Math.floor((new Date(modevalue.endexpdate) - new Date(item.doj)) / (30 * 24 * 60 * 60 * 1000));
+              if (modevalue.expmode === "Add") {
+                differenceInMonthsexp += parseInt(modevalue.expval);
+              } else if (modevalue.expmode === "Minus") {
+                differenceInMonthsexp -= parseInt(modevalue.expval);
+              } else if (modevalue.expmode === "Fix") {
+                differenceInMonthsexp = parseInt(modevalue.expval);
+              }
+            } else {
+              differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, findDate);
+              // Math.floor((new Date(findDate) - new Date(item.doj)) / (30 * 24 * 60 * 60 * 1000));
+              if (modevalue.expmode === "Add") {
+                differenceInMonthsexp += parseInt(modevalue.expval);
+              } else if (modevalue.expmode === "Minus") {
+                differenceInMonthsexp -= parseInt(modevalue.expval);
+              } else if (modevalue.expmode === "Fix") {
+                differenceInMonthsexp = parseInt(modevalue.expval);
+              } else {
+                // differenceInMonths = parseInt(modevalue.expval);
+                differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, findDate);
+              }
+            }
+  
+            //findtar end difference yes/no
+            if (modevalue.endtar === "Yes") {
+              differenceInMonthstar = calculateMonthsBetweenDates(item.doj, modevalue.endtardate);
+              //  Math.floor((new Date(modevalue.endtardate) - new Date(item.doj)) / (30 * 24 * 60 * 60 * 1000));
+              if (modevalue.expmode === "Add") {
+                differenceInMonthstar += parseInt(modevalue.expval);
+              } else if (modevalue.expmode === "Minus") {
+                differenceInMonthstar -= parseInt(modevalue.expval);
+              } else if (modevalue.expmode === "Fix") {
+                differenceInMonthstar = parseInt(modevalue.expval);
+              }
+            } else {
+              differenceInMonthstar = calculateMonthsBetweenDates(item.doj, findDate);
+              if (modevalue.expmode === "Add") {
+                differenceInMonthstar += parseInt(modevalue.expval);
+              } else if (modevalue.expmode === "Minus") {
+                differenceInMonthstar -= parseInt(modevalue.expval);
+              } else if (modevalue.expmode === "Fix") {
+                differenceInMonthstar = parseInt(modevalue.expval);
+              } else {
+                // differenceInMonths = parseInt(modevalue.expval);
+                differenceInMonthstar = calculateMonthsBetweenDates(item.doj, findDate);
+              }
+            }
+  
+            differenceInMonths = calculateMonthsBetweenDates(item.doj, findDate);
+            if (modevalue.expmode === "Add") {
+              differenceInMonths += parseInt(modevalue.expval);
+            } else if (modevalue.expmode === "Minus") {
+              differenceInMonths -= parseInt(modevalue.expval);
+            } else if (modevalue.expmode === "Fix") {
+              differenceInMonths = parseInt(modevalue.expval);
+            } else {
+              // differenceInMonths = parseInt(modevalue.expval);
+              differenceInMonths = calculateMonthsBetweenDates(item.doj, findDate);
+            }
+          } else {
+            differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, findDate);
+            differenceInMonthstar = calculateMonthsBetweenDates(item.doj, findDate);
+            differenceInMonths = calculateMonthsBetweenDates(item.doj, findDate);
+          }
+          // console.log(differenceInMonthstar, modevalue, 'differenceInMonthstar');
+          findexpval = differenceInMonthstar < 1 ? "00" : differenceInMonthstar <= 9 ? "0" + differenceInMonthstar : differenceInMonthstar;
+        }
+        let findUserProcessFinal = findUserProcess ? findUserProcess.process : item.process;
+  
+        return {
+          ...item,
+          department: findUserDepartment,
+          team: findUserTeam,
+          process: findUserProcessFinal,
+          exp: findexpval,
+          dojDate: dojDate,
+        };
+      });
+      // console.log(PENATY_TOTAL_FIELD.length, "PENATY_TOTAL_FIELD");
+      // Step 1: Flatten the loginallotlog array and include user info
+      let logs = loginids.flatMap((user) =>
+        user.loginallotlog.map((log) => ({
+          userid: user.userid,
+          projectvendor: user.projectvendor,
+          date: log.date,
+          time: log.time,
+          empname: log.empname,
+          empcode: log.empcode,
+          enddate: log.enddate ? log.enddate : null,
+        }))
+      );
+      // console.log(logs.length, "log");
+      // Step 2: Sort logs by date and time (ascending order)
+      logs.sort((a, b) => {
+        if (a.date === b.date) {
+          return a.time.localeCompare(b.time);
+        }
+        return new Date(a.date) - new Date(b.date);
+      });
+  
+      // Step 3: Calculate the enddate for each log (except the last log for each userid)
+      const userLogsMap = {};
+      logs.forEach((log) => {
+        if (!userLogsMap[log.userid]) {
+          userLogsMap[log.userid] = {};
+        }
+  
+        if (!userLogsMap[log.userid][log.projectvendor]) {
+          userLogsMap[log.userid][log.projectvendor] = [];
+        }
+  
+        userLogsMap[log.userid][log.projectvendor].push(log);
+      });
+  
+      Object.values(userLogsMap).forEach((userLogs) => {
+        Object.values(userLogs).forEach((logsArray) => {
+          logsArray.forEach((log, idx) => {
+            if (idx < logsArray.length - 1) {
+              log.enddate = logsArray[idx + 1].date;
+            }
+          });
         });
-
-        function formatDate(dateStr) {
-            const [year, month, day] = dateStr.split("-");
-            return `${day}${month}${year}`;
+      });
+  
+      // Step 4: Filter logs based on input date
+      const filteredLogs = logs.filter((log) => {
+        return new Date(log.date) <= new Date(req.body.date) && (!log.enddate || new Date(log.enddate) >= new Date(req.body.date));
+      });
+  
+      // Step 5: Sort the filtered logs by date and time (descending order)
+      filteredLogs.sort((a, b) => {
+        if (a.date === b.date) {
+          return b.time.localeCompare(a.time);
         }
-
-        // Example usage
-        const formattedDate = formatDate(req.body.date);
-        // console.log(formattedDate);
-        // console.log(finalResult.length, "finalResult");
-        if (finalResult.length > 0 && PENALTY_NOT_CONFIRM_COUNT == 0) {
-            finalvalue = [
-                {
-                    date: req.body.date,
-                    filename: `Penalty Day_${formattedDate}`,
-                    type: "nonexcel",
-                    uploaddata: finalResult,
-                    addedby: [
-                        {
-                            date: new Date(),
-                            name: req.body.username,
+        return new Date(b.date) - new Date(a.date);
+      });
+  
+      const penaltyerroruploads = await PenaltyErrorUpload.aggregate([
+        {
+          $match: { date: req.body.date },
+        },
+        {
+          $lookup: {
+            from: "penaltyerrortypes",
+            let: { projectvendor: "$projectvendor", process: "$process", errortype: "$errortype", status: "$status" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$projectvendor", "$$projectvendor"] },
+                      { $eq: ["$process", "$$process"] },
+                      // { $eq: ["$errortype", "$$errortype"] },
+                      {
+                        $regexMatch: {
+                          regex: "$errortype",
+                          input: "$$errortype", // assuming this is a regex string or variable
+                          options: "i", // optional, for case-insensitive match
                         },
+                      },
+                      { $eq: ["$status", "$$status"] },
                     ],
+                  },
                 },
-            ];
-            console.log(finalvalue.length, "finalvalue");
-
-            await Penaltydayupload.insertMany(finalvalue);
-            return res.status(200).json({
-                message: "Created Sucessfully",
-            });
-        } else if (PENALTY_NOT_CONFIRM_COUNT > 0) {
-            return res.status(200).json({
-                message: "Error upload confirmation pending",
-            });
-        } else {
-            return res.status(200).json({
-                message: "No Data to Upload",
-            });
+              },
+              {
+                $project: {
+                  _id: 0,
+                  penaltycalculation: 1,
+                },
+              },
+            ],
+            as: "penaltyerrortypes",
+          },
+        },
+        {
+          $addFields: {
+            penaltycalculation: {
+              $ifNull: [{ $arrayElemAt: ["$penaltyerrortypes.penaltycalculation", 0] }, "No"],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              projectvendor: "$projectvendor",
+              process: "$process",
+              loginid: "$loginid",
+              date: "$date",
+            },
+            movedstatus: {
+              $sum: { $cond: { if: "$movedstatus", then: 1, else: 0 } },
+            },
+            penalty: {
+              $sum: { $cond: { if: { $eq: ["$penaltycalculation", "Yes"] }, then: 1, else: 0 } },
+            },
+            nonpenalty: {
+              $sum: { $cond: { if: { $eq: ["$penaltycalculation", "No"] }, then: 1, else: 0 } },
+            },
+            validatestatus: { $push: { $ifNull: ["$validatestatus", false] } },
+            editedcount: { $push: { $ifNull: ["$editedcount", 0] } },
+            rejectarray: {
+              $push: {
+                $cond: [{ $isArray: "$rejectarray" }, { $size: "$rejectarray" }, 0],
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            projectvendor: "$_id.projectvendor",
+            process: "$_id.process",
+            loginid: "$_id.loginid",
+            rejectarray: 1,
+            movedstatus: 1,
+            validatestatus: 1,
+            penalty: 1,
+            editedcount: 1,
+            nonpenalty: 1,
+          },
+        },
+      ]);
+  
+      const bulkerroruploads = await BulkErrorUpload.aggregate([
+        {
+          $match: { dateformatted: req.body.date },
+        },
+        {
+          $lookup: {
+            from: "penaltyerrortypes",
+            let: { projectvendor: "$projectvendor", process: "$process", errortype: "$errortype", status: "$status" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [{ $eq: ["$projectvendor", "$$projectvendor"] }, { $eq: ["$process", "$$process"] }, { $eq: ["$errortype", "$$errortype"] }, { $eq: ["$status", "$$status"] }],
+                  },
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                  penaltycalculation: 1,
+                },
+              },
+            ],
+            as: "penaltyerrortypes",
+          },
+        },
+        {
+          $addFields: {
+            penaltycalculation: {
+              $ifNull: [{ $arrayElemAt: ["$penaltyerrortypes.penaltycalculation", 0] }, "No"],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              projectvendor: "$projectvendor",
+              process: "$process",
+              loginid: "$loginid",
+              date: "$date",
+              mode: "$mode",
+            },
+            mode: { $first: "$mode" },
+            movedstatus: {
+              $sum: { $cond: { if: "$movedstatus", then: 1, else: 0 } },
+            },
+            penalty: {
+              $sum: { $cond: { if: { $eq: ["$penaltycalculation", "Yes"] }, then: 1, else: 0 } },
+            },
+            nonpenalty: {
+              $sum: { $cond: { if: { $eq: ["$penaltycalculation", "No"] }, then: 1, else: 0 } },
+            },
+            validatestatus: { $push: { $ifNull: ["$validatestatus", false] } },
+            editedcount: { $push: { $ifNull: ["$editedcount", 0] } },
+            rejectarray: {
+              $push: {
+                $cond: [{ $isArray: "$rejectarray" }, { $size: "$rejectarray" }, 0],
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            projectvendor: "$_id.projectvendor",
+            process: "$_id.process",
+            loginid: "$_id.loginid",
+            rejectarray: 1,
+            movedstatus: 1,
+            validatestatus: 1,
+            penalty: 1,
+            mode: 1,
+            editedcount: 1,
+            nonpenalty: 1,
+          },
+        },
+      ]);
+  
+      const finalResult = PENATY_TOTAL_FIELD.map((upload) => {
+        const loginInfo = filteredLogs.filter((login) => login.userid === upload.loginid && login.projectvendor === upload.projectvendor);
+  
+        const errorUploadsInd = penaltyerroruploads.filter((item) => item.process == upload.queuename && item.loginid === upload.loginid && item.projectvendor === upload.projectvendor);
+        const bulkerrorUploads = bulkerroruploads.filter((item) => item.process == upload.queuename && item.loginid === upload.loginid && item.projectvendor === upload.projectvendor);
+  
+        const errorUploads = [...errorUploadsInd, ...bulkerrorUploads];
+        //Final
+        const errorUploadsMovedCount = errorUploads.reduce((sum, data) => sum + (data.movedstatus || 0), 0);
+        const errorUploadsPenaltyCount = errorUploads.reduce((sum, data) => sum + (data.penalty || 0), 0);
+        const errorUploadsNonPenaltyCount = errorUploads.reduce((sum, data) => sum + (data.nonpenalty || 0), 0);
+  
+        const rejectArrays = errorUploads.length > 0 ? errorUploads.flatMap((data) => data.rejectarray) : [];
+        const findrejectCount1 = rejectArrays.length > 0 ? rejectArrays.filter((d) => d == 1).length : 0;
+        const findrejectCount2 = rejectArrays.length > 0 ? rejectArrays.filter((d) => d == 2).length : 0;
+        const findrejectCount3 = rejectArrays.length > 0 ? rejectArrays.filter((d) => d == 3).length : 0;
+        const findrejectCount4 = rejectArrays.length > 0 ? rejectArrays.filter((d) => d == 4).length : 0;
+  
+        const EditedArrays = errorUploads.length > 0 ? errorUploads.flatMap((data) => data.editedcount) : [];
+        const findEditedCount1 = EditedArrays.length > 0 ? EditedArrays.filter((d) => d == 1).length : 0;
+        const findEditedCount2 = EditedArrays.length > 0 ? EditedArrays.filter((d) => d == 2).length : 0;
+        const findEditedCount3 = EditedArrays.length > 0 ? EditedArrays.filter((d) => d == 3).length : 0;
+        const findEditedCount4 = EditedArrays.length > 0 ? EditedArrays.filter((d) => d == 4).length : 0;
+  
+        // console.log(findrejectCount1, rejectArrays, rejectStatus, "rejectCounts");
+        let loginallot = loginInfo ? loginInfo : [];
+  
+        let filteredDataDateTime = null;
+  
+        if (loginallot.length > 0) {
+          const groupedByDateTime = {};
+  
+          loginallot.forEach((item) => {
+            const dateTime = item.date + " " + item.time;
+            if (!groupedByDateTime[dateTime]) {
+              groupedByDateTime[dateTime] = [];
+            }
+            groupedByDateTime[dateTime].push(item);
+          });
+  
+          // Extract the last item of each group
+          const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
+  
+          // Sort the last items by date and time
+          lastItemsForEachDateTime.sort((a, b) => {
+            return new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time);
+          });
+  
+          // Find the first item in the sorted array that meets the criteria
+          for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
+            const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
+            // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
+            let datevalsplitfinal = `${upload.date}`;
+            if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
+              filteredDataDateTime = lastItemsForEachDateTime[i];
+            } else {
+              break;
+            }
+          }
         }
+  
+        let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : "";
+  
+        const userInfo = users.find((user) => user.companyname === logininfoname);
+  
+        let getprocessCode = userInfo ? userInfo.process : "";
+        const NAME = userInfo ? userInfo.companyname : "";
+        const EMPCODE = userInfo ? userInfo.empcode : "";
+        const COMPANY = userInfo ? userInfo.company : "";
+        const UNIT = userInfo ? userInfo.unit : "";
+        const BRANCH = userInfo ? userInfo.branch : "";
+        const DOJ = userInfo ? userInfo.doj : "";
+        const DOJDATE = userInfo ? userInfo.dojDate : "";
+        const TEAM = userInfo ? userInfo.team : "";
+        const EXP = userInfo ? userInfo.exp : "";
+        const DEPARTMENT = userInfo ? userInfo.department : "";
+  
+        const getWaiverPercentage = WAIVER_MASTER.find(
+          (d) =>
+            (d.company == COMPANY || d.company == "All") &&
+            (d.branch == BRANCH || d.branch == "All") &&
+            (d.employee == NAME || d.employee == "All") &&
+            (d.processcode == getprocessCode?.slice(0, 3) || d.processcode == "All") &&
+            (d.process == upload.process || d.process == "All") &&
+            new Date(req.body.date) >= new Date(d.fromdate) &&
+            new Date(req.body.date) <= new Date(d.todate)
+        );
+        const WaiverPercentage = getWaiverPercentage ? Number(getWaiverPercentage.waiverpercentageupto) : 0;
+  
+        // console.log(WAIVER_MASTER.length, getWaiverPercentage, "waiverperocetage");
+        const bulkkeyingcnt = bulkerrorUploads.filter((d) => d.mode === "Bulkkeying").length;
+        const bulkuploadcnt = bulkerrorUploads.filter((d) => d.mode === "Bulkupload").length;
+  
+        const validatedArrays = errorUploads.length > 0 ? errorUploads.flatMap((data) => data.validatestatus) : [];
+  
+        const validatedCount = validatedArrays.filter((d) => d === "true" || d === true).length;
+        const notValidatedCount = validatedArrays.filter((d) => d == "false" || d == false).length;
+  
+        const getRate = (mode) => {
+          const found = errorControls.find((d) => d.mode === mode && d.projectvendor === upload.projectvendor && d.process === upload.queuename);
+          return found ? Number(found.rate) : 0;
+        };
+  
+        const Bulk_Keying_Amt = getRate("Bulk_Keying") * bulkkeyingcnt;
+        const Bulk_Upload_Amt = getRate("Bulk_Upload") * bulkuploadcnt;
+        const Reject1_Amt = getRate("Reject1") * findrejectCount1;
+        const Reject2_Amt = getRate("Reject2") * findrejectCount2;
+        const Reject3_Amt = getRate("Reject3") * findrejectCount3;
+        const Reject4_Amt = getRate("Reject4") * findrejectCount4;
+        const Edited1_Amt = getRate("Edited1") * findEditedCount1;
+        const Edited2_Amt = getRate("Edited2") * findEditedCount2;
+        const Edited3_Amt = getRate("Edited3") * findEditedCount3;
+        const Edited4_Amt = getRate("Edited4") * findEditedCount4;
+        const NotValidated_Amt = getRate("Not Validate") * notValidatedCount;
+  
+        const netErroramt = Bulk_Upload_Amt + Bulk_Keying_Amt + Edited1_Amt + Edited2_Amt + Edited3_Amt + Edited4_Amt + Reject1_Amt + Reject2_Amt + Reject3_Amt + Reject4_Amt + NotValidated_Amt + validatedCount;
+        // const netError = bulkkeyingcnt + bulkuploadcnt + findrejectCount1 + findrejectCount2 + findrejectCount3 + findrejectCount4 + findEditedCount1 + findEditedCount2 + findEditedCount3 + findEditedCount4 + notValidatedCount + validatedCount;
+  
+        const Percentage = Number(((netErroramt / Number(upload.totalfields)) * WaiverPercentage).toFixed(2));
+  
+        const Amount = Number((netErroramt * Percentage).toFixed(2));
+  
+        return {
+          loginid: upload.loginid,
+          vendorname: upload.projectvendor,
+          process: upload.queuename,
+          date: upload.date,
+          totalfield: upload.totalfields,
+          autoerror: upload.autocount,
+          manualerror: upload.manualerror,
+          uploaderror: upload.errorcount,
+          moved: errorUploadsMovedCount,
+          notupload: Number(upload.manualerror) - Number(upload.errorcount),
+          penalty: errorUploadsPenaltyCount,
+          nonpenalty: errorUploadsNonPenaltyCount,
+          bulkupload: Bulk_Upload_Amt,
+          bulkkeying: Bulk_Keying_Amt,
+          edited1: Edited1_Amt,
+          edited2: Edited2_Amt,
+          edited3: Edited3_Amt,
+          edited4: Edited4_Amt,
+          reject1: Reject1_Amt,
+          reject2: Reject2_Amt,
+          reject3: Reject3_Amt,
+          reject4: Reject4_Amt,
+          notvalidate: NotValidated_Amt,
+          validateerror: validatedCount,
+          waivererror: WaiverPercentage,
+          neterror: netErroramt,
+          per: WaiverPercentage,
+          percentage: Percentage,
+          amount: Amount,
+          name: NAME,
+          empcode: EMPCODE,
+          company: COMPANY,
+  
+          unit: UNIT,
+          branch: BRANCH,
+          doj: DOJ,
+          dojDate: DOJDATE,
+          team: TEAM,
+  
+          exp: EXP,
+          department: DEPARTMENT,
+          processcode: getprocessCode,
+        };
+      });
+  
+      const notconfimlist = PENALTY_NOT_CONFIRM_COUNT.map((upload) => {
+        const loginInfo = filteredLogs.filter((login) => login.userid === upload.loginid && login.projectvendor === upload.projectvendor);
+  
+        let loginallot = loginInfo ? loginInfo : [];
+  
+        let filteredDataDateTime = null;
+  
+        if (loginallot.length > 0) {
+          const groupedByDateTime = {};
+  
+          loginallot.forEach((item) => {
+            const dateTime = item.date + " " + item.time;
+            if (!groupedByDateTime[dateTime]) {
+              groupedByDateTime[dateTime] = [];
+            }
+            groupedByDateTime[dateTime].push(item);
+          });
+  
+          // Extract the last item of each group
+          const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
+  
+          // Sort the last items by date and time
+          lastItemsForEachDateTime.sort((a, b) => {
+            return new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time);
+          });
+  
+          // Find the first item in the sorted array that meets the criteria
+          for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
+            const dateTime = `${lastItemsForEachDateTime[i].date}`;
+            // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
+            let datevalsplitfinal = `${upload.date}`;
+            if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
+              filteredDataDateTime = lastItemsForEachDateTime[i];
+            } else {
+              break;
+            }
+          }
+        }
+  
+        let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : "";
+  
+        const userInfo = users.find((user) => user.companyname === logininfoname);
+  
+        let getprocessCode = userInfo ? userInfo.process : "";
+        const NAME = userInfo ? userInfo.companyname : "";
+        const EMPCODE = userInfo ? userInfo.empcode : "";
+        const COMPANY = userInfo ? userInfo.company : "";
+        const UNIT = userInfo ? userInfo.unit : "";
+        const BRANCH = userInfo ? userInfo.branch : "";
+        const DOJ = userInfo ? userInfo.doj : "";
+        const DOJDATE = userInfo ? userInfo.dojDate : "";
+        const TEAM = userInfo ? userInfo.team : "";
+        const EXP = userInfo ? userInfo.exp : "";
+        const DEPARTMENT = userInfo ? userInfo.department : "";
+  
+        return {
+          loginid: upload.loginid,
+          projectvendor: upload.projectvendor,
+          queuename: upload.queuename,
+          totalfields: upload.totalfields,
+          errorcount: upload.errorcount,
+          date: upload.date,
+          name: NAME,
+          empcode: EMPCODE,
+          company: COMPANY,
+          unit: UNIT,
+          branch: BRANCH,
+          doj: DOJ,
+          dojDate: DOJDATE,
+          team: TEAM,
+          exp: EXP,
+          department: DEPARTMENT,
+          processcode: getprocessCode,
+        };
+      });
+  
+      function formatDate(dateStr) {
+        const [year, month, day] = dateStr.split("-");
+        return `${day}${month}${year}`;
+      }
+  
+      // Example usage
+      const formattedDate = formatDate(req.body.date);
+  
+      if (finalResult.length > 0 && PENALTY_NOT_CONFIRM_COUNT.length == 0) {
+        finalvalue = [
+          {
+            date: req.body.date,
+            filename: `Penalty Day_${formattedDate}`,
+            type: "nonexcel",
+            uploaddata: finalResult,
+            addedby: [
+              {
+                date: new Date(),
+                name: req.body.username,
+              },
+            ],
+          },
+        ];
+        console.log(finalvalue.length, "finalvalue");
+  
+        await Penaltydayupload.insertMany(finalvalue);
+        return res.status(200).json({
+          message: "Created Sucessfully",
+        });
+      } else if (PENALTY_NOT_CONFIRM_COUNT.length > 0) {
+        return res.status(200).json({
+          message: "Error upload confirmation pending",
+          notconfirmlist: notconfimlist,
+        });
+      } else {
+        return res.status(200).json({
+          message: "No Data to Upload",
+        });
+      }
     } catch (err) {
-        console.log(err, "err");
-        return next(new ErrorHandler("Records not found!", 404));
+      console.log(err, "err");
+      return next(new ErrorHandler("Records not found!", 404));
     }
-});
+  });
 
 exports.checkWaiverIsStarted = catchAsyncErrors(async (req, res, next) => {
     let count;

@@ -45,7 +45,7 @@ function PenaltyAmountConsolidateView() {
     'Waiver% Error', 'Net Error',
     // 'Per%',
     'Percentage', 'Amount', 'Not Approved',
-    'Client Amount', 'Waiver Amount', 'Total Amount'
+    'Client Amount', 'Net Amount'
   ];
   let exportRowValues = [
     'company', 'branch', 'unit',
@@ -61,7 +61,8 @@ function PenaltyAmountConsolidateView() {
     'waivererror', 'neterror',
     // 'per',
     'percentage', 'amount', 'notapproved',
-   'clientamount', 'waiveramount', 'totalamount'
+    'clientamount', 'netamount', 'Not Approved',
+    'Client Amount', 'Net Amount'
   ];
 
   let exportColumnNamesviewall = [
@@ -216,10 +217,6 @@ function PenaltyAmountConsolidateView() {
     per: true,
     percentage: true,
     amount: true,
-    clientamount: true,
-    waiveramount: true,
-    totalamount: true,
-    notapprovedcount:true,
     actions: true,
   };
   const [columnVisibility, setColumnVisibility] = useState(
@@ -270,10 +267,6 @@ function PenaltyAmountConsolidateView() {
     per: true,
     percentage: true,
     amount: true,
-    clientamount: true,
-    waiveramount: true,
-    totalamount: true,
-    notapprovedcount:true,
     actions: true,
   };
   const [columnVisibilityviewall, setColumnVisibilityviewall] = useState(
@@ -459,21 +452,13 @@ function PenaltyAmountConsolidateView() {
       })
 
 
-      const final = res?.data?.penaltymonth?.map((item, index) => ({
-        ...item,
-        serialNumber: index + 1,
-        fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
-        todate: moment(item.todate).format("DD-MM-YYYY"),
-        oldfromdate: item.fromdate,
-        oldtodate: item.todate,
-        waiveramount: item.amountclient?.toFixed(2) || 0.00,
-        totalamount: (item.clientamount - item.amountclient).toFixed(2) || 0.00,
-      }))
+      const final = res?.data?.penaltymonth
 
       setClientUserIDFilterArray(final)
       setLoading(false)
     } catch (err) { handleApiError(err, setLoading(false), setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
   };
+
 
   useEffect(() => {
     fetchProductionListsArray()
@@ -526,13 +511,25 @@ function PenaltyAmountConsolidateView() {
 
   //serial no for listing items
   const addSerialNumber = (datas) => {
-    const itemsWithSerialNumber = datas;
+    const itemsWithSerialNumber = datas?.map((item, index) => ({
+      ...item,
+      serialNumber: index + 1,
+      fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
+      todate: moment(item.todate).format("DD-MM-YYYY"),
+      oldfromdate: item.fromdate,
+      oldtodate: item.todate
+    }));
     setItems(itemsWithSerialNumber);
   };
 
   //serial no for listing items
   const addSerialNumberviewall = (datas) => {
-    const itemsWithSerialNumber = datas;
+    const itemsWithSerialNumber = datas?.map((item, index) => ({
+      ...item,
+      serialNumber: index + 1,
+      fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
+      todate: moment(item.todate).format("DD-MM-YYYY"),
+    }));
     setItemsviewall(itemsWithSerialNumber);
   };
   //Datatable
@@ -901,16 +898,29 @@ function PenaltyAmountConsolidateView() {
       headerClassName: "bold-header",
     },
     {
-      field: "notapprovedcount",
+      field: "notapproved",
       headerName: "Not Approved",
       flex: 0,
       width: 120,
-      hide: !columnVisibility.notapprovedcount,
+      hide: !columnVisibility.notapproved,
       headerClassName: "bold-header",
     },
-    { field: "clientamount", headerName: "Client Amount", flex: 0, width: 130, hide: !columnVisibility.clientamount, },
-        { field: "waiveramount", headerName: "Waiver Amount", flex: 0, width: 130, hide: !columnVisibility.waiveramount, },
-        { field: "totalamount", headerName: "Total Amount", flex: 0, width: 120, hide: !columnVisibility.totalamount, },
+    {
+      field: "clientamount",
+      headerName: "Client Amount",
+      flex: 0,
+      width: 150,
+      hide: !columnVisibility.clientamount,
+      headerClassName: "bold-header",
+    },
+    {
+      field: "netamount",
+      headerName: "Net Amount",
+      flex: 0,
+      width: 130,
+      hide: !columnVisibility.netamount,
+      headerClassName: "bold-header",
+    },
     {
       field: "actions",
       headerName: "Action",
@@ -1470,18 +1480,31 @@ function PenaltyAmountConsolidateView() {
       hide: !columnVisibilityviewall.amount,
       headerClassName: "bold-header",
     },
-   
     {
-      field: "notapprovedcount",
+      field: "notapproved",
       headerName: "Not Approved",
       flex: 0,
       width: 120,
-      hide: !columnVisibility.notapprovedcount,
+      hide: !columnVisibilityviewall.notapproved,
       headerClassName: "bold-header",
     },
-    { field: "clientamount", headerName: "Client Amount", flex: 0, width: 130, hide: !columnVisibility.clientamount, },
-    { field: "waiveramount", headerName: "Waiver Amount", flex: 0, width: 130, hide: !columnVisibility.waiveramount, },
-    { field: "totalamount", headerName: "Total Amount", flex: 0, width: 120, hide: !columnVisibility.totalamount, },
+    {
+      field: "clientamount",
+      headerName: "Client Amount",
+      flex: 0,
+      width: 150,
+      hide: !columnVisibilityviewall.clientamount,
+      headerClassName: "bold-header",
+    },
+    {
+      field: "netamount",
+      headerName: "Net Amount",
+      flex: 0,
+      width: 130,
+      hide: !columnVisibilityviewall.netamount,
+      headerClassName: "bold-header",
+    },
+
   ];
 
   const rowDataTableviewall = filteredDataviewall.map((item, index) => {
@@ -1496,7 +1519,7 @@ function PenaltyAmountConsolidateView() {
       processcode: item.processcode,
       name: item.name,
       empcode: item.empcode,
-      date:item.date,
+      date: moment(item.date).format('DD-MM-YYYY'),
       vendorname: item.vendorname,
       process: item.process,
       totalfield: item.totalfield,
@@ -1663,20 +1686,12 @@ function PenaltyAmountConsolidateView() {
         },
       })
 
-      setClientUserIDFilterArrayview(res?.data?.penaltymonth?.map((item, index) => ({
-        ...item,
-        serialNumber: index + 1,
-        fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
-        todate: moment(item.todate).format("DD-MM-YYYY"),
-        date: moment(item.date).format('DD-MM-YYYY'),
-        waiveramount: item.amountclient?.toFixed(2) || 0.00,
-        totalamount: Number(item.clientamount - item.amountclient).toFixed(2) || 0.00,
-      })));
+      setClientUserIDFilterArrayview(res?.data?.penaltymonth);
       handleClickOpenviewAll();
       setClientUserIDFilterArrayviewcheck(false)
     } catch (err) { handleApiError(err, setClientUserIDFilterArrayviewcheck(false), setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
   };
-console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
+
   return (
     <Box>
       <Headtitle title={"MANAGEPenalty Amount Consolidated VIEW"} />

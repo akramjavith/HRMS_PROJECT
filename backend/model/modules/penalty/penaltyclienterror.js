@@ -5,6 +5,10 @@ const PenaltyClientErrorSchema = new Schema({
         type: String,
         required: false,
     },
+vendorvalue: {
+        type: String,
+        required: false,
+    }, 
     category: {
         type: String,
         required: false,
@@ -14,6 +18,10 @@ const PenaltyClientErrorSchema = new Schema({
         required: false,
     },
     loginid: {
+        type: String,
+        required: false,
+    },
+    vendor: {
         type: String,
         required: false,
     },
@@ -33,13 +41,18 @@ const PenaltyClientErrorSchema = new Schema({
         type: String,
         required: false,
     },
+    department: {
+        type: String,
+        required: false,
+    },
     employeename: {
         type: String,
         required: false,
     },
-
-
-
+    employeeid: {
+        type: String,
+        required: false,
+    },
     date: {
         type: String,
         required: false,
@@ -73,6 +86,66 @@ const PenaltyClientErrorSchema = new Schema({
         type: String,
         required: false,
     },
+    errorstatus: {
+        type: String,
+        required: false,
+    },
+    rejectreason: {
+        type: String,
+        required: false,
+    },
+    mode: {
+        type: String,
+        required: false,
+    },
+    clientamount: {
+        type: Number,
+        required: false,
+    },
+    percentage: {
+        type: Number,
+        required: false,
+    },
+    amount: {
+        type: Number,
+        required: false,
+    },
+    history: [
+        {
+            tablename: {
+                type: String,
+                required: false,
+            },
+            date: {
+                type: String,
+                required: false,
+            },
+            time: {
+                type: String,
+                required: false,
+            },
+            status: {
+                type: String,
+                required: false,
+            },
+            reason: {
+                type: String,
+                required: false,
+            },
+            mode: {
+                type: String,
+                required: false,
+            },
+            percentage: {
+                type: Number,
+                required: false,
+            },
+            calculatedamount: {
+                type: Number,
+                required: false,
+            },
+        }
+    ],
     addedby: [
         {
             name: {
@@ -85,7 +158,6 @@ const PenaltyClientErrorSchema = new Schema({
             },
         },
     ],
-
     updatedby: [
         {
             name: {
@@ -103,4 +175,9 @@ const PenaltyClientErrorSchema = new Schema({
         default: Date.now,
     },
 });
+
+PenaltyClientErrorSchema.index({
+    project: 1, vendor: 1, loginid: 1, employeename: 1,  errorstatus: 1, history: 1, date: 1,
+})
+
 module.exports = mongoose.model("Penaltyclienterror", PenaltyClientErrorSchema);

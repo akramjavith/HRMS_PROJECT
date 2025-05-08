@@ -432,29 +432,29 @@ function InvalidValidOverallReport() {
         } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
 
     }
-};
-
-const fetchClientUserID = async (proj) => {
-    setPageName(!pageName);
-    try {
-        let res_freq = await axios.get(SERVICE.ALL_CLIENTUSERIDDATA, {
-            headers: {
-                Authorization: `Bearer ${auth.APIToken}`,
-            },
-        });
-        const filterProjBased = res_freq?.data?.clientuserid.filter((item) => item.projectvendor === proj);
-        const loginIdOpt = [
-            ...filterProjBased.map((d) => ({
-                ...d,
-                label: d.userid,
-                value: d.userid,
-            })),
-        ];
-        setClientLoginIDOpt(loginIdOpt);
-
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
 
 
+    const fetchClientUserID = async (proj) => {
+        setPageName(!pageName);
+        try {
+            let res_freq = await axios.get(SERVICE.ALL_CLIENTUSERIDDATA, {
+                headers: {
+                    Authorization: `Bearer ${auth.APIToken}`,
+                },
+            });
+            const filterProjBased = res_freq?.data?.clientuserid.filter((item) => item.projectvendor === proj);
+            const loginIdOpt = [
+                ...filterProjBased.map((d) => ({
+                    ...d,
+                    label: d.userid,
+                    value: d.userid,
+                })),
+            ];
+            setClientLoginIDOpt(loginIdOpt);
+
+        } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+
+    }
 
     //get all client user id.
     const fetchClientUserIDEdit = async (proj) => {
@@ -694,7 +694,7 @@ const fetchClientUserID = async (proj) => {
         if (gridRefTableImgnot.current) {
             domtoimage.toBlob(gridRefTableImgnot.current)
                 .then((blob) => {
-                    saveAs(blob, "Error Upload Confirm.png");
+                    saveAs(blob, "Valid Error Approval List.png");
                 })
                 .catch((error) => {
                     console.error("dom-to-image error: ", error);
@@ -2188,6 +2188,8 @@ const fetchClientUserID = async (proj) => {
         setSelectedProcess([])
         setSelectedLoginId([])
         setFilterList([])
+        setisusercompleted([])
+        setValidapproval([])
         setPopupContent("Cleared Successfully!");
         setPopupSeverity("success");
         handleClickOpenPopup();
@@ -2905,7 +2907,7 @@ const fetchClientUserID = async (proj) => {
         setSearchQuery(event.target.value);
     };
     // Split the search query into individual terms
-    const searchTermsnot = searchQuery.toLowerCase().split(" ");
+    const searchTermsnot = searchQuerynot.toLowerCase().split(" ");
     // Modify the filtering logic to check each term
     const filteredDatasnot = itemsnot?.filter((item) => {
         return searchTermsnot.every((term) =>
@@ -3631,6 +3633,7 @@ const fetchClientUserID = async (proj) => {
                 setPopupSeverity("success");
                 handleClickOpenPopup();
                 handleCloseModEditError();
+                handleCloseModEditErrorinvalid()
 
             }
 
@@ -4126,6 +4129,7 @@ const fetchClientUserID = async (proj) => {
                 setPopupSeverity("success");
                 handleClickOpenPopup();
                 handleCloseModEditError();
+                handleCloseviewReject();
 
             }
 
@@ -5362,7 +5366,7 @@ const fetchClientUserID = async (proj) => {
                                         ) && (
                                                 <Button
                                                     sx={userStyle.buttongrp}
-                                                    onClick={handleCaptureImage}
+                                                    onClick={handleCaptureImageValid}
                                                 >
                                                     {" "}
                                                     <ImageIcon
@@ -5454,7 +5458,7 @@ const fetchClientUserID = async (proj) => {
                                         setSelectedRows={setSelectedRows}
                                         gridRefTable={gridRefTablenot}
                                         paginated={false}
-                                        filteredDatas={filteredDatas}
+                                        filteredDatas={filteredDatasnot}
                                         // totalDatas={totalDatas}
                                         searchQuery={searchedStringnot}
                                         handleShowAllColumns={handleShowAllColumnsnot}

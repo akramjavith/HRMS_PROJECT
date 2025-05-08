@@ -3,6 +3,9 @@ const PenaltyClientErrorUpload = require("../../../model/modules/production/pena
 const PenaltyDayUpload = require("../../../model/modules/penalty/penaltydayupload");
 const ErrorHandler = require("../../../utils/errorhandler");
 const catchAsyncErrors = require("../../../middleware/catchAsyncError");
+const PenaltyClientError = require('../../../model/modules/penalty/penaltyclienterror');
+const ProductionClientRate = require('../../../model/modules/production/productionclientrate');
+const ClientUserID = require("../../../model/modules/production/ClientUserIDModel");
 
 // get All PenaltyAmountConsolidate Name => /api/allpenaltyamountconsolidate
 exports.getAllPenaltyAmountConsolidated = catchAsyncErrors(
@@ -204,7 +207,176 @@ exports.deletePenaltyAmountConsolidated = catchAsyncErrors(
 exports.getAllPenaltyAmountConsolidatedMonthView = catchAsyncErrors(async (req, res, next) => {
 
   try {
+    let approvedpenaltyclienterror;
+    let penaltyclienterrorrate;
+    let clientuserid;
+    let filteredData;
+    let finalData;
+    let aggregatedData;
+
     const penaltymonthall = await PenaltyDayUpload.find({ date: { $gte: req.body.fromdate, $lte: req.body.todate } }, { uploaddata: 1 })
+
+        penaltyclienterrorrate = await ProductionClientRate.find({}, { project: 1, category: 1, subcategory: 1, rate: 1 });
+        approvedpenaltyclienterror = await PenaltyClientError.find({ date: { $gte:req.body.fromdate, $lte: req.body.todate },
+         });
+        clientuserid = await ClientUserID.find({ allotted: "allotted" });
+
+        // compare with penaltyrate and get matched data's client rate
+        filteredData = penaltyclienterrorrate.flatMap((rateData) => {
+            // Find all matching approved penalty client errors
+            const matchedItems = approvedpenaltyclienterror.filter((item) =>
+                rateData.project === item.project &&
+                rateData.category === item.category &&
+                rateData.subcategory === item.subcategory
+            );
+            const notApprovedOrEmptyHistory = approvedpenaltyclienterror.filter(entry => {
+              const history = entry.history;
+              return history.length === 0 || history[history.length - 1].status !== "Approved";
+            });
+            
+            // console.log(notApprovedOrEmptyHistory.length,"cccc"); // Count
+            // console.log(notApprovedOrEmptyHistory[0],"lll");  
+
+            // Map each matched item to include the client amount
+            return matchedItems.map((matchedItem) => ({
+                _id: matchedItem?._id,
+                project: matchedItem?.project,
+                category: matchedItem?.category,
+                subcategory: matchedItem?.subcategory,
+                loginid: matchedItem?.loginid,
+                vendor: matchedItem?.vendor,
+                company: matchedItem?.company,
+                branch: matchedItem?.branch,
+                unit: matchedItem?.unit,
+                team: matchedItem?.team,
+                department: matchedItem?.department,
+                employeename: matchedItem?.employeename,
+                employeeid: matchedItem?.employeeid,
+                date: matchedItem?.date,
+                documentnumber: matchedItem?.documentnumber,
+                documentlink: matchedItem?.documentlink,
+                fieldname: matchedItem?.fieldname,
+                line: matchedItem?.line,
+                errorvalue: matchedItem?.errorvalue,
+                correctvalue: matchedItem?.correctvalue,
+                clienterror: matchedItem?.clienterror,
+                errorstatus: matchedItem?.errorstatus,
+                clientamount: rateData.rate,
+                history: matchedItem?.history,
+                amount: matchedItem?.amount,
+                notapprovedcount: notApprovedOrEmptyHistory.length,
+                
+            }));
+        });
+
+
+        // find recently used id matched data
+        finalData = filteredData?.map((item) => {
+            let concatProjectVendor = `${item.project}-${item.vendor}`;
+
+            const loginInfo = clientuserid.filter((d) => d.userid == item.loginid && d.projectvendor == concatProjectVendor);
+
+            let loginallot = loginInfo.length > 0 ? loginInfo.map(d => d.loginallotlog).flat() : [];
+
+            let filteredDataDateTime = null;
+            if (loginallot.length > 0) {
+                const groupedByDateTime = {};
+
+                // Group items by date and time
+                loginallot.forEach((item) => {
+                    const dateTime = item.date + " " + item.time;
+
+                    if (!groupedByDateTime[dateTime]) {
+                        groupedByDateTime[dateTime] = [];
+                    }
+                    groupedByDateTime[dateTime].push(item);
+                });
+
+                // Extract the last item of each group
+                const lastItemsForEachDateTime = Object.values(groupedByDateTime).map(
+                    (group) => group[group.length - 1]
+                );
+
+                // Sort the last items by date and time
+                lastItemsForEachDateTime.sort((a, b) => {
+                    return (
+                        new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time)
+                    );
+                });
+
+                // Find the first item in the sorted array that meets the criteria
+
+                for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
+                    const dateTime =
+                        lastItemsForEachDateTime[i].date + " " + lastItemsForEachDateTime[i].time;
+
+                    // let datevalsplit = item.mode === "Manual" ? "" : upload.dateval.split(" IST");
+                    let datevalsplitfinal = item.date;
+
+                    if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
+                        filteredDataDateTime = lastItemsForEachDateTime[i];
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            return {
+                ...item
+            };
+        });
+
+        // Aggregate clientamount by employeeid
+        // aggregatedData = finalData.reduce((acc, item) => {
+        //     const existingEmployee = acc.find((entry) => entry.employeeid === item.employeeid);
+        //     if (existingEmployee) {
+        //         existingEmployee.clientamount += item.clientamount;
+        //         existingEmployee.amount += item.amount;
+        //     } else {
+        //         acc.push({
+        //             fromdate: req.body.fromdate,
+        //             todate: req.body.todate,
+        //             employeeid: item.employeeid,
+        //             employeename: item.employeename,
+        //             clientamount: item.clientamount,
+        //             notapprovedcount:item.notapprovedcount,
+        //             amount: item.amount || 0.00,
+        //         });
+        //     }
+        //     return acc;
+        // }, []);
+
+        aggregatedData = finalData.reduce((acc, item) => {
+          const existingEmployee = acc.find((entry) => entry.employeeid === item.employeeid);
+      
+          // Calculate if this record should count as "not approved"
+          const history = item.history || [];
+          // const lastStatus = history.length > 0 ? history[history.length - 1].status?.trim().toLowerCase() : null;
+          const lastStatus = history.length > 0 && history[history.length - 1].status !== "Approved"? history.filter(d => d.status !== "Approved").length : null;
+          // const isNotApproved = !lastStatus || lastStatus !== "Approved";
+      // console.log(lastStatus,"dd")
+          if (existingEmployee) {
+              existingEmployee.clientamount += item.clientamount;
+              existingEmployee.amount += item.amount;
+              if (lastStatus) {
+                  existingEmployee.notapprovedcount += 1;
+              }
+          } else {
+              acc.push({
+                  fromdate: req.body.fromdate,
+                  todate: req.body.todate,
+                  employeeid: item.employeeid,
+                  employeename: item.employeename,
+                  clientamount: item.clientamount,
+                  notapprovedcount: lastStatus,
+                  amount: item.amount || 0.00,
+              });
+          }
+          return acc;
+      }, []);
+      
+
+
 
 
     let penaltymonth = penaltymonthall
@@ -212,6 +384,8 @@ exports.getAllPenaltyAmountConsolidatedMonthView = catchAsyncErrors(async (req, 
       .flat()
       .reduce((acc, current) => {
         const existingItemIndex = acc.findIndex((item) => item.name === current.name && item.company === current.company && item.branch === current.branch);
+
+const findClientError = aggregatedData.find(d =>  d.employeename === current.name)
 
         if (existingItemIndex !== -1) {
           // Update existing item
@@ -289,13 +463,15 @@ exports.getAllPenaltyAmountConsolidatedMonthView = catchAsyncErrors(async (req, 
             amount: Number(current.amount),
             fromdate: req.body.fromdate,
             todate: req.body.todate,
-
+            clientamount:findClientError ? findClientError?.clientamount : 0,
+            amountclient: findClientError ? findClientError.amount : 0.00,
+            notapprovedcount:findClientError ? findClientError.notapprovedcount : 0,
           });
         }
         return acc;
       }, []);
     penaltymonth = penaltymonth.filter(item => item != null && item != undefined)
-    console.log(penaltymonth.length, "dffdf")
+    // console.log(penaltymonth[3], "dffdf")
     return res.status(200).json({
       penaltymonth,
     });
@@ -308,14 +484,197 @@ exports.getAllPenaltyAmountConsolidatedMonthView = catchAsyncErrors(async (req, 
 
 
 exports.getAllPenaltyMonthAmountConsolidatedViewIndividual = catchAsyncErrors(async (req, res, next) => {
-
+  let approvedpenaltyclienterror;
+  let penaltyclienterrorrate;
+  let clientuserid;
+  let filteredData;
+  let finalData;
+  let aggregatedData;
+  let findClientError;
+  let notApprovedOrEmptyHistory 
   try {
+
     const penaltymonthall = await PenaltyDayUpload.find({ date: { $gte: req.body.fromdate, $lte: req.body.todate } }, { uploaddata: 1 })
-    //console.log(penaltymonthall, "penaltymonthall")
+    
+
+    penaltyclienterrorrate = await ProductionClientRate.find({}, { project: 1, category: 1, subcategory: 1, rate: 1 });
+    approvedpenaltyclienterror = await PenaltyClientError.find({ date: { $gte:req.body.fromdate, $lte: req.body.todate },
+    // errorstatus: { $eq: "Approved" }, history: { $elemMatch: { mode: "Percentage", status: "Approved" } }, 
+     });
+    clientuserid = await ClientUserID.find({ allotted: "allotted" });
+
+
+    // compare with penaltyrate and get matched data's client rate
+    filteredData = penaltyclienterrorrate.flatMap((rateData) => {
+        // Find all matching approved penalty client errors
+        const matchedItems = approvedpenaltyclienterror.filter((item) =>
+            rateData.project === item.project &&
+            rateData.category === item.category &&
+            rateData.subcategory === item.subcategory
+        );
+
+        // Map each matched item to include the client amount
+        return matchedItems.map((matchedItem) => ({
+            _id: matchedItem?._id,
+            project: matchedItem?.project,
+            category: matchedItem?.category,
+            subcategory: matchedItem?.subcategory,
+            loginid: matchedItem?.loginid,
+            vendor: matchedItem?.vendor,
+            company: matchedItem?.company,
+            branch: matchedItem?.branch,
+            unit: matchedItem?.unit,
+            team: matchedItem?.team,
+            department: matchedItem?.department,
+            employeename: matchedItem?.employeename,
+            employeeid: matchedItem?.employeeid,
+            date: matchedItem?.date,
+            documentnumber: matchedItem?.documentnumber,
+            documentlink: matchedItem?.documentlink,
+            fieldname: matchedItem?.fieldname,
+            line: matchedItem?.line,
+            errorvalue: matchedItem?.errorvalue,
+            correctvalue: matchedItem?.correctvalue,
+            clienterror: matchedItem?.clienterror,
+            errorstatus: matchedItem?.errorstatus,
+            clientamount: rateData.rate,
+            history: matchedItem?.history,
+            amount: matchedItem?.amount,
+        }));
+    });
+// console.log(filteredData,"filteredData")
+    // find recently used id matched data
+    finalData = filteredData?.map((item) => {
+        let concatProjectVendor = `${item.project}-${item.vendor}`;
+
+        const loginInfo = clientuserid.filter((d) => d.userid == item.loginid && d.projectvendor == concatProjectVendor);
+
+        let loginallot = loginInfo.length > 0 ? loginInfo.map(d => d.loginallotlog).flat() : [];
+
+        let filteredDataDateTime = null;
+        if (loginallot.length > 0) {
+            const groupedByDateTime = {};
+
+            // Group items by date and time
+            loginallot.forEach((item) => {
+                const dateTime = item.date + " " + item.time;
+
+                if (!groupedByDateTime[dateTime]) {
+                    groupedByDateTime[dateTime] = [];
+                }
+                groupedByDateTime[dateTime].push(item);
+            });
+
+            // Extract the last item of each group
+            const lastItemsForEachDateTime = Object.values(groupedByDateTime).map(
+                (group) => group[group.length - 1]
+            );
+
+            // Sort the last items by date and time
+            lastItemsForEachDateTime.sort((a, b) => {
+                return (
+                    new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time)
+                );
+            });
+
+            // Find the first item in the sorted array that meets the criteria
+
+            for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
+                const dateTime =
+                    lastItemsForEachDateTime[i].date + " " + lastItemsForEachDateTime[i].time;
+
+                // let datevalsplit = item.mode === "Manual" ? "" : upload.dateval.split(" IST");
+                let datevalsplitfinal = item.date;
+
+                if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
+                    filteredDataDateTime = lastItemsForEachDateTime[i];
+                } else {
+                    break;
+                }
+            }
+        }
+        // const history = item.history || [];
+        // const lastStatus = history.length > 0 ? history[history.length - 1].status?.trim().toLowerCase() : null;
+        // const isNotApproved = !lastStatus || lastStatus !== "Approved";
+        
+        return {
+            ...item,
+            clientamount: item.clientamount,
+            amountclient: item.amount || 0.00,
+        };
+    });
+
+    
 
     let penaltymonth = penaltymonthall
       .map((data) => data.uploaddata)
-      .flat().filter(t => t.name === req.body.name)
+      .flat().filter(t => t.name === req.body.name).map(current => {
+        findClientError = finalData.find(d =>  d.employeename === req.body.name 
+          && d.date === current.date
+        )
+        // const notApprovedOrEmptyHistory = finalData.filter(entry =>
+        //   entry.employeename === req.body.name &&
+        //   entry.date === current.date &&
+        //   (
+        //     !entry.history || 
+        //     entry.history.length === 0 ||
+        //     entry.history[entry.history.length - 1].status?.trim().toLowerCase() !== "approved"
+        //   )
+        // );
+
+        const history =findClientError ? findClientError.history : 0;
+        // const lastStatus = history.length > 0 ? history[history.length - 1].status?.trim().toLowerCase() : null;
+        const lastStatus = history.length > 0 && history[history.length - 1].status !== "Approved"? history.filter(d => d.status !== "Approved").length : null;
+  
+        return {
+        ...current,
+        company: current.company,
+        branch: current.branch,
+        unit: current.unit,
+        team: current.team,
+        empcode: current.empcode,
+        name: current.name,
+        processcode: current.processcode,
+        vendorname: current.vendorname,
+        process: current.process,
+        date:current.date,
+        totalfield: Number(current.totalfield),
+        autoerror: Number(current.autoerror),
+        manualerror: Number(current.manualerror),
+        uploaderror: Number(current.uploaderror),
+        moved: Number(current.moved),
+        notupload: Number(current.notupload),
+        penalty: Number(current.penalty),
+        nonpenalty: Number(current.nonpenalty),
+        bulkupload: Number(current.bulkupload),
+
+        bulkkeying: Number(current.bulkkeying),
+        edited1: Number(current.edited1),
+        edited2: Number(current.edited2),
+        edited3: Number(current.edited3),
+        edited4: Number(current.edited4),
+
+
+        reject1: Number(current.reject1),
+        reject2: Number(current.reject2),
+        reject3: Number(current.reject3),
+        reject4: Number(current.reject4),
+        notvalidate: Number(current.notvalidate),
+
+        validateerror: Number(current.validateerror),
+        waivererror: Number(current.waivererror),
+        neterror: Number(current.neterror),
+        percentage: Number(current.percentage),
+        amount: Number(current.amount),
+        clientamount:findClientError ? findClientError?.clientamount : 0,
+        amountclient: findClientError ? findClientError.amountclient : 0.00,
+        notapprovedcount: lastStatus,        }
+
+      }
+    )
+
+// console.log(penaltymonth,"penaltymonth")
+      
 
     return res.status(200).json({
       penaltymonth,

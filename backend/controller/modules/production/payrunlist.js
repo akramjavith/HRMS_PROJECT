@@ -886,3 +886,22 @@ exports.checkIsPayRunGeneratedFromTo = catchAsyncErrors(async (req, res, next) =
         count,
     });
 });
+
+
+exports.checkIsPayRunGenerated = catchAsyncErrors(async (req, res, next) => {
+    let payruncontrol;
+    try {
+      const {date } = req.body;
+      // console.log(date,'date')
+      payruncontrol = await PayrunList.countDocuments({ from:{$lte:date}, to:{$gte:date }});
+      // console.log(payruncontrol)
+    } catch (err) {
+      return next(new ErrorHandler("Records not found!", 404));
+    }
+    // if (!payruncontrol) {
+    //   return next(new ErrorHandler("Payruncontrol not found!", 404));
+    // }
+    return res.status(200).json({
+      payruncontrol,
+    });
+  });

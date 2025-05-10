@@ -2465,7 +2465,7 @@ export const menuItems = [
           },
           {
             title: "Manual Overall Report",
-            dbname: "menumanualovrallreport",
+            dbname: "menumanualoverallreport",
             url: "/manualovrallreport",
             access: true,
           },

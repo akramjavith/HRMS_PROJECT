@@ -2637,6 +2637,13 @@ exports.getAllStockPdfDownloadAssetPDF = async (req, res, next) => {
 exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, next) => {
 
   try {
+    const {assignbranch} = req.body
+    const branchFilter = assignbranch.map((branchObj) => ({
+      branch: branchObj.branch,
+      company: branchObj.company,
+      unit: branchObj.unit,
+    }));
+  
 
     const [stock, stockData, managestockitems] = await Promise.all([
       Stock.aggregate([
@@ -2645,6 +2652,7 @@ exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, ne
             requestmode: req.body.assetmat,
             handover: { $exists: false },
             status: { $ne: "Transfer" },
+            $or: branchFilter,
           },
         },
         {
@@ -2664,7 +2672,8 @@ exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, ne
       ]),
 
       Stock.find(
-        { handover: { $in: ["return", "handover", "usagecount"] }, requestmode: req.body.assetmat },
+        { handover: { $in: ["return", "handover", "usagecount"] }, 
+        requestmode: req.body.assetmat, $or: branchFilter },
         {
           company: 1,
           branch: 1,

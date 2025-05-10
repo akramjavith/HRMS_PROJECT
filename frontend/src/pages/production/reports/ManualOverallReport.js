@@ -1,32 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import {
-  Box,
-  Typography,
-  Chip,
-  OutlinedInput,
-  TableBody,
-  TableRow,
-  TableCell,
-  Select,
-  MenuItem,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  Grid,
-  Paper,
-  Table,
-  TableHead,
-  TableContainer,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  Popover,
-  Checkbox,
-  TextField,
-  IconButton,
-} from '@mui/material';
+import { Box, Typography, Chip, OutlinedInput, TableBody, TableRow, TableCell, Select, MenuItem, Dialog, DialogContent, DialogActions, FormControl, Grid, Paper, Table, TableHead, TableContainer, Button, List, ListItem, ListItemText, Popover, Checkbox, TextField, IconButton } from '@mui/material';
 import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from 'react-icons/fa';
 import { userStyle } from '../../../pageStyle';
 import jsPDF from 'jspdf';
@@ -75,9 +48,13 @@ function ManualOverallReport() {
     setOpenPopup(false);
   };
 
+  const [isBoxFocused, setIsBoxFocused] = React.useState(false);
+  const [searchInputValue, setSearchInputValue] = useState('');
+  const [selectedEmp, setSelectedEmp] = useState([]);
+
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, isAssignBranch, buttonStyles } = useContext(UserRoleAccessContext);
+  const { isUserRoleAccess, allUsersData, isUserRoleCompare, isAssignBranch, allUsersLimit, alldepartment, allTeam, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
 
   const [sourceCheck, setSourcecheck] = useState(false);
@@ -297,14 +274,7 @@ function ManualOverallReport() {
         ?.filter((data) => {
           let fetfinalurl = [];
 
-          if (
-            data?.modulenameurl?.length !== 0 &&
-            data?.submodulenameurl?.length !== 0 &&
-            data?.mainpagenameurl?.length !== 0 &&
-            data?.subpagenameurl?.length !== 0 &&
-            data?.subsubpagenameurl?.length !== 0 &&
-            data?.subsubpagenameurl?.includes(window.location.pathname)
-          ) {
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
             fetfinalurl = data.subsubpagenameurl;
           } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
             fetfinalurl = data.subpagenameurl;
@@ -342,6 +312,11 @@ function ManualOverallReport() {
       }));
       setCompanyOpt(companies);
       setSelectedOptionsCompany(companies);
+      setValueCompanyCat(
+        companies.map((a, index) => {
+          return a.value;
+        })
+      );
       fetchBranchAll(companies);
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -355,14 +330,7 @@ function ManualOverallReport() {
         ?.filter((data) => {
           let fetfinalurl = [];
 
-          if (
-            data?.modulenameurl?.length !== 0 &&
-            data?.submodulenameurl?.length !== 0 &&
-            data?.mainpagenameurl?.length !== 0 &&
-            data?.subpagenameurl?.length !== 0 &&
-            data?.subsubpagenameurl?.length !== 0 &&
-            data?.subsubpagenameurl?.includes(window.location.pathname)
-          ) {
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
             fetfinalurl = data.subsubpagenameurl;
           } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
             fetfinalurl = data.subpagenameurl;
@@ -400,6 +368,11 @@ function ManualOverallReport() {
       }));
       setBranchOption(branchOptfirstthree);
       setSelectedOptionsBranch(branchOptfirstthree);
+      setValueBranchCat(
+        branchOptfirstthree.map((a, index) => {
+          return a.value;
+        })
+      );
       fetchUnitAll(company, branchOptfirstthree);
     } catch (err) {
       console.log(err, 'err');
@@ -414,14 +387,7 @@ function ManualOverallReport() {
         ?.filter((data) => {
           let fetfinalurl = [];
 
-          if (
-            data?.modulenameurl?.length !== 0 &&
-            data?.submodulenameurl?.length !== 0 &&
-            data?.mainpagenameurl?.length !== 0 &&
-            data?.subpagenameurl?.length !== 0 &&
-            data?.subsubpagenameurl?.length !== 0 &&
-            data?.subsubpagenameurl?.includes(window.location.pathname)
-          ) {
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
             fetfinalurl = data.subsubpagenameurl;
           } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
             fetfinalurl = data.subpagenameurl;
@@ -459,6 +425,12 @@ function ManualOverallReport() {
       }));
       setUnitOption(units);
       setSelectedOptionsUnit(units);
+
+      setValueUnitCat(
+        units.map((a, index) => {
+          return a.value;
+        })
+      );
       fetchTeamAll(company, branch, units);
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -485,6 +457,11 @@ function ManualOverallReport() {
 
       setTeamOption(TeamOpt);
       setSelectedOptionsTeam(TeamOpt);
+      setValueTeamCat(
+        TeamOpt.map((a, index) => {
+          return a.value;
+        })
+      );
       fetchEmployeesAll(company, branch, unit, TeamOpt);
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -630,8 +607,14 @@ function ManualOverallReport() {
     fetchCompany();
     fetchProjMaster();
   }, []);
+  let [valueEmployeeCat, setValueEmployeeCat] = useState([]);
 
   const handleEmployeeChangeFrom = (options) => {
+    setValueEmployeeCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
     setSelectedEmployeeFrom(options);
   };
   const customValueRendererEmployeeFrom = (valueCate, _employeename) => {
@@ -951,7 +934,11 @@ function ManualOverallReport() {
         setHasMoreData(false);
         setSourcecheck(false);
         setIsLoading(false);
-
+        // if (productionFilter.length > 0) {
+        //   setPopupContentMalert("Fully Loaded");
+        //   setPopupSeverityMalert("success");
+        //   handleClickOpenPopupMalert();
+        // }
       } else {
         const filtered = response.data.mergedData
           .filter((item) => item != null)
@@ -995,6 +982,130 @@ function ManualOverallReport() {
               cstist: formattedResult,
             };
           });
+        // setAllData((prevData) => [...prevData, ...filtered]);
+
+        // let final = filtered;
+
+        // function getTimeDifference(start, end) {
+        //   if (start && end) {
+        //     const startDate = new Date(start);
+        //     const endDate = new Date(end);
+
+        //     if (startDate > endDate) {
+        //       return "00:00:00";
+        //     } else {
+        //       const diff = new Date(endDate - startDate);
+        //       return diff.toISOString().substr(11, 8);
+        //     }
+        //   }
+        // }
+        // let lastTimes = {};
+
+        // let mergedDataall = final
+        //   .filter((item) => item !== undefined && item.empname != undefined && item.empname != "")
+        //   .sort((a, b) => {
+        //     if (a.mode !== b.mode) {
+        //       return a.mode === "Production" ? -1 : 1;
+        //     }
+
+        //     if (a.mode === "Production") {
+        //       const empnameA = a.empname.trim().toLowerCase();
+        //       const empnameB = b.empname.trim().toLowerCase();
+        //       if (empnameA < empnameB) return -1;
+        //       if (empnameA > empnameB) return 1;
+        //     } else if (a.mode === "Manual") {
+        //       const empnameA = a.empname.trim().toLowerCase();
+        //       const empnameB = b.empname.trim().toLowerCase();
+        //       if (empnameA < empnameB) return -1;
+        //       if (empnameA > empnameB) return 1;
+        //     }
+
+        //     // Convert empname to lowercase and trim spaces for case-insensitive and clean comparison
+        //     let adate = a.mode === "Production" ? a.dateval : `${a.fromdate}T${a.time}`;
+        //     let bdate = a.mode === "Production" ? b.dateval : `${b.fromdate}T${b.time}`;
+        //     const dateA = new Date(adate);
+        //     const dateB = new Date(bdate);
+
+        //     if (dateA < dateB) return -1;
+        //     if (dateA > dateB) return 1;
+
+        //     return 0;
+        //   });
+
+        // mergedDataall.forEach((item, index) => {
+        //   // const originalDatetime = new Date(item.olddateval);
+        //   // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+        //   const finddatevalue = item.dateval && item.dateval?.split(" ");
+        //   const findtime = finddatevalue && finddatevalue[1];
+        //   const finddate = finddatevalue && finddatevalue[0];
+
+        //   // const loginInfo = loginids.find(login => login.userid === item.user);
+
+        //   // const userInfo = loginInfo ? users.find(user => user.companyname === loginInfo.empname) : "";
+
+        //   const findshifttime = item.shifttiming ? item.shifttiming.split("to") : "00:00AMto00:00AM".split("to");
+
+        //   const getshift = item.shifttiming == "Week Off" ? findtime : findshifttime && findshifttime[0];
+        //   let hours24 = "";
+        //   const [time, period] = getshift.includes("AM") ? getshift.split("AM") : getshift.split("PM");
+        //   let [hoursshift, minutesshift] = time.split(":");
+
+        //   if (item.shifttiming != "Week Off") {
+        //     // Converting hours to 24-hour format if the period is "PM" and not "12"
+        //     hours24 = parseInt(hoursshift, 10);
+        //     if (getshift.includes("PM") && hoursshift !== "12") {
+        //       hours24 += 12;
+        //     }
+        //   } else {
+        //     hours24 = parseInt(findtime.split(":")[0], 10);
+        //     minutesshift = findtime.split(":")[1];
+        //   }
+        //   let secondssets = item.shifttiming == "Week Off" ? findtime.split(":")[0] : 0;
+        //   // Creating a new Date object with the updated hours
+        //   const date = new Date(finddate);
+        //   date.setHours(hours24);
+        //   date.setMinutes(parseInt(minutesshift, 10));
+        //   date.setSeconds(secondssets);
+
+        //   // Formatting the date to "hh:mm:ss" format
+        //   const formattedTimeshift = date.toTimeString().split(" ")[0];
+        //   console.log(formattedTimeshift,'formattedTimeshift')
+        //   const clockindate = attendances.find((d) => {
+        //     const [day, month, year] = d.date.split("-"); // Split the date string from the attendance record
+        //     const dateObject = new Date(year, month - 1, day); // Create a new Date object
+        //     const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`; // Format the date
+
+        //     return formattedDateString === finddate && item.username === d.username;
+        //   });
+
+        //   const [timePart, ampm] = clockindate ? clockindate.clockintime.split(" ") : ""; // Split the time and AM/PM
+        //   const [hours, minutes, seconds] = timePart ? timePart.split(":").map(Number) : ""; // Split hours, minutes, and seconds
+        //   let formattedHours = hours;
+
+        //   if (ampm === "PM" && hours < 12) {
+        //     formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
+        //   } else if (ampm === "AM" && hours === 12) {
+        //     formattedHours = 0; // Convert 12 AM to 0 hours
+        //   }
+        //   const formattedTime = `${String(formattedHours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        //   // return formattedTime;
+
+        //   if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+        //     if (item.empname) {
+        //       if (!lastTimes.hasOwnProperty(item.empname)) {
+        //         lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+        //       }
+
+        //       item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}`, `${finddate}T${findtime}`);
+        //     }
+        //   } else if (item.empname === mergedDataall[index - 1].empname) {
+        //     // item.empname = loginInfo.empname;
+        //     item.worktook = getTimeDifference(mergedDataall[index - 1].dateval, item.dateval);
+        //     // lastTimes[loginInfo.empname] = findtime;
+        //     //  productionResult.push(item);
+        //   }
+        // });
+        // // console.log(mergedDataall, "mergedDataall")
 
         setProductionFilter(filtered);
 
@@ -1091,8 +1202,6 @@ function ManualOverallReport() {
           empname: selectedEmployeeFrom.map((item) => item.value),
           user: selectedOptionsLoginid.map((item) => item.value),
           category: selectedOptionsCategory.map((item) => item.value),
-          subcategory: selectedOptionsSubCategory.map((item) => item.value),
-
           // category: selectedOptionsSubCategory.map(item => item.value),
           // vendor: selectedVendor.map(item => item.value),
           // project: selectedProject.map(item => item.value),
@@ -1104,7 +1213,7 @@ function ManualOverallReport() {
           fromYear: Number(selectedYear),
           fromMonth: Number(selectedMonthNum),
           batchNumber: batchNum,
-          batchSize: 50000,
+          batchSize: 10000,
         },
         {
           headers: {
@@ -1113,59 +1222,11 @@ function ManualOverallReport() {
         }
       );
 
-      if ((batchNumber * 50000) >= response.data.total) {
+      if (response.data.count === 0) {
         setHasMoreData(false);
         setSourcecheck(false);
         setIsLoading(false);
-
-        if (response.data.mergedData.filter((item) => item != null).length > 0) {
-          const filtered = response.data.mergedData
-            .filter((item) => item != null)
-            .map((item, index) => {
-              // const originalDatetime = new Date(item.olddateval);
-              // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
-              const finddatevalue = item.dateval && item.dateval?.split(' ');
-              const findtime = finddatevalue && finddatevalue[1];
-              const finddate = finddatevalue && finddatevalue[0];
-
-              // Given CST date and time
-              const istDate = new Date(`${finddate}T${findtime}`);
-
-              // Function to subtract hours and minutes from a date
-              function subtractTime(date, hours, minutes) {
-                // Subtract hours
-                date.setHours(date.getHours() - hours);
-                // Subtract minutes
-                date.setMinutes(date.getMinutes() - minutes);
-                return date;
-              }
-
-              // Subtract 10 hours and 30 minutes
-              const resultDate = subtractTime(istDate, 10, 30);
-
-              // Format the result to "YYYY-MM-DD HH:MM:SS"
-              function formatDate(date) {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-                const day = String(date.getDate()).padStart(2, '0');
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                const seconds = String(date.getSeconds()).padStart(2, '0');
-
-                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-              }
-
-              const formattedResult = formatDate(resultDate);
-              return {
-                ...item,
-                cstist: formattedResult,
-              };
-            });
-          // setAllData((prevData) => [...prevData, ...filtered]);
-
-
-          setProductionFilter((prevData) => [...productionFilter, ...filtered]);
-
+        if (productionFilter.length > 0) {
           setPopupContentMalert('Fully Loaded');
           setPopupSeverityMalert('success');
           handleClickOpenPopupMalert();
@@ -1215,7 +1276,130 @@ function ManualOverallReport() {
           });
         // setAllData((prevData) => [...prevData, ...filtered]);
 
+        // let final = filtered;
 
+        // function getTimeDifference(start, end) {
+        //   if (start && end) {
+        //     const startDate = new Date(start);
+        //     const endDate = new Date(end);
+
+        //     if (startDate > endDate) {
+        //       return "00:00:00";
+        //     } else {
+        //       const diff = new Date(endDate - startDate);
+        //       return diff.toISOString().substr(11, 8);
+        //     }
+        //   }
+        // }
+        // let lastTimes = {};
+
+        // let mergedDataall = final
+        //   .filter((item) => item !== undefined && item.empname != undefined && item.empname != "")
+        //   .sort((a, b) => {
+        //     if (a.mode !== b.mode) {
+        //       return a.mode === "Production" ? -1 : 1;
+        //     }
+
+        //     if (a.mode === "Production") {
+        //       const empnameA = a.empname.trim().toLowerCase();
+        //       const empnameB = b.empname.trim().toLowerCase();
+        //       if (empnameA < empnameB) return -1;
+        //       if (empnameA > empnameB) return 1;
+        //     } else if (a.mode === "Manual") {
+        //       const empnameA = a.empname.trim().toLowerCase();
+        //       const empnameB = b.empname.trim().toLowerCase();
+        //       if (empnameA < empnameB) return -1;
+        //       if (empnameA > empnameB) return 1;
+        //     }
+
+        //     // Convert empname to lowercase and trim spaces for case-insensitive and clean comparison
+        //     let adate = a.mode === "Production" ? a.dateval : `${a.fromdate}T${a.time}`;
+        //     let bdate = a.mode === "Production" ? b.dateval : `${b.fromdate}T${b.time}`;
+        //     const dateA = new Date(adate);
+        //     const dateB = new Date(bdate);
+
+        //     if (dateA < dateB) return -1;
+        //     if (dateA > dateB) return 1;
+
+        //     return 0;
+        //   });
+
+        // mergedDataall.forEach((item, index) => {
+        //   // const originalDatetime = new Date(item.olddateval);
+        //   // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+        //   const finddatevalue = item.dateval && item.dateval?.split(" ");
+        //   const findtime = finddatevalue && finddatevalue[1];
+        //   const finddate = finddatevalue && finddatevalue[0];
+
+        //   // const loginInfo = loginids.find(login => login.userid === item.user);
+
+        //   // const userInfo = loginInfo ? users.find(user => user.companyname === loginInfo.empname) : "";
+
+        //   const findshifttime = item.shifttiming ? item.shifttiming.split("to") : "00:00AMto00:00AM".split("to");
+
+        //   const getshift = item.shifttiming == "Week Off" ? findtime : findshifttime && findshifttime[0];
+        //   let hours24 = "";
+        //   const [time, period] = getshift.includes("AM") ? getshift.split("AM") : getshift.split("PM");
+        //   let [hoursshift, minutesshift] = time.split(":");
+
+        //   if (item.shifttiming != "Week Off") {
+        //     // Converting hours to 24-hour format if the period is "PM" and not "12"
+        //     hours24 = parseInt(hoursshift, 10);
+        //     if (getshift.includes("PM") && hoursshift !== "12") {
+        //       hours24 += 12;
+        //     }
+        //   } else {
+        //     hours24 = parseInt(findtime.split(":")[0], 10);
+        //     minutesshift = findtime.split(":")[1];
+        //   }
+        //   let secondssets = item.shifttiming == "Week Off" ? findtime.split(":")[0] : 0;
+        //   // Creating a new Date object with the updated hours
+        //   const date = new Date(finddate);
+        //   date.setHours(hours24);
+        //   date.setMinutes(parseInt(minutesshift, 10));
+        //   date.setSeconds(secondssets);
+
+        //   // Formatting the date to "hh:mm:ss" format
+        //   const formattedTimeshift = date.toTimeString().split(" ")[0];
+
+        //   const clockindate = attendances.find((d) => {
+        //     const [day, month, year] = d.date.split("-"); // Split the date string from the attendance record
+        //     const dateObject = new Date(year, month - 1, day); // Create a new Date object
+        //     const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`; // Format the date
+
+        //     return formattedDateString === finddate && item.username == d.username;
+        //   });
+
+        //   const [timePart, ampm] = clockindate ? clockindate.clockintime.split(" ") : ""; // Split the time and AM/PM
+        //   const [hours, minutes, seconds] = timePart ? timePart.split(":").map(Number) : ""; // Split hours, minutes, and seconds
+        //   let formattedHours = hours;
+
+        //   if (ampm === "PM" && hours < 12) {
+        //     formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
+        //   } else if (ampm === "AM" && hours === 12) {
+        //     formattedHours = 0; // Convert 12 AM to 0 hours
+        //   }
+        //   const formattedTime = `${String(formattedHours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        //   // return formattedTime;
+
+        //   if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+        //     if (item.empname) {
+        //       if (!lastTimes.hasOwnProperty(item.empname)) {
+        //         lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+        //       }
+
+        //       item.worktook = getTimeDifference(new Date(`${finddate}T${lastTimes[item.empname]}`), new Date(`${finddate}T${findtime}`));
+        //     }
+        //   } else if (item.empname == mergedDataall[index - 1].empname) {
+        //     // item.empname = loginInfo.empname;
+        //     item.worktook = getTimeDifference(mergedDataall[index - 1].dateval, item.dateval);
+        //     // lastTimes[loginInfo.empname] = findtime;
+        //     //  productionResult.push(item);
+        //   }
+        // });
+        // console.log(mergedDataall, "mergedDataall")
+
+        // setProductionFilter(mergedDataall);
         setProductionFilter((prevData) => [...productionFilter, ...filtered]);
 
         setPage(1);
@@ -1369,7 +1553,13 @@ function ManualOverallReport() {
     setSelectedOptionsSubCategory(options);
   };
 
+  let [valueCompanyCat, setValueCompanyCat] = useState([]);
   const handleCompanyChange = (options) => {
+    setValueCompanyCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
     fetchBranchAll(options);
     setSelectedOptionsCompany(options);
     fetchUnitAll(options, selectedOptionsBranch);
@@ -1379,8 +1569,13 @@ function ManualOverallReport() {
     setSelectedOptionsTeam([]);
     setSelectedEmployeeFrom([]);
   };
-
+  let [valueBranchCat, setValueBranchCat] = useState([]);
   const handleBranchChange = (options) => {
+    setValueBranchCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
     setSelectedOptionsBranch(options);
     fetchUnitAll(selectedOptionsCompany, options);
     fetchEmployeesAll(selectedOptionsCompany, options, selectedOptionsUnit, selectedOptionsTeam);
@@ -1388,16 +1583,27 @@ function ManualOverallReport() {
     setSelectedOptionsTeam([]);
     setSelectedEmployeeFrom([]);
   };
+  let [valueUnitCat, setValueUnitCat] = useState([]);
 
   const handleUnitChange = (options) => {
+    setValueUnitCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
     setSelectedOptionsUnit(options);
     fetchTeamAll(selectedOptionsCompany, selectedOptionsBranch, options);
     fetchEmployeesAll(selectedOptionsCompany, selectedOptionsBranch, options, selectedOptionsTeam);
     setSelectedOptionsTeam([]);
     setSelectedEmployeeFrom([]);
   };
-
+  let [valueTeamCat, setValueTeamCat] = useState([]);
   const handleTeamChange = (options) => {
+    setValueTeamCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
     setSelectedOptionsTeam(options);
     fetchEmployeesAll(selectedOptionsCompany, selectedOptionsBranch, selectedOptionsUnit, options);
     setSelectedEmployeeFrom([]);
@@ -1972,11 +2178,7 @@ function ManualOverallReport() {
         <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: 'flex' }}
-                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
-                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -2008,6 +2210,95 @@ function ManualOverallReport() {
       </DialogActions>
     </Box>
   );
+
+  useEffect(() => {
+    updateEmployees([]); // Pass an empty array instead of an empty string
+  }, [allUsersLimit, valueCompanyCat, valueBranchCat, valueUnitCat, valueTeamCat]);
+
+  const updateEmployees = (pastedNames) => {
+    console.log(pastedNames, "pastedNamesupdatemp")
+    const namesArray = Array.isArray(pastedNames) ? pastedNames : [];
+    console.log(namesArray, "namesArray")
+    console.log(allUsersLimit, "allUsersLimit")
+    const availableOptions = allUsersLimit?.filter((comp) =>
+      valueCompanyCat?.includes(comp.company) &&
+      valueBranchCat?.includes(comp.branch) &&
+      valueUnitCat?.includes(comp.unit) &&
+      valueTeamCat?.includes(comp.team))?.map((data) => data.companyname.replace(/\s*\.\s*/g, '.').trim());
+
+
+    allUsersLimit?.filter((comp) =>
+      console.log(
+        valueCompanyCat?.includes(comp.company), valueCompanyCat,
+        valueBranchCat?.includes(comp.branch), valueBranchCat,
+        valueUnitCat?.includes(comp.unit), valueUnitCat,
+        valueTeamCat?.includes(comp.team), valueTeamCat
+
+      ),
+
+    )
+
+    console.log(availableOptions, "availableOptions")
+    const matchedValues = namesArray.filter((name) => availableOptions.includes(name.replace(/\s*\.\s*/g, '.').trim()));
+    console.log(matchedValues, "matchedValues")
+
+    // Update selected options
+    const newOptions = matchedValues.map((value) => ({
+      label: value,
+      value: value,
+    }));
+    console.log(newOptions, "newOptions")
+
+    setSelectedEmployeeFrom((prev) => {
+      const newValues = newOptions.filter((newOpt) => !prev.some((prevOpt) => prevOpt.value === newOpt.value));
+      return [...prev, ...newValues];
+    });
+
+    // Update other states...
+    setValueEmployeeCat((prev) => [...new Set([...prev, ...matchedValues])]);
+  };
+
+  const handlePasteForEmp = (e) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData('text');
+    console.log(pastedText, "pastedText")
+    // Process the pasted text
+    const pastedNames = pastedText
+      .split(/[\n,]+/)
+      .map((name) => name.trim())
+      .filter((name) => name !== '');
+    console.log(pastedNames, "pastedNames")
+
+    // Update the state
+    updateEmployees(pastedNames);
+
+    // Clear the search input after paste
+    setSearchInputValue('');
+
+    // Refocus the element
+    e.target.focus();
+  };
+
+  // Handle clicks outside the Box
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      const boxElement = document.getElementById('paste-box'); // Add an ID to the Box
+      if (boxElement && !boxElement.contains(e.target)) {
+        setIsBoxFocused(false); // Reset focus state if clicking outside the Box
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleDelete = (e, value) => {
+    e.preventDefault();
+    setSelectedEmp((current) => current.filter((emp) => emp.value !== value));
+    setValueEmployeeCat((current) => current.filter((empValue) => empValue !== value));
+  };
 
   return (
     <Box>
@@ -2262,7 +2553,48 @@ function ManualOverallReport() {
             <Grid item md={3} xs={12} sm={12}>
               <FormControl fullWidth size="small">
                 <Typography>Employee Name</Typography>
-                <MultiSelect options={employeeOption} value={selectedEmployeeFrom} onChange={handleEmployeeChangeFrom} valueRenderer={customValueRendererEmployeeFrom} labelledBy="Please Select Employeename" />
+                <div onPaste={handlePasteForEmp} style={{ position: 'relative' }}>
+                  <MultiSelect
+                    options={employeeOption}
+                    value={selectedEmployeeFrom}
+                    // value={selectedEmp}
+                    onChange={handleEmployeeChangeFrom}
+                    valueRenderer={customValueRendererEmployeeFrom}
+                    labelledBy="Please Select Employeename"
+                  />
+                </div>
+              </FormControl>
+            </Grid>
+            <Grid item md={6} sm={12} xs={12} sx={{ display: 'flex', flexDirection: 'row' }}>
+              <FormControl fullWidth size="small">
+                <Typography>Selected Employees</Typography>
+                <Box
+                  id="paste-box"
+                  tabIndex={0}
+                  sx={{
+                    border: '1px solid #ccc',
+                    borderRadius: '3.75px',
+                    height: '110px',
+                    overflow: 'auto',
+                    '& .MuiChip-clickable': {
+                      margin: '1px',
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      background: '#e0e0e0',
+                    },
+                  }}
+                  onPaste={handlePasteForEmp}
+                  onFocus={() => setIsBoxFocused(true)}
+                  onBlur={(e) => {
+                    if (isBoxFocused) {
+                      e.target.focus();
+                    }
+                  }}
+                >
+                  {valueEmployeeCat.map((value) => (
+                    <Chip key={value} label={value} clickable sx={{ margin: 2, backgroundColor: '#FFF' }} onDelete={(e) => handleDelete(e, value)} onClick={() => console.log('clicked chip')} />
+                  ))}
+                </Box>
               </FormControl>
             </Grid>
           </Grid>
@@ -2626,7 +2958,7 @@ function ManualOverallReport() {
 
       <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContenmanualt={popupContent} popupSeverity={popupSeverity} />
     </Box>
   );
 }

@@ -103,12 +103,16 @@ function StockReorder() {
 
     const {
         isUserRoleCompare, pageName, setPageName,
-        isUserRoleAccess,
+        isUserRoleAccess,isAssignBranch
     } = useContext(UserRoleAccessContext);
 
     // console.log(isUserRoleAccess, "isUserRoleAccess")
 
-
+    const accessbranch = isAssignBranch?.map((data) => ({
+        branch: data.branch,
+        company: data.company,
+        unit: data.unit,
+    }));
     const { auth } = useContext(AuthContext);
 
     const [openPopupMalert, setOpenPopupMalert] = useState(false);
@@ -630,6 +634,7 @@ function StockReorder() {
                     Authorization: `Bearer ${auth.APIToken}`,
                 },
                 assetmat: "Stock Material",
+                assignbranch:accessbranch
             });
 
 

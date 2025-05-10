@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { TextField, IconButton, ListItem, List, RadioGroup, Radio, FormControlLabel, Checkbox, InputAdornment, ListItemText, Tooltip, Popover, Box, Typography, OutlinedInput, TableBody, Select, Paper, MenuItem, Dialog, DialogContent, DialogActions, FormControl, Grid, Table, TableHead, TableContainer, Button } from "@mui/material";
+import { TextField, Chip, IconButton, ListItem, List, RadioGroup, Radio, FormControlLabel, Checkbox, InputAdornment, ListItemText, Tooltip, Popover, Box, Typography, OutlinedInput, TableBody, Select, Paper, MenuItem, Dialog, DialogContent, DialogActions, FormControl, Grid, Table, TableHead, TableContainer, Button } from "@mui/material";
 import { userStyle, colourStyles } from "../../pageStyle";
 import { FaPrint, FaFilePdf, FaFileCsv, FaFileExcel, FaSearch } from "react-icons/fa";
 import { StyledTableRow, StyledTableCell } from "../../components/Table";
@@ -47,12 +47,18 @@ import { MdClose } from "react-icons/md";
 
 function OverallMaintenanceTaskReport({ com }) {
     // const { isUserRoleCompare } = useContext(UserRoleAccessContext);
+
+    const [isBoxFocused, setIsBoxFocused] = React.useState(false);
+    const [searchInputValue, setSearchInputValue] = useState('');
+
+    const [selectedEmp, setSelectedEmp] = useState([]);
+
     const { auth } = useContext(AuthContext);
-    const {
-        isAssignBranch,
-        allTeam,
-        allUsersData,
-    } = useContext(UserRoleAccessContext);
+    // const {
+    //     isAssignBranch,
+    //     allTeam,
+    //     allUsersData,
+    // } = useContext(UserRoleAccessContext);
     const [employees, setEmployees] = useState([]);
     const [filteredRowData, setFilteredRowData] = useState([]);
     const [filteredChanges, setFilteredChanges] = useState(null);
@@ -60,11 +66,8 @@ function OverallMaintenanceTaskReport({ com }) {
     const [searchedString, setSearchedString] = useState(null);
     const [filterValue, setFilterValue] = useState("");
     const gridRefTable = useRef(null);
-    const { isUserRoleCompare, isUserRoleAccess, listPageAccessMode,
-        //  pageName,
-        // setPageName,
-        buttonStyles, } =
-        useContext(UserRoleAccessContext);
+    const { isUserRoleAccess, allUsersData, isUserRoleCompare, isAssignBranch, allUsersLimit, alldepartment, allTeam, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
+
     const [filterLoader, setFilterLoader] = useState(false);
     const [tableLoader, setTableLoader] = useState(false);
     const [openPopupMalert, setOpenPopupMalert] = useState(false);
@@ -303,6 +306,7 @@ function OverallMaintenanceTaskReport({ com }) {
         setValueTeamCat([]);
         setSelectedOptionsTeam([]);
         setValueDepartmentCat([]);
+        setSelectedEmp([]);
         setSelectedOptionsDepartment([]);
         setValueEmployeeCat([]);
         setSelectedOptionsEmployee([]);
@@ -325,6 +329,7 @@ function OverallMaintenanceTaskReport({ com }) {
         setValueUnitCat([]);
         setSelectedOptionsUnit([]);
         setValueTeamCat([]);
+        setSelectedEmp([]);
         setSelectedOptionsTeam([]);
         setValueDepartmentCat([]);
         setSelectedOptionsDepartment([]);
@@ -349,6 +354,7 @@ function OverallMaintenanceTaskReport({ com }) {
         setSelectedOptionsUnit(options);
         setValueTeamCat([]);
         setSelectedOptionsTeam([]);
+        setSelectedEmp([]);
         setValueDepartmentCat([]);
         setSelectedOptionsDepartment([]);
         setValueEmployeeCat([]);
@@ -370,6 +376,7 @@ function OverallMaintenanceTaskReport({ com }) {
         );
         setSelectedOptionsTeam(options);
         setValueDepartmentCat([]);
+        setSelectedEmp([]);
         setSelectedOptionsDepartment([]);
         setValueEmployeeCat([]);
         setSelectedOptionsEmployee([]);
@@ -392,6 +399,7 @@ function OverallMaintenanceTaskReport({ com }) {
         );
         setSelectedOptionsDepartment(options);
         setValueEmployeeCat([]);
+        setSelectedEmp([]);
         setSelectedOptionsEmployee([]);
     };
     const customValueRendererDepartment = (valueDepartmentCat, _categoryname) => {
@@ -409,6 +417,7 @@ function OverallMaintenanceTaskReport({ com }) {
             })
         );
         setSelectedOptionsEmployee(options);
+        setSelectedEmp([]);
     };
     const customValueRendererEmployee = (valueEmployeeCat, _categoryname) => {
         return valueEmployeeCat?.length
@@ -1402,6 +1411,79 @@ function OverallMaintenanceTaskReport({ com }) {
         setRaiseTicketList([])
     }
 
+
+    useEffect(() => {
+        updateEmployees([]); // Pass an empty array instead of an empty string
+    }, [allUsersLimit, valueCompanyCat, valueBranchCat, valueUnitCat, valueTeamCat]);
+
+    const updateEmployees = (pastedNames) => {
+        const namesArray = Array.isArray(pastedNames) ? pastedNames : [];
+
+        const availableOptions = allUsersLimit?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch) && valueUnitCat?.includes(comp.unit) && valueTeamCat?.includes(comp.team))?.map((data) => data.companyname.replace(/\s*\.\s*/g, '.').trim());
+
+        const matchedValues = namesArray.filter((name) => availableOptions.includes(name.replace(/\s*\.\s*/g, '.').trim()));
+
+        // Update selected options
+        const newOptions = matchedValues.map((value) => ({
+            label: value,
+            value: value,
+        }));
+
+        // setSelectedEmp((prev) => {
+        //     const newValues = newOptions.filter((newOpt) => !prev.some((prevOpt) => prevOpt.value === newOpt.value));
+        //     return [...prev, ...newValues];
+        // });
+        
+        setSelectedOptionsEmployee((prev) => {
+            const newValues = newOptions.filter((newOpt) => !prev.some((prevOpt) => prevOpt.value === newOpt.value));
+            return [...prev, ...newValues];
+        });
+        // Update other states...
+        setValueEmployeeCat((prev) => [...new Set([...prev, ...matchedValues])]);
+    };
+
+    const handlePasteForEmp = (e) => {
+        e.preventDefault();
+        const pastedText = e.clipboardData.getData('text');
+console.log(pastedText,"pastedText")
+        // Process the pasted text
+        const pastedNames = pastedText
+            .split(/[\n,]+/)
+            .map((name) => name.trim())
+            .filter((name) => name !== '');
+            console.log(pastedNames,"pastedNames")
+
+        // Update the state
+        updateEmployees(pastedNames);
+
+        // Clear the search input after paste
+        setSearchInputValue('');
+
+        // Refocus the element
+        e.target.focus();
+    };
+
+    // Handle clicks outside the Box
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            const boxElement = document.getElementById('paste-box'); // Add an ID to the Box
+            if (boxElement && !boxElement.contains(e.target)) {
+                setIsBoxFocused(false); // Reset focus state if clicking outside the Box
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const handleDelete = (e, value) => {
+        e.preventDefault();
+        setSelectedEmp((current) => current.filter((emp) => emp.value !== value));
+        setValueEmployeeCat((current) => current.filter((empValue) => empValue !== value));
+    };
+
     return (
         <Box>
             <Headtitle title={"User Maintenance Task Panel - OVERALL REPORTS"} />
@@ -1724,6 +1806,7 @@ function OverallMaintenanceTaskReport({ com }) {
                                             <Typography>
                                                 Employee<b style={{ color: "red" }}>*</b>
                                             </Typography>
+                                            <div onPaste={handlePasteForEmp} style={{ position: 'relative' }}>
                                             <MultiSelect
                                                 options={allUsersData
                                                     ?.filter(
@@ -1745,6 +1828,41 @@ function OverallMaintenanceTaskReport({ com }) {
                                                 valueRenderer={customValueRendererEmployee}
                                                 labelledBy="Please Select Employee"
                                             />
+                                            </div>
+                                        </FormControl>
+                                    </Grid>
+                                )}
+                                {['Individual']?.includes(filterState.type) && (
+                                    <Grid item md={6} sm={12} xs={12} sx={{ display: 'flex', flexDirection: 'row' }}>
+                                        <FormControl fullWidth size="small">
+                                            <Typography>Selected Employees</Typography>
+                                            <Box
+                                                id="paste-box"
+                                                tabIndex={0}
+                                                sx={{
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '3.75px',
+                                                    height: '110px',
+                                                    overflow: 'auto',
+                                                    '& .MuiChip-clickable': {
+                                                        margin: '1px',
+                                                        cursor: 'pointer',
+                                                        userSelect: 'none',
+                                                        background: '#e0e0e0',
+                                                    },
+                                                }}
+                                                onPaste={handlePasteForEmp}
+                                                onFocus={() => setIsBoxFocused(true)}
+                                                onBlur={(e) => {
+                                                    if (isBoxFocused) {
+                                                        e.target.focus();
+                                                    }
+                                                }}
+                                            >
+                                                {valueEmployeeCat.map((value) => (
+                                                    <Chip key={value} label={value} clickable sx={{ margin: 2, backgroundColor: '#FFF' }} onDelete={(e) => handleDelete(e, value)} onClick={() => console.log('clicked chip')} />
+                                                ))}
+                                            </Box>
                                         </FormControl>
                                     </Grid>
                                 )}

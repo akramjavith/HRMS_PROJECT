@@ -1,8 +1,9 @@
-import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LoadingButton from "@mui/lab/LoadingButton";
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LoadingButton from '@mui/lab/LoadingButton';
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import {
   Box,
   Button,
@@ -30,80 +31,85 @@ import {
   TextField,
   Typography,
   Tooltip,
-  Chip
-} from "@mui/material";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import * as faceapi from "face-api.js";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPlus, FaPrint } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import { MultiSelect } from "react-multi-select-component";
-import {
-  NotificationContainer,
-  NotificationManager,
-} from "react-notifications";
-import "react-notifications/lib/notifications.css";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
+  Chip,
+} from '@mui/material';
+import Switch from '@mui/material/Switch';
+// import axios from '../../../../axiosInstance';
+import axios from 'axios';
+import * as faceapi from 'face-api.js';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPlus, FaPrint } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import { MultiSelect } from 'react-multi-select-component';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
+import 'react-notifications/lib/notifications.css';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
 import AggregatedSearchBar from '../../../../components/AggregatedSearchBar';
-import AggridTable from "../../../../components/AggridTable";
-import AlertDialog from "../../../../components/Alert";
-import { handleApiError } from "../../../../components/Errorhandling";
-import ExportData from "../../../../components/ExportData";
-import Headtitle from "../../../../components/Headtitle";
-import MessageAlert from "../../../../components/MessageAlert";
-import PageHeading from "../../../../components/PageHeading";
-import { StyledTableCell, StyledTableRow } from "../../../../components/Table";
-import { AuthContext, UserRoleAccessContext } from "../../../../context/Appcontext";
-import { colourStyles, userStyle } from "../../../../pageStyle";
-import { SERVICE } from "../../../../services/Baseservice";
+import AggridTable from '../../../../components/AggridTable';
+import AlertDialog from '../../../../components/Alert';
+import { handleApiError } from '../../../../components/Errorhandling';
+import ExportData from '../../../../components/ExportData';
+import Headtitle from '../../../../components/Headtitle';
+import MessageAlert from '../../../../components/MessageAlert';
+import PageHeading from '../../../../components/PageHeading';
+import { StyledTableCell, StyledTableRow } from '../../../../components/Table';
+import { AuthContext, UserRoleAccessContext } from '../../../../context/Appcontext';
+import { colourStyles, userStyle } from '../../../../pageStyle';
+import { SERVICE } from '../../../../services/Baseservice';
 import domtoimage from 'dom-to-image';
-import * as FileSaver from "file-saver";
-import ExcelJS from "exceljs";
-import Webcamimage from "../../../../components/webCamWithDuplicate";
-import ExistingProfileVisitor from "../../../interactors/visitors/ExistingProfileVisitor";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import Cropper from "react-cropper";
-import "cropperjs/dist/cropper.css";
-import "react-image-crop/dist/ReactCrop.css";
+import * as FileSaver from 'file-saver';
+import ExcelJS from 'exceljs';
+import Webcamimage from '../../../../components/webCamWithDuplicate';
+import ExistingProfileVisitor from '../../../interactors/visitors/ExistingProfileVisitor';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import Cropper from 'react-cropper';
+import 'cropperjs/dist/cropper.css';
+import 'react-image-crop/dist/ReactCrop.css';
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 
-const ExportXLWithImages = ({ csvData, fileName }) => {
+const ExportXLWithImages = ({ csvData, fileName,type }) => {
+
   const exportToExcel = async (csvData, fileName) => {
     if (!csvData || !csvData.length) {
-      console.error("No data provided for export.");
+      console.error('No data provided for export.');
       return;
     }
 
     if (!fileName) {
-      console.error("No file name provided.");
+      console.error('No file name provided.');
       return;
     }
 
     try {
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Data");
-
+      const worksheet = workbook.addWorksheet('Data');
+if(type === "filtered"){
+  worksheet.columns = [
+    { header: 'S.No', key: 'serial', width: 10 },
+    { header: 'Employeename', key: 'employeename', width: 30 },
+    { header: 'Image', key: 'image', width: 30 },
+  ];
+}else{
       // Define columns
       worksheet.columns = [
-        { header: "S.No", key: "serial", width: 10 },
-        { header: "Empcode", key: "empcode", width: 15 },
-        { header: "Employeename", key: "employeename", width: 30 },
-        { header: "Email", key: "email", width: 30 },
-        { header: "Work Mode", key: "workmode", width: 30 },
-        { header: "Contactpersonal", key: "contactpersonal", width: 20 },
-        { header: "Contactfamily", key: "contactfamily", width: 20 },
-        { header: "Emergencyno", key: "emergencyno", width: 20 },
-        { header: "Image", key: "image", width: 30 },
+        { header: 'S.No', key: 'serial', width: 10 },
+        { header: 'Empcode', key: 'empcode', width: 15 },
+        { header: 'Employeename', key: 'employeename', width: 30 },
+        { header: 'Email', key: 'email', width: 30 },
+        { header: 'Work Mode', key: 'workmode', width: 30 },
+        { header: 'Contactpersonal', key: 'contactpersonal', width: 20 },
+        { header: 'Contactfamily', key: 'contactfamily', width: 20 },
+        { header: 'Emergencyno', key: 'emergencyno', width: 20 },
+        { header: 'Image', key: 'image', width: 30 },
       ];
-
+    }
       // Add rows and images
       for (let i = 0; i < csvData.length; i++) {
         const item = csvData[i];
@@ -120,14 +126,14 @@ const ExportXLWithImages = ({ csvData, fileName }) => {
 
         // Center align the text in each cell of the row
         row.eachCell({ includeEmpty: true }, (cell) => {
-          cell.alignment = { vertical: "middle", horizontal: "center" };
+          cell.alignment = { vertical: 'middle', horizontal: 'center' };
         });
 
         if (item.imageBase64) {
-          const base64Image = item.imageBase64.split(",")[1];
+          const base64Image = item.imageBase64.split(',')[1];
           const imageId = workbook.addImage({
             base64: base64Image,
-            extension: "png",
+            extension: 'png',
           });
 
           const rowIndex = row.number;
@@ -137,14 +143,14 @@ const ExportXLWithImages = ({ csvData, fileName }) => {
 
           // Add image to the worksheet
           worksheet.addImage(imageId, {
-            tl: { col: 7, row: rowIndex - 1 },
+            tl: { col: 8, row: rowIndex - 1 },
             ext: { width: 100, height: 80 },
           });
 
           // Center align the image cell
           worksheet.getCell(`H${rowIndex}`).alignment = {
-            vertical: "middle",
-            horizontal: "center",
+            vertical: 'middle',
+            horizontal: 'center',
           };
         }
       }
@@ -152,19 +158,16 @@ const ExportXLWithImages = ({ csvData, fileName }) => {
       // Generate Excel file
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
       FileSaver.saveAs(blob, `${fileName}.xlsx`);
     } catch (error) {
-      console.error("Error exporting to Excel:", error);
+      console.error('Error exporting to Excel:', error);
     }
   };
 
   return (
-    <Button
-      onClick={() => exportToExcel(csvData, fileName)}
-      sx={userStyle.buttongrp}
-    >
+    <Button onClick={() => exportToExcel(csvData, fileName)} sx={userStyle.buttongrp}>
       <FaFileExcel /> &ensp;Export to Excel&ensp;
     </Button>
   );
@@ -173,30 +176,30 @@ const ExportXLWithImages = ({ csvData, fileName }) => {
 const ExportCSVWithImages = ({ csvData, fileName }) => {
   const exportToCSV = async (csvData, fileName) => {
     if (!csvData || !csvData.length) {
-      console.error("No data provided for export.");
+      console.error('No data provided for export.');
       return;
     }
 
     if (!fileName) {
-      console.error("No file name provided.");
+      console.error('No file name provided.');
       return;
     }
 
     try {
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Data");
+      const worksheet = workbook.addWorksheet('Data');
 
       // Define columns
       worksheet.columns = [
-        { header: "S.No", key: "serial", width: 10 },
-        { header: "Empcode", key: "empcode", width: 15 },
-        { header: "Employeename", key: "employeename", width: 30 },
-        { header: "Email", key: "email", width: 30 },
-        { header: "Work Mode", key: "workmode", width: 30 },
-        { header: "Contactpersonal", key: "contactpersonal", width: 20 },
-        { header: "Contactfamily", key: "contactfamily", width: 20 },
-        { header: "Emergencyno", key: "emergencyno", width: 20 },
-        { header: "Image", key: "image", width: 30 },
+        { header: 'S.No', key: 'serial', width: 10 },
+        { header: 'Empcode', key: 'empcode', width: 15 },
+        { header: 'Employeename', key: 'employeename', width: 30 },
+        { header: 'Email', key: 'email', width: 30 },
+        { header: 'Work Mode', key: 'workmode', width: 30 },
+        { header: 'Contactpersonal', key: 'contactpersonal', width: 20 },
+        { header: 'Contactfamily', key: 'contactfamily', width: 20 },
+        { header: 'Emergencyno', key: 'emergencyno', width: 20 },
+        { header: 'Image', key: 'image', width: 30 },
       ];
 
       // Add rows and images
@@ -215,14 +218,14 @@ const ExportCSVWithImages = ({ csvData, fileName }) => {
 
         // Center align the text in each cell of the row
         row.eachCell({ includeEmpty: true }, (cell) => {
-          cell.alignment = { vertical: "middle", horizontal: "center" };
+          cell.alignment = { vertical: 'middle', horizontal: 'center' };
         });
 
         if (item.imageBase64) {
-          const base64Image = item.imageBase64.split(",")[1];
+          const base64Image = item.imageBase64.split(',')[1];
           const imageId = workbook.addImage({
             base64: base64Image,
-            extension: "png",
+            extension: 'png',
           });
 
           const rowIndex = row.number;
@@ -232,14 +235,14 @@ const ExportCSVWithImages = ({ csvData, fileName }) => {
 
           // Add image to the worksheet
           worksheet.addImage(imageId, {
-            tl: { col: 7, row: rowIndex - 1 },
+            tl: { col: 8, row: rowIndex - 1 },
             ext: { width: 100, height: 80 },
           });
 
           // Center align the image cell
           worksheet.getCell(`H${rowIndex}`).alignment = {
-            vertical: "middle",
-            horizontal: "center",
+            vertical: 'middle',
+            horizontal: 'center',
           };
         }
       }
@@ -247,24 +250,20 @@ const ExportCSVWithImages = ({ csvData, fileName }) => {
       // Generate Excel file
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
       FileSaver.saveAs(blob, `${fileName}.csv`);
     } catch (error) {
-      console.error("Error exporting to Excel:", error);
+      console.error('Error exporting to Excel:', error);
     }
   };
 
   return (
-    <Button
-      onClick={() => exportToCSV(csvData, fileName)}
-      sx={userStyle.buttongrp}
-    >
+    <Button onClick={() => exportToCSV(csvData, fileName)} sx={userStyle.buttongrp}>
       <FaFileExcel /> &ensp;Export to CSV&ensp;
     </Button>
   );
 };
-
 
 function calculateLuminance(hex) {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -276,43 +275,461 @@ function calculateLuminance(hex) {
 
   // If luminance is greater than 128, it's a light color
   return luminance > 128;
-};
+}
 
 function Contactupdate() {
-
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
 
+
+    const ExportXLWithImages = async (csvData, fileName,type) => {
+      if (!csvData || !csvData.length) {
+        console.error('No data provided for export.');
+        return;
+      }
+  
+      if (!fileName) {
+        console.error('No file name provided.');
+        return;
+      }
+  
+      try {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Data');
+
+      
+      
+      if(type === "filtered"){
+    //     for (let i = 0; i < csvData.length; i++) {
+    //       const item = csvData[i];
+    //       const row = worksheet.addRow({
+    //         serial: i + 1,
+    //         // empcode: item.empcode,
+    //         employeename: item.companyname,
+    //         // email: item.email,
+    //         // workmode: item.workmode,
+    //         // contactpersonal: item.contactpersonal,
+    //         // contactfamily: item.contactfamily,
+    //         // emergencyno: item.emergencyno,
+    //       });
+    
+    //       // Center align the text in each cell of the row
+    //       row.eachCell({ includeEmpty: true }, (cell) => {
+    //         cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    //       });
+  
+    //       if (item.imageBase64) {
+    //         const base64Image = item.imageBase64.split(',')[1];
+    //         const imageId = workbook.addImage({
+    //           base64: base64Image,
+    //           extension: 'png',
+    //         });
+     
+    //         const rowIndex = row.number;
+  
+    //         // Adjust row height to fit the image
+    //         worksheet.getRow(rowIndex).height = 80;
+  
+    //         // Add image to the worksheet
+    //         worksheet.addImage(imageId, {
+    //           tl: { col:2, row: rowIndex - 1 },
+    //           ext: { width: 100, height: 80 },
+    //         });
+  
+    //         // Center align the image cell
+    //         worksheet.getCell(`H${rowIndex}`).alignment = {
+    //           vertical: 'middle',
+    //           horizontal: 'center',
+    //         };
+
+    //   }
+    // }
+    worksheet.addRow(['S.No', 'Image & Name']);
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    });
+    for (let i = 0; i < csvData.length; i++) {
+      const item = csvData[i];
+ const col2=   worksheet.getColumn(2)
+ col2.width=50
+      // Add an empty row for the image
+      const imageRow = worksheet.addRow([]);
+      imageRow.height = 90; // height for the image
+      const imageRowIndex = imageRow.number;
+    
+      // Add the employee name row right after the image
+      const nameRow = worksheet.addRow([]);
+      nameRow.getCell(2).value = item.companyname;
+      nameRow.getCell(2).alignment = { horizontal: 'center' };
+
+      // nameRow.getCell(1).value = i + 1; // S.No
+      nameRow.height = 20;
+
+      const sno = i + 1;
+worksheet.getCell(`A${imageRowIndex}`).value = sno;
+worksheet.mergeCells(`A${imageRowIndex}:A${imageRowIndex + 1}`);
+
+
+      nameRow.eachCell({ includeEmpty: true }, (cell) => {
+        cell.alignment = { vertical: 'middle', horizontal: 'end' };
+      });
+
+      worksheet.getCell(`A${imageRowIndex}`).alignment = {
+        vertical: 'middle',
+        horizontal: 'center',
+      };
+    
+      // Insert the image (Base64)
+      if (item.imageBase64) {
+        const base64Image = item.imageBase64.split(',')[1];
+        const imageId = workbook.addImage({
+          base64: base64Image,
+          extension: 'png',
+        });
+    
+
+        // Image is inserted into column B (index 1-based = 2)
+
+        worksheet.addImage(imageId, {
+          tl: { col: 1.5, row: imageRowIndex - 1 }, // zero-based row index
+          ext: { width: 100, height: 90 },
+        });
+      }
+    }
+    
+    
+
+  }
+      else{
+          // Define columns
+          worksheet.columns = [
+            { header: 'S.No', key: 'serial', width: 10 },
+            { header: 'Empcode', key: 'empcode', width: 15 },
+            { header: 'Employeename', key: 'employeename', width: 30 },
+            { header: 'Email', key: 'email', width: 30 },
+            { header: 'Work Mode', key: 'workmode', width: 30 },
+            { header: 'Contactpersonal', key: 'contactpersonal', width: 20 },
+            { header: 'Contactfamily', key: 'contactfamily', width: 20 },
+            { header: 'Emergencyno', key: 'emergencyno', width: 20 },
+            { header: 'Image', key: 'image', width: 30 },
+          ];
+     
+        // Add rows and images
+        for (let i = 0; i < csvData.length; i++) {
+          const item = csvData[i];
+          const row = worksheet.addRow({
+            serial: i + 1,
+            empcode: item.empcode,
+            employeename: item.companyname,
+            email: item.email,
+            workmode: item.workmode,
+            contactpersonal: item.contactpersonal,
+            contactfamily: item.contactfamily,
+            emergencyno: item.emergencyno,
+          });
+    
+          // Center align the text in each cell of the row
+          row.eachCell({ includeEmpty: true }, (cell) => {
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+          });
+  
+          if (item.imageBase64) {
+            const base64Image = item.imageBase64.split(',')[1];
+            const imageId = workbook.addImage({
+              base64: base64Image,
+              extension: 'png',
+            });
+     
+            const rowIndex = row.number;
+  
+            // Adjust row height to fit the image
+            worksheet.getRow(rowIndex).height = 80;
+  
+            // Add image to the worksheet
+            worksheet.addImage(imageId, {
+              tl: { col:8, row: rowIndex - 1 },
+              ext: { width: 100, height: 80 },
+            });
+  
+            // Center align the image cell
+            worksheet.getCell(`H${rowIndex}`).alignment = {
+              vertical: 'middle',
+              horizontal: 'center',
+            };
+          }
+          }
+        }
+  
+        // Generate Excel file
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        FileSaver.saveAs(blob, `${fileName}.xlsx`);
+        handleCloseFilterMod()
+      } catch (error) {
+        console.error('Error exporting to Excel:', error);
+      }
+    };
+  
+ 
+    const ExportCSVWithImages = async (csvData, fileName,type) => {
+      if (!csvData || !csvData.length) {
+        console.error('No data provided for export.');
+        return;
+      }
+  
+      if (!fileName) {
+        console.error('No file name provided.');
+        return;
+      }
+  
+      try {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Data');
+
+        // Define columns
+        // if(type === "filtered"){
+        //   worksheet.columns = [
+        //     { header: 'S.No', key: 'serial', width: 10 },
+        //     { header: 'Employeename', key: 'employeename', width: 30 },
+        //     { header: 'Image', key: 'image', width: 30 },
+        //   ];
+
+        //   for (let i = 0; i < csvData.length; i++) {
+        //     const item = csvData[i];
+        //     const row = worksheet.addRow({
+        //       serial: i + 1,
+        //       // empcode: item.empcode,
+        //       employeename: item.companyname,
+        //       // email: item.email,
+        //       // workmode: item.workmode,
+        //       // contactpersonal: item.contactpersonal,
+        //       // contactfamily: item.contactfamily,
+        //       // emergencyno: item.emergencyno,
+        //     });
+    
+        //     // Center align the text in each cell of the row
+        //     row.eachCell({ includeEmpty: true }, (cell) => {
+        //       cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        //     });
+    
+        //     if (item.imageBase64) {
+        //       const base64Image = item.imageBase64.split(',')[1];
+        //       const imageId = workbook.addImage({
+        //         base64: base64Image,
+        //         extension: 'png',
+        //       });
+    
+        //       const rowIndex = row.number;
+    
+        //       // Adjust row height to fit the image
+        //       worksheet.getRow(rowIndex).height = 80;
+    
+        //       // Add image to the worksheet
+        //       worksheet.addImage(imageId, {
+        //         tl: { col: 2, row: rowIndex - 1 },
+        //         ext: { width: 100, height: 80 },
+        //       });
+    
+        //       // Center align the image cell
+        //       worksheet.getCell(`H${rowIndex}`).alignment = {
+        //         vertical: 'middle',
+        //         horizontal: 'center',
+        //       };
+        //     }
+        //   }
+        // }
+
+        if(type === "filtered"){
+          //     for (let i = 0; i < csvData.length; i++) {
+          //       const item = csvData[i];
+          //       const row = worksheet.addRow({
+          //         serial: i + 1,
+          //         // empcode: item.empcode,
+          //         employeename: item.companyname,
+          //         // email: item.email,
+          //         // workmode: item.workmode,
+          //         // contactpersonal: item.contactpersonal,
+          //         // contactfamily: item.contactfamily,
+          //         // emergencyno: item.emergencyno,
+          //       });
+          
+          //       // Center align the text in each cell of the row
+          //       row.eachCell({ includeEmpty: true }, (cell) => {
+          //         cell.alignment = { vertical: 'middle', horizontal: 'center' };
+          //       });
+        
+          //       if (item.imageBase64) {
+          //         const base64Image = item.imageBase64.split(',')[1];
+          //         const imageId = workbook.addImage({
+          //           base64: base64Image,
+          //           extension: 'png',
+          //         });
+           
+          //         const rowIndex = row.number;
+        
+          //         // Adjust row height to fit the image
+          //         worksheet.getRow(rowIndex).height = 80;
+        
+          //         // Add image to the worksheet
+          //         worksheet.addImage(imageId, {
+          //           tl: { col:2, row: rowIndex - 1 },
+          //           ext: { width: 100, height: 80 },
+          //         });
+        
+          //         // Center align the image cell
+          //         worksheet.getCell(`H${rowIndex}`).alignment = {
+          //           vertical: 'middle',
+          //           horizontal: 'center',
+          //         };
+      
+          //   }
+          // }
+          worksheet.addRow(['S.No', 'Image & Name']);
+          worksheet.getRow(1).eachCell((cell) => {
+            cell.font = { bold: true };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+          });
+          for (let i = 0; i < csvData.length; i++) {
+            const item = csvData[i];
+       const col2=   worksheet.getColumn(2)
+       col2.width=50
+            // Add an empty row for the image
+            const imageRow = worksheet.addRow([]);
+            imageRow.height = 90; // height for the image
+            const imageRowIndex = imageRow.number;
+          
+            // Add the employee name row right after the image
+            const nameRow = worksheet.addRow([]);
+            nameRow.getCell(2).value = item.companyname;
+            nameRow.getCell(2).alignment = { horizontal: 'center' };
+      
+            // nameRow.getCell(1).value = i + 1; // S.No
+            nameRow.height = 20;
+      
+            const sno = i + 1;
+      worksheet.getCell(`A${imageRowIndex}`).value = sno;
+      worksheet.mergeCells(`A${imageRowIndex}:A${imageRowIndex + 1}`);
+      
+      
+            nameRow.eachCell({ includeEmpty: true }, (cell) => {
+              cell.alignment = { vertical: 'middle', horizontal: 'end' };
+            });
+      
+            worksheet.getCell(`A${imageRowIndex}`).alignment = {
+              vertical: 'middle',
+              horizontal: 'center',
+            };
+          
+            // Insert the image (Base64)
+            if (item.imageBase64) {
+              const base64Image = item.imageBase64.split(',')[1];
+              const imageId = workbook.addImage({
+                base64: base64Image,
+                extension: 'png',
+              });
+          
+      
+              // Image is inserted into column B (index 1-based = 2)
+      
+              worksheet.addImage(imageId, {
+                tl: { col: 1.5, row: imageRowIndex - 1 }, // zero-based row index
+                ext: { width: 100, height: 90 },
+              });
+            }
+          }
+          
+          
+      
+        }
+     
+      else{
+
+        worksheet.columns = [
+          { header: 'S.No', key: 'serial', width: 10 },
+          { header: 'Empcode', key: 'empcode', width: 15 },
+          { header: 'Employeename', key: 'employeename', width: 30 },
+          { header: 'Email', key: 'email', width: 30 },
+          { header: 'Work Mode', key: 'workmode', width: 30 },
+          { header: 'Contactpersonal', key: 'contactpersonal', width: 20 },
+          { header: 'Contactfamily', key: 'contactfamily', width: 20 },
+          { header: 'Emergencyno', key: 'emergencyno', width: 20 },
+          { header: 'Image', key: 'image', width: 30 },
+        ];
+        // Add rows and images
+        for (let i = 0; i < csvData.length; i++) {
+          const item = csvData[i];
+          const row = worksheet.addRow({
+            serial: i + 1,
+            empcode: item.empcode,
+            employeename: item.companyname,
+            email: item.email,
+            workmode: item.workmode,
+            contactpersonal: item.contactpersonal,
+            contactfamily: item.contactfamily,
+            emergencyno: item.emergencyno,
+          });
+    
+          // Center align the text in each cell of the row
+          row.eachCell({ includeEmpty: true }, (cell) => {
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+          });
+  
+          if (item.imageBase64) {
+            const base64Image = item.imageBase64.split(',')[1];
+            const imageId = workbook.addImage({
+              base64: base64Image,
+              extension: 'png',
+            });
+     
+            const rowIndex = row.number;
+  
+            // Adjust row height to fit the image
+            worksheet.getRow(rowIndex).height = 80;
+  
+            // Add image to the worksheet
+            worksheet.addImage(imageId, {
+              tl: { col:8, row: rowIndex - 1 },
+              ext: { width: 100, height: 80 },
+            });
+  
+            // Center align the image cell
+            worksheet.getCell(`H${rowIndex}`).alignment = {
+              vertical: 'middle',
+              horizontal: 'center',
+            };
+          }
+          }
+        }
+
+
+        // Generate Excel file
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        FileSaver.saveAs(blob, `${fileName}.csv`);
+        handleCloseFilterMod()
+
+      } catch (error) {
+        console.error('Error exporting to Excel:', error);
+      }
+    };
+  
+  
   const [overallItems, setOverallItems] = useState([]);
 
-
-  let exportColumnNames = [
-    'SNo',
-    'Emp code',
-    'Name',
-    'Email',
-    'ContactPersonal',
-    'ContactFamily',
-    'EmergencyNo',
-    'Image'
-  ];
-  let exportRowValues = [
-    'serialNumber',
-    'empcode',
-    'companyname',
-    'email',
-    'contactpersonal',
-    'contactfamily',
-    'emergencyno',
-    'imageBase64'
-  ];
+  let exportColumnNames = ['SNo', 'Emp code', 'Name', 'Email', 'ContactPersonal', 'ContactFamily', 'EmergencyNo', 'Image'];
+  let exportRowValues = ['serialNumber', 'empcode', 'companyname', 'email', 'contactpersonal', 'contactfamily', 'emergencyno', 'imageBase64'];
 
   const [isHandleChange, setIsHandleChange] = useState(false);
-  const [searchedString, setSearchedString] = useState("")
+  const [searchedString, setSearchedString] = useState('');
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
     setBtnUpdate(false);
@@ -321,8 +738,8 @@ function Contactupdate() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -342,20 +759,20 @@ function Contactupdate() {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("xl");
+  const [fileFormat, setFormat] = useState('xl');
   const [empaddform, setEmpaddform] = useState({
-    prefix: "",
-    firstname: "",
-    lastname: "",
-    referencename: "",
-    email: "",
-    emergencyno: "",
-    contactno: "",
-    details: "",
-    profileimage: "",
-    empcode: "",
-    contactfamily: "",
-    contactpersonal: "",
+    prefix: '',
+    firstname: '',
+    lastname: '',
+    referencename: '',
+    email: '',
+    emergencyno: '',
+    contactno: '',
+    details: '',
+    profileimage: '',
+    empcode: '',
+    contactfamily: '',
+    contactpersonal: '',
   });
 
   // Country city state datas
@@ -366,88 +783,55 @@ function Contactupdate() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const {
-    isUserRoleCompare,
-    isUserRoleAccess,
-    allUsersData,
-    allTeam,
-    isAssignBranch,
-    pageName,
-    setPageName,
-    buttonStyles,
-    allUsersLimit
-  } = useContext(UserRoleAccessContext);
+  const { isUserRoleCompare, isUserRoleAccess, allUsersData, allTeam, isAssignBranch, pageName, setPageName, buttonStyles, allUsersLimit } = useContext(UserRoleAccessContext);
 
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [
-          window.location.pathname?.substring(1),
-          window.location.pathname,
-        ];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
+
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
 
   const { auth } = useContext(AuthContext);
 
-  const [file, setFile] = useState("");
+  const [file, setFile] = useState('');
 
   const [isContact, setIsContact] = useState(false);
 
   const gridRef = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [copiedData, setCopiedData] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [copiedData, setCopiedData] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-
     getapi();
-
   }, []);
 
   const getapi = async () => {
@@ -457,7 +841,7 @@ function Contactupdate() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Contact Update"),
+      pagename: String('Contact Update'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -468,58 +852,57 @@ function Contactupdate() {
         },
       ],
     });
-  }
+  };
 
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
-
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
-
   // Copied fields Name
   const handleCopy = (message) => {
-    NotificationManager.success(`${message} 👍`, "", 2000);
+    NotificationManager.success(`${message} 👍`, '', 2000);
   };
 
   const gridRefTableImg = useRef(null);
   // image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Contact Info Update.png");
+          saveAs(blob, 'Contact Info Update.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
 
   const [filterState, setFilterState] = useState({
-    type: "Individual",
-    employeestatus: "Please Select Employee Status",
+    type: 'Individual',
+    employeestatus: 'Please Select Employee Status',
   });
   const TypeOptions = [
-    { label: "Individual", value: "Individual" },
-    { label: "Department", value: "Department" },
-    { label: "Company", value: "Company" },
-    { label: "Branch", value: "Branch" },
-    { label: "Unit", value: "Unit" },
-    { label: "Team", value: "Team" },
+    { label: 'Individual', value: 'Individual' },
+    { label: 'Department', value: 'Department' },
+    { label: 'Company', value: 'Company' },
+    { label: 'Branch', value: 'Branch' },
+    { label: 'Unit', value: 'Unit' },
+    { label: 'Team', value: 'Team' },
   ];
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const fetchDepartments = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let req = await axios.get(SERVICE.DEPARTMENT, {
         headers: {
@@ -541,9 +924,7 @@ function Contactupdate() {
   }, []);
 
   //department multiselect
-  const [selectedOptionsDepartment, setSelectedOptionsDepartment] = useState(
-    []
-  );
+  const [selectedOptionsDepartment, setSelectedOptionsDepartment] = useState([]);
   let [valueDepartmentCat, setValueDepartmentCat] = useState([]);
 
   const handleDepartmentChange = (options) => {
@@ -559,9 +940,7 @@ function Contactupdate() {
   };
 
   const customValueRendererDepartment = (valueDepartmentCat, _categoryname) => {
-    return valueDepartmentCat?.length
-      ? valueDepartmentCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Department";
+    return valueDepartmentCat?.length ? valueDepartmentCat.map(({ label }) => label)?.join(', ') : 'Please Select Department';
   };
   //empaddform multiselect
   const [selectedOptionsEmployee, setSelectedOptionsEmployee] = useState([]);
@@ -583,9 +962,7 @@ function Contactupdate() {
   };
 
   const customValueRendererEmployee = (valueEmployeeCat, _categoryname) => {
-    return valueEmployeeCat?.length
-      ? valueEmployeeCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Employee";
+    return valueEmployeeCat?.length ? valueEmployeeCat.map(({ label }) => label)?.join(', ') : 'Please Select Employee';
   };
   const handleSelectionChange = (newSelection) => {
     setSelectedRows(newSelection.selectionModel);
@@ -601,17 +978,17 @@ function Contactupdate() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   // Show All Columns & Manage Columns
@@ -632,9 +1009,7 @@ function Contactupdate() {
     actions: true,
   };
 
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
   // Edit model
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -642,33 +1017,32 @@ function Contactupdate() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
     setSingleReferenceTodo({
-      name: "",
-      relationship: "",
-      occupation: "",
-      contact: "",
-      details: "",
+      name: '',
+      relationship: '',
+      occupation: '',
+      contact: '',
+      details: '',
     });
     setReferenceTodo([]);
     setReferenceTodoError({});
     setColor('#FFFFFF');
-    setCroppedImage("");
+    setCroppedImage('');
 
     setFile(null);
     setGetImg(null);
     setSelectedFile(null);
-    setImage("");
+    setImage('');
   };
   const [selectedFile, setSelectedFile] = useState(null);
-  const [croppedImage, setCroppedImage] = useState("");
+  const [croppedImage, setCroppedImage] = useState('');
   const cropperRef = useRef(null);
 
-
-  const [image, setImage] = useState("")
+  const [image, setImage] = useState('');
   const handleCrop = () => {
-    if (typeof cropperRef.current.cropper.getCroppedCanvas() === "undefined") {
+    if (typeof cropperRef.current.cropper.getCroppedCanvas() === 'undefined') {
       return;
     }
     const croppedImageData = cropperRef.current.cropper.getCroppedCanvas().toDataURL();
@@ -694,8 +1068,6 @@ function Contactupdate() {
     // handleChangeImage()
   };
 
-
-
   const [color, setColor] = useState('#FFFFFF');
   const [bgbtn, setBgbtn] = useState(false);
   const handleColorChange = (e) => {
@@ -709,11 +1081,11 @@ function Contactupdate() {
     setCroppedImage(null);
     setEmpaddform({
       ...empaddform,
-      profileimage: "",
-      faceDescriptor: []
+      profileimage: '',
+      faceDescriptor: [],
     });
-    setImage("");
-    setColor('#FFFFFF')
+    setImage('');
+    setColor('#FFFFFF');
   };
   const handleSubmitBG = async () => {
     setBgbtn(true);
@@ -740,16 +1112,14 @@ function Contactupdate() {
     }
   };
 
-
-
   const isLightColor = calculateLuminance(color);
 
   const [profileAvailed, setProfileAvailed] = useState(false);
-  const [docID, setDocID] = useState("");
+  const [docID, setDocID] = useState('');
 
   const getCode = async (e) => {
     setPageName(!pageName);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const [res, resNew] = await Promise.all([
         axios.get(`${SERVICE.USER_SINGLE}/${e}`, {
@@ -771,8 +1141,8 @@ function Contactupdate() {
         setDocID(resNew?.data?.semployeedocument?._id);
       } else {
         setProfileAvailed(false);
-        setEmpaddform({ ...res?.data?.suser, profileimage: "" });
-        setDocID("");
+        setEmpaddform({ ...res?.data?.suser, profileimage: '' });
+        setDocID('');
       }
 
       setRowGetid(res?.data?.suser);
@@ -797,7 +1167,7 @@ function Contactupdate() {
   // get single row to view....
   const getinfoCode = async (e) => {
     setPageName(!pageName);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.USER_SINGLE}/${e}`, {
         headers: {
@@ -844,7 +1214,7 @@ function Contactupdate() {
   const sendRequestt = async () => {
     const starttime = performance.now();
     setPageName(!pageName);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.put(`${SERVICE.USER_SINGLE_PWD}/${logedit}`, {
         headers: {
@@ -856,10 +1226,7 @@ function Contactupdate() {
         emergencyno: String(empaddform.emergencyno),
         contactno: String(empaddform.contactno),
         // profileimage: String(empaddform.profileimage),
-        faceDescriptor:
-          empaddform?.faceDescriptor?.length > 0
-            ? empaddform?.faceDescriptor
-            : [],
+        faceDescriptor: empaddform?.faceDescriptor?.length > 0 ? empaddform?.faceDescriptor : [],
         contactfamily: String(empaddform.contactfamily),
         contactpersonal: String(empaddform.contactpersonal),
         updatedby: [
@@ -900,11 +1267,11 @@ function Contactupdate() {
       }
 
       setSingleReferenceTodo({
-        name: "",
-        relationship: "",
-        occupation: "",
-        contact: "",
-        details: "",
+        name: '',
+        relationship: '',
+        occupation: '',
+        contact: '',
+        details: '',
       });
       setReferenceTodo([]);
       setReferenceTodoError({});
@@ -914,13 +1281,13 @@ function Contactupdate() {
       await fetchHandler();
       setColor('#FFFFFF');
       setPopupContent('Updated Successfully');
-      setPopupSeverity("success");
+      setPopupSeverity('success');
       handleClickOpenPopup();
       handleCloseModEdit();
       setBtnUpdate(false);
     } catch (err) {
       setBtnUpdate(false);
-      console.log(err, "err");
+      console.log(err, 'err');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
@@ -930,7 +1297,6 @@ function Contactupdate() {
   let [valueBranchCat, setValueBranchCat] = useState([]);
   let [valueCompanyCat, setValueCompanyCat] = useState([]);
 
-
   const [allAssignCompany, setAllAssignCompany] = useState([]);
   const [allAssignBranch, setAllAssignBranch] = useState([]);
   const [allAssignUnit, setAllAssignUnit] = useState([]);
@@ -938,7 +1304,7 @@ function Contactupdate() {
   const fetchHandler = async () => {
     setPageName(!pageName);
     setIsContact(true);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const aggregationPipeline = [
         {
@@ -948,115 +1314,103 @@ function Contactupdate() {
               // Enquiry status filter
               {
                 enquirystatus: {
-                  $nin: ["Enquiry Purpose"],
+                  $nin: ['Enquiry Purpose'],
                 },
               },
               // Reasonable status filter
               {
                 resonablestatus: {
-                  $nin: [
-                    "Not Joined",
-                    "Postponed",
-                    "Rejected",
-                    "Closed",
-                    "Releave Employee",
-                    "Absconded",
-                    "Hold",
-                    "Terminate",
-                  ],
+                  $nin: ['Not Joined', 'Postponed', 'Rejected', 'Closed', 'Releave Employee', 'Absconded', 'Hold', 'Terminate'],
                 },
               },
               // Conditional company filter
               ...(valueCompanyCat.length > 0
                 ? [
-                  {
-                    company: { $in: valueCompanyCat },
-                  },
-                ]
+                    {
+                      company: { $in: valueCompanyCat },
+                    },
+                  ]
                 : [
-                  {
-                    company: { $in: allAssignCompany },
-                  },
-                ]),
+                    {
+                      company: { $in: allAssignCompany },
+                    },
+                  ]),
               // Conditional branch filter
               ...(valueBranchCat.length > 0
                 ? [
-                  {
-                    branch: { $in: valueBranchCat },
-                  },
-                ]
+                    {
+                      branch: { $in: valueBranchCat },
+                    },
+                  ]
                 : [
-                  {
-                    branch: { $in: allAssignBranch },
-                  },
-                ]),
+                    {
+                      branch: { $in: allAssignBranch },
+                    },
+                  ]),
               // Conditional unit filter
               ...(valueUnitCat.length > 0
                 ? [
-                  {
-                    unit: { $in: valueUnitCat },
-                  },
-                ]
+                    {
+                      unit: { $in: valueUnitCat },
+                    },
+                  ]
                 : [
-                  {
-                    unit: { $in: allAssignUnit },
-                  },
-                ]),
+                    {
+                      unit: { $in: allAssignUnit },
+                    },
+                  ]),
               // Conditional team filter
               ...(valueTeamCat.length > 0
                 ? [
-                  {
-                    team: { $in: valueTeamCat },
-                  },
-                ]
+                    {
+                      team: { $in: valueTeamCat },
+                    },
+                  ]
                 : []),
               // Conditional department filter
               ...(valueTeamCat.length > 0
                 ? [
-                  {
-                    team: { $in: valueTeamCat },
-                  },
-                ]
+                    {
+                      team: { $in: valueTeamCat },
+                    },
+                  ]
                 : []),
               // Conditional department filter
               ...(valueDepartmentCat.length > 0
                 ? [
-                  {
-                    department: { $in: valueDepartmentCat },
-                  },
-                ]
+                    {
+                      department: { $in: valueDepartmentCat },
+                    },
+                  ]
                 : []),
               // Conditional Employee filter
               ...(valueEmployeeCat.length > 0
                 ? [
-                  {
-                    companyname: { $in: valueEmployeeCat },
-                  },
-                ]
+                    {
+                      companyname: { $in: valueEmployeeCat },
+                    },
+                  ]
                 : []),
             ],
           },
         },
         {
           $addFields: {
-            userIdStr: { $toString: "$_id" }, // Convert the ObjectId to string
+            userIdStr: { $toString: '$_id' }, // Convert the ObjectId to string
           },
         },
         {
           $lookup: {
-            from: "employeedocuments",
-            localField: "userIdStr", // Use the string version of _id
-            foreignField: "commonid", // Match against the string commonid
-            as: "profileimage",
+            from: 'employeedocuments',
+            localField: 'userIdStr', // Use the string version of _id
+            foreignField: 'commonid', // Match against the string commonid
+            as: 'profileimage',
           },
         },
         {
           $addFields: {
             profileimage: {
-              $ifNull: [
-                { $arrayElemAt: ["$profileimage.profileimage", 0] },
-                "",
-              ],
+              $ifNull: [{ $arrayElemAt: ['$profileimage.profileimage', 0] }, ''],
             },
           },
         },
@@ -1103,42 +1457,29 @@ function Contactupdate() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setBtnUpdate(true);
-    if (
-      empaddform.emergencyno === "" ||
-      (empaddform.emergencyno?.length > 0 &&
-        empaddform.emergencyno?.length < 10)
-    ) {
+    if (empaddform.emergencyno === '' || (empaddform.emergencyno?.length > 0 && empaddform.emergencyno?.length < 10)) {
       setPopupContentMalert('Please Enter or Check Correct Emergency No');
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (empaddform?.email == "" || !validateEmail(empaddform?.email)) {
+    } else if (empaddform?.email == '' || !validateEmail(empaddform?.email)) {
       setPopupContentMalert('Please Enter Valid Email');
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      empaddform.contactpersonal === "" ||
-      !empaddform.contactpersonal
-    ) {
+    } else if (empaddform.contactpersonal === '' || !empaddform.contactpersonal) {
       setPopupContentMalert('Please Enter Contact Personal No');
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      empaddform.contactpersonal?.length > 0 &&
-      empaddform.contactpersonal?.length < 10
-    ) {
+    } else if (empaddform.contactpersonal?.length > 0 && empaddform.contactpersonal?.length < 10) {
       setPopupContentMalert('Please Enter Valid Contact Personal No');
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (empaddform.contactfamily === "" || !empaddform.contactfamily) {
+    } else if (empaddform.contactfamily === '' || !empaddform.contactfamily) {
       setPopupContentMalert('Please Enter Contact Family No');
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      empaddform.contactfamily?.length > 0 &&
-      empaddform.contactfamily?.length < 10
-    ) {
+    } else if (empaddform.contactfamily?.length > 0 && empaddform.contactfamily?.length < 10) {
       setPopupContentMalert('Please Enter Valid Contact Family No');
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequestt();
@@ -1147,15 +1488,22 @@ function Contactupdate() {
 
   //  PDF
   const columns = [
-    { title: "SNo", field: "serialNumber" },
-    { title: "Emp code", field: "empcode" },
-    { title: "Name", field: "companyname" },
-    { title: "Email", field: "email" },
-    { title: "Work Mode", field: "workmode" },
-    { title: "ContactPersonal", field: "contactpersonal" },
-    { title: "ContactFamily", field: "contactfamily" },
-    { title: "EmergencyNo", field: "emergencyno" },
-    { title: "Image", field: "imageBase64" },
+    { title: 'SNo', field: 'serialNumber' },
+    { title: 'Emp code', field: 'empcode' },
+    { title: 'Name', field: 'companyname' },
+    { title: 'Email', field: 'email' },
+    { title: 'Work Mode', field: 'workmode' },
+    { title: 'ContactPersonal', field: 'contactpersonal' },
+    { title: 'ContactFamily', field: 'contactfamily' },
+    { title: 'EmergencyNo', field: 'emergencyno' },
+    { title: 'Image', field: 'imageBase64' },
+  ];
+
+  const columnsoverall = [
+    { title: 'SNo', field: 'serialNumber' },
+    // { title: 'Name', field: 'companyname' },
+    // { title: 'Image', field: 'imageBase64' },
+    { title: 'Image & Name', field: 'imageAndName' },
   ];
 
   const downloadPdf = async () => {
@@ -1174,7 +1522,7 @@ function Contactupdate() {
         item.contactpersonal,
         item.contactfamily,
         item.emergencyno,
-        "", // Placeholder for the image column
+        '', // Placeholder for the image column
       ];
 
       tableRows.push(rowData);
@@ -1193,11 +1541,7 @@ function Contactupdate() {
       });
     };
 
-    const loadedImages = await Promise.all(
-      imagesToLoad.map((item) =>
-        loadImage(item.imageBase64).then((img) => ({ ...item, img }))
-      )
-    );
+    const loadedImages = await Promise.all(imagesToLoad.map((item) => loadImage(item.imageBase64).then((img) => ({ ...item, img }))));
 
     // Calculate the required row height based on image height
     const rowHeight = 20; // Set desired row height
@@ -1208,27 +1552,15 @@ function Contactupdate() {
       startY: 20,
       didDrawCell: (data) => {
         // Ensure that the cell belongs to the body section and it's the image column
-        if (
-          data.section === "body" &&
-          data.column.index === columns.length - 1
-        ) {
-          const imageInfo = loadedImages.find(
-            (image) => image.index === data.row.index
-          );
+        if (data.section === 'body' && data.column.index === columns.length - 1) {
+          const imageInfo = loadedImages.find((image) => image.index === data.row.index);
           if (imageInfo) {
             const imageHeight = 20; // Desired image height
             const imageWidth = 20; // Desired image width
             const xOffset = (data.cell.width - imageWidth) / 2; // Center the image horizontally
             const yOffset = (rowHeight - imageHeight) / 2; // Center the image vertically
 
-            doc.addImage(
-              imageInfo.img,
-              "PNG",
-              data.cell.x + xOffset,
-              data.cell.y + yOffset,
-              imageWidth,
-              imageHeight
-            );
+            doc.addImage(imageInfo.img, 'PNG', data.cell.x + xOffset, data.cell.y + yOffset, imageWidth, imageHeight);
 
             // Adjust cell styles to increase height
             data.cell.height = rowHeight; // Set custom height
@@ -1247,18 +1579,165 @@ function Contactupdate() {
       },
     });
 
-    doc.save("contactupdate.pdf");
+    doc.save('contactupdate.pdf');
+    handleClosePdfFilterMod()
+  };
+
+
+  const downloaddprofile = async () => {
+    const doc = new jsPDF();
+    const tableColumn = columnsoverall.map((col) => col.title);
+    const tableRows = [];
+    const imagesToLoad = [];
+
+    rowDataTable.forEach((item, index) => {
+      const rowData = [
+        index + 1,
+      //  item.companyname,
+        '', // Placeholder for the image column
+      ];
+
+      tableRows.push(rowData);
+
+      if (item.imageBase64) {
+        imagesToLoad.push({ index, imageBase64: item.imageBase64 });
+      }
+    });
+
+    const loadImage = (imageBase64) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = imageBase64;
+      });
+    };
+
+    const loadedImages = await Promise.all(imagesToLoad.map((item) => loadImage(item.imageBase64).then((img) => ({ ...item,    name: rowDataTable[item.index]?.companyname || '', img }))));
+
+    // Calculate the required row height based on image height
+    const rowHeight = 30; // Set desired row height
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+
+      columnStyles: {
+        0: { halign: 'center' }, // center the SNo column
+        1: { halign: 'center' }, // already used for image & name
+      },
+    
+      // didDrawCell: (data) => {
+      //   if (data.section === 'body' && data.column.index === 1) {
+      //     const imageInfo = loadedImages.find((img) => img.index === data.row.index);
+      //     if (imageInfo) {
+      //       const imageHeight = 20;
+      //       const imageWidth = 20;
+      //       const xOffset = (data.cell.width - imageWidth) / 2;
+      //       const yOffset = 2;
+      
+      //       // Draw the image
+      //       doc.addImage(imageInfo.imageBase64, 'PNG', data.cell.x + xOffset, data.cell.y + yOffset, imageWidth, imageHeight);
+      
+      //       // Draw the name text below the image
+      //       const textX = data.cell.x + data.cell.width / 2;
+      //       const textY = data.cell.y + yOffset + imageHeight + 4;
+      
+      //       doc.setFontSize(7);
+      //       doc.text(imageInfo.name || '', textX, textY, { align: 'center' });
+
+      //          // Adjust row height if needed
+      // data.cell.height = Math.max(data.cell.height, imageHeight + 15);
+      //     }
+      //   }
+      // },
+      
+      // didDrawCell: (data) => {
+      //   if (data.section === 'body' && data.column.index === 1) {
+      //     const imageInfo = loadedImages.find((img) => img.index === data.row.index);
+      //     if (imageInfo) {
+      //       const imageWidth = 20;
+      //       const imageHeight = 20;
+      
+      //       const cellX = data.cell.x;
+      //       const cellY = data.cell.y;
+      //       const cellWidth = data.cell.width;
+      
+      //       // Center image in the cell
+      //       const xImg = cellX + (cellWidth - imageWidth) / 2;
+      //       const yImg = cellY + 5;
+      
+      //       doc.addImage(imageInfo.imageBase64, 'PNG', xImg, yImg, imageWidth, imageHeight);
+      
+      //       // Center name text below image
+      //       const yText = yImg + imageHeight + 4;
+      //       doc.setFontSize(7);
+      //       doc.text(imageInfo.name || '', cellX + cellWidth / 2, yText, { align: 'center' });
+      
+      //       // Ensure row height is tall enough
+      //       data.cell.height = Math.max(data.cell.height, imageHeight + 15);
+      //     }
+      //   }
+      // },
+
+      didDrawCell: (data) => {
+        if (data.section === 'body' && data.column.index === 1) {
+          const imageInfo = loadedImages.find((img) => img.index === data.row.index);
+          if (imageInfo) {
+            const imageHeight = 20;
+            const imageWidth = 20;
+            const xOffset = (data.cell.width - imageWidth) / 2;
+            const yOffset = 2;
+    
+            doc.addImage(imageInfo.imageBase64, 'PNG', data.cell.x + xOffset, data.cell.y + yOffset, imageWidth, imageHeight);
+    
+            const textX = data.cell.x + data.cell.width / 2;
+            const textY = data.cell.y + yOffset + imageHeight + 4;
+    
+            doc.setFontSize(7);
+            doc.text(imageInfo.name || '', textX, textY, { align: 'center' });
+    
+            data.cell.height = Math.max(data.cell.height, imageHeight + 15);
+          }
+        }
+      },
+ 
+      
+      
+     
+      headStyles: {
+        minCellHeight: 5, // Set minimum cell height for header cells
+        halign: 'center',
+        fontSize: 4, // You can adjust the font size if needed
+        cellPadding: { top: 2, right: 5, bottom: 2, left: 5 }, // Adjust padding for header cells
+      },
+      // bodyStyles: {
+      //   fontSize: 4,
+      //   minCellHeight: rowHeight, 
+      //   cellPadding: { top: 7, right: 1, bottom: 0, left: 1 }, 
+      // },
+      bodyStyles: {
+        fontSize: 6,
+        minCellHeight: rowHeight,
+        cellPadding: 0,
+      },
+    });
+
+    doc.save('contactupdate.pdf');
+    handleClosePdfFilterMod()
+
   };
 
   // Excel
-  const fileName = "contactupdate";
+  const fileName = 'contactupdate';
 
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "contactupdate",
-    pageStyle: "print",
+    documentTitle: 'contactupdate',
+    pageStyle: 'print',
   });
   useEffect(() => {
     const loadModels = async () => {
@@ -1267,10 +1746,9 @@ function Contactupdate() {
       await faceapi.nets.tinyFaceDetector.loadFromUri(modelUrl);
       await faceapi.nets.faceLandmark68Net.loadFromUri(modelUrl);
       await faceapi.nets.faceRecognitionNet.loadFromUri(modelUrl);
-
     };
     loadModels();
-    console.log(window.location.origin, "window.location.origin");
+    console.log(window.location.origin, 'window.location.origin');
   }, []);
   // Image Upload
 
@@ -1284,8 +1762,8 @@ function Contactupdate() {
   const [isWebcamCapture, setIsWebcamCapture] = useState(false);
 
   useEffect(() => {
-    setEmpaddform((prev) => ({ ...prev, profileimage: getImg }))
-  }, [getImg])
+    setEmpaddform((prev) => ({ ...prev, profileimage: getImg }));
+  }, [getImg]);
   const webcamOpen = () => {
     setIsWebcamOpen(true);
   };
@@ -1293,7 +1771,7 @@ function Contactupdate() {
     setIsWebcamOpen(false);
   };
   const closeWebCam = () => {
-    setEmpaddform((prev) => ({ ...prev, profileimage: "", faceDescriptor: [] }));
+    setEmpaddform((prev) => ({ ...prev, profileimage: '', faceDescriptor: [] }));
     setGetImg(null);
   };
   const webcamDataStore = () => {
@@ -1319,17 +1797,17 @@ function Contactupdate() {
   const UploadWithDuplicate = (e) => {
     setShowDupProfileVIsitor([]);
     handleCloseerrpop();
-  }
+  };
   const UploadWithoutDuplicate = (e) => {
     setEmpaddform({
       ...empaddform,
-      profileimage: "",
+      profileimage: '',
       faceDescriptor: [],
     });
 
     setShowDupProfileVIsitor([]);
     handleCloseerrpop();
-  }
+  };
   const [imageUploaded, setImageUploaded] = useState(false);
   function handleChangeImage(e) {
     setBtnUpload(true); // Enable loader when the process starts
@@ -1345,24 +1823,17 @@ function Contactupdate() {
 
       image.onload = async () => {
         try {
-          const detections = await faceapi
-            .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceDescriptors();
+          const detections = await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
           if (detections.length > 0) {
             const faceDescriptor = detections[0].descriptor;
 
-            const response = await axios.post(
-              `${SERVICE.DUPLICATECANDIDATEFACEDETECTVISITOR}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${auth.APIToken}`,
-                },
-                id: empaddform?._id,
-                faceDescriptor: Array.from(faceDescriptor),
-              }
-            );
-
+            const response = await axios.post(`${SERVICE.DUPLICATECANDIDATEFACEDETECTVISITOR}`, {
+              headers: {
+                Authorization: `Bearer ${auth.APIToken}`,
+              },
+              id: empaddform?._id,
+              faceDescriptor: Array.from(faceDescriptor),
+            });
 
             if (response?.data?.matchfound) {
               // setPopupContentMalert('Image Already In Use.');
@@ -1374,13 +1845,11 @@ function Contactupdate() {
                   profileimage: String(dataUrl),
                   faceDescriptor: Array.from(faceDescriptor),
                 });
-
               });
               setShowDupProfileVIsitor(response?.data?.matchedData);
               handleClickOpenerrpop();
             } else {
               toDataURL(path, function (dataUrl) {
-
                 setEmpaddform({
                   ...empaddform,
                   profileimage: String(dataUrl),
@@ -1392,12 +1861,12 @@ function Contactupdate() {
             setImageUploaded(true);
           } else {
             setPopupContentMalert('No face detected.');
-            setPopupSeverityMalert("info");
+            setPopupSeverityMalert('info');
             handleClickOpenPopupMalert();
           }
         } catch (error) {
           setPopupContentMalert('Error in face detection.');
-          setPopupSeverityMalert("info");
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         } finally {
           setBtnUpload(false); // Disable loader when done
@@ -1406,15 +1875,15 @@ function Contactupdate() {
 
       image.onerror = (err) => {
         setPopupContentMalert('Error loading image.');
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();;
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
         setBtnUpload(false); // Disable loader in case of error
       };
 
       setFile(URL.createObjectURL(file));
     } else {
       setPopupContentMalert('File size is greater than 1MB, please upload a file below 1MB.');
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
       setBtnUpload(false); // Disable loader if file is too large
     }
@@ -1561,8 +2030,8 @@ function Contactupdate() {
       };
       reader.readAsDataURL(xhr.response);
     };
-    xhr.open("GET", url);
-    xhr.responseType = "blob";
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
     xhr.send();
   }
 
@@ -1601,28 +2070,20 @@ function Contactupdate() {
     setSearchQuery(event.target.value);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
-  const filteredData = filteredDatas?.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas?.slice((page - 1) * pageSize, page * pageSize);
 
   const totalPages = Math.ceil(filteredDatas.length / pageSize);
 
   const visiblePages = Math.min(totalPages, 3);
 
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
 
   const pageNumbers = [];
 
@@ -1639,40 +2100,39 @@ function Contactupdate() {
   );
 
   const columnDataTable = [
-
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 90,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "empcode",
-      headerName: "Emp Code",
+      field: 'empcode',
+      headerName: 'Emp Code',
       flex: 0,
       width: 130,
       hide: !columnVisibility.empcode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
+        <Grid sx={{ display: 'flex' }}>
           <ListItem
             sx={{
-              "&:hover": {
-                cursor: "pointer",
-                color: "blue",
-                textDecoration: "underline",
+              '&:hover': {
+                cursor: 'pointer',
+                color: 'blue',
+                textDecoration: 'underline',
               },
             }}
           >
             <CopyToClipboard
               onCopy={() => {
-                handleCopy("Copied Emp Code!");
+                handleCopy('Copied Emp Code!');
               }}
-              options={{ message: "Copied Emp Code!" }}
+              options={{ message: 'Copied Emp Code!' }}
               text={params?.data?.empcode}
             >
               <ListItemText primary={params?.data?.empcode} />
@@ -1682,28 +2142,28 @@ function Contactupdate() {
       ),
     },
     {
-      field: "companyname",
-      headerName: "Company Name",
+      field: 'companyname',
+      headerName: 'Company Name',
       flex: 0,
       width: 180,
       hide: !columnVisibility.companyname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
+        <Grid sx={{ display: 'flex' }}>
           <ListItem
             sx={{
-              "&:hover": {
-                cursor: "pointer",
-                color: "blue",
-                textDecoration: "underline",
+              '&:hover': {
+                cursor: 'pointer',
+                color: 'blue',
+                textDecoration: 'underline',
               },
             }}
           >
             <CopyToClipboard
               onCopy={() => {
-                handleCopy("Copied Company Name!");
+                handleCopy('Copied Company Name!');
               }}
-              options={{ message: "Copied Company Name!" }}
+              options={{ message: 'Copied Company Name!' }}
               text={params?.data?.companyname}
             >
               <ListItemText primary={params?.data?.companyname} />
@@ -1713,81 +2173,72 @@ function Contactupdate() {
       ),
     },
     {
-      field: "email",
-      headerName: "Email",
+      field: 'email',
+      headerName: 'Email',
       flex: 0,
       width: 130,
       hide: !columnVisibility.email,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "workmode",
-      headerName: "Work Mode",
+      field: 'workmode',
+      headerName: 'Work Mode',
       flex: 0,
       width: 130,
       hide: !columnVisibility.workmode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "contactpersonal",
-      headerName: "Contact Personal",
+      field: 'contactpersonal',
+      headerName: 'Contact Personal',
       flex: 0,
       width: 100,
       hide: !columnVisibility.contactpersonal,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "contactfamily",
-      headerName: "Contact Family",
+      field: 'contactfamily',
+      headerName: 'Contact Family',
       flex: 0,
       width: 100,
       hide: !columnVisibility.contactfamily,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "emergencyno",
-      headerName: "EmergencyNo",
+      field: 'emergencyno',
+      headerName: 'EmergencyNo',
       flex: 0,
       width: 100,
       hide: !columnVisibility.emergencyno,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "imageBase64",
-      headerName: "Profile",
+      field: 'imageBase64',
+      headerName: 'Profile',
       flex: 0,
       width: 100,
       hide: !columnVisibility.profileimage,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => {
-
-        return params.value !== "" ? (
-          <img
-            src={params.value}
-            alt="Profile"
-            style={{ width: "100%", height: "auto" }}
-          />
-        ) : (
-          <></>
-        );
+        return params.value !== '' ? <img src={params.value} alt="Profile" style={{ width: '100%', height: 'auto' }} /> : <></>;
       },
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <>
-          {isUserRoleCompare.includes("Manager") ? (
+          {isUserRoleCompare.includes('Manager') ? (
             <>
               <Grid container spacing={2}>
                 <Grid item>
-                  {isUserRoleCompare?.includes("icontactinfoupdate") && (
+                  {isUserRoleCompare?.includes('icontactinfoupdate') && (
                     <>
                       <Button
                         sx={userStyle.buttonedit}
@@ -1796,7 +2247,7 @@ function Contactupdate() {
                           getinfoCode(params.data.id);
                         }}
                       >
-                        <InfoOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttoninfo} />
+                        <InfoOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttoninfo} />
                       </Button>
                     </>
                   )}
@@ -1805,28 +2256,26 @@ function Contactupdate() {
             </>
           ) : (
             <>
-              <Grid sx={{ display: "flex" }}>
-                {isUserRoleCompare?.includes("econtactinfoupdate") && (
+              <Grid sx={{ display: 'flex' }}>
+                {isUserRoleCompare?.includes('econtactinfoupdate') && (
                   <Button
                     sx={userStyle.buttonedit}
                     onClick={() => {
-
                       getCode(params.data.id);
                     }}
                   >
-                    <EditIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonedit} />
+                    <EditIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonedit} />
                   </Button>
                 )}
 
-                {isUserRoleCompare?.includes("icontactinfoupdate") && (
+                {isUserRoleCompare?.includes('icontactinfoupdate') && (
                   <Button
                     sx={userStyle.buttonedit}
                     onClick={() => {
-
                       getinfoCode(params.data.id);
                     }}
                   >
-                    <InfoOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttoninfo} />
+                    <InfoOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttoninfo} />
                   </Button>
                 )}
               </Grid>
@@ -1852,16 +2301,12 @@ function Contactupdate() {
     };
   });
 
-
-
   // Show All Columns functionality
   const handleShowAllColumns = () => {
     setColumnVisibility(initialColumnVisibility);
   };
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
 
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
@@ -1875,9 +2320,9 @@ function Contactupdate() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1885,7 +2330,7 @@ function Contactupdate() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1893,38 +2338,16 @@ function Contactupdate() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -1932,11 +2355,7 @@ function Contactupdate() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -1944,7 +2363,7 @@ function Contactupdate() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -1964,46 +2383,30 @@ function Contactupdate() {
   const [referenceTodo, setReferenceTodo] = useState([]);
   const [referenceTodoError, setReferenceTodoError] = useState({});
   const [singleReferenceTodo, setSingleReferenceTodo] = useState({
-    name: "",
-    relationship: "",
-    occupation: "",
-    contact: "",
-    details: "",
+    name: '',
+    relationship: '',
+    occupation: '',
+    contact: '',
+    details: '',
   });
 
   const addReferenceTodoFunction = () => {
-    const isNameMatch = referenceTodo?.some(
-      (item) =>
-        item.name.toLowerCase() === singleReferenceTodo.name.toLowerCase()
-    );
+    const isNameMatch = referenceTodo?.some((item) => item.name.toLowerCase() === singleReferenceTodo.name.toLowerCase());
     const newErrorsLog = {};
-    if (singleReferenceTodo.name === "") {
-      newErrorsLog.name = (
-        <Typography style={{ color: "red" }}>Name must be required</Typography>
-      );
-    } else if (
-      singleReferenceTodo.contact.length > 0 &&
-      singleReferenceTodo.contact.length < 10
-    ) {
-      newErrorsLog.contact = (
-        <Typography style={{ color: "red" }}>
-          Contact must be 10 Digit
-        </Typography>
-      );
+    if (singleReferenceTodo.name === '') {
+      newErrorsLog.name = <Typography style={{ color: 'red' }}>Name must be required</Typography>;
+    } else if (singleReferenceTodo.contact.length > 0 && singleReferenceTodo.contact.length < 10) {
+      newErrorsLog.contact = <Typography style={{ color: 'red' }}>Contact must be 10 Digit</Typography>;
     } else if (isNameMatch) {
-      newErrorsLog.duplicate = (
-        <Typography style={{ color: "red" }}>
-          Reference Already Exist!
-        </Typography>
-      );
-    } else if (singleReferenceTodo !== "") {
+      newErrorsLog.duplicate = <Typography style={{ color: 'red' }}>Reference Already Exist!</Typography>;
+    } else if (singleReferenceTodo !== '') {
       setReferenceTodo([...referenceTodo, singleReferenceTodo]);
       setSingleReferenceTodo({
-        name: "",
-        relationship: "",
-        occupation: "",
-        contact: "",
-        details: "",
+        name: '',
+        relationship: '',
+        occupation: '',
+        contact: '',
+        details: '',
       });
     }
     setReferenceTodoError(newErrorsLog);
@@ -2018,14 +2421,13 @@ function Contactupdate() {
   const handlechangereferencecontactno = (e) => {
     const regex = /^[0-9]+$/;
     const inputValue = e.target.value?.slice(0, 10);
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       setSingleReferenceTodo({ ...singleReferenceTodo, contact: inputValue });
     }
   };
 
   const [valueEmp, setValueEmp] = React.useState([]); // State for employees
   const [isBoxFocused, setIsBoxFocused] = React.useState(false); // Track focus state
-
 
   const [searchInputValue, setSearchInputValue] = useState('');
 
@@ -2036,8 +2438,8 @@ function Contactupdate() {
     // Process the pasted text
     const pastedNames = pastedText
       .split(/[\n,]+/)
-      .map(name => name.trim())
-      .filter(name => name !== "");
+      .map((name) => name.trim())
+      .filter((name) => name !== '');
 
     // Update the state
     updateEmployees(pastedNames);
@@ -2049,9 +2451,6 @@ function Contactupdate() {
     e.target.focus();
   };
 
-
-
-
   useEffect(() => {
     updateEmployees([]); // Pass an empty array instead of an empty string
   }, [allUsersData, valueCompanyCat, valueBranchCat, valueUnitCat, valueTeamCat]);
@@ -2062,58 +2461,50 @@ function Contactupdate() {
 
     const availableOptions = allUsersData
       ?.filter(
-        (comp) =>
-          valueCompanyCat?.includes(comp.company) &&
-          valueBranchCat?.includes(comp.branch) &&
-          valueUnitCat?.includes(comp.unit) &&
-          valueTeamCat?.includes(comp.team)
+        (comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch) && valueUnitCat?.includes(comp.unit) && valueTeamCat?.includes(comp.team)
         // &&
         // comp.workmode !== "Internship"
       )
-      ?.map(data => data.companyname.replace(/\s*\.\s*/g, ".").trim())
+      ?.map((data) => data.companyname.replace(/\s*\.\s*/g, '.').trim());
 
-    const matchedValues = namesArray.filter((name) =>
-      availableOptions.includes(name.replace(/\s*\.\s*/g, ".").trim())
-    );
+    const matchedValues = namesArray.filter((name) => availableOptions.includes(name.replace(/\s*\.\s*/g, '.').trim()));
 
     // Update selected options
-    const newOptions = matchedValues.map(value => ({
+    const newOptions = matchedValues.map((value) => ({
       label: value,
-      value: value
+      value: value,
     }));
 
-    setSelectedOptionsEmployee(prev => {
-      const newValues = newOptions.filter(
-        newOpt => !prev.some(prevOpt => prevOpt.value === newOpt.value)
-      );
+    setSelectedOptionsEmployee((prev) => {
+      const newValues = newOptions.filter((newOpt) => !prev.some((prevOpt) => prevOpt.value === newOpt.value));
       return [...prev, ...newValues];
     });
 
     // Update other states...
-    setValueEmp(prev => [...new Set([...prev, ...matchedValues])]);
-    setValueEmployeeCat(prev => [...new Set([...prev, ...matchedValues])]);
+    setValueEmp((prev) => [...new Set([...prev, ...matchedValues])]);
+    setValueEmployeeCat((prev) => [...new Set([...prev, ...matchedValues])]);
   };
 
   // Handle clicks outside the Box
   useEffect(() => {
     const handleClickOutside = (e) => {
-      const boxElement = document.getElementById("paste-box"); // Add an ID to the Box
+      const boxElement = document.getElementById('paste-box'); // Add an ID to the Box
       if (boxElement && !boxElement.contains(e.target)) {
         setIsBoxFocused(false); // Reset focus state if clicking outside the Box
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
   const handleDelete = (e, value) => {
     e.preventDefault();
-    setSelectedOptionsEmployee((current) => current.filter(emp => emp.value !== value));
-    setValueEmp((current) => current.filter(empValue => empValue !== value));
-    setValueEmployeeCat((current) => current.filter(empValue => empValue !== value));
+    setSelectedOptionsEmployee((current) => current.filter((emp) => emp.value !== value));
+    setValueEmp((current) => current.filter((empValue) => empValue !== value));
+    setValueEmployeeCat((current) => current.filter((empValue) => empValue !== value));
   };
 
   const handleClearFilter = () => {
@@ -2129,17 +2520,17 @@ function Contactupdate() {
     setSelectedOptionsDepartment([]);
     setValueEmployeeCat([]);
     setSelectedOptionsEmployee([]);
-    setValueEmp([]); setEmployees([]);
+    setValueEmp([]);
+    setEmployees([]);
     setFilterState({
-      type: "Individual",
-      employeestatus: "Please Select Employee Status",
+      type: 'Individual',
+      employeestatus: 'Please Select Employee Status',
     });
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
-    setSearchQuery("")
+    setSearchQuery('');
   };
-
 
   //MULTISELECT ONCHANGE START
 
@@ -2167,9 +2558,7 @@ function Contactupdate() {
   };
 
   const customValueRendererCompany = (valueCompanyCat, _categoryname) => {
-    return valueCompanyCat?.length
-      ? valueCompanyCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Company";
+    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(', ') : 'Please Select Company';
   };
 
   //branch multiselect
@@ -2194,9 +2583,7 @@ function Contactupdate() {
   };
 
   const customValueRendererBranch = (valueBranchCat, _categoryname) => {
-    return valueBranchCat?.length
-      ? valueBranchCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Branch";
+    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(', ') : 'Please Select Branch';
   };
 
   //unit multiselect
@@ -2214,9 +2601,7 @@ function Contactupdate() {
   };
 
   const customValueRendererUnit = (valueUnitCat, _categoryname) => {
-    return valueUnitCat?.length
-      ? valueUnitCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Unit";
+    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(', ') : 'Please Select Unit';
   };
 
   //team multiselect
@@ -2232,70 +2617,49 @@ function Contactupdate() {
   };
 
   const customValueRendererTeam = (valueTeamCat, _categoryname) => {
-    return valueTeamCat?.length
-      ? valueTeamCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Team";
+    return valueTeamCat?.length ? valueTeamCat.map(({ label }) => label)?.join(', ') : 'Please Select Team';
   };
 
   //MULTISELECT ONCHANGE END
 
   const handleFilter = () => {
-    if (
-      filterState?.type === "Please Select Type" ||
-      filterState?.type === ""
-    ) {
-      setPopupContentMalert("Please Select Type!");
-      setPopupSeverityMalert("info");
+    if (filterState?.type === 'Please Select Type' || filterState?.type === '') {
+      setPopupContentMalert('Please Select Type!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (selectedOptionsCompany?.length === 0) {
-      setPopupContentMalert("Please Select Company!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Company!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      ["Individual", "Branch", "Unit", "Team"]?.includes(filterState?.type) &&
-      selectedOptionsBranch?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Branch!");
-      setPopupSeverityMalert("info");
+    } else if (['Individual', 'Branch', 'Unit', 'Team']?.includes(filterState?.type) && selectedOptionsBranch?.length === 0) {
+      setPopupContentMalert('Please Select Branch!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      ["Individual", "Unit", "Team"]?.includes(filterState?.type) &&
-      selectedOptionsUnit?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Unit!");
-      setPopupSeverityMalert("info");
+    } else if (['Individual', 'Unit', 'Team']?.includes(filterState?.type) && selectedOptionsUnit?.length === 0) {
+      setPopupContentMalert('Please Select Unit!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      ["Individual", "Team"]?.includes(filterState?.type) &&
-      selectedOptionsTeam?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Team!");
-      setPopupSeverityMalert("info");
+    } else if (['Individual', 'Team']?.includes(filterState?.type) && selectedOptionsTeam?.length === 0) {
+      setPopupContentMalert('Please Select Team!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      filterState?.type === "Individual" &&
-      selectedOptionsEmployee?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Employee!");
-      setPopupSeverityMalert("info");
+    } else if (filterState?.type === 'Individual' && selectedOptionsEmployee?.length === 0) {
+      setPopupContentMalert('Please Select Employee!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      filterState?.type === "Department" &&
-      selectedOptionsDepartment?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Department!");
-      setPopupSeverityMalert("info");
+    } else if (filterState?.type === 'Department' && selectedOptionsDepartment?.length === 0) {
+      setPopupContentMalert('Please Select Department!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
-      setSearchQuery("")
+      setSearchQuery('');
       fetchHandler();
     }
   };
 
   //auto select all dropdowns
   const handleAutoSelect = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let selectedValues = accessbranch
         ?.map((data) => ({
@@ -2303,30 +2667,15 @@ function Contactupdate() {
           branch: data.branch,
           unit: data.unit,
         }))
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        );
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit));
       let selectedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         .map((a, index) => {
           return a.company;
         });
 
       let mappedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         ?.map((data) => ({
           label: data?.company,
           value: data?.company,
@@ -2336,25 +2685,13 @@ function Contactupdate() {
       setSelectedOptionsCompany(mappedCompany);
 
       let selectedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         .map((a, index) => {
           return a.branch;
         });
 
       let mappedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         ?.map((data) => ({
           label: data?.branch,
           value: data?.branch,
@@ -2364,31 +2701,13 @@ function Contactupdate() {
       setSelectedOptionsBranch(mappedBranch);
 
       let selectedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         .map((a, index) => {
           return a.unit;
         });
 
       let mappedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         ?.map((data) => ({
           label: data?.unit,
           value: data?.unit,
@@ -2398,33 +2717,17 @@ function Contactupdate() {
       setSelectedOptionsUnit(mappedUnit);
 
       let mappedTeam = allTeam
-        ?.filter(
-          (u) =>
-            selectedCompany?.includes(u.company) &&
-            selectedBranch?.includes(u.branch) &&
-            selectedUnit?.includes(u.unit)
-        )
+        ?.filter((u) => selectedCompany?.includes(u.company) && selectedBranch?.includes(u.branch) && selectedUnit?.includes(u.unit))
         .map((u) => ({
           label: u.teamname,
           value: u.teamname,
         }));
 
-      let selectedTeam = allTeam
-        ?.filter(
-          (u) =>
-            selectedCompany?.includes(u.company) &&
-            selectedBranch?.includes(u.branch) &&
-            selectedUnit?.includes(u.unit)
-        )
-        .map((u) => u.teamname);
+      let selectedTeam = allTeam?.filter((u) => selectedCompany?.includes(u.company) && selectedBranch?.includes(u.branch) && selectedUnit?.includes(u.unit)).map((u) => u.teamname);
       //----------------------------
       let mappedemployees = allUsersData
         ?.filter(
-          (u) =>
-            selectedCompany?.includes(u.company) &&
-            selectedBranch?.includes(u.branch) &&
-            selectedUnit?.includes(u.unit) &&
-            selectedTeam?.includes(u.team)
+          (u) => selectedCompany?.includes(u.company) && selectedBranch?.includes(u.branch) && selectedUnit?.includes(u.unit) && selectedTeam?.includes(u.team)
           //   &&
           // comp.workmode !== "Internship"
         )
@@ -2435,11 +2738,7 @@ function Contactupdate() {
 
       let employees = allUsersData
         ?.filter(
-          (u) =>
-            selectedCompany?.includes(u.company) &&
-            selectedBranch?.includes(u.branch) &&
-            selectedUnit?.includes(u.unit) &&
-            selectedTeam?.includes(u.team)
+          (u) => selectedCompany?.includes(u.company) && selectedBranch?.includes(u.branch) && selectedUnit?.includes(u.unit) && selectedTeam?.includes(u.team)
           //   &&
           // comp.workmode !== "Internship"
         )
@@ -2469,17 +2768,10 @@ function Contactupdate() {
     <Box>
       <NotificationContainer />
       {/* ****** Header Content ****** */}
-      <Headtitle title={"CONTACT UPDATE"} />
-      <PageHeading
-        title="Contact Update"
-        modulename="Human Resources"
-        submodulename="HR"
-        mainpagename="Employee"
-        subpagename="Employee Update Details"
-        subsubpagename="Contact Info update"
-      />
+      <Headtitle title={'CONTACT UPDATE'} />
+      <PageHeading title="Contact Update" modulename="Human Resources" submodulename="HR" mainpagename="Employee" subpagename="Employee Update Details" subsubpagename="Contact Info update" />
       <br />
-      {isUserRoleCompare?.includes("lcontactinfoupdate") && (
+      {isUserRoleCompare?.includes('lcontactinfoupdate') && (
         <>
           <Box sx={userStyle.selectcontainer}>
             <Grid container spacing={2}>
@@ -2491,14 +2783,14 @@ function Contactupdate() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Type<b style={{ color: "red" }}>*</b>
+                      Type<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={TypeOptions}
                       styles={colourStyles}
                       value={{
-                        label: filterState.type ?? "Please Select Type",
-                        value: filterState.type ?? "Please Select Type",
+                        label: filterState.type ?? 'Please Select Type',
+                        value: filterState.type ?? 'Please Select Type',
                       }}
                       onChange={(e) => {
                         setFilterState((prev) => ({
@@ -2524,7 +2816,7 @@ function Contactupdate() {
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <Typography>
-                    Company<b style={{ color: "red" }}>*</b>
+                    Company<b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <FormControl size="small" fullWidth>
                     <MultiSelect
@@ -2534,12 +2826,7 @@ function Contactupdate() {
                           value: data.company,
                         }))
                         .filter((item, index, self) => {
-                          return (
-                            self.findIndex(
-                              (i) =>
-                                i.label === item.label && i.value === item.value
-                            ) === index
-                          );
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                         })}
                       value={selectedOptionsCompany}
                       onChange={(e) => {
@@ -2550,32 +2837,24 @@ function Contactupdate() {
                     />
                   </FormControl>
                 </Grid>
-                {["Individual", "Team"]?.includes(filterState.type) ? (
+                {['Individual', 'Team']?.includes(filterState.type) ? (
                   <>
                     {/* Branch Unit Team */}
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          {" "}
-                          Branch <b style={{ color: "red" }}>*</b>
+                          {' '}
+                          Branch <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <MultiSelect
                           options={accessbranch
-                            ?.filter((comp) =>
-                              valueCompanyCat?.includes(comp.company)
-                            )
+                            ?.filter((comp) => valueCompanyCat?.includes(comp.company))
                             ?.map((data) => ({
                               label: data.branch,
                               value: data.branch,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           value={selectedOptionsBranch}
                           onChange={(e) => {
@@ -2589,28 +2868,18 @@ function Contactupdate() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          {" "}
-                          Unit<b style={{ color: "red" }}>*</b>
+                          {' '}
+                          Unit<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <MultiSelect
                           options={accessbranch
-                            ?.filter(
-                              (comp) =>
-                                valueCompanyCat?.includes(comp.company) &&
-                                valueBranchCat?.includes(comp.branch)
-                            )
+                            ?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch))
                             ?.map((data) => ({
                               label: data.unit,
                               value: data.unit,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           value={selectedOptionsUnit}
                           onChange={(e) => {
@@ -2624,16 +2893,11 @@ function Contactupdate() {
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Team<b style={{ color: "red" }}>*</b>
+                          Team<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <MultiSelect
                           options={allTeam
-                            ?.filter(
-                              (u) =>
-                                valueCompanyCat?.includes(u.company) &&
-                                valueBranchCat?.includes(u.branch) &&
-                                valueUnitCat?.includes(u.unit)
-                            )
+                            ?.filter((u) => valueCompanyCat?.includes(u.company) && valueBranchCat?.includes(u.branch) && valueUnitCat?.includes(u.unit))
                             .map((u) => ({
                               ...u,
                               label: u.teamname,
@@ -2649,13 +2913,13 @@ function Contactupdate() {
                       </FormControl>
                     </Grid>
                   </>
-                ) : ["Department"]?.includes(filterState.type) ? (
+                ) : ['Department']?.includes(filterState.type) ? (
                   <>
                     {/* Department */}
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Department<b style={{ color: "red" }}>*</b>
+                          Department<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <MultiSelect
                           options={departmentOptions}
@@ -2669,31 +2933,23 @@ function Contactupdate() {
                       </FormControl>
                     </Grid>
                   </>
-                ) : ["Branch"]?.includes(filterState.type) ? (
+                ) : ['Branch']?.includes(filterState.type) ? (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          {" "}
-                          Branch <b style={{ color: "red" }}>*</b>
+                          {' '}
+                          Branch <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <MultiSelect
                           options={accessbranch
-                            ?.filter((comp) =>
-                              valueCompanyCat?.includes(comp.company)
-                            )
+                            ?.filter((comp) => valueCompanyCat?.includes(comp.company))
                             ?.map((data) => ({
                               label: data.branch,
                               value: data.branch,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           value={selectedOptionsBranch}
                           onChange={(e) => {
@@ -2705,31 +2961,23 @@ function Contactupdate() {
                       </FormControl>
                     </Grid>
                   </>
-                ) : ["Unit"]?.includes(filterState.type) ? (
+                ) : ['Unit']?.includes(filterState.type) ? (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          {" "}
-                          Branch<b style={{ color: "red" }}>*</b>
+                          {' '}
+                          Branch<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <MultiSelect
                           options={accessbranch
-                            ?.filter((comp) =>
-                              valueCompanyCat?.includes(comp.company)
-                            )
+                            ?.filter((comp) => valueCompanyCat?.includes(comp.company))
                             ?.map((data) => ({
                               label: data.branch,
                               value: data.branch,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           value={selectedOptionsBranch}
                           onChange={(e) => {
@@ -2743,28 +2991,18 @@ function Contactupdate() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          {" "}
-                          Unit <b style={{ color: "red" }}>*</b>
+                          {' '}
+                          Unit <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <MultiSelect
                           options={accessbranch
-                            ?.filter(
-                              (comp) =>
-                                valueCompanyCat?.includes(comp.company) &&
-                                valueBranchCat?.includes(comp.branch)
-                            )
+                            ?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch))
                             ?.map((data) => ({
                               label: data.unit,
                               value: data.unit,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           value={selectedOptionsUnit}
                           onChange={(e) => {
@@ -2777,26 +3015,19 @@ function Contactupdate() {
                     </Grid>
                   </>
                 ) : (
-                  ""
+                  ''
                 )}
-                {["Individual"]?.includes(filterState.type) && (
+                {['Individual']?.includes(filterState.type) && (
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Employee<b style={{ color: "red" }}>*</b>
+                        Employee<b style={{ color: 'red' }}>*</b>
                       </Typography>
-                      <div
-                        onPaste={handlePasteForEmp}
-                        style={{ position: 'relative' }}
-                      >
+                      <div onPaste={handlePasteForEmp} style={{ position: 'relative' }}>
                         <MultiSelect
                           options={allUsersData
                             ?.filter(
-                              (u) =>
-                                valueCompanyCat?.includes(u.company) &&
-                                valueBranchCat?.includes(u.branch) &&
-                                valueUnitCat?.includes(u.unit) &&
-                                valueTeamCat?.includes(u.team)
+                              (u) => valueCompanyCat?.includes(u.company) && valueBranchCat?.includes(u.branch) && valueUnitCat?.includes(u.unit) && valueTeamCat?.includes(u.team)
                               // &&
                               // u.workmode !== "Internship"
                             )
@@ -2818,8 +3049,8 @@ function Contactupdate() {
                     </FormControl>
                   </Grid>
                 )}
-                {["Individual"]?.includes(filterState.type) &&
-                  <Grid item md={6} sm={12} xs={12} sx={{ display: "flex", flexDirection: "row" }}>
+                {['Individual']?.includes(filterState.type) && (
+                  <Grid item md={6} sm={12} xs={12} sx={{ display: 'flex', flexDirection: 'row' }}>
                     <FormControl fullWidth size="small">
                       <Typography>Selected Employees</Typography>
                       <div
@@ -2840,43 +3071,28 @@ function Contactupdate() {
                         }}
                       >
                         {valueEmp.map((value) => (
-                          <Chip
-                            key={value}
-                            label={value}
-                            clickable
-                            sx={{ margin: 0.2, backgroundColor: "#FFF" }}
-                            onDelete={(e) => handleDelete(e, value)}
-                            onClick={() => console.log("clicked chip")}
-                          />
+                          <Chip key={value} label={value} clickable sx={{ margin: 0.2, backgroundColor: '#FFF' }} onDelete={(e) => handleDelete(e, value)} onClick={() => console.log('clicked chip')} />
                         ))}
                       </div>
                     </FormControl>
                   </Grid>
-                }
+                )}
               </>
             </Grid>
             <br />
             <br />
             <br />
-            <Grid
-              container
-              spacing={2}
-              sx={{ display: "flex", justifyContent: "center" }}
-            >
+            <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
               <Grid item lg={1} md={2} sm={2} xs={12}>
-                <Button
-                  sx={buttonStyles.buttonsubmit}
-                  variant="contained"
-                  onClick={handleFilter}
-                >
-                  {" "}
-                  Filter{" "}
+                <Button sx={buttonStyles.buttonsubmit} variant="contained" onClick={handleFilter}>
+                  {' '}
+                  Filter{' '}
                 </Button>
               </Grid>
               <Grid item lg={1} md={2} sm={2} xs={12}>
                 <Button sx={buttonStyles.btncancel} onClick={handleClearFilter}>
-                  {" "}
-                  Clear{" "}
+                  {' '}
+                  Clear{' '}
                 </Button>
               </Grid>
             </Grid>
@@ -2884,14 +3100,12 @@ function Contactupdate() {
         </>
       )}
       <br />
-      {isUserRoleCompare?.includes("lcontactinfoupdate") && (
+      {isUserRoleCompare?.includes('lcontactinfoupdate') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
-              <Typography sx={userStyle.importheadtext}>
-                Contact Update List
-              </Typography>
+              <Typography sx={userStyle.importheadtext}>Contact Update List</Typography>
             </Grid>
             <br />
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
@@ -2910,7 +3124,7 @@ function Contactupdate() {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -2928,29 +3142,30 @@ function Contactupdate() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelcontactinfoupdate") && (
+                  {isUserRoleCompare?.includes('excelcontactinfoupdate') && (
                     <>
-                      <ExportXLWithImages
-                        csvData={rowDataTable}
-                        fileName={fileName}
-                      />
+                      {/* <ExportXLWithImages csvData={rowDataTable} fileName={fileName} />
+                       */}
+                       <Button  sx={userStyle.buttongrp} onClick={()=>{setIsFilterOpen(true);setFormat("xl")}}> <FaFileExcel />
+                                               &ensp;Export to Excel&ensp;</Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvcontactinfoupdate") && (
+                  {isUserRoleCompare?.includes('csvcontactinfoupdate') && (
                     <>
-                      <ExportCSVWithImages
-                        csvData={rowDataTable}
-                        fileName={fileName}
-                      />
+                      {/* <ExportCSVWithImages csvData={rowDataTable} fileName={fileName} />
+                       */}
+                     <Button sx={userStyle.buttongrp} onClick={()=>{setIsFilterOpen(true);setFormat("csv")}}>  <FaFileCsv />
+                                             &ensp;Export to CSV&ensp;</Button>
+
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printcontactinfoupdate") && (
+                  {isUserRoleCompare?.includes('printcontactinfoupdate') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
@@ -2959,32 +3174,32 @@ function Contactupdate() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfcontactinfoupdate") && (
+                  {isUserRoleCompare?.includes('pdfcontactinfoupdate') && (
                     <>
-                      <Button
-                        sx={userStyle.buttongrp}
-                        onClick={() => downloadPdf()}
-                      >
+                      {/* <Button sx={userStyle.buttongrp} onClick={() => downloadPdf()}>
                         <FaFilePdf />
                         &ensp;Export to PDF&ensp;
-                      </Button>
+                      </Button> */}
+                      <Button sx={userStyle.buttongrp} onClick={()=>{setIsPdfFilterOpen(true)}}><FaFilePdf /> &ensp;Export to PDF&ensp;</Button>
+
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imagecontactinfoupdate") && (
-                    <Button
-                      sx={userStyle.buttongrp}
-                      onClick={handleCaptureImage}
-                    >
-                      {" "}
-                      <ImageIcon
-                        sx={{ fontSize: "15px" }}
-                      /> &ensp;Image&ensp;{" "}
+                  {isUserRoleCompare?.includes('imagecontactinfoupdate') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
               </Grid>
               <Grid item md={2} xs={6} sm={6}>
-                <AggregatedSearchBar columnDataTable={columnDataTable} setItems={setItems} addSerialNumber={addSerialNumber} setPage={setPage} maindatas={employees} setSearchedString={setSearchedString}
+                <AggregatedSearchBar
+                  columnDataTable={columnDataTable}
+                  setItems={setItems}
+                  addSerialNumber={addSerialNumber}
+                  setPage={setPage}
+                  maindatas={employees}
+                  setSearchedString={setSearchedString}
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
                   paginated={false}
@@ -3005,17 +3220,8 @@ function Contactupdate() {
             <br />
             {isContact ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
             ) : (
@@ -3057,8 +3263,8 @@ function Contactupdate() {
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
@@ -3074,48 +3280,25 @@ function Contactupdate() {
           fullWidth={true}
           maxWidth="md"
           sx={{ marginTop: '50px' }}
-        // PaperProps={{ sx: { position: "fixed", top: 10, left: 10, m: 0 } }}
+          // PaperProps={{ sx: { position: "fixed", top: 10, left: 10, m: 0 } }}
         >
           <DialogContent sx={userStyle.dialogbox}>
             <Box>
               <form onSubmit={handleSubmit}>
                 <Box>
-                  <Typography sx={userStyle.SubHeaderText}>
-                    {" "}
-                    Update Employee Contact
-                  </Typography>
+                  <Typography sx={userStyle.SubHeaderText}> Update Employee Contact</Typography>
                   <br />
                   <br />
                   <>
                     <Grid container spacing={2}>
-                      <Grid
-                        item
-                        md={6}
-                        sm={12}
-                        xs={12}
-                        sx={{ display: "flex" }}
-                      >
-                        <Typography
-                          sx={{ fontWeight: "600", marginRight: "5px" }}
-                        >
-                          Employee Name:
-                        </Typography>
+                      <Grid item md={6} sm={12} xs={12} sx={{ display: 'flex' }}>
+                        <Typography sx={{ fontWeight: '600', marginRight: '5px' }}>Employee Name:</Typography>
                         <Typography>{empaddform.companyname}</Typography>
                       </Grid>
                       <br />
                       <br />
-                      <Grid
-                        item
-                        md={6}
-                        sm={12}
-                        xs={12}
-                        sx={{ display: "flex" }}
-                      >
-                        <Typography
-                          sx={{ fontWeight: "600", marginRight: "5px" }}
-                        >
-                          Emp Code:
-                        </Typography>
+                      <Grid item md={6} sm={12} xs={12} sx={{ display: 'flex' }}>
+                        <Typography sx={{ fontWeight: '600', marginRight: '5px' }}>Emp Code:</Typography>
                         <Typography>{empaddform.empcode}</Typography>
                       </Grid>
                     </Grid>
@@ -3127,7 +3310,7 @@ function Contactupdate() {
                           <Grid item md={12} sm={12} xs={12}>
                             <FormControl fullWidth size="small">
                               <Typography>
-                                Email<b style={{ color: "red" }}>*</b>
+                                Email<b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <OutlinedInput
                                 id="component-outlined"
@@ -3146,8 +3329,7 @@ function Contactupdate() {
                           <Grid item md={12} sm={12} xs={12}>
                             <FormControl fullWidth size="small">
                               <Typography>
-                                Contact(personal){" "}
-                                <b style={{ color: "red" }}>*</b>
+                                Contact(personal) <b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <OutlinedInput
                                 id="component-outlined"
@@ -3156,7 +3338,7 @@ function Contactupdate() {
                                 value={empaddform.contactpersonal?.slice(0, 10)}
                                 onChange={(e) => {
                                   const value = e.target.value;
-                                  if (value === "" || /^\d*$/.test(value)) {
+                                  if (value === '' || /^\d*$/.test(value)) {
                                     setEmpaddform({
                                       ...empaddform,
                                       contactpersonal: value,
@@ -3169,8 +3351,7 @@ function Contactupdate() {
                           <Grid item md={12} sm={12} xs={12}>
                             <FormControl fullWidth size="small">
                               <Typography>
-                                Contact(Family){" "}
-                                <b style={{ color: "red" }}>*</b>{" "}
+                                Contact(Family) <b style={{ color: 'red' }}>*</b>{' '}
                               </Typography>
                               <OutlinedInput
                                 id="component-outlined"
@@ -3179,7 +3360,7 @@ function Contactupdate() {
                                 value={empaddform.contactfamily?.slice(0, 10)}
                                 onChange={(e) => {
                                   const value = e.target.value;
-                                  if (value === "" || /^\d*$/.test(value)) {
+                                  if (value === '' || /^\d*$/.test(value)) {
                                     setEmpaddform({
                                       ...empaddform,
                                       contactfamily: value,
@@ -3192,7 +3373,7 @@ function Contactupdate() {
                           <Grid item md={12} sm={12} xs={12}>
                             <FormControl fullWidth size="small">
                               <Typography>
-                                Emergency No<b style={{ color: "red" }}>*</b>
+                                Emergency No<b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <OutlinedInput
                                 id="component-outlined"
@@ -3201,7 +3382,7 @@ function Contactupdate() {
                                 value={empaddform.emergencyno?.slice(0, 10)}
                                 onChange={(e) => {
                                   const value = e.target.value;
-                                  if (value === "" || /^\d*$/.test(value)) {
+                                  if (value === '' || /^\d*$/.test(value)) {
                                     setEmpaddform({
                                       ...empaddform,
                                       emergencyno: value,
@@ -3219,9 +3400,9 @@ function Contactupdate() {
                       <Grid item lg={6} md={3} sm={12} xs={12}>
                         <Box
                           sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                           }}
                         >
                           <InputLabel>Profile Image</InputLabel>
@@ -3229,30 +3410,19 @@ function Contactupdate() {
                         <br />
                         <Grid
                           sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                           }}
                         >
                           <Box
                             sx={{
-                              border: "1px solid black",
-                              width: "153px",
-                              height: "153px",
+                              border: '1px solid black',
+                              width: '153px',
+                              height: '153px',
                             }}
                           >
-                            <img
-                              src={
-                                croppedImage
-                                  ? croppedImage
-                                  : empaddform.profileimage
-                                    ? empaddform.profileimage
-                                    : "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg"
-                              }
-                              alt="profile"
-                              width="100%"
-                              height="100%"
-                            />
+                            <img src={croppedImage ? croppedImage : empaddform.profileimage ? empaddform.profileimage : 'https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg'} alt="profile" width="100%" height="100%" />
                           </Box>
                         </Grid>
                         <br />
@@ -3294,7 +3464,6 @@ function Contactupdate() {
                              )} 
                           </Grid> */}
 
-
                           {croppedImage && (
                             <>
                               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -3315,9 +3484,8 @@ function Contactupdate() {
                                     <Typography
                                       variant="body1"
                                       style={{
-
                                         color: '#555',
-                                        fontSize: '10px'
+                                        fontSize: '10px',
                                       }}
                                     >
                                       BG Color
@@ -3356,11 +3524,9 @@ function Contactupdate() {
                                       '&:hover': {
                                         backgroundColor: `${color}90`, // Slightly transparent on hover for a nice effect
                                       },
-                                      border: '1px solid  black'
+                                      border: '1px solid  black',
                                     }}
-                                  >
-
-                                  </LoadingButton>
+                                  ></LoadingButton>
                                 </div>
                               </div>
                             </>
@@ -3368,39 +3534,24 @@ function Contactupdate() {
                           <div>
                             {empaddform.profileimage && !croppedImage ? (
                               <>
-                                <Cropper
-                                  style={{ height: 150 }}
-                                  aspectRatio={1 / 1}
-                                  src={empaddform.profileimage}
-                                  ref={cropperRef}
-                                />
+                                <Cropper style={{ height: 150 }} aspectRatio={1 / 1} src={empaddform.profileimage} ref={cropperRef} />
                                 <Box
                                   sx={{
-                                    display: "flex",
-                                    marginTop: "10px",
-                                    gap: "10px",
+                                    display: 'flex',
+                                    marginTop: '10px',
+                                    gap: '10px',
 
-                                    justifyContent: "center",
-                                    alignItems: "center",
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
                                   }}
-
-
                                 >
-
                                   <Box>
-                                    <Typography
-                                      sx={userStyle.uploadbtn}
-                                      onClick={handleCrop}
-                                    >
+                                    <Typography sx={userStyle.uploadbtn} onClick={handleCrop}>
                                       Crop Image
                                     </Typography>
                                   </Box>
                                   <Box>
-                                    <Button
-                                      variant="outlined"
-                                      sx={userStyle.btncancel}
-                                      onClick={handleClearImage}
-                                    >
+                                    <Button variant="outlined" sx={userStyle.btncancel} onClick={handleClearImage}>
                                       Clear
                                     </Button>
                                   </Box>
@@ -3409,37 +3560,25 @@ function Contactupdate() {
                             ) : (
                               <>
                                 {!empaddform.profileimage && (
-                                  <Grid container sx={{
-                                    display: "flex", justifyContent: "center",
-                                    alignItems: "center",
-                                  }}>
+                                  <Grid
+                                    container
+                                    sx={{
+                                      display: 'flex',
+                                      justifyContent: 'center',
+                                      alignItems: 'center',
+                                    }}
+                                  >
                                     <Grid item md={6} sm={6}>
                                       <section>
-                                        <LoadingButton
-                                          component="label"
-                                          variant="contained"
-                                          loading={btnUpload}
-                                          sx={buttonStyles?.buttonsubmit}
-                                        >
+                                        <LoadingButton component="label" variant="contained" loading={btnUpload} sx={buttonStyles?.buttonsubmit}>
                                           Upload
-                                          <input
-                                            type="file"
-                                            id="profileimage"
-                                            name="file"
-                                            accept="image/*"
-                                            hidden
-                                            onChange={handleChangeImage}
-                                          />
+                                          <input type="file" id="profileimage" name="file" accept="image/*" hidden onChange={handleChangeImage} />
                                           <br />
                                         </LoadingButton>
                                       </section>
                                     </Grid>
                                     <Grid item md={6} sm={6}>
-                                      <Button
-                                        onClick={showWebcam}
-                                        variant="contained"
-                                        sx={userStyle.uploadbtn}
-                                      >
+                                      <Button onClick={showWebcam} variant="contained" sx={userStyle.uploadbtn}>
                                         <CameraAltIcon />
                                       </Button>
                                     </Grid>
@@ -3448,11 +3587,7 @@ function Contactupdate() {
                                 {empaddform.profileimage && (
                                   <>
                                     <Grid item md={4} sm={4}>
-                                      <Button
-                                        variant="outlined"
-                                        sx={userStyle.btncancel}
-                                        onClick={handleClearImage}
-                                      >
+                                      <Button variant="outlined" sx={userStyle.btncancel} onClick={handleClearImage}>
                                         Clear
                                       </Button>
                                     </Grid>
@@ -3463,15 +3598,12 @@ function Contactupdate() {
                           </div>
                           <Box
                             sx={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
                             }}
                           >
-                            <Typography
-                              variant="body2"
-                              style={{ marginTop: "5px" }}
-                            >
+                            <Typography variant="body2" style={{ marginTop: '5px' }}>
                               Max File size: 1MB
                             </Typography>
                           </Box>
@@ -3481,9 +3613,7 @@ function Contactupdate() {
                     <br />
                   </>
                   <Grid item xs={8}>
-                    <Typography sx={userStyle.importheadtext}>
-                      Reference Details{" "}
-                    </Typography>
+                    <Typography sx={userStyle.importheadtext}>Reference Details </Typography>
                   </Grid>
                   <br />
                   <Grid container spacing={1}>
@@ -3524,7 +3654,7 @@ function Contactupdate() {
                     <Grid item md={4} sm={6} xs={12}>
                       <FormControl size="small" fullWidth>
                         <Typography>
-                          Name<b style={{ color: "red" }}>*</b>
+                          Name<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -3539,12 +3669,8 @@ function Contactupdate() {
                           }}
                         />
                       </FormControl>
-                      {referenceTodoError.name && (
-                        <div>{referenceTodoError.name}</div>
-                      )}
-                      {referenceTodoError.duplicate && (
-                        <div>{referenceTodoError.duplicate}</div>
-                      )}
+                      {referenceTodoError.name && <div>{referenceTodoError.name}</div>}
+                      {referenceTodoError.duplicate && <div>{referenceTodoError.duplicate}</div>}
                     </Grid>
                     <Grid item md={4} sm={6} xs={12}>
                       <FormControl size="small" fullWidth>
@@ -3594,9 +3720,7 @@ function Contactupdate() {
                           }}
                         />
                       </FormControl>
-                      {referenceTodoError.contact && (
-                        <div>{referenceTodoError.contact}</div>
-                      )}
+                      {referenceTodoError.contact && <div>{referenceTodoError.contact}</div>}
                     </Grid>
                     <Grid item md={4} sm={12} xs={12}>
                       <FormControl fullWidth>
@@ -3620,10 +3744,10 @@ function Contactupdate() {
                         variant="contained"
                         color="primary"
                         style={{
-                          height: "30px",
-                          minWidth: "20px",
-                          padding: "19px 13px",
-                          marginTop: "25px",
+                          height: '30px',
+                          minWidth: '20px',
+                          padding: '19px 13px',
+                          marginTop: '25px',
                         }}
                         onClick={addReferenceTodoFunction}
                       >
@@ -3632,16 +3756,12 @@ function Contactupdate() {
                     </Grid>
 
                     <Grid item md={12} sm={12} xs={12}>
-                      {" "}
+                      {' '}
                     </Grid>
                     <Grid item md={12} sm={12} xs={12}>
                       <TableContainer component={Paper}>
-                        <Table
-                          sx={{ minWidth: 700 }}
-                          aria-label="customized table"
-                          id="usertable"
-                        >
-                          <TableHead sx={{ fontWeight: "600" }}>
+                        <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable">
+                          <TableHead sx={{ fontWeight: '600' }}>
                             <StyledTableRow>
                               <StyledTableCell>SNo</StyledTableCell>
                               <StyledTableCell>Name</StyledTableCell>
@@ -3658,21 +3778,13 @@ function Contactupdate() {
                                 <StyledTableRow>
                                   <StyledTableCell>{index + 1}</StyledTableCell>
                                   <StyledTableCell>{row.name}</StyledTableCell>
-                                  <StyledTableCell>
-                                    {row.relationship}
-                                  </StyledTableCell>
-                                  <StyledTableCell>
-                                    {row.occupation}
-                                  </StyledTableCell>
-                                  <StyledTableCell>
-                                    {row.contact}
-                                  </StyledTableCell>
-                                  <StyledTableCell>
-                                    {row.details}
-                                  </StyledTableCell>
+                                  <StyledTableCell>{row.relationship}</StyledTableCell>
+                                  <StyledTableCell>{row.occupation}</StyledTableCell>
+                                  <StyledTableCell>{row.contact}</StyledTableCell>
+                                  <StyledTableCell>{row.details}</StyledTableCell>
                                   <StyledTableCell>
                                     <CloseIcon
-                                      sx={{ color: "red", cursor: "pointer" }}
+                                      sx={{ color: 'red', cursor: 'pointer' }}
                                       onClick={() => {
                                         // handleClickOpen(index);
                                         // setDeleteIndex(index);
@@ -3684,10 +3796,10 @@ function Contactupdate() {
                               ))
                             ) : (
                               <StyledTableRow>
-                                {" "}
+                                {' '}
                                 <StyledTableCell colSpan={8} align="center">
                                   No Data Available
-                                </StyledTableCell>{" "}
+                                </StyledTableCell>{' '}
                               </StyledTableRow>
                             )}
                             <StyledTableRow></StyledTableRow>
@@ -3695,33 +3807,25 @@ function Contactupdate() {
                         </Table>
                       </TableContainer>
                     </Grid>
-                  </Grid>{" "}
+                  </Grid>{' '}
                   <br />
                   <br />
                   <Grid
                     container
                     spacing={2}
                     sx={{
-                      textAlign: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      textAlign: 'center',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Grid item md={1}></Grid>
 
-                    <LoadingButton
-                      type="submit"
-                      variant="contained"
-                      loading={btnUpdate || btnUpload}
-                      sx={buttonStyles.buttonsubmit}
-                    >
+                    <LoadingButton type="submit" variant="contained" loading={btnUpdate || btnUpload} sx={buttonStyles.buttonsubmit}>
                       Update
                     </LoadingButton>
                     <Grid item md={1}></Grid>
-                    <Button
-                      sx={buttonStyles.btncancel}
-                      onClick={handleCloseModEdit}
-                    >
+                    <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
                       Cancel
                     </Button>
                   </Grid>
@@ -3736,17 +3840,12 @@ function Contactupdate() {
       </Box>
       <Box></Box>
       <Box>
-        <Dialog
-          open={isErrorOpen}
-          onClose={handleCloseerr}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
+        <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
           <DialogContent
             sx={{
-              width: "350px",
-              textAlign: "center",
-              alignItems: "center",
+              width: '350px',
+              textAlign: 'center',
+              alignItems: 'center',
             }}
           >
             {/* <ErrorOutlineOutlinedIcon
@@ -3763,20 +3862,10 @@ function Contactupdate() {
       </Box>
       {/* this is info view details */}
 
-      <Dialog
-        open={openInfo}
-        onClose={handleCloseinfo}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="lg"
-        sx={{ marginTop: '50px' }}
-      >
-        <Box sx={{ width: "550px", padding: "20px 30px" }}>
+      <Dialog open={openInfo} onClose={handleCloseinfo} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '50px' }}>
+        <Box sx={{ width: '550px', padding: '20px 30px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              Contactupdate Info
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> Contactupdate Info</Typography>
             <br />
             <br />
             <Grid container spacing={2}>
@@ -3786,38 +3875,16 @@ function Contactupdate() {
                   <br />
                   <Table>
                     <TableHead>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>
-                        {"SNO"}.
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>
-                        {" "}
-                        {"UserName"}
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>
-                        {" "}
-                        {"Date"}
-                      </StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'SNO'}.</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'UserName'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'Date'}</StyledTableCell>
                     </TableHead>
                     <TableBody>
                       {addedby?.map((item, i) => (
                         <StyledTableRow>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {i + 1}.
-                          </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {" "}
-                            {item.name}
-                          </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {" "}
-                            {moment(item.date).format("DD-MM-YYYY hh:mm:ss a")}
-                          </StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}>{i + 1}.</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.name}</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {moment(item.date).format('DD-MM-YYYY hh:mm:ss a')}</StyledTableCell>
                         </StyledTableRow>
                       ))}
                     </TableBody>
@@ -3831,38 +3898,16 @@ function Contactupdate() {
                   <br />
                   <Table>
                     <TableHead>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>
-                        {"SNO"}.
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>
-                        {" "}
-                        {"UserName"}
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>
-                        {" "}
-                        {"Date"}
-                      </StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'SNO'}.</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'UserName'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'Date'}</StyledTableCell>
                     </TableHead>
                     <TableBody>
                       {updateby?.map((item, i) => (
                         <StyledTableRow>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {i + 1}.
-                          </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {" "}
-                            {item.name}
-                          </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {" "}
-                            {moment(item.date).format("DD-MM-YYYY hh:mm:ss a")}
-                          </StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}>{i + 1}.</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.name}</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {moment(item.date).format('DD-MM-YYYY hh:mm:ss a')}</StyledTableCell>
                         </StyledTableRow>
                       ))}
                     </TableBody>
@@ -3874,8 +3919,8 @@ function Contactupdate() {
             <br />
             <Grid container spacing={2}>
               <Button variant="contained" onClick={handleCloseinfo} sx={buttonStyles.btncancel}>
-                {" "}
-                Back{" "}
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
@@ -3883,27 +3928,15 @@ function Contactupdate() {
       </Dialog>
 
       {/* view model */}
-      <Dialog
-        open={openview}
-        onClose={handleClickOpenview}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <Box sx={{ width: "450px", padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <Box sx={{ width: '450px', padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              View Login Details
-            </Typography>
+            <Typography sx={userStyle.HeaderText}>View Login Details</Typography>
             <br /> <br />
-            <form sx={{ maxWidth: "1200px" }}>
+            <form sx={{ maxWidth: '1200px' }}>
               <Grid container spacing={3}>
                 <Grid item md={6} sm={12} xs={12}>
-                  <Typography>
-                    {empaddform.prefix +
-                      "." +
-                      empaddform.firstname +
-                      empaddform.lastname}
-                  </Typography>
+                  <Typography>{empaddform.prefix + '.' + empaddform.firstname + empaddform.lastname}</Typography>
                 </Grid>
                 <Grid item md={6} sm={12} xs={12}>
                   <Typography>{empaddform.empcode}</Typography>
@@ -3916,7 +3949,7 @@ function Contactupdate() {
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography sx={userStyle.SubHeaderText}>
-                      Email<b style={{ color: "red" }}>*</b>
+                      Email<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Typography>{empaddform.email}</Typography>
                   </FormControl>
@@ -3924,9 +3957,7 @@ function Contactupdate() {
                   <br />
                   <br />
                   <FormControl fullWidth size="small">
-                    <Typography sx={userStyle.SubHeaderText}>
-                      per.contact
-                    </Typography>
+                    <Typography sx={userStyle.SubHeaderText}>per.contact</Typography>
                     <Typography>{empaddform.contactpersonal}</Typography>
                   </FormControl>
                 </Grid>
@@ -3938,17 +3969,12 @@ function Contactupdate() {
 
                     <Grid
                       sx={{
-                        border: "1px solid black",
+                        border: '1px solid black',
                         height: 153,
                         width: 153,
                       }}
                     >
-                      <img
-                        src={empaddform.profileimage}
-                        alt="profile"
-                        height="150px"
-                        width="150px"
-                      ></img>
+                      <img src={empaddform.profileimage} alt="profile" height="150px" width="150px"></img>
                     </Grid>
                     <Typography></Typography>
                   </FormControl>
@@ -3957,9 +3983,7 @@ function Contactupdate() {
                 <br />
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
-                    <Typography sx={userStyle.SubHeaderText}>
-                      Fam.contact
-                    </Typography>
+                    <Typography sx={userStyle.SubHeaderText}>Fam.contact</Typography>
                     <Typography>{empaddform.contactfamily}</Typography>
                   </FormControl>
                 </Grid>
@@ -3968,7 +3992,7 @@ function Contactupdate() {
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography sx={userStyle.SubHeaderText}>
-                      Emergency.no<b style={{ color: "red" }}>*</b>
+                      Emergency.no<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Typography>{empaddform.emergencyno}</Typography>
                   </FormControl>
@@ -3978,18 +4002,14 @@ function Contactupdate() {
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography sx={userStyle.SubHeaderText}> Name</Typography>
-                    <Typography>
-                      {empaddform.prefix + "." + empaddform.firstname}
-                    </Typography>
+                    <Typography>{empaddform.prefix + '.' + empaddform.firstname}</Typography>
                   </FormControl>
                 </Grid>
                 <br />
                 <br />
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
-                    <Typography sx={userStyle.SubHeaderText}>
-                      Details
-                    </Typography>
+                    <Typography sx={userStyle.SubHeaderText}>Details</Typography>
                     <Typography>{empaddform.details}</Typography>
                   </FormControl>
                 </Grid>
@@ -3999,19 +4019,14 @@ function Contactupdate() {
                 container
                 spacing={2}
                 sx={{
-                  textAlign: "center",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  textAlign: 'center',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleCloseview}
-                  sx={buttonStyles.btncancel}
-                >
-                  {" "}
-                  Back{" "}
+                <Button variant="contained" color="primary" onClick={handleCloseview} sx={buttonStyles.btncancel}>
+                  {' '}
+                  Back{' '}
                 </Button>
               </Grid>
             </form>
@@ -4021,7 +4036,7 @@ function Contactupdate() {
       {/* print layout */}
       <TableContainer component={Paper} sx={userStyle.printcls}>
         <Table aria-label="simple table" id="branch" ref={componentRef}>
-          <TableHead sx={{ fontWeight: "600" }}>
+          <TableHead sx={{ fontWeight: '600' }}>
             <StyledTableRow>
               <StyledTableCell>SI.NO</StyledTableCell>
               <StyledTableCell>Emp code</StyledTableCell>
@@ -4046,83 +4061,59 @@ function Contactupdate() {
                   <StyledTableCell>{row.contactpersonal}</StyledTableCell>
                   <StyledTableCell>{row.contactfamily}</StyledTableCell>
                   <StyledTableCell>{row.emergencyno}</StyledTableCell>
-                  <StyledTableCell>{row?.imageBase64 ? <img src={row?.imageBase64} style={{ height: "100px", width: "100px" }} /> : ""}</StyledTableCell>
+                  <StyledTableCell>{row?.imageBase64 ? <img src={row?.imageBase64} style={{ height: '100px', width: '100px' }} /> : ''}</StyledTableCell>
                 </StyledTableRow>
               ))}
           </TableBody>
         </Table>
       </TableContainer>
 
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
-      <Dialog open={isErrorOpenpop} onClose={(event, reason) => {
-        if (reason === "backdropClick") {
-          // Ignore backdrop clicks
-          return;
-        }
-        handleCloseerrpop(); // Handle other close actions
-      }}
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
+      <Dialog
+        open={isErrorOpenpop}
+        onClose={(event, reason) => {
+          if (reason === 'backdropClick') {
+            // Ignore backdrop clicks
+            return;
+          }
+          handleCloseerrpop(); // Handle other close actions
+        }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
         fullWidth={true}
-        sx={{ marginTop: "80px" }}
+        sx={{ marginTop: '80px' }}
       >
         <Box sx={userStyle.dialogbox}>
           <>
             <Typography sx={userStyle.HeaderText}>
-              {" "}
+              {' '}
               <b>Existing Profile List</b>
             </Typography>
             <Grid item md={6} sm={12} xs={12}>
-              {showDupProfileVIsitor && showDupProfileVIsitor.length > 0 ? (
-                <ExistingProfileVisitor
-                  ExistingProfileVisitors={showDupProfileVIsitor}
-
-                />) : (
-                <Typography sx={{ ...userStyle.HeaderText, marginLeft: '28px', display: "flex", justifyContent: "center" }}>
-                  There is No Profile
-                </Typography>
-              )}
+              {showDupProfileVIsitor && showDupProfileVIsitor.length > 0 ? <ExistingProfileVisitor ExistingProfileVisitors={showDupProfileVIsitor} /> : <Typography sx={{ ...userStyle.HeaderText, marginLeft: '28px', display: 'flex', justifyContent: 'center' }}>There is No Profile</Typography>}
             </Grid>
             <br />
             <Grid item md={12} sm={12} xs={12}>
               <Grid
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: "15px",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '15px',
                 }}
               >
-                <Tooltip
-                  title={
-                    showDupProfileVIsitor?.some(data => data?.modelName === "Employee")
-                      ? "Cannot upload duplicate images for Employee."
-                      : ""
-                  }
-                  placement="top"
-                  arrow
-                >
+                <Tooltip title={showDupProfileVIsitor?.some((data) => data?.modelName === 'Employee') ? 'Cannot upload duplicate images for Employee.' : ''} placement="top" arrow>
                   <span>
                     <Button
                       style={{
-                        padding: "7px 13px",
-                        color: "white",
-                        background: "rgb(25, 118, 210)",
+                        padding: '7px 13px',
+                        color: 'white',
+                        background: 'rgb(25, 118, 210)',
                         ...buttonStyles?.buttonsubmit,
                       }}
-                      disabled={showDupProfileVIsitor?.some(data => data?.modelName === "Employee")}
+                      disabled={showDupProfileVIsitor?.some((data) => data?.modelName === 'Employee')}
                       onClick={() => {
                         UploadWithDuplicate();
                       }}
@@ -4136,16 +4127,14 @@ function Contactupdate() {
                 </Button>
               </Grid>
             </Grid>
-
           </>
         </Box>
       </Dialog>
 
-
       <Dialog
         open={isWebcamOpen}
         onClose={(event, reason) => {
-          if (reason === "backdropClick") {
+          if (reason === 'backdropClick') {
             // Ignore backdrop clicks
             return;
           }
@@ -4155,7 +4144,7 @@ function Contactupdate() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogContent sx={{ textAlign: "center", alignItems: "center" }}>
+        <DialogContent sx={{ textAlign: 'center', alignItems: 'center' }}>
           <Webcamimage
             name="create"
             getImg={getImg}
@@ -4172,24 +4161,109 @@ function Contactupdate() {
           />
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={webcamDataStore}
-            sx={buttonStyles?.buttonsubmit}
-          >
+          <Button variant="contained" color="success" onClick={webcamDataStore} sx={buttonStyles?.buttonsubmit}>
             OK
           </Button>
-          <Button variant="contained" color="error" onClick={() => {
-            webcamClose();
-            closeWebCam();
-          }}
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              webcamClose();
+              closeWebCam();
+            }}
             sx={buttonStyles?.btncancel}
           >
             CANCEL
           </Button>
         </DialogActions>
       </Dialog>
+
+
+
+      
+            {/*Export XL Data  */}
+            <Dialog open={isFilterOpen} onClose={handleCloseFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+              <DialogContent sx={{ textAlign: "center", alignItems: "center", justifyContent: "center" }}>
+                <IconButton
+                  aria-label="close"
+                  onClick={handleCloseFilterMod}
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+                {fileFormat === "xl" ? <FaFileExcel style={{ fontSize: "80px", color: "green" }} /> : <FaFileCsv style={{ fontSize: "80px", color: "green" }} />}
+                <Typography variant="h5" sx={{ textAlign: "center" }}>
+                  Choose Export
+                </Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  autoFocus
+                  variant="contained"
+                  onClick={(e) => {
+                    fileFormat === "xl" ? ExportXLWithImages(rowDataTable,fileName,"filtered") : ExportCSVWithImages(rowDataTable,fileName,"filtered") 
+                  }}
+                >
+                Export Profile Only
+                </Button>
+                <LoadingButton
+                  autoFocus
+                  // loading={exportLoading}
+                  variant="contained"
+                  onClick={(e) => {
+                    //   handleExportXL("overall");
+                    fileFormat === "xl" ? ExportXLWithImages(rowDataTable,fileName) : ExportCSVWithImages(rowDataTable,fileName) 
+                  }}
+                >
+                  Export Filtered Data
+                </LoadingButton>
+              </DialogActions>
+            </Dialog>
+
+              <Dialog open={isPdfFilterOpen} onClose={handleClosePdfFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                    <DialogContent sx={{ textAlign: "center", alignItems: "center", justifyContent: "center" }}>
+                      <IconButton
+                        aria-label="close"
+                        onClick={handleClosePdfFilterMod}
+                        sx={{
+                          position: "absolute",
+                          right: 8,
+                          top: 8,
+                          color: (theme) => theme.palette.grey[500],
+                        }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                      <PictureAsPdfIcon sx={{ fontSize: "80px", color: "red" }} />
+                      <Typography variant="h5" sx={{ textAlign: "center" }}>
+                        Choose Export
+                      </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button
+                        variant="contained"
+                        onClick={(e) => {
+                          downloaddprofile();
+                         
+                        }}
+                      >
+                        Export Profile Only
+                      </Button>
+                      <LoadingButton
+                        variant="contained"
+                        onClick={(e) => {
+                          downloadPdf();
+                        }}
+                      >
+                        Export Filtered Data
+                      </LoadingButton>
+                    </DialogActions>
+                  </Dialog>
     </Box>
   );
 }

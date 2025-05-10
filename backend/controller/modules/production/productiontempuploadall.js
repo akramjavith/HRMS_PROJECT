@@ -609,7 +609,7 @@ exports.bulkDeleteUnitRateUnallottemp = catchAsyncErrors(async (req, res, next) 
 });
 
 // /unallot
-exports.productionTempCheckMismatchPresentFilter = catchAsyncErrors(async (req, res, next) => {
+exports.productionTempCheckMismatchPresentFilterold = catchAsyncErrors(async (req, res, next) => {
   let count;
   let filteredDatas = [];
   let filteredDatasManual = [];
@@ -692,6 +692,262 @@ exports.productionTempCheckMismatchPresentFilter = catchAsyncErrors(async (req, 
     }, []);
 
     count = filteredDatas.length;
+
+    console.log(count, "vt");
+  } catch (err) {
+    console.log(err.message);
+  }
+
+  return res.status(200).json({
+    filteredDatas,
+    filteredDatasManual,
+    count,
+  });
+});
+
+
+exports.productionTempCheckMismatchPresentFilter = catchAsyncErrors(async (req, res, next) => {
+  let count;
+  let filteredDatas = [];
+  let filteredDatasManual = [];
+
+  try {
+    const { date, project, fromtime, totime } = req.body;
+
+  console.log(date,'unmatch')
+
+    const [producionIndividualManual, productionunmatched, unitRates, subCategoryOpt] = await Promise.all([
+      ProducionIndividual.find(
+        {
+          fromdate: req.body.date,
+          time: {
+            $gte: fromtime,
+            $lte: totime,
+          },
+          updatedunitrate: { $exists: true, $ne: 0 },
+          vendor: new RegExp("^" + req.body.project),
+          unallothide: { $ne: "true" },
+          status: "Approved",
+        },
+        {
+          filename: 1,
+          category: 1,
+          vendor: 1,
+          unitrate: 1,
+          flagcount: 1,
+          updatedunitrate: 1,
+          updatedflag: 1,
+        }
+      ).lean(),
+ ProductionTempUploadAll.aggregate([
+  {
+    $match: {
+      formatteddate: date,
+      unitrate: { $exists: true, $ne: 0 },
+      $or: [
+        { updatedunitrate: { $exists: false } },
+        { updatedunitrate: { $exists: true, $ne: 0 } },
+      ],
+      flagcount: { $exists: true, $gt: 0 },
+      unallothide: { $ne: "true" },
+    }
+  },
+  {
+    $addFields: {
+      vendorPrefix: {
+        $arrayElemAt: [{ $split: ["$vendor", "_"] }, 0]
+      }
+    }
+  },
+  {
+    $lookup: {
+      from: "Unitrate",
+      let: {
+        vendor: "$vendorPrefix",
+        filenameupdated: "$filenameupdated",
+        category: "$category"
+      },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ["$project", "$$vendor"] },
+                { $eq: ["$category", "$$filenameupdated"] },
+                { $eq: ["$subcategory", "$$category"] }
+              ]
+            }
+          }
+        }
+      ],
+      as: "unitrateData"
+    }
+  },
+  {
+    $unwind: {
+      path: "$unitrateData",
+      preserveNullAndEmptyArrays: true
+    }
+  },
+  {
+    $lookup: {
+      from: "subCategoryprod",
+      let: {
+        vendor: "$vendorPrefix",
+        filenameupdated: "$filenameupdated",
+        category: "$category"
+      },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ["$project", "$$vendor"] },
+                { $eq: ["$categoryname", "$$filenameupdated"] },
+                { $eq: ["$name", "$$category"] }
+              ]
+            }
+          }
+        }
+      ],
+      as: "subCategoryData"
+    }
+  },
+  {
+    $unwind: {
+      path: "$subCategoryData",
+      preserveNullAndEmptyArrays: true
+    }
+  },
+  {
+    $project: {
+      _id: 1,
+      filename: 1,
+      category: 1,
+      vendor: 1,
+      vendorPrefix: 1,
+      unitrate: 1,
+      flagcount: 1,
+      updatedunitrate: 1,
+      updatedflag: 1,
+      unitrateData: 1,
+      subCategoryData: 1
+    }
+  },
+  {
+    $match: {
+      $expr: {
+        $or: [
+          { $ne: ["$unitrateData.mrate", "$updatedunitrate"] },
+          {
+            $and: [
+              { $gt: ["$unitrateData.flagcount", 1] },
+              { $ne: ["$updatedflag", "$unitrateData.flagcount"] },
+              { $in: ["Flag Mismatched", "$subCategoryData.mismatchmode"] }
+            ]
+          },
+          {
+            $and: [
+              { $eq: ["$unitrateData.mrate", "$updatedunitrate"] },
+              { $ne: ["$updatedflag", "$unitrateData.flagcount"] },
+              { $in: ["Flag Mismatched", "$subCategoryData.mismatchmode"] }
+            ]
+          }
+        ]
+      }
+    }
+  }
+], { allowDiskUse: true }),
+
+      Unitrate.find(
+        {},
+        {
+          category: 1,
+          project: 1,
+          flagcount: 1,
+          subcategory: 1,
+          mrate: 1,
+          trate: 1,
+        }
+      ).lean(),
+    
+      subCategoryprod.find(
+        {},
+        {
+          name: 1,
+          categoryname: 1,
+          project: 1,
+          mismatchmode: 1,
+        }
+      ).lean(),
+    ]);
+    
+console.log(productionunmatched.length,producionIndividualManual.length, 'unmatch')
+
+    const unitRateMap = new Map(unitRates.map((item) => [item.project + "-" + item.category + "-" + item.subcategory, item]));
+    const subCategoryMap = new Map(subCategoryOpt.map((item) => [item.project + "-" + item.categoryname + "-" + item.name, item]));
+    
+    const productionunmatchedFiltered = productionunmatched.filter(d => d.vendor.split("-")[0] == project && d.dateobjformatdate >= new Date(`${date}T${fromtime}Z`) && d.dateobjformatdate <= new Date(`${date}T${totime}Z`) )
+
+    filteredDatas = productionunmatchedFiltered.reduce((acc, obj) => {
+      const [filenameupdated] = obj.filename.split(".x");
+
+      const matchUnitrate = unitRateMap.get(obj.vendor.split("-")[0] + "-" + filenameupdated + "-" + obj.category);
+      const matchSubCategory = subCategoryMap.get(obj.vendor.split("-")[0] + "-" + filenameupdated + "-" + obj.category);
+
+      const mrateval = matchUnitrate && (matchUnitrate.mrate ? Number(matchUnitrate.mrate) : Number(matchUnitrate.trate));
+      const finalunitrate = obj.updatedunitrate ? Number(obj.updatedunitrate) : Number(obj.unitrate);
+
+      // console.log(mrateval, 'mrateval');
+
+      const mflagcount = matchUnitrate && Number(matchUnitrate.flagcount);
+
+      const finalflag = obj.updatedflag ? Number(obj.updatedflag) : Number(obj.flagcount);
+
+      const subMismatchModes = matchSubCategory ? matchSubCategory.mismatchmode : [];
+      const unitrateval = finalunitrate;
+
+      const isMisMatch =
+        Number(mrateval) !== Number(unitrateval) ||
+        (Number(mflagcount) > 1 && Number(finalflag) != Number(mflagcount)) ||
+        (Number(mrateval) == Number(unitrateval) && Number(finalflag) != Number(mflagcount) && subMismatchModes.includes("Flag Mismatched"));
+
+      if (isMisMatch) {
+        acc.push({ _id: obj._id });
+      }
+
+      return acc;
+    }, []);
+
+    filteredDatasManual = producionIndividualManual.reduce((acc, obj) => {
+      const filenameupdated = obj.filename;
+
+      const matchUnitrate = unitRateMap.get(obj.vendor.split("-")[0] + "-" + filenameupdated + "-" + obj.category);
+      const matchSubCategory = subCategoryMap.get(obj.vendor.split("-")[0] + "-" + filenameupdated + "-" + obj.category);
+
+      const mrateval = matchUnitrate ? Number(matchUnitrate.mrate) : 0;
+      const mflagcount = matchUnitrate ? Number(matchUnitrate.flagcount) : 0;
+      const finalunitrate = obj.updatedunitrate ? Number(obj.updatedunitrate) : Number(obj.unitrate);
+      const finalflag = obj.updatedflag ? Number(obj.updatedflag) : Number(obj.flagcount);
+      // const unitflagstatus = matchUnitrate ? (matchUnitrate.flagstatus) : "";
+      const subMismatchModes = matchSubCategory ? matchSubCategory.mismatchmode : [];
+      // const unitrateval = matchCategory && matchCategory.flagstatus === "Yes" && matchCategory.mismatchmode.includes("Flag") && matchCategory.mismatchmode.includes("Unit + Flag") ? finalunitrate / finalflag : finalunitrate;
+      const unitrateval = finalunitrate;
+      // const isMisMatch = (mrateval !== unitrateval || finalflag != mflagcount);
+
+      const isMisMatch =
+        Number(mrateval) !== Number(unitrateval) ||
+        (Number(mflagcount) > 1 && Number(finalflag) != Number(mflagcount) && subMismatchModes.includes("Flag Mismatched")) ||
+        (Number(mrateval) == Number(unitrateval) && Number(finalflag) != Number(mflagcount) && subMismatchModes.includes("Flag Mismatched"));
+
+      if (isMisMatch) {
+        acc.push({ _id: obj._id });
+      }
+
+      return acc;
+    }, []);
+
+    count = filteredDatas.length + filteredDatasManual.length;
 
     console.log(count, "vt");
   } catch (err) {

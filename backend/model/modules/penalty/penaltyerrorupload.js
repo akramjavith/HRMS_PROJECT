@@ -5,6 +5,10 @@ const penaltyerroruploadSchema = new Schema({
     type: String,
     required: false,
   },
+   type: {
+    type: String,
+    required: false,
+  },
   mode: {
     type: String,
     required: false,

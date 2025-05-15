@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { Box, Typography, OutlinedInput, TableBody, TableRow, TableCell, Select, MenuItem, Dialog, DialogContent, DialogActions, FormControl, Grid, Paper, Table, TableHead, TableContainer, Button, List, ListItem, ListItemText, Popover, Checkbox, TextField, IconButton } from '@mui/material';
+import { Box, Typography, Chip, OutlinedInput, TableBody, TableRow, TableCell, Select, MenuItem, Dialog, DialogContent, DialogActions, FormControl, Grid, Paper, Table, TableHead, TableContainer, Button, List, ListItem, ListItemText, Popover, Checkbox, TextField, IconButton } from '@mui/material';
 import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from 'react-icons/fa';
 import { userStyle } from '../../../pageStyle';
 // import { ExportXL, ExportCSV } from "../../components/Export";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import axios from 'axios';
+// import axios from '../../../axiosInstance';
+import axios from "axios";
 import { SERVICE } from '../../../services/Baseservice';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { useReactToPrint } from 'react-to-print';
@@ -55,6 +56,10 @@ function OverallReport() {
     setOpenPopup(false);
   };
 
+  const [isBoxFocused, setIsBoxFocused] = React.useState(false);
+  const [searchInputValue, setSearchInputValue] = useState('');
+  const [selectedEmp, setSelectedEmp] = useState([]);
+
   const [fileFormat, setFormat] = useState('');
 
   const PmodeOpt = [
@@ -70,7 +75,7 @@ function OverallReport() {
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, isAssignBranch, buttonStyles } = useContext(UserRoleAccessContext);
+  const { isUserRoleAccess, allUsersData, isUserRoleCompare, isAssignBranch, allUsersLimit, alldepartment, allTeam, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
 
   const [sourceCheck, setSourcecheck] = useState(false);
@@ -124,20 +129,19 @@ function OverallReport() {
     setIsLoadMorePopupOpen(false); // Close the popup without loading more
   };
 
-
   const CustomStyledDataGrid = styled(StyledDataGrid)(({ theme }) => ({
-    "& .MuiDataGrid-columnHeaderTitle": {
-      fontSize: "14px",
-      fontWeight: "bold !important",
-      lineHeight: "15px",
-      whiteSpace: "normal", // Wrap text within the available space
-      overflow: "visible", // Allow overflowed text to be visible
-      minWidth: "20px",
+    '& .MuiDataGrid-columnHeaderTitle': {
+      fontSize: '14px',
+      fontWeight: 'bold !important',
+      lineHeight: '15px',
+      whiteSpace: 'normal', // Wrap text within the available space
+      overflow: 'visible', // Allow overflowed text to be visible
+      minWidth: '20px',
     },
-    "& .MuiDataGrid-columnHeaders": {
-      minHeight: "55px !important",
+    '& .MuiDataGrid-columnHeaders': {
+      minHeight: '55px !important',
       // background: "#b7b3b347",
-      maxHeight: "55px",
+      maxHeight: '55px',
     },
     // "& .MuiDataGrid-row": {
     //   fontSize: "13px", // Change the font size for row data
@@ -166,7 +170,7 @@ function OverallReport() {
   }));
 
   // let exportColumnNames = [
- 
+
   //   'Mode',
   //   'Company',
   //   'Branch',
@@ -186,18 +190,17 @@ function OverallReport() {
   //   'WorkTook',
 
   //   'U-Unitrate',
-  //   'U-Points',   
+  //   'U-Points',
   //   'U-Section',
   //   'U-FlagCount',
 
   //   'A-Unitrate',
-  //   'A-Points',  
+  //   'A-Points',
   //   'A-Section',
   //   'A-FlagCount',
 
   //   'Total Points',
 
-   
   //   'UserName',
   //   'Dupe',
   // ];
@@ -221,17 +224,17 @@ function OverallReport() {
   //   'worktook',
 
   //   'unitrate',
-  //   'points', 
+  //   'points',
   //   'section',
   //   'flagcount',
 
   //   'cunitrate',
-  //   'cpoints',   
+  //   'cpoints',
   //   'csection',
   //   'cflagcount',
-    
+
   //   'totalpoints',
-   
+
   //   'username',
   //   'dupe',
   // ];
@@ -299,35 +302,34 @@ function OverallReport() {
 
   // //get all  company.
   // const fetchCompany = async () => {
-    const accessbranch = isUserRoleAccess?.role?.includes('Manager')
-      ? []
-      : 
-        isAssignBranch
-          ?.filter((data) => {
-            let fetfinalurl = [];
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
+    ? []
+    : isAssignBranch
+      ?.filter((data) => {
+        let fetfinalurl = [];
 
-            if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-              fetfinalurl = data.subsubpagenameurl;
-            } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-              fetfinalurl = data.subpagenameurl;
-            } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-              fetfinalurl = data.mainpagenameurl;
-            } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-              fetfinalurl = data.submodulenameurl;
-            } else if (data?.modulenameurl?.length !== 0) {
-              fetfinalurl = data.modulenameurl;
-            } else {
-              fetfinalurl = [];
-            }
+        if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.subsubpagenameurl;
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.subpagenameurl;
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.mainpagenameurl;
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.submodulenameurl;
+        } else if (data?.modulenameurl?.length !== 0) {
+          fetfinalurl = data.modulenameurl;
+        } else {
+          fetfinalurl = [];
+        }
 
-            const remove = [window.location.pathname?.substring(1), window.location.pathname];
-            return fetfinalurl?.some((item) => remove?.includes(item));
-          })
-          ?.map((data) => ({
-            // branch: data.branch,
-            name: data.company,
-            // unit: data.unit,
-          }));
+        const remove = [window.location.pathname?.substring(1), window.location.pathname];
+        return fetfinalurl?.some((item) => remove?.includes(item));
+      })
+      ?.map((data) => ({
+        // branch: data.branch,
+        name: data.company,
+        // unit: data.unit,
+      }));
 
   //   try {
   //     let res = await axios.post(SERVICE.COMPANY_LIMITED_BY_ACCESS, {
@@ -602,20 +604,19 @@ function OverallReport() {
         branch: branch.map((item) => item.value),
         unit: unit.map((item) => item.value),
         team: team.map((item) => item.value),
-        reasondate:fromdate
+        reasondate: fromdate,
       });
-      const allusers =res?.data?.users.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) => i.companyname === item.companyname  ) === index
-        );
-      }).map((t) => ({
-        ...t,
-        label: t.companyname,
-        value: t.companyname,
-        username:t.username
-      }));
-      
+      const allusers = res?.data?.users
+        .filter((item, index, self) => {
+          return self.findIndex((i) => i.companyname === item.companyname) === index;
+        })
+        .map((t) => ({
+          ...t,
+          label: t.companyname,
+          value: t.companyname,
+          username: t.username,
+        }));
+
       setEmployeeOption(allusers);
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -623,11 +624,9 @@ function OverallReport() {
   };
 
   const fetchAll = async () => {
-
     const accessbranch = isUserRoleAccess?.role?.includes('Manager')
-    ? []
-    : 
-      isAssignBranch
+      ? []
+      : isAssignBranch
         ?.filter((data) => {
           let fetfinalurl = [];
 
@@ -655,26 +654,26 @@ function OverallReport() {
         }));
     try {
       const [RES_COMPANY, RES_BRANCH, RES_UNIT, RES_TEAM, RES_PROJECT, RES_VENDOR, RES_CATEGORY, RES_SUBCATEGORY] = await Promise.all([
-        axios.post(SERVICE.COMPANY_LIMITED_BY_ACCESS, { 
+        axios.post(SERVICE.COMPANY_LIMITED_BY_ACCESS, {
           headers: { Authorization: `Bearer ${auth.APIToken}` },
           role: isUserRoleAccess.role,
-          assignbranch: accessbranch.map(data =>({name: data.company}))  
+          assignbranch: accessbranch.map((data) => ({ name: data.company })),
         }),
-        axios.post(SERVICE.BRANCH_BY_COMPANY_ACCESS, { 
+        axios.post(SERVICE.BRANCH_BY_COMPANY_ACCESS, {
           headers: { Authorization: `Bearer ${auth.APIToken}` },
           role: isUserRoleAccess.role,
-          assignbranch: accessbranch.map(data => ({name: data.branch, company: data.company, })),
+          assignbranch: accessbranch.map((data) => ({ name: data.branch, company: data.company })),
         }),
-        axios.post(SERVICE.UNIT_BY_ACCESS, { 
+        axios.post(SERVICE.UNIT_BY_ACCESS, {
           headers: { Authorization: `Bearer ${auth.APIToken}` },
           role: isUserRoleAccess.role,
-          assignbranch: accessbranch.map(data => ({ branch: data.branch, })),
+          assignbranch: accessbranch.map((data) => ({ branch: data.branch })),
         }),
         axios.get(SERVICE.TEAMS, { headers: { Authorization: `Bearer ${auth.APIToken}` } }),
-        axios.get(SERVICE.PROJECTMASTER_LIMITED, { headers: { Authorization: `Bearer ${auth.APIToken}` } }),       
-        axios.get(SERVICE.VENDORMASTER_LIMITED_NAMEONLY, { headers: { Authorization: `Bearer ${auth.APIToken}` } }),        
+        axios.get(SERVICE.PROJECTMASTER_LIMITED, { headers: { Authorization: `Bearer ${auth.APIToken}` } }),
+        axios.get(SERVICE.VENDORMASTER_LIMITED_NAMEONLY, { headers: { Authorization: `Bearer ${auth.APIToken}` } }),
         axios.get(SERVICE.CATEGORY_PROD_LIMITED_PROJECT, { headers: { Authorization: `Bearer ${auth.APIToken}` } }),
-        axios.get(SERVICE.SUBCATEGORYPROD_REPORT_LIMITED, { headers: { Authorization: `Bearer ${auth.APIToken}` } }),      
+        axios.get(SERVICE.SUBCATEGORYPROD_REPORT_LIMITED, { headers: { Authorization: `Bearer ${auth.APIToken}` } }),
       ]);
       let companies = [...new Set(RES_COMPANY?.data?.companies.map((data) => data.name))].map((name) => ({
         label: name,
@@ -682,43 +681,61 @@ function OverallReport() {
       }));
       setCompanyOpt(companies);
       setSelectedOptionsCompany(companies);
-      let branchOptfirstthree = RES_BRANCH?.data?.branches.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) => i.company === item.company && i.name === item.name  ) === index
-        );
-      }).map((t) => ({
-        ...t,
-        label: t.name,
-        value: t.name,
-      }));
+      let branchOptfirstthree = RES_BRANCH?.data?.branches
+        .filter((item, index, self) => {
+          return self.findIndex((i) => i.company === item.company && i.name === item.name) === index;
+        })
+        .map((t) => ({
+          ...t,
+          label: t.name,
+          value: t.name,
+        }));
+      setValueCompanyCat(
+        companies.map((a, index) => {
+          return a.value;
+        })
+      );
       setBranchOption(branchOptfirstthree);
       setSelectedOptionsBranch(branchOptfirstthree);
-      let units = RES_UNIT?.data?.units.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) => i.branch === item.branch && i.name === item.name  ) === index
-        );
-      }).map((t) => ({
-        ...t,
-        label: t.name,
-        value: t.name,
-      }));
+      setValueBranchCat(
+        branchOptfirstthree.map((a, index) => {
+          return a.value;
+        })
+      );
+      let units = RES_UNIT?.data?.units
+        .filter((item, index, self) => {
+          return self.findIndex((i) => i.branch === item.branch && i.name === item.name) === index;
+        })
+        .map((t) => ({
+          ...t,
+          label: t.name,
+          value: t.name,
+        }));
+
       setUnitOption(units);
       setSelectedOptionsUnit(units);
-      let TeamOpt =RES_TEAM?.data?.teamsdetails.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) => i.company === item.company && i.branch === item.branch && i.unit === item.unit && i.teamname === item.teamname  ) === index
-        );
-      }).map((t) => ({
-        ...t,
-        label: t.teamname,
-        value: t.teamname,
-      }));
+      setValueUnitCat(
+        units.map((a, index) => {
+          return a.value;
+        })
+      );
+      let TeamOpt = RES_TEAM?.data?.teamsdetails
+        .filter((item, index, self) => {
+          return self.findIndex((i) => i.company === item.company && i.branch === item.branch && i.unit === item.unit && i.teamname === item.teamname) === index;
+        })
+        .map((t) => ({
+          ...t,
+          label: t.teamname,
+          value: t.teamname,
+        }));
 
       setTeamOption(TeamOpt);
       setSelectedOptionsTeam(TeamOpt);
+      setValueTeamCat(
+        TeamOpt.map((a, index) => {
+          return a.value;
+        })
+      );
       const projectopt = RES_PROJECT?.data?.projmaster.map((item) => ({
         ...item,
         label: item.name,
@@ -726,53 +743,44 @@ function OverallReport() {
       }));
       setProjmasterOpt(projectopt);
       setSelectedProject(projectopt);
-      const projFilt = RES_VENDOR?.data?.vendormaster.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) =>
-              i.name === item.name && i.projectname === item.projectname
-          ) === index
-        );
-      }).map((t) => ({
-        ...t,
-        label: t.name,
-        value: t.name,
-      }));
+      const projFilt = RES_VENDOR?.data?.vendormaster
+        .filter((item, index, self) => {
+          return self.findIndex((i) => i.name === item.name && i.projectname === item.projectname) === index;
+        })
+        .map((t) => ({
+          ...t,
+          label: t.name,
+          value: t.name,
+        }));
       setVendormasterOpt(projFilt);
       setSelectedVendor(projFilt);
 
-      const categoryOpt = RES_CATEGORY?.data?.categoryprod.filter((item, index, self) => {
-            return (
-              self.findIndex(
-                (i) =>
-                  i.name === item.name && i.project === item.project
-              ) === index
-            );
-          }).map((t) => ({
-            ...t,
-            label: t.name,
-            value: t.name,
-          }));
+      const categoryOpt = RES_CATEGORY?.data?.categoryprod
+        .filter((item, index, self) => {
+          return self.findIndex((i) => i.name === item.name && i.project === item.project) === index;
+        })
+        .map((t) => ({
+          ...t,
+          label: t.name,
+          value: t.name,
+        }));
 
       setCategoryOPt(categoryOpt);
       setSelectedOptionsCategory(categoryOpt);
 
-      const subcategories = RES_SUBCATEGORY?.data?.subcategoryprod.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) =>
-              i.name === item.name && i.project === item.project && i.categoryname === item.categoryname
-          ) === index
-        );
-      }).map((t) => ({
-        ...t,
-        label: t.name,
-        value: t.name,
-      }));
+      const subcategories = RES_SUBCATEGORY?.data?.subcategoryprod
+        .filter((item, index, self) => {
+          return self.findIndex((i) => i.name === item.name && i.project === item.project && i.categoryname === item.categoryname) === index;
+        })
+        .map((t) => ({
+          ...t,
+          label: t.name,
+          value: t.name,
+        }));
 
       setSubCategoryOpt(subcategories);
       setSelectedOptionsSubCategory(subcategories);
-      fetchEmployeesAll(companies, branchOptfirstthree, units, TeamOpt,)
+      fetchEmployeesAll(companies, branchOptfirstthree, units, TeamOpt);
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
     }
@@ -782,10 +790,16 @@ function OverallReport() {
     fetchAllLogins();
     fetchAll();
   }, []);
+  let [valueEmployeeCat, setValueEmployeeCat] = useState([]);
 
   const handleEmployeeChangeFrom = (options) => {
     setSelectedEmployeeFrom(options);
-    setSelectedEmployeeUsername(options.map(item => item.username))
+    setValueEmployeeCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
+    setSelectedEmployeeUsername(options.map((item) => item.username));
   };
   const customValueRendererEmployeeFrom = (valueCate, _employeename) => {
     return valueCate.length ? valueCate.map(({ label }) => label).join(', ') : 'Please select Employee';
@@ -799,18 +813,17 @@ function OverallReport() {
     return valueLoginCat.length ? valueLoginCat.map(({ label }) => label).join(', ') : 'Please Select Login';
   };
 
-
-  const [fetchedUsers, setFetchedUsers] = useState([])
+  const [fetchedUsers, setFetchedUsers] = useState([]);
 
   const fetchBatchFilter = async (batchNum) => {
     setProductionFilter([]);
-  
+
     setSourcecheck(true);
     setIsLoading(true);
     // let allData = [];
     // let hasMoreData = true;
     setHasMoreData(true);
- 
+
     let resultvendor = [];
     selectedProject
       .map((d) => d.value)
@@ -825,7 +838,6 @@ function OverallReport() {
       });
     let projvendor = [...new Set(resultvendor)];
     try {
-     
       let batchNumber = 0;
       let allData = [];
       let hasMoreData = true;
@@ -846,42 +858,41 @@ function OverallReport() {
             apiUrl,
             batchNumber === 0
               ? {
-                  date: overallState.fromdate,
-                  empname: selectedEmployeeFrom.map((item) => item.value),
-                  user: selectedOptionsLoginid.map((item) => item.value),
-                  batchNumber: batchNumber,
-                  batchSize: 0,
-                }
+                date: overallState.fromdate,
+                empname: selectedEmployeeFrom.map((item) => item.value),
+                user: selectedOptionsLoginid.map((item) => item.value),
+                batchNumber: batchNumber,
+                batchSize: 0,
+              }
               : {
-                  date: overallState.fromdate,
-                  users: allusers.slice(beforeBatch, currentBatch),
-                  batchNumber: batchNumber,
-                  company:  selectedOptionsCompany.map((item) => item.value),
-                  branch:  selectedOptionsBranch.map((item) => item.value),
-                  unit: selectedOptionsUnit.map((item) => item.value),
-        
-                  // newcategory: valueSubCat,
-                  team: selectedOptionsTeam.map((item) => item.value),
-                  projectvendor: projvendor,
-                  // subs: result,
-                  // subsmanual: resultmanual,
-                  empname: selectedEmployeeFrom.map((item) => item.value),
-                  user: selectedOptionsLoginid.map((item) => item.value),
-                  category: selectedOptionsCategory.map((item) => item.value),
-                  subcategory: selectedOptionsSubCategory.map((item) => item.value),
-                  // vendor: selectedVendor.map(item => item.value),
-                  // project: selectedProject.map(item => item.value),
-                  username: selectedEmployeeUsername,
-                  
-                  selecteddupe: selectedDupe,
-                  fromdate: overallState.fromdate,
-                  fromtime: overallState.fromtime24Hrs,
-                  totime: overallState.totime24Hrs,
-                  todate: overallState.todate,
-                  shift: overallState.shift,
-                  mode: selectedOptionsMode.map((item) => item.value),
-        
-                },
+                date: overallState.fromdate,
+                users: allusers.slice(beforeBatch, currentBatch),
+                batchNumber: batchNumber,
+                company: selectedOptionsCompany.map((item) => item.value),
+                branch: selectedOptionsBranch.map((item) => item.value),
+                unit: selectedOptionsUnit.map((item) => item.value),
+
+                // newcategory: valueSubCat,
+                team: selectedOptionsTeam.map((item) => item.value),
+                projectvendor: projvendor,
+                // subs: result,
+                // subsmanual: resultmanual,
+                empname: selectedEmployeeFrom.map((item) => item.value),
+                user: selectedOptionsLoginid.map((item) => item.value),
+                category: selectedOptionsCategory.map((item) => item.value),
+                subcategory: selectedOptionsSubCategory.map((item) => item.value),
+                // vendor: selectedVendor.map(item => item.value),
+                // project: selectedProject.map(item => item.value),
+                username: selectedEmployeeUsername,
+
+                selecteddupe: selectedDupe,
+                fromdate: overallState.fromdate,
+                fromtime: overallState.fromtime24Hrs,
+                totime: overallState.totime24Hrs,
+                todate: overallState.todate,
+                shift: overallState.shift,
+                mode: selectedOptionsMode.map((item) => item.value),
+              },
             {
               headers: {
                 Authorization: `Bearer ${auth.APIToken}`,
@@ -892,7 +903,7 @@ function OverallReport() {
           if (batchNumber === 0) {
             allusers = response.data.users || [];
             totalBatchNumber = Math.ceil(allusers.length / 30);
-            setFetchedUsers(allusers)
+            setFetchedUsers(allusers);
           }
           const productionupload = response.data.mergedData || [];
           if (batchNumber > 0 && batchNumber > 1) {
@@ -902,12 +913,9 @@ function OverallReport() {
             allData = filtered;
             console.log(batchNumber, totalBatchNumber, filtered.length, 'batch');
             batchNumber++;
-         
           }
         } catch (err) {
           console.log(err, 'err123888');
-       
-         
 
           setPopupContentMalert(err.response.data.message === 'shifttiming' ? 'Shifttime value is undefined' : 'something went wrong!');
           setPopupSeverityMalert('info');
@@ -923,15 +931,15 @@ function OverallReport() {
         setHasMoreData(false);
         setSourcecheck(false);
         setIsLoading(false);
-        if (batchNumber >= totalBatchNumber ) {
-          setPopupContentMalert("Fully Loaded");
-          setPopupSeverityMalert("success");
+        if (batchNumber >= totalBatchNumber) {
+          setPopupContentMalert('Fully Loaded');
+          setPopupSeverityMalert('success');
           handleClickOpenPopupMalert();
           setHasMoreData(false);
         }
       } else {
         const filtered = allData.filter((item) => item != null);
-     
+
         // console.log(mergedDataall, "mergedDataall")
 
         setProductionFilter(filtered);
@@ -939,17 +947,17 @@ function OverallReport() {
         setBatchNumber(batchNum);
         setSourcecheck(false);
         setIsLoading(false);
-        if (batchNumber >= totalBatchNumber ) {
-          setPopupContentMalert("Fully Loaded");
-          setPopupSeverityMalert("success");
+        if (batchNumber >= totalBatchNumber) {
+          setPopupContentMalert('Fully Loaded');
+          setPopupSeverityMalert('success');
           handleClickOpenPopupMalert();
           setHasMoreData(false);
-        }else{
-        setIsLoadMorePopupOpen(true);
+        } else {
+          setIsLoadMorePopupOpen(true);
         }
       }
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.error('Error fetching data:', err);
       setSourcecheck(false);
       setIsLoading(false);
       setHasMoreData(false);
@@ -961,12 +969,11 @@ function OverallReport() {
   };
 
   const fetchBatch = async (batchNum) => {
- 
     setSourcecheck(true);
     setIsLoading(true);
     // let allData = [];
     setHasMoreData(true);
-    let batchNumber=batchNum
+    let batchNumber = batchNum;
     let resultvendor = [];
     selectedProject
       .map((d) => d.value)
@@ -981,58 +988,56 @@ function OverallReport() {
       });
     let projvendor = [...new Set(resultvendor)];
     // const isRoleManager = ['Manager', 'Director', 'Admin', 'SuperAdmin', 'ADMIN'].some((rl) => isUserRoleAccess.role.includes(rl));
-   let totalBatchNumber = Math.ceil(fetchedUsers.length / 30);
+    let totalBatchNumber = Math.ceil(fetchedUsers.length / 30);
     try {
-    
-    const apiUrl = SERVICE.PRODUCTION_UPLOAD_FILTER;
-    
-    const currentBatch = Number(batchNumber) * 30;
-    const beforeBatch = (Number(batchNumber) - 1) * 30;
+      const apiUrl = SERVICE.PRODUCTION_UPLOAD_FILTER;
 
-    const response = await axios.post(
-      apiUrl,
-      {
-            date: overallState.fromdate,
-            users: fetchedUsers.slice(beforeBatch, currentBatch),
-            batchNumber: batchNumber,
-            company:  selectedOptionsCompany.map((item) => item.value),
-            branch:  selectedOptionsBranch.map((item) => item.value),
-            unit: selectedOptionsUnit.map((item) => item.value),
-  
-            // newcategory: valueSubCat,
-            team: selectedOptionsTeam.map((item) => item.value),
-            projectvendor: projvendor,
-            // subs: result,
-            // subsmanual: resultmanual,
-            empname: selectedEmployeeFrom.map((item) => item.value),
-            user: selectedOptionsLoginid.map((item) => item.value),
-            category: selectedOptionsCategory.map((item) => item.value),
-            subcategory: selectedOptionsSubCategory.map((item) => item.value),
-            // vendor: selectedVendor.map(item => item.value),
-            // project: selectedProject.map(item => item.value),
-            selecteddupe: selectedDupe,
-            fromdate: overallState.fromdate,
-            fromtime: overallState.fromtime24Hrs,
-            totime: overallState.totime24Hrs,
-            todate: overallState.todate,
-            shift: overallState.shift,
-            mode: selectedOptionsMode.map((item) => item.value),
-  
-          },
-      {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
+      const currentBatch = Number(batchNumber) * 30;
+      const beforeBatch = (Number(batchNumber) - 1) * 30;
+
+      const response = await axios.post(
+        apiUrl,
+        {
+          date: overallState.fromdate,
+          users: fetchedUsers.slice(beforeBatch, currentBatch),
+          batchNumber: batchNumber,
+          company: selectedOptionsCompany.map((item) => item.value),
+          branch: selectedOptionsBranch.map((item) => item.value),
+          unit: selectedOptionsUnit.map((item) => item.value),
+
+          // newcategory: valueSubCat,
+          team: selectedOptionsTeam.map((item) => item.value),
+          projectvendor: projvendor,
+          // subs: result,
+          // subsmanual: resultmanual,
+          empname: selectedEmployeeFrom.map((item) => item.value),
+          user: selectedOptionsLoginid.map((item) => item.value),
+          category: selectedOptionsCategory.map((item) => item.value),
+          subcategory: selectedOptionsSubCategory.map((item) => item.value),
+          // vendor: selectedVendor.map(item => item.value),
+          // project: selectedProject.map(item => item.value),
+          selecteddupe: selectedDupe,
+          fromdate: overallState.fromdate,
+          fromtime: overallState.fromtime24Hrs,
+          totime: overallState.totime24Hrs,
+          todate: overallState.todate,
+          shift: overallState.shift,
+          mode: selectedOptionsMode.map((item) => item.value),
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        }
+      );
 
       if (response.data.count === 0) {
         setHasMoreData(false);
         setSourcecheck(false);
         setIsLoading(false);
-        if (batchNumber >= totalBatchNumber ) {
-          setPopupContentMalert("Fully Loaded");
-          setPopupSeverityMalert("success");
+        if (batchNumber >= totalBatchNumber) {
+          setPopupContentMalert('Fully Loaded');
+          setPopupSeverityMalert('success');
           handleClickOpenPopupMalert();
           setHasMoreData(false);
         }
@@ -1046,7 +1051,6 @@ function OverallReport() {
         } else {
           // let final = filtered;
 
-      
           setProductionFilter((prevData) => [...productionFilter, ...filtered]);
 
           setPage(1);
@@ -1054,13 +1058,13 @@ function OverallReport() {
           setBatchNumber(batchNum);
           setSourcecheck(false);
           setIsLoading(false);
-          if (batchNumber >= totalBatchNumber ) {
-            setPopupContentMalert("Fully Loaded");
-            setPopupSeverityMalert("success");
+          if (batchNumber >= totalBatchNumber) {
+            setPopupContentMalert('Fully Loaded');
+            setPopupSeverityMalert('success');
             handleClickOpenPopupMalert();
             setHasMoreData(false);
-          }else{
-          setIsLoadMorePopupOpen(true);
+          } else {
+            setIsLoadMorePopupOpen(true);
           }
         }
       }
@@ -1069,7 +1073,7 @@ function OverallReport() {
       setSourcecheck(false);
       setIsLoading(false);
       setHasMoreData(false);
-    } 
+    }
   };
 
   const loadMore = () => {
@@ -1204,43 +1208,66 @@ function OverallReport() {
   const handleSubCategoryChange = (options) => {
     setSelectedOptionsSubCategory(options);
   };
-
+  let [valueCompanyCat, setValueCompanyCat] = useState([]);
   const handleCompanyChange = (options) => {
     // fetchBranchAll(options);
     setSelectedOptionsCompany(options);
+    setValueCompanyCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
     // fetchUnitAll(options, selectedOptionsBranch);
     fetchEmployeesAll(options, selectedOptionsBranch, selectedOptionsUnit, selectedOptionsTeam);
     setSelectedOptionsBranch([]);
     setSelectedOptionsUnit([]);
     setSelectedOptionsTeam([]);
     setSelectedEmployeeFrom([]);
-    setSelectedEmployeeUsername([])
+    setSelectedEmployeeUsername([]);
   };
+  let [valueBranchCat, setValueBranchCat] = useState([]);
 
   const handleBranchChange = (options) => {
     setSelectedOptionsBranch(options);
+    setValueBranchCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
     // fetchUnitAll(selectedOptionsCompany, options);
     fetchEmployeesAll(selectedOptionsCompany, options, selectedOptionsUnit, selectedOptionsTeam);
     setSelectedOptionsUnit([]);
     setSelectedOptionsTeam([]);
     setSelectedEmployeeFrom([]);
-    setSelectedEmployeeUsername([])
+    setSelectedEmployeeUsername([]);
   };
-
+  let [valueUnitCat, setValueUnitCat] = useState([]);
   const handleUnitChange = (options) => {
+    setValueUnitCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
     setSelectedOptionsUnit(options);
     // fetchTeamAll(selectedOptionsCompany, selectedOptionsBranch, options);
     fetchEmployeesAll(selectedOptionsCompany, selectedOptionsBranch, options, selectedOptionsTeam);
     setSelectedOptionsTeam([]);
     setSelectedEmployeeFrom([]);
-    setSelectedEmployeeUsername([])
+    setSelectedEmployeeUsername([]);
   };
 
+  let [valueTeamCat, setValueTeamCat] = useState([]);
+
   const handleTeamChange = (options) => {
+    setValueTeamCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
     setSelectedOptionsTeam(options);
     fetchEmployeesAll(selectedOptionsCompany, selectedOptionsBranch, selectedOptionsUnit, options);
     setSelectedEmployeeFrom([]);
-    setSelectedEmployeeUsername([])
+    setSelectedEmployeeUsername([]);
   };
 
   const handleProjectChange = (options) => {
@@ -1429,7 +1456,7 @@ function OverallReport() {
     setSelectedOptionsUnit([]);
     setSelectedOptionsTeam([]);
     setSelectedEmployeeFrom([]);
-    setSelectedEmployeeUsername([])
+    setSelectedEmployeeUsername([]);
     setVendormasterOpt([]);
     setTeamOption([]);
     setBranchOption([]);
@@ -1566,12 +1593,12 @@ function OverallReport() {
         fromdate: moment(item.fromdate).format('DD/MM/yyyy'),
         todate: moment(item.todate).format('DD/MM/yyyy'),
         filename: item.filename,
-        section:item.section ? Number(item.section) : '',
-        csection:item.csection ? Number(item.csection) : "",
-        flagcount:item.flagcount ? Number(item.flagcount) : "",
-        cflagcount:item.cflagcount ? Number(item.cflagcount) : "",
+        section: item.section ? Number(item.section) : '',
+        csection: item.csection ? Number(item.csection) : '',
+        flagcount: item.flagcount ? Number(item.flagcount) : '',
+        cflagcount: item.cflagcount ? Number(item.cflagcount) : '',
         unitrate: Number(item.unitrate),
-        cunitrate:item.cunitrate ? Number(item.cunitrate) : "",
+        cunitrate: item.cunitrate ? Number(item.cunitrate) : '',
         points: Number(Number(item.points).toFixed(5)),
         cpoints: Number(Number(item.cpoints).toFixed(5)),
         totalpoints: Number(Number(item.totalpoints).toFixed(5)),
@@ -1858,9 +1885,75 @@ function OverallReport() {
     </Box>
   );
 
-  let exportColumnNames = columnDataTable.map(item => item.headerName).filter(d => d !=="SNo" && d !=="Checkbox"  && !d.includes("Action"));
-  let exportRowValues = columnDataTable.map(item => item.field).filter(d => d !=="serialNumber" && d !=="checkbox"  && !d.includes("action"))
- 
+  let exportColumnNames = columnDataTable.map((item) => item.headerName).filter((d) => d !== 'SNo' && d !== 'Checkbox' && !d.includes('Action'));
+  let exportRowValues = columnDataTable.map((item) => item.field).filter((d) => d !== 'serialNumber' && d !== 'checkbox' && !d.includes('action'));
+
+  useEffect(() => {
+    updateEmployees([]); // Pass an empty array instead of an empty string
+  }, [allUsersLimit, valueCompanyCat, valueBranchCat, valueUnitCat, valueTeamCat]);
+
+  const updateEmployees = (pastedNames) => {
+    const namesArray = Array.isArray(pastedNames) ? pastedNames : [];
+
+    const availableOptions = allUsersLimit?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch) && valueUnitCat?.includes(comp.unit) && valueTeamCat?.includes(comp.team))?.map((data) => data.companyname.replace(/\s*\.\s*/g, '.').trim());
+
+    const matchedValues = namesArray.filter((name) => availableOptions.includes(name.replace(/\s*\.\s*/g, '.').trim()));
+
+    // Update selected options
+    const newOptions = matchedValues.map((value) => ({
+      label: value,
+      value: value,
+    }));
+
+    setSelectedEmployeeFrom((prev) => {
+      const newValues = newOptions.filter((newOpt) => !prev.some((prevOpt) => prevOpt.value === newOpt.value));
+      return [...prev, ...newValues];
+    });
+
+    // Update other states...
+    setValueEmployeeCat((prev) => [...new Set([...prev, ...matchedValues])]);
+  };
+
+  const handlePasteForEmp = (e) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData('text');
+
+    // Process the pasted text
+    const pastedNames = pastedText
+      .split(/[\n,]+/)
+      .map((name) => name.trim())
+      .filter((name) => name !== '');
+
+    // Update the state
+    updateEmployees(pastedNames);
+
+    // Clear the search input after paste
+    setSearchInputValue('');
+
+    // Refocus the element
+    e.target.focus();
+  };
+
+  // Handle clicks outside the Box
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      const boxElement = document.getElementById('paste-box'); // Add an ID to the Box
+      if (boxElement && !boxElement.contains(e.target)) {
+        setIsBoxFocused(false); // Reset focus state if clicking outside the Box
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleDelete = (e, value) => {
+    e.preventDefault();
+    setSelectedEmployeeFrom((current) => current.filter((emp) => emp.value !== value));
+    setValueEmployeeCat((current) => current.filter((empValue) => empValue !== value));
+  };
 
   return (
     <Box>
@@ -1906,7 +1999,7 @@ function OverallReport() {
               <FormControl fullWidth size="small">
                 <Typography>Branch</Typography>
                 <MultiSelect
-                  options={branchOption.filter(item => selectedOptionsCompany.map(t=> t.value).includes(item.company))}
+                  options={branchOption.filter((item) => selectedOptionsCompany.map((t) => t.value).includes(item.company))}
                   value={selectedOptionsBranch}
                   onChange={(e) => {
                     handleBranchChange(e);
@@ -1920,7 +2013,7 @@ function OverallReport() {
               <FormControl fullWidth size="small">
                 <Typography>Unit</Typography>
                 <MultiSelect
-                  options={unitOption.filter(item => selectedOptionsBranch.map(t=> t.value).includes(item.branch)  )}
+                  options={unitOption.filter((item) => selectedOptionsBranch.map((t) => t.value).includes(item.branch))}
                   value={selectedOptionsUnit}
                   onChange={(e) => {
                     handleUnitChange(e);
@@ -1934,7 +2027,7 @@ function OverallReport() {
               <FormControl fullWidth size="small">
                 <Typography>Team</Typography>
                 <MultiSelect
-                  options={teamOption.filter(item => selectedOptionsCompany.map(t=> t.value).includes(item.company) && selectedOptionsBranch.map(t=> t.value).includes(item.branch) && selectedOptionsUnit.map(t=> t.value).includes(item.unit)  )}
+                  options={teamOption.filter((item) => selectedOptionsCompany.map((t) => t.value).includes(item.company) && selectedOptionsBranch.map((t) => t.value).includes(item.branch) && selectedOptionsUnit.map((t) => t.value).includes(item.unit))}
                   value={selectedOptionsTeam}
                   onChange={(e) => {
                     handleTeamChange(e);
@@ -1965,16 +2058,16 @@ function OverallReport() {
               <FormControl fullWidth>
                 <Typography>Vendor</Typography>
                 <MultiSelect
-                  options={vendorOpt.filter(item => selectedProject.map(t=> t.value).includes(item.projectname)).filter((item, index, self) => {
-                    return (
-                      self.findIndex(
-                        (i) => i.name === item.name  ) === index
-                    );
-                  }).map((t) => ({
-                    ...t,
-                    label: t.name,
-                    value: t.name,
-                  }))}
+                  options={vendorOpt
+                    .filter((item) => selectedProject.map((t) => t.value).includes(item.projectname))
+                    .filter((item, index, self) => {
+                      return self.findIndex((i) => i.name === item.name) === index;
+                    })
+                    .map((t) => ({
+                      ...t,
+                      label: t.name,
+                      value: t.name,
+                    }))}
                   value={selectedVendor}
                   onChange={(e) => {
                     handleVendorChange(e);
@@ -2012,18 +2105,17 @@ function OverallReport() {
                     const selectedDate = e.target.value;
                     setOverallState({ ...overallState, fromdate: selectedDate, todate: selectedDate });
                   }}
-                  onBlur={
-                    (e) => {
-                      const selectedDate = e.target.value;
-                     // Ensure that the selected date is not in the future
-                     const currentDate = new Date().toISOString().split('T')[0];
-                     if (new Date(selectedDate) <= new Date()) {
-                       // setSelectedFromdate(selectedDate);
-                       // setSelectedTodate(selectedDate);
-                       setOverallState({ ...overallState, fromdate: selectedDate, todate: selectedDate });
-                     } else {
-                      setOverallState({ ...overallState, fromdate: "", todate: "" })
-                     }
+                  onBlur={(e) => {
+                    const selectedDate = e.target.value;
+                    // Ensure that the selected date is not in the future
+                    const currentDate = new Date().toISOString().split('T')[0];
+                    if (new Date(selectedDate) <= new Date()) {
+                      // setSelectedFromdate(selectedDate);
+                      // setSelectedTodate(selectedDate);
+                      setOverallState({ ...overallState, fromdate: selectedDate, todate: selectedDate });
+                    } else {
+                      setOverallState({ ...overallState, fromdate: '', todate: '' });
+                    }
                   }}
                   // Set the max attribute to the current date
                   inputProps={{ max: new Date().toISOString().split('T')[0] }}
@@ -2046,7 +2138,7 @@ function OverallReport() {
                   // onMouseLeave={}
                   onBlur={(e) => {
                     const selectedDate = e.target.value;
-                   
+
                     const fromdateval = overallState.fromdate != '' && new Date(overallState.fromdate).toISOString().split('T')[0];
                     if (overallState.fromdate == '') {
                       setShowAlert(
@@ -2070,7 +2162,7 @@ function OverallReport() {
                       // setSelectedTodate(selectedDate);
                       setOverallState({ ...overallState, todate: selectedDate });
                     } else {
-                      setOverallState({ ...overallState,  todate: "" })
+                      setOverallState({ ...overallState, todate: '' });
                     }
                   }}
                   // Set the max attribute to the current date
@@ -2116,7 +2208,7 @@ function OverallReport() {
                   Category<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <MultiSelect
-                  options={categoryOpt.filter(item => selectedProject.map(t=> t.value).includes(item.project)  )}
+                  options={categoryOpt.filter((item) => selectedProject.map((t) => t.value).includes(item.project))}
                   value={selectedOptionsCategory}
                   onChange={(e) => {
                     handleCategoryChange(e);
@@ -2132,7 +2224,7 @@ function OverallReport() {
                   Sub Category<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <MultiSelect
-                  options={subcategory.filter(item => selectedProject.map(t=> t.value).includes(item.project) && selectedOptionsCategory.map(t=> t.value).includes(item.categoryname)  )}
+                  options={subcategory.filter((item) => selectedProject.map((t) => t.value).includes(item.project) && selectedOptionsCategory.map((t) => t.value).includes(item.categoryname))}
                   value={selectedOptionsSubCategory}
                   onChange={(e) => {
                     handleSubCategoryChange(e);
@@ -2152,7 +2244,41 @@ function OverallReport() {
             <Grid item md={3} xs={12} sm={6}>
               <FormControl fullWidth size="small">
                 <Typography>Employee Name</Typography>
-                <MultiSelect options={employeeOption} value={selectedEmployeeFrom} onChange={handleEmployeeChangeFrom} valueRenderer={customValueRendererEmployeeFrom} labelledBy="Please Select Employeename" />
+                <div onPaste={handlePasteForEmp} style={{ position: 'relative' }}>
+                  <MultiSelect options={employeeOption} value={selectedEmployeeFrom} onChange={handleEmployeeChangeFrom} valueRenderer={customValueRendererEmployeeFrom} labelledBy="Please Select Employeename" />
+                </div>
+              </FormControl>
+            </Grid>
+            <Grid item md={6} sm={12} xs={12} sx={{ display: 'flex', flexDirection: 'row' }}>
+              <FormControl fullWidth size="small">
+                <Typography>Selected Employees</Typography>
+                <Box
+                  id="paste-box"
+                  tabIndex={0}
+                  sx={{
+                    border: '1px solid #ccc',
+                    borderRadius: '3.75px',
+                    height: '110px',
+                    overflow: 'auto',
+                    '& .MuiChip-clickable': {
+                      margin: '1px',
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      background: '#e0e0e0',
+                    },
+                  }}
+                  onPaste={handlePasteForEmp}
+                  onFocus={() => setIsBoxFocused(true)}
+                  onBlur={(e) => {
+                    if (isBoxFocused) {
+                      e.target.focus();
+                    }
+                  }}
+                >
+                  {valueEmployeeCat.map((value) => (
+                    <Chip key={value} label={value} clickable sx={{ margin: 2, backgroundColor: '#FFF' }} onDelete={(e) => handleDelete(e, value)} onClick={() => console.log('clicked chip')} />
+                  ))}
+                </Box>
               </FormControl>
             </Grid>
             <Grid item md={3} xs={12} sm={6}>
@@ -2168,219 +2294,211 @@ function OverallReport() {
                 />
               </FormControl>
             </Grid>
-           
           </Grid>
-          {isUserRoleCompare?.includes("loverallreport") && ( 
-          <Grid item md={12} sm={12} xs={12}>
-            <br />
-            <Grid sx={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
-              <Button
-                variant="contained"
-                onClick={(e) => {
-                  handleSubmit(e);
-                }}
-              >
-                {' '}
-                Filter
-              </Button>
-              <Button sx={userStyle.btncancel} onClick={handleClear}>
-                {' '}
-                CLEAR
-              </Button>
+          {isUserRoleCompare?.includes('loverallreport') && (
+            <Grid item md={12} sm={12} xs={12}>
+              <br />
+              <Grid sx={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
+                <Button
+                  variant="contained"
+                  onClick={(e) => {
+                    handleSubmit(e);
+                  }}
+                >
+                  {' '}
+                  Filter
+                </Button>
+                <Button sx={userStyle.btncancel} onClick={handleClear}>
+                  {' '}
+                  CLEAR
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-            )}
+          )}
         </>
       </Box>
 
       <br />
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("loverallreport") && ( 
-            
-      <Box sx={userStyle.container}>
-        {/* ******************************************************EXPORT Buttons****************************************************** */}
-        <Grid item xs={8}>
-          <Typography sx={userStyle.importheadtext}>Overall Report</Typography>
-        </Grid>
-        <br />
-        <Grid container spacing={2} style={userStyle.dataTablestyle}>
-          <Grid item md={2} xs={12} sm={12}>
-            <Box>
-              <label>Show entries:</label>
-              <Select
-                id="pageSizeSelect"
-                value={pageSize}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 180,
-                      width: 80,
+      {isUserRoleCompare?.includes('loverallreport') && (
+        <Box sx={userStyle.container}>
+          {/* ******************************************************EXPORT Buttons****************************************************** */}
+          <Grid item xs={8}>
+            <Typography sx={userStyle.importheadtext}>Overall Report</Typography>
+          </Grid>
+          <br />
+          <Grid container spacing={2} style={userStyle.dataTablestyle}>
+            <Grid item md={2} xs={12} sm={12}>
+              <Box>
+                <label>Show entries:</label>
+                <Select
+                  id="pageSizeSelect"
+                  value={pageSize}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 180,
+                        width: 80,
+                      },
                     },
-                  },
-                }}
-                onChange={handlePageSizeChange}
-                sx={{ width: '77px' }}
-              >
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={5}>5</MenuItem>
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-                <MenuItem value={50}>50</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-                <MenuItem value={productionFilter?.length}>All</MenuItem>
-              </Select>
-            </Box>
-          </Grid>
-          <Grid item md={8} xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Box>
-              {isUserRoleCompare?.includes("exceloverallreport") && ( 
-            
-              <>
-                <Button
-                  onClick={(e) => {
-                    setIsFilterOpen(true);
-                    setFormat('xl');
                   }}
-                  sx={userStyle.buttongrp}
+                  onChange={handlePageSizeChange}
+                  sx={{ width: '77px' }}
                 >
-                  <FaFileExcel />
-                  &ensp;Export to Excel&ensp;
-                </Button>
-              </>
-             )}
-                            {isUserRoleCompare?.includes("csvoverallreport") && ( 
-           
-              <>
-                <Button
-                  onClick={(e) => {
-                    setIsFilterOpen(true);
-                    setFormat('csv');
-                  }}
-                  sx={userStyle.buttongrp}
-                >
-                  <FaFileCsv />
-                  &ensp;Export to CSV&ensp;
-                </Button>
-              </>
-             )}
-                            {isUserRoleCompare?.includes("printoverallreport") && ( 
-              <>
-                <Button sx={userStyle.buttongrp} onClick={handleprint}>
-                  &ensp;
-                  <FaPrint />
-                  &ensp;Print&ensp;
-                </Button>
-              </>
-              )}
-                            {isUserRoleCompare?.includes("pdfoverallreport") && (  
-            
-              <>
-                <Button
-                  sx={userStyle.buttongrp}
-                  onClick={() => {
-                    setIsPdfFilterOpen(true);
-                  }}
-                >
-                  <FaFilePdf />
-                  &ensp;Export to PDF&ensp;
-                </Button>
-              </>
-             )}
-                            {isUserRoleCompare?.includes("imageoverallreport") && ( 
-              <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                {' '}
-                <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
-              </Button>
-              )} 
-            </Box>
-          </Grid>
-          <Grid item md={2} xs={6} sm={6}>
-            <Box>
-              <FormControl fullWidth size="small">
-                <Typography>Search</Typography>
-                <OutlinedInput id="component-outlined" type="text" value={searchQuery} onChange={handleSearchChange} />
-              </FormControl>
-            </Box>
-          </Grid>
-        </Grid>
-        <br />
-        <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
-          Show All Columns
-        </Button>
-        &ensp;
-        <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
-          Manage Columns
-        </Button>
-        &ensp;
-        {/* Show "Load More" button if there's more data */}
-        {hasMoreData && !isLoading && productionFilter.length > 0 && (
-          <Button variant="contained" onClick={loadMore}>
-            Load More
-          </Button>
-        )}
-        <br />
-        <br />
-        {sourceCheck ? (
-          <>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              {/* <CircularProgress color="inherit" />  */}
-              <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
-            </Box>
-          </>
-        ) : (
-          <>
-            <Box
-              style={{
-                width: '100%',
-                overflowY: 'hidden', // Hide the y-axis scrollbar
-              }}
-            >
-              <CustomStyledDataGrid
-                onClipboardCopy={(copiedString) => setCopiedData(copiedString)}
-                rows={rowsWithCheckboxes}
-                columns={columnDataTable.filter((column) => columnVisibility[column.field])}
-                onSelectionModelChange={handleSelectionChange}
-                selectionModel={selectedRows}
-                autoHeight={true}
-                ref={gridRef}
-                density="compact"
-                hideFooter
-                getRowClassName={getRowClassName}
-                disableRowSelectionOnClick
-              />
-            </Box>
-            <Box style={userStyle.dataTablestyle}>
-              <Box>
-                Showing {filteredData.length > 0 ? (page - 1) * pageSize + 1 : 0} to {Math.min(page * pageSize, filteredDatas.length)} of {filteredDatas.length} entries
+                  <MenuItem value={1}>1</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={25}>25</MenuItem>
+                  <MenuItem value={50}>50</MenuItem>
+                  <MenuItem value={100}>100</MenuItem>
+                  <MenuItem value={productionFilter?.length}>All</MenuItem>
+                </Select>
               </Box>
+            </Grid>
+            <Grid item md={8} xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Box>
-                <Button onClick={() => setPage(1)} disabled={page === 1} sx={userStyle.paginationbtn}>
-                  <FirstPageIcon />
-                </Button>
-                <Button onClick={() => handlePageChange(page - 1)} disabled={page === 1} sx={userStyle.paginationbtn}>
-                  <NavigateBeforeIcon />
-                </Button>
-                {pageNumbers?.map((pageNumber) => (
-                  <Button key={pageNumber} sx={userStyle.paginationbtn} onClick={() => handlePageChange(pageNumber)} className={page === pageNumber ? 'active' : ''} disabled={page === pageNumber}>
-                    {pageNumber}
+                {isUserRoleCompare?.includes('exceloverallreport') && (
+                  <>
+                    <Button
+                      onClick={(e) => {
+                        setIsFilterOpen(true);
+                        setFormat('xl');
+                      }}
+                      sx={userStyle.buttongrp}
+                    >
+                      <FaFileExcel />
+                      &ensp;Export to Excel&ensp;
+                    </Button>
+                  </>
+                )}
+                {isUserRoleCompare?.includes('csvoverallreport') && (
+                  <>
+                    <Button
+                      onClick={(e) => {
+                        setIsFilterOpen(true);
+                        setFormat('csv');
+                      }}
+                      sx={userStyle.buttongrp}
+                    >
+                      <FaFileCsv />
+                      &ensp;Export to CSV&ensp;
+                    </Button>
+                  </>
+                )}
+                {isUserRoleCompare?.includes('printoverallreport') && (
+                  <>
+                    <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                      &ensp;
+                      <FaPrint />
+                      &ensp;Print&ensp;
+                    </Button>
+                  </>
+                )}
+                {isUserRoleCompare?.includes('pdfoverallreport') && (
+                  <>
+                    <Button
+                      sx={userStyle.buttongrp}
+                      onClick={() => {
+                        setIsPdfFilterOpen(true);
+                      }}
+                    >
+                      <FaFilePdf />
+                      &ensp;Export to PDF&ensp;
+                    </Button>
+                  </>
+                )}
+                {isUserRoleCompare?.includes('imageoverallreport') && (
+                  <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                    {' '}
+                    <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                   </Button>
-                ))}
-                {lastVisiblePage < totalPages && <span>...</span>}
-                <Button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
-                  <NavigateNextIcon />
-                </Button>
-                <Button onClick={() => setPage(totalPages)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
-                  <LastPageIcon />
-                </Button>
+                )}
               </Box>
-            </Box>
-          </>
-        )}
-      </Box>
-      
+            </Grid>
+            <Grid item md={2} xs={6} sm={6}>
+              <Box>
+                <FormControl fullWidth size="small">
+                  <Typography>Search</Typography>
+                  <OutlinedInput id="component-outlined" type="text" value={searchQuery} onChange={handleSearchChange} />
+                </FormControl>
+              </Box>
+            </Grid>
+          </Grid>
+          <br />
+          <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
+            Show All Columns
+          </Button>
+          &ensp;
+          <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
+            Manage Columns
+          </Button>
+          &ensp;
+          {/* Show "Load More" button if there's more data */}
+          {hasMoreData && !isLoading && productionFilter.length > 0 && (
+            <Button variant="contained" onClick={loadMore}>
+              Load More
+            </Button>
+          )}
+          <br />
+          <br />
+          {sourceCheck ? (
+            <>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                {/* <CircularProgress color="inherit" />  */}
+                <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
+              </Box>
+            </>
+          ) : (
+            <>
+              <Box
+                style={{
+                  width: '100%',
+                  overflowY: 'hidden', // Hide the y-axis scrollbar
+                }}
+              >
+                <CustomStyledDataGrid
+                  onClipboardCopy={(copiedString) => setCopiedData(copiedString)}
+                  rows={rowsWithCheckboxes}
+                  columns={columnDataTable.filter((column) => columnVisibility[column.field])}
+                  onSelectionModelChange={handleSelectionChange}
+                  selectionModel={selectedRows}
+                  autoHeight={true}
+                  ref={gridRef}
+                  density="compact"
+                  hideFooter
+                  getRowClassName={getRowClassName}
+                  disableRowSelectionOnClick
+                />
+              </Box>
+              <Box style={userStyle.dataTablestyle}>
+                <Box>
+                  Showing {filteredData.length > 0 ? (page - 1) * pageSize + 1 : 0} to {Math.min(page * pageSize, filteredDatas.length)} of {filteredDatas.length} entries
+                </Box>
+                <Box>
+                  <Button onClick={() => setPage(1)} disabled={page === 1} sx={userStyle.paginationbtn}>
+                    <FirstPageIcon />
+                  </Button>
+                  <Button onClick={() => handlePageChange(page - 1)} disabled={page === 1} sx={userStyle.paginationbtn}>
+                    <NavigateBeforeIcon />
+                  </Button>
+                  {pageNumbers?.map((pageNumber) => (
+                    <Button key={pageNumber} sx={userStyle.paginationbtn} onClick={() => handlePageChange(pageNumber)} className={page === pageNumber ? 'active' : ''} disabled={page === pageNumber}>
+                      {pageNumber}
+                    </Button>
+                  ))}
+                  {lastVisiblePage < totalPages && <span>...</span>}
+                  <Button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
+                    <NavigateNextIcon />
+                  </Button>
+                  <Button onClick={() => setPage(totalPages)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
+                    <LastPageIcon />
+                  </Button>
+                </Box>
+              </Box>
+            </>
+          )}
+        </Box>
       )}
-      
-  
 
       {/* Manage Column */}
       <Popover

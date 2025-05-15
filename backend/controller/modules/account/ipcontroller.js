@@ -522,7 +522,9 @@ exports.getAllIpMasterPaginationList = catchAsyncErrors(async (req, res, next) =
       query.$and = searchConditions;
     }
     console.log(query, "query")
-    const [result, totalCount] = await Promise.all([IpMaster.find(query, {}).lean().skip(skip).limit(limit), IpMaster.countDocuments(query, {}).lean()]);
+    const [result, totalCount] = await Promise.all([
+      IpMaster.find(query, {}).lean().skip(skip).limit(limit), 
+      IpMaster.countDocuments(query, {}).lean()]);
     console.log(result.length, "res")
     return res.status(200).json({ result, totalCount });
   } catch (err) {

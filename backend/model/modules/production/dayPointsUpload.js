@@ -150,6 +150,6 @@ const dayPointsUploadSchema = new Schema({
     default: Date.now,
   },
 });
-dayPointsUploadSchema.index({ "uploaddata.date": 1 })
+dayPointsUploadSchema.index({ "uploaddata.companyname": 1, "uploaddata.branch": 1, "uploaddata.unit": 1, "uploaddata.team": 1, "uploaddata.name": 1 })
 dayPointsUploadSchema.index({ date: 1 })
 module.exports = mongoose.model("dayPoints", dayPointsUploadSchema);

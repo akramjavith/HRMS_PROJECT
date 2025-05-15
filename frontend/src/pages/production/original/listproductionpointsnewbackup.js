@@ -78,15 +78,28 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import AggregatedSearchBar from "../../../components/AggregatedSearchBar.js";
+import AggridTable from "../../../components/AggridTable";
+
 import * as pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import domtoimage from 'dom-to-image';
 
-function ListTempProductionPoints() {
-
+function ListProductionPoints() {
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
+  const [isHandleChange, setIsHandleChange] = useState(false);
   const [searchedString, setSearchedString] = useState("");
+  const gridRefTable = useRef(null);
+
+
+    let exportColumnNames = [ "EmployeeCode", "EmployeeName", "Company", "Branch",
+        "Unit", "Team", "Date", "Exper", "Target",
+        "Weekoff", "Production", "Manual", "NonProduction", "Point", "AllowancePoint", "NonAllowancePoint", "AvgPoint"];
+  
+  
+        let exportRowValues = [ "empcode", "name", "companyname", "branch",
+        "unit", "team", "date", "exper", "target",
+        "weekoff", "production", "manual", "point", "Point", "allowancepoint", "nonallowancepoint", "avgpoint"];
 
   //auto select all dropdowns
   const [allAssignCompany, setAllAssignCompany] = useState([]);
@@ -165,14 +178,14 @@ function ListTempProductionPoints() {
       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
       // Save file
-      XLSX.writeFile(wb, "ListProductionPointsTemp.xlsx");
+      XLSX.writeFile(wb, "ListProductionPoints.xlsx");
       setIsFilterOpen(false);
     } else if (isfilter === "overall") {
       let result = [];
       setExportLoading(true);
 
       let response = await axios.post(
-        SERVICE.PRODUCTION_UPLOAD_TEMP_POINTS_FILTER_EXCEL, {
+        SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER_EXCEL, {
 
         company: ValueCompany,
         branch: ValueBranch,
@@ -201,7 +214,7 @@ function ListTempProductionPoints() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "ListProductionPointsTemp.xlsx";
+      a.download = "ListProductionPoints.xlsx";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -250,7 +263,7 @@ function ListTempProductionPoints() {
       const blob = new Blob([csvOutput], { type: "text/csv" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "ListProductionPointsTemp.csv";
+      link.download = "ListProductionPoints.csv";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -260,7 +273,7 @@ function ListTempProductionPoints() {
 
       try {
         let response = await axios.post(
-          SERVICE.PRODUCTION_UPLOAD_POINTS_TEMP_FILTER_CSV,
+          SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER_CSV,
           {
             company: ValueCompany,
             branch: ValueBranch,
@@ -303,7 +316,7 @@ function ListTempProductionPoints() {
       try {
 
 
-        // pdfMake.createPdf(docDefinition).download("ListProductionPointsTemp.pdf"); // Trigger downloa
+        // pdfMake.createPdf(docDefinition).download("ListProductionPoints.pdf"); // Trigger downloa
         const headers = [
           "EmployeeCode", "EmployeeName", "Company", "Branch",
           "Unit", "Team", "Date", "Exper", "Target",
@@ -389,7 +402,7 @@ function ListTempProductionPoints() {
 
 
 
-        pdfMake.createPdf(docDefinition).download("ListProductionPointsTemp.pdf");
+        pdfMake.createPdf(docDefinition).download("ListProductionPoints.pdf");
         setIsPdfFilterOpen(false);
       } catch (err) {
         setExportLoading(false);
@@ -400,7 +413,7 @@ function ListTempProductionPoints() {
       let result = [];
 
       let response = await axios.post(
-        SERVICE.PRODUCTION_UPLOAD_POINTS_TEMP_FILTER_PDF,
+        SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER_PDF,
 
         {
 
@@ -422,7 +435,7 @@ function ListTempProductionPoints() {
       const blob = new Blob([response.data], { type: "application/pdf" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "ListProductionPointsTemp.pdf";
+      link.download = "ListProductionPoints.pdf";
       link.click();
       URL.revokeObjectURL(link.href);
       setExportLoading(false);
@@ -721,9 +734,9 @@ function ListTempProductionPoints() {
 
 
   useEffect(() => {
-    // if (items?.length > 0) {
+    if (items?.length > 0) {
       fetchProductionLists();
-    // }
+    }
   }, [page, pageSize, searchQuery]);
 
 
@@ -827,16 +840,16 @@ function ListTempProductionPoints() {
     setIsEditOpen(false);
   };
   const [totalProjects, setTotalProjects] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
+  // const [totalPages, setTotalPages] = useState(0);
+  // const [totalCount, setTotalCount] = useState(0);
 
-  const [pageNumbers, setPageNumbers] = useState([]);
+  // const [pageNumbers, setPageNumbers] = useState([]);
   //get all client user id.
 
   const fetchProductionLists = async () => {
     setLoaders(true)
     try {
-      let res_freq = await axios.post(SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER_TEMP, {
+      let res_freq = await axios.post(SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
@@ -847,9 +860,9 @@ function ListTempProductionPoints() {
         username: ValueEmployee,
         fromdate: filterUser?.fromdate,
         todate: filterUser?.todate,
-        page: page,
-        pageSize: pageSize,
-        searchQuery: searchQuery,
+        // page: page,
+        // pageSize: pageSize,
+        // searchQuery: searchQuery,
       });
 
       let final = res_freq.data.result;
@@ -858,23 +871,24 @@ function ListTempProductionPoints() {
 
         return {
           ...d,
-          id: d.id,
-          serialNumber: (page - 1) * pageSize + index + 1,
+          id: d._id,
+          // serialNumber: (page - 1) * pageSize + index + 1,
+          serialNumber:  index + 1,
           date: moment(d.date).format("DD-MM-YYYY")
         };
       });
       console.log(subcates, "subcates")
       let subcatescount = res_freq?.data?.totalCount;
-      setTotalCount(subcatescount);
-      setTotalPages(Math.ceil(subcatescount / pageSize));
-      const firstVisiblePage = Math.max(1, page - 1);
-      const lastVisiblePage = Math.min(firstVisiblePage + 3 - 1, Math.ceil(subcatescount / pageSize));
-      const newPageNumbers = [];
-      for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
-        newPageNumbers.push(i);
-      }
-      setPageNumbers(newPageNumbers);
-      console.log(subcates, "subcates")
+      // setTotalCount(subcatescount);
+      // setTotalPages(Math.ceil(subcatescount / pageSize));
+      // const firstVisiblePage = Math.max(1, page - 1);
+      // const lastVisiblePage = Math.min(firstVisiblePage + 3 - 1, Math.ceil(subcatescount / pageSize));
+      // const newPageNumbers = [];
+      // for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
+      //   newPageNumbers.push(i);
+      // }
+      // setPageNumbers(newPageNumbers);
+      // console.log(subcates, "subcates")
       setClientUserIDArray(subcates);
 
       setLoaders(false)
@@ -899,7 +913,6 @@ function ListTempProductionPoints() {
       handleApiError(err, setShowAlert, handleClickOpenerr);
     }
   };
-
   const gridRefTableImg = useRef(null);
 
   const handleCaptureImage = () => {
@@ -907,7 +920,7 @@ function ListTempProductionPoints() {
       domtoimage
         .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, 'List Productions Points Temp.png');
+          saveAs(blob, 'List Productions Points.png');
         })
         .catch((error) => {
           console.error('dom-to-image error: ', error);
@@ -1019,22 +1032,22 @@ function ListTempProductionPoints() {
   };
 
   // Split the search query into individual terms
-  // const searchTerms = searchQuery.toLowerCase().split(' ');
+  const searchTerms = searchQuery.toLowerCase().split(' ');
 
   // Modify the filtering logic to check each term
-  // const filteredDatas = items?.filter((item) => {
-  //   return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
-  // });
+  const filteredDatas = items?.filter((item) => {
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
+  });
 
-  // const filteredData = filteredDatas?.slice((page - 1) * pageSize, page * pageSize);
-  // const totalPages = Math.ceil(filteredDatas?.length / pageSize);
-  // const visiblePages = Math.min(totalPages, 3);
-  // const firstVisiblePage = Math.max(1, page - 1);
-  // const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
-  // const pageNumbers = [];
-  // for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
-  //   pageNumbers.push(i);
-  // }
+  const filteredData = filteredDatas?.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.ceil(filteredDatas?.length / pageSize);
+  const visiblePages = Math.min(totalPages, 3);
+  const firstVisiblePage = Math.max(1, page - 1);
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
+  const pageNumbers = [];
+  for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
+    pageNumbers.push(i);
+  }
 
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const CheckboxHeader = ({ selectAllChecked, onSelectAll }) => (
@@ -1279,37 +1292,37 @@ function ListTempProductionPoints() {
     // },
   ];
 
-  // const rowDataTable = clientUserIDArray.map((item, index) => {
-  //   return {
-  //     ...item
+  const rowDataTable = filteredData.map((item, index) => {
+    return {
+      ...item
 
-  //     // id: item._id,
-  //     // serialNumber: item.serialNumber,
-  //     // empcode: item.empcode,
-  //     // name: item.name,
-  //     // companyname: item.companyname,
-  //     // branch: item.branch,
-  //     // unit: item.unit,
-  //     // team: item.team,
-  //     // date: moment(item.date).format('DD-MM-YYYY'),
-  //     // exper: item.exper,
-  //     // target: item.target,
-  //     // weekoff: item.weekoff,
-  //     // production: item.production,
-  //     // manual: item.manual,
-  //     // nonproduction: item.nonproduction,
-  //     // point: item.point,
-  //     // allowancepoint: item.allowancepoint,
-  //     // nonallowancepoint: item.nonallowancepoint,
-  //     // avgpoint: item.avgpoint,
-  //     // mainid: item.mainid,
-  //   };
-  // });
-  // const rowsWithCheckboxes = rowDataTable.map((row) => ({
-  //   ...row,
-  //   // Create a custom field for rendering the checkbox
-  //   checkbox: selectedRows.includes(row.id),
-  // }));
+      // id: item._id,
+      // serialNumber: item.serialNumber,
+      // empcode: item.empcode,
+      // name: item.name,
+      // companyname: item.companyname,
+      // branch: item.branch,
+      // unit: item.unit,
+      // team: item.team,
+      // date: moment(item.date).format('DD-MM-YYYY'),
+      // exper: item.exper,
+      // target: item.target,
+      // weekoff: item.weekoff,
+      // production: item.production,
+      // manual: item.manual,
+      // nonproduction: item.nonproduction,
+      // point: item.point,
+      // allowancepoint: item.allowancepoint,
+      // nonallowancepoint: item.nonallowancepoint,
+      // avgpoint: item.avgpoint,
+      // mainid: item.mainid,
+    };
+  });
+  const rowsWithCheckboxes = rowDataTable.map((row) => ({
+    ...row,
+    // Create a custom field for rendering the checkbox
+    checkbox: selectedRows.includes(row.id),
+  }));
   // Show All Columns functionality
   const handleShowAllColumns = () => {
     const updatedVisibility = { ...columnVisibility };
@@ -1732,7 +1745,7 @@ function ListTempProductionPoints() {
     setSelectedOptionsUnit([]);
     setValueTeamCat([]);
     setSelectedOptionsTeam([]);
-    setClientUserIDArray([])
+setClientUserIDArray([])
     setValueEmployeeCat([]);
     setSelectedOptionsEmployee([]);
 
@@ -2272,7 +2285,7 @@ function ListTempProductionPoints() {
                 <>
 
 
-                  <Box
+                  {/* <Box
                     style={{
                       // height: 300,
 
@@ -2280,22 +2293,9 @@ function ListTempProductionPoints() {
                       // overflowY: "hidden", // Hide the y-axis scrollbar
                     }}
                     className="ag-theme-quartz"
-                    ref={gridRefTableImg} // Triggers when cell editing is complete.
-
+                       ref={gridRefTableImg}
                   >
-                    {/* <StyledDataGrid
-                    onClipboardCopy={(copiedString) => setCopiedData(copiedString)}
-                    rows={rowsWithCheckboxes}
-                    columns={columnDataTable.filter((column) => columnVisibility[column.field])}
-                    onSelectionModelChange={handleSelectionChange}
-                    selectionModel={selectedRows}
-                    autoHeight={true}
-                    ref={gridRef}
-                    density="compact"
-                    hideFooter
-                    getRowClassName={getRowClassName}
-                    disableRowSelectionOnClick
-                  /> */}
+                
                     <AgGridReact
                       rowData={items}
                       columnDefs={columnDataTable}
@@ -2305,6 +2305,7 @@ function ListTempProductionPoints() {
                         filter: true,
                         // ...headerStyle,
                       }}
+                      // ref={gridRefTableImg} // Triggers when cell editing is complete.
                       suppressRowClickSelection={true}
                       rowSelection="multiple"
                       onGridReady={onGridReady}
@@ -2317,32 +2318,10 @@ function ListTempProductionPoints() {
                       getRowId={(params) => params.data.id}
                       getRowNodeId={(data) => data.id}
                     />
+
+
                   </Box>
-                  {/* <Box style={userStyle.dataTablestyle}>
-                  <Box>
-                    Showing {filteredData.length > 0 ? (page - 1) * pageSize + 1 : 0} to {Math.min(page * pageSize, filteredDatas?.length)} of {filteredDatas?.length} entries
-                  </Box>
-                  <Box>
-                    <Button onClick={() => setPage(1)} disabled={page === 1} sx={userStyle.paginationbtn}>
-                      <FirstPageIcon />
-                    </Button>
-                    <Button onClick={() => handlePageChange(page - 1)} disabled={page === 1} sx={userStyle.paginationbtn}>
-                      <NavigateBeforeIcon />
-                    </Button>
-                    {pageNumbers?.map((pageNumber) => (
-                      <Button key={pageNumber} sx={userStyle.paginationbtn} onClick={() => handlePageChange(pageNumber)} className={page === pageNumber ? 'active' : ''} disabled={page === pageNumber}>
-                        {pageNumber}
-                      </Button>
-                    ))}
-                    {lastVisiblePage < totalPages && <span>...</span>}
-                    <Button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
-                      <NavigateNextIcon />
-                    </Button>
-                    <Button onClick={() => setPage(totalPages)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
-                      <LastPageIcon />
-                    </Button>
-                  </Box>
-                </Box> */}
+                
 
                   <Box style={userStyle.dataTablestyle}>
                     <Box>
@@ -2367,7 +2346,33 @@ function ListTempProductionPoints() {
                         <LastPageIcon />
                       </Button>
                     </Box>
-                  </Box>
+                  </Box> */}
+                   <AggridTable
+                                    rowDataTable={rowDataTable}
+                                    columnDataTable={columnDataTable}
+                                    columnVisibility={columnVisibility}
+                                    page={page}
+                                    setPage={setPage}
+                                    pageSize={pageSize}
+                                    totalPages={totalPages}
+                                    setColumnVisibility={setColumnVisibility}
+                                    isHandleChange={isHandleChange}
+                                    items={items}
+                                    selectedRows={selectedRows}
+                                    setSelectedRows={setSelectedRows}
+                                    gridRefTable={gridRefTable}
+                                    paginated={false}
+                                    filteredDatas={filteredDatas}
+                                    // totalDatas={totalDatas}
+                                    searchQuery={searchedString}
+                                    handleShowAllColumns={handleShowAllColumns}
+                                    setFilteredRowData={setFilteredRowData}
+                                    filteredRowData={filteredRowData}
+                                    setFilteredChanges={setFilteredChanges}
+                                    filteredChanges={filteredChanges}
+                                    gridRefTableImg={gridRefTableImg}
+                                    itemsList={clientUserIDArray}
+                                  />
                 </>
               )}
               {/* ****** Table End ****** */}
@@ -2565,7 +2570,7 @@ function ListTempProductionPoints() {
       />
 
       {/*Export XL Data  */}
-      <Dialog open={isFilterOpen} onClose={handleCloseFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+      {/* <Dialog open={isFilterOpen} onClose={handleCloseFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent sx={{ textAlign: "center", alignItems: "center", justifyContent: "center" }}>
           <IconButton
             aria-label="close"
@@ -2646,9 +2651,25 @@ function ListTempProductionPoints() {
             Export Over All Data
           </LoadingButton>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
+
+       <ExportData
+              isFilterOpen={isFilterOpen}
+              handleCloseFilterMod={handleCloseFilterMod}
+              fileFormat={fileFormat}
+              setIsFilterOpen={setIsFilterOpen}
+              isPdfFilterOpen={isPdfFilterOpen}
+              setIsPdfFilterOpen={setIsPdfFilterOpen}
+              handleClosePdfFilterMod={handleClosePdfFilterMod}
+              filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
+              itemsTwo={clientUserIDArray ?? []}
+              filename={"List Production Points"}
+              exportColumnNames={exportColumnNames}
+              exportRowValues={exportRowValues}
+              componentRef={componentRef}
+            />
     </Box>
   );
 }
 
-export default ListTempProductionPoints;
+export default ListProductionPoints;

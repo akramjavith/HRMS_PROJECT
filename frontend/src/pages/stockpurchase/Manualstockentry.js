@@ -1,19 +1,19 @@
-import { makeStyles } from "@material-ui/core";
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { MultiSelect } from "react-multi-select-component";
-import { StyledTableCell, StyledTableRow } from "../../components/Table";
-import ManageStockItemsPopup from "../expenses/ManageStockItemsPopup";
-import StockCategoryPopup from "../expenses/StockCategoryPopup";
+import { makeStyles } from '@material-ui/core';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { MultiSelect } from 'react-multi-select-component';
+import { StyledTableCell, StyledTableRow } from '../../components/Table';
+import ManageStockItemsPopup from '../expenses/ManageStockItemsPopup';
+import StockCategoryPopup from '../expenses/StockCategoryPopup';
 import {
   Backdrop,
   Box,
@@ -49,71 +49,67 @@ import {
   TextareaAutosize,
   Tooltip,
   Typography,
-} from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
-import Switch from "@mui/material/Switch";
-import { styled } from "@mui/system";
-import axios from "axios";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import Resizable from "react-resizable";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import csvIcon from "../../components/Assets/CSV.png";
-import excelIcon from "../../components/Assets/excel-icon.png";
-import fileIcon from "../../components/Assets/file-icons.png";
-import pdfIcon from "../../components/Assets/pdf-icon.png";
-import wordIcon from "../../components/Assets/word-icon.png";
-import { handleApiError } from "../../components/Errorhandling";
-import Headtitle from "../../components/Headtitle";
-import StyledDataGrid from "../../components/TableStyle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { colourStyles, userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
-import VendorPopup from "../asset/VendorPopup";
-import ManuaStockTable from "./manualstocktable";
-import PageHeading from "../../components/PageHeading";
-import AlertDialog from "../../components/Alert";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../components/DeleteConfirmation.js";
-import ExportData from "../../components/ExportData";
-import InfoPopup from "../../components/InfoPopup.js";
-import MessageAlert from "../../components/MessageAlert";
+} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import Switch from '@mui/material/Switch';
+import { styled } from '@mui/system';
+import axios from '../../axiosInstance';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch, FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import Resizable from 'react-resizable';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import csvIcon from '../../components/Assets/CSV.png';
+import excelIcon from '../../components/Assets/excel-icon.png';
+import fileIcon from '../../components/Assets/file-icons.png';
+import pdfIcon from '../../components/Assets/pdf-icon.png';
+import wordIcon from '../../components/Assets/word-icon.png';
+import { handleApiError } from '../../components/Errorhandling';
+import Headtitle from '../../components/Headtitle';
+import StyledDataGrid from '../../components/TableStyle';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { colourStyles, userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
+import VendorPopup from '../asset/VendorPopup';
+import ManuaStockTable from './manualstocktable';
+import PageHeading from '../../components/PageHeading';
+import AlertDialog from '../../components/Alert';
+import { DeleteConfirmation, PleaseSelectRow } from '../../components/DeleteConfirmation.js';
+import ExportData from '../../components/ExportData';
+import InfoPopup from '../../components/InfoPopup.js';
+import MessageAlert from '../../components/MessageAlert';
 
 //new table
-import { IoMdOptions } from "react-icons/io";
-import { MdClose } from "react-icons/md";
+import { IoMdOptions } from 'react-icons/io';
+import { MdClose } from 'react-icons/md';
 import domtoimage from 'dom-to-image';
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
 import AdvancedSearchBar from '../../components/Searchbar';
-import AggregatedSearchBar from "../../components/AggregatedSearchBar";
-import AggridTable from "../../components/AggridTable";
-import AggridTableForPaginationTable from "../../components/AggridTableForPaginationTable.js";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { v4 as uuidv4 } from "uuid";
-import { paidOpt, statusOpt } from "../../components/Componentkeyword";
-
+import AggregatedSearchBar from '../../components/AggregatedSearchBar';
+import AggridTable from '../../components/AggridTable';
+import AggridTableForPaginationTable from '../../components/AggridTableForPaginationTable.js';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { v4 as uuidv4 } from 'uuid';
+import { paidOpt, statusOpt } from '../../components/Componentkeyword';
 
 const useStyles = makeStyles((theme) => ({
   inputs: {
-    display: "none",
+    display: 'none',
   },
   preview: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     marginTop: theme.spacing(2),
-    "& > *": {
+    '& > *': {
       margin: theme.spacing(1),
     },
   },
@@ -123,14 +119,14 @@ function Manualstockentry() {
   let Expensetotal = 0;
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
-  const [searchedString, setSearchedString] = useState("");
+  const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTableImg = useRef(null);
   const gridRefTable = useRef(null);
-  const [totalAmount, setAmount] = useState(0)
-  const [totalAmountEdit, setAmountEdit] = useState(0)
-  const [frequencyValue, setFrequencyValue] = useState("");
-  const [frequencyValueedit, setFrequencyValueedit] = useState("");
+  const [totalAmount, setAmount] = useState(0);
+  const [totalAmountEdit, setAmountEdit] = useState(0);
+  const [frequencyValue, setFrequencyValue] = useState('');
+  const [frequencyValueedit, setFrequencyValueedit] = useState('');
 
   const [refImgWarrantyEdit, setRefImgWarrantyEdit] = useState([]);
   const [refImgWarrantyBillEdit, setRefImgWarrantyBillEdit] = useState([]);
@@ -138,36 +134,32 @@ function Manualstockentry() {
   const [refImgWarrantyfilenamesEdit, setRefImgWarrantyfilenamesEdit] = useState([]);
   const [refImgbillfilenamesEdit, setRefImgbillfilenamesEdit] = useState([]);
 
-
   // State to track advanced filter
   const [advancedFilter, setAdvancedFilter] = useState(null);
   const [gridApi, setGridApi] = useState(null);
   const [columnApi, setColumnApi] = useState(null);
   const [filteredDataItems, setFilteredDataItems] = useState([]);
   //  const [filteredRowData, setFilteredRowData] = useState([]);
-  const [logicOperator, setLogicOperator] = useState("AND");
+  const [logicOperator, setLogicOperator] = useState('AND');
 
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [filterValue, setFilterValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [filterValue, setFilterValue] = useState('');
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = ["Contains", "Does Not Contain", "Equals", "Does Not Equal", "Begins With", "Ends With", "Blank", "Not Blank"]; // AgGrid-like conditions
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
 
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-
-
-
   const particularModeOptions = [
-    { label: "Stock Material", value: "Stock Material" },
+    { label: 'Stock Material', value: 'Stock Material' },
     // { label: "Others", value: "Others" },
   ];
 
-  const [stockCategoryAuto, setStockCategoryAuto] = useState("");
-  const [stockItemAuto, setStockItemAuto] = useState("");
+  const [stockCategoryAuto, setStockCategoryAuto] = useState('');
+  const [stockItemAuto, setStockItemAuto] = useState('');
 
   const [isErrorOpenAmount, setIsErrorOpenAmount] = useState(false);
 
@@ -181,61 +173,61 @@ function Manualstockentry() {
 
   //state and method to show current date onload
   let today1 = new Date();
-  var dd = String(today1.getDate()).padStart(2, "0");
-  var mm = String(today1.getMonth() + 1).padStart(2, "0");
+  var dd = String(today1.getDate()).padStart(2, '0');
+  var mm = String(today1.getMonth() + 1).padStart(2, '0');
   var yyyy = today1.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
   //useStates
   const [date, setDate] = useState(formattedDate);
   const [expensecreate, setExpensecreate] = useState({
-    expansecategory: "Please Select Expense Category",
-    expansesubcategory: "Please Select Expense Sub Category",
-    referenceno: "",
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    vendorname: "Please Select Vendor",
-    purpose: "Please Select Purpose",
-    totalbillamount: "",
+    expansecategory: 'Please Select Expense Category',
+    expansesubcategory: 'Please Select Expense Sub Category',
+    referenceno: '',
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    vendorname: 'Please Select Vendor',
+    purpose: 'Please Select Purpose',
+    totalbillamount: '',
     date,
-    files: "",
-    vendorfrequency: "",
-    paidstatus: "Not Paid",
-    duedate: "",
-    expansenote: "",
-    paidmode: "Please Select Paid Mode",
-    expensetotal: "",
-    balanceamount: "",
-    paidamount: "",
+    files: '',
+    vendorfrequency: '',
+    paidstatus: 'Not Paid',
+    duedate: '',
+    expansenote: '',
+    paidmode: 'Please Select Paid Mode',
+    expensetotal: '',
+    balanceamount: '',
+    paidamount: '',
   });
 
   const [todoDetails, setTodoDetails] = useState({
-    particularmode: "Please Select Particular Mode",
-    category: "Please Select Category",
-    subcategory: "Please Select Sub Category",
-    materialnew: "Please Select Item Name",
-    uomnew: "",
-    rate: "",
-    quantitynew: "",
-    amount: "",
-    productdetailsnew: "",
+    particularmode: 'Please Select Particular Mode',
+    category: 'Please Select Category',
+    subcategory: 'Please Select Sub Category',
+    materialnew: 'Please Select Item Name',
+    uomnew: '',
+    rate: '',
+    quantitynew: '',
+    amount: '',
+    productdetailsnew: '',
   });
 
   const [vendorstock, setVendorNewstock] = useState({
-    bankname: "",
-    bankbranchname: "",
-    accountholdername: "",
-    accountnumber: "",
-    ifsccode: "",
-    upinumber: "",
-    chequenumber: "",
-    cardnumber: "",
-    cardholdername: "",
-    cardtransactionnumber: "",
-    cardtype: "",
-    cardmonth: "",
-    cardyear: "",
-    cardsecuritycode: "",
+    bankname: '',
+    bankbranchname: '',
+    accountholdername: '',
+    accountnumber: '',
+    ifsccode: '',
+    upinumber: '',
+    chequenumber: '',
+    cardnumber: '',
+    cardholdername: '',
+    cardtransactionnumber: '',
+    cardtype: '',
+    cardmonth: '',
+    cardyear: '',
+    cardsecuritycode: '',
   });
 
   const [educationtodo, setEducationtodo] = useState([]);
@@ -243,7 +235,7 @@ function Manualstockentry() {
   const [expanseOpt, setExpanse] = useState([]);
   const [expansesubOpt, setExpanseSub] = useState([]);
   const [groupedVendorNames, setGroupedVendorNames] = useState([]);
-  const [vendorId, setVendorId] = useState("");
+  const [vendorId, setVendorId] = useState('');
   const [vendorModeOfPayments, setVendorModeOfPayments] = useState([]);
   const [espenseCheck, setExpenseCheck] = useState(false);
   const [purposes, setPurposes] = useState([]);
@@ -263,7 +255,7 @@ function Manualstockentry() {
       });
 
       setAllStockValues(res_status?.data?.managestockitems);
-      setStockItemAuto("");
+      setStockItemAuto('');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -283,7 +275,7 @@ function Manualstockentry() {
         })
       );
       setAllStockCategory(response?.data?.stockcategory);
-      setStockCategoryAuto("");
+      setStockCategoryAuto('');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -294,16 +286,10 @@ function Manualstockentry() {
     fetchStockItems();
   }, []);
 
-
-
-
-
-
-
   const [stock, setStock] = useState([]);
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
     setBtnSubmit(false);
@@ -313,8 +299,8 @@ function Manualstockentry() {
     setBtnSubmit(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
     setBtnSubmit(false);
@@ -325,67 +311,58 @@ function Manualstockentry() {
     setBtnSubmit(false);
   };
 
-  const {
-    isUserRoleCompare, buttonStyles,
-    isAssignBranch,
-    isUserRoleAccess, pageName, setPageName,
-    allCompany,
-    allBranch,
-    allUnit,
-    allTeam,
-  } = useContext(UserRoleAccessContext);
+  const { isUserRoleCompare, buttonStyles, isAssignBranch, isUserRoleAccess, pageName, setPageName, allCompany, allBranch, allUnit, allTeam } = useContext(UserRoleAccessContext);
 
   let exportColumnNames = [
-    "Company",
-    "Branch",
-    "Unit",
-    "Floor",
-    "Area",
-    "Location",
-    "Request Mode For",
-    "Asset Head",
-    "Material",
-    "Warranty",
-    "Purchasedate",
-    "Dealer Name",
-    "Gst No",
-    "Bill Number",
-    "Product Details",
-    "Warranty Details",
-    "Quantity",
-    "Quantity & UOM",
-    "Rate",
-    "Bill Amount",
-    "Bill Date",
-    "Vendor Group",
-    "Vendor Name",
+    'Company',
+    'Branch',
+    'Unit',
+    'Floor',
+    'Area',
+    'Location',
+    'Request Mode For',
+    'Asset Head',
+    'Material',
+    'Warranty',
+    'Purchasedate',
+    'Dealer Name',
+    'Gst No',
+    'Bill Number',
+    'Product Details',
+    'Warranty Details',
+    'Quantity',
+    'Quantity & UOM',
+    'Rate',
+    'Bill Amount',
+    'Bill Date',
+    'Vendor Group',
+    'Vendor Name',
   ];
   let exportRowValues = [
-    "company",
-    "branch",
-    "unit",
-    "floor",
-    "area",
-    "location",
-    "requestmode",
-    "producthead",
-    "productname",
-    "warranty",
-    "purchasedate",
-    "vendorname",
-    "gstno",
-    "billno",
-    "productdetails",
-    "warrantydetails",
-    "quantity",
-    "uom",
-    "rate",
-    "totalbillamount",
-    "billdate",
-    "vendorgroup",
-    "vendorname",
+    'company',
+    'branch',
+    'unit',
+    'floor',
+    'area',
+    'location',
+    'requestmode',
+    'producthead',
+    'productname',
+    'warranty',
+    'purchasedate',
+    'vendorname',
+    'gstno',
+    'billno',
+    'productdetails',
+    'warrantydetails',
+    'quantity',
+    'uom',
+    'rate',
+    'totalbillamount',
+    'billdate',
+    'vendorgroup',
+    'vendorname',
   ];
-
 
   //Access Module
   const pathname = window.location.pathname;
@@ -396,7 +373,7 @@ function Manualstockentry() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Manual Stock Entry"),
+      pagename: String('Manual Stock Entry'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -407,22 +384,20 @@ function Manualstockentry() {
         },
       ],
     });
-
-  }
+  };
 
   useEffect(() => {
     getapi();
   }, []);
 
-
   const [assetSpecificationType, setAssetSpecificationType] = useState({
-    name: "",
-    code: "",
+    name: '',
+    code: '',
   });
-  const [assetModel, setAssetModel] = useState({ name: "", code: "" });
-  const [assetSize, setAssetSize] = useState({ name: "", code: "" });
-  const [assetVariant, setAssetVariant] = useState({ name: "", code: "" });
-  const [brandMaster, setBrandMaster] = useState({ name: "", code: "" });
+  const [assetModel, setAssetModel] = useState({ name: '', code: '' });
+  const [assetSize, setAssetSize] = useState({ name: '', code: '' });
+  const [assetVariant, setAssetVariant] = useState({ name: '', code: '' });
+  const [brandMaster, setBrandMaster] = useState({ name: '', code: '' });
 
   const [btnSubmit, setBtnSubmit] = useState(false);
 
@@ -431,14 +406,13 @@ function Manualstockentry() {
 
   //new changes
   const requestModeOptions = [
-    { label: "Asset Material", value: "Asset Material" },
-    { label: "Stock Material", value: "Stock Material" },
+    { label: 'Asset Material', value: 'Asset Material' },
+    { label: 'Stock Material', value: 'Stock Material' },
   ];
   const vendorModeOptions = [
-    { label: "Manual", value: "Manual", _id: "" },
-    { label: "Old Stock", value: "Old Stock", _id: "" },
-    { label: "Unknown", value: "Unknown", _id: "" },
-
+    { label: 'Manual', value: 'Manual', _id: '' },
+    { label: 'Old Stock', value: 'Old Stock', _id: '' },
+    { label: 'Unknown', value: 'Unknown', _id: '' },
   ];
 
   const [isStockMaterial, setIsStockMaterial] = useState(false);
@@ -450,136 +424,119 @@ function Manualstockentry() {
   const [changeTable, setChangeTable] = useState([]);
 
   const [stockmaster, setStockmaster] = useState({
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    floor: "Please Select Floor",
-    totalbillamount: "",
-    area: "Please Select Area",
-    location: "Please Select Location",
-    workstation: "Please Select Workstation",
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    floor: 'Please Select Floor',
+    totalbillamount: '',
+    area: 'Please Select Area',
+    location: 'Please Select Location',
+    workstation: 'Please Select Workstation',
     workcheck: false,
-    producthead: "",
-    totalbillamount: "",
-    vendorname: "Please Select Vendor",
-    productname: "Please Select Material",
-    component: "Please Select Component",
-    gstno: "",
-    billno: "",
-    assettype: "",
-    asset: "",
-    productdetails: "",
-    warrantydetails: "",
-    uom: "Please Select UOM",
+    producthead: '',
+    totalbillamount: '',
+    vendorname: 'Please Select Vendor',
+    productname: 'Please Select Material',
+    component: 'Please Select Component',
+    gstno: '',
+    billno: '',
+    assettype: '',
+    asset: '',
+    productdetails: '',
+    warrantydetails: '',
+    uom: 'Please Select UOM',
     quantity: 1,
-    rate: "",
-    billdate: "",
-    files: "",
-    warrantyfiles: "",
+    rate: '',
+    billdate: '',
+    files: '',
+    warrantyfiles: '',
 
-    warranty: "Yes",
-    warrantycalculation: "",
-    estimation: "",
-    estimationtime: "Days",
-    purchasedate: "",
+    warranty: 'Yes',
+    warrantycalculation: '',
+    estimation: '',
+    estimationtime: 'Days',
+    purchasedate: '',
 
-    addedby: "",
-    updatedby: "",
+    addedby: '',
+    updatedby: '',
 
-    requestmode: "Please Select Stock Mode For",
-    stockcategory: "Please Select Stock Category",
-    stocksubcategory: "Please Select Stock Sub Category",
-    uomnew: "",
+    requestmode: 'Please Select Stock Mode For',
+    stockcategory: 'Please Select Stock Category',
+    stocksubcategory: 'Please Select Stock Sub Category',
+    uomnew: '',
     quantitynew: 1,
-    materialnew: "Please Select Material",
-    productdetailsnew: "",
+    materialnew: 'Please Select Material',
+    productdetailsnew: '',
   });
 
   const [stockmasteredit, setStockmasteredit] = useState({
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    floor: "Please Select Floor",
-    area: "Please Select Area",
-    location: "Please Select Location",
-    workstation: "Please Select Workstation",
-    producthead: "",
-    vendorname: "Please Select Vendor",
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    floor: 'Please Select Floor',
+    area: 'Please Select Area',
+    location: 'Please Select Location',
+    workstation: 'Please Select Workstation',
+    producthead: '',
+    vendorname: 'Please Select Vendor',
 
-    productname: "Please Select Material",
+    productname: 'Please Select Material',
 
-    component: "Please Select Component",
-    gstno: "",
-    billno: "",
-    productdetails: "",
-    warrantydetails: "",
-    uom: "Please Select UOM",
+    component: 'Please Select Component',
+    gstno: '',
+    billno: '',
+    productdetails: '',
+    warrantydetails: '',
+    uom: 'Please Select UOM',
     quantity: 1,
-    rate: "",
-    billdate: "",
-    files: "",
-    warrantyfiles: "",
+    rate: '',
+    billdate: '',
+    files: '',
+    warrantyfiles: '',
 
-    warranty: "",
-    warrantycalculation: "",
-    estimation: "",
-    estimationtime: "",
-    purchasedate: "",
+    warranty: '',
+    warrantycalculation: '',
+    estimation: '',
+    estimationtime: '',
+    purchasedate: '',
 
-    requestmode: "Please Select Stock Mode For",
-    stockcategory: "Please Select Stock Category",
-    stocksubcategory: "Please Select Stock Sub Category",
-    uomnew: "",
+    requestmode: 'Please Select Stock Mode For',
+    stockcategory: 'Please Select Stock Category',
+    stocksubcategory: 'Please Select Stock Sub Category',
+    uomnew: '',
     quantitynew: 1,
-    materialnew: "Please Select Material",
-    productdetailsnew: "",
+    materialnew: 'Please Select Material',
+    productdetailsnew: '',
   });
 
   const [stockArray, setStockArray] = useState([]);
   const [uomcodes, setuomcodes] = useState([]);
 
-  const [vendorGroup, setVendorGroup] = useState("Choose Vendor Group");
+  const [vendorGroup, setVendorGroup] = useState('Choose Vendor Group');
   const [vendorGroupOpt, setVendorGroupopt] = useState([]);
   const [vendorOverall, setVendorOverall] = useState([]);
-  const [vendorGroupEdit, setVendorGroupEdit] = useState("Choose Vendor Group");
+  const [vendorGroupEdit, setVendorGroupEdit] = useState('Choose Vendor Group');
   const handleStockArray = () => {
-    const isNameMatch = stockArray.some(
-      (item) =>
-        item.materialnew == stockmaster.materialnew &&
-        item.uomnew === String(stockmaster.uomnew) &&
-        item.quantitynew == stockmaster.quantitynew
-    );
-    if (
-      stockmaster.stockcategory === "Please Select Stock Category" ||
-      stockmaster.stockcategory === ""
-    ) {
-      setPopupContentMalert("Please Select Stock Category!");
-      setPopupSeverityMalert("info");
+    const isNameMatch = stockArray.some((item) => item.materialnew == stockmaster.materialnew && item.uomnew === String(stockmaster.uomnew) && item.quantitynew == stockmaster.quantitynew);
+    if (stockmaster.stockcategory === 'Please Select Stock Category' || stockmaster.stockcategory === '') {
+      setPopupContentMalert('Please Select Stock Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmaster.stocksubcategory === "Please Select Stock Sub Category" ||
-      stockmaster.stocksubcategory === ""
-    ) {
-      setPopupContentMalert("Please Select Stock Sub Category!");
-      setPopupSeverityMalert("info");
+    } else if (stockmaster.stocksubcategory === 'Please Select Stock Sub Category' || stockmaster.stocksubcategory === '') {
+      setPopupContentMalert('Please Select Stock Sub Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmaster.materialnew === "Please Select Material" ||
-      stockmaster.materialnew === ""
-    ) {
-      setPopupContentMalert("Please Select Material!");
-      setPopupSeverityMalert("info");
+    } else if (stockmaster.materialnew === 'Please Select Material' || stockmaster.materialnew === '') {
+      setPopupContentMalert('Please Select Material!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmaster.uomnew === "" || stockmaster.uomnew === undefined) {
-      setPopupContentMalert("Please Enter UOM!");
-      setPopupSeverityMalert("info");
+    } else if (stockmaster.uomnew === '' || stockmaster.uomnew === undefined) {
+      setPopupContentMalert('Please Enter UOM!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmaster.quantitynew === "" ||
-      stockmaster.quantitynew === undefined
-    ) {
-      setPopupContentMalert("Please Enter Quantityy!");
-      setPopupSeverityMalert("info");
+    } else if (stockmaster.quantitynew === '' || stockmaster.quantitynew === undefined) {
+      setPopupContentMalert('Please Enter Quantityy!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     // else if (stockmaster.productdetailsnew === "" || stockmaster.productdetailsnew === undefined) {
@@ -592,14 +549,12 @@ function Manualstockentry() {
     //   handleClickOpenerr();
     // }
     else if (isNameMatch) {
-      setPopupContentMalert("Todo Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Todo Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       try {
-        let findData = uomcodes.find(
-          (item) => item.name === stockmaster.uomnew
-        );
+        let findData = uomcodes.find((item) => item.name === stockmaster.uomnew);
 
         setStockArray([
           ...stockArray,
@@ -615,14 +570,14 @@ function Manualstockentry() {
 
         setStockmaster({
           ...stockmaster,
-          uomnew: "",
+          uomnew: '',
           quantitynew: 1,
-          materialnew: "Please Select Material",
-          productdetailsnew: "",
+          materialnew: 'Please Select Material',
+          productdetailsnew: '',
         });
       } catch (e) {
-        setPopupContentMalert("UOM is not found! Hence cannot get a UOM Code!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('UOM is not found! Hence cannot get a UOM Code!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -730,7 +685,7 @@ function Manualstockentry() {
       });
       // setProjectCheck(true);
       let filteredData = res_project?.data?.manualstock.filter((data) => {
-        return data.requestmode === "Stock Material";
+        return data.requestmode === 'Stock Material';
       });
       setStockMaterial(filteredData);
     } catch (err) {
@@ -748,11 +703,7 @@ function Manualstockentry() {
       });
 
       let getdata = res_vom.data.managestockitems.filter((data) => {
-        return (
-          data.itemname === e.value &&
-          data.stockcategory === stockmaster.stockcategory &&
-          data.stocksubcategory === stockmaster.stocksubcategory
-        );
+        return data.itemname === e.value && data.stockcategory === stockmaster.stockcategory && data.stocksubcategory === stockmaster.stocksubcategory;
       });
 
       setStockmaster((prev) => ({
@@ -801,10 +752,7 @@ function Manualstockentry() {
       });
 
       const resultall = res.data.managestockitems.filter((data) => {
-        return (
-          data.stockcategory === stockmaster.stockcategory &&
-          data.stocksubcategory === e.value
-        );
+        return data.stockcategory === stockmaster.stockcategory && data.stocksubcategory === e.value;
       });
 
       const assetmaterialuniqueArray = resultall.map((item) => ({
@@ -828,7 +776,7 @@ function Manualstockentry() {
 
   const handleClickCloseCapacity = () => {
     setOpenCapacity(false);
-    setcapacityname("");
+    setcapacityname('');
   };
 
   //alert model for Type details
@@ -840,7 +788,7 @@ function Manualstockentry() {
 
   const handleClickCloseType = () => {
     setOpenType(false);
-    setAssetSpecificationType({ name: "", code: "" });
+    setAssetSpecificationType({ name: '', code: '' });
   };
 
   //alert model for Model details
@@ -852,7 +800,7 @@ function Manualstockentry() {
 
   const handleClickCloseModel = () => {
     setOpenmodel(false);
-    setAssetModel({ name: "", code: "" });
+    setAssetModel({ name: '', code: '' });
   };
 
   //alert model for Size details
@@ -864,7 +812,7 @@ function Manualstockentry() {
 
   const handleClickCloseSize = () => {
     setOpensize(false);
-    setAssetSize({ name: "", code: "" });
+    setAssetSize({ name: '', code: '' });
   };
 
   //alert model for Variant details
@@ -876,7 +824,7 @@ function Manualstockentry() {
 
   const handleClickCloseVariant = () => {
     setOpenvariant(false);
-    setAssetVariant({ name: "", code: "" });
+    setAssetVariant({ name: '', code: '' });
   };
 
   //alert model for Brand details
@@ -888,34 +836,32 @@ function Manualstockentry() {
 
   const handleClickCloseBrand = () => {
     setOpenbrand(false);
-    setBrandMaster({ name: "", code: "" });
+    setBrandMaster({ name: '', code: '' });
   };
 
   //  Datefield
   var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = yyyy + "-" + mm + "-" + dd;
+  today = yyyy + '-' + mm + '-' + dd;
 
   const gridRef = useRef(null);
 
   const [vomMaster, setVomMaster] = useState({
-    name: "",
+    name: '',
   });
   const [vomMasterget, setVomMasterget] = useState([]);
 
   const [assetmaster, setAssetmaster] = useState([]);
 
   const [asset, setAsset] = useState({
-    name: "",
-    materialcode: "",
-    assethead: "",
+    name: '',
+    materialcode: '',
+    assethead: '',
   });
-  const [vendorAuto, setVendorAuto] = useState("");
-  const [selectedassethead, setSelectedAssethead] = useState(
-    "Please Select Assethead"
-  );
+  const [vendorAuto, setVendorAuto] = useState('');
+  const [selectedassethead, setSelectedAssethead] = useState('Please Select Assethead');
 
   const handleAssetChange = (e) => {
     const selectedassethead = e.value;
@@ -923,17 +869,17 @@ function Manualstockentry() {
   };
 
   const [vendor, setVendor] = useState({
-    vendorname: "",
-    emailid: "",
-    phonenumber: "",
-    whatsappnumber: "",
-    contactperson: "",
-    address: "",
-    gstnumber: "",
-    bankname: "Please Select Bank Name",
-    accountname: "",
-    accountnumber: "",
-    ifsccode: "",
+    vendorname: '',
+    emailid: '',
+    phonenumber: '',
+    whatsappnumber: '',
+    contactperson: '',
+    address: '',
+    gstnumber: '',
+    bankname: 'Please Select Bank Name',
+    accountname: '',
+    accountnumber: '',
+    ifsccode: '',
     phonecheck: false,
   });
 
@@ -941,64 +887,64 @@ function Manualstockentry() {
 
   //bank name options
   const accounttypes = [
-    { value: "ALLAHABAD BANK", label: "ALLAHABAD BANK" },
-    { value: "ANDHRA BANK", label: "ANDHRA BANK" },
-    { value: "AXIS BANK", label: "AXIS BANK" },
-    { value: "STATE BANK OF INDIA", label: "STATE BANK OF INDIA" },
-    { value: "BANK OF BARODA", label: "BANK OF BARODA" },
-    { value: "CITY UNION BANK", label: "CITY UNION BANK" },
-    { value: "UCO BANK", label: "UCO BANK" },
-    { value: "TMB BANK", label: "TMB BANK" },
-    { value: "UNION BANK OF INDIA", label: "UNION BANK OF INDIA" },
-    { value: "BANK OF INDIA", label: "BANK OF INDIA" },
-    { value: "BANDHAN BANK LIMITED", label: "BANDHAN BANK LIMITED" },
-    { value: "CANARA BANK", label: "CANARA BANK" },
-    { value: "GRAMIN VIKASH BANK", label: "GRAMIN VIKASH BANK" },
-    { value: "CORPORATION BANK", label: "CORPORATION BANK" },
-    { value: "INDIAN BANK", label: "INDIAN BANK" },
-    { value: "INDIAN OVERSEAS BANK", label: "INDIAN OVERSEAS BANK" },
-    { value: "ORIENTAL BANK OF COMMERCE", label: "ORIENTAL BANK OF COMMERCE" },
-    { value: "PUNJAB AND SIND BANK", label: "PUNJAB AND SIND BANK" },
-    { value: "PUNJAB NATIONAL BANK", label: "PUNJAB NATIONAL BANK" },
-    { value: "RESERVE BANK OF INDIA", label: "RESERVE BANK OF INDIA" },
-    { value: "SOUTH INDIAN BANK", label: "SOUTH INDIAN BANK" },
-    { value: "UNITED BANK OF INDIA", label: "UNITED BANK OF INDIA" },
-    { value: "CENTRAL BANK OF INDIA", label: "CENTRAL BANK OF INDIA" },
-    { value: "VIJAYA BANK", label: "VIJAYA BANK" },
-    { value: "DENA BANK", label: "DENA BANK" },
+    { value: 'ALLAHABAD BANK', label: 'ALLAHABAD BANK' },
+    { value: 'ANDHRA BANK', label: 'ANDHRA BANK' },
+    { value: 'AXIS BANK', label: 'AXIS BANK' },
+    { value: 'STATE BANK OF INDIA', label: 'STATE BANK OF INDIA' },
+    { value: 'BANK OF BARODA', label: 'BANK OF BARODA' },
+    { value: 'CITY UNION BANK', label: 'CITY UNION BANK' },
+    { value: 'UCO BANK', label: 'UCO BANK' },
+    { value: 'TMB BANK', label: 'TMB BANK' },
+    { value: 'UNION BANK OF INDIA', label: 'UNION BANK OF INDIA' },
+    { value: 'BANK OF INDIA', label: 'BANK OF INDIA' },
+    { value: 'BANDHAN BANK LIMITED', label: 'BANDHAN BANK LIMITED' },
+    { value: 'CANARA BANK', label: 'CANARA BANK' },
+    { value: 'GRAMIN VIKASH BANK', label: 'GRAMIN VIKASH BANK' },
+    { value: 'CORPORATION BANK', label: 'CORPORATION BANK' },
+    { value: 'INDIAN BANK', label: 'INDIAN BANK' },
+    { value: 'INDIAN OVERSEAS BANK', label: 'INDIAN OVERSEAS BANK' },
+    { value: 'ORIENTAL BANK OF COMMERCE', label: 'ORIENTAL BANK OF COMMERCE' },
+    { value: 'PUNJAB AND SIND BANK', label: 'PUNJAB AND SIND BANK' },
+    { value: 'PUNJAB NATIONAL BANK', label: 'PUNJAB NATIONAL BANK' },
+    { value: 'RESERVE BANK OF INDIA', label: 'RESERVE BANK OF INDIA' },
+    { value: 'SOUTH INDIAN BANK', label: 'SOUTH INDIAN BANK' },
+    { value: 'UNITED BANK OF INDIA', label: 'UNITED BANK OF INDIA' },
+    { value: 'CENTRAL BANK OF INDIA', label: 'CENTRAL BANK OF INDIA' },
+    { value: 'VIJAYA BANK', label: 'VIJAYA BANK' },
+    { value: 'DENA BANK', label: 'DENA BANK' },
     {
-      value: "BHARATIYA MAHILA BANK LIMITED",
-      label: "BHARATIYA MAHILA BANK LIMITED",
+      value: 'BHARATIYA MAHILA BANK LIMITED',
+      label: 'BHARATIYA MAHILA BANK LIMITED',
     },
-    { value: "FEDERAL BANK LTD", label: "FEDERAL BANK LTD" },
-    { value: "HDFC BANK LTD", label: "HDFC BANK LTD" },
-    { value: "ICICI BANK LTD", label: "ICICI BANK LTD" },
-    { value: "IDBI BANK LTD", label: "IDBI BANK LTD" },
-    { value: "PAYTM BANK", label: "PAYTM BANK" },
-    { value: "FINO PAYMENT BANK", label: "FINO PAYMENT BANK" },
-    { value: "INDUSIND BANK LTD", label: "INDUSIND BANK LTD" },
-    { value: "KARNATAKA BANK LTD", label: "KARNATAKA BANK LTD" },
-    { value: "KOTAK MAHINDRA BANK", label: "KOTAK MAHINDRA BANK" },
-    { value: "YES BANK LTD", label: "YES BANK LTD" },
-    { value: "SYNDICATE BANK", label: "SYNDICATE BANK" },
-    { value: "BANK OF MAHARASHTRA", label: "BANK OF MAHARASHTRA" },
-    { value: "DCB BANK", label: "DCB BANK" },
-    { value: "IDFC BANK", label: "IDFC BANK" },
+    { value: 'FEDERAL BANK LTD', label: 'FEDERAL BANK LTD' },
+    { value: 'HDFC BANK LTD', label: 'HDFC BANK LTD' },
+    { value: 'ICICI BANK LTD', label: 'ICICI BANK LTD' },
+    { value: 'IDBI BANK LTD', label: 'IDBI BANK LTD' },
+    { value: 'PAYTM BANK', label: 'PAYTM BANK' },
+    { value: 'FINO PAYMENT BANK', label: 'FINO PAYMENT BANK' },
+    { value: 'INDUSIND BANK LTD', label: 'INDUSIND BANK LTD' },
+    { value: 'KARNATAKA BANK LTD', label: 'KARNATAKA BANK LTD' },
+    { value: 'KOTAK MAHINDRA BANK', label: 'KOTAK MAHINDRA BANK' },
+    { value: 'YES BANK LTD', label: 'YES BANK LTD' },
+    { value: 'SYNDICATE BANK', label: 'SYNDICATE BANK' },
+    { value: 'BANK OF MAHARASHTRA', label: 'BANK OF MAHARASHTRA' },
+    { value: 'DCB BANK', label: 'DCB BANK' },
+    { value: 'IDFC BANK', label: 'IDFC BANK' },
     {
-      value: "JAMMU AND KASHMIR BANK BANK",
-      label: "JAMMU AND KASHMIR BANK BANK",
+      value: 'JAMMU AND KASHMIR BANK BANK',
+      label: 'JAMMU AND KASHMIR BANK BANK',
     },
-    { value: "KARUR VYSYA BANK", label: "KARUR VYSYA BANK" },
-    { value: "RBL BANK", label: "RBL BANK" },
-    { value: "DHANLAXMI BANK", label: "DHANLAXMI BANK" },
-    { value: "CSB BANK", label: "CSB BANK" },
+    { value: 'KARUR VYSYA BANK', label: 'KARUR VYSYA BANK' },
+    { value: 'RBL BANK', label: 'RBL BANK' },
+    { value: 'DHANLAXMI BANK', label: 'DHANLAXMI BANK' },
+    { value: 'CSB BANK', label: 'CSB BANK' },
   ];
 
   const getPhoneNumber = () => {
     if (vendor.phonecheck) {
       setVendor({ ...vendor, whatsappnumber: vendor.phonenumber });
     } else {
-      setVendor({ ...vendor, whatsappnumber: "" });
+      setVendor({ ...vendor, whatsappnumber: '' });
     }
   };
 
@@ -1024,17 +970,17 @@ function Manualstockentry() {
 
   //first allexcel....
   const getFileIcon = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1082,7 +1028,6 @@ function Manualstockentry() {
   //   }
   // };
 
-
   const handleInputChange = (event) => {
     const files = event.target.files;
     let newSelectedFiles = [...refImage];
@@ -1090,7 +1035,7 @@ function Manualstockentry() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) {
           const reader = new FileReader();
           reader.onload = () => {
@@ -1099,7 +1044,7 @@ function Manualstockentry() {
               size: file.size,
               type: file.type,
               preview: reader.result,
-              base64: reader.result.split(",")[1],
+              base64: reader.result.split(',')[1],
             });
             setRefImage(newSelectedFiles);
             setRefImgbillfilenames(newSelectedFiles.map((d) => d.name));
@@ -1108,13 +1053,13 @@ function Manualstockentry() {
           };
           reader.readAsDataURL(file);
         } else {
-          setPopupContentMalert("File size should be less than 5MB!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('File size should be less than 5MB!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         }
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1131,14 +1076,14 @@ function Manualstockentry() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImage = () => {
-    setGetImg("");
-    setFile("");
+    setGetImg('');
+    setFile('');
     setRefImage([]);
     setPreviewURL(null);
   };
@@ -1180,17 +1125,17 @@ function Manualstockentry() {
 
   //first allexcel....
   const getFileIconwarranty = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1233,7 +1178,6 @@ function Manualstockentry() {
   //   }
   // };
 
-
   const handleInputChangewarranty = (event) => {
     const files = event.target.files;
     let newSelectedFiles = [...refImagewarranty];
@@ -1241,7 +1185,7 @@ function Manualstockentry() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -1249,7 +1193,7 @@ function Manualstockentry() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImagewarranty(newSelectedFiles);
           setRefImgWarrantyfilenames(newSelectedFiles.map((d) => d.name));
@@ -1257,8 +1201,8 @@ function Manualstockentry() {
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1275,14 +1219,14 @@ function Manualstockentry() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImagewarranty = () => {
-    setGetImgwarranty("");
-    setFilewarranty("");
+    setGetImgwarranty('');
+    setFilewarranty('');
     setRefImagewarranty([]);
     setPreviewURLwarranty(null);
   };
@@ -1311,31 +1255,30 @@ function Manualstockentry() {
   const [filewarrantyedit, setFilewarrantyedit] = useState();
 
   // Upload Popup
-  const [uploadPopupOpenwarrantyedit, setUploadPopupOpenwarrantyedit] =
-    useState(false);
+  const [uploadPopupOpenwarrantyedit, setUploadPopupOpenwarrantyedit] = useState(false);
   const handleClickUploadPopupOpenwarrantyedit = () => {
     setUploadPopupOpenwarrantyedit(true);
   };
   const handleUploadPopupClosewarrantyedit = () => {
     setUploadPopupOpenwarrantyedit(false);
-    setGetImgwarrantyedit("");
-    setFilewarrantyedit("");
+    setGetImgwarrantyedit('');
+    setFilewarrantyedit('');
     setPreviewURLwarrantyedit(null);
   };
 
   //first allexcel....
   const getFileIconwarrantyedit = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1384,7 +1327,7 @@ function Manualstockentry() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -1392,7 +1335,7 @@ function Manualstockentry() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImagewarrantyedit(newSelectedFiles);
           setRefImgWarrantyfilenamesEdit(newSelectedFiles.map((d) => d.name));
@@ -1400,24 +1343,22 @@ function Manualstockentry() {
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
   };
 
-
-
   const handleFetchWarranty = (data) => {
     const files = Array.from(data); // Ensure it's an array
-    const imageFiles = files.filter(file => file.type.startsWith("image/"));
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
-    if (imageFiles.length !== files.length) {
-      setPopupContentMalert("Only Accept Images!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
+    // if (imageFiles.length !== files.length) {
+    //   setPopupContentMalert('Only Accept Images!');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    // }
 
     const fileReaders = [];
     const newSelectedFiles = [];
@@ -1450,8 +1391,6 @@ function Manualstockentry() {
     });
   };
 
-
-
   //first deletefile
   const handleDeleteFilewarrantyedit = (index) => {
     const newSelectedFiles = refImagewarrantyedit;
@@ -1469,14 +1408,14 @@ function Manualstockentry() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImagewarrantyedit = () => {
-    setGetImgwarrantyedit("");
-    setFilewarrantyedit("");
+    setGetImgwarrantyedit('');
+    setFilewarrantyedit('');
     setRefImagewarrantyedit([]);
     setPreviewURLwarrantyedit(null);
   };
@@ -1511,24 +1450,24 @@ function Manualstockentry() {
   };
   const handleUploadPopupCloseedit = () => {
     setUploadPopupOpenedit(false);
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setPreviewURLedit(null);
   };
 
   //first allexcel....
   const getFileIconedit = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1570,7 +1509,6 @@ function Manualstockentry() {
   //   }
   // };
 
-
   const handleInputChangeedit = (event) => {
     const files = event.target.files;
     let newSelectedFiles = [...refImageedit];
@@ -1578,7 +1516,7 @@ function Manualstockentry() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) {
           const reader = new FileReader();
           reader.onload = () => {
@@ -1587,7 +1525,7 @@ function Manualstockentry() {
               size: file.size,
               type: file.type,
               preview: reader.result,
-              base64: reader.result.split(",")[1],
+              base64: reader.result.split(',')[1],
             });
             setRefImageedit(newSelectedFiles);
             setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
@@ -1595,13 +1533,13 @@ function Manualstockentry() {
           };
           reader.readAsDataURL(file);
         } else {
-          setPopupContentMalert("File size should be less than 5MB!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('File size should be less than 5MB!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         }
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1609,16 +1547,15 @@ function Manualstockentry() {
 
   //first deletefile
 
-
   const handleFetchBill = (data) => {
     const files = Array.from(data); // Ensure it's an array
-    const imageFiles = files.filter(file => file.type.startsWith("image/"));
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
-    if (imageFiles.length !== files.length) {
-      setPopupContentMalert("Only Accept Images!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
+    // if (imageFiles.length !== files.length) {
+    //   setPopupContentMalert('Only Accept Images!');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    // }
 
     const fileReaders = [];
     const newSelectedFiles = [];
@@ -1649,10 +1586,8 @@ function Manualstockentry() {
       setRefImageedit(newSelectedFiles);
       setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
       setRefImgWarrantyBillEdit((existingFiles) => [...existingFiles, originalFiles]);
-
     });
   };
-
 
   const handleDeleteFileedit = (index) => {
     const newSelectedFiles = [...refImageedit];
@@ -1670,19 +1605,17 @@ function Manualstockentry() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImageedit = () => {
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setRefImageedit([]);
     setPreviewURLedit(null);
   };
-
-
 
   const handleUploadOverAlledit = () => {
     setUploadPopupOpenedit(false);
@@ -1703,43 +1636,31 @@ function Manualstockentry() {
   const [teamstabledata, setTeamstableData] = useState([]);
   const [account, setAccount] = useState([]);
 
-  const [selectedBranch, setSelectedBranch] = useState("Please Select Branch");
-  const [selectedBranchedit, setSelectedBranchedit] = useState(
-    "Please Select Branch"
-  );
-  const [selectedUnit, setSelectedUnit] = useState("Please Select Unit");
-  const [selectedUnitedit, setSelectedUnitedit] =
-    useState("Please Select Unit");
+  const [selectedBranch, setSelectedBranch] = useState('Please Select Branch');
+  const [selectedBranchedit, setSelectedBranchedit] = useState('Please Select Branch');
+  const [selectedUnit, setSelectedUnit] = useState('Please Select Unit');
+  const [selectedUnitedit, setSelectedUnitedit] = useState('Please Select Unit');
 
   const [assetType, setAssetType] = useState([]);
-  const [selectedassetType, setSelectedAssetType] = useState("");
-  const [selectedassetTypeEdit, setSelectedAssetTypeEdit] = useState("");
+  const [selectedassetType, setSelectedAssetType] = useState('');
+  const [selectedassetTypeEdit, setSelectedAssetTypeEdit] = useState('');
 
-  const [selectedProducthead, setSelectedProducthead] = useState(
-    "Please Select Assethead"
-  );
-  const [selectedProductheadedit, setSelectedProductheadedit] = useState(
-    "Please Select Assethead"
-  );
-  const [selectedProductname, setSelectedProductname] = useState(
-    "Please Select Materila Name"
-  );
-  const [selectedProductnameedit, setSelectedProductnameedit] = useState(
-    "Please Select Materila Name"
-  );
+  const [selectedProducthead, setSelectedProducthead] = useState('Please Select Assethead');
+  const [selectedProductheadedit, setSelectedProductheadedit] = useState('Please Select Assethead');
+  const [selectedProductname, setSelectedProductname] = useState('Please Select Materila Name');
+  const [selectedProductnameedit, setSelectedProductnameedit] = useState('Please Select Materila Name');
 
-
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
 
   //  Datefield
   var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = yyyy + "-" + mm + "-" + dd;
+  today = yyyy + '-' + mm + '-' + dd;
 
-  const [selectedPurchaseDate, setSelectedPurchaseDate] = useState("");
-  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState("");
+  const [selectedPurchaseDate, setSelectedPurchaseDate] = useState('');
+  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState('');
 
   //change form
   const handleChangephonenumber = (e) => {
@@ -1747,7 +1668,7 @@ function Manualstockentry() {
     const regex = /^\d*\.?\d*$/;
     const inputValue = e.target.value;
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setStockmaster({ ...stockmaster, estimation: inputValue });
     }
@@ -1758,7 +1679,7 @@ function Manualstockentry() {
     const regex = /^\d*\.?\d*$/;
     const inputValue = e.target.value;
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setStockmasteredit({ ...stockmasteredit, estimation: inputValue });
     }
@@ -1790,36 +1711,28 @@ function Manualstockentry() {
 
   const formatDateString = (date) => {
     const d = new Date(date);
-    const day = d.getDate().toString().padStart(2, "0");
-    const month = (d.getMonth() + 1).toString().padStart(2, "0");
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
 
   const calculateExpiryDate = () => {
-    if (stockmaster.estimationtime !== "" && stockmaster.purchasedate) {
+    if (stockmaster.estimationtime !== '' && stockmaster.purchasedate) {
       const currentDate = new Date(stockmaster.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (stockmaster.estimationtime === "Days") {
-        expiryDate.setDate(
-          currentDate.getDate() + parseInt(stockmaster.estimation)
-        );
-      } else if (stockmaster.estimationtime === "Month") {
-        expiryDate.setMonth(
-          currentDate.getMonth() + parseInt(stockmaster.estimation)
-        );
-      } else if (stockmaster.estimationtime === "Year") {
-        expiryDate.setFullYear(
-          currentDate.getFullYear() + parseInt(stockmaster.estimation)
-        );
+      if (stockmaster.estimationtime === 'Days') {
+        expiryDate.setDate(currentDate.getDate() + parseInt(stockmaster.estimation));
+      } else if (stockmaster.estimationtime === 'Month') {
+        expiryDate.setMonth(currentDate.getMonth() + parseInt(stockmaster.estimation));
+      } else if (stockmaster.estimationtime === 'Year') {
+        expiryDate.setFullYear(currentDate.getFullYear() + parseInt(stockmaster.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
 
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN")
-        ? ""
-        : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       setStockmaster({
         ...stockmaster,
@@ -1830,44 +1743,28 @@ function Manualstockentry() {
 
   useEffect(() => {
     calculateExpiryDate();
-  }, [
-    stockmaster.estimationtime,
-    stockmaster.estimation,
-    stockmaster.purchasedate,
-  ]);
+  }, [stockmaster.estimationtime, stockmaster.estimation, stockmaster.purchasedate]);
 
   useEffect(() => {
     calculateExpiryDateEdit();
-  }, [
-    stockmasteredit.estimationtime,
-    stockmasteredit.estimation,
-    stockmasteredit.purchasedate,
-  ]);
+  }, [stockmasteredit.estimationtime, stockmasteredit.estimation, stockmasteredit.purchasedate]);
 
   const calculateExpiryDateEdit = () => {
     if (stockmasteredit.estimationtime && stockmasteredit.purchasedate) {
       const currentDate = new Date(stockmasteredit.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (stockmasteredit.estimationtime === "Days") {
-        expiryDate.setDate(
-          currentDate.getDate() + parseInt(stockmasteredit.estimation)
-        );
-      } else if (stockmasteredit.estimationtime === "Month") {
-        expiryDate.setMonth(
-          currentDate.getMonth() + parseInt(stockmasteredit.estimation)
-        );
-      } else if (stockmasteredit.estimationtime === "Year") {
-        expiryDate.setFullYear(
-          currentDate.getFullYear() + parseInt(stockmasteredit.estimation)
-        );
+      if (stockmasteredit.estimationtime === 'Days') {
+        expiryDate.setDate(currentDate.getDate() + parseInt(stockmasteredit.estimation));
+      } else if (stockmasteredit.estimationtime === 'Month') {
+        expiryDate.setMonth(currentDate.getMonth() + parseInt(stockmasteredit.estimation));
+      } else if (stockmasteredit.estimationtime === 'Year') {
+        expiryDate.setFullYear(currentDate.getFullYear() + parseInt(stockmasteredit.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
 
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN")
-        ? ""
-        : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       setStockmasteredit({
         ...stockmasteredit,
@@ -1892,11 +1789,7 @@ function Manualstockentry() {
         })),
       ];
       const aeestuniqueArray = projall.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) => i.label === item.label && i.value === item.value
-          ) === index
-        );
+        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
       });
       setAssetType(aeestuniqueArray);
     } catch (err) {
@@ -1914,7 +1807,7 @@ function Manualstockentry() {
   const [units, setUnits] = useState([]);
   const [users, setUsers] = useState([]);
   const [teams, setTeams] = useState([]);
-  const [newcheckbranch, setNewcheckBranch] = useState("Choose Branch");
+  const [newcheckbranch, setNewcheckBranch] = useState('Choose Branch');
   const [floors, setFloors] = useState([]);
 
   //filter fields
@@ -1924,23 +1817,19 @@ function Manualstockentry() {
   const [unitsEdit, setUnitsEdit] = useState([]);
 
   const [capacities, setCapacities] = useState([]);
-  const [capacityname, setcapacityname] = useState("");
+  const [capacityname, setcapacityname] = useState('');
 
   const [areas, setAreas] = useState([]);
-  const [locations, setLocations] = useState([{ label: "ALL", value: "ALL" }]);
+  const [locations, setLocations] = useState([{ label: 'ALL', value: 'ALL' }]);
   const [areasEdit, setAreasEdit] = useState([]);
-  const [locationsEdit, setLocationsEdit] = useState([
-    { label: "ALL", value: "ALL" },
-  ]);
+  const [locationsEdit, setLocationsEdit] = useState([{ label: 'ALL', value: 'ALL' }]);
   const [floorsEdit, setFloorEdit] = useState([]);
   const [workStationOpt, setWorkStationOpt] = useState([]);
   const [Specification, setSpecification] = useState([]);
   const [Specificationedit, setSpecificationedit] = useState([]);
 
   const [materialOpt, setMaterialopt] = useState([]);
-  const [materialOptEdit, setMaterialoptEdit] = useState(
-    "Please Select Material"
-  );
+  const [materialOptEdit, setMaterialoptEdit] = useState('Please Select Material');
 
   // const handleVendorChange = (e) => {
   //     const selectedvendorname = e.value;
@@ -1959,7 +1848,7 @@ function Manualstockentry() {
   };
 
   const handleDataFromChild = () => {
-    fetchVendor()
+    fetchVendor();
   };
 
   //alert model for Uom details
@@ -1984,7 +1873,6 @@ function Manualstockentry() {
     setOpenviewalertAsset(false);
   };
 
-
   const { auth, setAuth } = useContext(AuthContext);
   const [projectCheck, setProjectCheck] = useState(false);
   // const accessbranch = isAssignBranch
@@ -1994,71 +1882,49 @@ function Manualstockentry() {
   //     unit: data.unit,
   //   }))
 
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [
-          window.location.pathname?.substring(1),
-          window.location.pathname,
-        ];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
 
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
 
   const handleBranchChange = (e) => {
     const selectedBranch = e.value;
     setSelectedBranch(selectedBranch);
-    setSelectedUnit("Please Select Unit");
+    setSelectedUnit('Please Select Unit');
   };
 
   const handleProductChange = (e) => {
     const selectedProducthead = e.value;
     setSelectedProducthead(selectedProducthead);
-    setSelectedProductname("Please Select Materila Name");
+    setSelectedProductname('Please Select Materila Name');
   };
 
   //Datatable
@@ -2077,11 +1943,11 @@ function Manualstockentry() {
 
   const [projectData, setProjectData] = useState([]);
   const [items, setItems] = useState([]);
-  const [sorting, setSorting] = useState({ column: "", direction: "" });
-  const [searchQuery, setSearchQuery] = useState("");
+  const [sorting, setSorting] = useState({ column: '', direction: '' });
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const [ovProj, setOvProj] = useState("");
-  const [getOverAllCount, setGetOverallCount] = useState("");
+  const [ovProj, setOvProj] = useState('');
+  const [getOverAllCount, setGetOverallCount] = useState('');
   const [ovProjcount, setOvProjcount] = useState(0);
   const [allProjectedit, setAllProjectedit] = useState([]);
 
@@ -2090,20 +1956,19 @@ function Manualstockentry() {
   const [checksubcategory, setChecksubcategory] = useState();
   const [checktimepoints, setChecktimepoints] = useState();
 
-  const [copiedData, setCopiedData] = useState("");
+  const [copiedData, setCopiedData] = useState('');
 
   const [canvasState, setCanvasState] = useState(false);
 
-
-
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Asset Purchase.png");
+          saveAs(blob, 'Asset Purchase.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -2192,7 +2057,7 @@ function Manualstockentry() {
   };
 
   const [vendorgetid, setVendorgetid] = useState({});
-  const [vendornameid, setVendornameid] = useState({});
+  const [vendornameid, setVendornameid] = useState('');
 
   const vendorid = async (id) => {
     try {
@@ -2207,11 +2072,11 @@ function Manualstockentry() {
       } else {
         setVendorgetid({
           ...vendorgetid,
-          gstnumber: "",
-          address: "",
-          phonenumber: "",
+          gstnumber: '',
+          address: '',
+          phonenumber: '',
         });
-        setVendornameid("");
+        setVendornameid('');
       }
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -2221,7 +2086,7 @@ function Manualstockentry() {
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   const username = isUserRoleAccess.username;
@@ -2244,11 +2109,11 @@ function Manualstockentry() {
   };
   const handleCloseManageColumns1 = () => {
     setManageColumnsOpen1(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl1);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   // Styles for the resizable column
   const ResizableColumn = styled(Resizable)`
@@ -2264,9 +2129,9 @@ function Manualstockentry() {
 
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.data.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   // Show All Columns & Manage Columns
@@ -2281,10 +2146,10 @@ function Manualstockentry() {
     area: true,
     location: true,
     requestmode: true,
-    gstno: "true",
-    assettype: "true",
-    producthead: "true",
-    productdetails: "true",
+    gstno: 'true',
+    assettype: 'true',
+    producthead: 'true',
+    productdetails: 'true',
     productname: true,
     vendorname: true,
     billno: true,
@@ -2301,9 +2166,7 @@ function Manualstockentry() {
     actions: true,
   };
 
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
   const fetchExcelLimited = async () => {
     try {
@@ -2312,15 +2175,11 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setOverallFilterdata(res1.data.manualstock)
+      setOverallFilterdata(res1.data.manualstock);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
-
-
-
 
   const fetchVendor = async () => {
     try {
@@ -2329,9 +2188,7 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const allGroup = Array.from(
-        new Set(res1?.data?.vendorgrouping.map((d) => d.name))
-      ).map((item) => {
+      const allGroup = Array.from(new Set(res1?.data?.vendorgrouping.map((d) => d.name))).map((item) => {
         return {
           label: item,
           value: item,
@@ -2402,16 +2259,13 @@ function Manualstockentry() {
 
   //set function to get particular row
   const rowData = async (id) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      let res = await axios.get(
-        `${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        }
-      );
+      let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
       setDeleteproject(res?.data?.smanualstock);
       handleClickOpen();
     } catch (err) {
@@ -2422,23 +2276,20 @@ function Manualstockentry() {
   // Alert delete popup
   let projectid = deleteproject._id;
   const delProject = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      await axios.delete(
-        `${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${projectid}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        }
-      );
-      await fetchStock("Filtered");
+      await axios.delete(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${projectid}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+      await fetchStock('Filtered');
       await fetchStockStockMaterial();
       handleCloseMod();
       setSelectedRows([]);
       setPage(1);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -2446,7 +2297,7 @@ function Manualstockentry() {
   };
 
   const delProjectcheckbox = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const deletePromises = selectedRows?.map((item) => {
         return axios.delete(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${item}`, {
@@ -2459,12 +2310,12 @@ function Manualstockentry() {
       // Wait for all delete requests to complete
       await Promise.all(deletePromises);
 
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
       await fetchStockStockMaterial();
       handleCloseModcheckbox();
       setSelectedRows([]);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       setSelectAllChecked(false);
       setPage(1);
@@ -2475,8 +2326,8 @@ function Manualstockentry() {
 
   //add function
   const sendRequest = async () => {
-    setPageName(!pageName)
-    setChangeTable("new");
+    setPageName(!pageName);
+    setChangeTable('new');
     const uniqueId = uuidv4();
     try {
       let stockcreate = await axios.post(SERVICE.MANUAL_STOCKPURCHASE_CREATE, {
@@ -2495,45 +2346,26 @@ function Manualstockentry() {
         //   stockmaster.workcheck ? stockmaster.workstation : ""
         // ),
         // workcheck: String(stockmaster.workcheck),
-        assettype: String(
-          stockmaster.assettype === undefined ? "" : stockmaster.assettype
-        ),
+        assettype: String(stockmaster.assettype === undefined ? '' : stockmaster.assettype),
         // asset: String(stockmaster.asset),
-        productname: String(
-          stockmaster.productname === "Please Select Material"
-            ? ""
-            : stockmaster.productname
-        ),
+        productname: String(stockmaster.productname === 'Please Select Material' ? '' : stockmaster.productname),
 
-        component: String(
-          stockmaster.component === "Please Select Component"
-            ? ""
-            : stockmaster.component
-        ),
+        component: String(stockmaster.component === 'Please Select Component' ? '' : stockmaster.component),
 
-        producthead: String(
-          stockmaster.producthead === "Please Select Assethead"
-            ? ""
-            : stockmaster.producthead
-        ),
+        producthead: String(stockmaster.producthead === 'Please Select Assethead' ? '' : stockmaster.producthead),
 
         vendorgroup: String(vendorGroup),
         vendorname: String(vendorNew),
-        vendorfrequency: String(frequencyValue === undefined ? "" : frequencyValue),
+        vendorfrequency: String(frequencyValue === undefined ? '' : frequencyValue),
 
-        vendorid: String(vendornameid),
-        gstno: String(
-          vendorgetid.gstnumber === undefined ? "" : vendorgetid.gstnumber
-        ),
+        vendorid: String(vendornameid) ? String(vendornameid) : '',
+        gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
         address: String(vendorgetid.address),
         phonenumber: String(vendorgetid.phonenumber),
         billno: Number(stockmaster.billno),
         productdetails: String(stockmaster.productdetails),
         warrantydetails: String(stockmaster.warrantydetails),
-        uom:
-          stockmaster.uom === "Please Select UOM"
-            ? ""
-            : String(stockmaster.uom),
+        uom: stockmaster.uom === 'Please Select UOM' ? '' : String(stockmaster.uom),
         quantity: Number(stockmaster.quantity),
         rate: Number(stockmaster.rate),
         billdate: String(stockmaster.billdate),
@@ -2542,9 +2374,7 @@ function Manualstockentry() {
         // warrantyfiles: [...refImagewarranty],
         warranty: String(stockmaster.warranty),
         estimation: String(stockmaster.estimation),
-        estimationtime: String(stockmaster.estimationtime)
-          ? stockmaster.estimationtime
-          : "Days",
+        estimationtime: String(stockmaster.estimationtime) ? stockmaster.estimationtime : 'Days',
         warrantycalculation: String(stockmaster.warrantycalculation),
         purchasedate: selectedPurchaseDate,
         requestmode: String(stockmaster.requestmode),
@@ -2565,7 +2395,7 @@ function Manualstockentry() {
         // warrantyfiles: [...refImagewarranty],
         warranty: String(stockmaster.warranty),
         estimation: String(stockmaster.estimation),
-        estimationtime: String(stockmaster.estimationtime) ? stockmaster.estimationtime : "Days",
+        estimationtime: String(stockmaster.estimationtime) ? stockmaster.estimationtime : 'Days',
         warrantycalculation: String(stockmaster.warrantycalculation),
         purchasedate: selectedPurchaseDate,
 
@@ -2577,64 +2407,64 @@ function Manualstockentry() {
         tododetails: [...educationtodo],
         paidstatus: String(expensecreate.paidstatus),
 
-        bankname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankname) : "",
-        bankbranchname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankbranchname) : "",
-        accountholdername: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.accountholdername) : "",
-        accountnumber: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.accountnumber) : "",
-        ifsccode: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.ifsccode) : "",
+        bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+        bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankbranchname) : '',
+        accountholdername: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountholdername) : '',
+        accountnumber: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountnumber) : '',
+        ifsccode: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.ifsccode) : '',
 
-        upinumber: expensecreate.paidmode === "UPI" ? String(vendorstock.upinumber) : "",
+        upinumber: expensecreate.paidmode === 'UPI' ? String(vendorstock.upinumber) : '',
 
-        cardnumber: expensecreate.paidmode === "Card" ? String(vendorstock.cardnumber) : "",
-        cardholdername: expensecreate.paidmode === "Card" ? String(vendorstock.cardholdername) : "",
-        cardtransactionnumber: expensecreate.paidmode === "Card" ? String(vendorstock.cardtransactionnumber) : "",
-        cardtype: expensecreate.paidmode === "Card" ? String(vendorstock.cardtype) : "",
-        cardmonth: expensecreate.paidmode === "Card" ? String(vendorstock.cardmonth) : "",
-        cardyear: expensecreate.paidmode === "Card" ? String(vendorstock.cardyear) : "",
-        cardsecuritycode: expensecreate.paidmode === "Card" ? String(vendorstock.cardsecuritycode) : "",
+        cardnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardnumber) : '',
+        cardholdername: expensecreate.paidmode === 'Card' ? String(vendorstock.cardholdername) : '',
+        cardtransactionnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtransactionnumber) : '',
+        cardtype: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtype) : '',
+        cardmonth: expensecreate.paidmode === 'Card' ? String(vendorstock.cardmonth) : '',
+        cardyear: expensecreate.paidmode === 'Card' ? String(vendorstock.cardyear) : '',
+        cardsecuritycode: expensecreate.paidmode === 'Card' ? String(vendorstock.cardsecuritycode) : '',
 
-        chequenumber: expensecreate.paidmode === "Cheque" ? String(vendor.chequenumber) : "",
+        chequenumber: expensecreate.paidmode === 'Cheque' ? String(vendor.chequenumber) : '',
 
-        cash: expensecreate.paidmode === "Cash" ? String("Cash") : "",
+        cash: expensecreate.paidmode === 'Cash' ? String('Cash') : '',
 
-        paidmode: String(expensecreate.paidstatus === "Not Paid" ? "" : expensecreate.paidmode),
-        paidamount: Number(expensecreate.paidstatus === "Not Paid" ? 0 : expensecreate.paidamount),
-        balanceamount: Number(expensecreate.paidstatus === "Not Paid" ? stockmaster.totalbillamount : expensecreate.balanceamount),
-        sortdate: String(expensecreate.paidstatus === "Not Paid" ? "" : new Date()),
-        billstatus: expensecreate.paidstatus === "Not Paid" ? "InComplete" : expensecreate.paidstatus === "Paid" && Number(expensecreate.paidamount) !== Number(Expensetotal) ? "Partially Paid" : "Completed",
+        paidmode: String(expensecreate.paidstatus === 'Not Paid' ? '' : expensecreate.paidmode),
+        paidamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+        balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmaster.totalbillamount : expensecreate.balanceamount),
+        sortdate: String(expensecreate.paidstatus === 'Not Paid' ? '' : new Date()),
+        billstatus: expensecreate.paidstatus === 'Not Paid' ? 'InComplete' : expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal) ? 'Partially Paid' : 'Completed',
         paymentduereminderlog:
-          expensecreate.paidstatus === "Paid"
+          expensecreate.paidstatus === 'Paid'
             ? [
-              {
-                balanceamount: Number(expensecreate.paidstatus === "Not Paid" ? stockmaster.totalbillamount : expensecreate.balanceamount),
-                expensetotal: stockmaster.totalbillamount,
-                modeofpayments: expensecreate.paidmode,
-                payamountdate: expensecreate.date,
-                payamount: Number(expensecreate.paidstatus === "Not Paid" ? 0 : expensecreate.paidamount),
-                bankname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankname) : "",
-                bankbranchname: expensecreate.paidmode === "Bank Transfer" ? vendorstock.bankbranchname : "",
-                accountholdername: expensecreate.paidmode === "Bank Transfer" ? vendorstock.accountholdername : "",
-                accountnumber: expensecreate.paidmode === "Bank Transfer" ? vendorstock.accountnumber : "",
-                ifsccode: expensecreate.paidmode === "Bank Transfer" ? vendorstock.ifsccode : "",
+                {
+                  balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmaster.totalbillamount : expensecreate.balanceamount),
+                  expensetotal: stockmaster.totalbillamount,
+                  modeofpayments: expensecreate.paidmode,
+                  payamountdate: expensecreate.date,
+                  payamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+                  bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+                  bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.bankbranchname : '',
+                  accountholdername: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountholdername : '',
+                  accountnumber: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountnumber : '',
+                  ifsccode: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.ifsccode : '',
 
-                upinumber: expensecreate.paidmode === "UPI" ? vendorstock.upinumber : "",
+                  upinumber: expensecreate.paidmode === 'UPI' ? vendorstock.upinumber : '',
 
-                cardnumber: expensecreate.paidmode === "Card" ? vendorstock.cardnumber : "",
-                cardholdername: expensecreate.paidmode === "Card" ? vendorstock.cardholdername : "",
-                cardtransactionnumber: expensecreate.paidmode === "Card" ? vendorstock.cardtransactionnumber : "",
-                cardtype: expensecreate.paidmode === "Card" ? vendorstock.cardtype : "",
-                cardmonth: expensecreate.paidmode === "Card" ? vendorstock.cardmonth : "",
-                cardyear: expensecreate.paidmode === "Card" ? vendorstock.cardyear : "",
-                cardsecuritycode: expensecreate.paidmode === "Card" ? vendorstock.cardsecuritycode : "",
-                chequenumber: expensecreate.paidmode === "Cheque" ? vendorstock.chequenumber : "",
-                addedby: [
-                  {
-                    name: String(isUserRoleAccess.companyname),
-                    date: String(new Date()),
-                  },
-                ],
-              },
-            ]
+                  cardnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardnumber : '',
+                  cardholdername: expensecreate.paidmode === 'Card' ? vendorstock.cardholdername : '',
+                  cardtransactionnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardtransactionnumber : '',
+                  cardtype: expensecreate.paidmode === 'Card' ? vendorstock.cardtype : '',
+                  cardmonth: expensecreate.paidmode === 'Card' ? vendorstock.cardmonth : '',
+                  cardyear: expensecreate.paidmode === 'Card' ? vendorstock.cardyear : '',
+                  cardsecuritycode: expensecreate.paidmode === 'Card' ? vendorstock.cardsecuritycode : '',
+                  chequenumber: expensecreate.paidmode === 'Cheque' ? vendorstock.chequenumber : '',
+                  addedby: [
+                    {
+                      name: String(isUserRoleAccess.companyname),
+                      date: String(new Date()),
+                    },
+                  ],
+                },
+              ]
             : [],
         addedby: [
           {
@@ -2644,55 +2474,54 @@ function Manualstockentry() {
         ],
       });
       setBtnSubmit(false);
-      await handleFileUpload(refImgWarranty, "todo", uniqueId);
-      await handleFileUpload(refImgWarrantyBill, "bill", uniqueId);
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      await handleFileUpload(refImgWarranty, 'todo', uniqueId);
+      await handleFileUpload(refImgWarrantyBill, 'bill', uniqueId);
+      setRefImgWarrantyfilenames([]);
+      setRefImgbillfilenames([]);
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       // setStockmaster(stockcreate.data);
-      setRefImgWarrantyfilenames([])
-      setRefImgbillfilenames([])
+
       setStockArray([]);
       setStockmaster({
         ...stockmaster,
-        gstno: "",
-        billno: "",
-        productname: "",
-        productdetails: "",
-        warrantydetails: "",
+        gstno: '',
+        billno: '',
+        productname: '',
+        productdetails: '',
+        warrantydetails: '',
         quantity: 1,
-        rate: "",
-        billdate: "",
-        warrantyfiles: "",
-        addedby: "",
-        updatedby: "",
+        rate: '',
+        billdate: '',
+        warrantyfiles: '',
+        addedby: '',
+        updatedby: '',
 
-        warranty: "Yes",
-        warrantycalculation: "",
-        estimation: "",
-        estimationtime: "Days",
-        purchasedate: "",
+        warranty: 'Yes',
+        warrantycalculation: '',
+        estimation: '',
+        estimationtime: 'Days',
+        purchasedate: '',
 
-        vendorname: "Please Select Vendor",
-        productname: "Please Select Material",
-        component: "Please Select Component",
+        vendorname: 'Please Select Vendor',
+        productname: 'Please Select Material',
+        component: 'Please Select Component',
       });
 
       setRefImage([]);
-      setFile("");
+      setFile('');
       setGetImg(null);
       setRefImagewarranty([]);
-      setFilewarranty("");
+      setFilewarranty('');
       setGetImgwarranty(null);
       setTodos([]);
-      setChangeTable("old");
-      setSelectedPurchaseDate("");
+      setChangeTable('old');
+      setSelectedPurchaseDate('');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
-
 
   const handleFileUpload = async (selectedFilesall, type, uniqueId) => {
     try {
@@ -2726,18 +2555,18 @@ function Manualstockentry() {
                 // console.log(chunk, "chunk");
 
                 const formData = new FormData();
-                formData.append("file", chunk);
-                formData.append("chunkNumber", chunkNumber);
-                formData.append("totalChunks", totalChunks);
-                formData.append("filesize", selectedFile.size);
-                formData.append("originalname", `${uniqueId}$${type}$${selectedFile.name}`);
+                formData.append('file', chunk);
+                formData.append('chunkNumber', chunkNumber);
+                formData.append('totalChunks', totalChunks);
+                formData.append('filesize', selectedFile.size);
+                formData.append('originalname', `${uniqueId}$${type}$${selectedFile.name}`);
 
                 // console.log(formData, "formData");
 
                 try {
                   const response = await axios.post(SERVICE.UPLOAD_CHUNK_MANUAL, formData, {
                     headers: {
-                      "Content-Type": "multipart/form-data",
+                      'Content-Type': 'multipart/form-data',
                     },
                   });
                   // console.log(response, "response");
@@ -2748,7 +2577,7 @@ function Manualstockentry() {
 
                   uploadNextChunk();
                 } catch (err) {
-                  console.log(err, "ERrer");
+                  console.log(err, 'ERrer');
                   handleApiError(err, setShowAlert, handleClickOpenerr);
                 }
               } else {
@@ -2756,7 +2585,7 @@ function Manualstockentry() {
                 console.log(`File upload completed for ${selectedFile.name}`);
               }
             } catch (err) {
-              console.log(err, "asdfse");
+              console.log(err, 'asdfse');
             }
           };
 
@@ -2768,14 +2597,14 @@ function Manualstockentry() {
 
       uploadFiles();
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
   //submit option for saving
   const handleSubmit = async (e) => {
     setBtnSubmit(true);
-    setPageName(!pageName)
+    setPageName(!pageName);
     e.preventDefault();
 
     // await fetchStock("Filtered");
@@ -2796,42 +2625,39 @@ function Manualstockentry() {
           item.assettype == stockmaster.assettype &&
           item.assethead == stockmaster.assethead &&
           item.component == stockmaster.component &&
-          item.productdetails.toLowerCase() ==
-          stockmaster.productdetails.toLowerCase() &&
-          item.warrantydetails.toLowerCase() ==
-          stockmaster.warrantydetails.toLowerCase() &&
+          item.productdetails.toLowerCase() == stockmaster.productdetails.toLowerCase() &&
+          item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
           item.uom == stockmaster.uom &&
           item.quantity == stockmaster.quantity &&
           item.rate == stockmaster.rate &&
           item.billdate == stockmaster.billdate
       );
 
-      let vendorEmpty = todos && todos.some((item) => item.subcomponentcheck === true && item.vendor == "Choose Vendor");
+      let vendorEmpty = todos && todos.some((item) => item.subcomponentcheck === true && item.vendor == 'Choose Vendor');
 
-
-      if (stockmaster.company === "Please Select Company") {
-        setPopupContentMalert("Please Select Company!");
-        setPopupSeverityMalert("info");
+      if (stockmaster.company === 'Please Select Company') {
+        setPopupContentMalert('Please Select Company!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.branch === "Please Select Branch") {
-        setPopupContentMalert("Please Select Branch!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.branch === 'Please Select Branch') {
+        setPopupContentMalert('Please Select Branch!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.unit === "Please Select Unit") {
-        setPopupContentMalert("Please Select Unit!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.unit === 'Please Select Unit') {
+        setPopupContentMalert('Please Select Unit!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.floor === "Please Select Floor") {
-        setPopupContentMalert("Please Select Floor!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.floor === 'Please Select Floor') {
+        setPopupContentMalert('Please Select Floor!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.area === "Please Select Area") {
-        setPopupContentMalert("Please Select Area!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.area === 'Please Select Area') {
+        setPopupContentMalert('Please Select Area!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.location === "Please Select Location") {
-        setPopupContentMalert("Please Select Location!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.location === 'Please Select Location') {
+        setPopupContentMalert('Please Select Location!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       //  else if (vendorGroup === "Choose Vendor Group") {
@@ -2842,27 +2668,18 @@ function Manualstockentry() {
       //   setPopupContentMalert("Please Select Vendor!");
       //   setPopupSeverityMalert("info");
       //   handleClickOpenPopupMalert();
-      // } 
-      else if (
-        stockmaster.requestmode === "Please Select Stock Mode For" ||
-        stockmaster.requestmode === ""
-      ) {
-        setPopupContentMalert("Please Select Stock Mode For!");
-        setPopupSeverityMalert("info");
+      // }
+      else if (stockmaster.requestmode === 'Please Select Stock Mode For' || stockmaster.requestmode === '') {
+        setPopupContentMalert('Please Select Stock Mode For!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.productname === "" ||
-        stockmaster.productname === "Please Select Material"
-      ) {
-        setPopupContentMalert("Please Select Asset Material!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.productname === '' || stockmaster.productname === 'Please Select Material') {
+        setPopupContentMalert('Please Select Asset Material!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.component === "" ||
-        stockmaster.component === "Please Select Component"
-      ) {
-        setPopupContentMalert("Please Select Component!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.component === '' || stockmaster.component === 'Please Select Component') {
+        setPopupContentMalert('Please Select Component!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       // else if (stockmaster.billno === "") {
@@ -2870,49 +2687,46 @@ function Manualstockentry() {
       //   setPopupSeverityMalert("info");
       //   handleClickOpenPopupMalert();
       // }
-      else if (stockmaster.productdetails === "") {
-        setPopupContentMalert("Please Enter Product Details!");
-        setPopupSeverityMalert("info");
+      else if (stockmaster.productdetails === '') {
+        setPopupContentMalert('Please Enter Product Details!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       //  else if (stockmaster.warrantydetails === "") {
       //   setPopupContentMalert("Please Enter Warranty Details!");
       //   setPopupSeverityMalert("info");
       //   handleClickOpenPopupMalert();
-      // } 
-      else if (
-        stockmaster.uom === "" ||
-        stockmaster.uom === "Please Select UOM"
-      ) {
-        setPopupContentMalert("Please Select Uom!");
-        setPopupSeverityMalert("info");
+      // }
+      else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
+        setPopupContentMalert('Please Select Uom!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.quantity === "") {
-        setPopupContentMalert("Please Enter Quantity!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.quantity === '') {
+        setPopupContentMalert('Please Enter Quantity!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.rate === "") {
-        setPopupContentMalert("Please Enter Rate!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.rate === '') {
+        setPopupContentMalert('Please Enter Rate!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       //  else if (stockmaster.billdate === "") {
       //   setPopupContentMalert("Please Select Bill Date!");
       //   setPopupSeverityMalert("info");
       //   handleClickOpenPopupMalert();
-      // } 
+      // }
       // else if (refImage.length == 0) {
       //   setPopupContentMalert("Please Upload Bill!");
       //   setPopupSeverityMalert("info");
       //   handleClickOpenPopupMalert();
-      // } 
+      // }
       else if (vendorEmpty) {
-        setPopupContentMalert("Please Select Vendor in All the Sub Dividends!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Please Select Vendor in All the Sub Dividends!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (isNameMatch) {
-        setPopupContentMalert("Data Already Exist!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Data Already Exist!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else {
         sendRequest();
@@ -2928,8 +2742,6 @@ function Manualstockentry() {
           item.location == stockmaster.location &&
           item.vendorname == stockmaster.vendorname &&
           Number(item.billno) == Number(stockmaster.billno) &&
-
-
           // item.productdetailsnew.toLowerCase() == stockmaster.productdetailsnew.toLowerCase() &&
           item.requestmode == stockmaster.requestmode
         // item.stockcategory == stockmaster.stockcategory &&
@@ -2945,29 +2757,29 @@ function Manualstockentry() {
         // item.billdate == stockmaster.billdate
       );
 
-      if (stockmaster.company === "Please Select Company") {
-        setPopupContentMalert("Please Select Company!");
-        setPopupSeverityMalert("info");
+      if (stockmaster.company === 'Please Select Company') {
+        setPopupContentMalert('Please Select Company!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.branch === "Please Select Branch") {
-        setPopupContentMalert("Please Select Branch!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.branch === 'Please Select Branch') {
+        setPopupContentMalert('Please Select Branch!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.unit === "Please Select Unit") {
-        setPopupContentMalert("Please Select Unit!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.unit === 'Please Select Unit') {
+        setPopupContentMalert('Please Select Unit!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.floor === "Please Select Floor") {
-        setPopupContentMalert("Please Select Floor!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.floor === 'Please Select Floor') {
+        setPopupContentMalert('Please Select Floor!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.area === "Please Select Area") {
-        setPopupContentMalert("Please Select Area!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.area === 'Please Select Area') {
+        setPopupContentMalert('Please Select Area!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.location === "Please Select Location") {
-        setPopupContentMalert("Please Select Location!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.location === 'Please Select Location') {
+        setPopupContentMalert('Please Select Location!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       // else if (stockmaster.vendorname === "" || stockmaster.vendorname === "Please Select Vendor") {
@@ -2988,12 +2800,9 @@ function Manualstockentry() {
       //   );
       //   handleClickOpenerr();
       // }
-      else if (
-        stockmaster.requestmode === "Please Select Stock Mode" ||
-        stockmaster.requestmode === ""
-      ) {
-        setPopupContentMalert("Please Select Stock Mode For!");
-        setPopupSeverityMalert("info");
+      else if (stockmaster.requestmode === 'Please Select Stock Mode' || stockmaster.requestmode === '') {
+        setPopupContentMalert('Please Select Stock Mode For!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       // else if (
@@ -3047,36 +2856,27 @@ function Manualstockentry() {
       //   );
       //   handleClickOpenerr();
       // }
-
-      else if (stockmaster.totalbillamount === "") {
-        setPopupContentMalert("Please Enter Totalbillamount!");
-        setPopupSeverityMalert("info");
+      else if (stockmaster.totalbillamount === '') {
+        setPopupContentMalert('Please Enter Totalbillamount!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (educationtodo.length == 0) {
-        setPopupContentMalert("Please Insert Todo!");
-        setPopupSeverityMalert("info");
+      } else if (educationtodo.length == 0) {
+        setPopupContentMalert('Please Insert Todo!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (expensecreate.paidstatus === "Paid" && expensecreate.paidmode === "Please Select Paid Mode") {
-        setPopupContentMalert("Please Select Paid Mode!");
-        setPopupSeverityMalert("info");
+      } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Please Select Paid Mode') {
+        setPopupContentMalert('Please Select Paid Mode!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (expensecreate.paidstatus === "Paid" && expensecreate.paidamount === "") {
-        setPopupContentMalert("Please Enter Paid Amount!");
-        setPopupSeverityMalert("info");
+      } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidamount === '') {
+        setPopupContentMalert('Please Enter Paid Amount!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (
-        expensecreate.paidstatus === "Paid" &&
-        Number(expensecreate.paidamount) !== Number(Expensetotal)
-      ) {
+      } else if (expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal)) {
         handleClickOpenerrAmount();
-      }
-      else if (isNameMatch) {
-        setPopupContentMalert("Data Already Exist!");
-        setPopupSeverityMalert("info");
+      } else if (isNameMatch) {
+        setPopupContentMalert('Data Already Exist!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else {
         sendRequest();
@@ -3085,102 +2885,101 @@ function Manualstockentry() {
   };
 
   const handleclear = (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     e.preventDefault();
 
     setStockmaster({
-      company: "Please Select Company",
-      branch: "Please Select Branch",
-      unit: "Please Select Unit",
-      floor: "Please Select Floor",
-      area: "Please Select Area",
-      location: "Please Select Location",
-      workstation: "Please Select Workstation",
+      company: 'Please Select Company',
+      branch: 'Please Select Branch',
+      unit: 'Please Select Unit',
+      floor: 'Please Select Floor',
+      area: 'Please Select Area',
+      location: 'Please Select Location',
+      workstation: 'Please Select Workstation',
       workcheck: false,
-      producthead: "",
-      vendorname: "Please Select Vendor",
-      productname: "Please Select Material",
-      component: "Please Select Component",
-      gstno: "",
-      billno: "",
-      assettype: "",
-      asset: "",
-      productdetails: "",
-      warrantydetails: "",
-      uom: "Please Select UOM",
+      producthead: '',
+      vendorname: 'Please Select Vendor',
+      productname: 'Please Select Material',
+      component: 'Please Select Component',
+      gstno: '',
+      billno: '',
+      assettype: '',
+      asset: '',
+      productdetails: '',
+      warrantydetails: '',
+      uom: 'Please Select UOM',
       quantity: 1,
-      rate: "",
-      billdate: "",
-      files: "",
-      warrantyfiles: "",
+      rate: '',
+      billdate: '',
+      files: '',
+      warrantyfiles: '',
 
-      warranty: "Yes",
-      warrantycalculation: "",
-      estimation: "",
-      estimationtime: "Days",
-      purchasedate: "",
+      warranty: 'Yes',
+      warrantycalculation: '',
+      estimation: '',
+      estimationtime: 'Days',
+      purchasedate: '',
 
-      addedby: "",
-      updatedby: "",
+      addedby: '',
+      updatedby: '',
 
-      requestmode: "Please Select Stock Mode For",
-      stockcategory: "Please Select Stock Category",
-      stocksubcategory: "Please Select Stock Sub Category",
-      uomnew: "",
+      requestmode: 'Please Select Stock Mode For',
+      stockcategory: 'Please Select Stock Category',
+      stocksubcategory: 'Please Select Stock Sub Category',
+      uomnew: '',
       quantitynew: 1,
-      materialnew: "Please Select Material",
-      productdetailsnew: "",
+      materialnew: 'Please Select Material',
+      productdetailsnew: '',
     });
     setExpensecreate({
+      totalbillamount: '',
 
-      totalbillamount: "",
+      paidstatus: 'Not Paid',
 
-      paidstatus: "Not Paid",
-
-      paidmode: "Please Select Paid Mode",
-
+      paidmode: 'Please Select Paid Mode',
     });
     setTodoDetails({
-      particularmode: "Please Select Particular Mode",
-      category: "Please Select Category",
-      subcategory: "Please Select Sub Category",
-      materialnew: "Please Select Item Name",
-      uomnew: "",
-      rate: "",
-      quantitynew: "",
-      amount: "",
+      particularmode: 'Please Select Particular Mode',
+      category: 'Please Select Category',
+      subcategory: 'Please Select Sub Category',
+      materialnew: 'Please Select Item Name',
+      uomnew: '',
+      rate: '',
+      quantitynew: '',
+      amount: '',
     });
     setEducationtodo([]);
-    setVendorModeOfPayments("");
+    setVendorModeOfPayments('');
     setCategoryOption([]);
-
+    setRefImgWarrantyfilenames([]);
+    setRefImgbillfilenames([]);
 
     setSubcategoryOption([]);
-    setCategoryOption([])
-    setSubcategoryOption([])
-    setMaterialoptNew([])
+    setCategoryOption([]);
+    setSubcategoryOption([]);
+    setMaterialoptNew([]);
     setTodos([]);
-    setVendorNew("Choose Vendor");
-    setVendorGroup("Choose Vendor Group");
+    setVendorNew('Choose Vendor');
+    setVendorGroup('Choose Vendor Group');
     setVendoropt([]);
     setBranchs([]);
     setUnits([]);
     setFloors([]);
     setStockArray([]);
     setAreas([]);
-    setLocations([{ label: "ALL", value: "ALL" }]);
-    setSelectedBranch("Please Select Branch");
-    setSelectedUnit("Please Select Unit");
-    setSelectedProducthead("Please Select Assethead");
-    setSelectedProductname("Please Select Materila Name");
-    setSelectedPurchaseDate("");
+    setLocations([{ label: 'ALL', value: 'ALL' }]);
+    setSelectedBranch('Please Select Branch');
+    setSelectedUnit('Please Select Unit');
+    setSelectedProducthead('Please Select Assethead');
+    setSelectedProductname('Please Select Materila Name');
+    setSelectedPurchaseDate('');
     setAccount([]);
-    setFile("");
+    setFile('');
     setRefImage([]);
     setGetImg(null);
-    setVendorgetid({ gstnumber: "", address: "", phonenumber: "" });
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setVendorgetid({ gstnumber: '', address: '', phonenumber: '' });
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
 
@@ -3200,9 +2999,7 @@ function Manualstockentry() {
         contactperson: String(vendor.contactperson),
         address: String(vendor.address),
         gstnumber: String(vendor.gstnumber),
-        bankname: String(
-          vendor.bankname === "Please Select Bank Name" ? "" : vendor.bankname
-        ),
+        bankname: String(vendor.bankname === 'Please Select Bank Name' ? '' : vendor.bankname),
         accountname: String(vendor.accountname),
         accountnumber: Number(vendor.accountnumber),
         ifsccode: String(vendor.ifsccode),
@@ -3215,17 +3012,17 @@ function Manualstockentry() {
       });
       await fetchVendor();
       setVendor({
-        vendorname: "",
-        emailid: "",
-        phonenumber: "",
-        whatsappnumber: "",
-        contactperson: "",
-        address: "",
-        gstnumber: "",
-        bankname: "Please Select Bank Name",
-        accountname: "",
-        accountnumber: "",
-        ifsccode: "",
+        vendorname: '',
+        emailid: '',
+        phonenumber: '',
+        whatsappnumber: '',
+        contactperson: '',
+        address: '',
+        gstnumber: '',
+        bankname: 'Please Select Bank Name',
+        accountname: '',
+        accountnumber: '',
+        ifsccode: '',
         phonecheck: false,
       });
       handleCloseviewalertvendor();
@@ -3256,7 +3053,7 @@ function Manualstockentry() {
       });
       setVomMaster(vomnamecreate.data);
       await fetchUom();
-      setVomMaster({ name: "" });
+      setVomMaster({ name: '' });
       handleCloseviewalertUom();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -3266,16 +3063,14 @@ function Manualstockentry() {
   //submit option for saving
   const handleSubmituom = (e) => {
     e.preventDefault();
-    const isNameMatch = vomMasterget?.some(
-      (item) => item.name?.toLowerCase() === vomMaster.name?.toLowerCase()
-    );
-    if (vomMaster.name === "") {
-      setPopupContentMalert("Please Enter VOM Master Name!");
-      setPopupSeverityMalert("info");
+    const isNameMatch = vomMasterget?.some((item) => item.name?.toLowerCase() === vomMaster.name?.toLowerCase());
+    if (vomMaster.name === '') {
+      setPopupContentMalert('Please Enter VOM Master Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequestuom();
@@ -3284,7 +3079,7 @@ function Manualstockentry() {
 
   const handleclearuom = (e) => {
     e.preventDefault();
-    setVomMaster({ name: "" });
+    setVomMaster({ name: '' });
   };
 
   //post call for asset material
@@ -3308,7 +3103,7 @@ function Manualstockentry() {
       });
       await fetchAsset();
       setAsset(subprojectscreate.data);
-      setAsset({ ...asset, name: "", materialcode: "" });
+      setAsset({ ...asset, name: '', materialcode: '' });
       handleCloseviewalertAsset();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -3321,40 +3116,28 @@ function Manualstockentry() {
 
     // const isNameMatch = assetmaster?.some(item => item?.name?.toLowerCase() === (asset.name)?.toLowerCase() && item.assethead === selectedassethead);
     // const isCodeMatch = assetmaster?.some(item => item?.headcode?.toLowerCase() === (asset.headcode)?.toLowerCase() && item.name?.toLowerCase() === (asset.name)?.toLowerCase() && item?.assethead === selectedassethead);
-    const isNameMatch = assetmaster?.some(
-      (item) =>
-        item?.name?.toLowerCase() === asset.name?.toLowerCase() &&
-        item.assethead === selectedassethead
-    );
-    const isCodeMatch = assetmaster?.some(
-      (item) =>
-        item?.materialcode?.toLowerCase() ===
-        asset.materialcode?.toLowerCase() &&
-        item.assethead === selectedassethead
-    );
+    const isNameMatch = assetmaster?.some((item) => item?.name?.toLowerCase() === asset.name?.toLowerCase() && item.assethead === selectedassethead);
+    const isCodeMatch = assetmaster?.some((item) => item?.materialcode?.toLowerCase() === asset.materialcode?.toLowerCase() && item.assethead === selectedassethead);
 
-    if (
-      selectedassethead === "" ||
-      selectedassethead == "Please Select Assethead"
-    ) {
-      setPopupContentMalert("Please Select Assethead!");
-      setPopupSeverityMalert("info");
+    if (selectedassethead === '' || selectedassethead == 'Please Select Assethead') {
+      setPopupContentMalert('Please Select Assethead!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (asset.materialcode === "") {
-      setPopupContentMalert("Please Enter Material Code!");
-      setPopupSeverityMalert("info");
+    } else if (asset.materialcode === '') {
+      setPopupContentMalert('Please Enter Material Code!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (asset.name === "") {
-      setPopupContentMalert("Please Enter Material Name!");
-      setPopupSeverityMalert("info");
+    } else if (asset.name === '') {
+      setPopupContentMalert('Please Enter Material Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isCodeMatch) {
-      setPopupContentMalert("Code already exits!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Code already exits!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequestasset();
@@ -3362,8 +3145,8 @@ function Manualstockentry() {
   };
   const handleClearasset = (e) => {
     e.preventDefault();
-    setSelectedAssethead("Please Select Assethead");
-    setAsset({ materialcode: "", name: "" });
+    setSelectedAssethead('Please Select Assethead');
+    setAsset({ materialcode: '', name: '' });
   };
 
   //Edit model...
@@ -3371,50 +3154,90 @@ function Manualstockentry() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
     setStockmasteredit({
-      vendorname: "Please Select Vendor",
-      gstno: "",
-      billno: "",
-      productdetails: "",
-      warrantydetails: "",
-      uom: "",
+      vendorname: 'Please Select Vendor',
+      gstno: '',
+      billno: '',
+      productdetails: '',
+      warrantydetails: '',
+      uom: '',
       quantity: 1,
-      warranty: "",
-      rate: "",
-      billdate: "",
-      files: "",
-      warrantyfiles: "",
+      warranty: '',
+      rate: '',
+      billdate: '',
+      files: '',
+      warrantyfiles: '',
     });
-    setSelectedBranch("Please Select Branch");
-    setSelectedUnit("Please Select Unit");
-    setSelectedProducthead("Please Select Assethead");
-    setSelectedProductname("Please Select Materila Name");
-    setVendorgetid({ gstnumber: "" });
+    setSelectedBranch('Please Select Branch');
+    setSelectedUnit('Please Select Unit');
+    setSelectedProducthead('Please Select Assethead');
+    setSelectedProductname('Please Select Materila Name');
+    setVendorgetid({ gstnumber: '' });
   };
 
-  const [vendorNew, setVendorNew] = useState("Choose Vendor");
-  const [vendorNewEdit, setVendorNewEdit] = useState("Choose Vendor");
+  const [vendorNew, setVendorNew] = useState('Choose Vendor');
+  const [vendorNewEdit, setVendorNewEdit] = useState('Choose Vendor');
+
+  //   const getMultipleFilesAsObjects = async (filenames, type, uniqueId) => {
+  //     const files = [];
+
+  //     for (const name of filenames) {
+  //       const res = await axios.post(
+  //         SERVICE.MANUAL_TODO_EDIT_FETCH,
+  //         { filename: `${uniqueId}$${type}$${name}` },
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${auth.APIToken}`,
+  //           },
+  //           responseType: 'blob',
+  //         }
+  //       );
+  // if(res.data.message == "File not found"){
+  //   return [];
+  // }
+  // else{
+  //       const blob = res.data;
+  //       const file = new File([blob], name, { type: blob.type });
+  //       files.push(file);
+
+  //     return files;
+  // }
+  //   };
 
   const getMultipleFilesAsObjects = async (filenames, type, uniqueId) => {
     const files = [];
 
     for (const name of filenames) {
-      const res = await axios.post(
-        SERVICE.MANUAL_TODO_EDIT_FETCH,
-        { filename: `${uniqueId}$${type}$${name}` },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-          responseType: "blob",
-        }
-      );
+      try {
+        const res = await axios.post(
+          SERVICE.MANUAL_TODO_EDIT_FETCH,
+          { filename: `${uniqueId}$${type}$${name}` },
+          {
+            headers: {
+              Authorization: `Bearer ${auth.APIToken}`,
+            },
+            responseType: 'blob',
+          }
+        );
 
-      const blob = res.data;
-      const file = new File([blob], name, { type: blob.type });
-      files.push(file);
+        // Check for "File not found" in blob content
+        const contentType = res.headers['content-type'];
+        if (contentType.includes('application/json')) {
+          const text = await res.data.text();
+          const json = JSON.parse(text);
+          if (json.message === 'File not found') {
+            continue; // Skip this file
+          }
+        }
+
+        const blob = res.data;
+        const file = new File([blob], name, { type: blob.type });
+        files.push(file);
+      } catch (err) {
+        console.error(`Error fetching file ${name}:`, err);
+      }
     }
 
     return files;
@@ -3424,16 +3247,16 @@ function Manualstockentry() {
   const [oldfileNamesBill, setoldfileNamesBill] = useState([]);
   //get single row to edit....
   const getCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${e}`, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setAmountEdit(res?.data?.smanualstock?.totalbillamount)
+      setAmountEdit(res?.data?.smanualstock?.totalbillamount);
       setStockmasteredit(res?.data?.smanualstock);
-      setFrequencyValueedit(res?.data?.smanualstock?.vendorfrequency === undefined ? "" : res?.data?.smanualstock?.vendorfrequency);
+      setFrequencyValueedit(res?.data?.smanualstock?.vendorfrequency === undefined ? '' : res?.data?.smanualstock?.vendorfrequency);
 
       setSelectedBranchedit(res?.data?.smanualstock.branch);
       setVendorGroupEdit(res?.data?.smanualstock?.vendorgroup);
@@ -3445,23 +3268,17 @@ function Manualstockentry() {
       setoldfileNamesBill(res?.data?.smanualstock?.filenamesbill.map((d) => `${res?.data?.smanualstock?.uniqueId}$bill$${d}`));
       setOldfileNamesWar(res?.data?.smanualstock?.filenames.map((d) => `${res?.data?.smanualstock?.uniqueId}$todo$${d}`));
 
-
-      const fileswarranty = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenames, "todo", res?.data?.smanualstock?.uniqueId);
+      const fileswarranty = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenames, 'todo', res?.data?.smanualstock?.uniqueId);
 
       handleFetchWarranty(fileswarranty);
 
-      const filesbill = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenamesbill, "bill", res?.data?.smanualstock?.uniqueId);
+      const filesbill = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenamesbill, 'bill', res?.data?.smanualstock?.uniqueId);
 
       handleFetchBill(filesbill);
 
-      setVendoroptIndEdit(
-        new Array(res?.data?.smanualstock?.subcomponent?.length).fill([])
-      );
+      setVendoroptIndEdit(new Array(res?.data?.smanualstock?.subcomponent?.length).fill([]));
       for (let i = 0; i < res?.data?.smanualstock?.subcomponent?.length; i++) {
-        await handleChangeGroupNameIndexBasedEdit(
-          { value: res?.data?.smanualstock?.subcomponent[i]?.vendorgroup },
-          i
-        );
+        await handleChangeGroupNameIndexBasedEdit({ value: res?.data?.smanualstock?.subcomponent[i]?.vendorgroup }, i);
       }
       setSelectedUnitedit(res?.data?.smanualstock.unit);
       setSelectedProductheadedit(res?.data?.smanualstock.producthead);
@@ -3480,32 +3297,22 @@ function Manualstockentry() {
       await fetchBranchDropdownsEdit(res?.data?.smanualstock?.company);
       await fetchUnitsEdit(res?.data?.smanualstock.branch);
       await fetchFloorEdit(res?.data?.smanualstock?.branch);
-      await fetchAreaEdit(
-        res?.data?.smanualstock?.branch,
-        res?.data?.smanualstock?.floor
-      );
-      await fetchAllLocationEdit(
-        res?.data?.smanualstock?.branch,
-        res?.data?.smanualstock?.floor,
-        res?.data?.smanualstock?.area
-      );
+      await fetchAreaEdit(res?.data?.smanualstock?.branch, res?.data?.smanualstock?.floor);
+      await fetchAllLocationEdit(res?.data?.smanualstock?.branch, res?.data?.smanualstock?.floor, res?.data?.smanualstock?.area);
 
       if (res?.data?.smanualstock.vendorid) {
-        let resv = await axios.get(
-          `${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.smanualstock.vendorid}`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-          }
-        );
+        let resv = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.smanualstock.vendorid}`, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
         setVendorgetid(resv?.data?.svendordetails);
       } else {
         setVendorgetid({
           ...vendorgetid,
-          gstnumber: "",
-          address: "",
-          phonenumber: "",
+          gstnumber: '',
+          address: '',
+          phonenumber: '',
         });
       }
       // let res1 = await axios.get(SERVICE.ASSETWORKSTAION, {
@@ -3524,7 +3331,7 @@ function Manualstockentry() {
       //   value: d.categoryname,
       // }));
       // setSpecificationedit(resultall);
-      await fetchspecificationEdit(res?.data?.smanualstock.component)
+      await fetchspecificationEdit(res?.data?.smanualstock.component);
       handleClickOpenEdit();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -3537,7 +3344,7 @@ function Manualstockentry() {
   };
   // get single row to view....
   const getviewCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${e}`, {
         headers: {
@@ -3556,13 +3363,11 @@ function Manualstockentry() {
         code: data.code,
       }));
 
-      let setDataOne = codeValues.find(
-        (item1) => res?.data?.smanualstock.uom === item1.name
-      );
+      let setDataOne = codeValues.find((item1) => res?.data?.smanualstock.uom === item1.name);
 
       let setData = {
         ...res?.data?.smanualstock,
-        uomcode: setDataOne ? setDataOne.code : "",
+        uomcode: setDataOne ? setDataOne.code : '',
       };
 
       setStockmasteredit(setData);
@@ -3574,7 +3379,7 @@ function Manualstockentry() {
 
   // get single row to view....
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${e}`, {
         headers: {
@@ -3624,119 +3429,78 @@ function Manualstockentry() {
 
   //editing the single data...
   const sendEditRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      let res = await axios.put(
-        `${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${maintenanceid}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
+      let res = await axios.put(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${maintenanceid}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        company: String(stockmasteredit.company),
+        branch: String(stockmasteredit.branch),
+        unit: String(stockmasteredit.unit),
+        floor: String(stockmasteredit.floor),
+        location: String(stockmasteredit.location),
+        area: String(stockmasteredit.area),
+        totalbillamount: Number(stockmasteredit.quantity) * Number(stockmasteredit.rate),
+        workstation: String(stockmasteredit.workcheck ? stockmasteredit.workstation : ''),
+        // workcheck: String(stockmasteredit.workcheck),
+        assettype: String(stockmasteredit.assettype === undefined ? '' : stockmasteredit.assettype),
+        asset: String(stockmasteredit.asset),
+
+        productname: String(stockmasteredit.productname === 'Please Select Material' || stockmasteredit.productname === undefined ? '' : stockmasteredit.productname),
+
+        component: String(stockmasteredit.component === 'Please Select Component' ? '' : stockmasteredit.component),
+        subcomponent: todosEdit ? [...todosEdit] : [],
+        warranty: String(stockmasteredit.warranty),
+        estimation: String(stockmasteredit.estimation),
+        estimationtime: String(stockmasteredit.estimationtime),
+        warrantycalculation: String(stockmasteredit.warrantycalculation),
+        purchasedate: selectedPurchaseDateEdit,
+
+        producthead: String(stockmasteredit.producthead === '' ? '' : stockmasteredit.producthead),
+
+        vendorname: String(vendorNewEdit),
+        vendorgroup: String(vendorGroupEdit),
+        vendorfrequency: String(frequencyValueedit === undefined ? '' : frequencyValueedit),
+
+        gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
+        vendorid: String(vendornameid) ? String(vendornameid) : '',
+        billno: Number(stockmasteredit.billno),
+        productdetails: String(stockmasteredit.productdetails),
+        warrantydetails: String(stockmasteredit.warrantydetails),
+        uom: stockmasteredit.uom === 'Please Select UOM' ? '' : String(stockmasteredit.uom),
+        quantity: Number(stockmasteredit.quantity),
+        rate: Number(stockmasteredit.rate),
+        billdate: String(stockmasteredit.billdate),
+        // files: [...refImageedit],
+        // warrantyfiles: [...refImagewarrantyedit],
+
+        filenames: refImgWarrantyfilenamesEdit,
+        filenamesbill: refImgbillfilenamesEdit,
+
+        requestmode: String(stockmasteredit.requestmode),
+        stockcategory: stockmasteredit.stockcategory === 'Please Select Stock Category' ? '' : String(stockmasteredit.stockcategory),
+        stocksubcategory: stockmasteredit.stocksubcategory === 'Please Select Stock Sub Category' ? '' : String(stockmasteredit.stocksubcategory),
+        uomnew: stockmasteredit.uomnew === '' ? '' : String(stockmasteredit.uomnew),
+        quantitynew: stockmasteredit.quantitynew === '' ? '' : Number(stockmasteredit.quantitynew),
+        materialnew: stockmasteredit.materialnew === 'Please Select Material' ? '' : String(stockmasteredit.materialnew),
+        productdetailsnew: String(stockmasteredit.productdetailsnew),
+        updatedby: [
+          ...updateby,
+          {
+            name: String(isUserRoleAccess.companyname),
+            date: String(new Date()),
           },
-          company: String(stockmasteredit.company),
-          branch: String(stockmasteredit.branch),
-          unit: String(stockmasteredit.unit),
-          floor: String(stockmasteredit.floor),
-          location: String(stockmasteredit.location),
-          area: String(stockmasteredit.area),
-          totalbillamount: Number(stockmasteredit.quantity) * Number(stockmasteredit.rate),
-          workstation: String(
-            stockmasteredit.workcheck ? stockmasteredit.workstation : ""
-          ),
-          // workcheck: String(stockmasteredit.workcheck),
-          assettype: String(
-            stockmasteredit.assettype === undefined
-              ? ""
-              : stockmasteredit.assettype
-          ),
-          asset: String(stockmasteredit.asset),
-
-          productname: String(
-            stockmasteredit.productname === "Please Select Material" ||
-              stockmasteredit.productname === undefined
-              ? ""
-              : stockmasteredit.productname
-          ),
-
-          component: String(
-            stockmasteredit.component === "Please Select Component"
-              ? ""
-              : stockmasteredit.component
-          ),
-          subcomponent: todosEdit ? [...todosEdit] : [],
-          warranty: String(stockmasteredit.warranty),
-          estimation: String(stockmasteredit.estimation),
-          estimationtime: String(stockmasteredit.estimationtime),
-          warrantycalculation: String(stockmasteredit.warrantycalculation),
-          purchasedate: selectedPurchaseDateEdit,
-
-          producthead: String(
-            stockmasteredit.producthead === ""
-              ? ""
-              : stockmasteredit.producthead
-          ),
-
-          vendorname: String(vendorNewEdit),
-          vendorgroup: String(vendorGroupEdit),
-          vendorfrequency: String(frequencyValueedit === undefined ? "" : frequencyValueedit),
-
-          gstno: String(
-            vendorgetid.gstnumber === undefined ? "" : vendorgetid.gstnumber
-          ),
-          vendorid: String(vendornameid._id ? vendornameid._id : ""),
-          billno: Number(stockmasteredit.billno),
-          productdetails: String(stockmasteredit.productdetails),
-          warrantydetails: String(stockmasteredit.warrantydetails),
-          uom:
-            stockmasteredit.uom === "Please Select UOM"
-              ? ""
-              : String(stockmasteredit.uom),
-          quantity: Number(stockmasteredit.quantity),
-          rate: Number(stockmasteredit.rate),
-          billdate: String(stockmasteredit.billdate),
-          // files: [...refImageedit],
-          // warrantyfiles: [...refImagewarrantyedit],
-
-          filenames: refImgWarrantyfilenamesEdit,
-          filenamesbill: refImgbillfilenamesEdit,
-
-          requestmode: String(stockmasteredit.requestmode),
-          stockcategory:
-            stockmasteredit.stockcategory === "Please Select Stock Category"
-              ? ""
-              : String(stockmasteredit.stockcategory),
-          stocksubcategory:
-            stockmasteredit.stocksubcategory ===
-              "Please Select Stock Sub Category"
-              ? ""
-              : String(stockmasteredit.stocksubcategory),
-          uomnew:
-            stockmasteredit.uomnew === "" ? "" : String(stockmasteredit.uomnew),
-          quantitynew:
-            stockmasteredit.quantitynew === ""
-              ? ""
-              : Number(stockmasteredit.quantitynew),
-          materialnew:
-            stockmasteredit.materialnew === "Please Select Material"
-              ? ""
-              : String(stockmasteredit.materialnew),
-          productdetailsnew: String(stockmasteredit.productdetailsnew),
-          updatedby: [
-            ...updateby,
-            {
-              name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
-            },
-          ],
-        }
-      );
-      await fetchStock("Filtered");
+        ],
+      });
+      await fetchStock('Filtered');
       await handleFileDeleteOld(oldfileNamesWar);
       await handleFileDeleteOld(oldfileNamesBill);
-      await handleFileUpload(refImgWarrantyEdit, "todo", stockmasteredit.uniqueId);
-      await handleFileUpload(refImgWarrantyBillEdit, "bill", stockmasteredit.uniqueId);
+      await handleFileUpload(refImgWarrantyEdit, 'todo', stockmasteredit.uniqueId);
+      await handleFileUpload(refImgWarrantyBillEdit, 'bill', stockmasteredit.uniqueId);
       setBtnSubmit(false);
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       handleCloseModEdit();
     } catch (err) {
@@ -3753,7 +3517,7 @@ function Manualstockentry() {
         filenames: filenames,
       });
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
@@ -3763,7 +3527,7 @@ function Manualstockentry() {
 
     // let vendorEmpty = todosEdit.some((item) => item.vendor == "Choose Vendor");
 
-    let vendorEmpty = todosEdit && todosEdit.some((item) => item.subcomponentcheck === true && item.vendor == "Choose Vendor");
+    let vendorEmpty = todosEdit && todosEdit.some((item) => item.subcomponentcheck === true && item.vendor == 'Choose Vendor');
 
     let res_employee = await axios.get(SERVICE.MANUAL_STOCKPURCHASE, {
       headers: {
@@ -3771,9 +3535,7 @@ function Manualstockentry() {
       },
     });
 
-    let getcondition = res_employee?.data?.manualstock.filter(
-      (item) => item._id !== stockmasteredit._id
-    )
+    let getcondition = res_employee?.data?.manualstock.filter((item) => item._id !== stockmasteredit._id);
 
     const isNameMatch = getcondition.some(
       (item) =>
@@ -3786,8 +3548,7 @@ function Manualstockentry() {
         item.assettype == stockmasteredit.assettype &&
         item.vendorgroup == vendorGroupEdit &&
         Number(item.billno) === Number(stockmasteredit.billno) &&
-        item.productdetails.toLowerCase() ==
-        String(stockmasteredit.productdetails.toLowerCase()) &&
+        item.productdetails.toLowerCase() == String(stockmasteredit.productdetails.toLowerCase()) &&
         item.warrantydetails == String(stockmasteredit.warrantydetails) &&
         item.uom == String(stockmasteredit.uom) &&
         item.quantity == Number(stockmasteredit.quantity) &&
@@ -3795,37 +3556,39 @@ function Manualstockentry() {
         item.billdate == String(stockmasteredit.billdate)
     );
 
-    if (stockmasteredit.company === "Please Select Company") {
-      setPopupContentMalert("Please Select Company!");
-      setPopupSeverityMalert("info");
+    if (stockmasteredit.company === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.branch === "Please Select Branch") {
-      setPopupContentMalert("Please Select Branch!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.branch === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.unit === "Please Select Unit") {
-      setPopupContentMalert("Please Select Unit!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.unit === 'Please Select Unit') {
+      setPopupContentMalert('Please Select Unit!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.floor === "Please Select Floor") {
-      setPopupContentMalert("Please Select Floor!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.floor === 'Please Select Floor') {
+      setPopupContentMalert('Please Select Floor!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.area === "Please Select Area") {
-      setPopupContentMalert("Please Select Area!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.area === 'Please Select Area') {
+      setPopupContentMalert('Please Select Area!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.location === "Please Select Location") {
-      setPopupContentMalert("Please Select Location!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.location === 'Please Select Location') {
+      setPopupContentMalert('Please Select Location!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (vendorGroupEdit === "Choose Vendor Group") {
-      setPopupContentMalert("Please Select Vendor Group!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    } else if (vendorNewEdit === "Choose Vendor") {
-      setPopupContentMalert("Please Select Vendor!");
-      setPopupSeverityMalert("info");
+    }
+    // else if (vendorGroupEdit === 'Choose Vendor Group') {
+    //   setPopupContentMalert('Please Select Vendor Group!');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    // }
+    else if (vendorNewEdit === 'Choose Vendor') {
+      setPopupContentMalert('Please Select Vendor!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     // else if (stockmasteredit.warranty == "Yes" && stockmasteredit.estimation === "") {
@@ -3837,32 +3600,29 @@ function Manualstockentry() {
     //   );
     //   handleClickOpenerr();
     // }
-    else if (stockmasteredit.productdetails === "") {
-      setPopupContentMalert("Please Enter Product Details!");
-      setPopupSeverityMalert("info");
+    else if (stockmasteredit.productdetails === '') {
+      setPopupContentMalert('Please Enter Product Details!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmasteredit.uom === "" ||
-      stockmasteredit.uom === "Please Select UOM"
-    ) {
-      setPopupContentMalert("Please Select Uom!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.uom === '' || stockmasteredit.uom === 'Please Select UOM') {
+      setPopupContentMalert('Please Select Uom!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.quantity === "") {
-      setPopupContentMalert("Please Enter Qunatity!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.quantity === '') {
+      setPopupContentMalert('Please Enter Qunatity!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.rate === "") {
-      setPopupContentMalert("Please Enter Rate!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.rate === '') {
+      setPopupContentMalert('Please Enter Rate!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (vendorEmpty) {
-      setPopupContentMalert("Please Select Vendor in All the Sub Dividends!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Vendor in All the Sub Dividends!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequest();
@@ -3902,9 +3662,6 @@ function Manualstockentry() {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
-
-
 
   useEffect(() => {
     fetchCompanyDropdowns();
@@ -3977,9 +3734,7 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_type.data.areagroupings
-        .filter((d) => d.branch === newcheckbranch && d.floor === e)
-        .map((data) => data.area);
+      let result = res_type.data.areagroupings.filter((d) => d.branch === newcheckbranch && d.floor === e).map((data) => data.area);
       let ji = [].concat(...result);
       let jiii = ji.map((data) => data);
       const all = ji.map((d) => ({
@@ -3999,18 +3754,11 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_type.data.locationgroupings
-        .filter(
-          (d) =>
-            d.branch === newcheckbranch &&
-            d.floor === stockmaster.floor &&
-            d.area === e
-        )
-        .map((data) => data.location);
+      let result = res_type.data.locationgroupings.filter((d) => d.branch === newcheckbranch && d.floor === stockmaster.floor && d.area === e).map((data) => data.location);
       let ji = [].concat(...result);
       let jiii = ji.map((data) => data);
       const all = [
-        { label: "ALL", value: "ALL" },
+        { label: 'ALL', value: 'ALL' },
         ...ji.map((d) => ({
           ...d,
           label: d,
@@ -4065,9 +3813,7 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_type.data.areagroupings
-        .filter((d) => d.branch === a && d.floor === e)
-        .map((data) => data.area);
+      let result = res_type.data.areagroupings.filter((d) => d.branch === a && d.floor === e).map((data) => data.area);
       let ji = [].concat(...result);
       const all = ji.map((d) => ({
         ...d,
@@ -4105,12 +3851,10 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_type.data.locationgroupings
-        .filter((d) => d.branch === a && d.floor === b && d.area === c)
-        .map((data) => data.location);
+      let result = res_type.data.locationgroupings.filter((d) => d.branch === a && d.floor === b && d.area === c).map((data) => data.location);
       let ji = [].concat(...result);
       const all = [
-        { label: "ALL", value: "ALL" },
+        { label: 'ALL', value: 'ALL' },
         ...ji.map((d) => ({
           ...d,
           label: d,
@@ -4142,11 +3886,7 @@ function Manualstockentry() {
         value: d.name,
       }));
       const aeestuniqueArray = assetall.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) => i.label === item.label && i.value === item.value
-          ) === index
-        );
+        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
       });
       setAssettypes(aeestuniqueArray);
       setAssetypesEdit(aeestuniqueArray);
@@ -4174,11 +3914,7 @@ function Manualstockentry() {
       }));
 
       const assetmaterialuniqueArray = resultall.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) => i.label === item.label && i.value === item.value
-          ) === index
-        );
+        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
       });
 
       setMaterialopt(assetmaterialuniqueArray);
@@ -4196,9 +3932,7 @@ function Manualstockentry() {
         },
       });
 
-      let result = res.data.assetworkstation.filter(
-        (d) => d.workstation === e.value
-      );
+      let result = res.data.assetworkstation.filter((d) => d.workstation === e.value);
 
       const resultall = result.map((d) => ({
         ...d,
@@ -4220,9 +3954,7 @@ function Manualstockentry() {
         },
       });
 
-      let result = res.data.assetworkstation?.filter(
-        (d) => d.workstation === e
-      );
+      let result = res.data.assetworkstation?.filter((d) => d.workstation === e);
 
       const resultall = result?.map((d) => ({
         ...d,
@@ -4236,12 +3968,8 @@ function Manualstockentry() {
     }
   };
 
-
-
   const [specificationGrouping, setSpecificationGrouping] = useState([]);
-  const [specificationGroupingEdit, setSpecificationGroupingEdit] = useState(
-    []
-  );
+  const [specificationGroupingEdit, setSpecificationGroupingEdit] = useState([]);
 
   const fetchSpecificationGrouping = async () => {
     try {
@@ -4250,11 +3978,7 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let getvalues = res?.data?.assetspecificationgrouping.filter(
-        (item) =>
-          item.assetmaterial === stockmaster.productname &&
-          stockmaster.component === item.component
-      );
+      let getvalues = res?.data?.assetspecificationgrouping.filter((item) => item.assetmaterial === stockmaster.productname && stockmaster.component === item.component);
 
       setSpecificationGrouping(getvalues);
     } catch (err) {
@@ -4269,11 +3993,7 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let getvalues = res?.data?.assetspecificationgrouping.filter(
-        (item) =>
-          item.assetmaterial === stockmasteredit.productname &&
-          stockmasteredit.component === item.component
-      );
+      let getvalues = res?.data?.assetspecificationgrouping.filter((item) => item.assetmaterial === stockmasteredit.productname && stockmasteredit.component === item.component);
 
       setSpecificationGroupingEdit(getvalues);
     } catch (err) {
@@ -4298,9 +4018,7 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const itAssetsObject = res_account?.data?.assettypegrouping.filter(
-        (item) => item.name === e
-      );
+      const itAssetsObject = res_account?.data?.assettypegrouping.filter((item) => item.name === e);
       //filter products
       let dataallstocks = itAssetsObject?.map((data, index) => {
         return data.accounthead;
@@ -4372,11 +4090,8 @@ function Manualstockentry() {
     }
   };
 
-
-
-
   const fetchStock = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     setProjectCheck(true);
     const queryParams = {
       page: Number(page),
@@ -4387,13 +4102,10 @@ function Manualstockentry() {
       unit: valueUnitCat,
     };
 
-    const allFilters = [
-      ...additionalFilters,
-      { column: selectedColumn, condition: selectedCondition, value: filterValue }
-    ];
+    const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
       queryParams.searchQuery = searchQuery;
@@ -4401,14 +4113,14 @@ function Manualstockentry() {
 
     try {
       // let res_project = await axios.get(SERVICE.STOCKMANAGE, {
-      if (e === "Filtered") {
+      if (e === 'Filtered') {
         let res_employee = await axios.post(SERVICE.MANUAL_STOCK_ACCESS, queryParams, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
         });
 
-        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
 
         // let filteredData = ans.filter((data) => {
         //   return data.requestmode === "Asset Material";
@@ -4428,40 +4140,24 @@ function Manualstockentry() {
 
         let setData = ans.map((item) => {
           // Find the corresponding item in codeValues array
-          const matchingItem = codeValues.find(
-            (item1) => item.uom === item1.name
-          );
+          const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
           // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-          return matchingItem
-            ? { ...item, uomcode: matchingItem?.code }
-            : { ...item, uomcode: "" };
+          return matchingItem ? { ...item, uomcode: matchingItem?.code } : { ...item, uomcode: '' };
         });
 
         const itemsWithSerialNumber = setData?.map((item, index) => ({
           ...item,
           id: item._id,
           serialNumber: (page - 1) * pageSize + index + 1,
-          uom: item.uom !== "" ? `${item.quantity}#${item.uom}` : item.quantity,
-          billdate: item.billdate === "" ? "" : moment(item.billdate).format("DD/MM/YYYY"),
-          purchasedate:
-            item.purchasedate != ""
-              ? moment(item.purchasedate).format("DD/MM/YYYY")
-              : "",
+          uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
+          billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
+          purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
         }));
 
         setStock(itemsWithSerialNumber);
 
-
-
-        setStockEdit(
-          ans.filter(
-            (item) => item._id !== stockmasteredit._id
-          )
-        );
-
-
-
+        setStockEdit(ans.filter((item) => item._id !== stockmasteredit._id));
 
         // setOverallFilterdata(res_employee?.data?.totalProjectsData?.length > 0 ?
         //   res_employee?.data?.totalProjectsData?.map((item, index) => {
@@ -4481,37 +4177,35 @@ function Manualstockentry() {
         //   ) : []
         // );
 
-
-
         setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
         setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-        setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-        setPage((data) => { return ans?.length > 0 ? data : 1 });
+        setPageSize((data) => {
+          return ans?.length > 0 ? data : 10;
+        });
+        setPage((data) => {
+          return ans?.length > 0 ? data : 1;
+        });
         setProjectCheck(false);
-
       } else {
-        setProjectCheck(false)
+        setProjectCheck(false);
       }
-    }
-    catch (err) {
+    } catch (err) {
       setProjectCheck(false);
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
-
-  }
+  };
 
   useEffect(() => {
     if (items?.length > 0) {
-      fetchStock("Filtered");
+      fetchStock('Filtered');
     }
   }, [page, pageSize, searchQuery]);
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Asset Purchase",
-    pageStyle: "print",
+    documentTitle: 'Asset Purchase',
+    pageStyle: 'print',
   });
 
   // serial no for listing items
@@ -4528,7 +4222,6 @@ function Manualstockentry() {
     //       : "",
     // }));
     setItems(datas);
-
   };
 
   useEffect(() => {
@@ -4551,34 +4244,25 @@ function Manualstockentry() {
 
   //datatable....
   const handleSearchChange = (event) => {
-
     setSearchQuery(event.target.value);
     setFilterValue(event.target.value);
     setPage(1);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
-  const filteredData = filteredDatas.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
 
   // const totalPages = Math.ceil(filteredDatas.length / pageSize);
 
   const visiblePages = Math.min(totalPages, 3);
 
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
 
   const pageNumbers = [];
 
@@ -4588,9 +4272,6 @@ function Manualstockentry() {
   for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
     pageNumbers.push(i);
   }
-
-
-
 
   useEffect(() => {
     fetchUom();
@@ -4619,9 +4300,9 @@ function Manualstockentry() {
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -4690,10 +4371,10 @@ function Manualstockentry() {
     //   headerClassName: "bold-header",
     // },
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -4702,214 +4383,214 @@ function Manualstockentry() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 100,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 100,
       hide: !columnVisibility.company,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 100,
       hide: !columnVisibility.branch,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 100,
       hide: !columnVisibility.unit,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "floor",
-      headerName: "Floor",
+      field: 'floor',
+      headerName: 'Floor',
       flex: 0,
       width: 100,
       hide: !columnVisibility.floor,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "area",
-      headerName: "Area",
+      field: 'area',
+      headerName: 'Area',
       flex: 0,
       width: 100,
       hide: !columnVisibility.area,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "location",
-      headerName: "Location",
+      field: 'location',
+      headerName: 'Location',
       flex: 0,
       width: 100,
       hide: !columnVisibility.location,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "requestmode",
-      headerName: "Request Mode For",
+      field: 'requestmode',
+      headerName: 'Request Mode For',
       flex: 0,
       width: 100,
       hide: !columnVisibility.requestmode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "vendorname",
-      headerName: "Dealers Name",
+      field: 'vendorname',
+      headerName: 'Dealers Name',
       flex: 0,
       width: 120,
       hide: !columnVisibility.vendorname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "gstno",
-      headerName: "Gst No",
+      field: 'gstno',
+      headerName: 'Gst No',
       flex: 0,
       width: 120,
       hide: !columnVisibility.gstno,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "billno",
-      headerName: "Bill Number",
+      field: 'billno',
+      headerName: 'Bill Number',
       flex: 0,
       width: 120,
       hide: !columnVisibility.billno,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "producthead",
-      headerName: "Asset Head",
+      field: 'producthead',
+      headerName: 'Asset Head',
       flex: 0,
       width: 150,
       hide: !columnVisibility.producthead,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "productname",
-      headerName: "Material",
+      field: 'productname',
+      headerName: 'Material',
       flex: 0,
       width: 200,
       hide: !columnVisibility.productname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     // { field: "material", headerName: "Material", flex: 0, width: 150, hide: !columnVisibility.material, headerClassName: "bold-header" },
     {
-      field: "component",
-      headerName: "Component",
+      field: 'component',
+      headerName: 'Component',
       flex: 0,
       width: 150,
       hide: !columnVisibility.component,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "warranty",
-      headerName: "Warranty",
+      field: 'warranty',
+      headerName: 'Warranty',
       flex: 0,
       width: 100,
       hide: !columnVisibility.warranty,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "purchasedate",
-      headerName: "Purchasedate",
+      field: 'purchasedate',
+      headerName: 'Purchasedate',
       flex: 0,
       width: 150,
       hide: !columnVisibility.purchasedate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "productdetails",
-      headerName: "Product Details",
+      field: 'productdetails',
+      headerName: 'Product Details',
       flex: 0,
       width: 130,
       hide: !columnVisibility.productdetails,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "warrantydetails",
-      headerName: "Warranty Details",
+      field: 'warrantydetails',
+      headerName: 'Warranty Details',
       flex: 0,
       width: 130,
       hide: !columnVisibility.warrantydetails,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     {
-      field: "quantity",
-      headerName: "Quantity",
+      field: 'quantity',
+      headerName: 'Quantity',
       flex: 0,
       width: 80,
       hide: !columnVisibility.quantity,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "uom",
-      headerName: "Quantity & UOM",
+      field: 'uom',
+      headerName: 'Quantity & UOM',
       flex: 0,
       width: 100,
       hide: !columnVisibility.uom,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "rate",
-      headerName: "Rate",
+      field: 'rate',
+      headerName: 'Rate',
       flex: 0,
       width: 100,
       hide: !columnVisibility.rate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "totalbillamount",
-      headerName: "Bill Amount",
+      field: 'totalbillamount',
+      headerName: 'Bill Amount',
       flex: 0,
       width: 100,
       hide: !columnVisibility.totalbillamount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "billdate",
-      headerName: "Bill Date",
+      field: 'billdate',
+      headerName: 'Bill Date',
       flex: 0,
       width: 120,
       hide: !columnVisibility.billdate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("emanualstockentry") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('emanualstockentry') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -4921,7 +4602,7 @@ function Manualstockentry() {
             </Button>
           )}
 
-          {isUserRoleCompare?.includes("dmanualstockentry") && (
+          {isUserRoleCompare?.includes('dmanualstockentry') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
@@ -4931,7 +4612,7 @@ function Manualstockentry() {
               <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("vmanualstockentry") && (
+          {isUserRoleCompare?.includes('vmanualstockentry') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -4941,7 +4622,7 @@ function Manualstockentry() {
               <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("imanualstockentry") && (
+          {isUserRoleCompare?.includes('imanualstockentry') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -4956,8 +4637,7 @@ function Manualstockentry() {
       ),
     },
   ];
-  const filteredSelectedColumn = columnDataTable.filter(data => data.field !== 'checkbox' && data.field !== "actions" && data.field !== "serialNumber");
-
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = items.map((item, index) => {
     return {
@@ -5010,9 +4690,7 @@ function Manualstockentry() {
     setColumnVisibility(updatedVisibility);
   };
   // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
     setColumnVisibility((prevVisibility) => ({
@@ -5024,9 +4702,9 @@ function Manualstockentry() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -5034,7 +4712,7 @@ function Manualstockentry() {
         aria-label="close"
         onClick={handleCloseManageColumns1}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -5042,38 +4720,16 @@ function Manualstockentry() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -5081,11 +4737,7 @@ function Manualstockentry() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -5093,7 +4745,7 @@ function Manualstockentry() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -5102,7 +4754,7 @@ function Manualstockentry() {
                 setColumnVisibility(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -5116,9 +4768,7 @@ function Manualstockentry() {
   const [todosEdit, setTodosEdit] = useState([]);
 
   const handleAddInput = (e) => {
-    let specificationItem = Specification.find(
-      (item) => e === item.categoryname
-    );
+    let specificationItem = Specification.find((item) => e === item.categoryname);
     let filtersub = specificationItem?.subcategoryname;
     let result;
     if (filtersub.length > 0) {
@@ -5126,53 +4776,45 @@ function Manualstockentry() {
         subname: sub.subcomponent,
         sub: `${index + 1}.${sub.subcomponent}`,
         subcomponentcheck: false,
-        type: sub.type ? "Choose Type" : "",
-        model: sub.model ? "Choose Model" : "",
-        size: sub.size ? "Choose Size" : "",
-        variant: sub.variant ? "Choose variant" : "",
-        brand: sub.brand ? "Choose Brand" : "",
-        serial: sub.serial ? "" : undefined,
-        other: sub.other ? "" : undefined,
-        capacity: sub.capacity ? "Choose Capacity" : "",
-        hdmiport: sub.hdmiport ? "" : undefined,
-        vgaport: sub.vgaport ? "" : undefined,
-        dpport: sub.dpport ? "" : undefined,
-        usbport: sub.usbport ? "" : undefined,
-        paneltypescreen: sub.paneltypescreen ? "Choose Panel Type" : "",
-        resolution: sub.resolution ? "Choose Screen Resolution" : "",
-        connectivity: sub.connectivity ? "Choose Connectivity" : "",
-        daterate: sub.daterate ? "Choose Data Rate" : "",
-        compatibledevice: sub.compatibledevice
-          ? "Choose Compatible Device"
-          : "",
-        outputpower: sub.outputpower ? "Choose Output Power" : "",
-        collingfancount: sub.collingfancount ? "Choose Cooling Fan Count" : "",
-        clockspeed: sub.clockspeed ? "Choose Clock Speed" : "",
-        core: sub.core ? "Choose Core" : "",
-        speed: sub.speed ? "Choose Speed" : "",
-        frequency: sub.frequency ? "Choose Frequency" : "",
-        output: sub.output ? "Choose Output" : "",
-        ethernetports: sub.ethernetports ? "Choose Ethernet Ports" : "",
-        distance: sub.distance ? "Choose Distance" : "",
-        lengthname: sub.lengthname ? "Choose Length" : "",
-        slot: sub.slot ? "Choose Slot" : "",
-        noofchannels: sub.noofchannels ? "Choose No. Of Channels" : "",
-        colours: sub.colours ? "Choose Colour" : "",
+        type: sub.type ? 'Choose Type' : '',
+        model: sub.model ? 'Choose Model' : '',
+        size: sub.size ? 'Choose Size' : '',
+        variant: sub.variant ? 'Choose variant' : '',
+        brand: sub.brand ? 'Choose Brand' : '',
+        serial: sub.serial ? '' : undefined,
+        other: sub.other ? '' : undefined,
+        capacity: sub.capacity ? 'Choose Capacity' : '',
+        hdmiport: sub.hdmiport ? '' : undefined,
+        vgaport: sub.vgaport ? '' : undefined,
+        dpport: sub.dpport ? '' : undefined,
+        usbport: sub.usbport ? '' : undefined,
+        paneltypescreen: sub.paneltypescreen ? 'Choose Panel Type' : '',
+        resolution: sub.resolution ? 'Choose Screen Resolution' : '',
+        connectivity: sub.connectivity ? 'Choose Connectivity' : '',
+        daterate: sub.daterate ? 'Choose Data Rate' : '',
+        compatibledevice: sub.compatibledevice ? 'Choose Compatible Device' : '',
+        outputpower: sub.outputpower ? 'Choose Output Power' : '',
+        collingfancount: sub.collingfancount ? 'Choose Cooling Fan Count' : '',
+        clockspeed: sub.clockspeed ? 'Choose Clock Speed' : '',
+        core: sub.core ? 'Choose Core' : '',
+        speed: sub.speed ? 'Choose Speed' : '',
+        frequency: sub.frequency ? 'Choose Frequency' : '',
+        output: sub.output ? 'Choose Output' : '',
+        ethernetports: sub.ethernetports ? 'Choose Ethernet Ports' : '',
+        distance: sub.distance ? 'Choose Distance' : '',
+        lengthname: sub.lengthname ? 'Choose Length' : '',
+        slot: sub.slot ? 'Choose Slot' : '',
+        noofchannels: sub.noofchannels ? 'Choose No. Of Channels' : '',
+        colours: sub.colours ? 'Choose Colour' : '',
 
         warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
         estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
-        estimationtime: stockmaster.estimationtime
-          ? stockmaster.estimationtime
-          : undefined,
-        warrantycalculation: stockmaster.warrantycalculation
-          ? stockmaster.warrantycalculation
-          : undefined,
+        estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
+        warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
         purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
         vendorgroup: vendorGroup ? vendorGroup : undefined,
         vendor: vendorNew ? vendorNew : undefined,
-        phonenumber: vendorgetid.phonenumber
-          ? vendorgetid.phonenumber
-          : undefined,
+        phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
         vendorid: vendornameid ? vendornameid : undefined,
         address: vendorgetid.address ? vendorgetid.address : undefined,
       }));
@@ -5197,69 +4839,45 @@ function Manualstockentry() {
         {
           // sub: `${index + 1}.${sub.subcomponent}`,
           subcomponentcheck: false,
-          type: specificationItem.type ? "Choose Type" : "",
-          model: specificationItem.model ? "Choose Model" : "",
-          size: specificationItem.size ? "Choose Size" : "",
-          variant: specificationItem.variant ? "Choose variant" : "",
-          brand: specificationItem.brand ? "Choose Brand" : "",
-          serial: specificationItem.serial ? "" : undefined,
-          other: specificationItem.other ? "" : undefined,
-          capacity: specificationItem.capacity ? "Choose Capacity" : "",
-          hdmiport: specificationItem.hdmiport ? "" : undefined,
-          vgaport: specificationItem.vgaport ? "" : undefined,
-          dpport: specificationItem.dpport ? "" : undefined,
-          usbport: specificationItem.usbport ? "" : undefined,
-          paneltypescreen: specificationItem.paneltypescreen
-            ? "Choose Panel Type"
-            : "",
-          resolution: specificationItem.resolution
-            ? "Choose Screen Resolution"
-            : "",
-          connectivity: specificationItem.connectivity
-            ? "Choose Connectivity"
-            : "",
-          daterate: specificationItem.daterate ? "Choose Data Rate" : "",
-          compatibledevice: specificationItem.compatibledevice
-            ? "Choose Compatible Device"
-            : "",
-          outputpower: specificationItem.outputpower
-            ? "Choose Output Power"
-            : "",
-          collingfancount: specificationItem.collingfancount
-            ? "Choose Cooling Fan Count"
-            : "",
-          clockspeed: specificationItem.clockspeed ? "Choose Clock Speed" : "",
-          core: specificationItem.core ? "Choose Core" : "",
-          speed: specificationItem.speed ? "Choose Speed" : "",
-          frequency: specificationItem.frequency ? "Choose Frequency" : "",
-          output: specificationItem.output ? "Choose Output" : "",
-          ethernetports: specificationItem.ethernetports
-            ? "Choose Ethernet Ports"
-            : "",
-          distance: specificationItem.distance ? "Choose Distance" : "",
-          lengthname: specificationItem.lengthname ? "Choose Length" : "",
-          slot: specificationItem.slot ? "Choose Slot" : "",
-          noofchannels: specificationItem.noofchannels
-            ? "Choose No. Of Channels"
-            : "",
-          colours: specificationItem.colours ? "Choose Colour" : "",
+          type: specificationItem.type ? 'Choose Type' : '',
+          model: specificationItem.model ? 'Choose Model' : '',
+          size: specificationItem.size ? 'Choose Size' : '',
+          variant: specificationItem.variant ? 'Choose variant' : '',
+          brand: specificationItem.brand ? 'Choose Brand' : '',
+          serial: specificationItem.serial ? '' : undefined,
+          other: specificationItem.other ? '' : undefined,
+          capacity: specificationItem.capacity ? 'Choose Capacity' : '',
+          hdmiport: specificationItem.hdmiport ? '' : undefined,
+          vgaport: specificationItem.vgaport ? '' : undefined,
+          dpport: specificationItem.dpport ? '' : undefined,
+          usbport: specificationItem.usbport ? '' : undefined,
+          paneltypescreen: specificationItem.paneltypescreen ? 'Choose Panel Type' : '',
+          resolution: specificationItem.resolution ? 'Choose Screen Resolution' : '',
+          connectivity: specificationItem.connectivity ? 'Choose Connectivity' : '',
+          daterate: specificationItem.daterate ? 'Choose Data Rate' : '',
+          compatibledevice: specificationItem.compatibledevice ? 'Choose Compatible Device' : '',
+          outputpower: specificationItem.outputpower ? 'Choose Output Power' : '',
+          collingfancount: specificationItem.collingfancount ? 'Choose Cooling Fan Count' : '',
+          clockspeed: specificationItem.clockspeed ? 'Choose Clock Speed' : '',
+          core: specificationItem.core ? 'Choose Core' : '',
+          speed: specificationItem.speed ? 'Choose Speed' : '',
+          frequency: specificationItem.frequency ? 'Choose Frequency' : '',
+          output: specificationItem.output ? 'Choose Output' : '',
+          ethernetports: specificationItem.ethernetports ? 'Choose Ethernet Ports' : '',
+          distance: specificationItem.distance ? 'Choose Distance' : '',
+          lengthname: specificationItem.lengthname ? 'Choose Length' : '',
+          slot: specificationItem.slot ? 'Choose Slot' : '',
+          noofchannels: specificationItem.noofchannels ? 'Choose No. Of Channels' : '',
+          colours: specificationItem.colours ? 'Choose Colour' : '',
 
           warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
-          estimation: stockmaster.estimation
-            ? stockmaster.estimation
-            : undefined,
-          estimationtime: stockmaster.estimationtime
-            ? stockmaster.estimationtime
-            : undefined,
-          warrantycalculation: stockmaster.warrantycalculation
-            ? stockmaster.warrantycalculation
-            : undefined,
+          estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
+          estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
+          warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
           purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
           vendorgroup: vendorGroup ? vendorGroup : undefined,
           vendor: vendorNew ? vendorNew : undefined,
-          phonenumber: vendorgetid.phonenumber
-            ? vendorgetid.phonenumber
-            : undefined,
+          phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
           vendorid: vendornameid ? vendornameid : undefined,
           address: vendorgetid.address ? vendorgetid.address : undefined,
         },
@@ -5280,32 +4898,20 @@ function Manualstockentry() {
 
     // Calculate expiry date for the updated todo
     const updatedTodo = updatedTodos[index];
-    if (
-      updatedTodo.estimationtime !== "" &&
-      updatedTodo.purchasedate &&
-      updatedTodo.estimation !== ""
-    ) {
+    if (updatedTodo.estimationtime !== '' && updatedTodo.purchasedate && updatedTodo.estimation !== '') {
       const currentDate = new Date(updatedTodo.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (updatedTodo.estimationtime === "Days") {
-        expiryDate.setDate(
-          currentDate.getDate() + parseInt(updatedTodo.estimation)
-        );
-      } else if (updatedTodo.estimationtime === "Month") {
-        expiryDate.setMonth(
-          currentDate.getMonth() + parseInt(updatedTodo.estimation)
-        );
-      } else if (updatedTodo.estimationtime === "Year") {
-        expiryDate.setFullYear(
-          currentDate.getFullYear() + parseInt(updatedTodo.estimation)
-        );
+      if (updatedTodo.estimationtime === 'Days') {
+        expiryDate.setDate(currentDate.getDate() + parseInt(updatedTodo.estimation));
+      } else if (updatedTodo.estimationtime === 'Month') {
+        expiryDate.setMonth(currentDate.getMonth() + parseInt(updatedTodo.estimation));
+      } else if (updatedTodo.estimationtime === 'Year') {
+        expiryDate.setFullYear(currentDate.getFullYear() + parseInt(updatedTodo.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN")
-        ? ""
-        : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       // Update the calculated expiry date in the todo
       const updatedTodosCopy = [...updatedTodos];
@@ -5318,7 +4924,7 @@ function Manualstockentry() {
     }
 
     const updatedTodovendor = updatedTodos[index];
-    if (updatedTodovendor.vendorname !== "" && id) {
+    if (updatedTodovendor.vendorname !== '' && id) {
       // Fix: Add await here to wait for the result of the axios call
       const res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
         headers: {
@@ -5341,69 +4947,59 @@ function Manualstockentry() {
     setTodos(updatedTodos);
     setStockmaster({
       ...stockmaster,
-      component: "Please Select Component",
-    })
+      component: 'Please Select Component',
+    });
   };
 
   //todo edit
 
   const handleAddInputEdit = (e) => {
-    let specificationItem = Specificationedit.find(
-      (item) => e === item.categoryname
-    );
+    let specificationItem = Specificationedit.find((item) => e === item.categoryname);
     let filtersub = specificationItem?.subcategoryname;
     let result;
     if (filtersub.length > 0) {
       result = filtersub?.map((sub, index) => ({
         sub: `${index + 1}.${sub.subcomponent}`,
         subname: sub.subcomponent,
-        type: sub.type ? "Choose Type" : "",
+        type: sub.type ? 'Choose Type' : '',
         subcomponentcheck: false,
-        model: sub.model ? "Choose Model" : "",
-        size: sub.size ? "Choose Size" : "",
-        variant: sub.variant ? "Choose variant" : "",
-        brand: sub.brand ? "Choose Brand" : "",
-        serial: sub.serial ? "" : undefined,
-        other: sub.other ? "" : undefined,
-        capacity: sub.capacity ? "Choose Capacity" : "",
-        hdmiport: sub.hdmiport ? "" : undefined,
-        vgaport: sub.vgaport ? "" : undefined,
-        dpport: sub.dpport ? "" : undefined,
-        usbport: sub.usbport ? "" : undefined,
-        paneltypescreen: sub.paneltypescreen ? "Choose Panel Type" : "",
-        resolution: sub.resolution ? "Choose Screen Resolution" : "",
-        connectivity: sub.connectivity ? "Choose Connectivity" : "",
-        daterate: sub.daterate ? "Choose Data Rate" : "",
-        compatibledevice: sub.compatibledevice
-          ? "Choose Compatible Device"
-          : "",
-        outputpower: sub.outputpower ? "Choose Output Power" : "",
-        collingfancount: sub.collingfancount ? "Choose Cooling Fan Count" : "",
-        clockspeed: sub.clockspeed ? "Choose Clock Speed" : "",
-        core: sub.core ? "Choose Core" : "",
-        speed: sub.speed ? "Choose Speed" : "",
-        frequency: sub.frequency ? "Choose Frequency" : "",
-        output: sub.output ? "Choose Output" : "",
-        ethernetports: sub.ethernetports ? "Choose Ethernet Ports" : "",
-        distance: sub.distance ? "Choose Distance" : "",
-        lengthname: sub.lengthname ? "Choose Length" : "",
-        slot: sub.slot ? "Choose Slot" : "",
-        noofchannels: sub.noofchannels ? "Choose No. Of Channels" : "",
-        colours: sub.colours ? "Choose Colour" : "",
+        model: sub.model ? 'Choose Model' : '',
+        size: sub.size ? 'Choose Size' : '',
+        variant: sub.variant ? 'Choose variant' : '',
+        brand: sub.brand ? 'Choose Brand' : '',
+        serial: sub.serial ? '' : undefined,
+        other: sub.other ? '' : undefined,
+        capacity: sub.capacity ? 'Choose Capacity' : '',
+        hdmiport: sub.hdmiport ? '' : undefined,
+        vgaport: sub.vgaport ? '' : undefined,
+        dpport: sub.dpport ? '' : undefined,
+        usbport: sub.usbport ? '' : undefined,
+        paneltypescreen: sub.paneltypescreen ? 'Choose Panel Type' : '',
+        resolution: sub.resolution ? 'Choose Screen Resolution' : '',
+        connectivity: sub.connectivity ? 'Choose Connectivity' : '',
+        daterate: sub.daterate ? 'Choose Data Rate' : '',
+        compatibledevice: sub.compatibledevice ? 'Choose Compatible Device' : '',
+        outputpower: sub.outputpower ? 'Choose Output Power' : '',
+        collingfancount: sub.collingfancount ? 'Choose Cooling Fan Count' : '',
+        clockspeed: sub.clockspeed ? 'Choose Clock Speed' : '',
+        core: sub.core ? 'Choose Core' : '',
+        speed: sub.speed ? 'Choose Speed' : '',
+        frequency: sub.frequency ? 'Choose Frequency' : '',
+        output: sub.output ? 'Choose Output' : '',
+        ethernetports: sub.ethernetports ? 'Choose Ethernet Ports' : '',
+        distance: sub.distance ? 'Choose Distance' : '',
+        lengthname: sub.lengthname ? 'Choose Length' : '',
+        slot: sub.slot ? 'Choose Slot' : '',
+        noofchannels: sub.noofchannels ? 'Choose No. Of Channels' : '',
+        colours: sub.colours ? 'Choose Colour' : '',
 
         warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
         estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
-        estimationtime: stockmaster.estimationtime
-          ? stockmaster.estimationtime
-          : undefined,
-        warrantycalculation: stockmaster.warrantycalculation
-          ? stockmaster.warrantycalculation
-          : undefined,
+        estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
+        warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
         purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
         vendor: stockmaster.vendorname ? stockmaster.vendorname : undefined,
-        phonenumber: vendorgetid.phonenumber
-          ? vendorgetid.phonenumber
-          : undefined,
+        phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
         vendorid: vendornameid ? vendornameid : undefined,
         address: vendorgetid.address ? vendorgetid.address : undefined,
       }));
@@ -5428,68 +5024,44 @@ function Manualstockentry() {
         {
           // sub: `${index + 1}.${sub.subcomponent}`,
           subcomponentcheck: false,
-          type: specificationItem.type ? "Choose Type" : "",
-          model: specificationItem.model ? "Choose Model" : "",
-          size: specificationItem.size ? "Choose Size" : "",
-          variant: specificationItem.variant ? "Choose variant" : "",
-          brand: specificationItem.brand ? "Choose Brand" : "",
-          serial: specificationItem.serial ? "" : undefined,
-          other: specificationItem.other ? "" : undefined,
-          capacity: specificationItem.capacity ? "Choose Capacity" : "",
-          hdmiport: specificationItem.hdmiport ? "" : undefined,
-          vgaport: specificationItem.vgaport ? "" : undefined,
-          dpport: specificationItem.dpport ? "" : undefined,
-          usbport: specificationItem.usbport ? "" : undefined,
-          paneltypescreen: specificationItem.paneltypescreen
-            ? "Choose Panel Type"
-            : "",
-          resolution: specificationItem.resolution
-            ? "Choose Screen Resolution"
-            : "",
-          connectivity: specificationItem.connectivity
-            ? "Choose Connectivity"
-            : "",
-          daterate: specificationItem.daterate ? "Choose Data Rate" : "",
-          compatibledevice: specificationItem.compatibledevice
-            ? "Choose Compatible Device"
-            : "",
-          outputpower: specificationItem.outputpower
-            ? "Choose Output Power"
-            : "",
-          collingfancount: specificationItem.collingfancount
-            ? "Choose Cooling Fan Count"
-            : "",
-          clockspeed: specificationItem.clockspeed ? "Choose Clock Speed" : "",
-          core: specificationItem.core ? "Choose Core" : "",
-          speed: specificationItem.speed ? "Choose Speed" : "",
-          frequency: specificationItem.frequency ? "Choose Frequency" : "",
-          output: specificationItem.output ? "Choose Output" : "",
-          ethernetports: specificationItem.ethernetports
-            ? "Choose Ethernet Ports"
-            : "",
-          distance: specificationItem.distance ? "Choose Distance" : "",
-          lengthname: specificationItem.lengthname ? "Choose Length" : "",
-          slot: specificationItem.slot ? "Choose Slot" : "",
-          noofchannels: specificationItem.noofchannels
-            ? "Choose No. Of Channels"
-            : "",
-          colours: specificationItem.colours ? "Choose Colour" : "",
+          type: specificationItem.type ? 'Choose Type' : '',
+          model: specificationItem.model ? 'Choose Model' : '',
+          size: specificationItem.size ? 'Choose Size' : '',
+          variant: specificationItem.variant ? 'Choose variant' : '',
+          brand: specificationItem.brand ? 'Choose Brand' : '',
+          serial: specificationItem.serial ? '' : undefined,
+          other: specificationItem.other ? '' : undefined,
+          capacity: specificationItem.capacity ? 'Choose Capacity' : '',
+          hdmiport: specificationItem.hdmiport ? '' : undefined,
+          vgaport: specificationItem.vgaport ? '' : undefined,
+          dpport: specificationItem.dpport ? '' : undefined,
+          usbport: specificationItem.usbport ? '' : undefined,
+          paneltypescreen: specificationItem.paneltypescreen ? 'Choose Panel Type' : '',
+          resolution: specificationItem.resolution ? 'Choose Screen Resolution' : '',
+          connectivity: specificationItem.connectivity ? 'Choose Connectivity' : '',
+          daterate: specificationItem.daterate ? 'Choose Data Rate' : '',
+          compatibledevice: specificationItem.compatibledevice ? 'Choose Compatible Device' : '',
+          outputpower: specificationItem.outputpower ? 'Choose Output Power' : '',
+          collingfancount: specificationItem.collingfancount ? 'Choose Cooling Fan Count' : '',
+          clockspeed: specificationItem.clockspeed ? 'Choose Clock Speed' : '',
+          core: specificationItem.core ? 'Choose Core' : '',
+          speed: specificationItem.speed ? 'Choose Speed' : '',
+          frequency: specificationItem.frequency ? 'Choose Frequency' : '',
+          output: specificationItem.output ? 'Choose Output' : '',
+          ethernetports: specificationItem.ethernetports ? 'Choose Ethernet Ports' : '',
+          distance: specificationItem.distance ? 'Choose Distance' : '',
+          lengthname: specificationItem.lengthname ? 'Choose Length' : '',
+          slot: specificationItem.slot ? 'Choose Slot' : '',
+          noofchannels: specificationItem.noofchannels ? 'Choose No. Of Channels' : '',
+          colours: specificationItem.colours ? 'Choose Colour' : '',
 
           warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
-          estimation: stockmaster.estimation
-            ? stockmaster.estimation
-            : undefined,
-          estimationtime: stockmaster.estimationtime
-            ? stockmaster.estimationtime
-            : undefined,
-          warrantycalculation: stockmaster.warrantycalculation
-            ? stockmaster.warrantycalculation
-            : undefined,
+          estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
+          estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
+          warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
           purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
           vendor: stockmaster.vendorname ? stockmaster.vendorname : undefined,
-          phonenumber: vendorgetid.phonenumber
-            ? vendorgetid.phonenumber
-            : undefined,
+          phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
           vendorid: vendornameid ? vendornameid : undefined,
           address: vendorgetid.address ? vendorgetid.address : undefined,
         },
@@ -5509,32 +5081,20 @@ function Manualstockentry() {
 
     // Calculate expiry date for the updated todo
     const updatedTodo = updatedTodos[index];
-    if (
-      updatedTodo.estimationtime !== "" &&
-      updatedTodo.purchasedate &&
-      updatedTodo.estimation !== ""
-    ) {
+    if (updatedTodo.estimationtime !== '' && updatedTodo.purchasedate && updatedTodo.estimation !== '') {
       const currentDate = new Date(updatedTodo.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (updatedTodo.estimationtime === "Days") {
-        expiryDate.setDate(
-          currentDate.getDate() + parseInt(updatedTodo.estimation)
-        );
-      } else if (updatedTodo.estimationtime === "Month") {
-        expiryDate.setMonth(
-          currentDate.getMonth() + parseInt(updatedTodo.estimation)
-        );
-      } else if (updatedTodo.estimationtime === "Year") {
-        expiryDate.setFullYear(
-          currentDate.getFullYear() + parseInt(updatedTodo.estimation)
-        );
+      if (updatedTodo.estimationtime === 'Days') {
+        expiryDate.setDate(currentDate.getDate() + parseInt(updatedTodo.estimation));
+      } else if (updatedTodo.estimationtime === 'Month') {
+        expiryDate.setMonth(currentDate.getMonth() + parseInt(updatedTodo.estimation));
+      } else if (updatedTodo.estimationtime === 'Year') {
+        expiryDate.setFullYear(currentDate.getFullYear() + parseInt(updatedTodo.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN")
-        ? ""
-        : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       // Update the calculated expiry date in the todo
       const updatedTodosCopy = [...updatedTodos];
@@ -5546,7 +5106,7 @@ function Manualstockentry() {
     }
 
     const updatedTodovendor = updatedTodos[index];
-    if (updatedTodovendor.vendorname !== "" && id) {
+    if (updatedTodovendor.vendorname !== '' && id) {
       // Fix: Add await here to wait for the result of the axios call
       const res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
         headers: {
@@ -5573,8 +5133,8 @@ function Manualstockentry() {
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
 
   useEffect(() => {
-    fetchExcelLimited()
-  }, [isFilterOpen])
+    fetchExcelLimited();
+  }, [isFilterOpen]);
 
   // page refersh reload
   const handleCloseFilterMod = () => {
@@ -5585,43 +5145,40 @@ function Manualstockentry() {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("");
-
-
+  const [fileFormat, setFormat] = useState('');
 
   // Search bar
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
   const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if (selectedColumn && filterValue || ["Blank", "Not Blank"].includes(selectedCondition)) {
-      setAdditionalFilters([
-        ...additionalFilters,
-        { column: selectedColumn, condition: selectedCondition, value: filterValue }
-      ]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
+      setAdditionalFilters([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
   // Show filtered combination in the search bar
   const getSearchDisplay = () => {
     if (advancedFilter && advancedFilter.length > 0) {
-      return advancedFilter.map((filter, index) => {
-        let showname = columnDataTable.find(col => col.field === filter.column)?.headerName;
-        return `${showname} ${filter.condition} "${filter.value}"`;
-      }).join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
+      return advancedFilter
+        .map((filter, index) => {
+          let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
+          return `${showname} ${filter.condition} "${filter.value}"`;
+        })
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
@@ -5635,12 +5192,12 @@ function Manualstockentry() {
     // Reset all filters and pagination state
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
@@ -5651,14 +5208,14 @@ function Manualstockentry() {
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
-      queryParams.searchQuery = searchQuery;  // Use searchQuery for regular search
+      queryParams.searchQuery = searchQuery; // Use searchQuery for regular search
     }
 
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       // let res_project = await axios.get(SERVICE.STOCKMANAGE, {
       let res_employee = await axios.post(SERVICE.MANUAL_STOCK_ACCESS, queryParams, {
@@ -5667,7 +5224,7 @@ function Manualstockentry() {
         },
       });
 
-      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
 
       // let filteredData = ans.filter((data) => {
       //   return data.requestmode === "Asset Material";
@@ -5687,14 +5244,10 @@ function Manualstockentry() {
 
       let setData = ans.map((item) => {
         // Find the corresponding item in codeValues array
-        const matchingItem = codeValues.find(
-          (item1) => item.uom === item1.name
-        );
+        const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
         // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-        return matchingItem
-          ? { ...item, uomcode: matchingItem?.code }
-          : { ...item, uomcode: "" };
+        return matchingItem ? { ...item, uomcode: matchingItem?.code } : { ...item, uomcode: '' };
       });
 
       const itemsWithSerialNumber = setData?.map((item, index) => ({
@@ -5702,57 +5255,43 @@ function Manualstockentry() {
         id: item._id,
         serialNumber: (page - 1) * pageSize + index + 1,
         totalbillamount: Number(item.quantity) * Number(item.rate),
-        uom: item.uom !== "" ? `${item.quantity}#${item.uom}` : item.quantity,
-        billdate: item.billdate === "" ? "" : moment(item.billdate).format("DD/MM/YYYY"),
-        purchasedate:
-          item.purchasedate != ""
-            ? moment(item.purchasedate).format("DD/MM/YYYY")
-            : "",
+        uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
+        billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
+        purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
       }));
 
       setStock(itemsWithSerialNumber);
 
+      setStockEdit(ans.filter((item) => item._id !== stockmasteredit._id));
 
-
-      setStockEdit(
-        ans.filter(
-          (item) => item._id !== stockmasteredit._id
-        )
+      setOverallFilterdata(
+        res_employee?.data?.totalProjectsData?.length > 0
+          ? res_employee?.data?.totalProjectsData?.map((item, index) => {
+              return {
+                ...item,
+                serialNumber: (page - 1) * pageSize + index + 1,
+                uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
+                billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
+                purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+              };
+            })
+          : []
       );
-
-
-
-
-      setOverallFilterdata(res_employee?.data?.totalProjectsData?.length > 0 ?
-        res_employee?.data?.totalProjectsData?.map((item, index) => {
-          return {
-            ...item,
-            serialNumber: (page - 1) * pageSize + index + 1,
-            uom: item.uom !== "" ? `${item.quantity}#${item.uom}` : item.quantity,
-            billdate: item.billdate === "" ? "" : moment(item.billdate).format("DD/MM/YYYY"),
-            purchasedate:
-              item.purchasedate != ""
-                ? moment(item.purchasedate).format("DD/MM/YYYY")
-                : "",
-
-          }
-        }
-
-        ) : []
-      );
-
-
 
       setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
       setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-      setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-      setPage((data) => { return ans?.length > 0 ? data : 1 });
+      setPageSize((data) => {
+        return ans?.length > 0 ? data : 10;
+      });
+      setPage((data) => {
+        return ans?.length > 0 ? data : 1;
+      });
       setProjectCheck(false);
+    } catch (err) {
+      setProjectCheck(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
-
-    catch (err) { setProjectCheck(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
   };
-
 
   //company multiselect
   //team multiselect
@@ -5773,9 +5312,7 @@ function Manualstockentry() {
   };
 
   const customValueRendererCompany = (valueCompanyCat, _categoryname) => {
-    return valueCompanyCat?.length
-      ? valueCompanyCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Company";
+    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(', ') : 'Please Select Company';
   };
 
   //branch multiselect
@@ -5794,9 +5331,7 @@ function Manualstockentry() {
   };
 
   const customValueRendererBranch = (valueBranchCat, _categoryname) => {
-    return valueBranchCat?.length
-      ? valueBranchCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Branch";
+    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(', ') : 'Please Select Branch';
   };
 
   //unit multiselect
@@ -5810,19 +5345,15 @@ function Manualstockentry() {
       })
     );
     setSelectedOptionsUnit(options);
-
   };
 
   const customValueRendererUnit = (valueUnitCat, _categoryname) => {
-    return valueUnitCat?.length
-      ? valueUnitCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Unit";
+    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(', ') : 'Please Select Unit';
   };
-
 
   //auto select all dropdowns
   const handleAutoSelect = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let selectedValues = accessbranch
         ?.map((data) => ({
@@ -5830,30 +5361,15 @@ function Manualstockentry() {
           branch: data.branch,
           unit: data.unit,
         }))
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        );
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit));
       let selectedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         .map((a, index) => {
           return a.company;
         });
 
       let mappedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         ?.map((data) => ({
           label: data?.company,
           value: data?.company,
@@ -5863,25 +5379,13 @@ function Manualstockentry() {
       setSelectedOptionsCompany(mappedCompany);
 
       let selectedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         .map((a, index) => {
           return a.branch;
         });
 
       let mappedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         ?.map((data) => ({
           label: data?.branch,
           value: data?.branch,
@@ -5891,31 +5395,13 @@ function Manualstockentry() {
       setSelectedOptionsBranch(mappedBranch);
 
       let selectedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         .map((a, index) => {
           return a.unit;
         });
 
       let mappedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         ?.map((data) => ({
           label: data?.unit,
           value: data?.unit,
@@ -5923,13 +5409,10 @@ function Manualstockentry() {
 
       setValueUnitCat(selectedUnit);
       setSelectedOptionsUnit(mappedUnit);
-
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
-
 
   useEffect(() => {
     handleAutoSelect();
@@ -5937,37 +5420,33 @@ function Manualstockentry() {
 
   const handleSubmitFilter = (e) => {
     e.preventDefault();
-    if (selectedOptionsCompany?.length === 0 &&
-      selectedOptionsBranch?.length === 0 &&
-      selectedOptionsUnit?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Any One");
-      setPopupSeverityMalert("info");
+    if (selectedOptionsCompany?.length === 0 && selectedOptionsBranch?.length === 0 && selectedOptionsUnit?.length === 0) {
+      setPopupContentMalert('Please Select Any One');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else {
-      fetchStock("Filtered");
+    } else {
+      fetchStock('Filtered');
     }
   };
 
   const handleClearFilter = () => {
     setStock([]);
     setItems([]);
-    setPage(1)
+    setPage(1);
     setTotalProjects(0);
     setTotalPages(0);
-    setPageSize(10)
+    setPageSize(10);
     setOverallFilterdata([]);
-    setSelectedOptionsCompany([])
-    setSelectedOptionsBranch([])
-    setSelectedOptionsUnit([])
-    setValueCompanyCat([])
-    setValueBranchCat([])
-    setValueUnitCat([])
+    setSelectedOptionsCompany([]);
+    setSelectedOptionsBranch([]);
+    setSelectedOptionsUnit([]);
+    setValueCompanyCat([]);
+    setValueBranchCat([]);
+    setValueUnitCat([]);
     setPopupContent('Cleared Successfully');
-    setPopupSeverity("success");
+    setPopupSeverity('success');
     handleClickOpenPopup();
-  }
+  };
   //alert model for stock category
   const [openviewalertstockcategory, setOpenviewalertstockcategory] = useState(false);
   // view model
@@ -5991,7 +5470,7 @@ function Manualstockentry() {
 
   const educationTodo = () => {
     const isNameMatch = educationtodo?.some((item) => {
-      if (stockmaster?.requestmode === "Stock Material") {
+      if (stockmaster?.requestmode === 'Stock Material') {
         return item?.category === todoDetails?.category && item?.subcategory === todoDetails?.subcategory && item?.itemname?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
       } else {
         return item?.materialnew?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
@@ -6002,57 +5481,54 @@ function Manualstockentry() {
     //   setPopupSeverityMalert("info");
     //   handleClickOpenPopupMalert();
     // } else
-    if (todoDetails.category === "Please Select Category") {
-      setPopupContentMalert("Please Select Category!");
-      setPopupSeverityMalert("info");
+    if (todoDetails.category === 'Please Select Category') {
+      setPopupContentMalert('Please Select Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (todoDetails.subcategory === "Please Select Sub Category") {
-      setPopupContentMalert("Please Select Sub Category!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.subcategory === 'Please Select Sub Category') {
+      setPopupContentMalert('Please Select Sub Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.materialnew === "Please Select Item Name") {
-      setPopupContentMalert("Please Select Item Name!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.materialnew === 'Please Select Item Name') {
+      setPopupContentMalert('Please Select Item Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.uomnew === "") {
-      setPopupContentMalert("Please Enter UOM!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.uomnew === '') {
+      setPopupContentMalert('Please Enter UOM!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.rate === "" || todoDetails.rate == 0) {
-      setPopupContentMalert("Please Enter Rate!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.rate === '' || todoDetails.rate == 0) {
+      setPopupContentMalert('Please Enter Rate!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.quantitynew === "" || todoDetails.quantitynew == 0) {
-      setPopupContentMalert("Please Enter Quantity!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.quantitynew === '' || todoDetails.quantitynew == 0) {
+      setPopupContentMalert('Please Enter Quantity!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.amount === "" || todoDetails.amount == 0) {
-      setPopupContentMalert("Please Enter Amount!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.amount === '' || todoDetails.amount == 0) {
+      setPopupContentMalert('Please Enter Amount!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (todoDetails.productdetailsnew === "") {
-      setPopupContentMalert("Please Enter Product Details!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.productdetailsnew === '') {
+      setPopupContentMalert('Please Enter Product Details!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (isNameMatch) {
-      setPopupContentMalert("Item Already Exists!");
-      setPopupSeverityMalert("info");
+    } else if (isNameMatch) {
+      setPopupContentMalert('Item Already Exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (Number(todoDetails.amount) + Number(Expensetotal) > Number(stockmaster.totalbillamount)) {
-      setPopupContentMalert("Amount Exceeds Total Bill Amount!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Amount Exceeds Total Bill Amount!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails !== "") {
+    } else if (todoDetails !== '') {
       setEducationtodo([...educationtodo, todoDetails]);
       setTodoDetails({
         ...todoDetails,
 
-        rate: "",
-        quantitynew: "",
-        amount: "",
+        rate: '',
+        quantitynew: '',
+        amount: '',
       });
     }
   };
@@ -6062,35 +5538,25 @@ function Manualstockentry() {
     setEducationtodo(newTasks);
     setExpensecreate({
       ...expensecreate,
-      paidstatus: "Not Paid",
-      paidmode: "Please Select Paid Mode",
-      paidamount: "",
-      balanceamount: "",
+      paidstatus: 'Not Paid',
+      paidmode: 'Please Select Paid Mode',
+      paidamount: '',
+      balanceamount: '',
     });
   };
 
-
   return (
     <Box>
-      <Headtitle title={"Manual Stock Manual Purchase"} />
+      <Headtitle title={'Manual Stock Manual Purchase'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="Manual Stock Purchase"
-        modulename="Asset"
-        submodulename="Stock"
-        mainpagename="Manual Stock Entry"
-        subpagename=""
-        subsubpagename=""
-      />
-      {isUserRoleCompare?.includes("amanualstockentry") && (
+      <PageHeading title="Manual Stock Purchase" modulename="Asset" submodulename="Stock" mainpagename="Manual Stock Entry" subpagename="" subsubpagename="" />
+      {isUserRoleCompare?.includes('amanualstockentry') && (
         <>
           <Box sx={userStyle.selectcontainer}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Add Manual Stock Purchase Details
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Add Manual Stock Purchase Details</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -6098,16 +5564,18 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Company<b style={{ color: "red" }}>*</b>
+                      Company<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={companys}
-                      options={accessbranch?.map(data => ({
-                        label: data.company,
-                        value: data.company,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={accessbranch
+                        ?.map((data) => ({
+                          label: data.company,
+                          value: data.company,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       styles={colourStyles}
                       value={{
                         label: stockmaster.company,
@@ -6117,17 +5585,17 @@ function Manualstockentry() {
                         setStockmaster({
                           ...stockmaster,
                           company: e.value,
-                          branch: "Please Select Branch",
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          branch: 'Please Select Branch',
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setBranchs([]);
                         setUnits([]);
                         setFloors([]);
                         setAreas([]);
-                        setLocations([{ label: "ALL", value: "ALL" }]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
                         fetchBranchDropdowns(e);
                       }}
                     />
@@ -6136,19 +5604,19 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Branch<b style={{ color: "red" }}>*</b>
+                      Branch<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={branchs}
-                      options={accessbranch?.filter(
-                        (comp) =>
-                          stockmaster.company === comp.company
-                      )?.map(data => ({
-                        label: data.branch,
-                        value: data.branch,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={accessbranch
+                        ?.filter((comp) => stockmaster.company === comp.company)
+                        ?.map((data) => ({
+                          label: data.branch,
+                          value: data.branch,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       styles={colourStyles}
                       value={{
                         label: stockmaster.branch,
@@ -6159,15 +5627,15 @@ function Manualstockentry() {
                         setStockmaster({
                           ...stockmaster,
                           branch: e.value,
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setUnits([]);
                         // setFloors([]);
                         setAreas([]);
-                        setLocations([{ label: "ALL", value: "ALL" }]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
                         fetchUnits(e);
                         fetchFloor(e);
                       }}
@@ -6177,19 +5645,19 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Unit<b style={{ color: "red" }}>*</b>
+                      Unit<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={units}
-                      options={accessbranch?.filter(
-                        (comp) =>
-                          stockmaster.company === comp.company && stockmaster.branch === comp.branch
-                      )?.map(data => ({
-                        label: data.unit,
-                        value: data.unit,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={accessbranch
+                        ?.filter((comp) => stockmaster.company === comp.company && stockmaster.branch === comp.branch)
+                        ?.map((data) => ({
+                          label: data.unit,
+                          value: data.unit,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       styles={colourStyles}
                       value={{
                         label: stockmaster.unit,
@@ -6199,13 +5667,13 @@ function Manualstockentry() {
                         setStockmaster({
                           ...stockmaster,
                           unit: e.value,
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setFloors([]);
                         setAreas([]);
-                        setLocations([{ label: "ALL", value: "ALL" }]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
                       }}
                     />
                   </FormControl>
@@ -6213,7 +5681,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Floor<b style={{ color: "red" }}>*</b>
+                      Floor<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={floors}
@@ -6226,11 +5694,11 @@ function Manualstockentry() {
                         setStockmaster({
                           ...stockmaster,
                           floor: e.value,
-                          workstation: "",
-                          area: "Please Select Area",
+                          workstation: '',
+                          area: 'Please Select Area',
                         });
                         // setAreas([]);
-                        setLocations([{ label: "ALL", value: "ALL" }]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
                         fetchArea(e.value);
                       }}
                     />
@@ -6239,7 +5707,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Area<b style={{ color: "red" }}>*</b>
+                      Area<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={areas}
@@ -6252,10 +5720,10 @@ function Manualstockentry() {
                         setStockmaster({
                           ...stockmaster,
                           area: e.value,
-                          workstation: "",
-                          location: "Please Select Location",
+                          workstation: '',
+                          location: 'Please Select Location',
                         });
-                        setLocations([{ label: "ALL", value: "ALL" }]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
                         fetchLocation(e.value);
                       }}
                     />
@@ -6264,7 +5732,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Location<b style={{ color: "red" }}>*</b>
+                      Location<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={locations}
@@ -6277,7 +5745,7 @@ function Manualstockentry() {
                         setStockmaster({
                           ...stockmaster,
                           location: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -6300,28 +5768,22 @@ function Manualstockentry() {
                       }}
                     >
                       <MenuItem value="" disabled>
-                        {" "}
+                        {' '}
                         Please Select
                       </MenuItem>
-                      <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                      <MenuItem value="No"> {"No"} </MenuItem>
+                      <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                      <MenuItem value="No"> {'No'} </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
-                {stockmaster.warranty === "Yes" && (
+                {stockmaster.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <Grid container>
                         <Grid item md={6} xs={6} sm={6}>
                           <Typography>Warranty Time</Typography>
                           <FormControl fullWidth size="small">
-                            <OutlinedInput
-                              id="component-outlined"
-                              type="text"
-                              placeholder="Enter Time"
-                              value={stockmaster.estimation}
-                              onChange={(e) => handleChangephonenumber(e)}
-                            />
+                            <OutlinedInput id="component-outlined" type="text" placeholder="Enter Time" value={stockmaster.estimation} onChange={(e) => handleChangephonenumber(e)} />
                           </FormControl>
                         </Grid>
                         <Grid item md={6} xs={6} sm={6}>
@@ -6337,12 +5799,12 @@ function Manualstockentry() {
                             onChange={handleEstimationChange}
                           >
                             <MenuItem value="" disabled>
-                              {" "}
+                              {' '}
                               Please Select
                             </MenuItem>
-                            <MenuItem value="Days"> {"Days"} </MenuItem>
-                            <MenuItem value="Month"> {"Month"} </MenuItem>
-                            <MenuItem value="Year"> {"Year"} </MenuItem>
+                            <MenuItem value="Days"> {'Days'} </MenuItem>
+                            <MenuItem value="Month"> {'Month'} </MenuItem>
+                            <MenuItem value="Year"> {'Year'} </MenuItem>
                           </Select>
                         </Grid>
                       </Grid>
@@ -6363,7 +5825,7 @@ function Manualstockentry() {
                     />
                   </FormControl>
                 </Grid>
-                {stockmaster.warranty === "Yes" && (
+                {stockmaster.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
@@ -6373,9 +5835,9 @@ function Manualstockentry() {
                           type="text"
                           placeholder=""
                           value={stockmaster.warrantycalculation}
-                        // onChange={(e) => {
-                        //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
-                        // }}
+                          // onChange={(e) => {
+                          //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
+                          // }}
                         />
                       </FormControl>
                     </Grid>
@@ -6385,7 +5847,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      {" "}
+                      {' '}
                       Vendor Group Name
                       {/* <b style={{ color: "red" }}>*</b>{" "} */}
                     </Typography>
@@ -6396,8 +5858,8 @@ function Manualstockentry() {
                       onChange={(e) => {
                         handleChangeGroupName(e);
                         setVendorGroup(e.value);
-                        setFrequencyValue("")
-                        setVendorNew("Choose Vendor");
+                        setFrequencyValue('');
+                        setVendorNew('Choose Vendor');
                       }}
                     />
                   </FormControl>
@@ -6410,7 +5872,7 @@ function Manualstockentry() {
                       {/* <b style={{ color: "red" }}>*</b>{" "} */}
                     </Typography>
                     <Selects
-                      options={[...vendorModeOptions, ...vendorOpt,]}
+                      options={[...vendorModeOptions, ...vendorOpt]}
                       styles={colourStyles}
                       value={{ label: vendorNew, value: vendorNew }}
                       onChange={(e) => {
@@ -6426,43 +5888,31 @@ function Manualstockentry() {
                   <Button
                     variant="contained"
                     style={{
-                      height: "30px",
-                      minWidth: "20px",
-                      padding: "19px 13px",
-                      color: "white",
-                      marginTop: "23px",
-                      marginLeft: "-10px",
-                      background: "rgb(25, 118, 210)",
+                      height: '30px',
+                      minWidth: '20px',
+                      padding: '19px 13px',
+                      color: 'white',
+                      marginTop: '23px',
+                      marginLeft: '-10px',
+                      background: 'rgb(25, 118, 210)',
                     }}
                     onClick={() => {
                       handleClickOpenviewalertvendor();
                     }}
                   >
-                    <FaPlus style={{ fontSize: "15px" }} />
+                    <FaPlus style={{ fontSize: '15px' }} />
                   </Button>
                 </Grid>
                 <Grid item lg={3} md={3} xs={12} sm={6}>
                   <FormControl size="small" fullWidth>
                     <Typography>Frequency</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      sx={userStyle.input}
-                      placeholder="Please Enter Frequency"
-                      value={frequencyValue}
-                      readOnly
-                    />
+                    <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValue} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>GST No</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      value={vendorgetid?.gstnumber}
-                      readOnly
-                    />
+                    <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} sm={12} xs={12}>
@@ -6484,9 +5934,7 @@ function Manualstockentry() {
                   </FormControl>
                 </Grid>
 
-
-
-                {stockmaster.warranty === "Yes" && (
+                {stockmaster.warranty === 'Yes' && (
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>Warranty Details</Typography>
@@ -6507,11 +5955,11 @@ function Manualstockentry() {
                   </Grid>
                 )}
 
-                {stockmaster.requestmode === "Asset Material" && (
+                {stockmaster.requestmode === 'Asset Material' && (
                   <Grid item md={3} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Rate<b style={{ color: "red" }}>*</b>{" "}
+                        Rate<b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -6520,39 +5968,33 @@ function Manualstockentry() {
                         placeholder="Please Enter Rate"
                         value={stockmaster.rate}
                         onChange={(e) => {
-                          const quantity = stockmaster.requestmode == "Stock Material" ? Number(stockmaster.quantitynew) : Number(stockmaster.quantity)
+                          const quantity = stockmaster.requestmode == 'Stock Material' ? Number(stockmaster.quantitynew) : Number(stockmaster.quantity);
                           setStockmaster({
                             ...stockmaster,
                             rate: e.target.value,
-
                           });
-                          setAmount(Number(e.target.value) * Number(quantity))
+                          setAmount(Number(e.target.value) * Number(quantity));
                         }}
                       />
                     </FormControl>
                   </Grid>
                 )}
 
-                {stockmaster.requestmode === "Asset Material" && (
+                {stockmaster.requestmode === 'Asset Material' && (
                   <Grid item md={3} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Bill Amount<b style={{ color: "red" }}>*</b>{" "}
+                        Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="number"
-                        sx={userStyle.input}
-                        value={Number(totalAmount)}
-                      />
+                      <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={Number(totalAmount)} />
                     </FormControl>
                   </Grid>
                 )}
-                {stockmaster.requestmode === "Stock Material" && (
+                {stockmaster.requestmode === 'Stock Material' && (
                   <Grid item md={3} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Total  Bill Amount<b style={{ color: "red" }}>*</b>{" "}
+                        Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -6566,7 +6008,6 @@ function Manualstockentry() {
                             totalbillamount: e.target.value,
                           });
                         }}
-
                       />
                     </FormControl>
                   </Grid>
@@ -6589,34 +6030,27 @@ function Manualstockentry() {
                 </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>Bill</Typography>
-                  <Box sx={{ display: "flex", justifyContent: "left" }}>
-                    <Button
-                      variant="contained"
-                      onClick={handleClickUploadPopupOpen}
-                    >
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                    <Button variant="contained" onClick={handleClickUploadPopupOpen}>
                       Upload
                     </Button>
                   </Box>
                 </Grid>
-                {stockmaster.warranty === "Yes" && (
+                {stockmaster.warranty === 'Yes' && (
                   <Grid item md={1.5} xs={12} sm={12}>
                     <Typography>Warranty Card </Typography>
-                    <Box sx={{ display: "flex", justifyContent: "left" }}>
-                      <Button
-                        variant="contained"
-                        onClick={handleClickUploadPopupOpenwarranty}
-                      >
+                    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                      <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
                         Upload
                       </Button>
                     </Box>
                   </Grid>
                 )}
 
-
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Stock Mode For<b style={{ color: "red" }}>*</b>
+                      Stock Mode For<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={requestModeOptions}
@@ -6630,36 +6064,36 @@ function Manualstockentry() {
                         setStockmaster({
                           ...stockmaster,
                           requestmode: e.value,
-                          productname: "Please Select Material",
-                          component: "Please Select Component",
+                          productname: 'Please Select Material',
+                          component: 'Please Select Component',
 
-                          assettype: "",
-                          asset: "",
-                          productdetails: "",
+                          assettype: '',
+                          asset: '',
+                          productdetails: '',
 
-                          uom: "Please Select UOM",
+                          uom: 'Please Select UOM',
                           quantity: 1,
 
-                          files: "",
-                          warrantyfiles: "",
+                          files: '',
+                          warrantyfiles: '',
 
                           // warranty: "Yes",
                           // warrantycalculation: "",
                           // estimation: "",
                           // estimationtime: "Days",
-                          purchasedate: "",
+                          purchasedate: '',
 
-                          addedby: "",
-                          updatedby: "",
+                          addedby: '',
+                          updatedby: '',
 
-                          stockcategory: "Please Select Stock Category",
-                          stocksubcategory: "Please Select Stock Sub Category",
-                          uomnew: "",
+                          stockcategory: 'Please Select Stock Category',
+                          stocksubcategory: 'Please Select Stock Sub Category',
+                          uomnew: '',
                           quantitynew: 1,
-                          materialnew: "Please Select Material",
-                          productdetailsnew: "",
+                          materialnew: 'Please Select Material',
+                          productdetailsnew: '',
                         });
-                        if (e.value === "Stock Material") {
+                        if (e.value === 'Stock Material') {
                           setIsStockMaterial(true);
                         } else {
                           setIsStockMaterial(false);
@@ -6671,22 +6105,21 @@ function Manualstockentry() {
                     />
                   </FormControl>
                 </Grid>
-
               </Grid>
               <br />
 
               {/* asset todo */}
-              {stockmaster.requestmode === "Asset Material" && (
+              {stockmaster.requestmode === 'Asset Material' && (
                 <>
                   <Grid container spacing={2}>
                     <Grid item md={12} xs={12} sm={12}>
-                      {" "}
+                      {' '}
                       <Typography variant="h6">Asset Material List</Typography>
                     </Grid>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Material<b style={{ color: "red" }}>*</b>{" "}
+                          Material<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <Selects
                           options={materialOpt}
@@ -6702,7 +6135,7 @@ function Manualstockentry() {
                               productname: e.value,
                               assettype: e.assettype,
                               producthead: e.assethead,
-                              component: "Please Select Component",
+                              component: 'Please Select Component',
                             });
 
                             fetchspecification(e);
@@ -6715,29 +6148,19 @@ function Manualstockentry() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>Asset Type</Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="text"
-                          value={stockmaster.assettype}
-                          readOnly
-                        />
+                        <OutlinedInput id="component-outlined" type="text" value={stockmaster.assettype} readOnly />
                       </FormControl>
                     </Grid>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>Asset Head</Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="text"
-                          value={stockmaster.producthead}
-                          readOnly
-                        />
+                        <OutlinedInput id="component-outlined" type="text" value={stockmaster.producthead} readOnly />
                       </FormControl>
                     </Grid>
                     <Grid item md={3} sm={6} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Component<b style={{ color: "red" }}>*</b>{" "}
+                          Component<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <Selects
                           options={Specification}
@@ -6768,48 +6191,34 @@ function Manualstockentry() {
                                   <Grid item md={2} sm={2} xs={2} marginTop={2}>
                                     <Typography>{todo.sub}</Typography>
                                   </Grid>
-                                  <Grid
-                                    item
-                                    md={10}
-                                    sm={10}
-                                    xs={10}
-                                    marginTop={2}
-                                  >
+                                  <Grid item md={10} sm={10} xs={10} marginTop={2}>
                                     <Grid container key={index} spacing={1}>
-
                                       <>
                                         <Grid item md={3} sm={6} xs={12}>
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
-
-
                                               <FormGroup>
                                                 <FormControlLabel
-
                                                   control={
                                                     <Switch
                                                       // color="success"
                                                       sx={{
-                                                        "& .MuiSwitch-switchBase.Mui-checked": {
-                                                          color: "green", // Thumb color when checked
+                                                        '& .MuiSwitch-switchBase.Mui-checked': {
+                                                          color: 'green', // Thumb color when checked
                                                         },
-                                                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                          backgroundColor: "green", // Track color when checked
+                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                          backgroundColor: 'green', // Track color when checked
                                                         },
-                                                        "& .MuiSwitch-switchBase": {
-                                                          color: "#ff0000a3", // Thumb color when not checked
+                                                        '& .MuiSwitch-switchBase': {
+                                                          color: '#ff0000a3', // Thumb color when not checked
                                                         },
-                                                        "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                          backgroundColor: "#ff0000a3", // Track color when not checked
+                                                        '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                          backgroundColor: '#ff0000a3', // Track color when not checked
                                                         },
                                                       }}
                                                       checked={todo.subcomponentcheck}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "subcomponentcheck",
-                                                          e.target.checked
-                                                        );
+                                                        handleChange(index, 'subcomponentcheck', e.target.checked);
                                                       }}
                                                     />
                                                   }
@@ -6828,18 +6237,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Type</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          .find((item) => item.subcomponent === todo.subname)
                                                           ?.type?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -6852,11 +6254,7 @@ function Manualstockentry() {
                                                           value: todo.type,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "type",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'type', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6868,21 +6266,19 @@ function Manualstockentry() {
                                                       disabled
                                                       size="small"
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         // color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenType();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -6894,18 +6290,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Model</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          .find((item) => item.subcomponent === todo.subname)
                                                           ?.model?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -6918,11 +6307,7 @@ function Manualstockentry() {
                                                           value: todo.model,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "model",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'model', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6933,21 +6318,19 @@ function Manualstockentry() {
                                                       disabled
                                                       size="small"
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenModel();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -6960,18 +6343,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Size</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          .find((item) => item.subcomponent === todo.subname)
                                                           ?.size?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -6984,11 +6360,7 @@ function Manualstockentry() {
                                                           value: todo.size,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "size",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'size', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6999,21 +6371,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenSize();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7026,20 +6396,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Variants
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Variants</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          .find((item) => item.subcomponent === todo.subname)
                                                           ?.variant?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -7052,11 +6413,7 @@ function Manualstockentry() {
                                                           value: todo.variant,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "variant",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'variant', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7067,21 +6424,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenVariant();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7094,18 +6449,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      size="small"
-                                                      fullWidth
-                                                    >
+                                                    <FormControl size="small" fullWidth>
                                                       <Typography>Brand</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          .find((item) => item.subcomponent === todo.subname)
                                                           ?.brand?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -7118,11 +6466,7 @@ function Manualstockentry() {
                                                           value: todo.brand,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "brand",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'brand', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7133,21 +6477,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenBrand();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7159,12 +6501,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>Serial</Typography>
 
                                                     <OutlinedInput
@@ -7175,11 +6512,7 @@ function Manualstockentry() {
                                                       placeholder="Please Enter Serial"
                                                       value={todo.serial}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "serial",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'serial', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -7192,12 +6525,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>Others</Typography>
 
                                                     <OutlinedInput
@@ -7208,11 +6536,7 @@ function Manualstockentry() {
                                                       placeholder="Please Enter Other"
                                                       value={todo.other}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "other",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'other', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -7225,20 +6549,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Capacity
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Capacity</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          .find((item) => item.subcomponent === todo.subname)
                                                           ?.capacity?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -7251,11 +6566,7 @@ function Manualstockentry() {
                                                           value: todo.capacity,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "capacity",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'capacity', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7267,21 +6578,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7292,12 +6601,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>HDMI Port</Typography>
 
                                                     <OutlinedInput
@@ -7311,21 +6615,12 @@ function Manualstockentry() {
                                                       //   handleChange(index, "hdmiport", e.target.value);
                                                       // }}
                                                       onChange={(e) => {
-                                                        const inputText =
-                                                          e.target.value;
+                                                        const inputText = e.target.value;
                                                         // Regex to allow only non-negative numbers
-                                                        const validatedInput =
-                                                          inputText.match(/^\d*$/);
+                                                        const validatedInput = inputText.match(/^\d*$/);
 
-                                                        const sanitizedInput =
-                                                          validatedInput !== null
-                                                            ? validatedInput[0]
-                                                            : "0";
-                                                        handleChange(
-                                                          index,
-                                                          "hdmiport",
-                                                          sanitizedInput
-                                                        );
+                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                        handleChange(index, 'hdmiport', sanitizedInput);
                                                       }}
                                                     />
                                                   </Grid>
@@ -7337,12 +6632,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>VGA Port</Typography>
 
                                                     <OutlinedInput
@@ -7353,21 +6643,12 @@ function Manualstockentry() {
                                                       value={todo.vgaport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        const inputText =
-                                                          e.target.value;
+                                                        const inputText = e.target.value;
                                                         // Regex to allow only non-negative numbers
-                                                        const validatedInput =
-                                                          inputText.match(/^\d*$/);
+                                                        const validatedInput = inputText.match(/^\d*$/);
 
-                                                        const sanitizedInput =
-                                                          validatedInput !== null
-                                                            ? validatedInput[0]
-                                                            : "0";
-                                                        handleChange(
-                                                          index,
-                                                          "vgaport",
-                                                          sanitizedInput
-                                                        );
+                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                        handleChange(index, 'vgaport', sanitizedInput);
                                                       }}
                                                     />
                                                   </Grid>
@@ -7379,12 +6660,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>DP Port</Typography>
 
                                                     <OutlinedInput
@@ -7395,21 +6671,12 @@ function Manualstockentry() {
                                                       placeholder="Please Enter DP Port"
                                                       value={todo.dpport}
                                                       onChange={(e) => {
-                                                        const inputText =
-                                                          e.target.value;
+                                                        const inputText = e.target.value;
                                                         // Regex to allow only non-negative numbers
-                                                        const validatedInput =
-                                                          inputText.match(/^\d*$/);
+                                                        const validatedInput = inputText.match(/^\d*$/);
 
-                                                        const sanitizedInput =
-                                                          validatedInput !== null
-                                                            ? validatedInput[0]
-                                                            : "0";
-                                                        handleChange(
-                                                          index,
-                                                          "dpport",
-                                                          sanitizedInput
-                                                        );
+                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                        handleChange(index, 'dpport', sanitizedInput);
                                                       }}
                                                     />
                                                   </Grid>
@@ -7421,12 +6688,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>USB Port</Typography>
 
                                                     <OutlinedInput
@@ -7437,21 +6699,12 @@ function Manualstockentry() {
                                                       value={todo.usbport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        const inputText =
-                                                          e.target.value;
+                                                        const inputText = e.target.value;
                                                         // Regex to allow only non-negative numbers
-                                                        const validatedInput =
-                                                          inputText.match(/^\d*$/);
+                                                        const validatedInput = inputText.match(/^\d*$/);
 
-                                                        const sanitizedInput =
-                                                          validatedInput !== null
-                                                            ? validatedInput[0]
-                                                            : "0";
-                                                        handleChange(
-                                                          index,
-                                                          "usbport",
-                                                          sanitizedInput
-                                                        );
+                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                        handleChange(index, 'usbport', sanitizedInput);
                                                       }}
                                                     />
                                                   </Grid>
@@ -7464,27 +6717,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Panel Type
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Panel Type</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.paneltype?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => item.subcomponent === todo.subname)
+                                                          ?.paneltype?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -7492,11 +6734,7 @@ function Manualstockentry() {
                                                           value: todo.paneltypescreen,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "paneltypescreen",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'paneltypescreen', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7508,21 +6746,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7534,27 +6770,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Screen Resolution
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Screen Resolution</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.screenresolution?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => item.subcomponent === todo.subname)
+                                                          ?.screenresolution?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -7562,11 +6787,7 @@ function Manualstockentry() {
                                                           value: todo.resolution,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "resolution",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'resolution', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7578,21 +6799,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7604,27 +6823,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Connectivity
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Connectivity</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.connectivity?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => item.subcomponent === todo.subname)
+                                                          ?.connectivity?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -7632,11 +6840,7 @@ function Manualstockentry() {
                                                           value: todo.connectivity,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "connectivity",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'connectivity', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7648,21 +6852,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7674,20 +6876,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Data Rate
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Data Rate</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          .find((item) => item.subcomponent === todo.subname)
                                                           ?.datarate?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -7700,11 +6893,7 @@ function Manualstockentry() {
                                                           value: todo.daterate,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "daterate",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'daterate', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7716,21 +6905,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7742,41 +6929,24 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Compatible Device
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Compatible Device</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.compatibledevices?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => item.subcomponent === todo.subname)
+                                                          ?.compatibledevices?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
-                                                          label:
-                                                            todo.compatibledevice,
-                                                          value:
-                                                            todo.compatibledevice,
+                                                          label: todo.compatibledevice,
+                                                          value: todo.compatibledevice,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "compatibledevice",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'compatibledevice', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7788,21 +6958,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7814,27 +6982,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Output Power
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Output Power</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.outputpower?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => item.subcomponent === todo.subname)
+                                                          ?.outputpower?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -7842,11 +6999,7 @@ function Manualstockentry() {
                                                           value: todo.outputpower,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "outputpower",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'outputpower', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7858,21 +7011,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7884,27 +7035,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Cooling Fan Count
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Cooling Fan Count</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.coolingfancount?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => item.subcomponent === todo.subname)
+                                                          ?.coolingfancount?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -7912,11 +7052,7 @@ function Manualstockentry() {
                                                           value: todo.collingfancount,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "collingfancount",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'collingfancount', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7928,21 +7064,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7954,27 +7088,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Clock Speed
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Clock Speed</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.clockspeed?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          ?.find((item) => item.subcomponent === todo.subname)
+                                                          ?.clockspeed?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -7982,11 +7105,7 @@ function Manualstockentry() {
                                                           value: todo.clockspeed,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "clockspeed",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'clockspeed', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7998,21 +7117,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8024,18 +7141,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Core</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          ?.find((item) => item.subcomponent === todo.subname)
                                                           ?.core?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -8048,11 +7158,7 @@ function Manualstockentry() {
                                                           value: todo.core,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "core",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'core', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8064,21 +7170,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8090,18 +7194,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Speed</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          ?.find((item) => item.subcomponent === todo.subname)
                                                           ?.speed?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -8114,11 +7211,7 @@ function Manualstockentry() {
                                                           value: todo.speed,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "speed",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'speed', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8130,21 +7223,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8156,27 +7247,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Frequency
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Frequency</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.frequency?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          ?.find((item) => item.subcomponent === todo.subname)
+                                                          ?.frequency?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -8184,11 +7264,7 @@ function Manualstockentry() {
                                                           value: todo.frequency,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "frequency",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'frequency', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8200,21 +7276,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8226,18 +7300,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Output</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          ?.find((item) => item.subcomponent === todo.subname)
                                                           ?.output?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -8250,11 +7317,7 @@ function Manualstockentry() {
                                                           value: todo.output,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "output",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'output', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8266,21 +7329,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8292,27 +7353,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Ethernet Ports
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Ethernet Ports</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.ethernetports?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          ?.find((item) => item.subcomponent === todo.subname)
+                                                          ?.ethernetports?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -8320,11 +7370,7 @@ function Manualstockentry() {
                                                           value: todo.ethernetports,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "ethernetports",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'ethernetports', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8336,21 +7382,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8362,20 +7406,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Distance
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Distance</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          ?.find((item) => item.subcomponent === todo.subname)
                                                           ?.distance?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -8388,11 +7423,7 @@ function Manualstockentry() {
                                                           value: todo.distance,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "distance",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'distance', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8404,21 +7435,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8430,25 +7459,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Length</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.lengthname?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          ?.find((item) => item.subcomponent === todo.subname)
+                                                          ?.lengthname?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -8456,11 +7476,7 @@ function Manualstockentry() {
                                                           value: todo.lengthname,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "lengthname",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'lengthname', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8472,21 +7488,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8498,18 +7512,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Slot</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          ?.find((item) => item.subcomponent === todo.subname)
                                                           ?.slot?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -8522,11 +7529,7 @@ function Manualstockentry() {
                                                           value: todo.slot,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "slot",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'slot', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8538,21 +7541,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8564,27 +7565,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        No. Of Channels
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>No. Of Channels</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
-                                                          ?.noofchannels?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          ?.find((item) => item.subcomponent === todo.subname)
+                                                          ?.noofchannels?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -8592,11 +7582,7 @@ function Manualstockentry() {
                                                           value: todo.noofchannels,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "noofchannels",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'noofchannels', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8608,21 +7594,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8634,18 +7618,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Colour</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          ?.find(
-                                                            (item) =>
-                                                              item.subcomponent ===
-                                                              todo.subname
-                                                          )
+                                                          ?.find((item) => item.subcomponent === todo.subname)
                                                           ?.colours?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -8658,11 +7635,7 @@ function Manualstockentry() {
                                                           value: todo.colours,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "colours",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'colours', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8674,21 +7647,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8702,10 +7673,7 @@ function Manualstockentry() {
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
-                                                      Warranty{" "}
-                                                      <b style={{ color: "red" }}>
-                                                        *
-                                                      </b>
+                                                      Warranty <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Select
                                                       fullWidth
@@ -8718,25 +7686,15 @@ function Manualstockentry() {
                                                       // }}
                                                       // value={todo.serial}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "warranty",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'warranty', e.target.value);
                                                       }}
                                                     >
                                                       <MenuItem value="" disabled>
-                                                        {" "}
+                                                        {' '}
                                                         Please Select
                                                       </MenuItem>
-                                                      <MenuItem value="Yes">
-                                                        {" "}
-                                                        {"Yes"}{" "}
-                                                      </MenuItem>
-                                                      <MenuItem value="No">
-                                                        {" "}
-                                                        {"No"}{" "}
-                                                      </MenuItem>
+                                                      <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                                      <MenuItem value="No"> {'No'} </MenuItem>
                                                     </Select>
                                                   </FormControl>
                                                 </Grid>
@@ -8744,21 +7702,15 @@ function Manualstockentry() {
                                             </Grid>
                                           </>
 
-                                          {todo.warranty === "Yes" && (
+                                          {todo.warranty === 'Yes' && (
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
                                                   <Grid item md={6} xs={6} sm={6}>
                                                     <Typography>
-                                                      Warranty Time{" "}
-                                                      <b style={{ color: "red" }}>
-                                                        *
-                                                      </b>
+                                                      Warranty Time <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <OutlinedInput
                                                         id="component-outlined"
                                                         type="text"
@@ -8766,23 +7718,16 @@ function Manualstockentry() {
                                                         disabled={todo.subcomponentcheck === false}
                                                         value={todo.estimation}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "estimation",
-                                                            e.target.value
-                                                          );
+                                                          handleChange(index, 'estimation', e.target.value);
                                                           // handleChangephonenumber(e)
                                                         }}
-                                                      // onChange={(e) => handleChangephonenumber(e)}
+                                                        // onChange={(e) => handleChangephonenumber(e)}
                                                       />
                                                     </FormControl>
                                                   </Grid>
                                                   <Grid item md={6} xs={6} sm={6}>
                                                     <Typography>
-                                                      Estimation{" "}
-                                                      <b style={{ color: "red" }}>
-                                                        *
-                                                      </b>
+                                                      Estimation <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Select
                                                       fullWidth
@@ -8794,31 +7739,18 @@ function Manualstockentry() {
                                                       //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
                                                       // }}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "estimationtime",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'estimationtime', e.target.value);
                                                         // handleEstimationChange()
                                                       }}
-                                                    // onChange={handleEstimationChange}
+                                                      // onChange={handleEstimationChange}
                                                     >
                                                       <MenuItem value="" disabled>
-                                                        {" "}
+                                                        {' '}
                                                         Please Select
                                                       </MenuItem>
-                                                      <MenuItem value="Days">
-                                                        {" "}
-                                                        {"Days"}{" "}
-                                                      </MenuItem>
-                                                      <MenuItem value="Month">
-                                                        {" "}
-                                                        {"Month"}{" "}
-                                                      </MenuItem>
-                                                      <MenuItem value="Year">
-                                                        {" "}
-                                                        {"Year"}{" "}
-                                                      </MenuItem>
+                                                      <MenuItem value="Days"> {'Days'} </MenuItem>
+                                                      <MenuItem value="Month"> {'Month'} </MenuItem>
+                                                      <MenuItem value="Year"> {'Year'} </MenuItem>
                                                     </Select>
                                                   </Grid>
                                                 </Grid>
@@ -8831,52 +7763,39 @@ function Manualstockentry() {
                                               <Grid container spacing={2}>
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Purchase date{" "}
-                                                    </Typography>
+                                                    <Typography>Purchase date </Typography>
                                                     <OutlinedInput
                                                       id="component-outlined"
                                                       type="date"
                                                       disabled={todo.subcomponentcheck === false}
                                                       value={todo.purchasedate}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "purchasedate",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'purchasedate', e.target.value);
                                                         // handlePurchaseDateChange()
                                                       }}
-                                                    // onChange={handlePurchaseDateChange}
+                                                      // onChange={handlePurchaseDateChange}
                                                     />
                                                   </FormControl>
                                                 </Grid>
                                               </Grid>
                                             </Grid>
                                           </>
-                                          {todo.warranty === "Yes" && (
+                                          {todo.warranty === 'Yes' && (
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Expiry Date{" "}
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Expiry Date </Typography>
                                                       <OutlinedInput
                                                         id="component-outlined"
                                                         type="text"
                                                         disabled={todo.subcomponentcheck === false}
                                                         placeholder=""
-                                                        value={
-                                                          todo.warrantycalculation
-                                                        }
-                                                      // onChange={(e) => {
-                                                      //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                      // }}
+                                                        value={todo.warrantycalculation}
+                                                        // onChange={(e) => {
+                                                        //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
+                                                        // }}
                                                       />
                                                     </FormControl>
                                                   </Grid>
@@ -8906,19 +7825,11 @@ function Manualstockentry() {
                                                         value: todo.vendorgroup,
                                                       }}
                                                       onChange={(e) => {
-                                                        handleChangeGroupNameIndexBased(
-                                                          e,
-                                                          index
-                                                        );
-                                                        handleChange(
-                                                          index,
-                                                          "vendorgroup",
-                                                          e.value
-                                                        );
+                                                        handleChangeGroupNameIndexBased(e, index);
+                                                        handleChange(index, 'vendorgroup', e.value);
                                                         setTodos((prev) => {
                                                           const updated = [...prev];
-                                                          updated[index].vendor =
-                                                            "Choose Vendor";
+                                                          updated[index].vendor = 'Choose Vendor';
                                                           return updated;
                                                         });
                                                       }}
@@ -8932,11 +7843,11 @@ function Manualstockentry() {
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
-                                                      Vendor<b style={{ color: "red" }}> * </b>
+                                                      Vendor<b style={{ color: 'red' }}> * </b>
                                                     </Typography>
                                                     <Selects
                                                       // options={vendorOptInd[index]}
-                                                      options={[...vendorModeOptions, ...vendorOptInd[index],]}
+                                                      options={[...vendorModeOptions, ...vendorOptInd[index]]}
                                                       styles={colourStyles}
                                                       isDisabled={todo.subcomponentcheck === false}
                                                       value={{
@@ -8944,12 +7855,7 @@ function Manualstockentry() {
                                                         value: todo.vendor,
                                                       }}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "vendor",
-                                                          e.value,
-                                                          e._id
-                                                        );
+                                                        handleChange(index, 'vendor', e.value, e._id);
                                                         // setVendor(e.value);
                                                         // vendorid(e._id);
                                                       }}
@@ -8985,9 +7891,7 @@ function Manualstockentry() {
                                               <Grid container spacing={2}>
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Phone Number
-                                                    </Typography>
+                                                    <Typography>Phone Number</Typography>
                                                     <OutlinedInput
                                                       id="component-outlined"
                                                       type="text"
@@ -9001,7 +7905,6 @@ function Manualstockentry() {
                                               </Grid>
                                             </Grid>
                                           </>
-
                                         </>
                                       )}
 
@@ -9035,47 +7938,34 @@ function Manualstockentry() {
                                 </Grid>
                               ) : (
                                 <Grid container key={index} spacing={1}>
-                                  <Grid
-                                    item
-                                    md={12}
-                                    sm={12}
-                                    xs={12}
-                                    marginTop={2}
-                                  >
+                                  <Grid item md={12} sm={12} xs={12} marginTop={2}>
                                     <Grid container key={index} spacing={1}>
-
                                       <>
                                         <Grid item md={3} sm={6} xs={12}>
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormGroup>
-
                                                 <FormControlLabel
-
                                                   control={
                                                     <Switch
                                                       // color="success"
                                                       sx={{
-                                                        "& .MuiSwitch-switchBase.Mui-checked": {
-                                                          color: "green", // Thumb color when checked
+                                                        '& .MuiSwitch-switchBase.Mui-checked': {
+                                                          color: 'green', // Thumb color when checked
                                                         },
-                                                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                          backgroundColor: "green", // Track color when checked
+                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                          backgroundColor: 'green', // Track color when checked
                                                         },
-                                                        "& .MuiSwitch-switchBase": {
-                                                          color: "#ff0000a3", // Thumb color when not checked
+                                                        '& .MuiSwitch-switchBase': {
+                                                          color: '#ff0000a3', // Thumb color when not checked
                                                         },
-                                                        "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                          backgroundColor: "#ff0000a3", // Track color when not checked
+                                                        '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                          backgroundColor: '#ff0000a3', // Track color when not checked
                                                         },
                                                       }}
                                                       checked={todo.subcomponentcheck}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "subcomponentcheck",
-                                                          e.target.checked
-                                                        );
+                                                        handleChange(index, 'subcomponentcheck', e.target.checked);
                                                       }}
                                                     />
                                                   }
@@ -9085,9 +7975,7 @@ function Manualstockentry() {
                                             </Grid>
                                           </Grid>
                                         </Grid>
-
                                       </>
-
 
                                       {todo.subcomponentcheck === true && (
                                         <>
@@ -9096,20 +7984,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Type</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.type?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -9122,11 +8001,7 @@ function Manualstockentry() {
                                                           value: todo.type,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "type",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'type', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9138,21 +8013,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenType();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9164,20 +8037,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Model</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.model?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -9190,11 +8054,7 @@ function Manualstockentry() {
                                                           value: todo.model,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "model",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'model', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9205,21 +8065,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenModel();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9232,20 +8090,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Size</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.size?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -9258,11 +8107,7 @@ function Manualstockentry() {
                                                           value: todo.size,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "size",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'size', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9273,21 +8118,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenSize();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9300,22 +8143,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Variants
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Variants</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.variant?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -9328,11 +8160,7 @@ function Manualstockentry() {
                                                           value: todo.variant,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "variant",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'variant', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9343,21 +8171,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenVariant();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9370,20 +8196,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      size="small"
-                                                      fullWidth
-                                                    >
+                                                    <FormControl size="small" fullWidth>
                                                       <Typography>Brand</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.brand?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -9396,11 +8213,7 @@ function Manualstockentry() {
                                                           value: todo.brand,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "brand",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'brand', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9411,21 +8224,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenBrand();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9437,12 +8248,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>Serial</Typography>
 
                                                     <OutlinedInput
@@ -9453,11 +8259,7 @@ function Manualstockentry() {
                                                       value={todo.serial}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "serial",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'serial', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -9470,12 +8272,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>Others</Typography>
 
                                                     <OutlinedInput
@@ -9486,11 +8283,7 @@ function Manualstockentry() {
                                                       value={todo.other}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "other",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'other', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -9503,22 +8296,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Capacity
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Capacity</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.capacity?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -9531,11 +8313,7 @@ function Manualstockentry() {
                                                           value: todo.capacity,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "capacity",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'capacity', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9547,21 +8325,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9572,12 +8348,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>HDMI Port</Typography>
 
                                                     <OutlinedInput
@@ -9588,11 +8359,7 @@ function Manualstockentry() {
                                                       value={todo.hdmiport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "hdmiport",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'hdmiport', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -9604,12 +8371,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>VGA Port</Typography>
 
                                                     <OutlinedInput
@@ -9620,11 +8382,7 @@ function Manualstockentry() {
                                                       value={todo.vgaport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "vgaport",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'vgaport', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -9636,12 +8394,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>DP Port</Typography>
 
                                                     <OutlinedInput
@@ -9652,11 +8405,7 @@ function Manualstockentry() {
                                                       value={todo.dpport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "dpport",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'dpport', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -9668,12 +8417,7 @@ function Manualstockentry() {
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
-                                                  <Grid
-                                                    item
-                                                    md={11.6}
-                                                    sm={10}
-                                                    xs={10}
-                                                  >
+                                                  <Grid item md={11.6} sm={10} xs={10}>
                                                     <Typography>USB Port</Typography>
 
                                                     <OutlinedInput
@@ -9684,11 +8428,7 @@ function Manualstockentry() {
                                                       value={todo.usbport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "usbport",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'usbport', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -9701,29 +8441,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Panel Type
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Panel Type</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.paneltype?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.paneltype?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -9731,11 +8458,7 @@ function Manualstockentry() {
                                                           value: todo.paneltypescreen,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "paneltypescreen",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'paneltypescreen', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9747,21 +8470,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9773,29 +8494,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Screen Resolution
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Screen Resolution</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.screenresolution?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.screenresolution?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -9803,11 +8511,7 @@ function Manualstockentry() {
                                                           value: todo.resolution,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "resolution",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'resolution', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9819,21 +8523,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9845,29 +8547,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Connectivity
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Connectivity</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.connectivity?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.connectivity?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -9875,11 +8564,7 @@ function Manualstockentry() {
                                                           value: todo.connectivity,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "connectivity",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'connectivity', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9891,21 +8576,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9917,22 +8600,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Data Rate
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Data Rate</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.datarate?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -9945,11 +8617,7 @@ function Manualstockentry() {
                                                           value: todo.daterate,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "daterate",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'daterate', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9961,21 +8629,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9987,43 +8653,24 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Compatible Device
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Compatible Device</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.compatibledevices?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.compatibledevices?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
-                                                          label:
-                                                            todo.compatibledevice,
-                                                          value:
-                                                            todo.compatibledevice,
+                                                          label: todo.compatibledevice,
+                                                          value: todo.compatibledevice,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "compatibledevice",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'compatibledevice', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10035,21 +8682,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10061,29 +8706,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Output Power
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Output Power</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.outputpower?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.outputpower?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -10091,11 +8723,7 @@ function Manualstockentry() {
                                                           value: todo.outputpower,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "outputpower",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'outputpower', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10107,21 +8735,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10133,29 +8759,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Cooling Fan Count
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Cooling Fan Count</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.coolingfancount?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.coolingfancount?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -10163,11 +8776,7 @@ function Manualstockentry() {
                                                           value: todo.collingfancount,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "collingfancount",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'collingfancount', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10179,21 +8788,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10205,29 +8812,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Clock Speed
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Clock Speed</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.clockspeed?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.clockspeed?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -10235,11 +8829,7 @@ function Manualstockentry() {
                                                           value: todo.clockspeed,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "clockspeed",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'clockspeed', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10251,21 +8841,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10277,20 +8865,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Core</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.core?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -10303,11 +8882,7 @@ function Manualstockentry() {
                                                           value: todo.core,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "core",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'core', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10319,21 +8894,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10345,20 +8918,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Speed</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.speed?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -10371,11 +8935,7 @@ function Manualstockentry() {
                                                           value: todo.speed,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "speed",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'speed', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10387,21 +8947,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10413,29 +8971,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Frequency
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Frequency</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.frequency?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.frequency?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -10443,11 +8988,7 @@ function Manualstockentry() {
                                                           value: todo.frequency,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "frequency",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'frequency', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10459,21 +9000,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10485,20 +9024,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Output</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.output?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -10511,11 +9041,7 @@ function Manualstockentry() {
                                                           value: todo.output,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "output",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'output', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10527,21 +9053,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10553,29 +9077,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Ethernet Ports
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Ethernet Ports</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.ethernetports?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.ethernetports?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -10583,11 +9094,7 @@ function Manualstockentry() {
                                                           value: todo.ethernetports,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "ethernetports",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'ethernetports', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10599,21 +9106,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10625,22 +9130,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Distance
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Distance</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.distance?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -10653,11 +9147,7 @@ function Manualstockentry() {
                                                           value: todo.distance,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "distance",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'distance', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10669,21 +9159,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10695,27 +9183,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Length</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.lengthname?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.lengthname?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -10723,11 +9200,7 @@ function Manualstockentry() {
                                                           value: todo.lengthname,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "lengthname",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'lengthname', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10739,21 +9212,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10765,20 +9236,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Slot</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.slot?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -10791,11 +9253,7 @@ function Manualstockentry() {
                                                           value: todo.slot,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "slot",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'slot', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10807,21 +9265,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10833,29 +9289,16 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        No. Of Channels
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>No. Of Channels</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
-                                                          ?.noofchannels?.map(
-                                                            (item) => ({
-                                                              ...item,
-                                                              label: item,
-                                                              value: item,
-                                                            })
-                                                          )}
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                          ?.noofchannels?.map((item) => ({
+                                                            ...item,
+                                                            label: item,
+                                                            value: item,
+                                                          }))}
                                                         styles={colourStyles}
                                                         isDisabled={todo.subcomponentcheck === false}
                                                         value={{
@@ -10863,11 +9306,7 @@ function Manualstockentry() {
                                                           value: todo.noofchannels,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "noofchannels",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'noofchannels', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10879,21 +9318,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10905,20 +9342,11 @@ function Manualstockentry() {
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <Typography>Colour</Typography>
                                                       <Selects
                                                         options={specificationGrouping
-                                                          .find(
-                                                            (item) =>
-                                                              stockmaster.component ===
-                                                              item.component &&
-                                                              stockmaster.productname ===
-                                                              item.assetmaterial
-                                                          )
+                                                          .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
                                                           ?.colours?.map((item) => ({
                                                             ...item,
                                                             label: item,
@@ -10931,11 +9359,7 @@ function Manualstockentry() {
                                                           value: todo.colours,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "colours",
-                                                            e.value
-                                                          );
+                                                          handleChange(index, 'colours', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -10947,21 +9371,19 @@ function Manualstockentry() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus
-                                                        style={{ fontSize: "15px" }}
-                                                      />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -10975,10 +9397,7 @@ function Manualstockentry() {
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
-                                                      Warranty{" "}
-                                                      <b style={{ color: "red" }}>
-                                                        *
-                                                      </b>
+                                                      Warranty <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Select
                                                       fullWidth
@@ -10992,25 +9411,15 @@ function Manualstockentry() {
                                                       // }}
                                                       // value={todo.serial}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "warranty",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'warranty', e.target.value);
                                                       }}
                                                     >
                                                       <MenuItem value="" disabled>
-                                                        {" "}
+                                                        {' '}
                                                         Please Select
                                                       </MenuItem>
-                                                      <MenuItem value="Yes">
-                                                        {" "}
-                                                        {"Yes"}{" "}
-                                                      </MenuItem>
-                                                      <MenuItem value="No">
-                                                        {" "}
-                                                        {"No"}{" "}
-                                                      </MenuItem>
+                                                      <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                                      <MenuItem value="No"> {'No'} </MenuItem>
                                                     </Select>
                                                   </FormControl>
                                                 </Grid>
@@ -11018,21 +9427,15 @@ function Manualstockentry() {
                                             </Grid>
                                           </>
 
-                                          {todo.warranty === "Yes" && (
+                                          {todo.warranty === 'Yes' && (
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
                                                   <Grid item md={6} xs={6} sm={6}>
                                                     <Typography>
-                                                      Warranty Time{" "}
-                                                      <b style={{ color: "red" }}>
-                                                        *
-                                                      </b>
+                                                      Warranty Time <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
+                                                    <FormControl fullWidth size="small">
                                                       <OutlinedInput
                                                         id="component-outlined"
                                                         type="text"
@@ -11040,23 +9443,16 @@ function Manualstockentry() {
                                                         value={todo.estimation}
                                                         disabled={todo.subcomponentcheck === false}
                                                         onChange={(e) => {
-                                                          handleChange(
-                                                            index,
-                                                            "estimation",
-                                                            e.target.value
-                                                          );
+                                                          handleChange(index, 'estimation', e.target.value);
                                                           handleChangephonenumber(e);
                                                         }}
-                                                      // onChange={(e) => handleChangephonenumber(e)}
+                                                        // onChange={(e) => handleChangephonenumber(e)}
                                                       />
                                                     </FormControl>
                                                   </Grid>
                                                   <Grid item md={6} xs={6} sm={6}>
                                                     <Typography>
-                                                      Estimation{" "}
-                                                      <b style={{ color: "red" }}>
-                                                        *
-                                                      </b>
+                                                      Estimation <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Select
                                                       fullWidth
@@ -11067,31 +9463,18 @@ function Manualstockentry() {
                                                       //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
                                                       // }}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "estimationtime",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'estimationtime', e.target.value);
                                                         // handleEstimationChange()
                                                       }}
-                                                    // onChange={handleEstimationChange}
+                                                      // onChange={handleEstimationChange}
                                                     >
                                                       <MenuItem value="" disabled>
-                                                        {" "}
+                                                        {' '}
                                                         Please Select
                                                       </MenuItem>
-                                                      <MenuItem value="Days">
-                                                        {" "}
-                                                        {"Days"}{" "}
-                                                      </MenuItem>
-                                                      <MenuItem value="Month">
-                                                        {" "}
-                                                        {"Month"}{" "}
-                                                      </MenuItem>
-                                                      <MenuItem value="Year">
-                                                        {" "}
-                                                        {"Year"}{" "}
-                                                      </MenuItem>
+                                                      <MenuItem value="Days"> {'Days'} </MenuItem>
+                                                      <MenuItem value="Month"> {'Month'} </MenuItem>
+                                                      <MenuItem value="Year"> {'Year'} </MenuItem>
                                                     </Select>
                                                   </Grid>
                                                 </Grid>
@@ -11104,52 +9487,39 @@ function Manualstockentry() {
                                               <Grid container spacing={2}>
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Purchase date{" "}
-                                                    </Typography>
+                                                    <Typography>Purchase date </Typography>
                                                     <OutlinedInput
                                                       id="component-outlined"
                                                       type="date"
                                                       value={todo.purchasedate}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "purchasedate",
-                                                          e.target.value
-                                                        );
+                                                        handleChange(index, 'purchasedate', e.target.value);
                                                         // handlePurchaseDateChange()
                                                       }}
-                                                    // onChange={handlePurchaseDateChange}
+                                                      // onChange={handlePurchaseDateChange}
                                                     />
                                                   </FormControl>
                                                 </Grid>
                                               </Grid>
                                             </Grid>
                                           </>
-                                          {todos.warranty === "Yes" && (
+                                          {todos.warranty === 'Yes' && (
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
                                                   <Grid item md={10} sm={10} xs={10}>
-                                                    <FormControl
-                                                      fullWidth
-                                                      size="small"
-                                                    >
-                                                      <Typography>
-                                                        Expiry Date{" "}
-                                                      </Typography>
+                                                    <FormControl fullWidth size="small">
+                                                      <Typography>Expiry Date </Typography>
                                                       <OutlinedInput
                                                         id="component-outlined"
                                                         type="text"
                                                         disabled={todo.subcomponentcheck === false}
                                                         placeholder=""
-                                                        value={
-                                                          todo.warrantycalculation
-                                                        }
-                                                      // onChange={(e) => {
-                                                      //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                      // }}
+                                                        value={todo.warrantycalculation}
+                                                        // onChange={(e) => {
+                                                        //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
+                                                        // }}
                                                       />
                                                     </FormControl>
                                                   </Grid>
@@ -11163,10 +9533,7 @@ function Manualstockentry() {
                                               <Grid container spacing={2}>
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Vendor Group Name
-
-                                                    </Typography>
+                                                    <Typography>Vendor Group Name</Typography>
                                                     <Selects
                                                       // options={vendorGroupOpt}
                                                       options={[...vendorModeOptions, ...vendorGroupOpt]}
@@ -11177,19 +9544,11 @@ function Manualstockentry() {
                                                         value: todo.vendorgroup,
                                                       }}
                                                       onChange={(e) => {
-                                                        handleChangeGroupNameIndexBased(
-                                                          e,
-                                                          index
-                                                        );
-                                                        handleChange(
-                                                          index,
-                                                          "vendorgroup",
-                                                          e.value
-                                                        );
+                                                        handleChangeGroupNameIndexBased(e, index);
+                                                        handleChange(index, 'vendorgroup', e.value);
                                                         setTodos((prev) => {
                                                           const updated = [...prev];
-                                                          updated[index].vendor =
-                                                            "Choose Vendor";
+                                                          updated[index].vendor = 'Choose Vendor';
                                                           return updated;
                                                         });
                                                       }}
@@ -11204,25 +9563,18 @@ function Manualstockentry() {
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
                                                       Vendor
-                                                      <b style={{ color: "red" }}>
-                                                        *
-                                                      </b>
+                                                      <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Selects
                                                       // options={vendorOptInd[index]}
-                                                      options={[...vendorModeOptions, ...vendorOptInd[index],]}
+                                                      options={[...vendorModeOptions, ...vendorOptInd[index]]}
                                                       styles={colourStyles}
                                                       value={{
                                                         label: todo.vendor,
                                                         value: todo.vendor,
                                                       }}
                                                       onChange={(e) => {
-                                                        handleChange(
-                                                          index,
-                                                          "vendor",
-                                                          e.value,
-                                                          e._id
-                                                        );
+                                                        handleChange(index, 'vendor', e.value, e._id);
                                                         // setVendor(e.value);
                                                         // vendorid(e._id);
                                                       }}
@@ -11258,9 +9610,7 @@ function Manualstockentry() {
                                               <Grid container spacing={2}>
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Phone Number
-                                                    </Typography>
+                                                    <Typography>Phone Number</Typography>
                                                     <OutlinedInput
                                                       id="component-outlined"
                                                       type="text"
@@ -11309,7 +9659,7 @@ function Manualstockentry() {
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Product Details <b style={{ color: "red" }}>*</b>{" "}
+                          Product Details <b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <TextareaAutosize
                           aria-label="minimum height"
@@ -11329,7 +9679,7 @@ function Manualstockentry() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl size="small" fullWidth>
                         <Typography>
-                          UOM <b style={{ color: "red" }}>*</b>{" "}
+                          UOM <b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <Selects
                           options={vomMasterget}
@@ -11347,7 +9697,7 @@ function Manualstockentry() {
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Qty<b style={{ color: "red" }}>*</b>{" "}
+                          Qty<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -11360,28 +9710,25 @@ function Manualstockentry() {
                               ...stockmaster,
                               quantity: e.target.value,
                             });
-                            setAmount(Number(e.target.value) * Number(stockmaster.rate))
-
+                            setAmount(Number(e.target.value) * Number(stockmaster.rate));
                           }}
                         />
                       </FormControl>
                     </Grid>
                   </Grid>
-
                 </>
               )}
 
               {/* stock todo */}
-              {stockmaster.requestmode === "Stock Material" && (
+              {stockmaster.requestmode === 'Stock Material' && (
                 <>
                   <Grid item md={12} xs={12} sm={12}>
-                    {" "}
+                    {' '}
                     <Typography variant="h6">Stock Purchase Todo List</Typography>
                   </Grid>
                   <Grid item md={12} sm={12} xs={12}>
-                    <Grid container spacing={3} sx={{ display: "flex" }}>
-
-                      {stockmaster.requestmode === "Stock Material" && (
+                    <Grid container spacing={3} sx={{ display: 'flex' }}>
+                      {stockmaster.requestmode === 'Stock Material' && (
                         <>
                           <Grid item md={2.5} sm={6} xs={12}>
                             <FormControl fullWidth size="small">
@@ -11398,35 +9745,35 @@ function Manualstockentry() {
                                   setTodoDetails({
                                     ...todoDetails,
                                     category: e.value,
-                                    subcategory: "Please Select Sub Category",
-                                    materialnew: todoDetails.particularmode === "Others" ? "" : "Please Select Item Name",
-                                    uomnew: "",
-                                    rate: "",
-                                    quantitynew: "",
-                                    amount: "",
+                                    subcategory: 'Please Select Sub Category',
+                                    materialnew: todoDetails.particularmode === 'Others' ? '' : 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
                             </FormControl>
                           </Grid>
-                          {isUserRoleCompare?.includes("astockcategory") && (
+                          {isUserRoleCompare?.includes('astockcategory') && (
                             <Grid item md={0.5} sm={1} xs={1}>
                               <Button
                                 variant="contained"
                                 style={{
-                                  height: "30px",
-                                  minWidth: "20px",
-                                  padding: "19px 13px",
-                                  color: "white",
-                                  marginTop: "23px",
-                                  marginLeft: "-10px",
-                                  background: "rgb(25, 118, 210)",
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
                                 }}
                                 onClick={() => {
                                   handleClickOpenviewalertstockcategory();
                                 }}
                               >
-                                <FaPlus style={{ fontSize: "15px" }} />
+                                <FaPlus style={{ fontSize: '15px' }} />
                               </Button>
                             </Grid>
                           )}
@@ -11449,7 +9796,7 @@ function Manualstockentry() {
                                   value: todoDetails.subcategory,
                                 }}
                                 onChange={(e) => {
-                                  if (e.value !== "Please Select Sub Category") {
+                                  if (e.value !== 'Please Select Sub Category') {
                                     setItemAllShow(false);
                                   } else {
                                     setItemAllShow(true);
@@ -11457,12 +9804,12 @@ function Manualstockentry() {
                                   setTodoDetails({
                                     ...todoDetails,
                                     subcategory: e.value,
-                                    materialnew: todoDetails.particularmode === "Others" ? "" : "Please Select Item Name",
-                                    uomnew: "",
-                                    rate: "",
-                                    quantitynew: "",
-                                    productdetailsnew: "",
-                                    amount: "",
+                                    materialnew: todoDetails.particularmode === 'Others' ? '' : 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
@@ -11471,23 +9818,23 @@ function Manualstockentry() {
                           <Grid item md={2.5} sm={6} xs={12}>
                             <FormControl fullWidth size="small">
                               <Typography>
-                                Item Name <b style={{ color: "red" }}>*</b>
+                                Item Name <b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <Selects
                                 options={
                                   !itemAllShow
                                     ? allStockValues
-                                      .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
-                                      .map((item) => ({
+                                        .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
+                                        .map((item) => ({
+                                          label: item.itemname,
+                                          value: item.itemname,
+                                          uom: item.uom,
+                                        }))
+                                    : allStockValues.map((item) => ({
                                         label: item.itemname,
                                         value: item.itemname,
                                         uom: item.uom,
                                       }))
-                                    : allStockValues.map((item) => ({
-                                      label: item.itemname,
-                                      value: item.itemname,
-                                      uom: item.uom,
-                                    }))
                                 }
                                 styles={colourStyles}
                                 value={{
@@ -11499,33 +9846,33 @@ function Manualstockentry() {
                                     ...todoDetails,
                                     materialnew: e.value,
                                     uomnew: e.uom,
-                                    rate: "",
-                                    quantitynew: "",
-                                    productdetailsnew: "",
-                                    amount: "",
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
                             </FormControl>
                           </Grid>
-                          {isUserRoleCompare?.includes("amanagestockitems") && (
+                          {isUserRoleCompare?.includes('amanagestockitems') && (
                             <Grid item md={0.5} sm={1} xs={1}>
                               <Button
                                 variant="contained"
                                 style={{
-                                  height: "30px",
-                                  minWidth: "20px",
-                                  padding: "19px 13px",
-                                  color: "white",
-                                  marginTop: "23px",
-                                  marginLeft: "-10px",
-                                  background: "rgb(25, 118, 210)",
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
                                 }}
                                 onClick={() => {
                                   handleClickOpenviewalertstockitem();
                                 }}
                               >
-                                <FaPlus style={{ fontSize: "15px" }} />
+                                <FaPlus style={{ fontSize: '15px' }} />
                               </Button>
                             </Grid>
                           )}
@@ -11541,7 +9888,7 @@ function Manualstockentry() {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Rate <b style={{ color: "red" }}>*</b>
+                            Rate <b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -11553,7 +9900,7 @@ function Manualstockentry() {
                             onChange={(e) => {
                               const value = e.target.value;
                               const regex = /^\d*\.?\d{0,2}$/;
-                              if (regex.test(value) || value === "") {
+                              if (regex.test(value) || value === '') {
                                 setTodoDetails({
                                   ...todoDetails,
                                   rate: value,
@@ -11567,7 +9914,7 @@ function Manualstockentry() {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Quantity <b style={{ color: "red" }}>*</b>
+                            Quantity <b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -11590,15 +9937,14 @@ function Manualstockentry() {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Amount<b style={{ color: "red" }}>*</b>
+                            Amount<b style={{ color: 'red' }}>*</b>
                           </Typography>
-                          <OutlinedInput id="component-outlined" type="number" placeholder="Please Enter Amount"
-                            sx={userStyle.input} value={todoDetails.amount} readOnly />
+                          <OutlinedInput id="component-outlined" type="number" placeholder="Please Enter Amount" sx={userStyle.input} value={todoDetails.amount} readOnly />
                         </FormControl>
                       </Grid>
-                      <Grid item md={todoDetails.particularmode !== "Others" ? 2.5 : 3} sm={6} xs={12}>
+                      <Grid item md={todoDetails.particularmode !== 'Others' ? 2.5 : 3} sm={6} xs={12}>
                         <Typography>
-                          Product Details<b style={{ color: "red" }}>*</b>
+                          Product Details<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <TextareaAutosize
                           aria-label="minimum height"
@@ -11614,15 +9960,15 @@ function Manualstockentry() {
                           }}
                         />
                       </Grid>
-                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: "-20px" }}>
+                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: '-20px' }}>
                         <Button
                           variant="contained"
                           color="success"
                           style={{
-                            height: "30px",
-                            minWidth: "20px",
-                            padding: "19px 13px",
-                            marginTop: "25px",
+                            height: '30px',
+                            minWidth: '20px',
+                            padding: '19px 13px',
+                            marginTop: '25px',
                           }}
                           onClick={educationTodo}
                         >
@@ -11630,14 +9976,13 @@ function Manualstockentry() {
                         </Button>
                       </Grid>
                     </Grid>
-                  </Grid>{" "}
+                  </Grid>{' '}
                   <br />
-
                   <Grid container spacing={2}>
                     <Grid item md={12} xs={12} sm={12}>
                       <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable">
-                          <TableHead sx={{ fontWeight: "600" }}>
+                          <TableHead sx={{ fontWeight: '600' }}>
                             <StyledTableRow>
                               <StyledTableCell>SNo</StyledTableCell>
                               <StyledTableCell>Item Name</StyledTableCell>
@@ -11662,7 +10007,7 @@ function Manualstockentry() {
                                   <StyledTableCell>{row.productdetailsnew}</StyledTableCell>
                                   <StyledTableCell>
                                     <CloseIcon
-                                      sx={{ color: "red", cursor: "pointer" }}
+                                      sx={{ color: 'red', cursor: 'pointer' }}
                                       onClick={() => {
                                         educationTodoremove(index);
                                       }}
@@ -11672,15 +10017,15 @@ function Manualstockentry() {
                               ))
                             ) : (
                               <StyledTableRow>
-                                {" "}
+                                {' '}
                                 <StyledTableCell colSpan={8} align="center">
                                   No Data Available
-                                </StyledTableCell>{" "}
+                                </StyledTableCell>{' '}
                               </StyledTableRow>
                             )}
                             <StyledTableRow></StyledTableRow>
                           </TableBody>
-                          <TableFooter sx={{ backgroundColor: "#9591914f", height: "50px" }}>
+                          <TableFooter sx={{ backgroundColor: '#9591914f', height: '50px' }}>
                             {educationtodo &&
                               educationtodo.forEach((item) => {
                                 Expensetotal += +item.amount;
@@ -11694,17 +10039,15 @@ function Manualstockentry() {
                             </StyledTableRow>
                           </TableFooter>
                         </Table>
-                      </TableContainer>{" "}
-
+                      </TableContainer>{' '}
                     </Grid>
                   </Grid>
-
                   <br />
-                  <Grid container spacing={2} sx={{ display: "flex" }}>
+                  <Grid container spacing={2} sx={{ display: 'flex' }}>
                     <Grid item lg={3} md={4} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Paid Status<b style={{ color: "red" }}>*</b>
+                          Paid Status<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           maxMenuHeight={250}
@@ -11718,7 +10061,7 @@ function Manualstockentry() {
                             setExpensecreate({
                               ...expensecreate,
                               paidstatus: e.value,
-                              paidmode: "Please Select Paid Mode",
+                              paidmode: 'Please Select Paid Mode',
                             });
                           }}
                           isDisabled={Number(Expensetotal) !== Number(stockmaster.totalbillamount)}
@@ -11726,10 +10069,10 @@ function Manualstockentry() {
                       </FormControl>
                     </Grid>
                     <Grid item lg={3} md={4} xs={12} sm={6}>
-                      {expensecreate.paidstatus === "Paid" && (
+                      {expensecreate.paidstatus === 'Paid' && (
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Paid Mode<b style={{ color: "red" }}>*</b>
+                            Paid Mode<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <Selects
                             maxMenuHeight={250}
@@ -11750,10 +10093,10 @@ function Manualstockentry() {
                       )}
                     </Grid>
                     <Grid item lg={3} md={4} xs={12} sm={6}>
-                      {expensecreate.paidstatus === "Paid" && (
+                      {expensecreate.paidstatus === 'Paid' && (
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Paid Amount<b style={{ color: "red" }}>*</b>
+                            Paid Amount<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -11775,41 +10118,41 @@ function Manualstockentry() {
                       )}
                     </Grid>
                     <Grid item lg={3} md={4} xs={12} sm={6}>
-                      {expensecreate.paidstatus === "Paid" && (
+                      {expensecreate.paidstatus === 'Paid' && (
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Balance Amount<b style={{ color: "red" }}>*</b>
+                            Balance Amount<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput readOnly id="component-outlined" type="number" sx={userStyle.input} placeholder="Please Enter Balance Amount" value={expensecreate.balanceamount} />
                         </FormControl>
                       )}
                     </Grid>
                     <br /> <br />
-                    {expensecreate.paidstatus === "Paid" && expensecreate.paidmode === "Cash" && (
+                    {expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Cash' && (
                       <>
                         <br />
                         <br />
                         <br />
 
-                        <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
-                            <Typography sx={{ fontWeight: "bold" }}>Cash</Typography>
+                            <Typography sx={{ fontWeight: 'bold' }}>Cash</Typography>
                             <br />
 
-                            <OutlinedInput id="component-outlined" type="text" readOnly={true} value={"Cash"} onChange={(e) => { }} />
+                            <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => {}} />
                           </FormControl>
                         </Grid>
                       </>
                     )}
                     <br />
                     <br />
-                    {expensecreate.paidmode === "Bank Transfer" && expensecreate.paidstatus === "Paid" && (
+                    {expensecreate.paidmode === 'Bank Transfer' && expensecreate.paidstatus === 'Paid' && (
                       <>
                         <br />
                         <br />
 
                         <Grid item md={12} xs={8}>
-                          <Typography sx={{ fontWeight: "bold" }}>Bank Details</Typography>
+                          <Typography sx={{ fontWeight: 'bold' }}>Bank Details</Typography>
                         </Grid>
 
                         <br />
@@ -11839,7 +10182,7 @@ function Manualstockentry() {
                             <OutlinedInput readOnly={true} value={vendorstock.accountnumber} />
                           </FormControl>
                         </Grid>
-                        <Grid item md={4} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={4} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>IFSC Code</Typography>
                             <OutlinedInput readOnly={true} value={vendor.ifsccode} />
@@ -11848,16 +10191,16 @@ function Manualstockentry() {
                       </>
                     )}
                     <br /> <br />
-                    {expensecreate.paidmode === "UPI" && expensecreate.paidstatus === "Paid" && (
+                    {expensecreate.paidmode === 'UPI' && expensecreate.paidstatus === 'Paid' && (
                       <>
                         <Grid item md={12} xs={8}>
-                          <Typography sx={{ fontWeight: "bold" }}>UPI Details</Typography>
+                          <Typography sx={{ fontWeight: 'bold' }}>UPI Details</Typography>
                         </Grid>
 
                         <br />
                         <br />
 
-                        <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>UPI Number</Typography>
                             <OutlinedInput readOnly={true} value={vendorstock.upinumber} />
@@ -11866,10 +10209,10 @@ function Manualstockentry() {
                       </>
                     )}
                     <br /> <br />
-                    {expensecreate.paidmode === "Card" && expensecreate.paidstatus === "Paid" && (
+                    {expensecreate.paidmode === 'Card' && expensecreate.paidstatus === 'Paid' && (
                       <>
                         <Grid md={12} item xs={8}>
-                          <Typography sx={{ fontWeight: "bold" }}>Card Details</Typography>
+                          <Typography sx={{ fontWeight: 'bold' }}>Card Details</Typography>
                         </Grid>
 
                         <br />
@@ -11912,7 +10255,7 @@ function Manualstockentry() {
                             </Grid>
                           </Grid>
                         </Grid>
-                        <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>Security Code</Typography>
                             <OutlinedInput readOnly={true} value={vendorstock.cardsecuritycode} />
@@ -11922,15 +10265,15 @@ function Manualstockentry() {
                     )}
                     <br />
                     <br />
-                    {expensecreate.paidmode === "Cheque" && expensecreate.paidstatus === "Paid" && (
+                    {expensecreate.paidmode === 'Cheque' && expensecreate.paidstatus === 'Paid' && (
                       <>
                         <Grid item md={12} xs={8}>
-                          <Typography sx={{ fontWeight: "bold" }}>Cheque Details</Typography>
+                          <Typography sx={{ fontWeight: 'bold' }}>Cheque Details</Typography>
                         </Grid>
 
                         <br />
 
-                        <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>Cheque Number</Typography>
                             <OutlinedInput readOnly={true} value={vendorstock.chequenumber} />
@@ -11939,11 +10282,8 @@ function Manualstockentry() {
                       </>
                     )}
                   </Grid>
-
-
                 </>
               )}
-
 
               <Grid container spacing={2}>
                 <Grid item md={3} xs={12} sm={6} marginTop={3}>
@@ -11953,12 +10293,7 @@ function Manualstockentry() {
                     </Box>
                   ) : (
                     <> */}
-                  <LoadingButton
-                    loading={btnSubmit}
-                    variant="contained"
-                    sx={buttonStyles.buttonsubmit}
-                    onClick={handleSubmit}
-                  >
+                  <LoadingButton loading={btnSubmit} variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
                     Create
                   </LoadingButton>
                   {/* </>
@@ -11976,37 +10311,29 @@ function Manualstockentry() {
       )}
       <Box>
         {/* Edit DIALOG */}
-        <Dialog
-          open={isEditOpen}
-          onClose={handleCloseModEdit}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="lg"
-          fullWidth={true}
-          sx={{ marginTop: "95px" }}
-        >
-          <Box sx={{ padding: "20px 50px" }}>
+        <Dialog open={isEditOpen} onClose={handleCloseModEdit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" fullWidth={true} sx={{ marginTop: '95px' }}>
+          <Box sx={{ padding: '20px 50px' }}>
             <>
               <Grid container spacing={2}>
-                <Typography sx={userStyle.HeaderText}>
-                  Edit Asset Purchase
-                </Typography>
+                <Typography sx={userStyle.HeaderText}>Edit Asset Purchase</Typography>
               </Grid>
               <br />
               <Grid container spacing={2}>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Company<b style={{ color: "red" }}>*</b>
+                      Company<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={companysEdit}
-                      options={accessbranch?.map(data => ({
-                        label: data.company,
-                        value: data.company,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={accessbranch
+                        ?.map((data) => ({
+                          label: data.company,
+                          value: data.company,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       styles={colourStyles}
                       value={{
                         label: stockmasteredit.company,
@@ -12016,16 +10343,16 @@ function Manualstockentry() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           company: e.value,
-                          branch: "Please Select Branch",
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          branch: 'Please Select Branch',
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         setUnitsEdit([]);
                         setAreasEdit([]);
                         setFloorEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchBranchDropdownsEdit(e.value);
                       }}
                     />
@@ -12034,19 +10361,19 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Branch<b style={{ color: "red" }}>*</b>
+                      Branch<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={branchsEdit}
-                      options={accessbranch?.filter(
-                        (comp) =>
-                          stockmasteredit.company === comp.company
-                      )?.map(data => ({
-                        label: data.branch,
-                        value: data.branch,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={accessbranch
+                        ?.filter((comp) => stockmasteredit.company === comp.company)
+                        ?.map((data) => ({
+                          label: data.branch,
+                          value: data.branch,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       styles={colourStyles}
                       value={{
                         label: stockmasteredit.branch,
@@ -12057,14 +10384,14 @@ function Manualstockentry() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           branch: e.value,
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setUnitsEdit([]);
                         // setAreasEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         setFloorEdit([]);
                         fetchUnitsEdit(e.value);
                         fetchFloorEdit(e.value);
@@ -12075,19 +10402,19 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Unit<b style={{ color: "red" }}>*</b>
+                      Unit<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={unitsEdit}
-                      options={accessbranch?.filter(
-                        (comp) =>
-                          stockmasteredit.company === comp.company && stockmasteredit.branch === comp.branch
-                      )?.map(data => ({
-                        label: data.unit,
-                        value: data.unit,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={accessbranch
+                        ?.filter((comp) => stockmasteredit.company === comp.company && stockmasteredit.branch === comp.branch)
+                        ?.map((data) => ({
+                          label: data.unit,
+                          value: data.unit,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       styles={colourStyles}
                       value={{
                         label: stockmasteredit.unit,
@@ -12097,7 +10424,7 @@ function Manualstockentry() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           unit: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -12106,7 +10433,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Floor<b style={{ color: "red" }}>*</b>
+                      Floor<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={floorsEdit}
@@ -12119,12 +10446,12 @@ function Manualstockentry() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           floor: e.value,
-                          workstation: "",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          workstation: '',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setAreasEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchAreaEdit(stockmasteredit.branch, e.value);
                       }}
                     />
@@ -12133,7 +10460,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Area<b style={{ color: "red" }}>*</b>
+                      Area<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={areasEdit}
@@ -12146,15 +10473,11 @@ function Manualstockentry() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           area: e.value,
-                          workstation: "",
-                          location: "Please Select Location",
+                          workstation: '',
+                          location: 'Please Select Location',
                         });
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
-                        fetchAllLocationEdit(
-                          stockmasteredit.branch,
-                          stockmasteredit.floor,
-                          e.value
-                        );
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
+                        fetchAllLocationEdit(stockmasteredit.branch, stockmasteredit.floor, e.value);
                       }}
                     />
                   </FormControl>
@@ -12162,7 +10485,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Location<b style={{ color: "red" }}>*</b>
+                      Location<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={locationsEdit}
@@ -12175,7 +10498,7 @@ function Manualstockentry() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           location: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -12231,28 +10554,22 @@ function Manualstockentry() {
                       }}
                     >
                       <MenuItem value="" disabled>
-                        {" "}
+                        {' '}
                         Please Select
                       </MenuItem>
-                      <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                      <MenuItem value="No"> {"No"} </MenuItem>
+                      <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                      <MenuItem value="No"> {'No'} </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
-                {stockmasteredit.warranty === "Yes" && (
+                {stockmasteredit.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <Grid container>
                         <Grid item md={6} xs={6} sm={6}>
                           <Typography>Warranty Time</Typography>
                           <FormControl fullWidth size="small">
-                            <OutlinedInput
-                              id="component-outlined"
-                              type="text"
-                              placeholder="Enter Time"
-                              value={stockmasteredit.estimation}
-                              onChange={(e) => handleChangephonenumberEdit(e)}
-                            />
+                            <OutlinedInput id="component-outlined" type="text" placeholder="Enter Time" value={stockmasteredit.estimation} onChange={(e) => handleChangephonenumberEdit(e)} />
                           </FormControl>
                         </Grid>
                         <Grid item md={6} xs={6} sm={6}>
@@ -12269,12 +10586,12 @@ function Manualstockentry() {
                             onChange={handleEstimationChangeEdit}
                           >
                             <MenuItem value="" disabled>
-                              {" "}
+                              {' '}
                               Please Select
                             </MenuItem>
-                            <MenuItem value="Days"> {"Days"} </MenuItem>
-                            <MenuItem value="Month"> {"Month"} </MenuItem>
-                            <MenuItem value="Year"> {"Year"} </MenuItem>
+                            <MenuItem value="Days"> {'Days'} </MenuItem>
+                            <MenuItem value="Month"> {'Month'} </MenuItem>
+                            <MenuItem value="Year"> {'Year'} </MenuItem>
                           </Select>
                         </Grid>
                       </Grid>
@@ -12295,17 +10612,12 @@ function Manualstockentry() {
                     />
                   </FormControl>
                 </Grid>
-                {stockmasteredit.warranty === "Yes" && (
+                {stockmasteredit.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>Expiry Date </Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="text"
-                          placeholder=""
-                          value={stockmasteredit.warrantycalculation}
-                        />
+                        <OutlinedInput id="component-outlined" type="text" placeholder="" value={stockmasteredit.warrantycalculation} />
                       </FormControl>
                     </Grid>
                   </>
@@ -12314,7 +10626,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      {" "}
+                      {' '}
                       Vendor Group Name
                       {/* <b style={{ color: "red" }}>*</b>{" "} */}
                     </Typography>
@@ -12325,8 +10637,8 @@ function Manualstockentry() {
                       onChange={(e) => {
                         handleChangeGroupNameEdit(e);
                         setVendorGroupEdit(e.value);
-                        setVendorNewEdit("Choose Vendor");
-                        setFrequencyValue("")
+                        setVendorNewEdit('Choose Vendor');
+                        setFrequencyValue('');
                       }}
                     />
                   </FormControl>
@@ -12334,7 +10646,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <Typography>
-                      Vendor Name <b style={{ color: "red" }}>*</b>{" "}
+                      Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       // options={vendormaster}
@@ -12352,25 +10664,13 @@ function Manualstockentry() {
                 <Grid item lg={2.5} md={4} xs={12} sm={6}>
                   <FormControl size="small" fullWidth>
                     <Typography>Frequency</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      sx={userStyle.input}
-                      placeholder="Please Enter Frequency"
-                      value={frequencyValueedit}
-                      readOnly
-                    />
+                    <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValueedit} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>GST No</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      value={vendorgetid?.gstnumber}
-                      readOnly
-                    />
+                    <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} sm={12} xs={12}>
@@ -12393,7 +10693,7 @@ function Manualstockentry() {
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Rate<b style={{ color: "red" }}>*</b>{" "}
+                      Rate<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -12402,14 +10702,13 @@ function Manualstockentry() {
                       placeholder="Please Enter Rate"
                       value={stockmasteredit.rate}
                       onChange={(e) => {
-                        const quantity = stockmasteredit.requestmode == "Stock Material" ? Number(stockmasteredit.quantitynew) : Number(stockmasteredit.quantity)
+                        const quantity = stockmasteredit.requestmode == 'Stock Material' ? Number(stockmasteredit.quantitynew) : Number(stockmasteredit.quantity);
 
                         setStockmasteredit({
                           ...stockmasteredit,
                           rate: e.target.value,
                         });
-                        setAmountEdit(Number(e.target.value) * Number(quantity))
-
+                        setAmountEdit(Number(e.target.value) * Number(quantity));
                       }}
                     />
                   </FormControl>
@@ -12417,15 +10716,9 @@ function Manualstockentry() {
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Bill Amount<b style={{ color: "red" }}>*</b>{" "}
+                      Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="number"
-                      sx={userStyle.input}
-                      placeholder="Please Enter Rate"
-                      value={Number(totalAmountEdit)}
-                    />
+                    <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} placeholder="Please Enter Rate" value={Number(totalAmountEdit)} />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
@@ -12446,23 +10739,17 @@ function Manualstockentry() {
                 </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>Bill</Typography>
-                  <Box sx={{ display: "flex", justifyContent: "left" }}>
-                    <Button
-                      variant="contained"
-                      onClick={handleClickUploadPopupOpenedit}
-                    >
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                    <Button variant="contained" onClick={handleClickUploadPopupOpenedit}>
                       Upload
                     </Button>
                   </Box>
                 </Grid>
-                {stockmasteredit.warranty === "Yes" && (
+                {stockmasteredit.warranty === 'Yes' && (
                   <Grid item md={1.5} xs={12} sm={12}>
                     <Typography>Warranty Card </Typography>
-                    <Box sx={{ display: "flex", justifyContent: "left" }}>
-                      <Button
-                        variant="contained"
-                        onClick={handleClickUploadPopupOpenwarrantyedit}
-                      >
+                    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                      <Button variant="contained" onClick={handleClickUploadPopupOpenwarrantyedit}>
                         Upload
                       </Button>
                     </Box>
@@ -12471,10 +10758,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>Stock Mode For</Typography>
-                    <OutlinedInput
-                      value={stockmasteredit.requestmode}
-                      readOnly={true}
-                    />
+                    <OutlinedInput value={stockmasteredit.requestmode} readOnly={true} />
                   </FormControl>
                 </Grid>
                 <Grid item md={12} xs={12} sm={12}>
@@ -12536,36 +10820,28 @@ function Manualstockentry() {
                                 <Grid item md={3} sm={6} xs={12}>
                                   <Grid container spacing={2}>
                                     <Grid item md={10} sm={10} xs={10}>
-
-
                                       <FormGroup>
-
                                         <FormControlLabel
-
                                           control={
                                             <Switch
                                               // color="success"
                                               sx={{
-                                                "& .MuiSwitch-switchBase.Mui-checked": {
-                                                  color: "green", // Thumb color when checked
+                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                  color: 'green', // Thumb color when checked
                                                 },
-                                                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                  backgroundColor: "green", // Track color when checked
+                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                  backgroundColor: 'green', // Track color when checked
                                                 },
-                                                "& .MuiSwitch-switchBase": {
-                                                  color: "#ff0000a3", // Thumb color when not checked
+                                                '& .MuiSwitch-switchBase': {
+                                                  color: '#ff0000a3', // Thumb color when not checked
                                                 },
-                                                "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                  backgroundColor: "#ff0000a3", // Track color when not checked
+                                                '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                  backgroundColor: '#ff0000a3', // Track color when not checked
                                                 },
                                               }}
                                               checked={todo.subcomponentcheck}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "subcomponentcheck",
-                                                  e.target.checked
-                                                );
+                                                handleChangeEdit(index, 'subcomponentcheck', e.target.checked);
                                               }}
                                             />
                                           }
@@ -12587,11 +10863,7 @@ function Manualstockentry() {
                                               <Typography>Type</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.type?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -12604,11 +10876,7 @@ function Manualstockentry() {
                                                   value: todo.type,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "type",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'type', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12619,21 +10887,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenType();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12649,11 +10915,7 @@ function Manualstockentry() {
                                               <Typography>Model</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.model?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -12666,11 +10928,7 @@ function Manualstockentry() {
                                                   value: todo.model,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "model",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'model', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12681,21 +10939,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenModel();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12711,11 +10967,7 @@ function Manualstockentry() {
                                               <Typography>Size</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.size?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -12728,11 +10980,7 @@ function Manualstockentry() {
                                                   value: todo.size,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "size",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'size', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12743,21 +10991,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenSize();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12773,11 +11019,7 @@ function Manualstockentry() {
                                               <Typography>Variants</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.variant?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -12790,11 +11032,7 @@ function Manualstockentry() {
                                                   value: todo.variant,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "variant",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'variant', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12805,21 +11043,19 @@ function Manualstockentry() {
                                               variant="contained"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenVariant();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12835,11 +11071,7 @@ function Manualstockentry() {
                                               <Typography>Brand</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.brand?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -12852,11 +11084,7 @@ function Manualstockentry() {
                                                   value: todo.brand,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "brand",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'brand', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12867,21 +11095,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenBrand();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12903,11 +11129,7 @@ function Manualstockentry() {
                                               value={todo.serial}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "serial",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'serial', e.target.value);
                                               }}
                                             />
                                           </Grid>
@@ -12929,11 +11151,7 @@ function Manualstockentry() {
                                               placeholder="Please Enter Other"
                                               value={todo.other}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "other",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'other', e.target.value);
                                               }}
                                             />
                                           </Grid>
@@ -12950,11 +11168,7 @@ function Manualstockentry() {
                                               <Typography>Capacity</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.capacity?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -12967,11 +11181,7 @@ function Manualstockentry() {
                                                   value: todo.capacity,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "capacity",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'capacity', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12983,21 +11193,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13021,18 +11229,10 @@ function Manualstockentry() {
                                               onChange={(e) => {
                                                 const inputText = e.target.value;
                                                 // Regex to allow only non-negative numbers
-                                                const validatedInput =
-                                                  inputText.match(/^\d*$/);
+                                                const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput =
-                                                  validatedInput !== null
-                                                    ? validatedInput[0]
-                                                    : "0";
-                                                handleChangeEdit(
-                                                  index,
-                                                  "hdmiport",
-                                                  sanitizedInput
-                                                );
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'hdmiport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -13057,18 +11257,10 @@ function Manualstockentry() {
                                               onChange={(e) => {
                                                 const inputText = e.target.value;
                                                 // Regex to allow only non-negative numbers
-                                                const validatedInput =
-                                                  inputText.match(/^\d*$/);
+                                                const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput =
-                                                  validatedInput !== null
-                                                    ? validatedInput[0]
-                                                    : "0";
-                                                handleChangeEdit(
-                                                  index,
-                                                  "vgaport",
-                                                  sanitizedInput
-                                                );
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'vgaport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -13093,18 +11285,10 @@ function Manualstockentry() {
                                               onChange={(e) => {
                                                 const inputText = e.target.value;
                                                 // Regex to allow only non-negative numbers
-                                                const validatedInput =
-                                                  inputText.match(/^\d*$/);
+                                                const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput =
-                                                  validatedInput !== null
-                                                    ? validatedInput[0]
-                                                    : "0";
-                                                handleChangeEdit(
-                                                  index,
-                                                  "dpport",
-                                                  sanitizedInput
-                                                );
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'dpport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -13129,18 +11313,10 @@ function Manualstockentry() {
                                               onChange={(e) => {
                                                 const inputText = e.target.value;
                                                 // Regex to allow only non-negative numbers
-                                                const validatedInput =
-                                                  inputText.match(/^\d*$/);
+                                                const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput =
-                                                  validatedInput !== null
-                                                    ? validatedInput[0]
-                                                    : "0";
-                                                handleChangeEdit(
-                                                  index,
-                                                  "usbport",
-                                                  sanitizedInput
-                                                );
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'usbport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -13157,11 +11333,7 @@ function Manualstockentry() {
                                               <Typography>Panel Type</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.paneltype?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13174,11 +11346,7 @@ function Manualstockentry() {
                                                   value: todo.paneltypescreen,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "paneltypescreen",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'paneltypescreen', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13190,21 +11358,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13217,23 +11383,15 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Screen Resolution
-                                              </Typography>
+                                              <Typography>Screen Resolution</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
-                                                  ?.screenresolution?.map(
-                                                    (item) => ({
-                                                      ...item,
-                                                      label: item,
-                                                      value: item,
-                                                    })
-                                                  )}
+                                                  .find((item) => item.subcomponent === todo.subname)
+                                                  ?.screenresolution?.map((item) => ({
+                                                    ...item,
+                                                    label: item,
+                                                    value: item,
+                                                  }))}
                                                 styles={colourStyles}
                                                 isDisabled={todo.subcomponentcheck === false}
                                                 value={{
@@ -13241,11 +11399,7 @@ function Manualstockentry() {
                                                   value: todo.resolution,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "resolution",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'resolution', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13257,21 +11411,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
-                                                color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
-                                                background: "rgb(25, 118, 210)",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
+                                                color: 'white',
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
+                                                background: 'rgb(25, 118, 210)',
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13287,11 +11439,7 @@ function Manualstockentry() {
                                               <Typography>Connectivity</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.connectivity?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13304,11 +11452,7 @@ function Manualstockentry() {
                                                   value: todo.connectivity,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "connectivity",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'connectivity', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13320,21 +11464,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13350,11 +11492,7 @@ function Manualstockentry() {
                                               <Typography>Data Rate</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.datarate?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13367,11 +11505,7 @@ function Manualstockentry() {
                                                   value: todo.daterate,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "daterate",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'daterate', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13383,21 +11517,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13410,23 +11542,15 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Compatible Device
-                                              </Typography>
+                                              <Typography>Compatible Device</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
-                                                  ?.compatibledevices?.map(
-                                                    (item) => ({
-                                                      ...item,
-                                                      label: item,
-                                                      value: item,
-                                                    })
-                                                  )}
+                                                  .find((item) => item.subcomponent === todo.subname)
+                                                  ?.compatibledevices?.map((item) => ({
+                                                    ...item,
+                                                    label: item,
+                                                    value: item,
+                                                  }))}
                                                 styles={colourStyles}
                                                 isDisabled={todo.subcomponentcheck === false}
                                                 value={{
@@ -13434,11 +11558,7 @@ function Manualstockentry() {
                                                   value: todo.compatibledevice,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "compatibledevice",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'compatibledevice', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13450,21 +11570,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13480,11 +11598,7 @@ function Manualstockentry() {
                                               <Typography>Output Power</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  .find((item) => item.subcomponent === todo.subname)
                                                   ?.outputpower?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13497,11 +11611,7 @@ function Manualstockentry() {
                                                   value: todo.outputpower,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "outputpower",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'outputpower', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13513,21 +11623,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13540,23 +11648,15 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Cooling Fan Count
-                                              </Typography>
+                                              <Typography>Cooling Fan Count</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
-                                                  ?.coolingfancount?.map(
-                                                    (item) => ({
-                                                      ...item,
-                                                      label: item,
-                                                      value: item,
-                                                    })
-                                                  )}
+                                                  .find((item) => item.subcomponent === todo.subname)
+                                                  ?.coolingfancount?.map((item) => ({
+                                                    ...item,
+                                                    label: item,
+                                                    value: item,
+                                                  }))}
                                                 styles={colourStyles}
                                                 isDisabled={todo.subcomponentcheck === false}
                                                 value={{
@@ -13564,11 +11664,7 @@ function Manualstockentry() {
                                                   value: todo.collingfancount,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "collingfancount",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'collingfancount', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13580,21 +11676,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13610,11 +11704,7 @@ function Manualstockentry() {
                                               <Typography>Clock Speed</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.clockspeed?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13627,11 +11717,7 @@ function Manualstockentry() {
                                                   value: todo.clockspeed,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "clockspeed",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'clockspeed', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13643,21 +11729,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13673,11 +11757,7 @@ function Manualstockentry() {
                                               <Typography>Core</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.core?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13690,11 +11770,7 @@ function Manualstockentry() {
                                                   value: todo.core,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "core",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'core', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13706,21 +11782,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13736,11 +11810,7 @@ function Manualstockentry() {
                                               <Typography>Speed</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.speed?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13753,11 +11823,7 @@ function Manualstockentry() {
                                                   value: todo.speed,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "speed",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'speed', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13769,21 +11835,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13799,11 +11863,7 @@ function Manualstockentry() {
                                               <Typography>Frequency</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.frequency?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13816,11 +11876,7 @@ function Manualstockentry() {
                                                   value: todo.frequency,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "frequency",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'frequency', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13832,21 +11888,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13862,11 +11916,7 @@ function Manualstockentry() {
                                               <Typography>Output</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.output?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13879,11 +11929,7 @@ function Manualstockentry() {
                                                   value: todo.output,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "output",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'output', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13895,21 +11941,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13922,16 +11966,10 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Ethernet Ports
-                                              </Typography>
+                                              <Typography>Ethernet Ports</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.ethernetports?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -13944,11 +11982,7 @@ function Manualstockentry() {
                                                   value: todo.ethernetports,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "ethernetports",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'ethernetports', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13960,21 +11994,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13990,11 +12022,7 @@ function Manualstockentry() {
                                               <Typography>Distance</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.distance?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14006,11 +12034,7 @@ function Manualstockentry() {
                                                   value: todo.distance,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "distance",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'distance', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14022,21 +12046,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14052,11 +12074,7 @@ function Manualstockentry() {
                                               <Typography>Length</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.lengthname?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14069,11 +12087,7 @@ function Manualstockentry() {
                                                   value: todo.lengthname,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "lengthname",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'lengthname', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14085,21 +12099,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14115,11 +12127,7 @@ function Manualstockentry() {
                                               <Typography>Slot</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.slot?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14132,11 +12140,7 @@ function Manualstockentry() {
                                                   value: todo.slot,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "slot",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'slot', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14148,21 +12152,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14175,16 +12177,10 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                No. Of Channels
-                                              </Typography>
+                                              <Typography>No. Of Channels</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.noofchannels?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14197,11 +12193,7 @@ function Manualstockentry() {
                                                   value: todo.noofchannels,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "noofchannels",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'noofchannels', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14213,21 +12205,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14243,11 +12233,7 @@ function Manualstockentry() {
                                               <Typography>Colour</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  ?.find(
-                                                    (item) =>
-                                                      item.subcomponent ===
-                                                      todo.subname
-                                                  )
+                                                  ?.find((item) => item.subcomponent === todo.subname)
                                                   ?.colours?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14260,11 +12246,7 @@ function Manualstockentry() {
                                                   value: todo.colours,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "colours",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'colours', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14276,21 +12258,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14310,25 +12290,15 @@ function Manualstockentry() {
                                               value={todo.warranty}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "warranty",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'warranty', e.target.value);
                                               }}
                                             >
                                               <MenuItem value="" disabled>
-                                                {" "}
+                                                {' '}
                                                 Please Select
                                               </MenuItem>
-                                              <MenuItem value="Yes">
-                                                {" "}
-                                                {"Yes"}{" "}
-                                              </MenuItem>
-                                              <MenuItem value="No">
-                                                {" "}
-                                                {"No"}{" "}
-                                              </MenuItem>
+                                              <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                              <MenuItem value="No"> {'No'} </MenuItem>
                                             </Select>
                                           </FormControl>
                                         </Grid>
@@ -14336,7 +12306,7 @@ function Manualstockentry() {
                                     </Grid>
                                   </>
 
-                                  {todo.warranty === "Yes" && (
+                                  {todo.warranty === 'Yes' && (
                                     <>
                                       <Grid item md={3} sm={6} xs={12}>
                                         <Grid container>
@@ -14351,11 +12321,7 @@ function Manualstockentry() {
                                                 value={todo.estimation}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "estimation",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'estimation', e.target.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14370,29 +12336,16 @@ function Manualstockentry() {
                                               value={todo.estimationtime}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "estimationtime",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'estimationtime', e.target.value);
                                               }}
                                             >
                                               <MenuItem value="" disabled>
-                                                {" "}
+                                                {' '}
                                                 Please Select
                                               </MenuItem>
-                                              <MenuItem value="Days">
-                                                {" "}
-                                                {"Days"}{" "}
-                                              </MenuItem>
-                                              <MenuItem value="Month">
-                                                {" "}
-                                                {"Month"}{" "}
-                                              </MenuItem>
-                                              <MenuItem value="Year">
-                                                {" "}
-                                                {"Year"}{" "}
-                                              </MenuItem>
+                                              <MenuItem value="Days"> {'Days'} </MenuItem>
+                                              <MenuItem value="Month"> {'Month'} </MenuItem>
+                                              <MenuItem value="Year"> {'Year'} </MenuItem>
                                             </Select>
                                           </Grid>
                                         </Grid>
@@ -14413,11 +12366,7 @@ function Manualstockentry() {
                                               value={todo.purchasedate}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "purchasedate",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'purchasedate', e.target.value);
                                               }}
                                             />
                                           </FormControl>
@@ -14425,21 +12374,14 @@ function Manualstockentry() {
                                       </Grid>
                                     </Grid>
                                   </>
-                                  {todo.warranty === "Yes" && (
+                                  {todo.warranty === 'Yes' && (
                                     <>
                                       <Grid item md={3} sm={6} xs={12}>
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
                                               <Typography>Expiry Date </Typography>
-                                              <OutlinedInput
-                                                id="component-outlined"
-                                                type="text"
-                                                disabled={todo.subcomponentcheck === false}
-                                                size="small"
-                                                placeholder=""
-                                                value={todo.warrantycalculation}
-                                              />
+                                              <OutlinedInput id="component-outlined" type="text" disabled={todo.subcomponentcheck === false} size="small" placeholder="" value={todo.warrantycalculation} />
                                             </FormControl>
                                           </Grid>
                                         </Grid>
@@ -14466,20 +12408,12 @@ function Manualstockentry() {
                                                 value: todo.vendorgroup,
                                               }}
                                               onChange={(e) => {
-                                                handleChangeGroupNameIndexBasedEdit(
-                                                  e,
-                                                  index
-                                                );
-                                                handleChangeEdit(
-                                                  index,
-                                                  "vendorgroup",
-                                                  e.value
-                                                );
+                                                handleChangeGroupNameIndexBasedEdit(e, index);
+                                                handleChangeEdit(index, 'vendorgroup', e.value);
 
                                                 setTodosEdit((prev) => {
                                                   const updated = [...prev];
-                                                  updated[index].vendor =
-                                                    "Choose Vendor";
+                                                  updated[index].vendor = 'Choose Vendor';
                                                   return updated;
                                                 });
                                               }}
@@ -14494,11 +12428,11 @@ function Manualstockentry() {
                                           <FormControl fullWidth size="small">
                                             <Typography>
                                               Vendor
-                                              <b style={{ color: "red" }}>*</b>
+                                              <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Selects
                                               // options={vendorOptIndEdit[index]}
-                                              options={[...vendorModeOptions, ...vendorOptIndEdit[index],]}
+                                              options={[...vendorModeOptions, ...vendorOptIndEdit[index]]}
                                               styles={colourStyles}
                                               isDisabled={todo.subcomponentcheck === false}
                                               value={{
@@ -14506,12 +12440,7 @@ function Manualstockentry() {
                                                 value: todo.vendor,
                                               }}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "vendor",
-                                                  e.value,
-                                                  e._id
-                                                );
+                                                handleChangeEdit(index, 'vendor', e.value, e._id);
 
                                                 // vendoridEdit(e._id);
                                               }}
@@ -14561,7 +12490,6 @@ function Manualstockentry() {
                                       </Grid>
                                     </Grid>
                                   </>
-
                                 </>
                               )}
 
@@ -14599,35 +12527,28 @@ function Manualstockentry() {
                                 <Grid item md={3} sm={6} xs={12}>
                                   <Grid container spacing={2}>
                                     <Grid item md={10} sm={10} xs={10}>
-
-
                                       <FormGroup>
                                         <FormControlLabel
-
                                           control={
                                             <Switch
                                               // color="success"
                                               sx={{
-                                                "& .MuiSwitch-switchBase.Mui-checked": {
-                                                  color: "green", // Thumb color when checked
+                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                  color: 'green', // Thumb color when checked
                                                 },
-                                                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                  backgroundColor: "green", // Track color when checked
+                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                  backgroundColor: 'green', // Track color when checked
                                                 },
-                                                "& .MuiSwitch-switchBase": {
-                                                  color: "#ff0000a3", // Thumb color when not checked
+                                                '& .MuiSwitch-switchBase': {
+                                                  color: '#ff0000a3', // Thumb color when not checked
                                                 },
-                                                "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                  backgroundColor: "#ff0000a3", // Track color when not checked
+                                                '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                  backgroundColor: '#ff0000a3', // Track color when not checked
                                                 },
                                               }}
                                               checked={todo.subcomponentcheck}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "subcomponentcheck",
-                                                  e.target.checked
-                                                );
+                                                handleChangeEdit(index, 'subcomponentcheck', e.target.checked);
                                               }}
                                             />
                                           }
@@ -14649,13 +12570,7 @@ function Manualstockentry() {
                                               <Typography>Type</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.type?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14667,11 +12582,7 @@ function Manualstockentry() {
                                                   value: todo.type,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "type",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'type', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14682,21 +12593,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenType();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14712,13 +12621,7 @@ function Manualstockentry() {
                                               <Typography>Model</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.model?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14731,11 +12634,7 @@ function Manualstockentry() {
                                                   value: todo.model,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "model",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'model', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14746,21 +12645,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenModel();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14776,13 +12673,7 @@ function Manualstockentry() {
                                               <Typography>Size</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.size?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14795,11 +12686,7 @@ function Manualstockentry() {
                                                   value: todo.size,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "size",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'size', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14810,21 +12697,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenSize();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14840,13 +12725,7 @@ function Manualstockentry() {
                                               <Typography>Variants</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.variant?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14859,11 +12738,7 @@ function Manualstockentry() {
                                                   value: todo.variant,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "variant",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'variant', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14874,21 +12749,19 @@ function Manualstockentry() {
                                               variant="contained"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenVariant();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14904,13 +12777,7 @@ function Manualstockentry() {
                                               <Typography>Brand</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.brand?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -14923,11 +12790,7 @@ function Manualstockentry() {
                                                   value: todo.brand,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "brand",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'brand', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14938,21 +12801,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenBrand();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14974,11 +12835,7 @@ function Manualstockentry() {
                                               value={todo.serial}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "serial",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'serial', e.target.value);
                                               }}
                                             />
                                           </Grid>
@@ -15001,11 +12858,7 @@ function Manualstockentry() {
                                               value={todo.other}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "other",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'other', e.target.value);
                                               }}
                                             />
                                           </Grid>
@@ -15022,13 +12875,7 @@ function Manualstockentry() {
                                               <Typography>Capacity</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.capacity?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15041,11 +12888,7 @@ function Manualstockentry() {
                                                   value: todo.capacity,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "capacity",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'capacity', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15057,21 +12900,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15095,18 +12936,10 @@ function Manualstockentry() {
                                               onChange={(e) => {
                                                 const inputText = e.target.value;
                                                 // Regex to allow only non-negative numbers
-                                                const validatedInput =
-                                                  inputText.match(/^\d*$/);
+                                                const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput =
-                                                  validatedInput !== null
-                                                    ? validatedInput[0]
-                                                    : "0";
-                                                handleChangeEdit(
-                                                  index,
-                                                  "hdmiport",
-                                                  sanitizedInput
-                                                );
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'hdmiport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -15131,18 +12964,10 @@ function Manualstockentry() {
                                               onChange={(e) => {
                                                 const inputText = e.target.value;
                                                 // Regex to allow only non-negative numbers
-                                                const validatedInput =
-                                                  inputText.match(/^\d*$/);
+                                                const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput =
-                                                  validatedInput !== null
-                                                    ? validatedInput[0]
-                                                    : "0";
-                                                handleChangeEdit(
-                                                  index,
-                                                  "vgaport",
-                                                  sanitizedInput
-                                                );
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'vgaport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -15167,18 +12992,10 @@ function Manualstockentry() {
                                               onChange={(e) => {
                                                 const inputText = e.target.value;
                                                 // Regex to allow only non-negative numbers
-                                                const validatedInput =
-                                                  inputText.match(/^\d*$/);
+                                                const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput =
-                                                  validatedInput !== null
-                                                    ? validatedInput[0]
-                                                    : "0";
-                                                handleChangeEdit(
-                                                  index,
-                                                  "dpport",
-                                                  sanitizedInput
-                                                );
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'dpport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -15203,18 +13020,10 @@ function Manualstockentry() {
                                               onChange={(e) => {
                                                 const inputText = e.target.value;
                                                 // Regex to allow only non-negative numbers
-                                                const validatedInput =
-                                                  inputText.match(/^\d*$/);
+                                                const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput =
-                                                  validatedInput !== null
-                                                    ? validatedInput[0]
-                                                    : "0";
-                                                handleChangeEdit(
-                                                  index,
-                                                  "usbport",
-                                                  sanitizedInput
-                                                );
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'usbport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -15232,13 +13041,7 @@ function Manualstockentry() {
                                               <Typography>Panel Type</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.paneltype?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15251,11 +13054,7 @@ function Manualstockentry() {
                                                   value: todo.paneltypescreen,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "paneltypescreen",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'paneltypescreen', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15267,21 +13066,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15294,25 +13091,15 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Screen Resolution
-                                              </Typography>
+                                              <Typography>Screen Resolution</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
-                                                  ?.screenresolution?.map(
-                                                    (item) => ({
-                                                      ...item,
-                                                      label: item,
-                                                      value: item,
-                                                    })
-                                                  )}
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
+                                                  ?.screenresolution?.map((item) => ({
+                                                    ...item,
+                                                    label: item,
+                                                    value: item,
+                                                  }))}
                                                 styles={colourStyles}
                                                 isDisabled={todo.subcomponentcheck === false}
                                                 value={{
@@ -15320,11 +13107,7 @@ function Manualstockentry() {
                                                   value: todo.resolution,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "resolution",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'resolution', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15336,21 +13119,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15366,13 +13147,7 @@ function Manualstockentry() {
                                               <Typography>Connectivity</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.connectivity?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15385,11 +13160,7 @@ function Manualstockentry() {
                                                   value: todo.connectivity,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "connectivity",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'connectivity', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15401,21 +13172,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15431,13 +13200,7 @@ function Manualstockentry() {
                                               <Typography>Data Rate</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.datarate?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15450,11 +13213,7 @@ function Manualstockentry() {
                                                   value: todo.daterate,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "daterate",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'daterate', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15466,21 +13225,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15493,25 +13250,15 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Compatible Device
-                                              </Typography>
+                                              <Typography>Compatible Device</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
-                                                  ?.compatibledevices?.map(
-                                                    (item) => ({
-                                                      ...item,
-                                                      label: item,
-                                                      value: item,
-                                                    })
-                                                  )}
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
+                                                  ?.compatibledevices?.map((item) => ({
+                                                    ...item,
+                                                    label: item,
+                                                    value: item,
+                                                  }))}
                                                 styles={colourStyles}
                                                 isDisabled={todo.subcomponentcheck === false}
                                                 value={{
@@ -15519,11 +13266,7 @@ function Manualstockentry() {
                                                   value: todo.compatibledevice,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "compatibledevice",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'compatibledevice', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15535,21 +13278,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15565,13 +13306,7 @@ function Manualstockentry() {
                                               <Typography>Output Power</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.outputpower?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15584,11 +13319,7 @@ function Manualstockentry() {
                                                   value: todo.outputpower,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "outputpower",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'outputpower', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15600,21 +13331,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15627,25 +13356,15 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Cooling Fan Count
-                                              </Typography>
+                                              <Typography>Cooling Fan Count</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
-                                                  ?.coolingfancount?.map(
-                                                    (item) => ({
-                                                      ...item,
-                                                      label: item,
-                                                      value: item,
-                                                    })
-                                                  )}
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
+                                                  ?.coolingfancount?.map((item) => ({
+                                                    ...item,
+                                                    label: item,
+                                                    value: item,
+                                                  }))}
                                                 styles={colourStyles}
                                                 isDisabled={todo.subcomponentcheck === false}
                                                 value={{
@@ -15653,11 +13372,7 @@ function Manualstockentry() {
                                                   value: todo.collingfancount,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "collingfancount",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'collingfancount', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15669,21 +13384,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15699,13 +13412,7 @@ function Manualstockentry() {
                                               <Typography>Clock Speed</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.clockspeed?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15718,11 +13425,7 @@ function Manualstockentry() {
                                                   value: todo.clockspeed,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "clockspeed",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'clockspeed', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15734,21 +13437,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15764,13 +13465,7 @@ function Manualstockentry() {
                                               <Typography>Core</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.core?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15783,11 +13478,7 @@ function Manualstockentry() {
                                                   value: todo.core,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "core",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'core', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15799,21 +13490,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15829,13 +13518,7 @@ function Manualstockentry() {
                                               <Typography>Speed</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.speed?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15848,11 +13531,7 @@ function Manualstockentry() {
                                                   value: todo.speed,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "speed",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'speed', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15864,21 +13543,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15894,13 +13571,7 @@ function Manualstockentry() {
                                               <Typography>Frequency</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.frequency?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15913,11 +13584,7 @@ function Manualstockentry() {
                                                   value: todo.frequency,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "frequency",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'frequency', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15929,21 +13596,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -15959,13 +13624,7 @@ function Manualstockentry() {
                                               <Typography>Output</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.output?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -15978,11 +13637,7 @@ function Manualstockentry() {
                                                   value: todo.output,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "output",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'output', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -15994,21 +13649,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -16021,18 +13674,10 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Ethernet Ports
-                                              </Typography>
+                                              <Typography>Ethernet Ports</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.ethernetports?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -16045,11 +13690,7 @@ function Manualstockentry() {
                                                   value: todo.ethernetports,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "ethernetports",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'ethernetports', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -16061,21 +13702,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -16091,13 +13730,7 @@ function Manualstockentry() {
                                               <Typography>Distance</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.distance?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -16110,11 +13743,7 @@ function Manualstockentry() {
                                                   value: todo.distance,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "distance",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'distance', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -16126,21 +13755,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -16156,13 +13783,7 @@ function Manualstockentry() {
                                               <Typography>Length</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.lengthname?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -16175,11 +13796,7 @@ function Manualstockentry() {
                                                   value: todo.lengthname,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "lengthname",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'lengthname', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -16191,21 +13808,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -16221,13 +13836,7 @@ function Manualstockentry() {
                                               <Typography>Slot</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.slot?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -16240,11 +13849,7 @@ function Manualstockentry() {
                                                   value: todo.slot,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "slot",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'slot', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -16256,21 +13861,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -16283,18 +13886,10 @@ function Manualstockentry() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                No. Of Channels
-                                              </Typography>
+                                              <Typography>No. Of Channels</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.noofchannels?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -16307,11 +13902,7 @@ function Manualstockentry() {
                                                   value: todo.noofchannels,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "noofchannels",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'noofchannels', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -16323,21 +13914,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -16353,13 +13942,7 @@ function Manualstockentry() {
                                               <Typography>Colour</Typography>
                                               <Selects
                                                 options={specificationGroupingEdit
-                                                  .find(
-                                                    (item) =>
-                                                      stockmasteredit.component ===
-                                                      item.component &&
-                                                      stockmasteredit.productname ===
-                                                      item.assetmaterial
-                                                  )
+                                                  .find((item) => stockmasteredit.component === item.component && stockmasteredit.productname === item.assetmaterial)
                                                   ?.colours?.map((item) => ({
                                                     ...item,
                                                     label: item,
@@ -16372,11 +13955,7 @@ function Manualstockentry() {
                                                   value: todo.colours,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "colours",
-                                                    e.value
-                                                  );
+                                                  handleChangeEdit(index, 'colours', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -16388,21 +13967,19 @@ function Manualstockentry() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus
-                                                style={{ fontSize: "15px" }}
-                                              />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -16416,8 +13993,7 @@ function Manualstockentry() {
                                         <Grid item md={10} sm={10} xs={10}>
                                           <FormControl fullWidth size="small">
                                             <Typography>
-                                              Warranty{" "}
-                                              <b style={{ color: "red" }}>*</b>
+                                              Warranty <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Select
                                               fullWidth
@@ -16431,25 +14007,15 @@ function Manualstockentry() {
                                               // }}
                                               // value={todo.serial}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "warranty",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'warranty', e.target.value);
                                               }}
                                             >
                                               <MenuItem value="" disabled>
-                                                {" "}
+                                                {' '}
                                                 Please Select
                                               </MenuItem>
-                                              <MenuItem value="Yes">
-                                                {" "}
-                                                {"Yes"}{" "}
-                                              </MenuItem>
-                                              <MenuItem value="No">
-                                                {" "}
-                                                {"No"}{" "}
-                                              </MenuItem>
+                                              <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                              <MenuItem value="No"> {'No'} </MenuItem>
                                             </Select>
                                           </FormControl>
                                         </Grid>
@@ -16457,14 +14023,13 @@ function Manualstockentry() {
                                     </Grid>
                                   </>
 
-                                  {todo.warranty === "Yes" && (
+                                  {todo.warranty === 'Yes' && (
                                     <>
                                       <Grid item md={3} sm={6} xs={12}>
                                         <Grid container>
                                           <Grid item md={6} xs={6} sm={6}>
                                             <Typography>
-                                              Warranty Time{" "}
-                                              <b style={{ color: "red" }}>*</b>
+                                              Warranty Time <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <FormControl fullWidth size="small">
                                               <OutlinedInput
@@ -16475,19 +14040,14 @@ function Manualstockentry() {
                                                 value={todo.estimation}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "estimation",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'estimation', e.target.value);
                                                 }}
                                               />
                                             </FormControl>
                                           </Grid>
                                           <Grid item md={6} xs={6} sm={6}>
                                             <Typography>
-                                              Estimation{" "}
-                                              <b style={{ color: "red" }}>*</b>
+                                              Estimation <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Select
                                               fullWidth
@@ -16497,31 +14057,18 @@ function Manualstockentry() {
                                               value={todo.estimationtime}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "estimationtime",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'estimationtime', e.target.value);
                                                 // handleEstimationChange()
                                               }}
-                                            // onChange={handleEstimationChange}
+                                              // onChange={handleEstimationChange}
                                             >
                                               <MenuItem value="" disabled>
-                                                {" "}
+                                                {' '}
                                                 Please Select
                                               </MenuItem>
-                                              <MenuItem value="Days">
-                                                {" "}
-                                                {"Days"}{" "}
-                                              </MenuItem>
-                                              <MenuItem value="Month">
-                                                {" "}
-                                                {"Month"}{" "}
-                                              </MenuItem>
-                                              <MenuItem value="Year">
-                                                {" "}
-                                                {"Year"}{" "}
-                                              </MenuItem>
+                                              <MenuItem value="Days"> {'Days'} </MenuItem>
+                                              <MenuItem value="Month"> {'Month'} </MenuItem>
+                                              <MenuItem value="Year"> {'Year'} </MenuItem>
                                             </Select>
                                           </Grid>
                                         </Grid>
@@ -16542,21 +14089,17 @@ function Manualstockentry() {
                                               value={todo.purchasedate}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "purchasedate",
-                                                  e.target.value
-                                                );
+                                                handleChangeEdit(index, 'purchasedate', e.target.value);
                                                 // handlePurchaseDateChange()
                                               }}
-                                            // onChange={handlePurchaseDateChange}
+                                              // onChange={handlePurchaseDateChange}
                                             />
                                           </FormControl>
                                         </Grid>
                                       </Grid>
                                     </Grid>
                                   </>
-                                  {todo.warranty === "Yes" && (
+                                  {todo.warranty === 'Yes' && (
                                     <>
                                       <Grid item md={3} sm={6} xs={12}>
                                         <Grid container spacing={2}>
@@ -16570,9 +14113,9 @@ function Manualstockentry() {
                                                 placeholder=""
                                                 disabled={todo.subcomponentcheck === false}
                                                 value={todo.warrantycalculation}
-                                              // onChange={(e) => {
-                                              //   setAssetdetail({ ...assetdetail, warrantyCalculation: e.target.value });
-                                              // }}
+                                                // onChange={(e) => {
+                                                //   setAssetdetail({ ...assetdetail, warrantyCalculation: e.target.value });
+                                                // }}
                                               />
                                             </FormControl>
                                           </Grid>
@@ -16593,7 +14136,6 @@ function Manualstockentry() {
                                             <Selects
                                               // options={vendorGroupOpt}
                                               options={[...vendorModeOptions, ...vendorGroupOpt]}
-
                                               styles={colourStyles}
                                               isDisabled={todo.subcomponentcheck === false}
                                               value={{
@@ -16601,20 +14143,12 @@ function Manualstockentry() {
                                                 value: todo.vendorgroup,
                                               }}
                                               onChange={(e) => {
-                                                handleChangeGroupNameIndexBasedEdit(
-                                                  e,
-                                                  index
-                                                );
-                                                handleChangeEdit(
-                                                  index,
-                                                  "vendorgroup",
-                                                  e.value
-                                                );
+                                                handleChangeGroupNameIndexBasedEdit(e, index);
+                                                handleChangeEdit(index, 'vendorgroup', e.value);
 
                                                 setTodosEdit((prev) => {
                                                   const updated = [...prev];
-                                                  updated[index].vendor =
-                                                    "Choose Vendor";
+                                                  updated[index].vendor = 'Choose Vendor';
                                                   return updated;
                                                 });
                                               }}
@@ -16629,12 +14163,11 @@ function Manualstockentry() {
                                           <FormControl fullWidth size="small">
                                             <Typography>
                                               Vendor
-                                              <b style={{ color: "red" }}>*</b>
+                                              <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Selects
                                               // options={vendorOptIndEdit[index]}
-                                              options={[...vendorModeOptions, ...vendorOptIndEdit[index],]}
-
+                                              options={[...vendorModeOptions, ...vendorOptIndEdit[index]]}
                                               styles={colourStyles}
                                               isDisabled={todo.subcomponentcheck === false}
                                               value={{
@@ -16642,12 +14175,7 @@ function Manualstockentry() {
                                                 value: todo.vendor,
                                               }}
                                               onChange={(e) => {
-                                                handleChangeEdit(
-                                                  index,
-                                                  "vendor",
-                                                  e.value,
-                                                  e._id
-                                                );
+                                                handleChangeEdit(index, 'vendor', e.value, e._id);
 
                                                 // vendoridEdit(e._id);
                                               }}
@@ -16730,13 +14258,11 @@ function Manualstockentry() {
                 })}
               <br />
               <br />
-
-
               <Grid container spacing={2}>
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Product Details <b style={{ color: "red" }}>*</b>{" "}
+                      Product Details <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <TextareaAutosize
                       aria-label="minimum height"
@@ -16752,7 +14278,7 @@ function Manualstockentry() {
                     />
                   </FormControl>
                 </Grid>
-                {stockmasteredit.warranty === "Yes" && (
+                {stockmasteredit.warranty === 'Yes' && (
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>Warranty Details</Typography>
@@ -16775,7 +14301,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <Typography>
-                      UOM <b style={{ color: "red" }}>*</b>{" "}
+                      UOM <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={vomMasterget}
@@ -16796,7 +14322,7 @@ function Manualstockentry() {
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Qty<b style={{ color: "red" }}>*</b>{" "}
+                      Qty<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -16809,26 +14335,23 @@ function Manualstockentry() {
                           ...stockmasteredit,
                           quantity: e.target.value,
                         });
-                        setAmountEdit(Number(e.target.value) * Number(stockmasteredit.rate))
-
+                        setAmountEdit(Number(e.target.value) * Number(stockmasteredit.rate));
                       }}
                     />
                   </FormControl>
                 </Grid>
-
-
               </Grid>
               <br /> <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
                   {btnSubmit ? (
-                    <Box sx={{ display: "flex" }}>
+                    <Box sx={{ display: 'flex' }}>
                       <CircularProgress />
                     </Box>
                   ) : (
                     <>
                       <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
-                        {" "}
+                        {' '}
                         Update
                       </Button>
                     </>
@@ -16837,8 +14360,8 @@ function Manualstockentry() {
                 <br />
                 <Grid item md={6} xs={12} sm={12}>
                   <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
-                    {" "}
-                    Cancel{" "}
+                    {' '}
+                    Cancel{' '}
                   </Button>
                 </Grid>
               </Grid>
@@ -16849,350 +14372,291 @@ function Manualstockentry() {
       <br />
 
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lmanualstockentry") && (
+      {isUserRoleCompare?.includes('lmanualstockentry') && (
         <>
-          {" "}
-          {projectCheck ? (
-            <Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  minHeight: "350px",
-                }}
-              >
-                <ThreeDots
-                  height="80"
-                  width="80"
-                  radius="9"
-                  color="#1976d2"
-                  ariaLabel="three-dots-loading"
-                  wrapperStyle={{}}
-                  wrapperClassName=""
-                  visible={true}
-                />
-                {/* <FacebookCircularProgress /> */}
-              </Box>
-            </Box>
-          ) : (
-            <>
-              <Box sx={userStyle.container}>
-                {/* ******************************************************EXPORT Buttons****************************************************** */}
-                <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Asset Purchase List
-                  </Typography>
+          {' '}
+          <Box sx={userStyle.container}>
+            {/* ******************************************************EXPORT Buttons****************************************************** */}
+            <Grid item xs={8}>
+              <Typography sx={userStyle.importheadtext}>Asset Purchase List</Typography>
+            </Grid>
+
+            <Grid container spacing={2}>
+              <>
+                <Grid item md={3} xs={12} sm={12}>
+                  <Typography>Company</Typography>
+                  <FormControl size="small" fullWidth>
+                    <MultiSelect
+                      options={accessbranch
+                        ?.map((data) => ({
+                          label: data.company,
+                          value: data.company,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
+                      value={selectedOptionsCompany}
+                      onChange={(e) => {
+                        handleCompanyChange(e);
+                      }}
+                      valueRenderer={customValueRendererCompany}
+                      labelledBy="Please Select Company"
+                    />
+                  </FormControl>
                 </Grid>
-
-                <Grid container spacing={2}>
-                  <>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <Typography>
-                        Company
-                      </Typography>
-                      <FormControl size="small" fullWidth>
-                        <MultiSelect
-                          options={accessbranch
-                            ?.map((data) => ({
-                              label: data.company,
-                              value: data.company,
-                            }))
-                            .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label && i.value === item.value
-                                ) === index
-                              );
-                            })}
-                          value={selectedOptionsCompany}
-                          onChange={(e) => {
-                            handleCompanyChange(e);
-                          }}
-                          valueRenderer={customValueRendererCompany}
-                          labelledBy="Please Select Company"
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          {" "}
-                          Branch
-                        </Typography>
-                        <MultiSelect
-                          options={accessbranch
-                            ?.filter((comp) =>
-                              valueCompanyCat?.includes(comp.company)
-                            )
-                            ?.map((data) => ({
-                              label: data.branch,
-                              value: data.branch,
-                            }))
-                            .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
-                            })}
-                          value={selectedOptionsBranch}
-                          onChange={(e) => {
-                            handleBranchChangeFilter(e);
-                          }}
-                          valueRenderer={customValueRendererBranch}
-                          labelledBy="Please Select Branch"
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          {" "}
-                          Unit
-                        </Typography>
-                        <MultiSelect
-                          options={accessbranch
-                            ?.filter(
-                              (comp) =>
-                                valueCompanyCat?.includes(comp.company) &&
-                                valueBranchCat?.includes(comp.branch)
-                            )
-                            ?.map((data) => ({
-                              label: data.unit,
-                              value: data.unit,
-                            }))
-                            .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
-                            })}
-                          value={selectedOptionsUnit}
-                          onChange={(e) => {
-                            handleUnitChange(e);
-                          }}
-                          valueRenderer={customValueRendererUnit}
-                          labelledBy="Please Select Unit"
-                        />
-                      </FormControl>
-                    </Grid>
-
-                  </>
-
-                  <br />
-
-                  <Grid item md={2} sm={12} xs={12} marginTop={3}>
-                    <Grid sx={{ display: "flex", gap: "15px" }}>
-                      <Button
-                        variant="contained"
-                        sx={buttonStyles.buttonsubmit}
-                        onClick={(e) => {
-                          handleSubmitFilter(e);
-                        }}
-                      >
-                        {" "}
-                        Filter
-                      </Button>
-                      <Button
-                        sx={buttonStyles.btncancel}
-                        onClick={() => {
-                          handleClearFilter();
-                        }}
-                      >
-                        {" "}
-                        CLEAR
-                      </Button>
-                    </Grid>
-                  </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography> Branch</Typography>
+                    <MultiSelect
+                      options={accessbranch
+                        ?.filter((comp) => valueCompanyCat?.includes(comp.company))
+                        ?.map((data) => ({
+                          label: data.branch,
+                          value: data.branch,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
+                      value={selectedOptionsBranch}
+                      onChange={(e) => {
+                        handleBranchChangeFilter(e);
+                      }}
+                      valueRenderer={customValueRendererBranch}
+                      labelledBy="Please Select Branch"
+                    />
+                  </FormControl>
                 </Grid>
-                <br />
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography> Unit</Typography>
+                    <MultiSelect
+                      options={accessbranch
+                        ?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch))
+                        ?.map((data) => ({
+                          label: data.unit,
+                          value: data.unit,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
+                      value={selectedOptionsUnit}
+                      onChange={(e) => {
+                        handleUnitChange(e);
+                      }}
+                      valueRenderer={customValueRendererUnit}
+                      labelledBy="Please Select Unit"
+                    />
+                  </FormControl>
+                </Grid>
+              </>
 
+              <br />
 
-                <Grid container spacing={2} style={userStyle.dataTablestyle}>
-                  <Grid item md={2} xs={12} sm={12}>
-                    <Box>
-                      <label>Show entries:</label>
-                      <Select
-                        id="pageSizeSelect"
-                        value={pageSize}
-                        MenuProps={{
-                          PaperProps: {
-                            style: {
-                              maxHeight: 180,
-                              width: 80,
-                            },
-                          },
-                        }}
-                        onChange={handlePageSizeChange}
-                        sx={{ width: "77px" }}
-                      >
-                        <MenuItem value={1}>1</MenuItem>
-                        <MenuItem value={5}>5</MenuItem>
-                        <MenuItem value={10}>10</MenuItem>
-                        <MenuItem value={25}>25</MenuItem>
-                        <MenuItem value={50}>50</MenuItem>
-                        <MenuItem value={100}>100</MenuItem>
-                        <MenuItem value={totalProjects}>All</MenuItem>
-                      </Select>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    item
-                    md={8}
-                    xs={12}
-                    sm={12}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+              <Grid item md={2} sm={12} xs={12} marginTop={3}>
+                <Grid sx={{ display: 'flex', gap: '15px' }}>
+                  <Button
+                    variant="contained"
+                    sx={buttonStyles.buttonsubmit}
+                    onClick={(e) => {
+                      handleSubmitFilter(e);
                     }}
                   >
-                    <Box>
-                      {isUserRoleCompare?.includes("excelmanualstockentry") && (
-                        <>
-                          <Button
-                            onClick={(e) => {
-                              setIsFilterOpen(true);
-                              setFormat("xl");
-                            }}
-                            sx={userStyle.buttongrp}
-                          >
-                            <FaFileExcel />
-                            &ensp;Export to Excel&ensp;
-                          </Button>
-                        </>
-                      )}
-                      {isUserRoleCompare?.includes("csvmanualstockentry") && (
-                        <>
-                          <Button
-                            onClick={(e) => {
-                              setIsFilterOpen(true);
-                              setFormat("csv");
-                            }}
-                            sx={userStyle.buttongrp}
-                          >
-                            <FaFileCsv />
-                            &ensp;Export to CSV&ensp;
-                          </Button>
-                        </>
-                      )}
-                      {isUserRoleCompare?.includes("printmanualstockentry") && (
-                        <>
-                          <Button
-                            sx={userStyle.buttongrp}
-                            onClick={handleprint}
-                          >
-                            &ensp;
-                            <FaPrint />
-                            &ensp;Print&ensp;
-                          </Button>
-                        </>
-                      )}
-                      {isUserRoleCompare?.includes("pdfmanualstockentry") && (
-                        <>
-                          <Button
-                            sx={userStyle.buttongrp}
-                            onClick={() => {
-                              setIsPdfFilterOpen(true);
-                            }}
-                          >
-                            <FaFilePdf />
-                            &ensp;Export to PDF&ensp;
-                          </Button>
-                        </>
-                      )}
-                      {isUserRoleCompare?.includes("imagemanualstockentry") && (
-                        <>
-                          <Button
-                            sx={userStyle.buttongrp}
-                            onClick={handleCaptureImage}
-                          >
-                            {" "}
-                            <ImageIcon sx={{ fontSize: "15px" }} />{" "}
-                            &ensp;Image&ensp;{" "}
-                          </Button>
-                        </>
-                      )}
-                    </Box>
-                  </Grid>
-                  <Grid item md={2} xs={12} sm={12}>
-                    <FormControl fullWidth size="small">
-                      <OutlinedInput size="small"
-                        id="outlined-adornment-weight"
-                        startAdornment={
-                          <InputAdornment position="start">
-                            <FaSearch />
-                          </InputAdornment>
-                        }
-                        endAdornment={
-                          <InputAdornment position="end">
-                            {advancedFilter && (
-                              <IconButton onClick={handleResetSearch}>
-                                <MdClose />
-                              </IconButton>
-                            )}
-                            <Tooltip title="Show search options">
-                              <span>
-                                <IoMdOptions style={{ cursor: 'pointer', }} onClick={handleClickSearch} />
-                              </span>
-                            </Tooltip>
-                          </InputAdornment>}
-                        aria-describedby="outlined-weight-helper-text"
-                        inputProps={{ 'aria-label': 'weight', }}
-                        type="text"
-                        value={getSearchDisplay()}
-                        onChange={handleSearchChange}
-                        placeholder="Type to search..."
-                        disabled={!!advancedFilter}
-                      />
-                    </FormControl>
-                  </Grid>
+                    {' '}
+                    Filter
+                  </Button>
+                  <Button
+                    sx={buttonStyles.btncancel}
+                    onClick={() => {
+                      handleClearFilter();
+                    }}
+                  >
+                    {' '}
+                    CLEAR
+                  </Button>
                 </Grid>
-                <br />
-                <Grid container spacing={1}>
-                  <Grid item md={6} xs={12} sm={12}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "left",
-                        flexWrap: "wrap",
-                        gap: "10px",
-                      }}
-                    >
-                      <Button
-                        sx={userStyle.buttongrp}
-                        onClick={handleShowAllColumns}
-                      >
-                        Show All Columns
-                      </Button>
-                      <Button
-                        sx={userStyle.buttongrp}
-                        onClick={handleOpenManageColumns1}
-                      >
-                        Manage Columns
-                      </Button>
-                      {isUserRoleCompare?.includes("bdmanualstockentry") && (
-                        <Button
-                          variant="contained"
-                          sx={buttonStyles.buttonbulkdelete}
-                          onClick={handleClickOpenalert}
-                        >
-                          Bulk Delete
-                        </Button>
-                      )}
+              </Grid>
+            </Grid>
+            <br />
 
-                    </Box>
-                    <br />
-                    <br />
-                  </Grid>
-                </Grid>
-                <Box style={{ width: "100%", overflowY: "hidden" }}>
+            <Grid container spacing={2} style={userStyle.dataTablestyle}>
+              <Grid item md={2} xs={12} sm={12}>
+                <Box>
+                  <label>Show entries:</label>
+                  <Select
+                    id="pageSizeSelect"
+                    value={pageSize}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 180,
+                          width: 80,
+                        },
+                      },
+                    }}
+                    onChange={handlePageSizeChange}
+                    sx={{ width: '77px' }}
+                  >
+                    <MenuItem value={1}>1</MenuItem>
+                    <MenuItem value={5}>5</MenuItem>
+                    <MenuItem value={10}>10</MenuItem>
+                    <MenuItem value={25}>25</MenuItem>
+                    <MenuItem value={50}>50</MenuItem>
+                    <MenuItem value={100}>100</MenuItem>
+                    <MenuItem value={totalProjects}>All</MenuItem>
+                  </Select>
+                </Box>
+              </Grid>
+              <Grid
+                item
+                md={8}
+                xs={12}
+                sm={12}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Box>
+                  {isUserRoleCompare?.includes('excelmanualstockentry') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          setFormat('xl');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileExcel />
+                        &ensp;Export to Excel&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('csvmanualstockentry') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          setFormat('csv');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileCsv />
+                        &ensp;Export to CSV&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('printmanualstockentry') && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                        &ensp;
+                        <FaPrint />
+                        &ensp;Print&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('pdfmanualstockentry') && (
+                    <>
+                      <Button
+                        sx={userStyle.buttongrp}
+                        onClick={() => {
+                          setIsPdfFilterOpen(true);
+                        }}
+                      >
+                        <FaFilePdf />
+                        &ensp;Export to PDF&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('imagemanualstockentry') && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                        {' '}
+                        <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                      </Button>
+                    </>
+                  )}
+                </Box>
+              </Grid>
+              <Grid item md={2} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <OutlinedInput
+                    size="small"
+                    id="outlined-adornment-weight"
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <FaSearch />
+                      </InputAdornment>
+                    }
+                    endAdornment={
+                      <InputAdornment position="end">
+                        {advancedFilter && (
+                          <IconButton onClick={handleResetSearch}>
+                            <MdClose />
+                          </IconButton>
+                        )}
+                        <Tooltip title="Show search options">
+                          <span>
+                            <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
+                          </span>
+                        </Tooltip>
+                      </InputAdornment>
+                    }
+                    aria-describedby="outlined-weight-helper-text"
+                    inputProps={{ 'aria-label': 'weight' }}
+                    type="text"
+                    value={getSearchDisplay()}
+                    onChange={handleSearchChange}
+                    placeholder="Type to search..."
+                    disabled={!!advancedFilter}
+                  />
+                </FormControl>
+              </Grid>
+            </Grid>
+            <br />
+            <Grid container spacing={1}>
+              <Grid item md={6} xs={12} sm={12}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'left',
+                    flexWrap: 'wrap',
+                    gap: '10px',
+                  }}
+                >
+                  <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
+                    Show All Columns
+                  </Button>
+                  <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns1}>
+                    Manage Columns
+                  </Button>
+                  {isUserRoleCompare?.includes('bdmanualstockentry') && (
+                    <Button variant="contained" sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
+                      Bulk Delete
+                    </Button>
+                  )}
+                </Box>
+                <br />
+                <br />
+              </Grid>
+            </Grid>
+
+            {projectCheck ? (
+              <Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    minHeight: '350px',
+                  }}
+                >
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
+                  {/* <FacebookCircularProgress /> */}
+                </Box>
+              </Box>
+            ) : (
+              <>
+                <Box style={{ width: '100%', overflowY: 'hidden' }}>
                   <>
                     <AggridTableForPaginationTable
                       rowDataTable={rowDataTable}
@@ -17214,41 +14678,28 @@ function Manualstockentry() {
                     />
                   </>
                 </Box>
-                {/* ****** Table End ****** */}
-              </Box>
-            </>
-          )}
+              </>
+            )}
+            {/* ****** Table End ****** */}
+          </Box>
         </>
       )}
 
       {/* ****** Table End ****** */}
 
       {/* Manage Column */}
-      <Popover
-        id={id}
-        open={isManageColumnsOpen1}
-        anchorEl1={anchorEl1}
-        onClose={handleCloseManageColumns1}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left", }}
-        transformOrigin={{ vertical: 'center', horizontal: 'right', }}
-      >
+      <Popover id={id} open={isManageColumnsOpen1} anchorEl1={anchorEl1} onClose={handleCloseManageColumns1} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} transformOrigin={{ vertical: 'center', horizontal: 'right' }}>
         {manageColumnsContent}
       </Popover>
 
-      <Popover
-        id={idSearch}
-        open={openSearch}
-        anchorEl1={anchorElSearch}
-        onClose={handleCloseSearch}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
-      >
-        <Box style={{ padding: "10px", maxWidth: '450px' }}>
+      <Popover id={idSearch} open={openSearch} anchorEl1={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <Box style={{ padding: '10px', maxWidth: '450px' }}>
           <Typography variant="h6">Advance Search</Typography>
           <IconButton
             aria-label="close"
             onClick={handleCloseSearch}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -17256,27 +14707,33 @@ function Manualstockentry() {
           >
             <CloseIcon />
           </IconButton>
-          <DialogContent sx={{ width: "100%" }}>
-            <Box sx={{
-              width: '350px',
-              maxHeight: '400px',
-              overflow: 'hidden',
-              position: 'relative'
-            }}>
-              <Box sx={{
-                maxHeight: '300px',
-                overflowY: 'auto',
-                // paddingRight: '5px'
-              }}>
+          <DialogContent sx={{ width: '100%' }}>
+            <Box
+              sx={{
+                width: '350px',
+                maxHeight: '400px',
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
+              <Box
+                sx={{
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  // paddingRight: '5px'
+                }}
+              >
                 <Grid container spacing={1}>
                   <Grid item md={12} sm={12} xs={12}>
                     <Typography>Columns</Typography>
-                    <Select fullWidth size="small"
+                    <Select
+                      fullWidth
+                      size="small"
                       MenuProps={{
                         PaperProps: {
                           style: {
                             maxHeight: 200,
-                            width: "auto",
+                            width: 'auto',
                           },
                         },
                       }}
@@ -17285,7 +14742,9 @@ function Manualstockentry() {
                       onChange={(e) => setSelectedColumn(e.target.value)}
                       displayEmpty
                     >
-                      <MenuItem value="" disabled>Select Column</MenuItem>
+                      <MenuItem value="" disabled>
+                        Select Column
+                      </MenuItem>
                       {filteredSelectedColumn.map((col) => (
                         <MenuItem key={col.field} value={col.field}>
                           {col.headerName}
@@ -17295,12 +14754,14 @@ function Manualstockentry() {
                   </Grid>
                   <Grid item md={12} sm={12} xs={12}>
                     <Typography>Operator</Typography>
-                    <Select fullWidth size="small"
+                    <Select
+                      fullWidth
+                      size="small"
                       MenuProps={{
                         PaperProps: {
                           style: {
                             maxHeight: 200,
-                            width: "auto",
+                            width: 'auto',
                           },
                         },
                       }}
@@ -17318,11 +14779,13 @@ function Manualstockentry() {
                   </Grid>
                   <Grid item md={12} sm={12} xs={12}>
                     <Typography>Value</Typography>
-                    <TextField fullWidth size="small"
-                      value={["Blank", "Not Blank"].includes(selectedCondition) ? "" : filterValue}
+                    <TextField
+                      fullWidth
+                      size="small"
+                      value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
                       onChange={(e) => setFilterValue(e.target.value)}
-                      disabled={["Blank", "Not Blank"].includes(selectedCondition)}
-                      placeholder={["Blank", "Not Blank"].includes(selectedCondition) ? "Disabled" : "Enter value"}
+                      disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                      placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
                       sx={{
                         '& .MuiOutlinedInput-root.Mui-disabled': {
                           backgroundColor: 'rgb(0 0 0 / 26%)',
@@ -17336,11 +14799,7 @@ function Manualstockentry() {
                   {additionalFilters.length > 0 && (
                     <>
                       <Grid item md={12} sm={12} xs={12}>
-                        <RadioGroup
-                          row
-                          value={logicOperator}
-                          onChange={(e) => setLogicOperator(e.target.value)}
-                        >
+                        <RadioGroup row value={logicOperator} onChange={(e) => setLogicOperator(e.target.value)}>
                           <FormControlLabel value="AND" control={<Radio />} label="AND" />
                           <FormControlLabel value="OR" control={<Radio />} label="OR" />
                         </RadioGroup>
@@ -17348,22 +14807,24 @@ function Manualstockentry() {
                     </>
                   )}
                   {additionalFilters.length === 0 && (
-                    <Grid item md={4} sm={12} xs={12} >
-                      <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                    <Grid item md={4} sm={12} xs={12}>
+                      <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
                         Add Filter
                       </Button>
                     </Grid>
                   )}
 
                   <Grid item md={2} sm={12} xs={12}>
-                    <Button variant="contained" onClick={() => {
-                      fetchStock("Filtered");
-                      setIsSearchActive(true);
-                      setAdvancedFilter([
-                        ...additionalFilters,
-                        { column: selectedColumn, condition: selectedCondition, value: filterValue }
-                      ])
-                    }} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        fetchStock('Filtered');
+                        setIsSearchActive(true);
+                        setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+                      }}
+                      sx={{ textTransform: 'capitalize' }}
+                      disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
+                    >
                       Search
                     </Button>
                   </Grid>
@@ -17374,23 +14835,11 @@ function Manualstockentry() {
         </Box>
       </Popover>
 
-
       {/* view model */}
-      <Dialog
-        open={openview}
-        onClose={handleClickOpenview}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        fullWidth={true}
-        sx={{ marginTop: "95px" }}
-      >
-        <Box sx={{ padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth={true} sx={{ marginTop: '95px' }}>
+        <Box sx={{ padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              View Asset Purchase
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> View Asset Purchase</Typography>
             <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={3} xs={12} sm={12}>
@@ -17444,7 +14893,7 @@ function Manualstockentry() {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Purchasedate</Typography>
-                  <Typography>{stockmasteredit.purchasedate === "" ? "" : moment(stockmasteredit.purchasedate).format("DD/MM/YYYY")}</Typography>
+                  <Typography>{stockmasteredit.purchasedate === '' ? '' : moment(stockmasteredit.purchasedate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
@@ -17511,12 +14960,7 @@ function Manualstockentry() {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Quantity & UOM</Typography>
-                  <Typography>
-                    {stockmasteredit.uomcode !== "" ||
-                      stockmasteredit.uomcode !== undefined
-                      ? `${stockmasteredit.quantity}#${stockmasteredit.uomcode}`
-                      : ""}
-                  </Typography>
+                  <Typography>{stockmasteredit.uomcode !== '' || stockmasteredit.uomcode !== undefined ? `${stockmasteredit.quantity}#${stockmasteredit.uomcode}` : ''}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
@@ -17528,21 +14972,15 @@ function Manualstockentry() {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Bill Date</Typography>
-                  <Typography>{
-                    stockmasteredit.billdate === "" ? "" :
-                      moment(stockmasteredit.billdate).format("DD/MM/YYYY")}</Typography>
+                  <Typography>{stockmasteredit.billdate === '' ? '' : moment(stockmasteredit.billdate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleCloseview}
-              >
-                {" "}
-                Back{" "}
+              <Button variant="contained" color="primary" onClick={handleCloseview}>
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
@@ -17551,26 +14989,17 @@ function Manualstockentry() {
 
       {/* ALERT DIALOG */}
       <Box>
-        <Dialog
-          open={isErrorOpenpop}
-          onClose={handleCloseerrpop}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="md"
-          fullWidth={true}
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
+        <Dialog open={isErrorOpenpop} onClose={handleCloseerrpop} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth={true}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlertpop}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={() => {
                 sendEditRequest();
@@ -17581,15 +15010,15 @@ function Manualstockentry() {
             </Button>
             <Button
               style={{
-                backgroundColor: "#f4f4f4",
-                color: "#444",
-                boxShadow: "none",
-                borderRadius: "3px",
-                padding: "7px 13px",
-                border: "1px solid #0000006b",
-                "&:hover": {
-                  "& .css-bluauu-MuiButtonBase-root-MuiButton-root": {
-                    backgroundColor: "#f4f4f4",
+                backgroundColor: '#f4f4f4',
+                color: '#444',
+                boxShadow: 'none',
+                borderRadius: '3px',
+                padding: '7px 13px',
+                border: '1px solid #0000006b',
+                '&:hover': {
+                  '& .css-bluauu-MuiButtonBase-root-MuiButton-root': {
+                    backgroundColor: '#f4f4f4',
                   },
                 },
               }}
@@ -17602,62 +15031,35 @@ function Manualstockentry() {
       </Box>
 
       {/* ALERT DIALOG */}
-      <Dialog
-        open={isCheckOpen}
-        onClose={handleCloseCheck}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogContent
-          sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-        >
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "80px", color: "orange" }}
-          />
-          <Typography variant="h6" sx={{ color: "black", textAlign: "center" }}>
-            {checkvendor?.length > 0 &&
-              checkcategory?.length > 0 &&
-              checksubcategory?.length > 0 &&
-              checktimepoints?.length > 0 ? (
+      <Dialog open={isCheckOpen} onClose={handleCloseCheck} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+          <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
+            {checkvendor?.length > 0 && checkcategory?.length > 0 && checksubcategory?.length > 0 && checktimepoints?.length > 0 ? (
               <>
-                <span
-                  style={{ fontWeight: "700", color: "#777" }}
-                >{`${deleteproject.name} `}</span>
-                was linked in{" "}
-                <span style={{ fontWeight: "700" }}>
-                  Vendor, Category, Subcategory & Time and points{" "}
-                </span>
+                <span style={{ fontWeight: '700', color: '#777' }}>{`${deleteproject.name} `}</span>
+                was linked in <span style={{ fontWeight: '700' }}>Vendor, Category, Subcategory & Time and points </span>
               </>
-            ) : checkvendor?.length > 0 ||
-              checkcategory?.length > 0 ||
-              checksubcategory?.length > 0 ||
-              checktimepoints?.length > 0 ? (
+            ) : checkvendor?.length > 0 || checkcategory?.length > 0 || checksubcategory?.length > 0 || checktimepoints?.length > 0 ? (
               <>
-                <span
-                  style={{ fontWeight: "700", color: "#777" }}
-                >{`${deleteproject.name} `}</span>
-                was linked in{" "}
-                <span style={{ fontWeight: "700" }}>
-                  {checkvendor?.length ? " Vendor" : ""}
-                  {checkcategory?.length ? " Category" : ""}
-                  {checksubcategory?.length ? " Subcategory" : ""}
-                  {checktimepoints?.length ? " Time and points" : ""}
+                <span style={{ fontWeight: '700', color: '#777' }}>{`${deleteproject.name} `}</span>
+                was linked in{' '}
+                <span style={{ fontWeight: '700' }}>
+                  {checkvendor?.length ? ' Vendor' : ''}
+                  {checkcategory?.length ? ' Category' : ''}
+                  {checksubcategory?.length ? ' Subcategory' : ''}
+                  {checktimepoints?.length ? ' Time and points' : ''}
                 </span>
               </>
             ) : (
-              ""
+              ''
             )}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={handleCloseCheck}
-            autoFocus
-            variant="contained"
-            color="error"
-          >
-            {" "}
-            OK{" "}
+          <Button onClick={handleCloseCheck} autoFocus variant="contained" color="error">
+            {' '}
+            OK{' '}
           </Button>
         </DialogActions>
       </Dialog>
@@ -17671,15 +15073,11 @@ function Manualstockentry() {
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
         sx={{
-          marginTop: "95px"
+          marginTop: '95px',
         }}
         fullWidth={true}
       >
-        <VendorPopup
-          setVendorAuto={setVendorAuto}
-          handleCloseviewalertvendor={handleCloseviewalertvendor}
-          sendDataToParent={handleDataFromChild}
-        />
+        <VendorPopup setVendorAuto={setVendorAuto} handleCloseviewalertvendor={handleCloseviewalertvendor} sendDataToParent={handleDataFromChild} />
       </Dialog>
 
       {/* dialog box for uom details */}
@@ -17690,9 +15088,9 @@ function Manualstockentry() {
         aria-describedby="alert-dialog-description"
         maxWidth="md"
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
         fullWidth={true}
@@ -17701,9 +15099,7 @@ function Manualstockentry() {
           <>
             <Grid container spacing={2}>
               <Grid item xs={8}>
-                <Typography sx={userStyle.importheadtext}>
-                  Manage UOM
-                </Typography>
+                <Typography sx={userStyle.importheadtext}>Manage UOM</Typography>
               </Grid>
             </Grid>
             <br />
@@ -17711,7 +15107,7 @@ function Manualstockentry() {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography>
-                    Name<b style={{ color: "red" }}>*</b>
+                    Name<b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <OutlinedInput
                     id="component-outlined"
@@ -17730,11 +15126,7 @@ function Manualstockentry() {
 
             <Grid container>
               <Grid item md={3} xs={12} sm={6}>
-                <Button
-                  variant="contained"
-                  sx={buttonStyles.buttonsubmit}
-                  onClick={handleSubmituom}
-                >
+                <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmituom}>
                   Submit
                 </Button>
               </Grid>
@@ -17744,10 +15136,7 @@ function Manualstockentry() {
                 </Button>
               </Grid>
               <Grid item md={3} xs={12} sm={6}>
-                <Button
-                  sx={buttonStyles.btncancel}
-                  onClick={handleCloseviewalertUom}
-                >
+                <Button sx={buttonStyles.btncancel} onClick={handleCloseviewalertUom}>
                   Cancel
                 </Button>
               </Grid>
@@ -17764,9 +15153,9 @@ function Manualstockentry() {
         maxWidth="md"
         fullWidth={true}
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
       >
@@ -17778,40 +15167,19 @@ function Manualstockentry() {
       </Dialog>
 
       {/* UPLOAD BILL CREATE IMAGE DIALOG */}
-      <Dialog
-        open={uploadPopupOpen}
-        onClose={handleUploadPopupClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ marginTop: "95px" }}
-      >
-        <DialogTitle
-          id="customized-dialog-title1"
-          sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
-        >
+      <Dialog open={uploadPopupOpen} onClose={handleUploadPopupClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
-                  <Button
-                    variant="contained"
-                    component="label"
-                    sx={userStyle.uploadbtn}
-                  >
+                <Grid sx={{ display: 'flex' }}>
+                  <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
-                    <input
-                      type="file"
-                      multiple
-                      id="productimage"
-                      accept="image/*"
-                      hidden
-                      onChange={handleInputChange}
-                    />
+                    <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChange} />
                   </Button>
                   &ensp;
                 </Grid>
@@ -17823,27 +15191,22 @@ function Manualstockentry() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
-                        <img
-                          className={classes.preview}
-                          src={getFileIcon(file.name)}
-                          height="10"
-                          alt="file icon"
-                        />
+                        <img className={classes.preview} src={getFileIcon(file.name)} height="10" alt="file icon" />
                       )}
                     </Box>
                   </Grid>
@@ -17853,44 +15216,40 @@ function Manualstockentry() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreview(file)}
                       >
-                        <VisibilityOutlinedIcon
-                          style={{ fontsize: "12px", color: "#357AE8" }}
-                        />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFile(index)}
                       >
-                        <FaTrash
-                          style={{ color: "#a73131", fontSize: "12px" }}
-                        />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -17913,40 +15272,19 @@ function Manualstockentry() {
       </Dialog>
 
       {/* UPLOAD BILL IMAGE DIALOG EDIT*/}
-      <Dialog
-        open={uploadPopupOpenedit}
-        onClose={handleUploadPopupCloseedit}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ marginTop: "95px" }}
-      >
-        <DialogTitle
-          id="customized-dialog-title1"
-          sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
-        >
+      <Dialog open={uploadPopupOpenedit} onClose={handleUploadPopupCloseedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
-                  <Button
-                    variant="contained"
-                    component="label"
-                    sx={userStyle.uploadbtn}
-                  >
+                <Grid sx={{ display: 'flex' }}>
+                  <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
-                    <input
-                      type="file"
-                      multiple
-                      id="productimage"
-                      accept="image/*"
-                      hidden
-                      onChange={handleInputChangeedit}
-                    />
+                    <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangeedit} />
                   </Button>
                   &ensp;
                 </Grid>
@@ -17958,27 +15296,22 @@ function Manualstockentry() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
-                        <img
-                          className={classes.preview}
-                          src={getFileIconedit(file.name)}
-                          height="10"
-                          alt="file icon"
-                        />
+                        <img className={classes.preview} src={getFileIconedit(file.name)} height="10" alt="file icon" />
                       )}
                     </Box>
                   </Grid>
@@ -17988,44 +15321,40 @@ function Manualstockentry() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewedit(file)}
                       >
-                        <VisibilityOutlinedIcon
-                          style={{ fontsize: "12px", color: "#357AE8" }}
-                        />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFileedit(index)}
                       >
-                        <FaTrash
-                          style={{ color: "#a73131", fontSize: "12px" }}
-                        />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -18048,40 +15377,19 @@ function Manualstockentry() {
       </Dialog>
 
       {/* UPLOAD WARRANTY IMAGE DIALOG    CREATE*/}
-      <Dialog
-        open={uploadPopupOpenwarranty}
-        onClose={handleUploadPopupClosewarranty}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ marginTop: "95px" }}
-      >
-        <DialogTitle
-          id="customized-dialog-title1"
-          sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
-        >
+      <Dialog open={uploadPopupOpenwarranty} onClose={handleUploadPopupClosewarranty} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
-                  <Button
-                    variant="contained"
-                    component="label"
-                    sx={userStyle.uploadbtn}
-                  >
+                <Grid sx={{ display: 'flex' }}>
+                  <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
-                    <input
-                      type="file"
-                      multiple
-                      id="productimage"
-                      accept="image/*"
-                      hidden
-                      onChange={handleInputChangewarranty}
-                    />
+                    <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangewarranty} />
                   </Button>
                   &ensp;
                 </Grid>
@@ -18093,27 +15401,22 @@ function Manualstockentry() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
-                        <img
-                          className={classes.preview}
-                          src={getFileIconwarranty(file.name)}
-                          height="10"
-                          alt="file icon"
-                        />
+                        <img className={classes.preview} src={getFileIconwarranty(file.name)} height="10" alt="file icon" />
                       )}
                     </Box>
                   </Grid>
@@ -18123,44 +15426,40 @@ function Manualstockentry() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewwarranty(file)}
                       >
-                        <VisibilityOutlinedIcon
-                          style={{ fontsize: "12px", color: "#357AE8" }}
-                        />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFilewarranty(index)}
                       >
-                        <FaTrash
-                          style={{ color: "#a73131", fontSize: "12px" }}
-                        />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -18176,10 +15475,7 @@ function Manualstockentry() {
           <Button onClick={resetImagewarranty} sx={userStyle.btncancel}>
             Reset
           </Button>
-          <Button
-            onClick={handleUploadPopupClosewarranty}
-            sx={userStyle.btncancel}
-          >
+          <Button onClick={handleUploadPopupClosewarranty} sx={userStyle.btncancel}>
             Cancel
           </Button>
         </DialogActions>
@@ -18193,21 +15489,19 @@ function Manualstockentry() {
         aria-describedby="alert-dialog-description"
         maxWidth="md"
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
         fullWidth={true}
       >
-        {isUserRoleCompare?.includes("aassetcapacity") ? (
+        {isUserRoleCompare?.includes('aassetcapacity') ? (
           <Box sx={userStyle.dialogbox}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Manage Capacity
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Manage Capacity</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -18215,7 +15509,7 @@ function Manualstockentry() {
                 <Grid item md={4} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Name <b style={{ color: "red" }}>*</b>
+                      Name <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -18236,7 +15530,7 @@ function Manualstockentry() {
                   <Button
                     variant="contained"
                     sx={buttonStyles.buttonsubmit}
-                  //  onClick={handleSubmitCapacity}
+                    //  onClick={handleSubmitCapacity}
                   >
                     Submit
                   </Button>
@@ -18245,16 +15539,13 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={6}>
                   <Button
                     sx={buttonStyles.btncancel}
-                  // onClick={handleclearCapacity}
+                    // onClick={handleclearCapacity}
                   >
                     Clear
                   </Button>
                 </Grid>
                 <Grid item md={3} xs={12} sm={6}>
-                  <Button
-                    sx={buttonStyles.btncancel}
-                    onClick={handleClickCloseCapacity}
-                  >
+                  <Button sx={buttonStyles.btncancel} onClick={handleClickCloseCapacity}>
                     Close
                   </Button>
                 </Grid>
@@ -18266,24 +15557,19 @@ function Manualstockentry() {
             <DialogContent>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Manage Capacity
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Manage Capacity</Typography>
                 </Grid>
               </Grid>
               <br />
               <br />
-              <Box sx={{ textAlign: "center" }}>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography>No Access</Typography>
               </Box>
               <br />
               <br />
             </DialogContent>
             <DialogActions>
-              <Button
-                sx={userStyle.btncancel}
-                onClick={handleClickCloseCapacity}
-              >
+              <Button sx={userStyle.btncancel} onClick={handleClickCloseCapacity}>
                 Close
               </Button>
             </DialogActions>
@@ -18292,40 +15578,19 @@ function Manualstockentry() {
       </Dialog>
 
       {/* UPLOAD WARRANTY IMAGE DIALOG EDIT*/}
-      <Dialog
-        open={uploadPopupOpenwarrantyedit}
-        onClose={handleUploadPopupClosewarrantyedit}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ marginTop: "95px" }}
-      >
-        <DialogTitle
-          id="customized-dialog-title1"
-          sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
-        >
+      <Dialog open={uploadPopupOpenwarrantyedit} onClose={handleUploadPopupClosewarrantyedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
-                  <Button
-                    variant="contained"
-                    component="label"
-                    sx={userStyle.uploadbtn}
-                  >
+                <Grid sx={{ display: 'flex' }}>
+                  <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
-                    <input
-                      type="file"
-                      multiple
-                      id="productimage"
-                      accept="image/*"
-                      hidden
-                      onChange={handleInputChangewarrantyedit}
-                    />
+                    <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangewarrantyedit} />
                   </Button>
                   &ensp;
                 </Grid>
@@ -18337,27 +15602,22 @@ function Manualstockentry() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
-                        <img
-                          className={classes.preview}
-                          src={getFileIconwarrantyedit(file.name)}
-                          height="10"
-                          alt="file icon"
-                        />
+                        <img className={classes.preview} src={getFileIconwarrantyedit(file.name)} height="10" alt="file icon" />
                       )}
                     </Box>
                   </Grid>
@@ -18367,44 +15627,40 @@ function Manualstockentry() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewwarrantyedit(file)}
                       >
-                        <VisibilityOutlinedIcon
-                          style={{ fontsize: "12px", color: "#357AE8" }}
-                        />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFilewarrantyedit(index)}
                       >
-                        <FaTrash
-                          style={{ color: "#a73131", fontSize: "12px" }}
-                        />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -18420,10 +15676,7 @@ function Manualstockentry() {
           <Button onClick={resetImagewarrantyedit} sx={userStyle.btncancel}>
             Reset
           </Button>
-          <Button
-            onClick={handleUploadPopupClosewarrantyedit}
-            sx={userStyle.btncancel}
-          >
+          <Button onClick={handleUploadPopupClosewarrantyedit} sx={userStyle.btncancel}>
             Cancel
           </Button>
         </DialogActions>
@@ -18434,19 +15687,9 @@ function Manualstockentry() {
 
       {/* EXTERNAL COMPONENTS -------------- START */}
       {/* VALIDATION */}
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
         isFilterOpen={isFilterOpen}
@@ -18458,48 +15701,22 @@ function Manualstockentry() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={overallFilterdata ?? []}
-        filename={"AssetPurchase"}
+        filename={'AssetPurchase'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
       {/* INFO */}
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Asset Purchase Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Asset Purchase Info" addedby={addedby} updateby={updateby} />
       {/*SINGLE DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={delProject}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delProject} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/*BULK DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={delProjectcheckbox}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delProjectcheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/* PLEASE SELECT ANY ROW */}
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
       {/* EXTERNAL COMPONENTS -------------- END */}
 
-      <Dialog open={openviewalertstockcategory} onClose={handleClickOpenviewalertstockcategory} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: "50px" }} fullWidth={true}>
+      <Dialog open={openviewalertstockcategory} onClose={handleClickOpenviewalertstockcategory} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '50px' }} fullWidth={true}>
         <StockCategoryPopup setStockCategoryAuto={setStockCategoryAuto} handleCloseviewalertstockcategory={handleCloseviewalertstockcategory} />
       </Dialog>
       {/* dialog box for manage stock items */}
@@ -18511,9 +15728,9 @@ function Manualstockentry() {
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
         fullWidth={true}
@@ -18521,43 +15738,30 @@ function Manualstockentry() {
         <ManageStockItemsPopup setStockItemAuto={setStockItemAuto} handleCloseviewalertstockitem={handleCloseviewalertstockitem} />
       </Dialog>
 
-
-      <Dialog
-        open={isErrorOpenAmount}
-        onClose={handleCloseerrAmount}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={isErrorOpenAmount} onClose={handleCloseerrAmount} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent
           sx={{
-            width: "350px",
-            textAlign: "center",
-            alignItems: "center",
+            width: '350px',
+            textAlign: 'center',
+            alignItems: 'center',
           }}
         >
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "100px", color: "orange" }}
-          />
-          <Typography variant="h6" style={{ color: "red" }}>
-            {
-              "Are you sure? Paid Amount is less than Total Bill Amount.Do you want to save?"
-            }
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <Typography variant="h6" style={{ color: 'red' }}>
+            {'Are you sure? Paid Amount is less than Total Bill Amount.Do you want to save?'}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            sx={buttonStyles.btncancel}
-            onClick={handleCloseerrAmount}
-          >
+          <Button sx={buttonStyles.btncancel} onClick={handleCloseerrAmount}>
             Cancel
           </Button>
           &nbsp;
           <Button
             variant="contained"
             style={{
-              padding: "7px 13px",
-              color: "white",
-              background: "rgb(25, 118, 210)",
+              padding: '7px 13px',
+              color: 'white',
+              background: 'rgb(25, 118, 210)',
             }}
             onClick={sendRequest}
           >
@@ -18565,10 +15769,6 @@ function Manualstockentry() {
           </Button>
         </DialogActions>
       </Dialog>
-
-
-
-
     </Box>
   );
 }

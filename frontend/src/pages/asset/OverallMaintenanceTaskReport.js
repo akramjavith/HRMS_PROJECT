@@ -1445,7 +1445,6 @@ function OverallMaintenanceTaskReport({ com }) {
     const handlePasteForEmp = (e) => {
         e.preventDefault();
         const pastedText = e.clipboardData.getData('text');
-console.log(pastedText,"pastedText")
         // Process the pasted text
         const pastedNames = pastedText
             .split(/[\n,]+/)

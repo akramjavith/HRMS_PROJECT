@@ -597,6 +597,7 @@ function ManagePenaltyMonth() {
             const final = res?.data?.penaltymonth
 
             handleClickOpenEdit();
+            
             await getExcelFilterDatas(final);
         } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
     };

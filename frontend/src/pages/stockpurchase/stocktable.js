@@ -1,17 +1,17 @@
-import { makeStyles } from "@material-ui/core";
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { MultiSelect } from "react-multi-select-component";
-import { v4 as uuidv4 } from "uuid";
+import { makeStyles } from '@material-ui/core';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { MultiSelect } from 'react-multi-select-component';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   Box,
@@ -45,70 +45,66 @@ import {
   TextareaAutosize,
   TextField,
   Typography,
-} from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import * as FileSaver from "file-saver";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaTrash, FaSearch, FaPlus, FaEdit } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import * as XLSX from "xlsx";
-import csvIcon from "../../components/Assets/CSV.png";
-import excelIcon from "../../components/Assets/excel-icon.png";
-import fileIcon from "../../components/Assets/file-icons.png";
-import pdfIcon from "../../components/Assets/pdf-icon.png";
-import wordIcon from "../../components/Assets/word-icon.png";
-import { handleApiError } from "../../components/Errorhandling";
-import { StyledTableCell, StyledTableRow } from "../../components/Table";
-import StyledDataGrid from "../../components/TableStyle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { colourStyles, userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
+} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import Switch from '@mui/material/Switch';
+import axios from '../../axiosInstance';
+import * as FileSaver from 'file-saver';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaTrash, FaSearch, FaPlus, FaEdit } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import * as XLSX from 'xlsx';
+import csvIcon from '../../components/Assets/CSV.png';
+import excelIcon from '../../components/Assets/excel-icon.png';
+import fileIcon from '../../components/Assets/file-icons.png';
+import pdfIcon from '../../components/Assets/pdf-icon.png';
+import wordIcon from '../../components/Assets/word-icon.png';
+import { handleApiError } from '../../components/Errorhandling';
+import { StyledTableCell, StyledTableRow } from '../../components/Table';
+import StyledDataGrid from '../../components/TableStyle';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { colourStyles, userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
 
-import AlertDialog from "../../components/Alert";
-import { DeleteConfirmation, PleaseSelectRow } from "../../components/DeleteConfirmation.js";
-import ExportData from "../../components/ExportData";
-import InfoPopup from "../../components/InfoPopup.js";
-import MessageAlert from "../../components/MessageAlert";
+import AlertDialog from '../../components/Alert';
+import { DeleteConfirmation, PleaseSelectRow } from '../../components/DeleteConfirmation.js';
+import ExportData from '../../components/ExportData';
+import InfoPopup from '../../components/InfoPopup.js';
+import MessageAlert from '../../components/MessageAlert';
 
 //new table
-import { IoMdOptions } from "react-icons/io";
-import { MdClose } from "react-icons/md";
-import domtoimage from "dom-to-image";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import AdvancedSearchBar from "../../components/Searchbar";
-import AggregatedSearchBar from "../../components/AggregatedSearchBar";
-import AggridTable from "../../components/AggridTable";
-import AggridTableForPaginationTable from "../../components/AggridTableForPaginationTable.js";
-import ManageStockItemsPopup from "../expenses/ManageStockItemsPopup";
-import StockCategoryPopup from "../expenses/StockCategoryPopup";
-import {
-  paidOpt,
-  statusOpt,
-} from "../../components/Componentkeyword";
-
+import { IoMdOptions } from 'react-icons/io';
+import { MdClose } from 'react-icons/md';
+import domtoimage from 'dom-to-image';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import AdvancedSearchBar from '../../components/Searchbar';
+import AggregatedSearchBar from '../../components/AggregatedSearchBar';
+import AggridTable from '../../components/AggridTable';
+import AggridTableForPaginationTable from '../../components/AggridTableForPaginationTable.js';
+import ManageStockItemsPopup from '../expenses/ManageStockItemsPopup';
+import StockCategoryPopup from '../expenses/StockCategoryPopup';
+import { paidOpt, statusOpt } from '../../components/Componentkeyword';
 
 const useStyles = makeStyles((theme) => ({
   inputs: {
-    display: "none",
+    display: 'none',
   },
   preview: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     marginTop: theme.spacing(2),
-    "& > *": {
+    '& > *': {
       margin: theme.spacing(1),
     },
   },
@@ -119,16 +115,14 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   let Expensetotal = 0;
 
   const particularModeOptions = [
-    { label: "Stock Material", value: "Stock Material" },
+    { label: 'Stock Material', value: 'Stock Material' },
     // { label: "Others", value: "Others" },
   ];
 
-  const [stockCategoryAuto, setStockCategoryAuto] = useState("");
-  const [stockItemAuto, setStockItemAuto] = useState("");
+  const [stockCategoryAuto, setStockCategoryAuto] = useState('');
+  const [stockItemAuto, setStockItemAuto] = useState('');
 
   const [isErrorOpenAmount, setIsErrorOpenAmount] = useState(false);
-
-
 
   const handleClickOpenerrAmount = () => {
     setIsErrorOpenAmount(true);
@@ -138,113 +132,110 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   };
 
   const [stockmanagemasteredit, setStockmanagemasteredit] = useState({
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    floor: "Please Select Floor",
-    area: "Please Select Area",
-    location: "Please Select Location",
-    workstation: "Please Select Workstation",
-    producthead: "",
-    vendorname: "Please Select Vendor",
-    material: "Please Select Material",
-    component: "Please Select Component",
-    gstno: "",
-    billno: "",
-    productname: "",
-    productdetails: "",
-    warrantydetails: "",
-    uom: "Please Select UOM",
-    quantity: "",
-    rate: "",
-    billdate: "",
-    files: "",
-    warrantyfiles: "",
-    totalbillamount: "",
-    warranty: "",
-    warrantycalculation: "",
-    estimation: "",
-    estimationtime: "",
-    purchasedate: "",
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    floor: 'Please Select Floor',
+    area: 'Please Select Area',
+    location: 'Please Select Location',
+    workstation: 'Please Select Workstation',
+    producthead: '',
+    vendorname: 'Please Select Vendor',
+    material: 'Please Select Material',
+    component: 'Please Select Component',
+    gstno: '',
+    billno: '',
+    productname: '',
+    productdetails: '',
+    warrantydetails: '',
+    uom: 'Please Select UOM',
+    quantity: '',
+    rate: '',
+    billdate: '',
+    files: '',
+    warrantyfiles: '',
+    totalbillamount: '',
+    warranty: '',
+    warrantycalculation: '',
+    estimation: '',
+    estimationtime: '',
+    purchasedate: '',
 
-    requestmode: "Please Select Request Mode",
-    stockcategory: "Please Select Stock Category",
-    stocksubcategory: "Please Select Stock Sub Category",
-    uomnew: "",
-    quantitynew: "",
-    materialnew: "Please Select Material",
-    productdetailsnew: "",
+    requestmode: 'Please Select Request Mode',
+    stockcategory: 'Please Select Stock Category',
+    stocksubcategory: 'Please Select Stock Sub Category',
+    uomnew: '',
+    quantitynew: '',
+    materialnew: 'Please Select Material',
+    productdetailsnew: '',
   });
-
 
   //state and method to show current date onload
   let today1 = new Date();
-  var dd = String(today1.getDate()).padStart(2, "0");
-  var mm = String(today1.getMonth() + 1).padStart(2, "0");
+  var dd = String(today1.getDate()).padStart(2, '0');
+  var mm = String(today1.getMonth() + 1).padStart(2, '0');
   var yyyy = today1.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
   //useStates
   const [date, setDate] = useState(formattedDate);
   const [expensecreate, setExpensecreate] = useState({
-    expansecategory: "Please Select Expense Category",
-    expansesubcategory: "Please Select Expense Sub Category",
-    referenceno: "",
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    vendorname: "Please Select Vendor",
-    purpose: "Please Select Purpose",
-    totalbillamount: "",
+    expansecategory: 'Please Select Expense Category',
+    expansesubcategory: 'Please Select Expense Sub Category',
+    referenceno: '',
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    vendorname: 'Please Select Vendor',
+    purpose: 'Please Select Purpose',
+    totalbillamount: '',
     date,
-    files: "",
-    vendorfrequency: "",
-    paidstatus: "Not Paid",
-    duedate: "",
-    expansenote: "",
-    paidmode: "Please Select Paid Mode",
-    expensetotal: "",
-    balanceamount: "",
-    paidamount: "",
+    files: '',
+    vendorfrequency: '',
+    paidstatus: 'Not Paid',
+    duedate: '',
+    expansenote: '',
+    paidmode: 'Please Select Paid Mode',
+    expensetotal: '',
+    balanceamount: '',
+    paidamount: '',
   });
 
-
   const [todoDetails, setTodoDetails] = useState({
-    particularmode: "Please Select Particular Mode",
-    category: "Please Select Category",
-    subcategory: "Please Select Sub Category",
-    materialnew: "Please Select Item Name",
-    uomnew: "",
-    rate: "",
-    quantitynew: "",
-    amount: "",
-    productdetailsnew: ""
+    particularmode: 'Please Select Particular Mode',
+    category: 'Please Select Category',
+    subcategory: 'Please Select Sub Category',
+    materialnew: 'Please Select Item Name',
+    uomnew: '',
+    rate: '',
+    quantitynew: '',
+    amount: '',
+    productdetailsnew: '',
   });
 
   const [vendorstock, setVendorNewstock] = useState({
-    bankname: "",
-    bankbranchname: "",
-    accountholdername: "",
-    accountnumber: "",
-    ifsccode: "",
-    upinumber: "",
-    chequenumber: "",
-    cardnumber: "",
-    cardholdername: "",
-    cardtransactionnumber: "",
-    cardtype: "",
-    cardmonth: "",
-    cardyear: "",
-    cardsecuritycode: "",
+    bankname: '',
+    bankbranchname: '',
+    accountholdername: '',
+    accountnumber: '',
+    ifsccode: '',
+    upinumber: '',
+    chequenumber: '',
+    cardnumber: '',
+    cardholdername: '',
+    cardtransactionnumber: '',
+    cardtype: '',
+    cardmonth: '',
+    cardyear: '',
+    cardsecuritycode: '',
   });
-
 
   const [educationtodo, setEducationtodo] = useState([]);
   const [upload, setUpload] = useState([]);
   const [expanseOpt, setExpanse] = useState([]);
   const [expansesubOpt, setExpanseSub] = useState([]);
-  const [frequencyValue, setFrequencyValue] = useState("");
+  const [frequencyValue, setFrequencyValue] = useState('');
   const [groupedVendorNames, setGroupedVendorNames] = useState([]);
-  const [vendorId, setVendorId] = useState("");
+  const [vendorId, setVendorId] = useState('');
   const [vendorModeOfPayments, setVendorModeOfPayments] = useState([]);
   const [espenseCheck, setExpenseCheck] = useState(false);
   const [purposes, setPurposes] = useState([]);
@@ -264,14 +255,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       });
 
       setAllStockValues(res_status?.data?.managestockitems);
-      setStockItemAuto("");
+      setStockItemAuto('');
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -289,17 +275,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         })
       );
       setAllStockCategory(response?.data?.stockcategory);
-      setStockCategoryAuto("");
+      setStockCategoryAuto('');
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
 
   useEffect(() => {
     getStockCategory();
@@ -308,17 +288,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     fetchStockItems();
   }, [stockItemAuto]);
 
-
   useEffect(() => {
     getStockCategory();
     fetchStockItems();
-
   }, []);
-
-
-
-
-
 
   // State to track advanced filter
   const [advancedFilter, setAdvancedFilter] = useState(null);
@@ -326,14 +299,14 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const [columnApi, setColumnApi] = useState(null);
   const [filteredDataItems, setFilteredDataItems] = useState([]);
   //  const [filteredRowData, setFilteredRowData] = useState([]);
-  const [logicOperator, setLogicOperator] = useState("AND");
+  const [logicOperator, setLogicOperator] = useState('AND');
 
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [filterValue, setFilterValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [filterValue, setFilterValue] = useState('');
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = ["Contains", "Does Not Contain", "Equals", "Does Not Equal", "Begins With", "Ends With", "Blank", "Not Blank"]; // AgGrid-like conditions
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
 
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
@@ -342,7 +315,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
-  const [searchedString, setSearchedString] = useState("");
+  const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTableImg = useRef(null);
   const gridRefTable = useRef(null);
@@ -351,8 +324,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const username = isUserRoleAccess.username;
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
     setBtnSubmit(false);
@@ -361,8 +334,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
     setBtnSubmit(false);
@@ -371,8 +344,54 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setOpenPopup(false);
   };
 
-  let exportColumnNames = ["Company", "Subcategoryname", "Unit", "Floor", "Area", "Location", "Request Mode For", "Stock Category", "Stock Sub Category", "Quantity", "Quantity & UOM", "Material", "Product Details", "GST No", "Bill No", "Warranty Details", "Warranty", "Purchase Date", "Bill Date", "Rate", "Vendor Group", "Vendor Name"];
-  let exportRowValues = ["company", "branch", "unit", "floor", "area", "location", "requestmode", "stockcategory", "stocksubcategory", "quantitynew", "uomnew", "materialnew", "productdetailsnew", "gstno", "billno", "warrantydetails", "warranty", "purchasedate", "billdate", "rate", "vendorgroup", "vendor"];
+  let exportColumnNames = [
+    'Company',
+    'Subcategoryname',
+    'Unit',
+    'Floor',
+    'Area',
+    'Location',
+    'Request Mode For',
+    'Stock Category',
+    'Stock Sub Category',
+    'Quantity',
+    'Quantity & UOM',
+    'Material',
+    'Product Details',
+    'GST No',
+    'Bill No',
+    'Warranty Details',
+    'Warranty',
+    'Purchase Date',
+    'Bill Date',
+    'Rate',
+    'Vendor Group',
+    'Vendor Name',
+  ];
+  let exportRowValues = [
+    'company',
+    'branch',
+    'unit',
+    'floor',
+    'area',
+    'location',
+    'requestmode',
+    'stockcategory',
+    'stocksubcategory',
+    'quantitynew',
+    'uomnew',
+    'materialnew',
+    'productdetailsnew',
+    'gstno',
+    'billno',
+    'warrantydetails',
+    'warranty',
+    'purchasedate',
+    'billdate',
+    'rate',
+    'vendorgroup',
+    'vendor',
+  ];
 
   //Access Module
   const pathname = window.location.pathname;
@@ -383,7 +402,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Stock Purchase"),
+      pagename: String('Stock Purchase'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -405,38 +424,38 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const [singleDoc, setSingleDoc] = useState({});
   const { auth } = useContext(AuthContext);
 
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [window.location.pathname?.substring(1), window.location.pathname];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
+
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
 
   //Datatable
   const [loading, setLoading] = useState(false);
@@ -446,17 +465,17 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const [showAlert, setShowAlert] = useState();
   const [openInfo, setOpeninfo] = useState(false);
   const [docData, setDocData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [viewInfo, setViewInfo] = useState([]);
   const [openView, setOpenView] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [documentFiles, setDocumentFiles] = useState([]);
-  const [newcheckbranch, setNewcheckBranch] = useState("Please Select Branch");
+  const [newcheckbranch, setNewcheckBranch] = useState('Please Select Branch');
   const [Specification, setSpecification] = useState([]);
 
   const [btnSubmit, setBtnSubmit] = useState(false);
@@ -491,15 +510,15 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     vendorname: true,
   };
 
-  const [vendorGroup, setVendorGroup] = useState("Choose Vendor Group");
+  const [vendorGroup, setVendorGroup] = useState('Choose Vendor Group');
   const [vendorGroupOpt, setVendorGroupopt] = useState([]);
   const [vendorOverall, setVendorOverall] = useState([]);
-  const [vendorNew, setVendorNew] = useState("Choose Vendor");
-  const [vendorNewEdit, setVendorNewEdit] = useState("Choose Vendor");
+  const [vendorNew, setVendorNew] = useState('Choose Vendor');
+  const [vendorNewEdit, setVendorNewEdit] = useState('Choose Vendor');
 
   const [vendorOpt, setVendoropt] = useState([]);
 
-  const [vendorGroupEdit, setVendorGroupEdit] = useState("Choose Vendor Group");
+  const [vendorGroupEdit, setVendorGroupEdit] = useState('Choose Vendor Group');
   const [vendorOptEdit, setVendoroptEdit] = useState([]);
 
   const [vendorOptIndEdit, setVendoroptIndEdit] = useState([]);
@@ -594,8 +613,6 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   };
 
   const fetchVendor = async (e) => {
-
-
     let res1 = await axios.get(SERVICE.ALL_VENDORDETAILS, {
       headers: {
         Authorization: `Bearer ${auth.APIToken}`,
@@ -606,18 +623,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         ...t,
         label: t.vendorname,
         value: t.vendorname,
-      }))
-    ]
+      })),
+    ];
 
     // setVendoropt(final);
     setVendoropt(datas);
-
   };
 
-
   useEffect(() => {
-    fetchVendor()
-  }, [vendorAuto, groupedVendorNames])
+    fetchVendor();
+  }, [vendorAuto, groupedVendorNames]);
 
   //reference images
   // const handleInputChangeedit = (event) => {
@@ -656,7 +671,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) {
           const reader = new FileReader();
           reader.onload = () => {
@@ -665,7 +680,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               size: file.size,
               type: file.type,
               preview: reader.result,
-              base64: reader.result.split(",")[1],
+              base64: reader.result.split(',')[1],
             });
             setRefImageedit(newSelectedFiles);
             setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
@@ -673,13 +688,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           };
           reader.readAsDataURL(file);
         } else {
-          setPopupContentMalert("File size should be less than 5MB!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('File size should be less than 5MB!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         }
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -723,13 +738,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
   const handleFetchBill = (data) => {
     const files = Array.from(data); // Ensure it's an array
-    const imageFiles = files.filter(file => file.type.startsWith("image/"));
-
-    if (imageFiles.length !== files.length) {
-      setPopupContentMalert("Only Accept Images!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
     const fileReaders = [];
     const newSelectedFiles = [];
@@ -760,7 +769,6 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       setRefImageedit(newSelectedFiles);
       setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
       setRefImgWarrantyBillEdit((existingFiles) => [...existingFiles, originalFiles]);
-
     });
   };
 
@@ -773,9 +781,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   //first deletefile
@@ -786,8 +794,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   };
 
   const resetImageedit = () => {
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setRefImageedit([]);
     setPreviewURLedit(null);
   };
@@ -810,7 +818,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) {
           const reader = new FileReader();
           reader.onload = () => {
@@ -819,7 +827,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               size: file.size,
               type: file.type,
               preview: reader.result,
-              base64: reader.result.split(",")[1],
+              base64: reader.result.split(',')[1],
             });
             setRefImagewarranty(newSelectedFiles);
             setRefImgWarrantyfilenamesEdit(newSelectedFiles.map((d) => d.name));
@@ -827,13 +835,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           };
           reader.readAsDataURL(file);
         } else {
-          setPopupContentMalert("File size should be less than 5MB!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('File size should be less than 5MB!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         }
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -873,13 +881,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   // };
   const handleFetchWarranty = (data) => {
     const files = Array.from(data); // Ensure it's an array
-    const imageFiles = files.filter(file => file.type.startsWith("image/"));
-
-    if (imageFiles.length !== files.length) {
-      setPopupContentMalert("Only Accept Images!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
     const fileReaders = [];
     const newSelectedFiles = [];
@@ -912,20 +914,19 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     });
   };
 
-
   //first allexcel....
   const getFileIconwarranty = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -934,17 +935,17 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
   //first allexcel....
   const getFileIconedit = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -983,8 +984,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setOpenview(true);
   };
   const [openview, setOpenview] = useState(false);
-  const [selectedUnitedit, setSelectedUnitedit] = useState("Please Select Unit");
-  const [selectedBranchedit, setSelectedBranchedit] = useState("Please Select Branch");
+  const [selectedUnitedit, setSelectedUnitedit] = useState('Please Select Unit');
+  const [selectedBranchedit, setSelectedBranchedit] = useState('Please Select Branch');
 
   const [pageNumber, setPageNumber] = useState(1);
   const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
@@ -999,7 +1000,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     const regex = /^\d*\.?\d*$/;
     const inputValue = e.target.value;
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setStockmanagemasteredit({
         ...stockmanagemasteredit,
@@ -1017,7 +1018,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     // calculateExpiryDate(value, stockmanagemasteredit.purchasedate);
   };
 
-  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState("");
+  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState('');
 
   const handlePurchaseDateChangeEdit = (e) => {
     const { value } = e.target;
@@ -1028,8 +1029,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
   const formatDateString = (date) => {
     const d = new Date(date);
-    const day = d.getDate().toString().padStart(2, "0");
-    const month = (d.getMonth() + 1).toString().padStart(2, "0");
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
@@ -1039,17 +1040,17 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       const currentDate = new Date(stockmanagemasteredit.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (stockmanagemasteredit.estimationtime === "Days") {
+      if (stockmanagemasteredit.estimationtime === 'Days') {
         expiryDate.setDate(currentDate.getDate() + parseInt(stockmanagemasteredit.estimation));
-      } else if (stockmanagemasteredit.estimationtime === "Month") {
+      } else if (stockmanagemasteredit.estimationtime === 'Month') {
         expiryDate.setMonth(currentDate.getMonth() + parseInt(stockmanagemasteredit.estimation));
-      } else if (stockmanagemasteredit.estimationtime === "Year") {
+      } else if (stockmanagemasteredit.estimationtime === 'Year') {
         expiryDate.setFullYear(currentDate.getFullYear() + parseInt(stockmanagemasteredit.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
 
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN") ? "" : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       setStockmanagemasteredit({
         ...stockmanagemasteredit,
@@ -1077,29 +1078,29 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
   const handleStockArray = () => {
     const isNameMatch = stockArray.some((item) => item.materialnew == stockmanagemasteredit.materialnew && item.uomnew === String(stockmanagemasteredit.uomnew) && item.quantitynew == stockmanagemasteredit.quantitynew);
-    if (stockmanagemasteredit.stockcategory === "Please Select Stock Category" || stockmanagemasteredit.stockcategory === "") {
-      setPopupContentMalert("Please Select Stock Category!");
-      setPopupSeverityMalert("info");
+    if (stockmanagemasteredit.stockcategory === 'Please Select Stock Category' || stockmanagemasteredit.stockcategory === '') {
+      setPopupContentMalert('Please Select Stock Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.stocksubcategory === "Please Select Stock Sub Category" || stockmanagemasteredit.stocksubcategory === "") {
-      setPopupContentMalert("Please Select Stock Sub Category!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.stocksubcategory === 'Please Select Stock Sub Category' || stockmanagemasteredit.stocksubcategory === '') {
+      setPopupContentMalert('Please Select Stock Sub Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.materialnew === "Please Select Material" || stockmanagemasteredit.materialnew === "") {
-      setPopupContentMalert("Please Select Materia!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.materialnew === 'Please Select Material' || stockmanagemasteredit.materialnew === '') {
+      setPopupContentMalert('Please Select Materia!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.uomnew === "" || stockmanagemasteredit.uomnew === undefined) {
-      setPopupContentMalert("Please Enter UOM!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.uomnew === '' || stockmanagemasteredit.uomnew === undefined) {
+      setPopupContentMalert('Please Enter UOM!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.quantitynew === "" || stockmanagemasteredit.quantitynew === undefined) {
-      setPopupContentMalert("Please Enter Quantity!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.quantitynew === '' || stockmanagemasteredit.quantitynew === undefined) {
+      setPopupContentMalert('Please Enter Quantity!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Todo Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Todo Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     // else if (stockmanagemasteredit.productdetailsnew === "" || stockmanagemasteredit.productdetailsnew === undefined) {
@@ -1121,7 +1122,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
             uomnew: stockmanagemasteredit.uomnew,
             quantitynew: stockmanagemasteredit.quantitynew,
             materialnew: stockmanagemasteredit.materialnew,
-            productdetailsnew: stockmanagemasteredit.productdetailsnew === undefined ? "" : stockmanagemasteredit.productdetailsnew,
+            productdetailsnew: stockmanagemasteredit.productdetailsnew === undefined ? '' : stockmanagemasteredit.productdetailsnew,
             uomnew: findData.code,
             totalbillamount: totalQuantityStock * stockmanagemasteredit.rate,
           },
@@ -1129,14 +1130,14 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
         setStockmanagemasteredit({
           ...stockmanagemasteredit,
-          uomnew: "",
-          quantitynew: "",
-          materialnew: "Please Select Material",
-          productdetailsnew: "",
+          uomnew: '',
+          quantitynew: '',
+          materialnew: 'Please Select Material',
+          productdetailsnew: '',
         });
       } catch (e) {
-        setPopupContentMalert("UOM is not found! Hence cannot get a UOM Code!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('UOM is not found! Hence cannot get a UOM Code!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1197,9 +1198,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
   const [uploadPopupOpenedit, setUploadPopupOpenedit] = useState(false);
   const handleClickUploadPopupOpenedit = () => {
@@ -1213,22 +1214,22 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   };
   const handleUploadPopupClosewarranty = () => {
     setUploadPopupOpenwarranty(false);
-    setGetImgwarranty("");
-    setFilewarranty("");
+    setGetImgwarranty('');
+    setFilewarranty('');
     setPreviewURLwarranty(null);
   };
 
   const resetImagewarranty = () => {
-    setGetImgwarranty("");
-    setFilewarranty("");
+    setGetImgwarranty('');
+    setFilewarranty('');
     setRefImagewarranty([]);
     setPreviewURLwarranty(null);
   };
 
   const handleUploadPopupCloseedit = () => {
     setUploadPopupOpenedit(false);
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setPreviewURLedit(null);
   };
 
@@ -1362,7 +1363,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
-          responseType: "blob",
+          responseType: 'blob',
         }
       );
 
@@ -1386,11 +1387,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         },
       });
       handleClickOpenEdit();
-      console.log(res?.data?.sstock, "stock")
+      console.log(res?.data?.sstock, 'stock');
       // let groupings = await fetchVendorGrouping();
-      setGroupedVendorNames(vendorOverall?.filter(item => item.name === res?.data?.sstock?.vendorgroup)?.map(data => data?.vendor));
+      setGroupedVendorNames(vendorOverall?.filter((item) => item.name === res?.data?.sstock?.vendorgroup)?.map((data) => data?.vendor));
 
-      const alldata = { ...res?.data?.sstock, calculationbalamount: Number(res?.data?.sstock?.balanceamount) }
+      const alldata = { ...res?.data?.sstock, calculationbalamount: Number(res?.data?.sstock?.balanceamount) };
       setExpensecreate(alldata);
       setFrequencyValue(res?.data?.sstock?.vendorfrequency);
 
@@ -1402,17 +1403,33 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       setOldfileNamesWar(res?.data?.sstock?.filenames.map((d) => `${res?.data?.sstock?.uniqueId}$todo$${d}`));
       setStockmanagemasteredit({
         ...res?.data?.sstock,
-        materialnew: "Please Select Material",
-        totalbillamount: res?.data?.sstock?.totalbillamountstock
+        materialnew: 'Please Select Material',
+        totalbillamount: res?.data?.sstock?.totalbillamountstock,
       });
 
-      const fileswarranty = await getMultipleFilesAsObjects(res?.data?.sstock?.filenames, "todo", res?.data?.sstock?.uniqueId);
+      // const fileswarranty = await getMultipleFilesAsObjects(res?.data?.sstock?.filenames, "todo", res?.data?.sstock?.uniqueId);
 
-      handleFetchWarranty(fileswarranty);
+      // handleFetchWarranty(fileswarranty);
 
-      const filesbill = await getMultipleFilesAsObjects(res?.data?.sstock?.filenamesbill, "bill", res?.data?.sstock?.uniqueId);
+      // const filesbill = await getMultipleFilesAsObjects(res?.data?.sstock?.filenamesbill, "bill", res?.data?.sstock?.uniqueId);
 
-      handleFetchBill(filesbill);
+      // handleFetchBill(filesbill);
+
+      if (res?.data?.sstock?.filenames.length > 0) {
+        const fileswarranty = await getMultipleFilesAsObjects(res?.data?.sstock?.filenames, 'todo', res?.data?.sstock?.uniqueId);
+        setOldfileNamesWar(res?.data?.sstock?.filenames.map((d) => `${res?.data?.sstock?.uniqueId}$todo$${d}`));
+        handleFetchWarranty(fileswarranty);
+      } else {
+        setRefImageedit([]);
+      }
+      if (res?.data?.sstock?.filenamesbill.length > 0) {
+        const filesbill = await getMultipleFilesAsObjects(res?.data?.sstock?.filenamesbill, 'bill', res?.data?.sstock?.uniqueId);
+
+        handleFetchBill(filesbill);
+        setoldfileNamesBill(res?.data?.sstock?.filenamesbill.map((d) => `${res?.data?.sstock?.uniqueId}$bill$${d}`));
+      } else {
+        setRefImagewarranty([]);
+      }
 
       // setSelectedAssetTypeEdit(res?.data?.sstock?.assettype);
       setStockArray(res?.data?.sstock.tododetails);
@@ -1447,7 +1464,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       //   setVendorgetid(resv?.data?.svendordetails);
       // }
     } catch (err) {
-      console.log(err, "err");
+      console.log(err, 'err');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
@@ -1465,10 +1482,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
       // handleCloseMod();
       handleCloseDelete();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
       setSelectedRows([]);
       setPage(1);
     } catch (err) {
@@ -1486,15 +1503,15 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         },
       });
       setStockmanagemasteredit(res?.data?.sstock);
-      console.log(res?.data?.sstock, "sstcok")
+      console.log(res?.data?.sstock, 'sstcok');
 
       let stockcategoryNew = res?.data?.sstock.tododetails.map((data, newindex) => {
-        return data.category === "Please Select Category" ? "" : `${data.category}`;
+        return data.category === 'Please Select Category' ? '' : `${data.category}`;
       });
       setstockcategoryNeww(stockcategoryNew.toString());
 
       let stocksubcategoryNew = res?.data?.sstock.tododetails.map((data, newindex) => {
-        return data.subcategory === "Please Select Sub Category" ? "" : `${data.subcategory}`;
+        return data.subcategory === 'Please Select Sub Category' ? '' : `${data.subcategory}`;
       });
       setMSubcategoryNeww(stocksubcategoryNew.toString());
       let quantityNew = res?.data?.sstock.tododetails.map((data, newindex) => {
@@ -1537,7 +1554,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      console.log(res?.data?.sstock, "stock")
+      console.log(res?.data?.sstock, 'stock');
       let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
@@ -1569,13 +1586,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         code: data.code,
       }));
 
-
-
       let setDataOne = codeValues.find((item1) => res?.data?.sstock.uomnew === item1.name);
 
       let setData = {
         ...res?.data?.sstock,
-        uomcode: setDataOne ? setDataOne.code : "",
+        uomcode: setDataOne ? setDataOne.code : '',
       };
 
       setStockmanagemasteredit(setData);
@@ -1594,7 +1609,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       let result = res_type.data.locationgroupings.filter((d) => d.branch === a && d.floor === b && d.area === c).map((data) => data.location);
       let ji = [].concat(...result);
       const all = [
-        { label: "ALL", value: "ALL" },
+        { label: 'ALL', value: 'ALL' },
         ...ji.map((d) => ({
           ...d,
           label: d,
@@ -1618,7 +1633,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   }, [vendorAuto]);
 
   useEffect(() => {
-    const savedVisibility = localStorage.getItem("columnVisibility1");
+    const savedVisibility = localStorage.getItem('columnVisibility1');
     if (savedVisibility) {
       setColumnVisibility(JSON.parse(savedVisibility));
     }
@@ -1654,13 +1669,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setIsEditOpen(true);
   };
   useEffect(() => {
-    localStorage.setItem("columnVisibility1", JSON.stringify(columnVisibility));
+    localStorage.setItem('columnVisibility1', JSON.stringify(columnVisibility));
   }, [columnVisibility]);
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -1702,8 +1717,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
       function updatePage() {
         const currentPageContent = pages[pageNumber - 1];
-        document.querySelector(".pdf-navigation span").innerText = "Page " + pageNumber + " of " + numPages;
-        document.querySelector(".pdf-content").innerHTML = currentPageContent;
+        document.querySelector('.pdf-navigation span').innerText = 'Page ' + pageNumber + ' of ' + numPages;
+        document.querySelector('.pdf-content').innerHTML = currentPageContent;
       }
 
       const doc = new jsPDF();
@@ -1712,7 +1727,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       doc.text(10, 10, pages[pageNumber - 1]);
 
       // Convert the content to a data URL
-      const pdfDataUri = doc.output("datauristring");
+      const pdfDataUri = doc.output('datauristring');
 
       const newTab = window.open();
       newTab.document.write(`
@@ -1773,11 +1788,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               <h2 id="pdf-heading">${ansType[pageNumber - 1]}</h2> <!-- Add heading here -->
               <div class="pdf-content">
               <div class="pdf-content">
-                ${/* Render PDF content directly in the embed tag */ ""}
+                ${/* Render PDF content directly in the embed tag */ ''}
                 <embed src="${pdfDataUri}" type="application/pdf" width="100%" height="600px" />
               </div>
               <div class="pdf-thumbnails">
-                ${pages.map((_, index) => `<div class="pdf-thumbnail" onclick="handlePageClick(${index + 1})">${index + 1}</div>`).join("")}
+                ${pages.map((_, index) => `<div class="pdf-thumbnail" onclick="handlePageClick(${index + 1})">${index + 1}</div>`).join('')}
               </div>
             </div>
             <script>
@@ -1824,7 +1839,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           return new Promise((resolve, reject) => {
             const bufferArray = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0)).buffer;
 
-            const wb = XLSX.read(bufferArray, { type: "buffer" });
+            const wb = XLSX.read(bufferArray, { type: 'buffer' });
 
             const wsname = wb.SheetNames[0];
             const ws = wb.Sheets[wsname];
@@ -1840,15 +1855,15 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         pdfContentArray.forEach((document) => {
           const fileExtension = getFileExtension(document.name);
 
-          if (fileExtension === "xlsx" || fileExtension === "xls") {
+          if (fileExtension === 'xlsx' || fileExtension === 'xls') {
             readExcel(document.data)
               .then((excelData) => {
                 const newTab = window.open();
                 const htmlTable = generateHtmlTable(excelData);
                 newTab.document.write(htmlTable);
               })
-              .catch((error) => { });
-          } else if (fileExtension === "pdf") {
+              .catch((error) => {});
+          } else if (fileExtension === 'pdf') {
             // Handle PDF file
             const newTab = window.open();
             newTab.document.write('<iframe width="100%" height="100%" src="' + document.preview + '"></iframe>');
@@ -1857,22 +1872,22 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
         // Helper function to extract file extension from a filename
         function getFileExtension(filename) {
-          return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
+          return filename.slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2);
         }
 
         // Helper function to generate an HTML table from Excel data
         function generateHtmlTable(data) {
           const headers = Object.keys(data[0]);
 
-          const tableHeader = `<tr>${headers.map((header) => `<th style="padding: 4px; background-color: #f2f2f2;">${header}</th>`).join("")}</tr>`;
+          const tableHeader = `<tr>${headers.map((header) => `<th style="padding: 4px; background-color: #f2f2f2;">${header}</th>`).join('')}</tr>`;
 
           const tableRows = data.map((row, index) => {
-            const rowStyle = index % 2 === 0 ? "background-color: #f9f9f9;" : "";
-            const cells = headers.map((header) => `<td style="padding: 4px;${rowStyle}">${row[header]}</td>`).join("");
+            const rowStyle = index % 2 === 0 ? 'background-color: #f9f9f9;' : '';
+            const cells = headers.map((header) => `<td style="padding: 4px;${rowStyle}">${row[header]}</td>`).join('');
             return `<tr>${cells}</tr>`;
           });
 
-          return `<table style="border-collapse: collapse; width: 100%;" border="1"; overflow :"scroll">${tableHeader}${tableRows.join("")}</table>`;
+          return `<table style="border-collapse: collapse; width: 100%;" border="1"; overflow :"scroll">${tableHeader}${tableRows.join('')}</table>`;
         }
       });
     }
@@ -1882,45 +1897,44 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const [companysEdit, setCompanysEdit] = useState([]);
   const [floorsEdit, setFloorEdit] = useState([]);
   const [areasEdit, setAreasEdit] = useState([]);
-  const [locationsEdit, setLocationsEdit] = useState([{ label: "ALL", value: "ALL" }]);
+  const [locationsEdit, setLocationsEdit] = useState([{ label: 'ALL', value: 'ALL' }]);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
     setStockmanagemasteredit({
-      company: "Please Select Company",
-      branch: "Please Select Branch",
-      unit: "Please Select Unit",
-      floor: "Please Select Floor",
-      area: "Please Select Area",
-      location: "Please Select Location",
-      workstation: "Please Select Workstation",
-      assettype: "",
-      asset: "",
-      material: "Please Select Material",
-      component: "Please Select Component",
-      productdetails: "",
-      uom: "Please Select UOM",
-      quantity: "",
-      stockcategory: "Please Select Stock Category",
-      stocksubcategory: "Please Select Stock Sub Category",
-      uomnew: "",
-      quantitynew: "",
-      materialnew: "Please Select Material",
-      productdetailsnew: "",
+      company: 'Please Select Company',
+      branch: 'Please Select Branch',
+      unit: 'Please Select Unit',
+      floor: 'Please Select Floor',
+      area: 'Please Select Area',
+      location: 'Please Select Location',
+      workstation: 'Please Select Workstation',
+      assettype: '',
+      asset: '',
+      material: 'Please Select Material',
+      component: 'Please Select Component',
+      productdetails: '',
+      uom: 'Please Select UOM',
+      quantity: '',
+      stockcategory: 'Please Select Stock Category',
+      stocksubcategory: 'Please Select Stock Sub Category',
+      uomnew: '',
+      quantitynew: '',
+      materialnew: 'Please Select Material',
+      productdetailsnew: '',
     });
     setTodoDetails({
       ...todoDetails,
-      category: "Please Select Category",
-      subcategory: "Please Select Sub Category",
-      materialnew: "Please Select Item Name",
-      productdetailsnew: "",
-      rate: "",
-      quantitynew: "",
-      amount: "",
+      category: 'Please Select Category',
+      subcategory: 'Please Select Sub Category',
+      materialnew: 'Please Select Item Name',
+      productdetailsnew: '',
+      rate: '',
+      quantitynew: '',
+      amount: '',
     });
-
   };
   const fetchBranchDropdownsEdit = async (e) => {
     try {
@@ -1956,45 +1970,43 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         item.vendorname == stockmanagemasteredit.vendorname &&
         item.billno == stockmanagemasteredit.billno &&
         item.requestmode == stockmanagemasteredit.requestmode &&
-
         item.warrantydetails == stockmanagemasteredit.warrantydetails &&
-
         item.materialnew == stockmanagemasteredit.materialnew &&
         item.rate == Number(stockmanagemasteredit.rate) &&
         item.billdate == stockmanagemasteredit.billdate
     );
 
-    if (stockmanagemasteredit.company === "Please Select Company") {
-      setPopupContentMalert("Please Select Company!");
-      setPopupSeverityMalert("info");
+    if (stockmanagemasteredit.company === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.branch === "Please Select Branch") {
-      setPopupContentMalert("Please Select Branch!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.branch === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.unit === "Please Select Unit") {
-      setPopupContentMalert("Please Select Unit!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.unit === 'Please Select Unit') {
+      setPopupContentMalert('Please Select Unit!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.floor === "Please Select Floor") {
-      setPopupContentMalert("Please Select Floor!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.floor === 'Please Select Floor') {
+      setPopupContentMalert('Please Select Floor!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.area === "Please Select Area") {
-      setPopupContentMalert("Please Select Area!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.area === 'Please Select Area') {
+      setPopupContentMalert('Please Select Area!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.location === "Please Select Location") {
-      setPopupContentMalert("Please Select Location!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.location === 'Please Select Location') {
+      setPopupContentMalert('Please Select Location!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (vendorGroup === "Choose Vendor Group") {
-      setPopupContentMalert("Please Select Vendor Group!");
-      setPopupSeverityMalert("info");
+    } else if (vendorGroup === 'Choose Vendor Group') {
+      setPopupContentMalert('Please Select Vendor Group!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (vendorNew === "Choose Vendor") {
-      setPopupContentMalert("Please Select Vendor!");
-      setPopupSeverityMalert("info");
+    } else if (vendorNew === 'Choose Vendor') {
+      setPopupContentMalert('Please Select Vendor!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     // else if (stockmanagemasteredit.gstno === "") {
@@ -2006,57 +2018,43 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     //   );
     //   handleClickOpenerr();
     // }
-    else if (stockmanagemasteredit.billno === "") {
-      setPopupContentMalert("Please Enter Billno!");
-      setPopupSeverityMalert("info");
+    else if (stockmanagemasteredit.billno === '') {
+      setPopupContentMalert('Please Enter Billno!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.requestmode === "Please Select Request Mode" || stockmanagemasteredit.requestmode === "") {
-      setPopupContentMalert("Please Select Request Mode For!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.requestmode === 'Please Select Request Mode' || stockmanagemasteredit.requestmode === '') {
+      setPopupContentMalert('Please Select Request Mode For!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.warrantydetails === "") {
-      setPopupContentMalert("Please Enter Warranty Details!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.warrantydetails === '') {
+      setPopupContentMalert('Please Enter Warranty Details!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.billdate === "") {
-      setPopupContentMalert("Please Select Bill Date!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.billdate === '') {
+      setPopupContentMalert('Please Select Bill Date!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (stockmanagemasteredit.totalbillamount === "") {
-      setPopupContentMalert("Please Enter Totalbillamounts!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.totalbillamount === '') {
+      setPopupContentMalert('Please Enter Totalbillamounts!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (educationtodo.length == 0) {
-      setPopupContentMalert("Please Insert Todo!");
-      setPopupSeverityMalert("info");
+    } else if (educationtodo.length == 0) {
+      setPopupContentMalert('Please Insert Todo!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      expensecreate.paidstatus === "Paid" &&
-      expensecreate.paidmode === "Please Select Paid Mode"
-    ) {
-      setPopupContentMalert("Please Select Paid Mode!");
-      setPopupSeverityMalert("info");
+    } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Please Select Paid Mode') {
+      setPopupContentMalert('Please Select Paid Mode!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      expensecreate.paidstatus === "Paid" &&
-      expensecreate.paidamount === ""
-    ) {
-      setPopupContentMalert("Please Enter Paid Amount!");
-      setPopupSeverityMalert("info");
+    } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidamount === '') {
+      setPopupContentMalert('Please Enter Paid Amount!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      expensecreate.paidstatus === "Paid" &&
-      Number(expensecreate.paidamount) !== Number(Expensetotal)
-    ) {
+    } else if (expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal)) {
       handleClickOpenerrAmount();
-    }
-    else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exist!");
-      setPopupSeverityMalert("info");
+    } else if (isNameMatch) {
+      setPopupContentMalert('Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequest();
@@ -2115,28 +2113,28 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         floor: String(stockmanagemasteredit.floor),
         location: String(stockmanagemasteredit.location),
         area: String(stockmanagemasteredit.area),
-        workstation: String(stockmanagemasteredit.workcheck ? stockmanagemasteredit.workstation : ""),
+        workstation: String(stockmanagemasteredit.workcheck ? stockmanagemasteredit.workstation : ''),
         totalbillamountstock: stockmanagemasteredit.totalbillamount,
         // workcheck: String(stockmanagemasteredit.workcheck),
-        assettype: "",
-        asset: "",
-        material: "",
-        component: "",
+        assettype: '',
+        asset: '',
+        material: '',
+        component: '',
         // subcomponent: todosEdit ? [...todosEdit] : [],
-        warranty: String(stockmanagemasteredit.warranty === undefined ? "" : stockmanagemasteredit.warranty),
-        estimation: String(stockmanagemasteredit.estimation === undefined ? "" : stockmanagemasteredit.estimation),
-        estimationtime: String(stockmanagemasteredit.estimationtime === undefined ? "" : stockmanagemasteredit.estimationtime),
-        warrantycalculation: String(stockmanagemasteredit.warrantycalculation === undefined ? "" : stockmanagemasteredit.warrantycalculation),
+        warranty: String(stockmanagemasteredit.warranty === undefined ? '' : stockmanagemasteredit.warranty),
+        estimation: String(stockmanagemasteredit.estimation === undefined ? '' : stockmanagemasteredit.estimation),
+        estimationtime: String(stockmanagemasteredit.estimationtime === undefined ? '' : stockmanagemasteredit.estimationtime),
+        warrantycalculation: String(stockmanagemasteredit.warrantycalculation === undefined ? '' : stockmanagemasteredit.warrantycalculation),
         purchasedate: selectedPurchaseDateEdit,
         // producthead: String(selectedProductheadedit),
         vendorgroup: String(vendorGroup),
         vendor: String(vendorNew),
-        gstno: String(vendorgetid.gstnumber === undefined ? "" : vendorgetid.gstnumber),
-        vendorid: String(vendorgetid._id),
+        gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
+        vendorid: String(vendornameid._id ? vendornameid._id : ''),
         billno: Number(stockmanagemasteredit.billno),
         productdetails: String(stockmanagemasteredit.productdetails),
         warrantydetails: String(stockmanagemasteredit.warrantydetails),
-        uom: stockmanagemasteredit.uom === "Please Select UOM" ? "" : String(stockmanagemasteredit.uom),
+        uom: stockmanagemasteredit.uom === 'Please Select UOM' ? '' : String(stockmanagemasteredit.uom),
         quantity: Number(stockmanagemasteredit.quantity),
         rate: Number(stockmanagemasteredit.rate),
         billdate: String(stockmanagemasteredit.billdate),
@@ -2146,70 +2144,70 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         filenamesbill: refImgbillfilenamesEdit,
         uniqueId: stockmanagemasteredit.uniqueId,
         requestmode: String(stockmanagemasteredit.requestmode),
-        stockcategory: stockmanagemasteredit.stockcategory === "Please Select Stock Category" ? "" : String(stockmanagemasteredit.stockcategory),
-        stocksubcategory: stockmanagemasteredit.stocksubcategory === "Please Select Stock Sub Category" ? "" : String(stockmanagemasteredit.stocksubcategory),
+        stockcategory: stockmanagemasteredit.stockcategory === 'Please Select Stock Category' ? '' : String(stockmanagemasteredit.stockcategory),
+        stocksubcategory: stockmanagemasteredit.stocksubcategory === 'Please Select Stock Sub Category' ? '' : String(stockmanagemasteredit.stocksubcategory),
         tododetails: [...educationtodo],
         paidstatus: String(expensecreate.paidstatus),
 
-        bankname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankname) : "",
-        bankbranchname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankbranchname) : "",
-        accountholdername: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.accountholdername) : "",
-        accountnumber: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.accountnumber) : "",
-        ifsccode: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.ifsccode) : "",
+        bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+        bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankbranchname) : '',
+        accountholdername: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountholdername) : '',
+        accountnumber: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountnumber) : '',
+        ifsccode: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.ifsccode) : '',
 
-        upinumber: expensecreate.paidmode === "UPI" ? String(vendorstock.upinumber) : "",
+        upinumber: expensecreate.paidmode === 'UPI' ? String(vendorstock.upinumber) : '',
 
-        cardnumber: expensecreate.paidmode === "Card" ? String(vendorstock.cardnumber) : "",
-        cardholdername: expensecreate.paidmode === "Card" ? String(vendorstock.cardholdername) : "",
-        cardtransactionnumber: expensecreate.paidmode === "Card" ? String(vendorstock.cardtransactionnumber) : "",
-        cardtype: expensecreate.paidmode === "Card" ? String(vendorstock.cardtype) : "",
-        cardmonth: expensecreate.paidmode === "Card" ? String(vendorstock.cardmonth) : "",
-        cardyear: expensecreate.paidmode === "Card" ? String(vendorstock.cardyear) : "",
-        cardsecuritycode: expensecreate.paidmode === "Card" ? String(vendorstock.cardsecuritycode) : "",
+        cardnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardnumber) : '',
+        cardholdername: expensecreate.paidmode === 'Card' ? String(vendorstock.cardholdername) : '',
+        cardtransactionnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtransactionnumber) : '',
+        cardtype: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtype) : '',
+        cardmonth: expensecreate.paidmode === 'Card' ? String(vendorstock.cardmonth) : '',
+        cardyear: expensecreate.paidmode === 'Card' ? String(vendorstock.cardyear) : '',
+        cardsecuritycode: expensecreate.paidmode === 'Card' ? String(vendorstock.cardsecuritycode) : '',
 
-        chequenumber: expensecreate.paidmode === "Cheque" ? String(vendorstock.chequenumber) : "",
+        chequenumber: expensecreate.paidmode === 'Cheque' ? String(vendorstock.chequenumber) : '',
 
-        cash: expensecreate.paidmode === "Cash" ? String("Cash") : "",
+        cash: expensecreate.paidmode === 'Cash' ? String('Cash') : '',
 
-        paidmode: String(expensecreate.paidstatus === "Not Paid" ? "" : expensecreate.paidmode),
-        paidamount: Number(expensecreate.paidstatus === "Not Paid" ? 0 : expensecreate.paidamount),
-        balanceamount: Number(expensecreate.paidstatus === "Not Paid" ? stockmanagemasteredit.totalbillamount : expensecreate.balanceamount),
-        sortdate: String(expensecreate.paidstatus === "Not Paid" ? "" : new Date()),
-        billstatus: expensecreate.paidstatus === "Not Paid" ? "InComplete" : expensecreate.paidstatus === "Paid" && Number(expensecreate.paidamount) !== Number(Expensetotal) ? "Partially Paid" : "Completed",
+        paidmode: String(expensecreate.paidstatus === 'Not Paid' ? '' : expensecreate.paidmode),
+        paidamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+        balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmanagemasteredit.totalbillamount : expensecreate.balanceamount),
+        sortdate: String(expensecreate.paidstatus === 'Not Paid' ? '' : new Date()),
+        billstatus: expensecreate.paidstatus === 'Not Paid' ? 'InComplete' : expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal) ? 'Partially Paid' : 'Completed',
         paymentduereminderlog:
-          expensecreate.paidstatus === "Paid"
+          expensecreate.paidstatus === 'Paid'
             ? [
-              {
-                balanceamount: Number(expensecreate.paidstatus === "Not Paid" ? stockmanagemasteredit.totalbillamount : expensecreate.balanceamount),
-                expensetotal: stockmanagemasteredit.totalbillamount,
-                modeofpayments: expensecreate.paidmode,
-                payamountdate: expensecreate.date,
-                payamount: Number(expensecreate.paidstatus === "Not Paid" ? 0 : expensecreate.paidamount),
-                bankname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankname) : "",
-                bankbranchname: expensecreate.paidmode === "Bank Transfer" ? vendorstock.bankbranchname : "",
-                accountholdername: expensecreate.paidmode === "Bank Transfer" ? vendorstock.accountholdername : "",
-                accountnumber: expensecreate.paidmode === "Bank Transfer" ? vendorstock.accountnumber : "",
-                ifsccode: expensecreate.paidmode === "Bank Transfer" ? vendorstock.ifsccode : "",
+                {
+                  balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmanagemasteredit.totalbillamount : expensecreate.balanceamount),
+                  expensetotal: stockmanagemasteredit.totalbillamount,
+                  modeofpayments: expensecreate.paidmode,
+                  payamountdate: expensecreate.date,
+                  payamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+                  bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+                  bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.bankbranchname : '',
+                  accountholdername: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountholdername : '',
+                  accountnumber: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountnumber : '',
+                  ifsccode: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.ifsccode : '',
 
-                upinumber: expensecreate.paidmode === "UPI" ? vendorstock.upinumber : "",
+                  upinumber: expensecreate.paidmode === 'UPI' ? vendorstock.upinumber : '',
 
-                cardnumber: expensecreate.paidmode === "Card" ? vendorstock.cardnumber : "",
-                cardholdername: expensecreate.paidmode === "Card" ? vendorstock.cardholdername : "",
-                cardtransactionnumber: expensecreate.paidmode === "Card" ? vendorstock.cardtransactionnumber : "",
-                cardtype: expensecreate.paidmode === "Card" ? vendorstock.cardtype : "",
-                cardmonth: expensecreate.paidmode === "Card" ? vendorstock.cardmonth : "",
-                cardyear: expensecreate.paidmode === "Card" ? vendorstock.cardyear : "",
-                cardsecuritycode: expensecreate.paidmode === "Card" ? vendorstock.cardsecuritycode : "",
-                chequenumber: expensecreate.paidmode === "Cheque" ? vendorstock.chequenumber : "",
-                updatedby: [
-                  ...updateby,
-                  {
-                    name: String(isUserRoleAccess.companyname),
-                    date: String(new Date()),
-                  },
-                ],
-              },
-            ]
+                  cardnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardnumber : '',
+                  cardholdername: expensecreate.paidmode === 'Card' ? vendorstock.cardholdername : '',
+                  cardtransactionnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardtransactionnumber : '',
+                  cardtype: expensecreate.paidmode === 'Card' ? vendorstock.cardtype : '',
+                  cardmonth: expensecreate.paidmode === 'Card' ? vendorstock.cardmonth : '',
+                  cardyear: expensecreate.paidmode === 'Card' ? vendorstock.cardyear : '',
+                  cardsecuritycode: expensecreate.paidmode === 'Card' ? vendorstock.cardsecuritycode : '',
+                  chequenumber: expensecreate.paidmode === 'Cheque' ? vendorstock.chequenumber : '',
+                  updatedby: [
+                    ...updateby,
+                    {
+                      name: String(isUserRoleAccess.companyname),
+                      date: String(new Date()),
+                    },
+                  ],
+                },
+              ]
             : [],
         updatedby: [
           ...updateby,
@@ -2221,14 +2219,14 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       });
       await handleFileDeleteOld(oldfileNamesWar);
       await handleFileDeleteOld(oldfileNamesBill);
-      await handleFileUpload(refImgWarrantyEdit, "todo", stockmanagemasteredit.uniqueId);
-      await handleFileUpload(refImgWarrantyBillEdit, "bill", stockmanagemasteredit.uniqueId);
+      await handleFileUpload(refImgWarrantyEdit, 'todo', stockmanagemasteredit.uniqueId);
+      await handleFileUpload(refImgWarrantyBillEdit, 'bill', stockmanagemasteredit.uniqueId);
       setBtnSubmit(false);
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       handleCloseModEdit();
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -2266,18 +2264,18 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 // console.log(chunk, "chunk");
 
                 const formData = new FormData();
-                formData.append("file", chunk);
-                formData.append("chunkNumber", chunkNumber);
-                formData.append("totalChunks", totalChunks);
-                formData.append("filesize", selectedFile.size);
-                formData.append("originalname", `${uniqueId}$${type}$${selectedFile.name}`);
+                formData.append('file', chunk);
+                formData.append('chunkNumber', chunkNumber);
+                formData.append('totalChunks', totalChunks);
+                formData.append('filesize', selectedFile.size);
+                formData.append('originalname', `${uniqueId}$${type}$${selectedFile.name}`);
 
                 // console.log(formData, "formData");
 
                 try {
                   const response = await axios.post(SERVICE.UPLOAD_CHUNK_STOCK, formData, {
                     headers: {
-                      "Content-Type": "multipart/form-data",
+                      'Content-Type': 'multipart/form-data',
                     },
                   });
                   // console.log(response, "response");
@@ -2288,7 +2286,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
                   uploadNextChunk();
                 } catch (err) {
-                  console.log(err, "ERrer");
+                  console.log(err, 'ERrer');
                   handleApiError(err, setShowAlert, handleClickOpenerr);
                 }
               } else {
@@ -2296,7 +2294,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 console.log(`File upload completed for ${selectedFile.name}`);
               }
             } catch (err) {
-              console.log(err, "asdfse");
+              console.log(err, 'asdfse');
             }
           };
 
@@ -2308,7 +2306,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
       uploadFiles();
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
@@ -2321,7 +2319,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         filenames: filenames,
       });
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
@@ -2334,14 +2332,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setStockmanageedit(res_project?.data?.stock.filter((item) => item._id !== stockmanagemasteredit._id && item.requestmode !== "Asset Material"));
+      setStockmanageedit(res_project?.data?.stock.filter((item) => item._id !== stockmanagemasteredit._id && item.requestmode !== 'Asset Material'));
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
   useEffect(() => {
-
     fetchStockedit();
   }, [isEditOpen, stockmanagemasteredit]);
 
@@ -2349,9 +2346,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   useEffect(() => {
@@ -2364,10 +2361,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       domtoimage
         .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Stock Purchase List.png");
+          saveAs(blob, 'Stock Purchase List.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -2411,7 +2408,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const handleSelectionChange = (newSelection) => {
     setSelectedRows(newSelection.selectionModel);
   };
@@ -2499,7 +2496,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
     const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
+    if (allFilters.length > 0 && selectedColumn !== '') {
       queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
@@ -2507,7 +2504,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     }
     try {
       // let res_project = await axios.get(SERVICE.STOCKPURCHASE, {
-      if (e === "Filtered") {
+      if (e === 'Filtered') {
         let res_employee = await axios.post(SERVICE.STOCK_ACCESS_PAGINATION, queryParams, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
@@ -2595,7 +2592,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         // Optimize matching process with Map
         const setData = ans.map((item) => ({
           ...item,
-          uomcode: codeMap.get(item.uom) || "",
+          uomcode: codeMap.get(item.uom) || '',
         }));
 
         // Optimize stock material data processing
@@ -2628,18 +2625,18 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
             area: item.area,
             location: item.location,
             requestmode: item.requestmode,
-            stockcategory: stockcategoryNew.join(","),
-            stocksubcategory: stocksubcategoryNew.join(","),
-            uomnew: quantityAndUom.join(","),
-            quantitynew: quantityNew.join(","),
-            materialnew: materialNew.join(","),
-            productdetailsnew: productdetailsNew.length > 0 ? productdetailsNew.join(",") : "",
+            stockcategory: stockcategoryNew.join(','),
+            stocksubcategory: stocksubcategoryNew.join(','),
+            uomnew: quantityAndUom.join(','),
+            quantitynew: quantityNew.join(','),
+            materialnew: materialNew.join(','),
+            productdetailsnew: productdetailsNew.length > 0 ? productdetailsNew.join(',') : '',
             gstno: item.gstno,
             billno: item.billno,
             warrantydetails: item.warrantydetails,
             warranty: item.warranty,
-            purchasedate: item.purchasedate ? moment(item.purchasedate).format("DD/MM/YYYY") : "",
-            billdate: moment(item.billdate).format("DD/MM/YYYY"),
+            purchasedate: item.purchasedate ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+            billdate: moment(item.billdate).format('DD/MM/YYYY'),
             rate: item.rate,
             vendor: item.vendor,
             vendorgroup: item.vendorgroup,
@@ -2662,7 +2659,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         setLoading(false);
       }
     } catch (err) {
-      console.log(err, "errorororo");
+      console.log(err, 'errorororo');
       setLoading(false);
 
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -2671,7 +2668,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
   useEffect(() => {
     if (items?.length > 0) {
-      fetchStock("Filtered");
+      fetchStock('Filtered');
     }
   }, [page, pageSize, searchQuery]);
 
@@ -2699,83 +2696,83 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   // }));
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.data.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
   const columns = [
-    { title: "SNO", field: "serialNumber" },
-    { title: "Company", field: "company" },
-    { title: "Subcategoryname", field: "branch" },
-    { title: "Unit", field: "unit" },
-    { title: "Floor", field: "floor" },
-    { title: "Area", field: "area" },
-    { title: "Location", field: "location" },
-    { title: "Request Mode For", field: "requestmode" },
-    { title: "Stock Category", field: "stockcategory" },
-    { title: "Stock Sub Category", field: "stocksubcategory" },
+    { title: 'SNO', field: 'serialNumber' },
+    { title: 'Company', field: 'company' },
+    { title: 'Subcategoryname', field: 'branch' },
+    { title: 'Unit', field: 'unit' },
+    { title: 'Floor', field: 'floor' },
+    { title: 'Area', field: 'area' },
+    { title: 'Location', field: 'location' },
+    { title: 'Request Mode For', field: 'requestmode' },
+    { title: 'Stock Category', field: 'stockcategory' },
+    { title: 'Stock Sub Category', field: 'stocksubcategory' },
 
-    { title: "Quantity", field: "quantitynew" },
-    { title: "Quantity & UOM", field: "uomnew" },
-    { title: "Material", field: "materialnew" },
-    { title: "Product Details", field: "productdetailsnew" },
+    { title: 'Quantity', field: 'quantitynew' },
+    { title: 'Quantity & UOM', field: 'uomnew' },
+    { title: 'Material', field: 'materialnew' },
+    { title: 'Product Details', field: 'productdetailsnew' },
 
-    { title: "GST No", field: "gstno" },
-    { title: "Bill No", field: "billno" },
-    { title: "Warranty Details", field: "warrantydetails" },
-    { title: "Warranty", field: "warranty" },
-    { title: "Purchase Date", field: "purchasedate" },
-    { title: "Bill Date", field: "billdate" },
-    { title: "Rate", field: "rate" },
-    { title: "Vendor Group", field: "vendorgroup" },
-    { title: "Vendor Name", field: "vendor" },
+    { title: 'GST No', field: 'gstno' },
+    { title: 'Bill No', field: 'billno' },
+    { title: 'Warranty Details', field: 'warrantydetails' },
+    { title: 'Warranty', field: 'warranty' },
+    { title: 'Purchase Date', field: 'purchasedate' },
+    { title: 'Bill Date', field: 'billdate' },
+    { title: 'Rate', field: 'rate' },
+    { title: 'Vendor Group', field: 'vendorgroup' },
+    { title: 'Vendor Name', field: 'vendor' },
   ];
   // PDF
   const downloadPdf = (isfilter) => {
-    const doc = new jsPDF({ orientation: "landscape" });
+    const doc = new jsPDF({ orientation: 'landscape' });
 
     // Initialize serial number counter
     let serialNumberCounter = 1;
 
     // Modify row data to include serial number
     const dataWithSerial =
-      isfilter === "filtered"
+      isfilter === 'filtered'
         ? rowDataTable.map((row) => ({
-          ...row,
-          serialNumber: serialNumberCounter++,
-        }))
-        : stockmanages.map((row) => {
-          let purchasedate = row?.purchasedate ? row.purchasedate.split("-") : ["", "", ""];
-          let year = purchasedate[0];
-          let month = purchasedate[1];
-          let date = purchasedate[2];
-          let [year1, month1, date1] = row.billdate.split("-");
-          return {
             ...row,
             serialNumber: serialNumberCounter++,
-            purchasedate: purchasedate && date != "" && month != "" ? `${date}/${month}/${year}` : "",
-            billdate: `${date1}/${month1}/${year1}`,
-            quantitynew: row.tododetails.map((data) => ` ${data.quantitynew}`),
-            uomnew: row.tododetails.map((data) => ` ${data.quantitynew}#${data.uomnew}`),
-            materialnew: row.tododetails.map((data) => ` ${data.materialnew}`),
-            productdetailsnew: row.tododetails.map((data) => ` ${data.productdetailsnew}`),
-          };
-        });
+          }))
+        : stockmanages.map((row) => {
+            let purchasedate = row?.purchasedate ? row.purchasedate.split('-') : ['', '', ''];
+            let year = purchasedate[0];
+            let month = purchasedate[1];
+            let date = purchasedate[2];
+            let [year1, month1, date1] = row.billdate.split('-');
+            return {
+              ...row,
+              serialNumber: serialNumberCounter++,
+              purchasedate: purchasedate && date != '' && month != '' ? `${date}/${month}/${year}` : '',
+              billdate: `${date1}/${month1}/${year1}`,
+              quantitynew: row.tododetails.map((data) => ` ${data.quantitynew}`),
+              uomnew: row.tododetails.map((data) => ` ${data.quantitynew}#${data.uomnew}`),
+              materialnew: row.tododetails.map((data) => ` ${data.materialnew}`),
+              productdetailsnew: row.tododetails.map((data) => ` ${data.productdetailsnew}`),
+            };
+          });
 
     // Generate PDF
     doc.autoTable({
-      theme: "grid",
+      theme: 'grid',
       styles: { fontSize: 5 },
       // columns: columnsWithSerial,
       columns: columns.map((col) => ({ ...col, dataKey: col.field })),
       body: dataWithSerial,
     });
 
-    doc.save("Stock Purchase List.pdf");
+    doc.save('Stock Purchase List.pdf');
   };
 
   // Excel
-  const fileName = "Stock Purchase List";
+  const fileName = 'Stock Purchase List';
 
   const fetchspecification = async (e) => {
     try {
@@ -2814,13 +2811,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       await Promise.all(deletePromises);
 
       handleCloseModcheckbox();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       setSelectedRows([]);
       setSelectAllChecked(false);
       setPage(1);
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -2830,8 +2827,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Stock Purchase",
-    pageStyle: "print",
+    documentTitle: 'Stock Purchase',
+    pageStyle: 'print',
   });
 
   //serial no for listing items
@@ -2913,10 +2910,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setPage(1);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
   const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
@@ -2944,10 +2941,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   );
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -2956,86 +2953,86 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "S.No",
+      field: 'serialNumber',
+      headerName: 'S.No',
       flex: 0,
       width: 90,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.serialNumber,
-      pinned: "left",
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.company,
-      pinned: "left",
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.branch,
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.unit,
-      pinned: "left",
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "floor",
-      headerName: "Floor",
+      field: 'floor',
+      headerName: 'Floor',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.floor,
     },
     {
-      field: "area",
-      headerName: "Area",
+      field: 'area',
+      headerName: 'Area',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.area,
     },
     {
-      field: "location",
-      headerName: "Location",
+      field: 'location',
+      headerName: 'Location',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.location,
     },
     {
-      field: "vendorgroup",
-      headerName: "Vendor Group",
+      field: 'vendorgroup',
+      headerName: 'Vendor Group',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.vendorgroup,
     },
     {
-      field: "vendor",
-      headerName: "Dealers Name",
+      field: 'vendor',
+      headerName: 'Dealers Name',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.vendor,
     },
     // {
@@ -3048,101 +3045,101 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     // },
 
     {
-      field: "requestmode",
-      headerName: "Request Mode",
+      field: 'requestmode',
+      headerName: 'Request Mode',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.requestmode,
     },
 
     {
-      field: "gstno",
-      headerName: "GST No",
+      field: 'gstno',
+      headerName: 'GST No',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.gstno,
     },
     {
-      field: "billno",
-      headerName: "Bill No",
+      field: 'billno',
+      headerName: 'Bill No',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.billno,
     },
     {
-      field: "warranty",
-      headerName: "Warranty",
+      field: 'warranty',
+      headerName: 'Warranty',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.warranty,
     },
     {
-      field: "purchasedate",
-      headerName: "Purchase Date",
+      field: 'purchasedate',
+      headerName: 'Purchase Date',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.purchasedate,
     },
     {
-      field: "stockcategory",
-      headerName: "Stockcategory",
+      field: 'stockcategory',
+      headerName: 'Stockcategory',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.stockcategory,
     },
     {
-      field: "stocksubcategory",
-      headerName: "Stocksubcategory",
+      field: 'stocksubcategory',
+      headerName: 'Stocksubcategory',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.stocksubcategory,
     },
 
     {
-      field: "quantitynew",
-      headerName: "Quantity",
+      field: 'quantitynew',
+      headerName: 'Quantity',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.quantitynew,
     },
     {
-      field: "uomnew",
-      headerName: "Quantity & UOM",
+      field: 'uomnew',
+      headerName: 'Quantity & UOM',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.uomnew,
     },
     {
-      field: "materialnew",
-      headerName: "Material",
+      field: 'materialnew',
+      headerName: 'Material',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.materialnew,
     },
     {
-      field: "productdetailsnew",
-      headerName: "Product Details",
+      field: 'productdetailsnew',
+      headerName: 'Product Details',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.productdetailsnew,
     },
     {
-      field: "warrantydetails",
-      headerName: "Warranty Details",
+      field: 'warrantydetails',
+      headerName: 'Warranty Details',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.warrantydetails,
     },
     // {
@@ -3154,26 +3151,26 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     //   hide: !columnVisibility.rate,
     // },
     {
-      field: "billdate",
-      headerName: "Bill Date",
+      field: 'billdate',
+      headerName: 'Bill Date',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.billdate,
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
       sortable: false,
       hide: !columnVisibility.actions,
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("estockpurchase") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('estockpurchase') && (
             <Button
               sx={userStyle.buttonedit}
-              style={{ minWidth: "0px" }}
+              style={{ minWidth: '0px' }}
               onClick={() => {
                 getCode(params.data.id);
                 // fetchStockedit(params.data.id);
@@ -3182,7 +3179,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               <EditOutlinedIcon sx={buttonStyles.buttonedit} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("dstockpurchase") && (
+          {isUserRoleCompare?.includes('dstockpurchase') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
@@ -3193,7 +3190,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("vstockpurchase") && (
+          {isUserRoleCompare?.includes('vstockpurchase') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={(e) => {
@@ -3204,7 +3201,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("istockpurchase") && (
+          {isUserRoleCompare?.includes('istockpurchase') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -3220,7 +3217,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     },
   ];
 
-  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== "checkbox" && data.field !== "actions" && data.field !== "serialNumber");
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = items.map((item, index) => {
     // let documentArray = item.document.length === 0 ? item.documentstext : item.document;
@@ -3281,9 +3278,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -3291,7 +3288,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -3299,16 +3296,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: "absolute" }} />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent sx={{ minWidth: "auto", height: "200px", position: "relative" }}>
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText sx={{ display: "flex" }} primary={<Switch sx={{ marginTop: "-5px" }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === "checkbox" ? "Checkbox" : column.headerName} />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -3316,7 +3313,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button variant="text" sx={{ textTransform: "none" }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -3324,7 +3321,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -3333,7 +3330,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 setColumnVisibility(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -3343,7 +3340,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   );
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -3359,51 +3356,51 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setOverallFilterdata(
       res_employee?.data?.stock?.length > 0
         ? res_employee?.data?.stock?.map((item, index) => {
-          let quantityNew = item.tododetails.map((data, newindex) => {
-            return ` ${data.quantitynew}`;
-          });
+            let quantityNew = item.tododetails.map((data, newindex) => {
+              return ` ${data.quantitynew}`;
+            });
 
-          let materialNew = item.tododetails.map((data, newindex) => {
-            return ` ${data.materialnew}`;
-          });
+            let materialNew = item.tododetails.map((data, newindex) => {
+              return ` ${data.materialnew}`;
+            });
 
-          let productdetailsNew = item.tododetails.map((data, newindex) => {
-            return ` ${data.productdetailsnew}`;
-          });
+            let productdetailsNew = item.tododetails.map((data, newindex) => {
+              return ` ${data.productdetailsnew}`;
+            });
 
-          let quantityAndUom = item.tododetails.map((data, newindex) => {
-            return ` ${data.quantitynew}#${data.uomnew}`;
-          });
-          return {
-            ...item,
-            serialNumber: (page - 1) * pageSize + index + 1,
-            id: item._id,
-            company: item.company,
-            branch: item.branch,
-            unit: item.unit,
-            floor: item.floor,
-            area: item.area,
-            location: item.location,
-            requestmode: item.requestmode,
-            stockcategory: item.stockcategory,
-            stocksubcategory: item.stocksubcategory,
+            let quantityAndUom = item.tododetails.map((data, newindex) => {
+              return ` ${data.quantitynew}#${data.uomnew}`;
+            });
+            return {
+              ...item,
+              serialNumber: (page - 1) * pageSize + index + 1,
+              id: item._id,
+              company: item.company,
+              branch: item.branch,
+              unit: item.unit,
+              floor: item.floor,
+              area: item.area,
+              location: item.location,
+              requestmode: item.requestmode,
+              stockcategory: item.stockcategory,
+              stocksubcategory: item.stocksubcategory,
 
-            uomnew: quantityAndUom.join(","),
-            quantitynew: quantityNew.join(","),
-            materialnew: materialNew.join(",").toString(),
-            productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(",") : "",
+              uomnew: quantityAndUom.join(','),
+              quantitynew: quantityNew.join(','),
+              materialnew: materialNew.join(',').toString(),
+              productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(',') : '',
 
-            gstno: item.gstno,
-            billno: item.billno,
-            warrantydetails: item.warrantydetails,
-            warranty: item.warranty,
-            purchasedate: item.purchasedate != "" ? moment(item.purchasedate).format("DD/MM/YYYY") : "",
-            billdate: moment(item.billdate).format("DD/MM/YYYY"),
-            rate: item.rate,
-            vendor: item.vendor,
-            vendorgroup: item.vendorgroup,
-          };
-        })
+              gstno: item.gstno,
+              billno: item.billno,
+              warrantydetails: item.warrantydetails,
+              warranty: item.warranty,
+              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+              billdate: moment(item.billdate).format('DD/MM/YYYY'),
+              rate: item.rate,
+              vendor: item.vendor,
+              vendorgroup: item.vendorgroup,
+            };
+          })
         : []
     );
     setIsFilterOpen(false);
@@ -3424,51 +3421,51 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setOverallFilterdata(
       res_employee?.data?.stock?.length > 0
         ? res_employee?.data?.stock?.map((item, index) => {
-          let quantityNew = item.tododetails.map((data, newindex) => {
-            return ` ${data.quantitynew}`;
-          });
+            let quantityNew = item.tododetails.map((data, newindex) => {
+              return ` ${data.quantitynew}`;
+            });
 
-          let materialNew = item.tododetails.map((data, newindex) => {
-            return ` ${data.materialnew}`;
-          });
+            let materialNew = item.tododetails.map((data, newindex) => {
+              return ` ${data.materialnew}`;
+            });
 
-          let productdetailsNew = item.tododetails.map((data, newindex) => {
-            return ` ${data.productdetailsnew}`;
-          });
+            let productdetailsNew = item.tododetails.map((data, newindex) => {
+              return ` ${data.productdetailsnew}`;
+            });
 
-          let quantityAndUom = item.tododetails.map((data, newindex) => {
-            return ` ${data.quantitynew}#${data.uomnew}`;
-          });
-          return {
-            ...item,
-            serialNumber: (page - 1) * pageSize + index + 1,
-            id: item._id,
-            company: item.company,
-            branch: item.branch,
-            unit: item.unit,
-            floor: item.floor,
-            area: item.area,
-            location: item.location,
-            requestmode: item.requestmode,
-            stockcategory: item.stockcategory,
-            stocksubcategory: item.stocksubcategory,
+            let quantityAndUom = item.tododetails.map((data, newindex) => {
+              return ` ${data.quantitynew}#${data.uomnew}`;
+            });
+            return {
+              ...item,
+              serialNumber: (page - 1) * pageSize + index + 1,
+              id: item._id,
+              company: item.company,
+              branch: item.branch,
+              unit: item.unit,
+              floor: item.floor,
+              area: item.area,
+              location: item.location,
+              requestmode: item.requestmode,
+              stockcategory: item.stockcategory,
+              stocksubcategory: item.stocksubcategory,
 
-            uomnew: quantityAndUom.join(","),
-            quantitynew: quantityNew.join(","),
-            materialnew: materialNew.join(",").toString(),
-            productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(",") : "",
+              uomnew: quantityAndUom.join(','),
+              quantitynew: quantityNew.join(','),
+              materialnew: materialNew.join(',').toString(),
+              productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(',') : '',
 
-            gstno: item.gstno,
-            billno: item.billno,
-            warrantydetails: item.warrantydetails,
-            warranty: item.warranty,
-            purchasedate: item.purchasedate != "" ? moment(item.purchasedate).format("DD/MM/YYYY") : "",
-            billdate: moment(item.billdate).format("DD/MM/YYYY"),
-            rate: item.rate,
-            vendor: item.vendor,
-            vendorgroup: item.vendorgroup,
-          };
-        })
+              gstno: item.gstno,
+              billno: item.billno,
+              warrantydetails: item.warrantydetails,
+              warranty: item.warranty,
+              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+              billdate: moment(item.billdate).format('DD/MM/YYYY'),
+              rate: item.rate,
+              vendor: item.vendor,
+              vendorgroup: item.vendorgroup,
+            };
+          })
         : []
     );
     setIsPdfFilterOpen(false);
@@ -3478,38 +3475,37 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("");
-  const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = fileFormat === "xl" ? ".xlsx" : ".csv";
+  const [fileFormat, setFormat] = useState('');
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+  const fileExtension = fileFormat === 'xl' ? '.xlsx' : '.csv';
   const exportToCSV = (csvData, fileName) => {
     const ws = XLSX.utils.json_to_sheet(csvData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
     FileSaver.saveAs(data, fileName + fileExtension);
   };
-
 
   // Search bar
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
-  const idSearch = openSearch ? "simple-popover" : undefined;
+  const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if ((selectedColumn && filterValue) || ["Blank", "Not Blank"].includes(selectedCondition)) {
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
       setAdditionalFilters([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
@@ -3521,7 +3517,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
           return `${showname} ${filter.condition} "${filter.value}"`;
         })
-        .join(" " + (advancedFilter.length > 1 ? advancedFilter[1].condition : "") + " ");
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
@@ -3535,12 +3531,12 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     // Reset all filters and pagination state
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
@@ -3551,7 +3547,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
+    if (allFilters.length > 0 && selectedColumn !== '') {
       queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
@@ -3591,7 +3587,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
         // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-        return matchingItem ? { ...item, uomcode: matchingItem.code } : { ...item, uomcode: "" };
+        return matchingItem ? { ...item, uomcode: matchingItem.code } : { ...item, uomcode: '' };
       });
 
       const itemsWithSerialNumber = setData.map((item, index) => {
@@ -3623,18 +3619,18 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           area: item.area,
           location: item.location,
           requestmode: item.requestmode,
-          stockcategory: stockcategoryNew.join(","),
-          stocksubcategory: stocksubcategoryNew.join(","),
-          uomnew: quantityAndUom.join(","),
-          quantitynew: quantityNew.join(","),
-          materialnew: materialNew.join(","),
-          productdetailsnew: productdetailsNew.length > 0 ? productdetailsNew.join(",") : "",
+          stockcategory: stockcategoryNew.join(','),
+          stocksubcategory: stocksubcategoryNew.join(','),
+          uomnew: quantityAndUom.join(','),
+          quantitynew: quantityNew.join(','),
+          materialnew: materialNew.join(','),
+          productdetailsnew: productdetailsNew.length > 0 ? productdetailsNew.join(',') : '',
           gstno: item.gstno,
           billno: item.billno,
           warrantydetails: item.warrantydetails,
           warranty: item.warranty,
-          purchasedate: item.purchasedate ? moment(item.purchasedate).format("DD/MM/YYYY") : "",
-          billdate: moment(item.billdate).format("DD/MM/YYYY"),
+          purchasedate: item.purchasedate ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+          billdate: moment(item.billdate).format('DD/MM/YYYY'),
           rate: item.rate,
           vendor: item.vendor,
           vendorgroup: item.vendorgroup,
@@ -3645,51 +3641,51 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       setOverallFilterdata(
         res_employee?.data?.totalProjectsData?.length > 0
           ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-            let quantityNew = item.tododetails.map((data, newindex) => {
-              return ` ${data.quantitynew}`;
-            });
+              let quantityNew = item.tododetails.map((data, newindex) => {
+                return ` ${data.quantitynew}`;
+              });
 
-            let materialNew = item.tododetails.map((data, newindex) => {
-              return ` ${data.materialnew}`;
-            });
+              let materialNew = item.tododetails.map((data, newindex) => {
+                return ` ${data.materialnew}`;
+              });
 
-            let productdetailsNew = item.tododetails.map((data, newindex) => {
-              return ` ${data.productdetailsnew}`;
-            });
+              let productdetailsNew = item.tododetails.map((data, newindex) => {
+                return ` ${data.productdetailsnew}`;
+              });
 
-            let quantityAndUom = item.tododetails.map((data, newindex) => {
-              return ` ${data.quantitynew}#${data.uomnew}`;
-            });
-            return {
-              ...item,
-              serialNumber: (page - 1) * pageSize + index + 1,
-              id: item._id,
-              company: item.company,
-              branch: item.branch,
-              unit: item.unit,
-              floor: item.floor,
-              area: item.area,
-              location: item.location,
-              requestmode: item.requestmode,
-              stockcategory: item.stockcategory,
-              stocksubcategory: item.stocksubcategory,
+              let quantityAndUom = item.tododetails.map((data, newindex) => {
+                return ` ${data.quantitynew}#${data.uomnew}`;
+              });
+              return {
+                ...item,
+                serialNumber: (page - 1) * pageSize + index + 1,
+                id: item._id,
+                company: item.company,
+                branch: item.branch,
+                unit: item.unit,
+                floor: item.floor,
+                area: item.area,
+                location: item.location,
+                requestmode: item.requestmode,
+                stockcategory: item.stockcategory,
+                stocksubcategory: item.stocksubcategory,
 
-              uomnew: quantityAndUom.join(","),
-              quantitynew: quantityNew.join(","),
-              materialnew: materialNew.join(",").toString(),
-              productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(",") : "",
+                uomnew: quantityAndUom.join(','),
+                quantitynew: quantityNew.join(','),
+                materialnew: materialNew.join(',').toString(),
+                productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(',') : '',
 
-              gstno: item.gstno,
-              billno: item.billno,
-              warrantydetails: item.warrantydetails,
-              warranty: item.warranty,
-              purchasedate: item.purchasedate != "" ? moment(item.purchasedate).format("DD/MM/YYYY") : "",
-              billdate: moment(item.billdate).format("DD/MM/YYYY"),
-              rate: item.rate,
-              vendor: item.vendor,
-              vendorgroup: item.vendorgroup,
-            };
-          })
+                gstno: item.gstno,
+                billno: item.billno,
+                warrantydetails: item.warrantydetails,
+                warranty: item.warranty,
+                purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+                billdate: moment(item.billdate).format('DD/MM/YYYY'),
+                rate: item.rate,
+                vendor: item.vendor,
+                vendorgroup: item.vendorgroup,
+              };
+            })
           : []
       );
 
@@ -3728,7 +3724,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   };
 
   const customValueRendererCompany = (valueCompanyCat, _categoryname) => {
-    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(", ") : "Please Select Company";
+    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(', ') : 'Please Select Company';
   };
 
   //branch multiselect
@@ -3747,7 +3743,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   };
 
   const customValueRendererBranch = (valueBranchCat, _categoryname) => {
-    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(", ") : "Please Select Branch";
+    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(', ') : 'Please Select Branch';
   };
 
   //unit multiselect
@@ -3764,7 +3760,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   };
 
   const customValueRendererUnit = (valueUnitCat, _categoryname) => {
-    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(", ") : "Please Select Unit";
+    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(', ') : 'Please Select Unit';
   };
 
   //auto select all dropdowns
@@ -3837,11 +3833,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const handleSubmitFilter = (e) => {
     e.preventDefault();
     if (selectedOptionsCompany?.length === 0 && selectedOptionsBranch?.length === 0 && selectedOptionsUnit?.length === 0) {
-      setPopupContentMalert("Please Select Any One");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Any One');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
-      fetchStock("Filtered");
+      fetchStock('Filtered');
     }
   };
 
@@ -3859,11 +3855,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setValueCompanyCat([]);
     setValueBranchCat([]);
     setValueUnitCat([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
-
 
   //alert model for stock category
   const [openviewalertstockcategory, setOpenviewalertstockcategory] = useState(false);
@@ -3888,75 +3883,71 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const educationTodo = () => {
     try {
       const isNameMatch = educationtodo?.some((item) => {
-        if (stockmanagemasteredit?.requestmode === "Stock Material") {
+        if (stockmanagemasteredit?.requestmode === 'Stock Material') {
           return item?.category === todoDetails?.category && item?.subcategory === todoDetails?.subcategory && item?.itemname?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
         } else {
           return item?.materialnew?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
         }
       });
-      if (todoDetails.category === "Please Select Category") {
-        setPopupContentMalert("Please Select Category!");
-        setPopupSeverityMalert("info");
+      if (todoDetails.category === 'Please Select Category') {
+        setPopupContentMalert('Please Select Category!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (todoDetails.subcategory === "Please Select Sub Category") {
-        setPopupContentMalert("Please Select Sub Category!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.subcategory === 'Please Select Sub Category') {
+        setPopupContentMalert('Please Select Sub Category!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (todoDetails.materialnew === "Please Select Item Name") {
-        setPopupContentMalert("Please Select Item Name!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.materialnew === 'Please Select Item Name') {
+        setPopupContentMalert('Please Select Item Name!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.materialnew === "") {
-        setPopupContentMalert("Please Enter Item Name!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.materialnew === '') {
+        setPopupContentMalert('Please Enter Item Name!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.uomnew === "") {
-        setPopupContentMalert("Please Enter UOM!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.uomnew === '') {
+        setPopupContentMalert('Please Enter UOM!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.rate === "" || todoDetails.rate == 0) {
-        setPopupContentMalert("Please Enter Rate!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.rate === '' || todoDetails.rate == 0) {
+        setPopupContentMalert('Please Enter Rate!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.quantitynew === "" || todoDetails.quantitynew == 0) {
-        setPopupContentMalert("Please Enter Quantity!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.quantitynew === '' || todoDetails.quantitynew == 0) {
+        setPopupContentMalert('Please Enter Quantity!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.amount === "" || todoDetails.amount == 0) {
-        setPopupContentMalert("Please Enter Amount!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.amount === '' || todoDetails.amount == 0) {
+        setPopupContentMalert('Please Enter Amount!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (todoDetails.productdetailsnew === "") {
-        setPopupContentMalert("Please Enter Product Details!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.productdetailsnew === '') {
+        setPopupContentMalert('Please Enter Product Details!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (isNameMatch) {
-        setPopupContentMalert("Item Already Exists!");
-        setPopupSeverityMalert("info");
+      } else if (isNameMatch) {
+        setPopupContentMalert('Item Already Exists!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (Number(todoDetails.amount) + Number(Expensetotal) > Number(stockmanagemasteredit.totalbillamount)) {
-        setPopupContentMalert("Amount Exceeds Total Bill Amount!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Amount Exceeds Total Bill Amount!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails !== "") {
+      } else if (todoDetails !== '') {
         setEducationtodo([...educationtodo, todoDetails]);
         setTodoDetails({
           ...todoDetails,
-          category: "Please Select Category",
-          subcategory: "Please Select Sub Category",
-          materialnew: "Please Select Item Name",
-          productdetailsnew: "",
-          rate: "",
-          quantitynew: "",
-          amount: "",
+          category: 'Please Select Category',
+          subcategory: 'Please Select Sub Category',
+          materialnew: 'Please Select Item Name',
+          productdetailsnew: '',
+          rate: '',
+          quantitynew: '',
+          amount: '',
         });
       }
     } catch (err) {
-      console.log(err, "errtodo")
+      console.log(err, 'errtodo');
     }
   };
 
@@ -3966,10 +3957,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setEducationtodo(newTasks);
     setExpensecreate({
       ...expensecreate,
-      paidstatus: "Not Paid",
-      paidmode: "Please Select Paid Mode",
-      paidamount: "",
-      balanceamount: "",
+      paidstatus: 'Not Paid',
+      paidmode: 'Please Select Paid Mode',
+      paidamount: '',
+      balanceamount: '',
     });
   };
 
@@ -3980,7 +3971,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       {/* <Typography sx={userStyle.HeaderText}>Reference Documents List</Typography> */}
 
       <>
-        {isUserRoleCompare?.includes("lstockpurchase") && (
+        {isUserRoleCompare?.includes('lstockpurchase') && (
           <>
             <Box sx={userStyle.container}>
               {/* ******************************************************EXPORT Buttons****************************************************** */}
@@ -4061,7 +4052,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <br />
 
                 <Grid item md={2} sm={12} xs={12} marginTop={3}>
-                  <Grid sx={{ display: "flex", gap: "15px" }}>
+                  <Grid sx={{ display: 'flex', gap: '15px' }}>
                     <Button
                       variant="contained"
                       sx={buttonStyles.buttonsubmit}
@@ -4069,7 +4060,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         handleSubmitFilter(e);
                       }}
                     >
-                      {" "}
+                      {' '}
                       Filter
                     </Button>
                     <Button
@@ -4078,7 +4069,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         handleClearFilter();
                       }}
                     >
-                      {" "}
+                      {' '}
                       CLEAR
                     </Button>
                   </Grid>
@@ -4091,19 +4082,19 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Grid>
-                  {isUserRoleCompare?.includes("excelstockpurchase") && (
+                  {isUserRoleCompare?.includes('excelstockpurchase') && (
                     <>
                       <Button
                         onClick={(e) => {
                           handleCloseFilterOpen();
 
-                          setFormat("xl");
+                          setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -4112,12 +4103,12 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvstockpurchase") && (
+                  {isUserRoleCompare?.includes('csvstockpurchase') && (
                     <>
                       <Button
                         onClick={(e) => {
                           handleCloseFilterOpen();
-                          setFormat("csv");
+                          setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -4126,7 +4117,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printstockpurchase") && (
+                  {isUserRoleCompare?.includes('printstockpurchase') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
@@ -4135,7 +4126,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfstockpurchase") && (
+                  {isUserRoleCompare?.includes('pdfstockpurchase') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
@@ -4149,10 +4140,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imagestockpurchase") && (
+                  {isUserRoleCompare?.includes('imagestockpurchase') && (
                     <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                      {" "}
-                      <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Grid>
@@ -4174,7 +4165,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -4205,13 +4196,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                             )}
                             <Tooltip title="Show search options">
                               <span>
-                                <IoMdOptions style={{ cursor: "pointer" }} onClick={handleClickSearch} />
+                                <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
                               </span>
                             </Tooltip>
                           </InputAdornment>
                         }
                         aria-describedby="outlined-weight-helper-text"
-                        inputProps={{ "aria-label": "weight" }}
+                        inputProps={{ 'aria-label': 'weight' }}
                         type="text"
                         value={getSearchDisplay()}
                         onChange={handleSearchChange}
@@ -4238,7 +4229,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 Manage Columns
               </Button>
               &emsp;
-              {isUserRoleCompare?.includes("bdstockpurchase") && (
+              {isUserRoleCompare?.includes('bdstockpurchase') && (
                 <Button variant="contained" sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
                   Bulk Delete
                 </Button>
@@ -4248,9 +4239,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Box>
                   <Box
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      minHeight: "350px",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      minHeight: '350px',
                     }}
                   >
                     <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
@@ -4258,7 +4249,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 </Box>
               ) : (
                 <>
-                  <Box style={{ width: "100%", overflowY: "hidden" }}>
+                  <Box style={{ width: '100%', overflowY: 'hidden' }}>
                     <>
                       <AggridTableForPaginationTable
                         rowDataTable={rowDataTable}
@@ -4284,9 +4275,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               )}
               {/* ****** Table End ****** */}
             </Box>
+
+
+
+
             <TableContainer component={Paper} sx={userStyle.printcls}>
               <Table aria-label="customized table" id="jobopening" ref={componentRef}>
-                <TableHead sx={{ fontWeight: "600" }}>
+                <TableHead sx={{ fontWeight: '600' }}>
                   <StyledTableRow>
                     <StyledTableCell>SNo</StyledTableCell>
                     <StyledTableCell>Company</StyledTableCell>
@@ -4351,10 +4346,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                     ))
                   ) : (
                     <StyledTableRow>
-                      {" "}
+                      {' '}
                       <StyledTableCell colSpan={7} align="center">
                         No Data Available
-                      </StyledTableCell>{" "}
+                      </StyledTableCell>{' '}
                     </StyledTableRow>
                   )}
                   <StyledTableRow></StyledTableRow>
@@ -4362,17 +4357,17 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               </Table>
             </TableContainer>
 
-            <Popover id={id} open={isManageColumnsOpen} anchorEl={anchorEl} onClose={handleCloseManageColumns} anchorOrigin={{ vertical: "bottom", horizontal: "left" }} transformOrigin={{ vertical: "center", horizontal: "right" }}>
+            <Popover id={id} open={isManageColumnsOpen} anchorEl={anchorEl} onClose={handleCloseManageColumns} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} transformOrigin={{ vertical: 'center', horizontal: 'right' }}>
               {manageColumnsContent}
             </Popover>
-            <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
-              <Box style={{ padding: "10px", maxWidth: "450px" }}>
+            <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+              <Box style={{ padding: '10px', maxWidth: '450px' }}>
                 <Typography variant="h6">Advance Search</Typography>
                 <IconButton
                   aria-label="close"
                   onClick={handleCloseSearch}
                   sx={{
-                    position: "absolute",
+                    position: 'absolute',
                     right: 8,
                     top: 8,
                     color: (theme) => theme.palette.grey[500],
@@ -4380,19 +4375,19 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 >
                   <CloseIcon />
                 </IconButton>
-                <DialogContent sx={{ width: "100%" }}>
+                <DialogContent sx={{ width: '100%' }}>
                   <Box
                     sx={{
-                      width: "350px",
-                      maxHeight: "400px",
-                      overflow: "hidden",
-                      position: "relative",
+                      width: '350px',
+                      maxHeight: '400px',
+                      overflow: 'hidden',
+                      position: 'relative',
                     }}
                   >
                     <Box
                       sx={{
-                        maxHeight: "300px",
-                        overflowY: "auto",
+                        maxHeight: '300px',
+                        overflowY: 'auto',
                         // paddingRight: '5px'
                       }}
                     >
@@ -4406,7 +4401,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                               PaperProps: {
                                 style: {
                                   maxHeight: 200,
-                                  width: "auto",
+                                  width: 'auto',
                                 },
                               },
                             }}
@@ -4434,7 +4429,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                               PaperProps: {
                                 style: {
                                   maxHeight: 200,
-                                  width: "auto",
+                                  width: 'auto',
                                 },
                               },
                             }}
@@ -4455,16 +4450,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                           <TextField
                             fullWidth
                             size="small"
-                            value={["Blank", "Not Blank"].includes(selectedCondition) ? "" : filterValue}
+                            value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
                             onChange={(e) => setFilterValue(e.target.value)}
-                            disabled={["Blank", "Not Blank"].includes(selectedCondition)}
-                            placeholder={["Blank", "Not Blank"].includes(selectedCondition) ? "Disabled" : "Enter value"}
+                            disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                            placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
                             sx={{
-                              "& .MuiOutlinedInput-root.Mui-disabled": {
-                                backgroundColor: "rgb(0 0 0 / 26%)",
+                              '& .MuiOutlinedInput-root.Mui-disabled': {
+                                backgroundColor: 'rgb(0 0 0 / 26%)',
                               },
-                              "& .MuiOutlinedInput-input.Mui-disabled": {
-                                cursor: "not-allowed",
+                              '& .MuiOutlinedInput-input.Mui-disabled': {
+                                cursor: 'not-allowed',
                               },
                             }}
                           />
@@ -4481,7 +4476,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         )}
                         {additionalFilters.length === 0 && (
                           <Grid item md={4} sm={12} xs={12}>
-                            <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                            <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
                               Add Filter
                             </Button>
                           </Grid>
@@ -4491,12 +4486,12 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                           <Button
                             variant="contained"
                             onClick={() => {
-                              fetchStock("Filtered");
+                              fetchStock('Filtered');
                               setIsSearchActive(true);
                               setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
                             }}
-                            sx={{ textTransform: "capitalize" }}
-                            disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
+                            sx={{ textTransform: 'capitalize' }}
+                            disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
                           >
                             Search
                           </Button>
@@ -4511,9 +4506,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         )}
       </>
 
+      
+
       {/* this is info view details */}
       <Dialog open={openInfo} onClose={handleCloseinfo} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <Box sx={{ width: "550px", padding: "20px 50px" }}>
+        <Box sx={{ width: '550px', padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}>Stock Purchase Info</Typography>
             <br />
@@ -4525,16 +4522,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   <br />
                   <Table>
                     <TableHead>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"SNO"}.</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}> {"UserName"}</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}> {"Date"}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'SNO'}.</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'UserName'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'Date'}</StyledTableCell>
                     </TableHead>
                     <TableBody>
                       {addedby?.map((item, i) => (
                         <StyledTableRow>
-                          <StyledTableCell sx={{ padding: "5px 10px !important" }}>{i + 1}.</StyledTableCell>
-                          <StyledTableCell sx={{ padding: "5px 10px !important" }}> {item.name}</StyledTableCell>
-                          <StyledTableCell sx={{ padding: "5px 10px !important" }}> {moment(item.date).format("DD-MM-YYYY hh:mm:ss a")}</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}>{i + 1}.</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.name}</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {moment(item.date).format('DD-MM-YYYY hh:mm:ss a')}</StyledTableCell>
                         </StyledTableRow>
                       ))}
                     </TableBody>
@@ -4547,16 +4544,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   <br />
                   <Table>
                     <TableHead>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"SNO"}.</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}> {"UserName"}</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}> {"Date"}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'SNO'}.</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'UserName'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'Date'}</StyledTableCell>
                     </TableHead>
                     <TableBody>
                       {updateby?.map((item, i) => (
                         <StyledTableRow>
-                          <StyledTableCell sx={{ padding: "5px 10px !important" }}>{i + 1}.</StyledTableCell>
-                          <StyledTableCell sx={{ padding: "5px 10px !important" }}> {item.name}</StyledTableCell>
-                          <StyledTableCell sx={{ padding: "5px 10px !important" }}> {moment(item.date).format("DD-MM-YYYY hh:mm:ss a")}</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}>{i + 1}.</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.name}</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {moment(item.date).format('DD-MM-YYYY hh:mm:ss a')}</StyledTableCell>
                         </StyledTableRow>
                       ))}
                     </TableBody>
@@ -4568,8 +4565,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
             <br />
             <Grid container spacing={2}>
               <Button variant="contained" onClick={handleCloseinfo}>
-                {" "}
-                Back{" "}
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
@@ -4585,14 +4582,14 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           maxWidth="lg"
           fullWidth={true}
           sx={{
-            overflow: "scroll",
-            "& .MuiPaper-root": {
-              overflow: "scroll",
+            overflow: 'scroll',
+            '& .MuiPaper-root': {
+              overflow: 'scroll',
             },
-            marginTop: "95px",
+            marginTop: '95px',
           }}
         >
-          <Box sx={{ padding: "20px 50px" }}>
+          <Box sx={{ padding: '20px 50px' }}>
             <>
               <Grid container spacing={2}>
                 <Typography sx={userStyle.HeaderText}>Edit Stock Purchase</Typography>
@@ -4602,7 +4599,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Company<b style={{ color: "red" }}>*</b>
+                      Company<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={companysEdit}
@@ -4623,17 +4620,17 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           company: e.value,
-                          branch: "Please Select Branch",
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          branch: 'Please Select Branch',
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setBranchsEdit([]);
                         setUnitsEdit([]);
                         setAreasEdit([]);
                         setFloorEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchBranchDropdownsEdit(e.value);
                       }}
                     />
@@ -4642,7 +4639,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Branch<b style={{ color: "red" }}>*</b>
+                      Branch<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={branchsEdit}
@@ -4665,14 +4662,14 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           branch: e.value,
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setUnitsEdit([]);
                         setAreasEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         setFloorEdit([]);
                         fetchUnitsEdit(e.value);
                         fetchFloorEdit(e.value);
@@ -4683,7 +4680,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Unit<b style={{ color: "red" }}>*</b>
+                      Unit<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={unitsEdit}
@@ -4705,7 +4702,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           unit: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -4714,7 +4711,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Floor<b style={{ color: "red" }}>*</b>
+                      Floor<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={floorsEdit}
@@ -4727,12 +4724,12 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           floor: e.value,
-                          workstation: "",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          workstation: '',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setAreasEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchAreaEdit(stockmanagemasteredit.branch, e.value);
                       }}
                     />
@@ -4741,7 +4738,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Area<b style={{ color: "red" }}>*</b>
+                      Area<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={areasEdit}
@@ -4754,10 +4751,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           area: e.value,
-                          workstation: "",
-                          location: "Please Select Location",
+                          workstation: '',
+                          location: 'Please Select Location',
                         });
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchAllLocationEdit(stockmanagemasteredit.branch, stockmanagemasteredit.floor, e.value);
                       }}
                     />
@@ -4766,7 +4763,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Location<b style={{ color: "red" }}>*</b>
+                      Location<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={locationsEdit}
@@ -4779,7 +4776,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           location: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -4790,8 +4787,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                     <Typography>Warranty</Typography>
                     <Selects
                       options={[
-                        { label: "Yes", value: "Yes" },
-                        { label: "No", value: "No" },
+                        { label: 'Yes', value: 'Yes' },
+                        { label: 'No', value: 'No' },
                       ]}
                       styles={colourStyles}
                       value={{
@@ -4807,7 +4804,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                     />
                   </FormControl>
                 </Grid>
-                {stockmanagemasteredit.warranty === "Yes" && (
+                {stockmanagemasteredit.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <Grid container>
@@ -4831,12 +4828,12 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                             onChange={handleEstimationChangeEdit}
                           >
                             <MenuItem value="" disabled>
-                              {" "}
+                              {' '}
                               Please Select
                             </MenuItem>
-                            <MenuItem value="Days"> {"Days"} </MenuItem>
-                            <MenuItem value="Month"> {"Month"} </MenuItem>
-                            <MenuItem value="Year"> {"Year"} </MenuItem>
+                            <MenuItem value="Days"> {'Days'} </MenuItem>
+                            <MenuItem value="Month"> {'Month'} </MenuItem>
+                            <MenuItem value="Year"> {'Year'} </MenuItem>
                           </Select>
                         </Grid>
                       </Grid>
@@ -4857,7 +4854,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                     />
                   </FormControl>
                 </Grid>
-                {stockmanagemasteredit.warranty === "Yes" && (
+                {stockmanagemasteredit.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
@@ -4870,18 +4867,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      {" "}
-                      Vendor Group Name<b style={{ color: "red" }}>*</b>{" "}
+                      {' '}
+                      Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       // options={vendorGroupOpt}
                       options={vendorGroupOpt.filter((item, index, self) => {
-                        return (
-                          self.findIndex(
-                            (i) =>
-                              i.label === item.label && i.value === item.value
-                          ) === index
-                        );
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                       })}
                       styles={colourStyles}
                       value={{ label: vendorGroup, value: vendorGroup }}
@@ -4889,16 +4881,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         setExpensecreate({
                           ...expensecreate,
                           vendorgrouping: e.value,
-                          vendorname: "Please Select Vendor",
-                          vendorfrequency: "",
-                          duedate: "",
-                          paidmode: "Please Select Paid Mode",
+                          vendorname: 'Please Select Vendor',
+                          vendorfrequency: '',
+                          duedate: '',
+                          paidmode: 'Please Select Paid Mode',
                         });
                         setVendorGroup(e.value);
-                        setFrequencyValue("");
-                        setVendorNew("Choose Vendor");
-                        setGroupedVendorNames(vendorGroupOpt?.filter(item => item.name === e.value)?.map(data => data?.vendor));
-                        setVendorModeOfPayments("");
+                        setFrequencyValue('');
+                        setVendorNew('Choose Vendor');
+                        setGroupedVendorNames(vendorGroupOpt?.filter((item) => item.name === e.value)?.map((data) => data?.vendor));
+                        setVendorModeOfPayments('');
                       }}
                     />
                   </FormControl>
@@ -4906,22 +4898,20 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <Typography>
-                      Vendor Name <b style={{ color: "red" }}>*</b>{" "}
+                      Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       // options={vendorOpt}
-                      options={vendorOpt?.filter(data =>
-                        groupedVendorNames?.includes?.(data?.value)
-                      )}
+                      options={vendorOpt?.filter((data) => groupedVendorNames?.includes?.(data?.value))}
                       styles={colourStyles}
                       value={{ label: vendorNew, value: vendorNew }}
                       onChange={(e) => {
                         setVendorNew(e.value);
                         setFrequencyValue(e.paymentfrequency);
-                        setVendorModeOfPayments(e?.modeofpayments)
+                        setVendorModeOfPayments(e?.modeofpayments);
                         setVendorNewstock((prev) => ({
                           ...prev,
-                          ...e
+                          ...e,
                         }));
                         vendorid(e._id);
                       }}
@@ -4931,20 +4921,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item lg={3} md={3} xs={12} sm={6}>
                   <FormControl size="small" fullWidth>
                     <Typography>Frequency</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      sx={userStyle.input}
-                      placeholder="Please Enter Frequency"
-                      value={frequencyValue}
-                      readOnly
-                    />
+                    <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValue} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      GST No <b style={{ color: "red" }}>*</b>{" "}
+                      GST No <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
                   </FormControl>
@@ -4952,7 +4935,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Bill No <b style={{ color: "red" }}>*</b>{" "}
+                      Bill No <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -4976,13 +4959,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   </FormControl>
                 </Grid>
 
-
-
-
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Warranty Details <b style={{ color: "red" }}>*</b>{" "}
+                      Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -5022,9 +5002,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Total Bill Amounts<b style={{ color: "red" }}>*</b>{" "}
+                      Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
-                    <OutlinedInput id="component-outlined" type="number"
+                    <OutlinedInput
+                      id="component-outlined"
+                      type="number"
                       sx={userStyle.input}
                       //  value={totalQuantityStock * stockmanagemasteredit.rate}
                       value={stockmanagemasteredit.totalbillamount}
@@ -5034,14 +5016,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                           totalbillamount: e.target.value,
                         });
                       }}
-
                     />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Bill Date <b style={{ color: "red" }}>*</b>{" "}
+                      Bill Date <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <TextField
                       size="small"
@@ -5058,9 +5039,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>
-                    Bill <b style={{ color: "red" }}>*</b>{" "}
+                    Bill <b style={{ color: 'red' }}>*</b>{' '}
                   </Typography>
-                  <Box sx={{ display: "flex", justifyContent: "left" }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                     <Button variant="contained" onClick={handleClickUploadPopupOpenedit}>
                       Upload
                     </Button>
@@ -5068,7 +5049,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>Warranty Card </Typography>
-                  <Box sx={{ display: "flex", justifyContent: "left" }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                     <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
                       Upload
                     </Button>
@@ -5076,11 +5057,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 </Grid>
                 <>
                   <Grid item md={12} xs={12} sm={12}>
-                    {" "}
+                    {' '}
                     <Typography variant="h6">Stock Purchase Todo List</Typography>
                   </Grid>
                   <Grid item md={12} sm={12} xs={12}>
-                    <Grid container spacing={3} sx={{ display: "flex" }}>
+                    <Grid container spacing={3} sx={{ display: 'flex' }}>
                       {/* <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
@@ -5112,7 +5093,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         </FormControl>
                       </Grid> */}
 
-                      {stockmanagemasteredit.requestmode === "Stock Material" && (
+                      {stockmanagemasteredit.requestmode === 'Stock Material' && (
                         <>
                           <Grid item md={2.5} sm={6} xs={12}>
                             <FormControl fullWidth size="small">
@@ -5129,35 +5110,35 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                                   setTodoDetails({
                                     ...todoDetails,
                                     category: e.value,
-                                    subcategory: "Please Select Sub Category",
-                                    itemname: "Please Select Item Name",
-                                    uomnew: "",
-                                    rate: "",
-                                    quantitynew: "",
-                                    amount: "",
+                                    subcategory: 'Please Select Sub Category',
+                                    itemname: 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
                             </FormControl>
                           </Grid>
-                          {isUserRoleCompare?.includes("astockcategory") && (
+                          {isUserRoleCompare?.includes('astockcategory') && (
                             <Grid item md={0.5} sm={1} xs={1}>
                               <Button
                                 variant="contained"
                                 style={{
-                                  height: "30px",
-                                  minWidth: "20px",
-                                  padding: "19px 13px",
-                                  color: "white",
-                                  marginTop: "23px",
-                                  marginLeft: "-10px",
-                                  background: "rgb(25, 118, 210)",
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
                                 }}
                                 onClick={() => {
                                   handleClickOpenviewalertstockcategory();
                                 }}
                               >
-                                <FaPlus style={{ fontSize: "15px" }} />
+                                <FaPlus style={{ fontSize: '15px' }} />
                               </Button>
                             </Grid>
                           )}
@@ -5180,7 +5161,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                                   value: todoDetails.subcategory,
                                 }}
                                 onChange={(e) => {
-                                  if (e.value !== "Please Select Sub Category") {
+                                  if (e.value !== 'Please Select Sub Category') {
                                     setItemAllShow(false);
                                   } else {
                                     setItemAllShow(true);
@@ -5188,12 +5169,12 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                                   setTodoDetails({
                                     ...todoDetails,
                                     subcategory: e.value,
-                                    materialnew: todoDetails.particularmode === "Others" ? "" : "Please Select Item Name",
-                                    uomnew: "",
-                                    rate: "",
-                                    quantitynew: "",
-                                    productdetailsnew: "",
-                                    amount: "",
+                                    materialnew: todoDetails.particularmode === 'Others' ? '' : 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
@@ -5202,23 +5183,23 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                           <Grid item md={2.5} sm={6} xs={12}>
                             <FormControl fullWidth size="small">
                               <Typography>
-                                Item Name <b style={{ color: "red" }}>*</b>
+                                Item Name <b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <Selects
                                 options={
                                   !itemAllShow
                                     ? allStockValues
-                                      .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
-                                      .map((item) => ({
+                                        .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
+                                        .map((item) => ({
+                                          label: item.itemname,
+                                          value: item.itemname,
+                                          uom: item.uom,
+                                        }))
+                                    : allStockValues.map((item) => ({
                                         label: item.itemname,
                                         value: item.itemname,
                                         uom: item.uom,
                                       }))
-                                    : allStockValues.map((item) => ({
-                                      label: item.itemname,
-                                      value: item.itemname,
-                                      uom: item.uom,
-                                    }))
                                 }
                                 styles={colourStyles}
                                 value={{
@@ -5230,33 +5211,33 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                                     ...todoDetails,
                                     materialnew: e.value,
                                     uomnew: e.uom,
-                                    rate: "",
-                                    quantitynew: "",
-                                    productdetailsnew: "",
-                                    amount: "",
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
                             </FormControl>
                           </Grid>
-                          {isUserRoleCompare?.includes("amanagestockitems") && (
+                          {isUserRoleCompare?.includes('amanagestockitems') && (
                             <Grid item md={0.5} sm={1} xs={1}>
                               <Button
                                 variant="contained"
                                 style={{
-                                  height: "30px",
-                                  minWidth: "20px",
-                                  padding: "19px 13px",
-                                  color: "white",
-                                  marginTop: "23px",
-                                  marginLeft: "-10px",
-                                  background: "rgb(25, 118, 210)",
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
                                 }}
                                 onClick={() => {
                                   handleClickOpenviewalertstockitem();
                                 }}
                               >
-                                <FaPlus style={{ fontSize: "15px" }} />
+                                <FaPlus style={{ fontSize: '15px' }} />
                               </Button>
                             </Grid>
                           )}
@@ -5272,7 +5253,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Rate <b style={{ color: "red" }}>*</b>
+                            Rate <b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -5284,7 +5265,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                             onChange={(e) => {
                               const value = e.target.value;
                               const regex = /^\d*\.?\d{0,2}$/;
-                              if (regex.test(value) || value === "") {
+                              if (regex.test(value) || value === '') {
                                 setTodoDetails({
                                   ...todoDetails,
                                   rate: value,
@@ -5298,7 +5279,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Quantity <b style={{ color: "red" }}>*</b>
+                            Quantity <b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -5321,14 +5302,14 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Amount<b style={{ color: "red" }}>*</b>
+                            Amount<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput id="component-outlined" type="number" placeholder="Please Enter Amount" sx={userStyle.input} value={todoDetails.amount} readOnly />
                         </FormControl>
                       </Grid>
-                      <Grid item md={todoDetails.particularmode !== "Others" ? 2.5 : 3} sm={6} xs={12}>
+                      <Grid item md={todoDetails.particularmode !== 'Others' ? 2.5 : 3} sm={6} xs={12}>
                         <Typography>
-                          Product Details<b style={{ color: "red" }}>*</b>
+                          Product Details<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <TextareaAutosize
                           aria-label="minimum height"
@@ -5344,15 +5325,15 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                           }}
                         />
                       </Grid>
-                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: "-20px" }}>
+                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: '-20px' }}>
                         <Button
                           variant="contained"
                           color="success"
                           style={{
-                            height: "30px",
-                            minWidth: "20px",
-                            padding: "19px 13px",
-                            marginTop: "25px",
+                            height: '30px',
+                            minWidth: '20px',
+                            padding: '19px 13px',
+                            marginTop: '25px',
                           }}
                           onClick={educationTodo}
                         >
@@ -5360,7 +5341,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         </Button>
                       </Grid>
                     </Grid>
-                  </Grid>{" "}
+                  </Grid>{' '}
                 </>
               </Grid>
               <br />
@@ -5368,7 +5349,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <Grid item md={12} xs={12} sm={12}>
                   <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable">
-                      <TableHead sx={{ fontWeight: "600" }}>
+                      <TableHead sx={{ fontWeight: '600' }}>
                         <StyledTableRow>
                           <StyledTableCell>SNo</StyledTableCell>
                           <StyledTableCell>Item Name</StyledTableCell>
@@ -5393,7 +5374,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                               <StyledTableCell>{row.productdetailsnew}</StyledTableCell>
                               <StyledTableCell>
                                 <CloseIcon
-                                  sx={{ color: "red", cursor: "pointer" }}
+                                  sx={{ color: 'red', cursor: 'pointer' }}
                                   onClick={() => {
                                     educationTodoremove(index);
                                   }}
@@ -5403,15 +5384,15 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                           ))
                         ) : (
                           <StyledTableRow>
-                            {" "}
+                            {' '}
                             <StyledTableCell colSpan={8} align="center">
                               No Data Available
-                            </StyledTableCell>{" "}
+                            </StyledTableCell>{' '}
                           </StyledTableRow>
                         )}
                         <StyledTableRow></StyledTableRow>
                       </TableBody>
-                      <TableFooter sx={{ backgroundColor: "#9591914f", height: "50px" }}>
+                      <TableFooter sx={{ backgroundColor: '#9591914f', height: '50px' }}>
                         {educationtodo &&
                           educationtodo.forEach((item) => {
                             Expensetotal += +item.amount;
@@ -5425,15 +5406,15 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         </StyledTableRow>
                       </TableFooter>
                     </Table>
-                  </TableContainer>{" "}
+                  </TableContainer>{' '}
                 </Grid>
               </Grid>
               <br />
-              <Grid container spacing={2} sx={{ display: "flex" }}>
+              <Grid container spacing={2} sx={{ display: 'flex' }}>
                 <Grid item lg={3} md={4} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Paid Status<b style={{ color: "red" }}>*</b>
+                      Paid Status<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
@@ -5447,7 +5428,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         setExpensecreate({
                           ...expensecreate,
                           paidstatus: e.value,
-                          paidmode: "Please Select Paid Mode",
+                          paidmode: 'Please Select Paid Mode',
                         });
                       }}
                       isDisabled={Number(Expensetotal) !== Number(stockmanagemasteredit.totalbillamount)}
@@ -5455,10 +5436,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   </FormControl>
                 </Grid>
                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                  {expensecreate.paidstatus === "Paid" && (
+                  {expensecreate.paidstatus === 'Paid' && (
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Paid Mode<b style={{ color: "red" }}>*</b>
+                        Paid Mode<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         maxMenuHeight={250}
@@ -5479,10 +5460,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   )}
                 </Grid>
                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                  {expensecreate.paidstatus === "Paid" && (
+                  {expensecreate.paidstatus === 'Paid' && (
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Paid Amount<b style={{ color: "red" }}>*</b>
+                        Paid Amount<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -5504,41 +5485,41 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   )}
                 </Grid>
                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                  {expensecreate.paidstatus === "Paid" && (
+                  {expensecreate.paidstatus === 'Paid' && (
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Balance Amount<b style={{ color: "red" }}>*</b>
+                        Balance Amount<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <OutlinedInput readOnly id="component-outlined" type="number" sx={userStyle.input} placeholder="Please Enter Balance Amount" value={expensecreate.balanceamount} />
                     </FormControl>
                   )}
                 </Grid>
                 <br /> <br />
-                {expensecreate.paidstatus === "Paid" && expensecreate.paidmode === "Cash" && (
+                {expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Cash' && (
                   <>
                     <br />
                     <br />
                     <br />
 
-                    <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
-                        <Typography sx={{ fontWeight: "bold" }}>Cash</Typography>
+                        <Typography sx={{ fontWeight: 'bold' }}>Cash</Typography>
                         <br />
 
-                        <OutlinedInput id="component-outlined" type="text" readOnly={true} value={"Cash"} onChange={(e) => { }} />
+                        <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => {}} />
                       </FormControl>
                     </Grid>
                   </>
                 )}
                 <br />
                 <br />
-                {expensecreate.paidmode === "Bank Transfer" && expensecreate.paidstatus === "Paid" && (
+                {expensecreate.paidmode === 'Bank Transfer' && expensecreate.paidstatus === 'Paid' && (
                   <>
                     <br />
                     <br />
 
                     <Grid item md={12} xs={8}>
-                      <Typography sx={{ fontWeight: "bold" }}>Bank Details</Typography>
+                      <Typography sx={{ fontWeight: 'bold' }}>Bank Details</Typography>
                     </Grid>
 
                     <br />
@@ -5568,7 +5549,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         <OutlinedInput readOnly={true} value={vendorstock.accountnumber} />
                       </FormControl>
                     </Grid>
-                    <Grid item md={4} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={4} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
                         <Typography>IFSC Code</Typography>
                         <OutlinedInput readOnly={true} value={vendorstock.ifsccode} />
@@ -5577,16 +5558,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   </>
                 )}
                 <br /> <br />
-                {expensecreate.paidmode === "UPI" && expensecreate.paidstatus === "Paid" && (
+                {expensecreate.paidmode === 'UPI' && expensecreate.paidstatus === 'Paid' && (
                   <>
                     <Grid item md={12} xs={8}>
-                      <Typography sx={{ fontWeight: "bold" }}>UPI Details</Typography>
+                      <Typography sx={{ fontWeight: 'bold' }}>UPI Details</Typography>
                     </Grid>
 
                     <br />
                     <br />
 
-                    <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
                         <Typography>UPI Number</Typography>
                         <OutlinedInput readOnly={true} value={vendorstock.upinumber} />
@@ -5595,10 +5576,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   </>
                 )}
                 <br /> <br />
-                {expensecreate.paidmode === "Card" && expensecreate.paidstatus === "Paid" && (
+                {expensecreate.paidmode === 'Card' && expensecreate.paidstatus === 'Paid' && (
                   <>
                     <Grid md={12} item xs={8}>
-                      <Typography sx={{ fontWeight: "bold" }}>Card Details</Typography>
+                      <Typography sx={{ fontWeight: 'bold' }}>Card Details</Typography>
                     </Grid>
 
                     <br />
@@ -5641,7 +5622,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                         </Grid>
                       </Grid>
                     </Grid>
-                    <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
                         <Typography>Security Code</Typography>
                         <OutlinedInput readOnly={true} value={vendorstock.cardsecuritycode} />
@@ -5651,15 +5632,15 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 )}
                 <br />
                 <br />
-                {expensecreate.paidmode === "Cheque" && expensecreate.paidstatus === "Paid" && (
+                {expensecreate.paidmode === 'Cheque' && expensecreate.paidstatus === 'Paid' && (
                   <>
                     <Grid item md={12} xs={8}>
-                      <Typography sx={{ fontWeight: "bold" }}>Cheque Details</Typography>
+                      <Typography sx={{ fontWeight: 'bold' }}>Cheque Details</Typography>
                     </Grid>
 
                     <br />
 
-                    <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
                         <Typography>Cheque Number</Typography>
                         <OutlinedInput readOnly={true} value={vendorstock.chequenumber} />
@@ -5669,18 +5650,17 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 )}
               </Grid>
 
-
               <br />
               <Grid container spacing={2}>
                 <Grid item md={3} xs={12} sm={12}>
                   {btnSubmit ? (
-                    <Box sx={{ display: "flex" }}>
+                    <Box sx={{ display: 'flex' }}>
                       <CircularProgress />
                     </Box>
                   ) : (
                     <>
                       <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
-                        {" "}
+                        {' '}
                         Update
                       </Button>
                     </>
@@ -5689,8 +5669,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                 <br />
                 <Grid item md={3} xs={12} sm={12}>
                   <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
-                    {" "}
-                    Cancel{" "}
+                    {' '}
+                    Cancel{' '}
                   </Button>
                 </Grid>
               </Grid>
@@ -5700,9 +5680,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       </Box>
       {/* Delete modal */}
       <Dialog open={openDelete} onClose={handleCloseDelete} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-          <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: "orange" }} />
-          <Typography variant="h5" sx={{ color: "red", textAlign: "center" }}>
+        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+          <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
             Are you sure?
           </Typography>
         </DialogContent>
@@ -5711,16 +5691,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
             Cancel
           </Button>
           <Button onClick={(e) => delProject()} autoFocus variant="contained" color="error">
-            {" "}
-            OK{" "}
+            {' '}
+            OK{' '}
           </Button>
         </DialogActions>
       </Dialog>
       <br />
       <br />
       {/* view model */}
-      <Dialog open={openView} onClose={handlViewClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: "95px" }}>
-        <Box sx={{ padding: "20px 50px" }}>
+      <Dialog open={openView} onClose={handlViewClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '95px' }}>
+        <Box sx={{ padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}> View Stock Purchase</Typography>
             <br /> <br />
@@ -5801,7 +5781,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Purchase Date</Typography>
-                  <Typography>{stockmanagemasteredit.purchasedate === "" ? "" : moment(stockmanagemasteredit.purchasedate).format("DD/MM/YYYY")}</Typography>
+                  <Typography>{stockmanagemasteredit.purchasedate === '' ? '' : moment(stockmanagemasteredit.purchasedate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={4} xs={12} sm={12}>
@@ -5857,7 +5837,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Bill Date</Typography>
-                  <Typography>{moment(stockmanagemasteredit.billdate).format("DD/MM/YYYY")}</Typography>
+                  <Typography>{moment(stockmanagemasteredit.billdate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
             </Grid>
@@ -5873,36 +5853,36 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={handleCloseerr}
             >
-              {" "}
-              ok{" "}
+              {' '}
+              ok{' '}
             </Button>
           </DialogActions>
         </Dialog>
       </Box>
       {/* UPLOAD BILL IMAGE DIALOG EDIT*/}
-      <Dialog open={uploadPopupOpenedit} onClose={handleUploadPopupCloseedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: "95px" }}>
-        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}>
+      <Dialog open={uploadPopupOpenedit} onClose={handleUploadPopupCloseedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
+                <Grid sx={{ display: 'flex' }}>
                   <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
                     <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangeedit} />
@@ -5917,18 +5897,18 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
@@ -5942,40 +5922,40 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewedit(file)}
                       >
-                        <VisibilityOutlinedIcon style={{ fontsize: "12px", color: "#357AE8" }} />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFileedit(index)}
                       >
-                        <FaTrash style={{ color: "#a73131", fontSize: "12px" }} />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -5998,16 +5978,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       </Dialog>
 
       {/* UPLOAD WARRANTY IMAGE DIALOG    CREATE*/}
-      <Dialog open={uploadPopupOpenwarranty} onClose={handleUploadPopupClosewarranty} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: "95px" }}>
-        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}>
+      <Dialog open={uploadPopupOpenwarranty} onClose={handleUploadPopupClosewarranty} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
+                <Grid sx={{ display: 'flex' }}>
                   <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
                     <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangewarranty} />
@@ -6022,18 +6002,18 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
@@ -6047,40 +6027,40 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewwarranty(file)}
                       >
-                        <VisibilityOutlinedIcon style={{ fontsize: "12px", color: "#357AE8" }} />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFilewarranty(index)}
                       >
-                        <FaTrash style={{ color: "#a73131", fontSize: "12px" }} />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -6104,16 +6084,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       <Box>
         {/* ALERT DIALOG */}
         <Dialog open={isDeleteOpenalert} onClose={handleCloseModalert} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-            <ErrorOutlineOutlinedIcon sx={{ fontSize: "70px", color: "orange" }} />
-            <Typography variant="h6" sx={{ color: "black", textAlign: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '70px', color: 'orange' }} />
+            <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
               Please Select any Row
             </Typography>
           </DialogContent>
           <DialogActions>
             <Button autoFocus variant="contained" color="error" onClick={handleCloseModalert}>
-              {" "}
-              OK{" "}
+              {' '}
+              OK{' '}
             </Button>
           </DialogActions>
         </Dialog>
@@ -6135,7 +6115,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={overallFilterdata ?? []}
-        filename={"StockPurchase"}
+        filename={'StockPurchase'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
@@ -6150,7 +6130,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
       {/* EXTERNAL COMPONENTS -------------- END */}
 
-      <Dialog open={openviewalertstockcategory} onClose={handleClickOpenviewalertstockcategory} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: "50px" }} fullWidth={true}>
+      <Dialog open={openviewalertstockcategory} onClose={handleClickOpenviewalertstockcategory} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '50px' }} fullWidth={true}>
         <StockCategoryPopup setStockCategoryAuto={setStockCategoryAuto} handleCloseviewalertstockcategory={handleCloseviewalertstockcategory} />
       </Dialog>
       {/* dialog box for manage stock items */}
@@ -6162,9 +6142,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
         fullWidth={true}
@@ -6174,42 +6154,30 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
       {/* Amount Mismatch Alert Dialog */}
       <Box>
-        <Dialog
-          open={isErrorOpenAmount}
-          onClose={handleCloseerrAmount}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
+        <Dialog open={isErrorOpenAmount} onClose={handleCloseerrAmount} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
           <DialogContent
             sx={{
-              width: "350px",
-              textAlign: "center",
-              alignItems: "center",
+              width: '350px',
+              textAlign: 'center',
+              alignItems: 'center',
             }}
           >
-            <ErrorOutlineOutlinedIcon
-              sx={{ fontSize: "100px", color: "orange" }}
-            />
-            <Typography variant="h6" style={{ color: "red" }}>
-              {
-                "Are you sure? Paid Amount is less than Total Bill Amount.Do you want to save?"
-              }
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+            <Typography variant="h6" style={{ color: 'red' }}>
+              {'Are you sure? Paid Amount is less than Total Bill Amount.Do you want to save?'}
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button
-              sx={buttonStyles.btncancel}
-              onClick={handleCloseerrAmount}
-            >
+            <Button sx={buttonStyles.btncancel} onClick={handleCloseerrAmount}>
               Cancel
             </Button>
             &nbsp;
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={sendEditRequest}
             >
@@ -6218,7 +6186,6 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           </DialogActions>
         </Dialog>
       </Box>
-
     </Box>
   );
 }

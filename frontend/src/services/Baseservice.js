@@ -5705,7 +5705,6 @@ export const SERVICE = {
     ALL_EVENT_PAGINATION_EXPORTS: `${BASE_URL}/api/allscheduleeventspaginationexports`,
     TEAM_AUTO_CLOCKOUT_RESTRICTION: `${BASE_URL}/api/teamautoclockoutrestrictionlist`,
 
-    PENALTY_ERROR_UPLOAD_CLIENT_USER_LIMITED: `${BASE_URL}/api/penaltyerroruploadsclientuseridlimited`,
 
 
     PENALTY_ERROR_UPLOAD_CLIENT_USER_LIMITED: `${BASE_URL}/api/penaltyerroruploadsclientuseridlimited`,
@@ -5765,6 +5764,22 @@ export const SERVICE = {
 
     
     PENALTYERRORUPLOADS_BY_DATE: `${BASE_URL}/api/penaltyerroruploadsbydate`,
-
     BULKRRORUPLOADS_FETCH_BY_DATE: `${BASE_URL}/api/bulkerroruploadfetchbydate`,
+
+    PRODUCTION_UPLOAD_POINTS_FILTER: `${BASE_URL}/api/productinouploadlistpointsfilter`,
+    PRODUCTION_UPLOAD_POINTS_FILTER_TEMP: `${BASE_URL}/api/productinouploadlistpointsfiltertemp`,
+
+   PRODUCTION_UPLOAD_POINTS_FILTER_EXCEL: `${BASE_URL}/api/daypointsuploadexcel`,
+    PRODUCTION_UPLOAD_POINTS_FILTER_CSV: `${BASE_URL}/api/daypointsuploadcsv`,
+    PRODUCTION_UPLOAD_POINTS_FILTER_PDF: `${BASE_URL}/api/daypointsuploadpdf`,
+
+       PRODUCTION_UPLOAD_TEMP_POINTS_FILTER_EXCEL: `${BASE_URL}/api/daypointsuploadexceltemp`,
+    PRODUCTION_UPLOAD_POINTS_TEMP_FILTER_CSV: `${BASE_URL}/api/daypointsuploadcsvtemp`,
+    PRODUCTION_UPLOAD_POINTS_TEMP_FILTER_PDF: `${BASE_URL}/api/daypointsuploadpdftemp`,
+
+
+      PENALTYERRORUPLOADS_BY_DATE_NEW: `${BASE_URL}/api/penaltyerroruploadsbydatenew`,
+    BULKRRORUPLOADS_FETCH_BY_DATE_NEW: `${BASE_URL}/api/bulkerroruploadfetchbydatenew`,
+
+    
 };

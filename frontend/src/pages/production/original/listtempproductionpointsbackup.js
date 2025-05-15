@@ -721,9 +721,9 @@ function ListTempProductionPoints() {
 
 
   useEffect(() => {
-    // if (items?.length > 0) {
+    if (items?.length > 0) {
       fetchProductionLists();
-    // }
+    }
   }, [page, pageSize, searchQuery]);
 
 

@@ -82,7 +82,7 @@ import * as pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import domtoimage from 'dom-to-image';
 
-function ListTempProductionPoints() {
+function ListProductionPoints() {
 
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
@@ -165,14 +165,14 @@ function ListTempProductionPoints() {
       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
       // Save file
-      XLSX.writeFile(wb, "ListProductionPointsTemp.xlsx");
+      XLSX.writeFile(wb, "ListProductionPoints.xlsx");
       setIsFilterOpen(false);
     } else if (isfilter === "overall") {
       let result = [];
       setExportLoading(true);
 
       let response = await axios.post(
-        SERVICE.PRODUCTION_UPLOAD_TEMP_POINTS_FILTER_EXCEL, {
+        SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER_EXCEL, {
 
         company: ValueCompany,
         branch: ValueBranch,
@@ -201,7 +201,7 @@ function ListTempProductionPoints() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "ListProductionPointsTemp.xlsx";
+      a.download = "ListProductionPoints.xlsx";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -250,7 +250,7 @@ function ListTempProductionPoints() {
       const blob = new Blob([csvOutput], { type: "text/csv" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "ListProductionPointsTemp.csv";
+      link.download = "ListProductionPoints.csv";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -260,7 +260,7 @@ function ListTempProductionPoints() {
 
       try {
         let response = await axios.post(
-          SERVICE.PRODUCTION_UPLOAD_POINTS_TEMP_FILTER_CSV,
+          SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER_CSV,
           {
             company: ValueCompany,
             branch: ValueBranch,
@@ -303,7 +303,7 @@ function ListTempProductionPoints() {
       try {
 
 
-        // pdfMake.createPdf(docDefinition).download("ListProductionPointsTemp.pdf"); // Trigger downloa
+        // pdfMake.createPdf(docDefinition).download("ListProductionPoints.pdf"); // Trigger downloa
         const headers = [
           "EmployeeCode", "EmployeeName", "Company", "Branch",
           "Unit", "Team", "Date", "Exper", "Target",
@@ -389,7 +389,7 @@ function ListTempProductionPoints() {
 
 
 
-        pdfMake.createPdf(docDefinition).download("ListProductionPointsTemp.pdf");
+        pdfMake.createPdf(docDefinition).download("ListProductionPoints.pdf");
         setIsPdfFilterOpen(false);
       } catch (err) {
         setExportLoading(false);
@@ -400,7 +400,7 @@ function ListTempProductionPoints() {
       let result = [];
 
       let response = await axios.post(
-        SERVICE.PRODUCTION_UPLOAD_POINTS_TEMP_FILTER_PDF,
+        SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER_PDF,
 
         {
 
@@ -422,7 +422,7 @@ function ListTempProductionPoints() {
       const blob = new Blob([response.data], { type: "application/pdf" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "ListProductionPointsTemp.pdf";
+      link.download = "ListProductionPoints.pdf";
       link.click();
       URL.revokeObjectURL(link.href);
       setExportLoading(false);
@@ -721,9 +721,9 @@ function ListTempProductionPoints() {
 
 
   useEffect(() => {
-    // if (items?.length > 0) {
+    if (items?.length > 0) {
       fetchProductionLists();
-    // }
+    }
   }, [page, pageSize, searchQuery]);
 
 
@@ -836,7 +836,7 @@ function ListTempProductionPoints() {
   const fetchProductionLists = async () => {
     setLoaders(true)
     try {
-      let res_freq = await axios.post(SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER_TEMP, {
+      let res_freq = await axios.post(SERVICE.PRODUCTION_UPLOAD_POINTS_FILTER, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
@@ -899,7 +899,6 @@ function ListTempProductionPoints() {
       handleApiError(err, setShowAlert, handleClickOpenerr);
     }
   };
-
   const gridRefTableImg = useRef(null);
 
   const handleCaptureImage = () => {
@@ -907,7 +906,7 @@ function ListTempProductionPoints() {
       domtoimage
         .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, 'List Productions Points Temp.png');
+          saveAs(blob, 'List Productions Points.png');
         })
         .catch((error) => {
           console.error('dom-to-image error: ', error);
@@ -2280,8 +2279,7 @@ function ListTempProductionPoints() {
                       // overflowY: "hidden", // Hide the y-axis scrollbar
                     }}
                     className="ag-theme-quartz"
-                    ref={gridRefTableImg} // Triggers when cell editing is complete.
-
+                    ref={gridRefTableImg}
                   >
                     {/* <StyledDataGrid
                     onClipboardCopy={(copiedString) => setCopiedData(copiedString)}
@@ -2305,6 +2303,7 @@ function ListTempProductionPoints() {
                         filter: true,
                         // ...headerStyle,
                       }}
+                      // ref={gridRefTableImg} // Triggers when cell editing is complete.
                       suppressRowClickSelection={true}
                       rowSelection="multiple"
                       onGridReady={onGridReady}
@@ -2651,4 +2650,4 @@ function ListTempProductionPoints() {
   );
 }
 
-export default ListTempProductionPoints;
+export default ListProductionPoints;

@@ -80,9 +80,26 @@ productionRoute.route("/productionconsolidated/new").post(addProductionConsolida
 productionRoute.route("/filterproductionconsolidated").post(getFilterProductionConsolidated);
 productionRoute.route("/productionconsolidated/:id").delete(deleteProductionConsolidated).get(getSingleProductionConsolidated).put(updateProductionConsolidated);
 
-const { addDayPointsUpload, getAllDayPointsUpload, getDayPointIdByDate, getCheckDaypointIsCreated, getAllDayPointByDate, getAllDayPointsUploadLimitedDateOnly, getSingleDayPointsUpload, getEmployeeProductionLastThreeMonths, getDocumentPrepProductionDate, checkDayPointdate, getAllDayPointsUploadLimited, updateDayPointsUpload, dayPointsMonthYearFilterNxtMonth, deleteDayPointsUpload, updateDayPointsSingleUpload, dayPointsfilter, dayPointsfilterHome, dayPointsDatasFetch, dayPointsMonthYearFilter } = require("../controller/modules/production/dayPointsUpload");
+const { addDayPointsUpload,
+  DayPointsUploadEXCELDownload,DayPointsUploadCSVDownload,DayPointsUploadPDFDownload,DayPointsUploadTempEXCELDownload,DayPointsUploadTempCSVDownload,
+  DayPointsUploadTempPDFDownload,
+  getAllDayPointsUploadProductionListPointsFilter,getAllDayPointsUploadProductionListPointsFilterTemp, getAllDayPointsUpload, getDayPointIdByDate, getCheckDaypointIsCreated, getAllDayPointByDate, getAllDayPointsUploadLimitedDateOnly, getSingleDayPointsUpload, getEmployeeProductionLastThreeMonths, getDocumentPrepProductionDate, checkDayPointdate, getAllDayPointsUploadLimited, updateDayPointsUpload, dayPointsMonthYearFilterNxtMonth, deleteDayPointsUpload, updateDayPointsSingleUpload, dayPointsfilter, dayPointsfilterHome, dayPointsDatasFetch, dayPointsMonthYearFilter } = require("../controller/modules/production/dayPointsUpload");
 productionRoute.route("/daypoints").get(getAllDayPointsUpload);
+
+productionRoute.route("/productinouploadlistpointsfilter").post(getAllDayPointsUploadProductionListPointsFilter);
+productionRoute.route("/productinouploadlistpointsfiltertemp").post(getAllDayPointsUploadProductionListPointsFilterTemp);
+productionRoute.route("/daypointsuploadexcel").post(DayPointsUploadEXCELDownload);
+productionRoute.route("/daypointsuploadcsv").post(DayPointsUploadCSVDownload);
+productionRoute.route("/daypointsuploadpdf").post(DayPointsUploadPDFDownload);
+
+//temp
+productionRoute.route("/daypointsuploadexceltemp").post(DayPointsUploadTempEXCELDownload);
+productionRoute.route("/daypointsuploadcsvtemp").post(DayPointsUploadTempCSVDownload);
+productionRoute.route("/daypointsuploadpdftemp").post(DayPointsUploadTempPDFDownload);
+
+
 productionRoute.route("/checkdaypointiscreated").post(getCheckDaypointIsCreated);
+
 productionRoute.route("/getdaypointsdate").post(getAllDayPointByDate);
 productionRoute.route("/getemployeeproductionlastthreemonths").post(getEmployeeProductionLastThreeMonths);
 productionRoute.route("/daypoint/new").post(addDayPointsUpload);
@@ -641,7 +658,7 @@ productionRoute.route("/categorydatechange/:id").get(getSingleCategorydatechange
 
 //Penaltyerroruploadpoints Route
 const { getAllPenaltyerroruploadpoints, getAllPenaltyerroruploadpointsduplicatewithbulkerrorupload,getAllPenaltyerroruploadpointsClientUserId,
-  getAllBulkErroruploadbydate,
+  getAllBulkErroruploadbydate,getAllPenaltyErrorUploadPointsByDateNew,getAllBulkErroruploadbydateNew,
   getAllBulkerroruploadpointsduplicatewithbulkerrorupload, getAllBulkerroruploadpointsduplicatewithbulkerroruploadFile,getAllPenaltyErrorUploadPointsByDate,
   getAllPenaltyerroruploadpointsduplicatewithbulkerroruploadFile, PenaltyErrorUploadSort, updatePenaltyerroruploadpoints, getAllPenaltyerroruploadpointsProjectBasedFilter, getAllPenaltyerroruploadpointsDateFilter, deletePenaltyerroruploadpoints, deleteMultiplePenaltyErrorUpload, getSinglePenaltyerroruploadpoints, addPenaltyerroruploadpoints } = require("../controller/modules/penalty/penaltyerrorupload");
 productionRoute.route("/penaltyerroruploadsclientuseridlimited").post(getAllPenaltyerroruploadpointsClientUserId);
@@ -663,6 +680,9 @@ productionRoute.route("/penaltyerroruploadsprojectbasedfilter").post(getAllPenal
 
 productionRoute.route("/penaltyerroruploadsbydate").post(getAllPenaltyErrorUploadPointsByDate);
 productionRoute.route("/bulkerroruploadfetchbydate").post(getAllBulkErroruploadbydate);
+
+productionRoute.route("/penaltyerroruploadsbydatenew").post(getAllPenaltyErrorUploadPointsByDateNew);
+productionRoute.route("/bulkerroruploadfetchbydatenew").post(getAllBulkErroruploadbydateNew);
 
 
 

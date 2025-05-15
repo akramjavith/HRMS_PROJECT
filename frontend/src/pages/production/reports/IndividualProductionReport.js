@@ -5,6 +5,7 @@ import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from 'react-icons/fa';
 import { ExportXL, ExportCSV } from '../../../components/Export.js';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+// import axios from '../../../axiosInstance';
 import axios from 'axios';
 import { SERVICE } from '../../../services/Baseservice.js';
 import { handleApiError } from '../../../components/Errorhandling.js';
@@ -185,7 +186,6 @@ function ProductionReport() {
       let enddate = firstDate.setDate(firstDate.getDate() + 1);
       let endMonthDate = new Date(enddate);
 
-    
       setSourcecheck(true);
       let res_vendor = await axios.post(SERVICE.PRODUCTION_REPORT_FILTER, {
         headers: {
@@ -205,8 +205,8 @@ function ProductionReport() {
         shift: overallState.shift,
         mode: selectedOptionsMode.map((item) => item.value),
         username: isUserRoleAccess.username,
-        companyname: isUserRoleAccess.companyname,  
-       });
+        companyname: isUserRoleAccess.companyname,
+      });
 
       let final = res_vendor.data.mergedData;
 

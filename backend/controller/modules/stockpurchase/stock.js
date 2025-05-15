@@ -467,9 +467,6 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
 
     const [totalProjects, result, totalProjectsData,] = await Promise.all([
       Stock.countDocuments(query),
-
-
-
       Stock.find(query, {
         company: 1,
         totalbillamountstock:1,

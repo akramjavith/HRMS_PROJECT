@@ -416,7 +416,7 @@ let query = {
   filename:req.body.filename,
  "addedby.name" : req.body.companyname
 }
-    // console.log(query,"query")
+  console.log(query,"query")
     penaltyerroruploadpoints = await PenaltyErrorUploadpoints.find(query);
     // console.log(penaltyerroruploadpoints.length,"penaltyerroruploadpoints")
 
@@ -442,11 +442,35 @@ exports.getAllPenaltyErrorUploadPointsByDate = catchAsyncErrors(async (req, res,
 
     let query = {
       projectvendor: projectvendor,
-      process: process,
+    process: {$in:process},
       loginid: loginid,
-      date: date,
+   date: date,
     }
+
     penaltyerroruploadpoints = await PenaltyErrorUploadpoints.find(query);
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+
+  return res.status(200).json({
+    // count: products.length,
+    penaltyerroruploadpoints,
+  });
+});
+
+exports.getAllBulkErroruploadbydate = catchAsyncErrors(async (req, res, next) => {
+  let penaltyerroruploadpoints;
+  try {
+    const { projectvendor, process, loginid, date } = req.body;
+
+
+    let query = {
+        projectvendor: projectvendor,
+    process: {$in:process},
+      loginid: loginid,
+   dateformatted: date,
+    }
+    penaltyerroruploadpoints = await BulkErrorUploadpoints.find(query);
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
   }
@@ -459,7 +483,8 @@ exports.getAllPenaltyErrorUploadPointsByDate = catchAsyncErrors(async (req, res,
 
 
 
-exports.getAllBulkErroruploadbydate = catchAsyncErrors(async (req, res, next) => {
+//bulk 
+exports.getAllPenaltyErrorUploadPointsByDateNew = catchAsyncErrors(async (req, res, next) => {
   let penaltyerroruploadpoints;
   try {
     const { projectvendor, process, loginid, date } = req.body;
@@ -467,7 +492,31 @@ exports.getAllBulkErroruploadbydate = catchAsyncErrors(async (req, res, next) =>
 
     let query = {
       projectvendor: projectvendor,
-      process: process,
+      process: {$in:process},
+      loginid: loginid,
+      date: date,
+    }
+
+    penaltyerroruploadpoints = await PenaltyErrorUploadpoints.find(query);
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+
+  return res.status(200).json({
+    // count: products.length,
+    penaltyerroruploadpoints,
+  });
+});
+
+exports.getAllBulkErroruploadbydateNew = catchAsyncErrors(async (req, res, next) => {
+  let penaltyerroruploadpoints;
+  try {
+    const { projectvendor, process, loginid, date } = req.body;
+
+
+    let query = {
+      projectvendor: projectvendor,
+       process: {$in:process},
       loginid: loginid,
       dateformatted: date,
     }

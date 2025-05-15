@@ -1,18 +1,23 @@
-import { makeStyles } from "@material-ui/core";
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { MultiSelect } from "react-multi-select-component";
+import { makeStyles } from '@material-ui/core';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { MultiSelect } from 'react-multi-select-component';
 
 import {
-  Box, InputAdornment, Radio, RadioGroup, Tooltip, FormControlLabel,
+  Box,
+  InputAdornment,
+  Radio,
+  RadioGroup,
+  Tooltip,
+  FormControlLabel,
   Button,
   Checkbox,
   Dialog,
@@ -38,118 +43,110 @@ import {
   TextareaAutosize,
   TextField,
   Typography,
-} from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import { StyledTableCell, StyledTableRow } from "../../components/Table";
-import ManageStockItemsPopup from "../expenses/ManageStockItemsPopup";
-import StockCategoryPopup from "../expenses/StockCategoryPopup";
-import {
-  paidOpt,
-  statusOpt,
-} from "../../components/Componentkeyword";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FaFileCsv, FaFileExcel, FaTrash, FaFilePdf, FaPrint, FaSearch, FaPlus, FaEdit } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import * as XLSX from "xlsx";
-import csvIcon from "../../components/Assets/CSV.png";
-import excelIcon from "../../components/Assets/excel-icon.png";
-import fileIcon from "../../components/Assets/file-icons.png";
-import pdfIcon from "../../components/Assets/pdf-icon.png";
-import wordIcon from "../../components/Assets/word-icon.png";
-import { handleApiError } from "../../components/Errorhandling";
-import StyledDataGrid from "../../components/TableStyle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { colourStyles, userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
+} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import Switch from '@mui/material/Switch';
+import axios from '../../axiosInstance';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import { StyledTableCell, StyledTableRow } from '../../components/Table';
+import ManageStockItemsPopup from '../expenses/ManageStockItemsPopup';
+import StockCategoryPopup from '../expenses/StockCategoryPopup';
+import { paidOpt, statusOpt } from '../../components/Componentkeyword';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
+import { FaFileCsv, FaFileExcel, FaTrash, FaFilePdf, FaPrint, FaSearch, FaPlus, FaEdit } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import * as XLSX from 'xlsx';
+import csvIcon from '../../components/Assets/CSV.png';
+import excelIcon from '../../components/Assets/excel-icon.png';
+import fileIcon from '../../components/Assets/file-icons.png';
+import pdfIcon from '../../components/Assets/pdf-icon.png';
+import wordIcon from '../../components/Assets/word-icon.png';
+import { handleApiError } from '../../components/Errorhandling';
+import StyledDataGrid from '../../components/TableStyle';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { colourStyles, userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
 
-import AlertDialog from "../../components/Alert";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../components/DeleteConfirmation.js";
-import ExportData from "../../components/ExportData";
-import InfoPopup from "../../components/InfoPopup.js";
-import MessageAlert from "../../components/MessageAlert";
-import AggridTableForPaginationTable from "../../components/AggridTableForPaginationTable.js";
-
+import AlertDialog from '../../components/Alert';
+import { DeleteConfirmation, PleaseSelectRow } from '../../components/DeleteConfirmation.js';
+import ExportData from '../../components/ExportData';
+import InfoPopup from '../../components/InfoPopup.js';
+import MessageAlert from '../../components/MessageAlert';
+import AggridTableForPaginationTable from '../../components/AggridTableForPaginationTable.js';
 
 //new table
-import { IoMdOptions } from "react-icons/io";
-import { MdClose } from "react-icons/md";
+import { IoMdOptions } from 'react-icons/io';
+import { MdClose } from 'react-icons/md';
 import domtoimage from 'dom-to-image';
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
 import AdvancedSearchBar from '../../components/Searchbar';
-import AggregatedSearchBar from "../../components/AggregatedSearchBar";
-import AggridTable from "../../components/AggridTable";
-
+import AggregatedSearchBar from '../../components/AggregatedSearchBar';
+import AggridTable from '../../components/AggridTable';
 
 const useStyles = makeStyles((theme) => ({
   inputs: {
-    display: "none",
+    display: 'none',
   },
   preview: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     marginTop: theme.spacing(2),
-    "& > *": {
+    '& > *': {
       margin: theme.spacing(1),
     },
   },
 }));
 function ManuaStockTable({ vendorAuto }) {
   const [stockmanages, setStockmanage] = useState([]);
-  const [totalAmountEdit, setAmountEdit] = useState(0)
+  const [totalAmountEdit, setAmountEdit] = useState(0);
 
   const [stockmanagemasteredit, setStockmanagemasteredit] = useState({
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    floor: "Please Select Floor",
-    area: "Please Select Area",
-    location: "Please Select Location",
-    workstation: "Please Select Workstation",
-    producthead: "",
-    vendorname: "Please Select Vendor",
-    material: "Please Select Material",
-    component: "Please Select Component",
-    gstno: "",
-    billno: "",
-    productname: "",
-    productdetails: "",
-    warrantydetails: "",
-    uom: "Please Select UOM",
-    quantity: "",
-    rate: "",
-    billdate: "",
-    files: "",
-    warrantyfiles: "",
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    floor: 'Please Select Floor',
+    area: 'Please Select Area',
+    location: 'Please Select Location',
+    workstation: 'Please Select Workstation',
+    producthead: '',
+    vendorname: 'Please Select Vendor',
+    material: 'Please Select Material',
+    component: 'Please Select Component',
+    gstno: '',
+    billno: '',
+    productname: '',
+    productdetails: '',
+    warrantydetails: '',
+    uom: 'Please Select UOM',
+    quantity: '',
+    rate: '',
+    billdate: '',
+    files: '',
+    warrantyfiles: '',
 
-    warranty: "",
-    warrantycalculation: "",
-    estimation: "",
-    estimationtime: "",
-    purchasedate: "",
+    warranty: '',
+    warrantycalculation: '',
+    estimation: '',
+    estimationtime: '',
+    purchasedate: '',
 
-    requestmode: "Please Select Stock Mode For",
-    stockcategory: "Please Select Stock Category",
-    stocksubcategory: "Please Select Stock Sub Category",
-    uomnew: "",
+    requestmode: 'Please Select Stock Mode For',
+    stockcategory: 'Please Select Stock Category',
+    stocksubcategory: 'Please Select Stock Sub Category',
+    uomnew: '',
     quantitynew: 1,
-    materialnew: "Please Select Material",
-    productdetailsnew: "",
+    materialnew: 'Please Select Material',
+    productdetailsnew: '',
   });
 
   let Expensetotal = 0;
@@ -160,9 +157,8 @@ function ManuaStockTable({ vendorAuto }) {
   const [refImgWarrantyfilenamesEdit, setRefImgWarrantyfilenamesEdit] = useState([]);
   const [refImgbillfilenamesEdit, setRefImgbillfilenamesEdit] = useState([]);
 
-
-  const [stockCategoryAuto, setStockCategoryAuto] = useState("");
-  const [stockItemAuto, setStockItemAuto] = useState("");
+  const [stockCategoryAuto, setStockCategoryAuto] = useState('');
+  const [stockItemAuto, setStockItemAuto] = useState('');
 
   const [isErrorOpenAmount, setIsErrorOpenAmount] = useState(false);
 
@@ -175,72 +171,70 @@ function ManuaStockTable({ vendorAuto }) {
 
   //state and method to show current date onload
   let today1 = new Date();
-  var dd = String(today1.getDate()).padStart(2, "0");
-  var mm = String(today1.getMonth() + 1).padStart(2, "0");
+  var dd = String(today1.getDate()).padStart(2, '0');
+  var mm = String(today1.getMonth() + 1).padStart(2, '0');
   var yyyy = today1.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
   //useStates
   const [date, setDate] = useState(formattedDate);
   const [expensecreate, setExpensecreate] = useState({
-    expansecategory: "Please Select Expense Category",
-    expansesubcategory: "Please Select Expense Sub Category",
-    referenceno: "",
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    vendorname: "Please Select Vendor",
-    purpose: "Please Select Purpose",
-    totalbillamount: "",
+    expansecategory: 'Please Select Expense Category',
+    expansesubcategory: 'Please Select Expense Sub Category',
+    referenceno: '',
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    vendorname: 'Please Select Vendor',
+    purpose: 'Please Select Purpose',
+    totalbillamount: '',
     date,
-    files: "",
-    vendorfrequency: "",
-    paidstatus: "Not Paid",
-    duedate: "",
-    expansenote: "",
-    paidmode: "Please Select Paid Mode",
-    expensetotal: "",
-    balanceamount: "",
-    paidamount: "",
+    files: '',
+    vendorfrequency: '',
+    paidstatus: 'Not Paid',
+    duedate: '',
+    expansenote: '',
+    paidmode: 'Please Select Paid Mode',
+    expensetotal: '',
+    balanceamount: '',
+    paidamount: '',
   });
 
-
   const [todoDetails, setTodoDetails] = useState({
-    particularmode: "Please Select Particular Mode",
-    category: "Please Select Category",
-    subcategory: "Please Select Sub Category",
-    materialnew: "Please Select Item Name",
-    uomnew: "",
-    rate: "",
-    quantitynew: "",
-    amount: "",
-    productdetailsnew: ""
+    particularmode: 'Please Select Particular Mode',
+    category: 'Please Select Category',
+    subcategory: 'Please Select Sub Category',
+    materialnew: 'Please Select Item Name',
+    uomnew: '',
+    rate: '',
+    quantitynew: '',
+    amount: '',
+    productdetailsnew: '',
   });
 
   const [vendorstock, setVendorNewstock] = useState({
-    bankname: "",
-    bankbranchname: "",
-    accountholdername: "",
-    accountnumber: "",
-    ifsccode: "",
-    upinumber: "",
-    chequenumber: "",
-    cardnumber: "",
-    cardholdername: "",
-    cardtransactionnumber: "",
-    cardtype: "",
-    cardmonth: "",
-    cardyear: "",
-    cardsecuritycode: "",
+    bankname: '',
+    bankbranchname: '',
+    accountholdername: '',
+    accountnumber: '',
+    ifsccode: '',
+    upinumber: '',
+    chequenumber: '',
+    cardnumber: '',
+    cardholdername: '',
+    cardtransactionnumber: '',
+    cardtype: '',
+    cardmonth: '',
+    cardyear: '',
+    cardsecuritycode: '',
   });
-
 
   const [educationtodo, setEducationtodo] = useState([]);
   const [upload, setUpload] = useState([]);
   const [expanseOpt, setExpanse] = useState([]);
   const [expansesubOpt, setExpanseSub] = useState([]);
-  const [frequencyValue, setFrequencyValue] = useState("");
+  const [frequencyValue, setFrequencyValue] = useState('');
   const [groupedVendorNames, setGroupedVendorNames] = useState([]);
-  const [vendorId, setVendorId] = useState("");
+  const [vendorId, setVendorId] = useState('');
   const [vendorModeOfPayments, setVendorModeOfPayments] = useState([]);
   const [espenseCheck, setExpenseCheck] = useState(false);
   const [purposes, setPurposes] = useState([]);
@@ -260,14 +254,9 @@ function ManuaStockTable({ vendorAuto }) {
       });
 
       setAllStockValues(res_status?.data?.managestockitems);
-      setStockItemAuto("");
+      setStockItemAuto('');
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -285,17 +274,11 @@ function ManuaStockTable({ vendorAuto }) {
         })
       );
       setAllStockCategory(response?.data?.stockcategory);
-      setStockCategoryAuto("");
+      setStockCategoryAuto('');
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
 
   useEffect(() => {
     getStockCategory();
@@ -304,13 +287,10 @@ function ManuaStockTable({ vendorAuto }) {
     fetchStockItems();
   }, [stockItemAuto]);
 
-
   useEffect(() => {
     getStockCategory();
     fetchStockItems();
-
   }, []);
-
 
   // State to track advanced filter
   const [advancedFilter, setAdvancedFilter] = useState(null);
@@ -318,14 +298,14 @@ function ManuaStockTable({ vendorAuto }) {
   const [columnApi, setColumnApi] = useState(null);
   const [filteredDataItems, setFilteredDataItems] = useState([]);
   //  const [filteredRowData, setFilteredRowData] = useState([]);
-  const [logicOperator, setLogicOperator] = useState("AND");
+  const [logicOperator, setLogicOperator] = useState('AND');
 
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [filterValue, setFilterValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [filterValue, setFilterValue] = useState('');
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = ["Contains", "Does Not Contain", "Equals", "Does Not Equal", "Begins With", "Ends With", "Blank", "Not Blank"]; // AgGrid-like conditions
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
 
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
@@ -334,15 +314,14 @@ function ManuaStockTable({ vendorAuto }) {
 
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
-  const [searchedString, setSearchedString] = useState("");
+  const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTableImg = useRef(null);
   const gridRefTable = useRef(null);
 
-
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
     setBtnSubmit(false);
@@ -351,8 +330,8 @@ function ManuaStockTable({ vendorAuto }) {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
     setBtnSubmit(false);
@@ -362,55 +341,53 @@ function ManuaStockTable({ vendorAuto }) {
   };
 
   let exportColumnNames = [
-    "Company",
-    "Branch",
-    "Unit",
-    "Floor",
-    "Area",
-    "Location",
-    "Request Mode For",
-    "Dealers Name",
-    "Gst No",
-    "Bill No",
-    "Warranty",
-    "Purchase Date",
-    "Stock Category",
-    "Stock Sub Category",
-    "Quantity",
-    "Bill Amount",
-    "Quantity & UOM",
-    "Material",
-    "Product Details",
-    "Warranty Details",
-    "Rate",
-    "Bill Date",
+    'Company',
+    'Branch',
+    'Unit',
+    'Floor',
+    'Area',
+    'Location',
+    'Request Mode For',
+    'Dealers Name',
+    'Gst No',
+    'Bill No',
+    'Warranty',
+    'Purchase Date',
+    'Stock Category',
+    'Stock Sub Category',
+    'Quantity',
+    'Bill Amount',
+    'Quantity & UOM',
+    'Material',
+    'Product Details',
+    'Warranty Details',
+    'Rate',
+    'Bill Date',
   ];
   let exportRowValues = [
-    "company",
-    "branch",
-    "unit",
-    "floor",
-    "area",
-    "location",
-    "requestmode",
-    "vendorname",
-    "gstno",
-    "billno",
-    "warranty",
-    "purchasedate",
-    "stockcategory",
-    "stocksubcategory",
-    "quantitynew",
-    "totalbillamountstock",
-    "uomnew",
-    "materialnew",
-    "productdetailsnew",
-    "warrantydetails",
-    "rate",
-    "billdate",
+    'company',
+    'branch',
+    'unit',
+    'floor',
+    'area',
+    'location',
+    'requestmode',
+    'vendorname',
+    'gstno',
+    'billno',
+    'warranty',
+    'purchasedate',
+    'stockcategory',
+    'stocksubcategory',
+    'quantitynew',
+    'totalbillamountstock',
+    'uomnew',
+    'materialnew',
+    'productdetailsnew',
+    'warrantydetails',
+    'rate',
+    'billdate',
   ];
-
-
 
   //Access Module
   const pathname = window.location.pathname;
@@ -421,7 +398,7 @@ function ManuaStockTable({ vendorAuto }) {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Manual Stock Entry"),
+      pagename: String('Manual Stock Entry'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -432,30 +409,26 @@ function ManuaStockTable({ vendorAuto }) {
         },
       ],
     });
-
-  }
+  };
 
   useEffect(() => {
     getapi();
   }, []);
 
   const vendorModeOptions = [
-    { label: "Manual", value: "Manual", _id: "" },
-    { label: "Old Stock", value: "Old Stock", _id: "" },
-    { label: "Unknown", value: "Unknown", _id: "" },
+    { label: 'Manual', value: 'Manual', _id: '' },
+    { label: 'Old Stock', value: 'Old Stock', _id: '' },
+    { label: 'Unknown', value: 'Unknown', _id: '' },
   ];
 
   const gridRef = useRef(null);
-  const { isUserRoleCompare, isAssignBranch, pageName, setPageName, buttonStyles,
-
-  } = useContext(UserRoleAccessContext);
+  const { isUserRoleCompare, isAssignBranch, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
-  const accessbranch = isAssignBranch
-    ?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
+  const accessbranch = isAssignBranch?.map((data) => ({
+    branch: data.branch,
+    company: data.company,
+    unit: data.unit,
+  }));
 
   //Datatable
   const [loading, setLoading] = useState(false);
@@ -465,17 +438,17 @@ function ManuaStockTable({ vendorAuto }) {
   const [showAlert, setShowAlert] = useState();
   const [openInfo, setOpeninfo] = useState(false);
   const [docData, setDocData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [isManageColumnsOpen2, setManageColumnsOpen2] = useState(false);
   const [anchorEl2, setAnchorEl2] = useState(null);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [viewInfo, setViewInfo] = useState([]);
   const [openView, setOpenView] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [documentFiles, setDocumentFiles] = useState([]);
-  const [newcheckbranch, setNewcheckBranch] = useState("Please Select Branch");
+  const [newcheckbranch, setNewcheckBranch] = useState('Please Select Branch');
   const [Specification, setSpecification] = useState([]);
 
   const [btnSubmit, setBtnSubmit] = useState(false);
@@ -516,12 +489,11 @@ function ManuaStockTable({ vendorAuto }) {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setOverallFilterdata(res1.data.manualstock)
+      setOverallFilterdata(res1.data.manualstock);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
 
   //reference images
   // const handleInputChangeedit = (event) => {
@@ -565,7 +537,7 @@ function ManuaStockTable({ vendorAuto }) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) {
           const reader = new FileReader();
           reader.onload = () => {
@@ -574,7 +546,7 @@ function ManuaStockTable({ vendorAuto }) {
               size: file.size,
               type: file.type,
               preview: reader.result,
-              base64: reader.result.split(",")[1],
+              base64: reader.result.split(',')[1],
             });
             setRefImageedit(newSelectedFiles);
             setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
@@ -582,13 +554,13 @@ function ManuaStockTable({ vendorAuto }) {
           };
           reader.readAsDataURL(file);
         } else {
-          setPopupContentMalert("File size should be less than 5MB!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('File size should be less than 5MB!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         }
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -596,13 +568,13 @@ function ManuaStockTable({ vendorAuto }) {
 
   const handleFetchBill = (data) => {
     const files = Array.from(data); // Ensure it's an array
-    const imageFiles = files.filter(file => file.type.startsWith("image/"));
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
-    if (imageFiles.length !== files.length) {
-      setPopupContentMalert("Only Accept Images!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
+    // if (imageFiles.length !== files.length) {
+    //   setPopupContentMalert('Only Accept Images!');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    // }
 
     const fileReaders = [];
     const newSelectedFiles = [];
@@ -628,17 +600,16 @@ function ManuaStockTable({ vendorAuto }) {
     });
 
     Promise.all(fileReaders).then((originalFiles) => {
-      console.log(originalFiles, "originalFiles");
+      console.log(originalFiles, 'originalFiles');
 
       setRefImageedit(newSelectedFiles);
       setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
       setRefImgWarrantyBillEdit((existingFiles) => [...existingFiles, originalFiles]);
-
     });
   };
 
   const [vendorGroupOpt, setVendorGroupopt] = useState([]);
-  const [vendorNewEdit, setVendorNewEdit] = useState("Choose Vendor");
+  const [vendorNewEdit, setVendorNewEdit] = useState('Choose Vendor');
   const [vendorOverall, setVendorOverall] = useState([]);
 
   const fetchVendor = async () => {
@@ -648,9 +619,7 @@ function ManuaStockTable({ vendorAuto }) {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const allGroup = Array.from(
-        new Set(res1?.data?.vendorgrouping.map((d) => d.name))
-      ).map((item) => {
+      const allGroup = Array.from(new Set(res1?.data?.vendorgrouping.map((d) => d.name))).map((item) => {
         return {
           label: item,
           value: item,
@@ -664,7 +633,7 @@ function ManuaStockTable({ vendorAuto }) {
     }
   };
 
-  const [vendorGroupEdit, setVendorGroupEdit] = useState("Choose Vendor Group");
+  const [vendorGroupEdit, setVendorGroupEdit] = useState('Choose Vendor Group');
   const [vendorOptEdit, setVendoroptEdit] = useState([]);
   const handleChangeGroupNameEdit = async (e) => {
     let foundDatas = vendorOverall
@@ -702,9 +671,9 @@ function ManuaStockTable({ vendorAuto }) {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   //first deletefile
@@ -715,8 +684,8 @@ function ManuaStockTable({ vendorAuto }) {
   };
 
   const resetImageedit = () => {
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setRefImageedit([]);
     setPreviewURLedit(null);
   };
@@ -767,7 +736,7 @@ function ManuaStockTable({ vendorAuto }) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) {
           const reader = new FileReader();
           reader.onload = () => {
@@ -776,7 +745,7 @@ function ManuaStockTable({ vendorAuto }) {
               size: file.size,
               type: file.type,
               preview: reader.result,
-              base64: reader.result.split(",")[1],
+              base64: reader.result.split(',')[1],
             });
             setRefImagewarranty(newSelectedFiles);
             setRefImgWarrantyfilenamesEdit(newSelectedFiles.map((d) => d.name));
@@ -784,13 +753,13 @@ function ManuaStockTable({ vendorAuto }) {
           };
           reader.readAsDataURL(file);
         } else {
-          setPopupContentMalert("File size should be less than 5MB!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('File size should be less than 5MB!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         }
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -798,13 +767,13 @@ function ManuaStockTable({ vendorAuto }) {
 
   const handleFetchWarranty = (data) => {
     const files = Array.from(data); // Ensure it's an array
-    const imageFiles = files.filter(file => file.type.startsWith("image/"));
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
-    if (imageFiles.length !== files.length) {
-      setPopupContentMalert("Only Accept Images!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
+    // if (imageFiles.length !== files.length) {
+    //   setPopupContentMalert('Only Accept Images!');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    // }
 
     const fileReaders = [];
     const newSelectedFiles = [];
@@ -837,20 +806,19 @@ function ManuaStockTable({ vendorAuto }) {
     });
   };
 
-
   //first allexcel....
   const getFileIconwarranty = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -859,17 +827,17 @@ function ManuaStockTable({ vendorAuto }) {
 
   //first allexcel....
   const getFileIconedit = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -908,15 +876,10 @@ function ManuaStockTable({ vendorAuto }) {
     setOpenview(true);
   };
   const [openview, setOpenview] = useState(false);
-  const [selectedUnitedit, setSelectedUnitedit] =
-    useState("Please Select Unit");
-  const [selectedBranchedit, setSelectedBranchedit] = useState(
-    "Please Select Branch"
-  );
+  const [selectedUnitedit, setSelectedUnitedit] = useState('Please Select Unit');
+  const [selectedBranchedit, setSelectedBranchedit] = useState('Please Select Branch');
   const [pageNumber, setPageNumber] = useState(1);
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
   const [uomOpt, setUomOpt] = useState([]);
   const [categoryOption, setCategoryOption] = useState([]);
@@ -930,7 +893,7 @@ function ManuaStockTable({ vendorAuto }) {
     const regex = /^\d*\.?\d*$/;
     const inputValue = e.target.value;
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setStockmanagemasteredit({
         ...stockmanagemasteredit,
@@ -948,7 +911,7 @@ function ManuaStockTable({ vendorAuto }) {
     // calculateExpiryDate(value, stockmanagemasteredit.purchasedate);
   };
 
-  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState("");
+  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState('');
 
   const handlePurchaseDateChangeEdit = (e) => {
     const { value } = e.target;
@@ -958,39 +921,28 @@ function ManuaStockTable({ vendorAuto }) {
 
   const formatDateString = (date) => {
     const d = new Date(date);
-    const day = d.getDate().toString().padStart(2, "0");
-    const month = (d.getMonth() + 1).toString().padStart(2, "0");
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
 
   const calculateExpiryDateEdit = () => {
-    if (
-      stockmanagemasteredit.estimationtime &&
-      stockmanagemasteredit.purchasedate
-    ) {
+    if (stockmanagemasteredit.estimationtime && stockmanagemasteredit.purchasedate) {
       const currentDate = new Date(stockmanagemasteredit.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (stockmanagemasteredit.estimationtime === "Days") {
-        expiryDate.setDate(
-          currentDate.getDate() + parseInt(stockmanagemasteredit.estimation)
-        );
-      } else if (stockmanagemasteredit.estimationtime === "Month") {
-        expiryDate.setMonth(
-          currentDate.getMonth() + parseInt(stockmanagemasteredit.estimation)
-        );
-      } else if (stockmanagemasteredit.estimationtime === "Year") {
-        expiryDate.setFullYear(
-          currentDate.getFullYear() + parseInt(stockmanagemasteredit.estimation)
-        );
+      if (stockmanagemasteredit.estimationtime === 'Days') {
+        expiryDate.setDate(currentDate.getDate() + parseInt(stockmanagemasteredit.estimation));
+      } else if (stockmanagemasteredit.estimationtime === 'Month') {
+        expiryDate.setMonth(currentDate.getMonth() + parseInt(stockmanagemasteredit.estimation));
+      } else if (stockmanagemasteredit.estimationtime === 'Year') {
+        expiryDate.setFullYear(currentDate.getFullYear() + parseInt(stockmanagemasteredit.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
 
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN")
-        ? ""
-        : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       setStockmanagemasteredit({
         ...stockmanagemasteredit,
@@ -1009,61 +961,38 @@ function ManuaStockTable({ vendorAuto }) {
   const [stockArray, setStockArray] = useState([]);
 
   const totalQuantityStock = stockArray.reduce((sum, item) => {
-
     return sum + Number(item.quantitynew || 0);
 
     // return sum;
   }, 0);
 
-
   const [uomcodes, setuomcodes] = useState([]);
 
   const handleStockArray = () => {
-    const isNameMatch = stockArray.some(
-      (item) =>
-        item.materialnew == stockmanagemasteredit.materialnew &&
-        item.uomnew === String(stockmanagemasteredit.uomnew) &&
-        item.quantitynew == stockmanagemasteredit.quantitynew
-    );
-    if (
-      stockmanagemasteredit.stockcategory === "Please Select Stock Category" ||
-      stockmanagemasteredit.stockcategory === ""
-    ) {
-      setPopupContentMalert("Please Select Stock Category!");
-      setPopupSeverityMalert("info");
+    const isNameMatch = stockArray.some((item) => item.materialnew == stockmanagemasteredit.materialnew && item.uomnew === String(stockmanagemasteredit.uomnew) && item.quantitynew == stockmanagemasteredit.quantitynew);
+    if (stockmanagemasteredit.stockcategory === 'Please Select Stock Category' || stockmanagemasteredit.stockcategory === '') {
+      setPopupContentMalert('Please Select Stock Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmanagemasteredit.stocksubcategory ===
-      "Please Select Stock Sub Category" ||
-      stockmanagemasteredit.stocksubcategory === ""
-    ) {
-      setPopupContentMalert("Please Select Stock Sub Category!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.stocksubcategory === 'Please Select Stock Sub Category' || stockmanagemasteredit.stocksubcategory === '') {
+      setPopupContentMalert('Please Select Stock Sub Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmanagemasteredit.materialnew === "Please Select Material" ||
-      stockmanagemasteredit.materialnew === ""
-    ) {
-      setPopupContentMalert("Please Select Material!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.materialnew === 'Please Select Material' || stockmanagemasteredit.materialnew === '') {
+      setPopupContentMalert('Please Select Material!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmanagemasteredit.uomnew === "" ||
-      stockmanagemasteredit.uomnew === undefined
-    ) {
-      setPopupContentMalert("Please Enter UOM!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.uomnew === '' || stockmanagemasteredit.uomnew === undefined) {
+      setPopupContentMalert('Please Enter UOM!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmanagemasteredit.quantitynew === "" ||
-      stockmanagemasteredit.quantitynew === undefined
-    ) {
-      setPopupContentMalert("Please Enter Quantityy!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.quantitynew === '' || stockmanagemasteredit.quantitynew === undefined) {
+      setPopupContentMalert('Please Enter Quantityy!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Todo Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Todo Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     // else if (stockmanagemasteredit.productdetailsnew === "" || stockmanagemasteredit.productdetailsnew === undefined) {
@@ -1077,9 +1006,7 @@ function ManuaStockTable({ vendorAuto }) {
     // }
     else {
       try {
-        let findData = uomcodes.find(
-          (item) => item.name === stockmanagemasteredit.uomnew
-        );
+        let findData = uomcodes.find((item) => item.name === stockmanagemasteredit.uomnew);
 
         setStockArray([
           ...stockArray,
@@ -1087,27 +1014,23 @@ function ManuaStockTable({ vendorAuto }) {
             uomnew: stockmanagemasteredit.uomnew,
             quantitynew: stockmanagemasteredit.quantitynew,
             materialnew: stockmanagemasteredit.materialnew,
-            productdetailsnew:
-              stockmanagemasteredit.productdetailsnew === undefined
-                ? ""
-                : stockmanagemasteredit.productdetailsnew,
+            productdetailsnew: stockmanagemasteredit.productdetailsnew === undefined ? '' : stockmanagemasteredit.productdetailsnew,
             uomcodenew: findData.code,
             // totalbillamount: totalAmountEdit
-            totalbillamount: (totalQuantityStock) * (stockmanagemasteredit.rate)
+            totalbillamount: totalQuantityStock * stockmanagemasteredit.rate,
           },
         ]);
 
-
         setStockmanagemasteredit({
           ...stockmanagemasteredit,
-          uomnew: "",
-          quantitynew: "",
-          materialnew: "Please Select Material",
-          productdetailsnew: "",
+          uomnew: '',
+          quantitynew: '',
+          materialnew: 'Please Select Material',
+          productdetailsnew: '',
         });
       } catch (e) {
-        setPopupContentMalert("UOM is not found! Hence cannot get a UOM Code!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('UOM is not found! Hence cannot get a UOM Code!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1150,9 +1073,9 @@ function ManuaStockTable({ vendorAuto }) {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
   const [uploadPopupOpenedit, setUploadPopupOpenedit] = useState(false);
   const handleClickUploadPopupOpenedit = () => {
@@ -1172,22 +1095,21 @@ function ManuaStockTable({ vendorAuto }) {
   };
 
   const resetImagewarranty = () => {
-    setGetImgwarranty("");
-    setFilewarranty("");
+    setGetImgwarranty('');
+    setFilewarranty('');
     setRefImagewarranty([]);
     setPreviewURLwarranty(null);
   };
 
   const handleUploadPopupCloseedit = () => {
     setUploadPopupOpenedit(false);
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setPreviewURLedit(null);
   };
 
   // Upload Popup
-  const [uploadPopupOpenwarrantyedit, setUploadPopupOpenwarrantyedit] =
-    useState(false);
+  const [uploadPopupOpenwarrantyedit, setUploadPopupOpenwarrantyedit] = useState(false);
   const handleClickUploadPopupOpenwarrantyedit = () => {
     setUploadPopupOpenwarrantyedit(true);
   };
@@ -1205,11 +1127,11 @@ function ManuaStockTable({ vendorAuto }) {
       } else {
         setVendorgetid({
           ...vendorgetid,
-          gstnumber: "",
-          address: "",
-          phonenumber: "",
+          gstnumber: '',
+          address: '',
+          phonenumber: '',
         });
-        setVendornameid("");
+        setVendornameid('');
       }
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -1226,11 +1148,7 @@ function ManuaStockTable({ vendorAuto }) {
       });
 
       let getdata = res_vom.data.managestockitems.filter((data) => {
-        return (
-          data.itemname === e.value &&
-          data.stockcategory === stockmanagemasteredit.stockcategory &&
-          data.stocksubcategory === stockmanagemasteredit.stocksubcategory
-        );
+        return data.itemname === e.value && data.stockcategory === stockmanagemasteredit.stockcategory && data.stocksubcategory === stockmanagemasteredit.stocksubcategory;
       });
 
       setStockmanagemasteredit((prev) => ({
@@ -1279,10 +1197,7 @@ function ManuaStockTable({ vendorAuto }) {
         },
       });
       const resultall = res.data.managestockitems.filter((data) => {
-        return (
-          data.stockcategory === stockcategory &&
-          data.stocksubcategory === e.value
-        );
+        return data.stockcategory === stockcategory && data.stocksubcategory === e.value;
       });
 
       const assetmaterialuniqueArray = resultall.map((item) => ({
@@ -1334,7 +1249,7 @@ function ManuaStockTable({ vendorAuto }) {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
-          responseType: "blob",
+          responseType: 'blob',
         }
       );
 
@@ -1358,20 +1273,23 @@ function ManuaStockTable({ vendorAuto }) {
         },
       });
       if (res?.data?.smanualstock?.filenames.length > 0) {
-        const fileswarranty = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenames, "todo", res?.data?.smanualstock?.uniqueId);
+        const fileswarranty = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenames, 'todo', res?.data?.smanualstock?.uniqueId);
         setOldfileNamesWar(res?.data?.smanualstock?.filenames.map((d) => `${res?.data?.smanualstock?.uniqueId}$todo$${d}`));
         handleFetchWarranty(fileswarranty);
+      } else {
+        setRefImageedit([]);
       }
       if (res?.data?.smanualstock?.filenamesbill.length > 0) {
-        const filesbill = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenamesbill, "bill", res?.data?.smanualstock?.uniqueId);
+        const filesbill = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenamesbill, 'bill', res?.data?.smanualstock?.uniqueId);
 
         handleFetchBill(filesbill);
         setoldfileNamesBill(res?.data?.smanualstock?.filenamesbill.map((d) => `${res?.data?.smanualstock?.uniqueId}$bill$${d}`));
+      } else {
+        setRefImagewarranty([]);
       }
 
-
-      const alldata = { ...res?.data?.smanualstock, calculationbalamount: Number(res?.data?.smanualstock?.balanceamount) }
-      setFrequencyValue(res?.data?.smanualstock?.vendorfrequency === undefined ? "" : res?.data?.smanualstock?.vendorfrequency);
+      const alldata = { ...res?.data?.smanualstock, calculationbalamount: Number(res?.data?.smanualstock?.balanceamount) };
+      setFrequencyValue(res?.data?.smanualstock?.vendorfrequency === undefined ? '' : res?.data?.smanualstock?.vendorfrequency);
 
       setExpensecreate(alldata);
       setEducationtodo(res?.data?.smanualstock?.tododetails);
@@ -1380,14 +1298,14 @@ function ManuaStockTable({ vendorAuto }) {
       await handleChangeGroupNameEdit({
         value: res?.data?.smanualstock?.vendorgroup,
       });
-      console.log(res?.data?.smanualstock, "rersdf")
+      console.log(res?.data?.smanualstock, 'rersdf');
       setStockmanagemasteredit({
         ...res?.data?.smanualstock,
-        materialnew: "Please Select Material",
-        totalbillamount: res?.data?.smanualstock?.totalbillamountstock
+        materialnew: 'Please Select Material',
+        totalbillamount: res?.data?.smanualstock?.totalbillamountstock,
       });
-      console.log(res?.data?.smanualstock?.tododetails.totalbillamount, "tato")
-      setAmountEdit(res?.data?.smanualstock?.tododetails.totalbillamount)
+      console.log(res?.data?.smanualstock?.tododetails.totalbillamount, 'tato');
+      setAmountEdit(res?.data?.smanualstock?.tododetails.totalbillamount);
       // setRefImageedit(res?.data?.smanualstock?.files);
       // setRefImagewarrantyedit(
       //   res?.data?.smanualstock?.warrantyfiles
@@ -1416,35 +1334,25 @@ function ManuaStockTable({ vendorAuto }) {
       await fetchBranchDropdownsEdit(res?.data?.smanualstock?.company);
       await fetchUnitsEdit(res?.data?.smanualstock?.branch);
       await fetchFloorEdit(res?.data?.smanualstock?.branch);
-      await fetchAreaEdit(
-        res?.data?.smanualstock?.branch,
-        res?.data?.smanualstock?.floor
-      );
-      await fetchAllLocationEdit(
-        res?.data?.smanualstock?.branch,
-        res?.data?.smanualstock?.floor,
-        res?.data?.smanualstock?.area
-      );
+      await fetchAreaEdit(res?.data?.smanualstock?.branch, res?.data?.smanualstock?.floor);
+      await fetchAllLocationEdit(res?.data?.smanualstock?.branch, res?.data?.smanualstock?.floor, res?.data?.smanualstock?.area);
       if (res?.data?.smanualstock.vendorid) {
-        let resv = await axios.get(
-          `${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.smanualstock.vendorid}`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-          }
-        );
+        let resv = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.smanualstock.vendorid}`, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
         setVendorgetid(resv?.data?.svendordetails);
       } else {
         setVendorgetid({
           ...vendorgetid,
-          gstnumber: "",
-          address: "",
-          phonenumber: "",
+          gstnumber: '',
+          address: '',
+          phonenumber: '',
         });
       }
     } catch (err) {
-      console.log(err, "errrroedit")
+      console.log(err, 'errrroedit');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
@@ -1452,21 +1360,18 @@ function ManuaStockTable({ vendorAuto }) {
   // Alert delete popup
   // let projectid = deleteproject._id;
   const delProject = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      await axios.delete(
-        `${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${stockmanagemasteredit._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        }
-      );
-      await fetchStock("Filtered");
+      await axios.delete(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${stockmanagemasteredit._id}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+      await fetchStock('Filtered');
       // handleCloseMod();
       handleCloseDelete();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       setSelectedRows([]);
       setPage(1);
@@ -1479,7 +1384,7 @@ function ManuaStockTable({ vendorAuto }) {
   const [quantityNeww, setQuantityNeww] = useState();
   const [materialNeww, setMaterialNeww] = useState();
   const [productdetailsNeww, setProductdetailsNeww] = useState();
-  const [quantityAndUom, setQuantityAndUom] = useState()
+  const [quantityAndUom, setQuantityAndUom] = useState();
   // get single row to view....
   const getviewCode = async (e) => {
     try {
@@ -1491,12 +1396,12 @@ function ManuaStockTable({ vendorAuto }) {
       handleViewOpen();
       setStockmanagemasteredit(res?.data?.smanualstock);
       let stockcategoryNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
-        return data.category === "Please Select Category" ? "" : `${data.category}`;
+        return data.category === 'Please Select Category' ? '' : `${data.category}`;
       });
       setstockcategoryNeww(stockcategoryNew.toString());
 
       let stocksubcategoryNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
-        return data.subcategory === "Please Select Sub Category" ? "" : `${data.subcategory}`;
+        return data.subcategory === 'Please Select Sub Category' ? '' : `${data.subcategory}`;
       });
       setMSubcategoryNeww(stocksubcategoryNew.toString());
       let quantityNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
@@ -1518,16 +1423,13 @@ function ManuaStockTable({ vendorAuto }) {
         return ` ${data.quantitynew}#${data.uomnew}`;
       });
       setQuantityAndUom(quantityAndUom.toString());
-
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-  ;
-
   // get single row to view....
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${e}`, {
         headers: {
@@ -1541,32 +1443,24 @@ function ManuaStockTable({ vendorAuto }) {
         },
       });
 
-      let quantityNew = res?.data?.smanualstock.tododetails.map(
-        (data, newindex) => {
-          return ` ${data.quantitynew}`;
-        }
-      );
+      let quantityNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return ` ${data.quantitynew}`;
+      });
       setQuantityNeww(quantityNew.toString());
 
-      let materialNew = res?.data?.smanualstock.tododetails.map(
-        (data, newindex) => {
-          return ` ${data.materialnew}`;
-        }
-      );
+      let materialNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return ` ${data.materialnew}`;
+      });
       setMaterialNeww(materialNew.toString());
 
-      let productdetailsNew = res?.data?.smanualstock.tododetails.map(
-        (data, newindex) => {
-          return ` ${data.productdetailsnew}`;
-        }
-      );
+      let productdetailsNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return ` ${data.productdetailsnew}`;
+      });
       setProductdetailsNeww(productdetailsNew.toString());
 
-      let quantityAndUom = res?.data?.smanualstock.tododetails.map(
-        (data, newindex) => {
-          return ` ${data.quantitynew}#${data.uomcodenew}`;
-        }
-      );
+      let quantityAndUom = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return ` ${data.quantitynew}#${data.uomcodenew}`;
+      });
       setQuantityAndUom(quantityAndUom.toString());
 
       let codeValues = res_project_1?.data?.vommaster.map((data) => ({
@@ -1574,13 +1468,11 @@ function ManuaStockTable({ vendorAuto }) {
         code: data.code,
       }));
 
-      let setDataOne = codeValues.find(
-        (item1) => res?.data?.smanualstock.uomnew === item1.name
-      );
+      let setDataOne = codeValues.find((item1) => res?.data?.smanualstock.uomnew === item1.name);
 
       let setData = {
         ...res?.data?.smanualstock,
-        uomcode: setDataOne ? setDataOne.code : "",
+        uomcode: setDataOne ? setDataOne.code : '',
       };
 
       setStockmanagemasteredit(setData);
@@ -1590,19 +1482,17 @@ function ManuaStockTable({ vendorAuto }) {
   };
   //get all Locations edit.
   const fetchAllLocationEdit = async (a, b, c) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_type = await axios.get(SERVICE.LOCATIONGROUPING, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_type.data.locationgroupings
-        .filter((d) => d.branch === a && d.floor === b && d.area === c)
-        .map((data) => data.location);
+      let result = res_type.data.locationgroupings.filter((d) => d.branch === a && d.floor === b && d.area === c).map((data) => data.location);
       let ji = [].concat(...result);
       const all = [
-        { label: "ALL", value: "ALL" },
+        { label: 'ALL', value: 'ALL' },
         ...ji.map((d) => ({
           ...d,
           label: d,
@@ -1625,7 +1515,7 @@ function ManuaStockTable({ vendorAuto }) {
   }, [vendorAuto]);
 
   useEffect(() => {
-    const savedVisibility = localStorage.getItem("columnVisibility1");
+    const savedVisibility = localStorage.getItem('columnVisibility1');
     if (savedVisibility) {
       setColumnVisibility(JSON.parse(savedVisibility));
     }
@@ -1654,13 +1544,13 @@ function ManuaStockTable({ vendorAuto }) {
     setIsEditOpen(true);
   };
   useEffect(() => {
-    localStorage.setItem("columnVisibility1", JSON.stringify(columnVisibility));
+    localStorage.setItem('columnVisibility1', JSON.stringify(columnVisibility));
   }, [columnVisibility]);
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -1671,9 +1561,7 @@ function ManuaStockTable({ vendorAuto }) {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_type.data.areagroupings
-        .filter((d) => d.branch === a && d.floor === e)
-        .map((data) => data.area);
+      let result = res_type.data.areagroupings.filter((d) => d.branch === a && d.floor === e).map((data) => data.area);
       let ji = [].concat(...result);
       const all = ji.map((d) => ({
         ...d,
@@ -1686,23 +1574,17 @@ function ManuaStockTable({ vendorAuto }) {
     }
   };
   const getDownloadFile = async (data) => {
-    const ans = data
-      .filter((item) => item?.document?.length < 1)
-      .map((d) => d?.documentstext);
+    const ans = data.filter((item) => item?.document?.length < 1).map((d) => d?.documentstext);
     const ansDocuments = data.filter((item) => item?.document?.length > 0);
-    const ansType = data
-      .filter((item) => item?.document?.length < 1)
-      .map((d) => d?.label);
+    const ansType = data.filter((item) => item?.document?.length < 1).map((d) => d?.label);
 
     if (ans.length > 0) {
       const pages = ans;
       const numPages = pages.length;
       const pageNumber = 1;
 
-      const goToPrevPage = () =>
-        setPageNumber((prevPage) => Math.max(prevPage - 1, 1));
-      const goToNextPage = () =>
-        setPageNumber((prevPage) => Math.min(prevPage + 1, numPages));
+      const goToPrevPage = () => setPageNumber((prevPage) => Math.max(prevPage - 1, 1));
+      const goToNextPage = () => setPageNumber((prevPage) => Math.min(prevPage + 1, numPages));
 
       const handlePageClick = (page) => {
         setPageNumber(page);
@@ -1710,9 +1592,8 @@ function ManuaStockTable({ vendorAuto }) {
 
       function updatePage() {
         const currentPageContent = pages[pageNumber - 1];
-        document.querySelector(".pdf-navigation span").innerText =
-          "Page " + pageNumber + " of " + numPages;
-        document.querySelector(".pdf-content").innerHTML = currentPageContent;
+        document.querySelector('.pdf-navigation span').innerText = 'Page ' + pageNumber + ' of ' + numPages;
+        document.querySelector('.pdf-content').innerHTML = currentPageContent;
       }
 
       const doc = new jsPDF();
@@ -1721,7 +1602,7 @@ function ManuaStockTable({ vendorAuto }) {
       doc.text(10, 10, pages[pageNumber - 1]);
 
       // Convert the content to a data URL
-      const pdfDataUri = doc.output("datauristring");
+      const pdfDataUri = doc.output('datauristring');
 
       const newTab = window.open();
       newTab.document.write(`
@@ -1779,21 +1660,14 @@ function ManuaStockTable({ vendorAuto }) {
                 <span>Page ${pageNumber} of ${numPages}</span>
                 <button onclick="goToNextPage()">Next</button>
               </div>
-              <h2 id="pdf-heading">${ansType[pageNumber - 1]
-        }</h2> <!-- Add heading here -->
+              <h2 id="pdf-heading">${ansType[pageNumber - 1]}</h2> <!-- Add heading here -->
               <div class="pdf-content">
               <div class="pdf-content">
-                ${/* Render PDF content directly in the embed tag */ ""}
+                ${/* Render PDF content directly in the embed tag */ ''}
                 <embed src="${pdfDataUri}" type="application/pdf" width="100%" height="600px" />
               </div>
               <div class="pdf-thumbnails">
-                ${pages
-          .map(
-            (_, index) =>
-              `<div class="pdf-thumbnail" onclick="handlePageClick(${index + 1
-              })">${index + 1}</div>`
-          )
-          .join("")}
+                ${pages.map((_, index) => `<div class="pdf-thumbnail" onclick="handlePageClick(${index + 1})">${index + 1}</div>`).join('')}
               </div>
             </div>
             <script>
@@ -1838,11 +1712,9 @@ function ManuaStockTable({ vendorAuto }) {
       data.forEach((d) => {
         const readExcel = (base64Data) => {
           return new Promise((resolve, reject) => {
-            const bufferArray = Uint8Array.from(atob(base64Data), (c) =>
-              c.charCodeAt(0)
-            ).buffer;
+            const bufferArray = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0)).buffer;
 
-            const wb = XLSX.read(bufferArray, { type: "buffer" });
+            const wb = XLSX.read(bufferArray, { type: 'buffer' });
 
             const wsname = wb.SheetNames[0];
             const ws = wb.Sheets[wsname];
@@ -1858,56 +1730,39 @@ function ManuaStockTable({ vendorAuto }) {
         pdfContentArray.forEach((document) => {
           const fileExtension = getFileExtension(document.name);
 
-          if (fileExtension === "xlsx" || fileExtension === "xls") {
+          if (fileExtension === 'xlsx' || fileExtension === 'xls') {
             readExcel(document.data)
               .then((excelData) => {
                 const newTab = window.open();
                 const htmlTable = generateHtmlTable(excelData);
                 newTab.document.write(htmlTable);
               })
-              .catch((error) => { });
-          } else if (fileExtension === "pdf") {
+              .catch((error) => {});
+          } else if (fileExtension === 'pdf') {
             // Handle PDF file
             const newTab = window.open();
-            newTab.document.write(
-              '<iframe width="100%" height="100%" src="' +
-              document.preview +
-              '"></iframe>'
-            );
+            newTab.document.write('<iframe width="100%" height="100%" src="' + document.preview + '"></iframe>');
           }
         });
 
         // Helper function to extract file extension from a filename
         function getFileExtension(filename) {
-          return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
+          return filename.slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2);
         }
 
         // Helper function to generate an HTML table from Excel data
         function generateHtmlTable(data) {
           const headers = Object.keys(data[0]);
 
-          const tableHeader = `<tr>${headers
-            .map(
-              (header) =>
-                `<th style="padding: 4px; background-color: #f2f2f2;">${header}</th>`
-            )
-            .join("")}</tr>`;
+          const tableHeader = `<tr>${headers.map((header) => `<th style="padding: 4px; background-color: #f2f2f2;">${header}</th>`).join('')}</tr>`;
 
           const tableRows = data.map((row, index) => {
-            const rowStyle =
-              index % 2 === 0 ? "background-color: #f9f9f9;" : "";
-            const cells = headers
-              .map(
-                (header) =>
-                  `<td style="padding: 4px;${rowStyle}">${row[header]}</td>`
-              )
-              .join("");
+            const rowStyle = index % 2 === 0 ? 'background-color: #f9f9f9;' : '';
+            const cells = headers.map((header) => `<td style="padding: 4px;${rowStyle}">${row[header]}</td>`).join('');
             return `<tr>${cells}</tr>`;
           });
 
-          return `<table style="border-collapse: collapse; width: 100%;" border="1"; overflow :"scroll">${tableHeader}${tableRows.join(
-            ""
-          )}</table>`;
+          return `<table style="border-collapse: collapse; width: 100%;" border="1"; overflow :"scroll">${tableHeader}${tableRows.join('')}</table>`;
         }
       });
     }
@@ -1917,45 +1772,43 @@ function ManuaStockTable({ vendorAuto }) {
   const [companysEdit, setCompanysEdit] = useState([]);
   const [floorsEdit, setFloorEdit] = useState([]);
   const [areasEdit, setAreasEdit] = useState([]);
-  const [locationsEdit, setLocationsEdit] = useState([
-    { label: "ALL", value: "ALL" },
-  ]);
+  const [locationsEdit, setLocationsEdit] = useState([{ label: 'ALL', value: 'ALL' }]);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
     setStockmanagemasteredit({
-      company: "Please Select Company",
-      branch: "Please Select Branch",
-      unit: "Please Select Unit",
-      floor: "Please Select Floor",
-      area: "Please Select Area",
-      location: "Please Select Location",
-      workstation: "Please Select Workstation",
-      assettype: "",
-      asset: "",
-      material: "Please Select Material",
-      component: "Please Select Component",
-      productdetails: "",
-      uom: "Please Select UOM",
-      quantity: "",
-      stockcategory: "Please Select Stock Category",
-      stocksubcategory: "Please Select Stock Sub Category",
-      uomnew: "",
-      quantitynew: "",
-      materialnew: "Please Select Material",
-      productdetailsnew: "",
+      company: 'Please Select Company',
+      branch: 'Please Select Branch',
+      unit: 'Please Select Unit',
+      floor: 'Please Select Floor',
+      area: 'Please Select Area',
+      location: 'Please Select Location',
+      workstation: 'Please Select Workstation',
+      assettype: '',
+      asset: '',
+      material: 'Please Select Material',
+      component: 'Please Select Component',
+      productdetails: '',
+      uom: 'Please Select UOM',
+      quantity: '',
+      stockcategory: 'Please Select Stock Category',
+      stocksubcategory: 'Please Select Stock Sub Category',
+      uomnew: '',
+      quantitynew: '',
+      materialnew: 'Please Select Material',
+      productdetailsnew: '',
     });
     setTodoDetails({
       ...todoDetails,
-      category: "Please Select Category",
-      subcategory: "Please Select Sub Category",
-      materialnew: "Please Select Item Name",
-      productdetailsnew: "",
-      rate: "",
-      quantitynew: "",
-      amount: "",
+      category: 'Please Select Category',
+      subcategory: 'Please Select Sub Category',
+      materialnew: 'Please Select Item Name',
+      productdetailsnew: '',
+      rate: '',
+      quantitynew: '',
+      amount: '',
     });
   };
   const fetchBranchDropdownsEdit = async (e) => {
@@ -1978,12 +1831,11 @@ function ManuaStockTable({ vendorAuto }) {
   };
 
   useEffect(() => {
-
     fetchStockedit();
   }, [isEditOpen, stockmanagemasteredit]);
 
   const editSubmit = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     setBtnSubmit(true);
     e.preventDefault();
     // fetchStockedit();
@@ -2024,9 +1876,7 @@ function ManuaStockTable({ vendorAuto }) {
     //   // // item.stockcategory == stockmanagemasteredit.stockcategory &&
     //   // item.stocksubcategory == stockmanagemasteredit.stocksubcategory &&
 
-
     //   // item.rate == Number(stockmanagemasteredit.rate)
-
 
     // );
     // item.billdate == stockmanagemasteredit.billdate
@@ -2039,29 +1889,29 @@ function ManuaStockTable({ vendorAuto }) {
 
     // item.productdetailsnew.toLowerCase() == stockmanagemasteredit.productdetailsnew.toLowerCase() &&
 
-    if (stockmanagemasteredit.company === "Please Select Company") {
-      setPopupContentMalert("Please Select Company!");
-      setPopupSeverityMalert("info");
+    if (stockmanagemasteredit.company === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.branch === "Please Select Branch") {
-      setPopupContentMalert("Please Select Branch!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.branch === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.unit === "Please Select Unit") {
-      setPopupContentMalert("Please Select Unit!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.unit === 'Please Select Unit') {
+      setPopupContentMalert('Please Select Unit!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.floor === "Please Select Floor") {
-      setPopupContentMalert("Please Select Floor!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.floor === 'Please Select Floor') {
+      setPopupContentMalert('Please Select Floor!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.area === "Please Select Area") {
-      setPopupContentMalert("Please Select Area!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.area === 'Please Select Area') {
+      setPopupContentMalert('Please Select Area!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.location === "Please Select Location") {
-      setPopupContentMalert("Please Select Location!");
-      setPopupSeverityMalert("info");
+    } else if (stockmanagemasteredit.location === 'Please Select Location') {
+      setPopupContentMalert('Please Select Location!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     // else if (stockmanagemasteredit.vendorname === "Please Select Vendor") {
@@ -2078,12 +1928,9 @@ function ManuaStockTable({ vendorAuto }) {
     //   );
     //   handleClickOpenerr();
     // }
-    else if (
-      stockmanagemasteredit.requestmode === "Please Select Stock Mode For" ||
-      stockmanagemasteredit.requestmode === ""
-    ) {
-      setPopupContentMalert("Please Select Stock Mode For!");
-      setPopupSeverityMalert("info");
+    else if (stockmanagemasteredit.requestmode === 'Please Select Stock Mode For' || stockmanagemasteredit.requestmode === '') {
+      setPopupContentMalert('Please Select Stock Mode For!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     // else if (stockmanagemasteredit.materialnew == "Please Select Material") {
@@ -2096,35 +1943,23 @@ function ManuaStockTable({ vendorAuto }) {
     //   setPopupSeverityMalert("info");
     //   handleClickOpenPopupMalert();
     // }
-    else if (stockmanagemasteredit.totalbillamount === "") {
-      setPopupContentMalert("Please Enter Total bill Amount!");
-      setPopupSeverityMalert("info");
+    else if (stockmanagemasteredit.totalbillamount === '') {
+      setPopupContentMalert('Please Enter Total bill Amount!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (educationtodo.length == 0) {
-      setPopupContentMalert("Please Insert Todo!");
-      setPopupSeverityMalert("info");
+    } else if (educationtodo.length == 0) {
+      setPopupContentMalert('Please Insert Todo!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      expensecreate.paidstatus === "Paid" &&
-      expensecreate.paidmode === "Please Select Paid Mode"
-    ) {
-      setPopupContentMalert("Please Select Paid Mode!");
-      setPopupSeverityMalert("info");
+    } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Please Select Paid Mode') {
+      setPopupContentMalert('Please Select Paid Mode!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      expensecreate.paidstatus === "Paid" &&
-      expensecreate.paidamount === ""
-    ) {
-      setPopupContentMalert("Please Enter Paid Amount!");
-      setPopupSeverityMalert("info");
+    } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidamount === '') {
+      setPopupContentMalert('Please Enter Paid Amount!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      expensecreate.paidstatus === "Paid" &&
-      Number(expensecreate.paidamount) !== Number(Expensetotal)
-    ) {
+    } else if (expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal)) {
       handleClickOpenerrAmount();
     }
     // else if (isNameMatch) {
@@ -2177,170 +2012,143 @@ function ManuaStockTable({ vendorAuto }) {
   const username = isUserRoleAccess.username;
   //editing the single data...
   const sendEditRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      let res = await axios.put(
-        `${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${stockmanagemasteredit?._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-          // company: String(stockmanagemasteredit.company),
-          // branch: String(stockmanagemasteredit.branch),
-          // unit: String(stockmanagemasteredit.unit),
-          // floor: String(stockmanagemasteredit.floor),
-          // location: String(stockmanagemasteredit.location),
-          // area: String(stockmanagemasteredit.area),
-          // workstation: String(stockmanagemasteredit.workcheck ? stockmanagemasteredit.workstation : ""),
-          // workcheck: String(stockmanagemasteredit.workcheck),
-          // assettype: String(stockmanagemasteredit.assettype),
-          // asset: String(stockmanagemasteredit.asset),
-          // subcomponent: "",
-          // material: String(stockmanagemasteredit.material === "Please Select Material" ? "" : stockmanagemasteredit.material),
-          // component: String(stockmanagemasteredit.component === "Please Select Component" ? "" : stockmanagemasteredit.component),
-          // productdetails: String(stockmanagemasteredit.productdetails),
-          // uom: stockmanagemasteredit.uom === "Please Select UOM" ? "" : String(stockmanagemasteredit.uom),
-          // quantity: Number(stockmanagemasteredit.quantity),
-          // updating: String(""),
+      let res = await axios.put(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${stockmanagemasteredit?._id}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        // company: String(stockmanagemasteredit.company),
+        // branch: String(stockmanagemasteredit.branch),
+        // unit: String(stockmanagemasteredit.unit),
+        // floor: String(stockmanagemasteredit.floor),
+        // location: String(stockmanagemasteredit.location),
+        // area: String(stockmanagemasteredit.area),
+        // workstation: String(stockmanagemasteredit.workcheck ? stockmanagemasteredit.workstation : ""),
+        // workcheck: String(stockmanagemasteredit.workcheck),
+        // assettype: String(stockmanagemasteredit.assettype),
+        // asset: String(stockmanagemasteredit.asset),
+        // subcomponent: "",
+        // material: String(stockmanagemasteredit.material === "Please Select Material" ? "" : stockmanagemasteredit.material),
+        // component: String(stockmanagemasteredit.component === "Please Select Component" ? "" : stockmanagemasteredit.component),
+        // productdetails: String(stockmanagemasteredit.productdetails),
+        // uom: stockmanagemasteredit.uom === "Please Select UOM" ? "" : String(stockmanagemasteredit.uom),
+        // quantity: Number(stockmanagemasteredit.quantity),
+        // updating: String(""),
 
-          // requestmode: String(stockmanagemasteredit.requestmode),
-          // stockcategory: stockmanagemasteredit.stockcategory === "Please Select Stock Category" ? "" : String(stockmanagemasteredit.stockcategory),
-          // stocksubcategory: stockmanagemasteredit.stocksubcategory === "Please Select Stock Sub Category" ? "" : String(stockmanagemasteredit.stocksubcategory),
-          // uomnew: stockmanagemasteredit.uomnew === "Please Select UOM" ? "" : String(stockmanagemasteredit.uomnew),
-          // quantitynew: stockmanagemasteredit.quantitynew === "" ? "" : String(stockmanagemasteredit.quantitynew),
-          // materialnew: stockmanagemasteredit.materialnew === "Please Select Material" ? "" : String(stockmanagemasteredit.materialnew),
-          // productdetailsnew: String(stockmanagemasteredit.productdetailsnew),
+        // requestmode: String(stockmanagemasteredit.requestmode),
+        // stockcategory: stockmanagemasteredit.stockcategory === "Please Select Stock Category" ? "" : String(stockmanagemasteredit.stockcategory),
+        // stocksubcategory: stockmanagemasteredit.stocksubcategory === "Please Select Stock Sub Category" ? "" : String(stockmanagemasteredit.stocksubcategory),
+        // uomnew: stockmanagemasteredit.uomnew === "Please Select UOM" ? "" : String(stockmanagemasteredit.uomnew),
+        // quantitynew: stockmanagemasteredit.quantitynew === "" ? "" : String(stockmanagemasteredit.quantitynew),
+        // materialnew: stockmanagemasteredit.materialnew === "Please Select Material" ? "" : String(stockmanagemasteredit.materialnew),
+        // productdetailsnew: String(stockmanagemasteredit.productdetailsnew),
 
-          company: String(stockmanagemasteredit.company),
-          vendorfrequency: String(frequencyValue === undefined ? "" : frequencyValue),
-          branch: String(stockmanagemasteredit.branch),
-          unit: String(stockmanagemasteredit.unit),
-          floor: String(stockmanagemasteredit.floor),
-          location: String(stockmanagemasteredit.location),
-          area: String(stockmanagemasteredit.area),
-          workstation: String(
-            stockmanagemasteredit.workcheck
-              ? stockmanagemasteredit.workstation
-              : ""
-          ),
-          // workcheck: String(stockmanagemasteredit.workcheck),
-          assettype: "",
-          asset: "",
-          material: "",
-          component: "",
+        company: String(stockmanagemasteredit.company),
+        vendorfrequency: String(frequencyValue === undefined ? '' : frequencyValue),
+        branch: String(stockmanagemasteredit.branch),
+        unit: String(stockmanagemasteredit.unit),
+        floor: String(stockmanagemasteredit.floor),
+        location: String(stockmanagemasteredit.location),
+        area: String(stockmanagemasteredit.area),
+        workstation: String(stockmanagemasteredit.workcheck ? stockmanagemasteredit.workstation : ''),
+        // workcheck: String(stockmanagemasteredit.workcheck),
+        assettype: '',
+        asset: '',
+        material: '',
+        component: '',
 
-          // subcomponent: todosEdit ? [...todosEdit] : [],
-          warranty: String(
-            stockmanagemasteredit.warranty === undefined
-              ? ""
-              : stockmanagemasteredit.warranty
-          ),
-          estimation: String(
-            stockmanagemasteredit.estimation === undefined
-              ? ""
-              : stockmanagemasteredit.estimation
-          ),
-          estimationtime: String(
-            stockmanagemasteredit.estimationtime === undefined
-              ? ""
-              : stockmanagemasteredit.estimationtime
-          ),
-          warrantycalculation: String(
-            stockmanagemasteredit.warrantycalculation === undefined
-              ? ""
-              : stockmanagemasteredit.warrantycalculation
-          ),
-          totalbillamountstock: stockmanagemasteredit.totalbillamount,
-          purchasedate: selectedPurchaseDateEdit,
-          // producthead: String(selectedProductheadedit),
-          vendorname: String(vendorNewEdit),
-          vendorgroup: String(vendorGroupEdit),
-          gstno: String(
-            vendorgetid.gstnumber === undefined ? "" : vendorgetid.gstnumber
-          ),
-          vendorid: String(vendornameid._id ? vendornameid._id : ""),
-          billno: Number(stockmanagemasteredit.billno),
-          productdetails: String(stockmanagemasteredit.productdetails),
-          warrantydetails: String(stockmanagemasteredit.warrantydetails),
-          uom:
-            stockmanagemasteredit.uom === "Please Select UOM"
-              ? ""
-              : String(stockmanagemasteredit.uom),
-          quantity: Number(stockmanagemasteredit.quantity),
-          rate: Number(stockmanagemasteredit.rate),
-          billdate: String(stockmanagemasteredit.billdate),
-          // files: [...refImageedit],
-          // warrantyfiles: [...refImagewarrantyedit],
+        // subcomponent: todosEdit ? [...todosEdit] : [],
+        warranty: String(stockmanagemasteredit.warranty === undefined ? '' : stockmanagemasteredit.warranty),
+        estimation: String(stockmanagemasteredit.estimation === undefined ? '' : stockmanagemasteredit.estimation),
+        estimationtime: String(stockmanagemasteredit.estimationtime === undefined ? '' : stockmanagemasteredit.estimationtime),
+        warrantycalculation: String(stockmanagemasteredit.warrantycalculation === undefined ? '' : stockmanagemasteredit.warrantycalculation),
+        totalbillamountstock: stockmanagemasteredit.totalbillamount,
+        purchasedate: selectedPurchaseDateEdit,
+        // producthead: String(selectedProductheadedit),
+        vendorname: String(vendorNewEdit),
+        vendorgroup: String(vendorGroupEdit),
+        gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
+        vendorid: String(vendornameid._id ? vendornameid._id : ''),
+        billno: Number(stockmanagemasteredit.billno),
+        productdetails: String(stockmanagemasteredit.productdetails),
+        warrantydetails: String(stockmanagemasteredit.warrantydetails),
+        uom: stockmanagemasteredit.uom === 'Please Select UOM' ? '' : String(stockmanagemasteredit.uom),
+        quantity: Number(stockmanagemasteredit.quantity),
+        rate: Number(stockmanagemasteredit.rate),
+        billdate: String(stockmanagemasteredit.billdate),
+        // files: [...refImageedit],
+        // warrantyfiles: [...refImagewarrantyedit],
 
-          filenames: refImgWarrantyfilenamesEdit,
-          filenamesbill: refImgbillfilenamesEdit,
-          uniqueId: stockmanagemasteredit.uniqueId,
+        filenames: refImgWarrantyfilenamesEdit,
+        filenamesbill: refImgbillfilenamesEdit,
+        uniqueId: stockmanagemasteredit.uniqueId,
 
-          requestmode: String(stockmanagemasteredit.requestmode),
-          // stockcategory:
-          //   stockmanagemasteredit.stockcategory ===
-          //     "Please Select Stock Category"
-          //     ? ""
-          //     : String(stockmanagemasteredit.stockcategory),
-          // stocksubcategory:
-          //   stockmanagemasteredit.stocksubcategory ===
-          //     "Please Select Stock Sub Category"
-          //     ? ""
-          //     : String(stockmanagemasteredit.stocksubcategory),
-          // tododetails: stockArray,
-          tododetails: [...educationtodo],
-          paidstatus: String(expensecreate.paidstatus),
+        requestmode: String(stockmanagemasteredit.requestmode),
+        // stockcategory:
+        //   stockmanagemasteredit.stockcategory ===
+        //     "Please Select Stock Category"
+        //     ? ""
+        //     : String(stockmanagemasteredit.stockcategory),
+        // stocksubcategory:
+        //   stockmanagemasteredit.stocksubcategory ===
+        //     "Please Select Stock Sub Category"
+        //     ? ""
+        //     : String(stockmanagemasteredit.stocksubcategory),
+        // tododetails: stockArray,
+        tododetails: [...educationtodo],
+        paidstatus: String(expensecreate.paidstatus),
 
-          bankname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankname) : "",
-          bankbranchname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankbranchname) : "",
-          accountholdername: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.accountholdername) : "",
-          accountnumber: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.accountnumber) : "",
-          ifsccode: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.ifsccode) : "",
+        bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+        bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankbranchname) : '',
+        accountholdername: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountholdername) : '',
+        accountnumber: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountnumber) : '',
+        ifsccode: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.ifsccode) : '',
 
-          upinumber: expensecreate.paidmode === "UPI" ? String(vendorstock.upinumber) : "",
+        upinumber: expensecreate.paidmode === 'UPI' ? String(vendorstock.upinumber) : '',
 
-          cardnumber: expensecreate.paidmode === "Card" ? String(vendorstock.cardnumber) : "",
-          cardholdername: expensecreate.paidmode === "Card" ? String(vendorstock.cardholdername) : "",
-          cardtransactionnumber: expensecreate.paidmode === "Card" ? String(vendorstock.cardtransactionnumber) : "",
-          cardtype: expensecreate.paidmode === "Card" ? String(vendorstock.cardtype) : "",
-          cardmonth: expensecreate.paidmode === "Card" ? String(vendorstock.cardmonth) : "",
-          cardyear: expensecreate.paidmode === "Card" ? String(vendorstock.cardyear) : "",
-          cardsecuritycode: expensecreate.paidmode === "Card" ? String(vendorstock.cardsecuritycode) : "",
+        cardnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardnumber) : '',
+        cardholdername: expensecreate.paidmode === 'Card' ? String(vendorstock.cardholdername) : '',
+        cardtransactionnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtransactionnumber) : '',
+        cardtype: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtype) : '',
+        cardmonth: expensecreate.paidmode === 'Card' ? String(vendorstock.cardmonth) : '',
+        cardyear: expensecreate.paidmode === 'Card' ? String(vendorstock.cardyear) : '',
+        cardsecuritycode: expensecreate.paidmode === 'Card' ? String(vendorstock.cardsecuritycode) : '',
 
-          chequenumber: expensecreate.paidmode === "Cheque" ? String(vendorstock.chequenumber) : "",
+        chequenumber: expensecreate.paidmode === 'Cheque' ? String(vendorstock.chequenumber) : '',
 
-          cash: expensecreate.paidmode === "Cash" ? String("Cash") : "",
+        cash: expensecreate.paidmode === 'Cash' ? String('Cash') : '',
 
-          paidmode: String(expensecreate.paidstatus === "Not Paid" ? "" : expensecreate.paidmode),
-          paidamount: Number(expensecreate.paidstatus === "Not Paid" ? 0 : expensecreate.paidamount),
-          balanceamount: Number(expensecreate.paidstatus === "Not Paid" ? stockmanagemasteredit.totalbillamount : expensecreate.balanceamount),
-          sortdate: String(expensecreate.paidstatus === "Not Paid" ? "" : new Date()),
-          billstatus: expensecreate.paidstatus === "Not Paid" ? "InComplete" : expensecreate.paidstatus === "Paid" && Number(expensecreate.paidamount) !== Number(Expensetotal) ? "Partially Paid" : "Completed",
-          paymentduereminderlog:
-            expensecreate.paidstatus === "Paid"
-              ? [
+        paidmode: String(expensecreate.paidstatus === 'Not Paid' ? '' : expensecreate.paidmode),
+        paidamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+        balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmanagemasteredit.totalbillamount : expensecreate.balanceamount),
+        sortdate: String(expensecreate.paidstatus === 'Not Paid' ? '' : new Date()),
+        billstatus: expensecreate.paidstatus === 'Not Paid' ? 'InComplete' : expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal) ? 'Partially Paid' : 'Completed',
+        paymentduereminderlog:
+          expensecreate.paidstatus === 'Paid'
+            ? [
                 {
-                  balanceamount: Number(expensecreate.paidstatus === "Not Paid" ? stockmanagemasteredit.totalbillamount : expensecreate.balanceamount),
+                  balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmanagemasteredit.totalbillamount : expensecreate.balanceamount),
                   expensetotal: stockmanagemasteredit.totalbillamount,
                   modeofpayments: expensecreate.paidmode,
                   payamountdate: expensecreate.date,
-                  payamount: Number(expensecreate.paidstatus === "Not Paid" ? 0 : expensecreate.paidamount),
-                  bankname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankname) : "",
-                  bankbranchname: expensecreate.paidmode === "Bank Transfer" ? vendorstock.bankbranchname : "",
-                  accountholdername: expensecreate.paidmode === "Bank Transfer" ? vendorstock.accountholdername : "",
-                  accountnumber: expensecreate.paidmode === "Bank Transfer" ? vendorstock.accountnumber : "",
-                  ifsccode: expensecreate.paidmode === "Bank Transfer" ? vendorstock.ifsccode : "",
+                  payamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+                  bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+                  bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.bankbranchname : '',
+                  accountholdername: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountholdername : '',
+                  accountnumber: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountnumber : '',
+                  ifsccode: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.ifsccode : '',
 
-                  upinumber: expensecreate.paidmode === "UPI" ? vendorstock.upinumber : "",
+                  upinumber: expensecreate.paidmode === 'UPI' ? vendorstock.upinumber : '',
 
-                  cardnumber: expensecreate.paidmode === "Card" ? vendorstock.cardnumber : "",
-                  cardholdername: expensecreate.paidmode === "Card" ? vendorstock.cardholdername : "",
-                  cardtransactionnumber: expensecreate.paidmode === "Card" ? vendorstock.cardtransactionnumber : "",
-                  cardtype: expensecreate.paidmode === "Card" ? vendorstock.cardtype : "",
-                  cardmonth: expensecreate.paidmode === "Card" ? vendorstock.cardmonth : "",
-                  cardyear: expensecreate.paidmode === "Card" ? vendorstock.cardyear : "",
-                  cardsecuritycode: expensecreate.paidmode === "Card" ? vendorstock.cardsecuritycode : "",
-                  chequenumber: expensecreate.paidmode === "Cheque" ? vendorstock.chequenumber : "",
+                  cardnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardnumber : '',
+                  cardholdername: expensecreate.paidmode === 'Card' ? vendorstock.cardholdername : '',
+                  cardtransactionnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardtransactionnumber : '',
+                  cardtype: expensecreate.paidmode === 'Card' ? vendorstock.cardtype : '',
+                  cardmonth: expensecreate.paidmode === 'Card' ? vendorstock.cardmonth : '',
+                  cardyear: expensecreate.paidmode === 'Card' ? vendorstock.cardyear : '',
+                  cardsecuritycode: expensecreate.paidmode === 'Card' ? vendorstock.cardsecuritycode : '',
+                  chequenumber: expensecreate.paidmode === 'Cheque' ? vendorstock.chequenumber : '',
                   updatedby: [
                     ...updateby,
                     {
@@ -2350,24 +2158,23 @@ function ManuaStockTable({ vendorAuto }) {
                   ],
                 },
               ]
-              : [],
-          updatedby: [
-            ...updateby,
-            {
-              name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
-            },
-          ],
-        }
-      );
+            : [],
+        updatedby: [
+          ...updateby,
+          {
+            name: String(isUserRoleAccess.companyname),
+            date: String(new Date()),
+          },
+        ],
+      });
       await handleFileDeleteOld(oldfileNamesWar);
       await handleFileDeleteOld(oldfileNamesBill);
-      await handleFileUpload(refImgWarrantyEdit, "todo", stockmanagemasteredit.uniqueId);
-      await handleFileUpload(refImgWarrantyBillEdit, "bill", stockmanagemasteredit.uniqueId);
-      await fetchStock("Filtered");
+      await handleFileUpload(refImgWarrantyEdit, 'todo', stockmanagemasteredit.uniqueId);
+      await handleFileUpload(refImgWarrantyBillEdit, 'bill', stockmanagemasteredit.uniqueId);
+      await fetchStock('Filtered');
       setBtnSubmit(false);
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       handleCloseModEdit();
     } catch (err) {
@@ -2407,18 +2214,18 @@ function ManuaStockTable({ vendorAuto }) {
                 // console.log(chunk, "chunk");
 
                 const formData = new FormData();
-                formData.append("file", chunk);
-                formData.append("chunkNumber", chunkNumber);
-                formData.append("totalChunks", totalChunks);
-                formData.append("filesize", selectedFile.size);
-                formData.append("originalname", `${uniqueId}$${type}$${selectedFile.name}`);
+                formData.append('file', chunk);
+                formData.append('chunkNumber', chunkNumber);
+                formData.append('totalChunks', totalChunks);
+                formData.append('filesize', selectedFile.size);
+                formData.append('originalname', `${uniqueId}$${type}$${selectedFile.name}`);
 
                 // console.log(formData, "formData");
 
                 try {
                   const response = await axios.post(SERVICE.UPLOAD_CHUNK_MANUAL, formData, {
                     headers: {
-                      "Content-Type": "multipart/form-data",
+                      'Content-Type': 'multipart/form-data',
                     },
                   });
                   // console.log(response, "response");
@@ -2429,7 +2236,7 @@ function ManuaStockTable({ vendorAuto }) {
 
                   uploadNextChunk();
                 } catch (err) {
-                  console.log(err, "ERrer");
+                  console.log(err, 'ERrer');
                   handleApiError(err, setShowAlert, handleClickOpenerr);
                 }
               } else {
@@ -2437,7 +2244,7 @@ function ManuaStockTable({ vendorAuto }) {
                 console.log(`File upload completed for ${selectedFile.name}`);
               }
             } catch (err) {
-              console.log(err, "asdfse");
+              console.log(err, 'asdfse');
             }
           };
 
@@ -2449,7 +2256,7 @@ function ManuaStockTable({ vendorAuto }) {
 
       uploadFiles();
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
@@ -2462,7 +2269,7 @@ function ManuaStockTable({ vendorAuto }) {
         filenames: filenames,
       });
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
@@ -2475,48 +2282,38 @@ function ManuaStockTable({ vendorAuto }) {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setStockmanageedit(
-        res_project?.data?.manualstock.filter(
-          (item) => item._id !== stockmanagemasteredit._id && item.requestmode !== "Asset Material"
-        )
-      );
+      setStockmanageedit(res_project?.data?.manualstock.filter((item) => item._id !== stockmanagemasteredit._id && item.requestmode !== 'Asset Material'));
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
-
   const renderFilePreview = async (file) => {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   useEffect(() => {
     calculateExpiryDateEdit();
-  }, [
-    stockmanagemasteredit.estimationtime,
-    stockmanagemasteredit.estimation,
-    stockmanagemasteredit.purchasedate,
-  ]);
+  }, [stockmanagemasteredit.estimationtime, stockmanagemasteredit.estimation, stockmanagemasteredit.purchasedate]);
   //image
-
 
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Stock Purchase List.png");
+          saveAs(blob, 'Stock Purchase List.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
-
 
   //Delete model
   const [isDeleteOpenalert, setIsDeleteOpenalert] = useState(false);
@@ -2557,7 +2354,7 @@ function ManuaStockTable({ vendorAuto }) {
   };
 
   const open = Boolean(anchorEl2);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const handleSelectionChange = (newSelection) => {
     setSelectedRows(newSelection.selectionModel);
   };
@@ -2619,7 +2416,7 @@ function ManuaStockTable({ vendorAuto }) {
   // };
 
   const fetchStock = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     setLoading(true);
     const queryParams = {
       page: Number(page),
@@ -2630,14 +2427,10 @@ function ManuaStockTable({ vendorAuto }) {
       unit: valueUnitCat,
     };
 
-
-    const allFilters = [
-      ...additionalFilters,
-      { column: selectedColumn, condition: selectedCondition, value: filterValue }
-    ];
+    const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
       queryParams.searchQuery = searchQuery;
@@ -2645,14 +2438,14 @@ function ManuaStockTable({ vendorAuto }) {
 
     try {
       // let res_project = await axios.get(SERVICE.STOCKMANAGE, {
-      if (e === "Filtered") {
+      if (e === 'Filtered') {
         let res_employee = await axios.post(SERVICE.MANUAL_STOCK_ACCESS_PAGINATION, queryParams, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
         });
 
-        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
 
         // let filteredData = ans.filter((data) => {
         //   return data.requestmode === "Asset Material";
@@ -2672,14 +2465,10 @@ function ManuaStockTable({ vendorAuto }) {
 
         let setData = ans.map((item) => {
           // Find the corresponding item in codeValues array
-          const matchingItem = codeValues.find(
-            (item1) => item.uom === item1.name
-          );
+          const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
           // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-          return matchingItem
-            ? { ...item, uomcode: matchingItem?.code }
-            : { ...item, uomcode: "" };
+          return matchingItem ? { ...item, uomcode: matchingItem?.code } : { ...item, uomcode: '' };
         });
 
         const itemsWithSerialNumber = setData?.map((item, index) => {
@@ -2721,22 +2510,21 @@ function ManuaStockTable({ vendorAuto }) {
             area: item.area,
             location: item.location,
             requestmode: item.requestmode,
-            stockcategory: stockcategoryNew.join(","),
-            stocksubcategory: stocksubcategoryNew.join(","),
+            stockcategory: stockcategoryNew.join(','),
+            stocksubcategory: stocksubcategoryNew.join(','),
             totalbillamount: totalbillamount,
-            uomnew: quantityAndUom.join(","),
-            quantitynew: quantityNew.join(","),
-            materialnew: materialNew.join(",").toString(),
-            productdetailsnew:
-              item.tododetails.length > 0 ? productdetailsNew.join(",") : "",
+            uomnew: quantityAndUom.join(','),
+            quantitynew: quantityNew.join(','),
+            materialnew: materialNew.join(',').toString(),
+            productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(',') : '',
 
             gstno: item.gstno,
             billno: item.billno,
             warrantydetails: item.warrantydetails,
             warranty: item.warranty,
             purchasedate: item.purchasedate,
-            billdate: item.billdate === "" ? "" : moment(item.billdate).format("DD/MM/YYYY"),
-            purchasedate: item.purchasedate === "" ? "" : moment(item.purchasedate).format("DD/MM/YYYY"),
+            billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
+            purchasedate: item.purchasedate === '' ? '' : moment(item.purchasedate).format('DD/MM/YYYY'),
             rate: item.rate,
             vendorname: item.vendorname,
             vendorgroup: item.vendorgroup,
@@ -2745,35 +2533,29 @@ function ManuaStockTable({ vendorAuto }) {
 
         setStockmanage(itemsWithSerialNumber);
 
-
-
-
-
-
         setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
         setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-        setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-        setPage((data) => { return ans?.length > 0 ? data : 1 });
+        setPageSize((data) => {
+          return ans?.length > 0 ? data : 10;
+        });
+        setPage((data) => {
+          return ans?.length > 0 ? data : 1;
+        });
         setLoading(false);
       } else {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-
-    catch (err) {
+    } catch (err) {
       setLoading(false);
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
-
-  }
+  };
 
   useEffect(() => {
     if (items?.length > 0) {
-      fetchStock("Filtered");
+      fetchStock('Filtered');
     }
   }, [page, pageSize, searchQuery]);
-
 
   // Error Popup model
   const handleClickOpenerr = () => {
@@ -2799,9 +2581,9 @@ function ManuaStockTable({ vendorAuto }) {
   // }));
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.data.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   const delVendorcheckbox = async () => {
@@ -2818,13 +2600,13 @@ function ManuaStockTable({ vendorAuto }) {
       await Promise.all(deletePromises);
 
       handleCloseModcheckbox();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       setSelectedRows([]);
       setSelectAllChecked(false);
       setPage(1);
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -2834,8 +2616,8 @@ function ManuaStockTable({ vendorAuto }) {
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Stock Purchase",
-    pageStyle: "print",
+    documentTitle: 'Stock Purchase',
+    pageStyle: 'print',
   });
 
   //serial no for listing items
@@ -2910,36 +2692,26 @@ function ManuaStockTable({ vendorAuto }) {
 
   //datatable....
   const handleSearchChange = (event) => {
-
     setSearchQuery(event.target.value);
     setFilterValue(event.target.value);
     setPage(1);
   };
 
-
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
-  const filteredData = filteredDatas.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
 
   // const totalPages = Math.ceil(filteredDatas.length / pageSize);
 
   const visiblePages = Math.min(totalPages, 3);
 
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
 
   const pageNumbers = [];
 
@@ -2949,7 +2721,6 @@ function ManuaStockTable({ vendorAuto }) {
   for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
     pageNumbers.push(i);
   }
-
 
   const CheckboxHeader = ({ selectAllChecked, onSelectAll }) => (
     <div>
@@ -3008,10 +2779,10 @@ function ManuaStockTable({ vendorAuto }) {
     //   headerClassName: "bold-header",
     // },
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -3020,74 +2791,70 @@ function ManuaStockTable({ vendorAuto }) {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "S.No",
+      field: 'serialNumber',
+      headerName: 'S.No',
       flex: 0,
       width: 90,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.serialNumber,
-      pinned: "left",
+      pinned: 'left',
       lockPinned: true,
-
-
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.company,
-      pinned: "left",
+      pinned: 'left',
       lockPinned: true,
-
-
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.branch,
-      pinned: "left",
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.unit,
     },
     {
-      field: "floor",
-      headerName: "Floor",
+      field: 'floor',
+      headerName: 'Floor',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.floor,
     },
     {
-      field: "area",
-      headerName: "Area",
+      field: 'area',
+      headerName: 'Area',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.area,
     },
     {
-      field: "location",
-      headerName: "Location",
+      field: 'location',
+      headerName: 'Location',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.location,
     },
     // {
@@ -3099,147 +2866,147 @@ function ManuaStockTable({ vendorAuto }) {
     //     hide: !columnVisibility.workstation,
     // },
     {
-      field: "requestmode",
-      headerName: "Request Mode",
+      field: 'requestmode',
+      headerName: 'Request Mode',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.requestmode,
     },
     {
-      field: "vendorname",
-      headerName: "Dealers Name",
+      field: 'vendorname',
+      headerName: 'Dealers Name',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.vendorname,
     },
     {
-      field: "gstno",
-      headerName: "GST No",
+      field: 'gstno',
+      headerName: 'GST No',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.gstno,
     },
     {
-      field: "billno",
-      headerName: "Bill No",
+      field: 'billno',
+      headerName: 'Bill No',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.billno,
     },
     {
-      field: "warranty",
-      headerName: "Warranty",
+      field: 'warranty',
+      headerName: 'Warranty',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.warranty,
     },
     {
-      field: "purchasedate",
-      headerName: "Purchase Date",
+      field: 'purchasedate',
+      headerName: 'Purchase Date',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.purchasedate,
     },
     {
-      field: "stockcategory",
-      headerName: "Stockcategory",
+      field: 'stockcategory',
+      headerName: 'Stockcategory',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.stockcategory,
     },
     {
-      field: "stocksubcategory",
-      headerName: "Stocksubcategory",
+      field: 'stocksubcategory',
+      headerName: 'Stocksubcategory',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.stocksubcategory,
     },
 
     {
-      field: "quantitynew",
-      headerName: "Quantity",
+      field: 'quantitynew',
+      headerName: 'Quantity',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.quantitynew,
     },
     {
-      field: "totalbillamountstock",
-      headerName: "Bill Amount",
+      field: 'totalbillamountstock',
+      headerName: 'Bill Amount',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.totalbillamountstock,
     },
     {
-      field: "uomnew",
-      headerName: "Quantity & UOM",
+      field: 'uomnew',
+      headerName: 'Quantity & UOM',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.uomnew,
     },
     {
-      field: "materialnew",
-      headerName: "Material",
+      field: 'materialnew',
+      headerName: 'Material',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.materialnew,
     },
     {
-      field: "productdetailsnew",
-      headerName: "Product Details",
+      field: 'productdetailsnew',
+      headerName: 'Product Details',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.productdetailsnew,
     },
     {
-      field: "warrantydetails",
-      headerName: "Warranty Details",
+      field: 'warrantydetails',
+      headerName: 'Warranty Details',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.warrantydetails,
     },
     {
-      field: "rate",
-      headerName: "Rate",
+      field: 'rate',
+      headerName: 'Rate',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.rate,
     },
     {
-      field: "billdate",
-      headerName: "Bill Date",
+      field: 'billdate',
+      headerName: 'Bill Date',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.billdate,
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
       sortable: false,
       hide: !columnVisibility.actions,
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("emanualstockentry") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('emanualstockentry') && (
             <Button
               sx={userStyle.buttonedit}
-              style={{ minWidth: "0px" }}
+              style={{ minWidth: '0px' }}
               onClick={() => {
                 handleClickOpenEdit();
                 getCode(params.data.id);
@@ -3249,7 +3016,7 @@ function ManuaStockTable({ vendorAuto }) {
               <EditOutlinedIcon sx={buttonStyles.buttonedit} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("dmanualstockentry") && (
+          {isUserRoleCompare?.includes('dmanualstockentry') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
@@ -3260,7 +3027,7 @@ function ManuaStockTable({ vendorAuto }) {
               <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("vmanualstockentry") && (
+          {isUserRoleCompare?.includes('vmanualstockentry') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={(e) => {
@@ -3271,7 +3038,7 @@ function ManuaStockTable({ vendorAuto }) {
               <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("imanualstockentry") && (
+          {isUserRoleCompare?.includes('imanualstockentry') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -3287,8 +3054,7 @@ function ManuaStockTable({ vendorAuto }) {
     },
   ];
 
-  const filteredSelectedColumn = columnDataTable.filter(data => data.field !== 'checkbox' && data.field !== "actions" && data.field !== "serialNumber");
-
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = items.map((item, index) => {
     // let documentArray = item.document.length === 0 ? item.documentstext : item.document;
@@ -3318,10 +3084,8 @@ function ManuaStockTable({ vendorAuto }) {
       billno: item.billno,
       warrantydetails: item.warrantydetails,
       warranty: item.warranty,
-      purchasedate:
-        item.purchasedate,
-      billdate:
-        item.billdate,
+      purchasedate: item.purchasedate,
+      billdate: item.billdate,
       rate: item.rate,
       vendorgroup: item.vendorgroup,
       vendorname: item.vendorname,
@@ -3343,9 +3107,7 @@ function ManuaStockTable({ vendorAuto }) {
     setColumnVisibility(updatedVisibility);
   };
   // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
     setColumnVisibility((prevVisibility) => ({
@@ -3357,9 +3119,9 @@ function ManuaStockTable({ vendorAuto }) {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -3367,7 +3129,7 @@ function ManuaStockTable({ vendorAuto }) {
         aria-label="close"
         onClick={handleCloseManageColumns2}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -3375,38 +3137,16 @@ function ManuaStockTable({ vendorAuto }) {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -3414,11 +3154,7 @@ function ManuaStockTable({ vendorAuto }) {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -3426,7 +3162,7 @@ function ManuaStockTable({ vendorAuto }) {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -3435,7 +3171,7 @@ function ManuaStockTable({ vendorAuto }) {
                 setColumnVisibility(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -3446,7 +3182,7 @@ function ManuaStockTable({ vendorAuto }) {
 
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -3461,43 +3197,40 @@ function ManuaStockTable({ vendorAuto }) {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("");
-
-
+  const [fileFormat, setFormat] = useState('');
 
   // Search bar
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
   const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if (selectedColumn && filterValue || ["Blank", "Not Blank"].includes(selectedCondition)) {
-      setAdditionalFilters([
-        ...additionalFilters,
-        { column: selectedColumn, condition: selectedCondition, value: filterValue }
-      ]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
+      setAdditionalFilters([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
   // Show filtered combination in the search bar
   const getSearchDisplay = () => {
     if (advancedFilter && advancedFilter.length > 0) {
-      return advancedFilter.map((filter, index) => {
-        let showname = columnDataTable.find(col => col.field === filter.column)?.headerName;
-        return `${showname} ${filter.condition} "${filter.value}"`;
-      }).join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
+      return advancedFilter
+        .map((filter, index) => {
+          let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
+          return `${showname} ${filter.condition} "${filter.value}"`;
+        })
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
@@ -3511,12 +3244,12 @@ function ManuaStockTable({ vendorAuto }) {
     // Reset all filters and pagination state
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
@@ -3527,15 +3260,14 @@ function ManuaStockTable({ vendorAuto }) {
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
-      queryParams.searchQuery = searchQuery;  // Use searchQuery for regular search
+      queryParams.searchQuery = searchQuery; // Use searchQuery for regular search
     }
 
-    setPageName(!pageName)
-
+    setPageName(!pageName);
 
     try {
       // let res_project = await axios.get(SERVICE.STOCKMANAGE, {
@@ -3545,7 +3277,7 @@ function ManuaStockTable({ vendorAuto }) {
         },
       });
 
-      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
 
       // let filteredData = ans.filter((data) => {
       //   return data.requestmode === "Asset Material";
@@ -3565,14 +3297,10 @@ function ManuaStockTable({ vendorAuto }) {
 
       let setData = ans.map((item) => {
         // Find the corresponding item in codeValues array
-        const matchingItem = codeValues.find(
-          (item1) => item.uom === item1.name
-        );
+        const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
         // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-        return matchingItem
-          ? { ...item, uomcode: matchingItem?.code }
-          : { ...item, uomcode: "" };
+        return matchingItem ? { ...item, uomcode: matchingItem?.code } : { ...item, uomcode: '' };
       });
 
       const itemsWithSerialNumber = setData?.map((item, index) => {
@@ -3604,19 +3332,18 @@ function ManuaStockTable({ vendorAuto }) {
           stockcategory: item.stockcategory,
           stocksubcategory: item.stocksubcategory,
 
-          uomnew: quantityAndUom.join(","),
-          quantitynew: quantityNew.join(","),
-          materialnew: materialNew.join(",").toString(),
-          productdetailsnew:
-            item.tododetails.length > 0 ? productdetailsNew.join(",") : "",
+          uomnew: quantityAndUom.join(','),
+          quantitynew: quantityNew.join(','),
+          materialnew: materialNew.join(',').toString(),
+          productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(',') : '',
 
           gstno: item.gstno,
           billno: item.billno,
           warrantydetails: item.warrantydetails,
           warranty: item.warranty,
           purchasedate: item.purchasedate,
-          billdate: item.billdate === "" ? "" : moment(item.billdate).format("DD/MM/YYYY"),
-          purchasedate: item.purchasedate === "" ? "" : moment(item.purchasedate).format("DD/MM/YYYY"),
+          billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
+          purchasedate: item.purchasedate === '' ? '' : moment(item.purchasedate).format('DD/MM/YYYY'),
           rate: item.rate,
           vendorname: item.vendorname,
           vendorgroup: item.vendorgroup,
@@ -3625,18 +3352,19 @@ function ManuaStockTable({ vendorAuto }) {
 
       setStockmanage(itemsWithSerialNumber);
 
-
-
-
-
-
       setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
       setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-      setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-      setPage((data) => { return ans?.length > 0 ? data : 1 });
+      setPageSize((data) => {
+        return ans?.length > 0 ? data : 10;
+      });
+      setPage((data) => {
+        return ans?.length > 0 ? data : 1;
+      });
       setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
-    catch (err) { setLoading(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
   };
 
   //company multiselect
@@ -3658,9 +3386,7 @@ function ManuaStockTable({ vendorAuto }) {
   };
 
   const customValueRendererCompany = (valueCompanyCat, _categoryname) => {
-    return valueCompanyCat?.length
-      ? valueCompanyCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Company";
+    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(', ') : 'Please Select Company';
   };
 
   //branch multiselect
@@ -3679,9 +3405,7 @@ function ManuaStockTable({ vendorAuto }) {
   };
 
   const customValueRendererBranch = (valueBranchCat, _categoryname) => {
-    return valueBranchCat?.length
-      ? valueBranchCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Branch";
+    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(', ') : 'Please Select Branch';
   };
 
   //unit multiselect
@@ -3695,19 +3419,15 @@ function ManuaStockTable({ vendorAuto }) {
       })
     );
     setSelectedOptionsUnit(options);
-
   };
 
   const customValueRendererUnit = (valueUnitCat, _categoryname) => {
-    return valueUnitCat?.length
-      ? valueUnitCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Unit";
+    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(', ') : 'Please Select Unit';
   };
-
 
   //auto select all dropdowns
   const handleAutoSelect = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let selectedValues = accessbranch
         ?.map((data) => ({
@@ -3715,30 +3435,15 @@ function ManuaStockTable({ vendorAuto }) {
           branch: data.branch,
           unit: data.unit,
         }))
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        );
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit));
       let selectedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         .map((a, index) => {
           return a.company;
         });
 
       let mappedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         ?.map((data) => ({
           label: data?.company,
           value: data?.company,
@@ -3748,25 +3453,13 @@ function ManuaStockTable({ vendorAuto }) {
       setSelectedOptionsCompany(mappedCompany);
 
       let selectedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         .map((a, index) => {
           return a.branch;
         });
 
       let mappedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         ?.map((data) => ({
           label: data?.branch,
           value: data?.branch,
@@ -3776,31 +3469,13 @@ function ManuaStockTable({ vendorAuto }) {
       setSelectedOptionsBranch(mappedBranch);
 
       let selectedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         .map((a, index) => {
           return a.unit;
         });
 
       let mappedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         ?.map((data) => ({
           label: data?.unit,
           value: data?.unit,
@@ -3808,13 +3483,10 @@ function ManuaStockTable({ vendorAuto }) {
 
       setValueUnitCat(selectedUnit);
       setSelectedOptionsUnit(mappedUnit);
-
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
-
 
   useEffect(() => {
     handleAutoSelect();
@@ -3822,38 +3494,32 @@ function ManuaStockTable({ vendorAuto }) {
 
   const handleSubmitFilter = (e) => {
     e.preventDefault();
-    if (selectedOptionsCompany?.length === 0 &&
-      selectedOptionsBranch?.length === 0 &&
-      selectedOptionsUnit?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Any One");
-      setPopupSeverityMalert("info");
+    if (selectedOptionsCompany?.length === 0 && selectedOptionsBranch?.length === 0 && selectedOptionsUnit?.length === 0) {
+      setPopupContentMalert('Please Select Any One');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else {
-      fetchStock("Filtered");
+    } else {
+      fetchStock('Filtered');
     }
   };
 
   const handleClearFilter = () => {
     setStockmanage([]);
     setItems([]);
-    setPage(1)
+    setPage(1);
     setTotalProjects(0);
     setTotalPages(0);
-    setPageSize(10)
-    setSelectedOptionsCompany([])
-    setSelectedOptionsBranch([])
-    setSelectedOptionsUnit([])
-    setValueCompanyCat([])
-    setValueBranchCat([])
-    setValueUnitCat([])
+    setPageSize(10);
+    setSelectedOptionsCompany([]);
+    setSelectedOptionsBranch([]);
+    setSelectedOptionsUnit([]);
+    setValueCompanyCat([]);
+    setValueBranchCat([]);
+    setValueUnitCat([]);
     setPopupContent('Cleared Successfully');
-    setPopupSeverity("success");
+    setPopupSeverity('success');
     handleClickOpenPopup();
-  }
-
-
+  };
 
   //alert model for stock category
   const [openviewalertstockcategory, setOpenviewalertstockcategory] = useState(false);
@@ -3878,75 +3544,71 @@ function ManuaStockTable({ vendorAuto }) {
   const educationTodo = () => {
     try {
       const isNameMatch = educationtodo?.some((item) => {
-        if (stockmanagemasteredit?.requestmode === "Stock Material") {
+        if (stockmanagemasteredit?.requestmode === 'Stock Material') {
           return item?.category === todoDetails?.category && item?.subcategory === todoDetails?.subcategory && item?.itemname?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
         } else {
           return item?.materialnew?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
         }
       });
-      if (todoDetails.category === "Please Select Category") {
-        setPopupContentMalert("Please Select Category!");
-        setPopupSeverityMalert("info");
+      if (todoDetails.category === 'Please Select Category') {
+        setPopupContentMalert('Please Select Category!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (todoDetails.subcategory === "Please Select Sub Category") {
-        setPopupContentMalert("Please Select Sub Category!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.subcategory === 'Please Select Sub Category') {
+        setPopupContentMalert('Please Select Sub Category!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (todoDetails.materialnew === "Please Select Item Name") {
-        setPopupContentMalert("Please Select Item Name!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.materialnew === 'Please Select Item Name') {
+        setPopupContentMalert('Please Select Item Name!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.materialnew === "") {
-        setPopupContentMalert("Please Enter Item Name!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.materialnew === '') {
+        setPopupContentMalert('Please Enter Item Name!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.uomnew === "") {
-        setPopupContentMalert("Please Enter UOM!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.uomnew === '') {
+        setPopupContentMalert('Please Enter UOM!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.rate === "" || todoDetails.rate == 0) {
-        setPopupContentMalert("Please Enter Rate!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.rate === '' || todoDetails.rate == 0) {
+        setPopupContentMalert('Please Enter Rate!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.quantitynew === "" || todoDetails.quantitynew == 0) {
-        setPopupContentMalert("Please Enter Quantity!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.quantitynew === '' || todoDetails.quantitynew == 0) {
+        setPopupContentMalert('Please Enter Quantity!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails.amount === "" || todoDetails.amount == 0) {
-        setPopupContentMalert("Please Enter Amount!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.amount === '' || todoDetails.amount == 0) {
+        setPopupContentMalert('Please Enter Amount!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (todoDetails.productdetailsnew === "") {
-        setPopupContentMalert("Please Enter Product Details!");
-        setPopupSeverityMalert("info");
+      } else if (todoDetails.productdetailsnew === '') {
+        setPopupContentMalert('Please Enter Product Details!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (isNameMatch) {
-        setPopupContentMalert("Item Already Exists!");
-        setPopupSeverityMalert("info");
+      } else if (isNameMatch) {
+        setPopupContentMalert('Item Already Exists!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (Number(todoDetails.amount) + Number(Expensetotal) > Number(stockmanagemasteredit.totalbillamount)) {
-        setPopupContentMalert("Amount Exceeds Total Bill Amount!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Amount Exceeds Total Bill Amount!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todoDetails !== "") {
+      } else if (todoDetails !== '') {
         setEducationtodo([...educationtodo, todoDetails]);
         setTodoDetails({
           ...todoDetails,
-          category: "Please Select Category",
-          subcategory: "Please Select Sub Category",
-          materialnew: "Please Select Item Name",
-          productdetailsnew: "",
-          rate: "",
-          quantitynew: "",
-          amount: "",
+          category: 'Please Select Category',
+          subcategory: 'Please Select Sub Category',
+          materialnew: 'Please Select Item Name',
+          productdetailsnew: '',
+          rate: '',
+          quantitynew: '',
+          amount: '',
         });
       }
     } catch (err) {
-      console.log(err, "errtodo")
+      console.log(err, 'errtodo');
     }
   };
 
@@ -3956,12 +3618,12 @@ function ManuaStockTable({ vendorAuto }) {
     setEducationtodo(newTasks);
     setExpensecreate({
       ...expensecreate,
-      paidstatus: "Not Paid",
-      paidmode: "Please Select Paid Mode",
-      paidamount: "",
-      balanceamount: "",
+      paidstatus: 'Not Paid',
+      paidmode: 'Please Select Paid Mode',
+      paidamount: '',
+      balanceamount: '',
     });
-  }
+  };
 
   return (
     <Box>
@@ -3969,23 +3631,19 @@ function ManuaStockTable({ vendorAuto }) {
       {/* ****** Header Content ****** */}
       {/* <Typography sx={userStyle.HeaderText}>Reference Documents List</Typography> */}
 
-      {isUserRoleCompare?.includes("lmanualstockentry") && (
+      {isUserRoleCompare?.includes('lmanualstockentry') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid container spacing={2}>
               <Grid item xs={8}>
-                <Typography sx={userStyle.importheadtext}>
-                  Stock Purchase List
-                </Typography>
+                <Typography sx={userStyle.importheadtext}>Stock Purchase List</Typography>
               </Grid>
             </Grid>
             <Grid container spacing={2}>
               <>
                 <Grid item md={3} xs={12} sm={12}>
-                  <Typography>
-                    Company
-                  </Typography>
+                  <Typography>Company</Typography>
                   <FormControl size="small" fullWidth>
                     <MultiSelect
                       options={accessbranch
@@ -3994,12 +3652,7 @@ function ManuaStockTable({ vendorAuto }) {
                           value: data.company,
                         }))
                         .filter((item, index, self) => {
-                          return (
-                            self.findIndex(
-                              (i) =>
-                                i.label === item.label && i.value === item.value
-                            ) === index
-                          );
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                         })}
                       value={selectedOptionsCompany}
                       onChange={(e) => {
@@ -4012,27 +3665,16 @@ function ManuaStockTable({ vendorAuto }) {
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      {" "}
-                      Branch
-                    </Typography>
+                    <Typography> Branch</Typography>
                     <MultiSelect
                       options={accessbranch
-                        ?.filter((comp) =>
-                          valueCompanyCat?.includes(comp.company)
-                        )
+                        ?.filter((comp) => valueCompanyCat?.includes(comp.company))
                         ?.map((data) => ({
                           label: data.branch,
                           value: data.branch,
                         }))
                         .filter((item, index, self) => {
-                          return (
-                            self.findIndex(
-                              (i) =>
-                                i.label === item.label &&
-                                i.value === item.value
-                            ) === index
-                          );
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                         })}
                       value={selectedOptionsBranch}
                       onChange={(e) => {
@@ -4045,29 +3687,16 @@ function ManuaStockTable({ vendorAuto }) {
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      {" "}
-                      Unit
-                    </Typography>
+                    <Typography> Unit</Typography>
                     <MultiSelect
                       options={accessbranch
-                        ?.filter(
-                          (comp) =>
-                            valueCompanyCat?.includes(comp.company) &&
-                            valueBranchCat?.includes(comp.branch)
-                        )
+                        ?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch))
                         ?.map((data) => ({
                           label: data.unit,
                           value: data.unit,
                         }))
                         .filter((item, index, self) => {
-                          return (
-                            self.findIndex(
-                              (i) =>
-                                i.label === item.label &&
-                                i.value === item.value
-                            ) === index
-                          );
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                         })}
                       value={selectedOptionsUnit}
                       onChange={(e) => {
@@ -4078,13 +3707,12 @@ function ManuaStockTable({ vendorAuto }) {
                     />
                   </FormControl>
                 </Grid>
-
               </>
 
               <br />
 
               <Grid item md={2} sm={12} xs={12} marginTop={3}>
-                <Grid sx={{ display: "flex", gap: "15px" }}>
+                <Grid sx={{ display: 'flex', gap: '15px' }}>
                   <Button
                     variant="contained"
                     sx={buttonStyles.buttonsubmit}
@@ -4092,7 +3720,7 @@ function ManuaStockTable({ vendorAuto }) {
                       handleSubmitFilter(e);
                     }}
                   >
-                    {" "}
+                    {' '}
                     Filter
                   </Button>
                   <Button
@@ -4101,7 +3729,7 @@ function ManuaStockTable({ vendorAuto }) {
                       handleClearFilter();
                     }}
                   >
-                    {" "}
+                    {' '}
                     CLEAR
                   </Button>
                 </Grid>
@@ -4114,18 +3742,18 @@ function ManuaStockTable({ vendorAuto }) {
               xs={12}
               sm={12}
               sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
               <Grid>
-                {isUserRoleCompare?.includes("excelmanualstockentry") && (
+                {isUserRoleCompare?.includes('excelmanualstockentry') && (
                   <>
                     <Button
                       onClick={(e) => {
                         setIsFilterOpen(true);
-                        setFormat("xl");
+                        setFormat('xl');
                       }}
                       sx={userStyle.buttongrp}
                     >
@@ -4134,12 +3762,12 @@ function ManuaStockTable({ vendorAuto }) {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("csvmanualstockentry") && (
+                {isUserRoleCompare?.includes('csvmanualstockentry') && (
                   <>
                     <Button
                       onClick={(e) => {
                         setIsFilterOpen(true);
-                        setFormat("csv");
+                        setFormat('csv');
                       }}
                       sx={userStyle.buttongrp}
                     >
@@ -4148,7 +3776,7 @@ function ManuaStockTable({ vendorAuto }) {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("printmanualstockentry") && (
+                {isUserRoleCompare?.includes('printmanualstockentry') && (
                   <>
                     <Button sx={userStyle.buttongrp} onClick={handleprint}>
                       &ensp;
@@ -4157,7 +3785,7 @@ function ManuaStockTable({ vendorAuto }) {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("pdfmanualstockentry") && (
+                {isUserRoleCompare?.includes('pdfmanualstockentry') && (
                   <>
                     <Button
                       sx={userStyle.buttongrp}
@@ -4170,14 +3798,10 @@ function ManuaStockTable({ vendorAuto }) {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("imagemanualstockentry") && (
-                  <Button
-                    sx={userStyle.buttongrp}
-                    onClick={handleCaptureImage}
-                  >
-                    {" "}
-                    <ImageIcon sx={{ fontSize: "15px" }} />{" "}
-                    &ensp;Image&ensp;{" "}
+                {isUserRoleCompare?.includes('imagemanualstockentry') && (
+                  <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                    {' '}
+                    <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                   </Button>
                 )}
               </Grid>
@@ -4199,7 +3823,7 @@ function ManuaStockTable({ vendorAuto }) {
                     },
                   }}
                   onChange={handlePageSizeChange}
-                  sx={{ width: "77px" }}
+                  sx={{ width: '77px' }}
                 >
                   <MenuItem value={1}>1</MenuItem>
                   <MenuItem value={5}>5</MenuItem>
@@ -4212,7 +3836,8 @@ function ManuaStockTable({ vendorAuto }) {
               </Box>
               <Box>
                 <FormControl fullWidth size="small">
-                  <OutlinedInput size="small"
+                  <OutlinedInput
+                    size="small"
                     id="outlined-adornment-weight"
                     startAdornment={
                       <InputAdornment position="start">
@@ -4228,12 +3853,13 @@ function ManuaStockTable({ vendorAuto }) {
                         )}
                         <Tooltip title="Show search options">
                           <span>
-                            <IoMdOptions style={{ cursor: 'pointer', }} onClick={handleClickSearch} />
+                            <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
                           </span>
                         </Tooltip>
-                      </InputAdornment>}
+                      </InputAdornment>
+                    }
                     aria-describedby="outlined-weight-helper-text"
-                    inputProps={{ 'aria-label': 'weight', }}
+                    inputProps={{ 'aria-label': 'weight' }}
                     type="text"
                     value={getSearchDisplay()}
                     onChange={handleSearchChange}
@@ -4253,50 +3879,32 @@ function ManuaStockTable({ vendorAuto }) {
               Show All Columns
             </Button>
             &emsp;
-            <Button
-              sx={userStyle.buttongrp}
-              onClick={handleOpenManageColumns2}
-            >
+            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns2}>
               Manage Columns
             </Button>
             &emsp;
-            {isUserRoleCompare?.includes("bdmanualstockentry") && (
-              <Button
-                variant="contained"
-                sx={buttonStyles.buttonbulkdelete}
-                onClick={handleClickOpenalert}
-              >
+            {isUserRoleCompare?.includes('bdmanualstockentry') && (
+              <Button variant="contained" sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
                 Bulk Delete
               </Button>
             )}
             <br />
             <br />
-
-
             {loading ? (
               <Box>
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    minHeight: "350px",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    minHeight: '350px',
                   }}
                 >
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </Box>
             ) : (
               <>
-                <Box style={{ width: "100%", overflowY: "hidden" }}>
+                <Box style={{ width: '100%', overflowY: 'hidden' }}>
                   <>
                     <AggridTableForPaginationTable
                       rowDataTable={rowDataTable}
@@ -4320,17 +3928,11 @@ function ManuaStockTable({ vendorAuto }) {
                 </Box>
               </>
             )}
-
-
             {/* ****** Table End ****** */}
           </Box>
           <TableContainer component={Paper} sx={userStyle.printcls}>
-            <Table
-              aria-label="customized table"
-              id="jobopening"
-              ref={componentRef}
-            >
-              <TableHead sx={{ fontWeight: "600" }}>
+            <Table aria-label="customized table" id="jobopening" ref={componentRef}>
+              <TableHead sx={{ fontWeight: '600' }}>
                 <StyledTableRow>
                   <StyledTableCell>SNo</StyledTableCell>
                   <StyledTableCell>Company</StyledTableCell>
@@ -4374,22 +3976,16 @@ function ManuaStockTable({ vendorAuto }) {
                       {/* <StyledTableCell>{row.workstation}</StyledTableCell> */}
                       <StyledTableCell>{row.requestmode}</StyledTableCell>
                       <StyledTableCell>{row.stockcategory}</StyledTableCell>
-                      <StyledTableCell>
-                        {row.stocksubcategory}
-                      </StyledTableCell>
+                      <StyledTableCell>{row.stocksubcategory}</StyledTableCell>
 
                       <StyledTableCell>{row.quantitynew}</StyledTableCell>
                       <StyledTableCell>{row.uomnew}</StyledTableCell>
                       <StyledTableCell>{row.materialnew}</StyledTableCell>
-                      <StyledTableCell>
-                        {row.productdetailsnew}
-                      </StyledTableCell>
+                      <StyledTableCell>{row.productdetailsnew}</StyledTableCell>
 
                       <StyledTableCell>{row.gstno}</StyledTableCell>
                       <StyledTableCell>{row.billno}</StyledTableCell>
-                      <StyledTableCell>
-                        {row.warrantydetails}
-                      </StyledTableCell>
+                      <StyledTableCell>{row.warrantydetails}</StyledTableCell>
                       <StyledTableCell>{row.warranty}</StyledTableCell>
                       <StyledTableCell>{row.purchasedate}</StyledTableCell>
                       <StyledTableCell>{row.billdate}</StyledTableCell>
@@ -4401,10 +3997,10 @@ function ManuaStockTable({ vendorAuto }) {
                   ))
                 ) : (
                   <StyledTableRow>
-                    {" "}
+                    {' '}
                     <StyledTableCell colSpan={7} align="center">
                       No Data Available
-                    </StyledTableCell>{" "}
+                    </StyledTableCell>{' '}
                   </StyledTableRow>
                 )}
                 <StyledTableRow></StyledTableRow>
@@ -4417,25 +4013,19 @@ function ManuaStockTable({ vendorAuto }) {
             open={isManageColumnsOpen2}
             anchorEl1={anchorEl2}
             onClose={handleCloseManageColumns2}
-            anchorOrigin={{ vertical: "bottom", horizontal: "left", }}
-          // transformOrigin={{ vertical: 'center', horizontal: 'right', }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            // transformOrigin={{ vertical: 'center', horizontal: 'right', }}
           >
             {manageColumnsContent}
           </Popover>
-          <Popover
-            id={idSearch}
-            open={openSearch}
-            anchorEl2={anchorElSearch}
-            onClose={handleCloseSearch}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
-          >
-            <Box style={{ padding: "10px", maxWidth: '450px' }}>
+          <Popover id={idSearch} open={openSearch} anchorEl2={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+            <Box style={{ padding: '10px', maxWidth: '450px' }}>
               <Typography variant="h6">Advance Search</Typography>
               <IconButton
                 aria-label="close"
                 onClick={handleCloseSearch}
                 sx={{
-                  position: "absolute",
+                  position: 'absolute',
                   right: 8,
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
@@ -4443,27 +4033,33 @@ function ManuaStockTable({ vendorAuto }) {
               >
                 <CloseIcon />
               </IconButton>
-              <DialogContent sx={{ width: "100%" }}>
-                <Box sx={{
-                  width: '350px',
-                  maxHeight: '400px',
-                  overflow: 'hidden',
-                  position: 'relative'
-                }}>
-                  <Box sx={{
-                    maxHeight: '300px',
-                    overflowY: 'auto',
-                    // paddingRight: '5px'
-                  }}>
+              <DialogContent sx={{ width: '100%' }}>
+                <Box
+                  sx={{
+                    width: '350px',
+                    maxHeight: '400px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                      // paddingRight: '5px'
+                    }}
+                  >
                     <Grid container spacing={1}>
                       <Grid item md={12} sm={12} xs={12}>
                         <Typography>Columns</Typography>
-                        <Select fullWidth size="small"
+                        <Select
+                          fullWidth
+                          size="small"
                           MenuProps={{
                             PaperProps: {
                               style: {
                                 maxHeight: 200,
-                                width: "auto",
+                                width: 'auto',
                               },
                             },
                           }}
@@ -4472,7 +4068,9 @@ function ManuaStockTable({ vendorAuto }) {
                           onChange={(e) => setSelectedColumn(e.target.value)}
                           displayEmpty
                         >
-                          <MenuItem value="" disabled>Select Column</MenuItem>
+                          <MenuItem value="" disabled>
+                            Select Column
+                          </MenuItem>
                           {filteredSelectedColumn.map((col) => (
                             <MenuItem key={col.field} value={col.field}>
                               {col.headerName}
@@ -4482,12 +4080,14 @@ function ManuaStockTable({ vendorAuto }) {
                       </Grid>
                       <Grid item md={12} sm={12} xs={12}>
                         <Typography>Operator</Typography>
-                        <Select fullWidth size="small"
+                        <Select
+                          fullWidth
+                          size="small"
                           MenuProps={{
                             PaperProps: {
                               style: {
                                 maxHeight: 200,
-                                width: "auto",
+                                width: 'auto',
                               },
                             },
                           }}
@@ -4505,11 +4105,13 @@ function ManuaStockTable({ vendorAuto }) {
                       </Grid>
                       <Grid item md={12} sm={12} xs={12}>
                         <Typography>Value</Typography>
-                        <TextField fullWidth size="small"
-                          value={["Blank", "Not Blank"].includes(selectedCondition) ? "" : filterValue}
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
                           onChange={(e) => setFilterValue(e.target.value)}
-                          disabled={["Blank", "Not Blank"].includes(selectedCondition)}
-                          placeholder={["Blank", "Not Blank"].includes(selectedCondition) ? "Disabled" : "Enter value"}
+                          disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                          placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
                           sx={{
                             '& .MuiOutlinedInput-root.Mui-disabled': {
                               backgroundColor: 'rgb(0 0 0 / 26%)',
@@ -4523,11 +4125,7 @@ function ManuaStockTable({ vendorAuto }) {
                       {additionalFilters.length > 0 && (
                         <>
                           <Grid item md={12} sm={12} xs={12}>
-                            <RadioGroup
-                              row
-                              value={logicOperator}
-                              onChange={(e) => setLogicOperator(e.target.value)}
-                            >
+                            <RadioGroup row value={logicOperator} onChange={(e) => setLogicOperator(e.target.value)}>
                               <FormControlLabel value="AND" control={<Radio />} label="AND" />
                               <FormControlLabel value="OR" control={<Radio />} label="OR" />
                             </RadioGroup>
@@ -4535,22 +4133,24 @@ function ManuaStockTable({ vendorAuto }) {
                         </>
                       )}
                       {additionalFilters.length === 0 && (
-                        <Grid item md={4} sm={12} xs={12} >
-                          <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                        <Grid item md={4} sm={12} xs={12}>
+                          <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
                             Add Filter
                           </Button>
                         </Grid>
                       )}
 
                       <Grid item md={2} sm={12} xs={12}>
-                        <Button variant="contained" onClick={() => {
-                          fetchStock("Filtered");
-                          setIsSearchActive(true);
-                          setAdvancedFilter([
-                            ...additionalFilters,
-                            { column: selectedColumn, condition: selectedCondition, value: filterValue }
-                          ])
-                        }} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            fetchStock('Filtered');
+                            setIsSearchActive(true);
+                            setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+                          }}
+                          sx={{ textTransform: 'capitalize' }}
+                          disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
+                        >
                           Search
                         </Button>
                       </Grid>
@@ -4563,7 +4163,6 @@ function ManuaStockTable({ vendorAuto }) {
         </>
       )}
 
-
       <Box>
         {/* Edit DIALOG */}
         <Dialog
@@ -4574,35 +4173,35 @@ function ManuaStockTable({ vendorAuto }) {
           maxWidth="lg"
           fullWidth={true}
           sx={{
-            overflow: "scroll",
-            "& .MuiPaper-root": {
-              overflow: "scroll",
+            overflow: 'scroll',
+            '& .MuiPaper-root': {
+              overflow: 'scroll',
             },
-            marginTop: "95px"
+            marginTop: '95px',
           }}
         >
-          <Box sx={{ padding: "20px 50px" }}>
+          <Box sx={{ padding: '20px 50px' }}>
             <>
               <Grid container spacing={2}>
-                <Typography sx={userStyle.HeaderText}>
-                  Edit Stock Purchase
-                </Typography>
+                <Typography sx={userStyle.HeaderText}>Edit Stock Purchase</Typography>
               </Grid>
               <br />
               <Grid container spacing={2}>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Company<b style={{ color: "red" }}>*</b>
+                      Company<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={companysEdit}
-                      options={isAssignBranch?.map(data => ({
-                        label: data.company,
-                        value: data.company,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={isAssignBranch
+                        ?.map((data) => ({
+                          label: data.company,
+                          value: data.company,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       styles={colourStyles}
                       value={{
                         label: stockmanagemasteredit.company,
@@ -4612,17 +4211,17 @@ function ManuaStockTable({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           company: e.value,
-                          branch: "Please Select Branch",
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          branch: 'Please Select Branch',
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         setBranchsEdit([]);
                         setAreasEdit([]);
-                        setUnitsEdit([])
+                        setUnitsEdit([]);
                         setFloorEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchBranchDropdownsEdit(e.value);
                       }}
                     />
@@ -4631,19 +4230,19 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Branch<b style={{ color: "red" }}>*</b>
+                      Branch<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={branchsEdit}
-                      options={isAssignBranch?.filter(
-                        (comp) =>
-                          stockmanagemasteredit.company === comp.company
-                      )?.map(data => ({
-                        label: data.branch,
-                        value: data.branch,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={isAssignBranch
+                        ?.filter((comp) => stockmanagemasteredit.company === comp.company)
+                        ?.map((data) => ({
+                          label: data.branch,
+                          value: data.branch,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       styles={colourStyles}
                       value={{
                         label: stockmanagemasteredit.branch,
@@ -4654,14 +4253,14 @@ function ManuaStockTable({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           branch: e.value,
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         setUnitsEdit([]);
                         setAreasEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         setFloorEdit([]);
                         fetchUnitsEdit(e.value);
                         fetchFloorEdit(e.value);
@@ -4672,19 +4271,19 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Unit<b style={{ color: "red" }}>*</b>
+                      Unit<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={unitsEdit}
-                      options={isAssignBranch?.filter(
-                        (comp) =>
-                          stockmanagemasteredit.company === comp.company && stockmanagemasteredit.branch === comp.branch
-                      )?.map(data => ({
-                        label: data.unit,
-                        value: data.unit,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={isAssignBranch
+                        ?.filter((comp) => stockmanagemasteredit.company === comp.company && stockmanagemasteredit.branch === comp.branch)
+                        ?.map((data) => ({
+                          label: data.unit,
+                          value: data.unit,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       styles={colourStyles}
                       value={{
                         label: stockmanagemasteredit.unit,
@@ -4694,7 +4293,7 @@ function ManuaStockTable({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           unit: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -4703,7 +4302,7 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Floor<b style={{ color: "red" }}>*</b>
+                      Floor<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={floorsEdit}
@@ -4716,12 +4315,12 @@ function ManuaStockTable({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           floor: e.value,
-                          workstation: "",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          workstation: '',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         setAreasEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchAreaEdit(stockmanagemasteredit.branch, e.value);
                       }}
                     />
@@ -4730,7 +4329,7 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Area<b style={{ color: "red" }}>*</b>
+                      Area<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={areasEdit}
@@ -4743,15 +4342,11 @@ function ManuaStockTable({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           area: e.value,
-                          workstation: "",
-                          location: "Please Select Location",
+                          workstation: '',
+                          location: 'Please Select Location',
                         });
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
-                        fetchAllLocationEdit(
-                          stockmanagemasteredit.branch,
-                          stockmanagemasteredit.floor,
-                          e.value
-                        );
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
+                        fetchAllLocationEdit(stockmanagemasteredit.branch, stockmanagemasteredit.floor, e.value);
                       }}
                     />
                   </FormControl>
@@ -4759,7 +4354,7 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Location<b style={{ color: "red" }}>*</b>
+                      Location<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={locationsEdit}
@@ -4772,7 +4367,7 @@ function ManuaStockTable({ vendorAuto }) {
                         setStockmanagemasteredit({
                           ...stockmanagemasteredit,
                           location: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -4783,8 +4378,8 @@ function ManuaStockTable({ vendorAuto }) {
                     <Typography>Warranty</Typography>
                     <Selects
                       options={[
-                        { label: "Yes", value: "Yes" },
-                        { label: "No", value: "No" },
+                        { label: 'Yes', value: 'Yes' },
+                        { label: 'No', value: 'No' },
                       ]}
                       styles={colourStyles}
                       value={{
@@ -4800,20 +4395,14 @@ function ManuaStockTable({ vendorAuto }) {
                     />
                   </FormControl>
                 </Grid>
-                {stockmanagemasteredit.warranty === "Yes" && (
+                {stockmanagemasteredit.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <Grid container>
                         <Grid item md={6} xs={6} sm={6}>
                           <Typography>Warranty Time</Typography>
                           <FormControl fullWidth size="small">
-                            <OutlinedInput
-                              id="component-outlined"
-                              type="text"
-                              placeholder="Enter Time"
-                              value={stockmanagemasteredit.estimation}
-                              onChange={(e) => handleChangephonenumberEdit(e)}
-                            />
+                            <OutlinedInput id="component-outlined" type="text" placeholder="Enter Time" value={stockmanagemasteredit.estimation} onChange={(e) => handleChangephonenumberEdit(e)} />
                           </FormControl>
                         </Grid>
                         <Grid item md={6} xs={6} sm={6}>
@@ -4830,12 +4419,12 @@ function ManuaStockTable({ vendorAuto }) {
                             onChange={handleEstimationChangeEdit}
                           >
                             <MenuItem value="" disabled>
-                              {" "}
+                              {' '}
                               Please Select
                             </MenuItem>
-                            <MenuItem value="Days"> {"Days"} </MenuItem>
-                            <MenuItem value="Month"> {"Month"} </MenuItem>
-                            <MenuItem value="Year"> {"Year"} </MenuItem>
+                            <MenuItem value="Days"> {'Days'} </MenuItem>
+                            <MenuItem value="Month"> {'Month'} </MenuItem>
+                            <MenuItem value="Year"> {'Year'} </MenuItem>
                           </Select>
                         </Grid>
                       </Grid>
@@ -4856,17 +4445,12 @@ function ManuaStockTable({ vendorAuto }) {
                     />
                   </FormControl>
                 </Grid>
-                {stockmanagemasteredit.warranty === "Yes" && (
+                {stockmanagemasteredit.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>Expiry Date </Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="text"
-                          placeholder=""
-                          value={stockmanagemasteredit.warrantycalculation}
-                        />
+                        <OutlinedInput id="component-outlined" type="text" placeholder="" value={stockmanagemasteredit.warrantycalculation} />
                       </FormControl>
                     </Grid>
                   </>
@@ -4874,7 +4458,7 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      {" "}
+                      {' '}
                       Vendor Group Name
                       {/* <b style={{ color: "red" }}>*</b>{" "} */}
                     </Typography>
@@ -4886,8 +4470,8 @@ function ManuaStockTable({ vendorAuto }) {
                       onChange={(e) => {
                         handleChangeGroupNameEdit(e);
                         setVendorGroupEdit(e.value);
-                        setVendorNewEdit("Choose Vendor");
-                        setFrequencyValue("")
+                        setVendorNewEdit('Choose Vendor');
+                        setFrequencyValue('');
                       }}
                     />
                   </FormControl>
@@ -4895,7 +4479,7 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <Typography>
-                      Vendor Name <b style={{ color: "red" }}>*</b>{" "}
+                      Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={[...vendorModeOptions, ...vendorOptEdit]}
@@ -4903,7 +4487,7 @@ function ManuaStockTable({ vendorAuto }) {
                       value={{ label: vendorNewEdit, value: vendorNewEdit }}
                       onChange={(e) => {
                         setVendorNewEdit(e.value);
-                        setFrequencyValue(e?.paymentfrequency)
+                        setFrequencyValue(e?.paymentfrequency);
                         vendorid(e._id);
                       }}
                     />
@@ -4912,25 +4496,13 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item lg={3} md={3} xs={12} sm={6}>
                   <FormControl size="small" fullWidth>
                     <Typography>Frequency</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      sx={userStyle.input}
-                      placeholder="Please Enter Frequency"
-                      value={frequencyValue}
-                      readOnly
-                    />
+                    <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValue} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>GST No</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      value={vendorgetid?.gstnumber}
-                      readOnly
-                    />
+                    <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} sm={12} xs={12}>
@@ -4954,14 +4526,9 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>Request Mode For</Typography>
-                    <OutlinedInput
-                      value={stockmanagemasteredit.requestmode}
-                      readOnly={true}
-                    />
+                    <OutlinedInput value={stockmanagemasteredit.requestmode} readOnly={true} />
                   </FormControl>
                 </Grid>
-
-
 
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
@@ -5007,7 +4574,7 @@ function ManuaStockTable({ vendorAuto }) {
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Total  Bill Amount<b style={{ color: "red" }}>*</b>{" "}
+                      Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -5022,7 +4589,6 @@ function ManuaStockTable({ vendorAuto }) {
                           totalbillamount: e.target.value,
                         });
                       }}
-
                     />
                   </FormControl>
                 </Grid>
@@ -5044,22 +4610,16 @@ function ManuaStockTable({ vendorAuto }) {
                 </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>Bill</Typography>
-                  <Box sx={{ display: "flex", justifyContent: "left" }}>
-                    <Button
-                      variant="contained"
-                      onClick={handleClickUploadPopupOpenedit}
-                    >
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                    <Button variant="contained" onClick={handleClickUploadPopupOpenedit}>
                       Upload
                     </Button>
                   </Box>
                 </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>Warranty Card </Typography>
-                  <Box sx={{ display: "flex", justifyContent: "left" }}>
-                    <Button
-                      variant="contained"
-                      onClick={handleClickUploadPopupOpenwarranty}
-                    >
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                    <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
                       Upload
                     </Button>
                   </Box>
@@ -5067,11 +4627,11 @@ function ManuaStockTable({ vendorAuto }) {
 
                 <>
                   <Grid item md={12} xs={12} sm={12}>
-                    {" "}
+                    {' '}
                     <Typography variant="h6">Stock Purchase Todo List</Typography>
                   </Grid>
                   <Grid item md={12} sm={12} xs={12}>
-                    <Grid container spacing={3} sx={{ display: "flex" }}>
+                    <Grid container spacing={3} sx={{ display: 'flex' }}>
                       {/* <Grid item md={3} sm={6} xs={12}>
                                         <FormControl fullWidth size="small">
                                           <Typography>
@@ -5103,7 +4663,7 @@ function ManuaStockTable({ vendorAuto }) {
                                         </FormControl>
                                       </Grid> */}
 
-                      {stockmanagemasteredit.requestmode === "Stock Material" && (
+                      {stockmanagemasteredit.requestmode === 'Stock Material' && (
                         <>
                           <Grid item md={2.5} sm={6} xs={12}>
                             <FormControl fullWidth size="small">
@@ -5120,35 +4680,35 @@ function ManuaStockTable({ vendorAuto }) {
                                   setTodoDetails({
                                     ...todoDetails,
                                     category: e.value,
-                                    subcategory: "Please Select Sub Category",
-                                    itemname: "Please Select Item Name",
-                                    uomnew: "",
-                                    rate: "",
-                                    quantitynew: "",
-                                    amount: "",
+                                    subcategory: 'Please Select Sub Category',
+                                    itemname: 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
                             </FormControl>
                           </Grid>
-                          {isUserRoleCompare?.includes("astockcategory") && (
+                          {isUserRoleCompare?.includes('astockcategory') && (
                             <Grid item md={0.5} sm={1} xs={1}>
                               <Button
                                 variant="contained"
                                 style={{
-                                  height: "30px",
-                                  minWidth: "20px",
-                                  padding: "19px 13px",
-                                  color: "white",
-                                  marginTop: "23px",
-                                  marginLeft: "-10px",
-                                  background: "rgb(25, 118, 210)",
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
                                 }}
                                 onClick={() => {
                                   handleClickOpenviewalertstockcategory();
                                 }}
                               >
-                                <FaPlus style={{ fontSize: "15px" }} />
+                                <FaPlus style={{ fontSize: '15px' }} />
                               </Button>
                             </Grid>
                           )}
@@ -5171,7 +4731,7 @@ function ManuaStockTable({ vendorAuto }) {
                                   value: todoDetails.subcategory,
                                 }}
                                 onChange={(e) => {
-                                  if (e.value !== "Please Select Sub Category") {
+                                  if (e.value !== 'Please Select Sub Category') {
                                     setItemAllShow(false);
                                   } else {
                                     setItemAllShow(true);
@@ -5179,12 +4739,12 @@ function ManuaStockTable({ vendorAuto }) {
                                   setTodoDetails({
                                     ...todoDetails,
                                     subcategory: e.value,
-                                    materialnew: todoDetails.particularmode === "Others" ? "" : "Please Select Item Name",
-                                    uomnew: "",
-                                    rate: "",
-                                    quantitynew: "",
-                                    productdetailsnew: "",
-                                    amount: "",
+                                    materialnew: todoDetails.particularmode === 'Others' ? '' : 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
@@ -5193,23 +4753,23 @@ function ManuaStockTable({ vendorAuto }) {
                           <Grid item md={2.5} sm={6} xs={12}>
                             <FormControl fullWidth size="small">
                               <Typography>
-                                Item Name <b style={{ color: "red" }}>*</b>
+                                Item Name <b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <Selects
                                 options={
                                   !itemAllShow
                                     ? allStockValues
-                                      .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
-                                      .map((item) => ({
+                                        .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
+                                        .map((item) => ({
+                                          label: item.itemname,
+                                          value: item.itemname,
+                                          uom: item.uom,
+                                        }))
+                                    : allStockValues.map((item) => ({
                                         label: item.itemname,
                                         value: item.itemname,
                                         uom: item.uom,
                                       }))
-                                    : allStockValues.map((item) => ({
-                                      label: item.itemname,
-                                      value: item.itemname,
-                                      uom: item.uom,
-                                    }))
                                 }
                                 styles={colourStyles}
                                 value={{
@@ -5221,33 +4781,33 @@ function ManuaStockTable({ vendorAuto }) {
                                     ...todoDetails,
                                     materialnew: e.value,
                                     uomnew: e.uom,
-                                    rate: "",
-                                    quantitynew: "",
-                                    productdetailsnew: "",
-                                    amount: "",
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
                             </FormControl>
                           </Grid>
-                          {isUserRoleCompare?.includes("amanagestockitems") && (
+                          {isUserRoleCompare?.includes('amanagestockitems') && (
                             <Grid item md={0.5} sm={1} xs={1}>
                               <Button
                                 variant="contained"
                                 style={{
-                                  height: "30px",
-                                  minWidth: "20px",
-                                  padding: "19px 13px",
-                                  color: "white",
-                                  marginTop: "23px",
-                                  marginLeft: "-10px",
-                                  background: "rgb(25, 118, 210)",
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
                                 }}
                                 onClick={() => {
                                   handleClickOpenviewalertstockitem();
                                 }}
                               >
-                                <FaPlus style={{ fontSize: "15px" }} />
+                                <FaPlus style={{ fontSize: '15px' }} />
                               </Button>
                             </Grid>
                           )}
@@ -5263,7 +4823,7 @@ function ManuaStockTable({ vendorAuto }) {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Rate <b style={{ color: "red" }}>*</b>
+                            Rate <b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -5275,7 +4835,7 @@ function ManuaStockTable({ vendorAuto }) {
                             onChange={(e) => {
                               const value = e.target.value;
                               const regex = /^\d*\.?\d{0,2}$/;
-                              if (regex.test(value) || value === "") {
+                              if (regex.test(value) || value === '') {
                                 setTodoDetails({
                                   ...todoDetails,
                                   rate: value,
@@ -5289,7 +4849,7 @@ function ManuaStockTable({ vendorAuto }) {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Quantity <b style={{ color: "red" }}>*</b>
+                            Quantity <b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -5312,14 +4872,14 @@ function ManuaStockTable({ vendorAuto }) {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Amount<b style={{ color: "red" }}>*</b>
+                            Amount<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput id="component-outlined" type="number" placeholder="Please Enter Amount" sx={userStyle.input} value={todoDetails.amount} readOnly />
                         </FormControl>
                       </Grid>
-                      <Grid item md={todoDetails.particularmode !== "Others" ? 2.5 : 3} sm={6} xs={12}>
+                      <Grid item md={todoDetails.particularmode !== 'Others' ? 2.5 : 3} sm={6} xs={12}>
                         <Typography>
-                          Product Details<b style={{ color: "red" }}>*</b>
+                          Product Details<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <TextareaAutosize
                           aria-label="minimum height"
@@ -5335,15 +4895,15 @@ function ManuaStockTable({ vendorAuto }) {
                           }}
                         />
                       </Grid>
-                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: "-20px" }}>
+                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: '-20px' }}>
                         <Button
                           variant="contained"
                           color="success"
                           style={{
-                            height: "30px",
-                            minWidth: "20px",
-                            padding: "19px 13px",
-                            marginTop: "25px",
+                            height: '30px',
+                            minWidth: '20px',
+                            padding: '19px 13px',
+                            marginTop: '25px',
                           }}
                           onClick={educationTodo}
                         >
@@ -5351,15 +4911,14 @@ function ManuaStockTable({ vendorAuto }) {
                         </Button>
                       </Grid>
                     </Grid>
-                  </Grid>{" "}
+                  </Grid>{' '}
                 </>
-
               </Grid>
               <Grid container spacing={2}>
                 <Grid item md={12} xs={12} sm={12}>
                   <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable">
-                      <TableHead sx={{ fontWeight: "600" }}>
+                      <TableHead sx={{ fontWeight: '600' }}>
                         <StyledTableRow>
                           <StyledTableCell>SNo</StyledTableCell>
                           <StyledTableCell>Item Name</StyledTableCell>
@@ -5384,7 +4943,7 @@ function ManuaStockTable({ vendorAuto }) {
                               <StyledTableCell>{row.productdetailsnew}</StyledTableCell>
                               <StyledTableCell>
                                 <CloseIcon
-                                  sx={{ color: "red", cursor: "pointer" }}
+                                  sx={{ color: 'red', cursor: 'pointer' }}
                                   onClick={() => {
                                     educationTodoremove(index);
                                   }}
@@ -5394,15 +4953,15 @@ function ManuaStockTable({ vendorAuto }) {
                           ))
                         ) : (
                           <StyledTableRow>
-                            {" "}
+                            {' '}
                             <StyledTableCell colSpan={8} align="center">
                               No Data Available
-                            </StyledTableCell>{" "}
+                            </StyledTableCell>{' '}
                           </StyledTableRow>
                         )}
                         <StyledTableRow></StyledTableRow>
                       </TableBody>
-                      <TableFooter sx={{ backgroundColor: "#9591914f", height: "50px" }}>
+                      <TableFooter sx={{ backgroundColor: '#9591914f', height: '50px' }}>
                         {educationtodo &&
                           educationtodo.forEach((item) => {
                             Expensetotal += +item.amount;
@@ -5416,15 +4975,15 @@ function ManuaStockTable({ vendorAuto }) {
                         </StyledTableRow>
                       </TableFooter>
                     </Table>
-                  </TableContainer>{" "}
+                  </TableContainer>{' '}
                 </Grid>
               </Grid>
               <br />
-              <Grid container spacing={2} sx={{ display: "flex" }}>
+              <Grid container spacing={2} sx={{ display: 'flex' }}>
                 <Grid item lg={3} md={4} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Paid Status<b style={{ color: "red" }}>*</b>
+                      Paid Status<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
@@ -5438,7 +4997,7 @@ function ManuaStockTable({ vendorAuto }) {
                         setExpensecreate({
                           ...expensecreate,
                           paidstatus: e.value,
-                          paidmode: "Please Select Paid Mode",
+                          paidmode: 'Please Select Paid Mode',
                         });
                       }}
                       isDisabled={Number(Expensetotal) !== Number(stockmanagemasteredit.totalbillamount)}
@@ -5446,10 +5005,10 @@ function ManuaStockTable({ vendorAuto }) {
                   </FormControl>
                 </Grid>
                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                  {expensecreate.paidstatus === "Paid" && (
+                  {expensecreate.paidstatus === 'Paid' && (
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Paid Mode<b style={{ color: "red" }}>*</b>
+                        Paid Mode<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         maxMenuHeight={250}
@@ -5470,10 +5029,10 @@ function ManuaStockTable({ vendorAuto }) {
                   )}
                 </Grid>
                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                  {expensecreate.paidstatus === "Paid" && (
+                  {expensecreate.paidstatus === 'Paid' && (
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Paid Amount<b style={{ color: "red" }}>*</b>
+                        Paid Amount<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -5495,41 +5054,41 @@ function ManuaStockTable({ vendorAuto }) {
                   )}
                 </Grid>
                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                  {expensecreate.paidstatus === "Paid" && (
+                  {expensecreate.paidstatus === 'Paid' && (
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Balance Amount<b style={{ color: "red" }}>*</b>
+                        Balance Amount<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <OutlinedInput readOnly id="component-outlined" type="number" sx={userStyle.input} placeholder="Please Enter Balance Amount" value={expensecreate.balanceamount} />
                     </FormControl>
                   )}
                 </Grid>
                 <br /> <br />
-                {expensecreate.paidstatus === "Paid" && expensecreate.paidmode === "Cash" && (
+                {expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Cash' && (
                   <>
                     <br />
                     <br />
                     <br />
 
-                    <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
-                        <Typography sx={{ fontWeight: "bold" }}>Cash</Typography>
+                        <Typography sx={{ fontWeight: 'bold' }}>Cash</Typography>
                         <br />
 
-                        <OutlinedInput id="component-outlined" type="text" readOnly={true} value={"Cash"} onChange={(e) => { }} />
+                        <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => {}} />
                       </FormControl>
                     </Grid>
                   </>
                 )}
                 <br />
                 <br />
-                {expensecreate.paidmode === "Bank Transfer" && expensecreate.paidstatus === "Paid" && (
+                {expensecreate.paidmode === 'Bank Transfer' && expensecreate.paidstatus === 'Paid' && (
                   <>
                     <br />
                     <br />
 
                     <Grid item md={12} xs={8}>
-                      <Typography sx={{ fontWeight: "bold" }}>Bank Details</Typography>
+                      <Typography sx={{ fontWeight: 'bold' }}>Bank Details</Typography>
                     </Grid>
 
                     <br />
@@ -5559,7 +5118,7 @@ function ManuaStockTable({ vendorAuto }) {
                         <OutlinedInput readOnly={true} value={vendorstock.accountnumber} />
                       </FormControl>
                     </Grid>
-                    <Grid item md={4} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={4} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
                         <Typography>IFSC Code</Typography>
                         <OutlinedInput readOnly={true} value={vendorstock.ifsccode} />
@@ -5568,16 +5127,16 @@ function ManuaStockTable({ vendorAuto }) {
                   </>
                 )}
                 <br /> <br />
-                {expensecreate.paidmode === "UPI" && expensecreate.paidstatus === "Paid" && (
+                {expensecreate.paidmode === 'UPI' && expensecreate.paidstatus === 'Paid' && (
                   <>
                     <Grid item md={12} xs={8}>
-                      <Typography sx={{ fontWeight: "bold" }}>UPI Details</Typography>
+                      <Typography sx={{ fontWeight: 'bold' }}>UPI Details</Typography>
                     </Grid>
 
                     <br />
                     <br />
 
-                    <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
                         <Typography>UPI Number</Typography>
                         <OutlinedInput readOnly={true} value={vendorstock.upinumber} />
@@ -5586,10 +5145,10 @@ function ManuaStockTable({ vendorAuto }) {
                   </>
                 )}
                 <br /> <br />
-                {expensecreate.paidmode === "Card" && expensecreate.paidstatus === "Paid" && (
+                {expensecreate.paidmode === 'Card' && expensecreate.paidstatus === 'Paid' && (
                   <>
                     <Grid md={12} item xs={8}>
-                      <Typography sx={{ fontWeight: "bold" }}>Card Details</Typography>
+                      <Typography sx={{ fontWeight: 'bold' }}>Card Details</Typography>
                     </Grid>
 
                     <br />
@@ -5632,7 +5191,7 @@ function ManuaStockTable({ vendorAuto }) {
                         </Grid>
                       </Grid>
                     </Grid>
-                    <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
                         <Typography>Security Code</Typography>
                         <OutlinedInput readOnly={true} value={vendorstock.cardsecuritycode} />
@@ -5642,15 +5201,15 @@ function ManuaStockTable({ vendorAuto }) {
                 )}
                 <br />
                 <br />
-                {expensecreate.paidmode === "Cheque" && expensecreate.paidstatus === "Paid" && (
+                {expensecreate.paidmode === 'Cheque' && expensecreate.paidstatus === 'Paid' && (
                   <>
                     <Grid item md={12} xs={8}>
-                      <Typography sx={{ fontWeight: "bold" }}>Cheque Details</Typography>
+                      <Typography sx={{ fontWeight: 'bold' }}>Cheque Details</Typography>
                     </Grid>
 
                     <br />
 
-                    <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                    <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                       <FormControl fullWidth size="small">
                         <Typography>Cheque Number</Typography>
                         <OutlinedInput readOnly={true} value={vendorstock.chequenumber} />
@@ -5663,13 +5222,13 @@ function ManuaStockTable({ vendorAuto }) {
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
                   {btnSubmit ? (
-                    <Box sx={{ display: "flex" }}>
+                    <Box sx={{ display: 'flex' }}>
                       <CircularProgress />
                     </Box>
                   ) : (
                     <>
                       <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
-                        {" "}
+                        {' '}
                         Update
                       </Button>
                     </>
@@ -5678,8 +5237,8 @@ function ManuaStockTable({ vendorAuto }) {
                 <br />
                 <Grid item md={6} xs={12} sm={12}>
                   <Button sx={userStyle.btncancel} onClick={handleCloseModEdit}>
-                    {" "}
-                    Cancel{" "}
+                    {' '}
+                    Cancel{' '}
                   </Button>
                 </Grid>
               </Grid>
@@ -5691,20 +5250,10 @@ function ManuaStockTable({ vendorAuto }) {
       <br />
       <br />
       {/* view model */}
-      <Dialog
-        open={openView}
-        onClose={handlViewClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ marginTop: "95px" }}
-      >
-        <Box sx={{ padding: "20px 50px" }}>
+      <Dialog open={openView} onClose={handlViewClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <Box sx={{ padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              View Manual Stock Purchase
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> View Manual Stock Purchase</Typography>
             <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={3} xs={12} sm={12}>
@@ -5777,9 +5326,7 @@ function ManuaStockTable({ vendorAuto }) {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Purchase Date</Typography>
-                  <Typography>{
-                    stockmanagemasteredit.purchasedate === "" ? "" :
-                      moment(stockmanagemasteredit.purchasedate).format("DD/MM/YYYY")}</Typography>
+                  <Typography>{stockmanagemasteredit.purchasedate === '' ? '' : moment(stockmanagemasteredit.purchasedate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
@@ -5825,9 +5372,7 @@ function ManuaStockTable({ vendorAuto }) {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Warranty Details</Typography>
-                  <Typography>
-                    {stockmanagemasteredit.warrantydetails}
-                  </Typography>
+                  <Typography>{stockmanagemasteredit.warrantydetails}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
@@ -5839,19 +5384,13 @@ function ManuaStockTable({ vendorAuto }) {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Bill Date</Typography>
-                  <Typography>{
-                    stockmanagemasteredit.billdate === "" ? "" :
-                      moment(stockmanagemasteredit.billdate).format("DD/MM/YYYY")}</Typography>
+                  <Typography>{stockmanagemasteredit.billdate === '' ? '' : moment(stockmanagemasteredit.billdate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handlViewClose}
-              >
+              <Button variant="contained" color="primary" onClick={handlViewClose}>
                 Back
               </Button>
             </Grid>
@@ -5860,40 +5399,19 @@ function ManuaStockTable({ vendorAuto }) {
       </Dialog>
 
       {/* UPLOAD BILL IMAGE DIALOG EDIT*/}
-      <Dialog
-        open={uploadPopupOpenedit}
-        onClose={handleUploadPopupCloseedit}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ marginTop: "95px" }}
-      >
-        <DialogTitle
-          id="customized-dialog-title1"
-          sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
-        >
+      <Dialog open={uploadPopupOpenedit} onClose={handleUploadPopupCloseedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
-                  <Button
-                    variant="contained"
-                    component="label"
-                    sx={userStyle.uploadbtn}
-                  >
+                <Grid sx={{ display: 'flex' }}>
+                  <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
-                    <input
-                      type="file"
-                      multiple
-                      id="productimage"
-                      accept="image/*"
-                      hidden
-                      onChange={handleInputChangeedit}
-                    />
+                    <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangeedit} />
                   </Button>
                   &ensp;
                 </Grid>
@@ -5905,27 +5423,22 @@ function ManuaStockTable({ vendorAuto }) {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
-                        <img
-                          className={classes.preview}
-                          src={getFileIconedit(file.name)}
-                          height="10"
-                          alt="file icon"
-                        />
+                        <img className={classes.preview} src={getFileIconedit(file.name)} height="10" alt="file icon" />
                       )}
                     </Box>
                   </Grid>
@@ -5935,44 +5448,40 @@ function ManuaStockTable({ vendorAuto }) {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewedit(file)}
                       >
-                        <VisibilityOutlinedIcon
-                          style={{ fontsize: "12px", color: "#357AE8" }}
-                        />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFileedit(index)}
                       >
-                        <FaTrash
-                          style={{ color: "#a73131", fontSize: "12px" }}
-                        />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -5995,40 +5504,19 @@ function ManuaStockTable({ vendorAuto }) {
       </Dialog>
 
       {/* UPLOAD WARRANTY IMAGE DIALOG    CREATE*/}
-      <Dialog
-        open={uploadPopupOpenwarranty}
-        onClose={handleUploadPopupClosewarranty}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ marginTop: "95px" }}
-      >
-        <DialogTitle
-          id="customized-dialog-title1"
-          sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
-        >
+      <Dialog open={uploadPopupOpenwarranty} onClose={handleUploadPopupClosewarranty} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
-                  <Button
-                    variant="contained"
-                    component="label"
-                    sx={userStyle.uploadbtn}
-                  >
+                <Grid sx={{ display: 'flex' }}>
+                  <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
-                    <input
-                      type="file"
-                      multiple
-                      id="productimage"
-                      accept="image/*"
-                      hidden
-                      onChange={handleInputChangewarranty}
-                    />
+                    <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangewarranty} />
                   </Button>
                   &ensp;
                 </Grid>
@@ -6040,27 +5528,22 @@ function ManuaStockTable({ vendorAuto }) {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
-                        <img
-                          className={classes.preview}
-                          src={getFileIconwarranty(file.name)}
-                          height="10"
-                          alt="file icon"
-                        />
+                        <img className={classes.preview} src={getFileIconwarranty(file.name)} height="10" alt="file icon" />
                       )}
                     </Box>
                   </Grid>
@@ -6070,44 +5553,40 @@ function ManuaStockTable({ vendorAuto }) {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewwarranty(file)}
                       >
-                        <VisibilityOutlinedIcon
-                          style={{ fontsize: "12px", color: "#357AE8" }}
-                        />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFilewarranty(index)}
                       >
-                        <FaTrash
-                          style={{ color: "#a73131", fontSize: "12px" }}
-                        />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -6123,10 +5602,7 @@ function ManuaStockTable({ vendorAuto }) {
           <Button onClick={resetImagewarranty} sx={userStyle.btncancel}>
             Reset
           </Button>
-          <Button
-            onClick={handleUploadPopupClosewarranty}
-            sx={userStyle.btncancel}
-          >
+          <Button onClick={handleUploadPopupClosewarranty} sx={userStyle.btncancel}>
             Cancel
           </Button>
         </DialogActions>
@@ -6134,19 +5610,9 @@ function ManuaStockTable({ vendorAuto }) {
 
       {/* EXTERNAL COMPONENTS -------------- START */}
       {/* VALIDATION */}
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
         isFilterOpen={isFilterOpen}
@@ -6158,48 +5624,22 @@ function ManuaStockTable({ vendorAuto }) {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={stockmanages ?? []}
-        filename={"StockPurchase"}
+        filename={'StockPurchase'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
       {/* INFO */}
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Stock Purchase Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Stock Purchase Info" addedby={addedby} updateby={updateby} />
       {/*SINGLE DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={openDelete}
-        onClose={handleCloseDelete}
-        onConfirm={delProject}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={openDelete} onClose={handleCloseDelete} onConfirm={delProject} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/*BULK DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={delVendorcheckbox}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delVendorcheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/* PLEASE SELECT ANY ROW */}
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
       {/* EXTERNAL COMPONENTS -------------- END */}
 
-      <Dialog open={openviewalertstockcategory} onClose={handleClickOpenviewalertstockcategory} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: "50px" }} fullWidth={true}>
+      <Dialog open={openviewalertstockcategory} onClose={handleClickOpenviewalertstockcategory} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '50px' }} fullWidth={true}>
         <StockCategoryPopup setStockCategoryAuto={setStockCategoryAuto} handleCloseviewalertstockcategory={handleCloseviewalertstockcategory} />
       </Dialog>
       {/* dialog box for manage stock items */}
@@ -6211,20 +5651,16 @@ function ManuaStockTable({ vendorAuto }) {
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
         fullWidth={true}
       >
         <ManageStockItemsPopup setStockItemAuto={setStockItemAuto} handleCloseviewalertstockitem={handleCloseviewalertstockitem} />
       </Dialog>
-
-
     </Box>
-
-
   );
 }
 export default ManuaStockTable;

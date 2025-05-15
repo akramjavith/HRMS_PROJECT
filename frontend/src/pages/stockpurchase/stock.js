@@ -1,13 +1,13 @@
-import { makeStyles } from "@material-ui/core";
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { makeStyles } from '@material-ui/core';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Backdrop,
   Box,
@@ -43,71 +43,70 @@ import {
   TextareaAutosize,
   Tooltip,
   Typography,
-} from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
-import ExpCategorypopup from "../expenses/expanseaddpopup";
-import ManageStockItemsPopup from "../expenses/ManageStockItemsPopup";
-import StockCategoryPopup from "../expenses/StockCategoryPopup";
-import axios from "axios";
-import { saveAs } from "file-saver";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPlus,
-   FaPrint, FaSearch, FaTrash } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import { MultiSelect } from "react-multi-select-component";
-import Resizable from "react-resizable";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import csvIcon from "../../components/Assets/CSV.png";
-import excelIcon from "../../components/Assets/excel-icon.png";
-import fileIcon from "../../components/Assets/file-icons.png";
-import pdfIcon from "../../components/Assets/pdf-icon.png";
-import wordIcon from "../../components/Assets/word-icon.png";
-import { handleApiError } from "../../components/Errorhandling";
-import Headtitle from "../../components/Headtitle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { colourStyles, userStyle } from "../../pageStyle";
-import { StyledTableCell, StyledTableRow } from "../../components/Table";
+} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import ExpCategorypopup from '../expenses/expanseaddpopup';
+import ManageStockItemsPopup from '../expenses/ManageStockItemsPopup';
+import StockCategoryPopup from '../expenses/StockCategoryPopup';
+import axios from '../../axiosInstance';
+import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPlus, FaPrint, FaSearch, FaTrash } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import { MultiSelect } from 'react-multi-select-component';
+import Resizable from 'react-resizable';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import csvIcon from '../../components/Assets/CSV.png';
+import excelIcon from '../../components/Assets/excel-icon.png';
+import fileIcon from '../../components/Assets/file-icons.png';
+import pdfIcon from '../../components/Assets/pdf-icon.png';
+import wordIcon from '../../components/Assets/word-icon.png';
+import { handleApiError } from '../../components/Errorhandling';
+import Headtitle from '../../components/Headtitle';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { colourStyles, userStyle } from '../../pageStyle';
+import { StyledTableCell, StyledTableRow } from '../../components/Table';
 
-import { SERVICE } from "../../services/Baseservice";
-import VendorPopup from "../asset/VendorPopup";
-import Stocktable from "./stocktable";
+import { SERVICE } from '../../services/Baseservice';
+import VendorPopup from '../asset/VendorPopup';
+import Stocktable from './stocktable';
 // import AssetMaterialPopup from "../account/AssetMaterialPopup";
-import * as FileSaver from "file-saver";
-import * as XLSX from "xlsx";
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 
-import AlertDialog from "../../components/Alert";
-import { DeleteConfirmation, PleaseSelectRow } from "../../components/DeleteConfirmation.js";
-import ExportData from "../../components/ExportData";
-import InfoPopup from "../../components/InfoPopup.js";
-import MessageAlert from "../../components/MessageAlert";
-import PageHeading from "../../components/PageHeading";
+import AlertDialog from '../../components/Alert';
+import { DeleteConfirmation, PleaseSelectRow } from '../../components/DeleteConfirmation.js';
+import ExportData from '../../components/ExportData';
+import InfoPopup from '../../components/InfoPopup.js';
+import MessageAlert from '../../components/MessageAlert';
+import PageHeading from '../../components/PageHeading';
 //new table
-import Switch from "@mui/material/Switch";
-import { styled } from "@mui/material/styles";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import domtoimage from "dom-to-image";
-import { IoMdOptions } from "react-icons/io";
-import { MdClose } from "react-icons/md";
-import AggridTableForPaginationTable from "../../components/AggridTableForPaginationTable.js";
-import { v4 as uuidv4 } from "uuid";
-import { paidOpt, statusOpt } from "../../components/Componentkeyword";
+import Switch from '@mui/material/Switch';
+import { styled } from '@mui/material/styles';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import domtoimage from 'dom-to-image';
+import { IoMdOptions } from 'react-icons/io';
+import { MdClose } from 'react-icons/md';
+import AggridTableForPaginationTable from '../../components/AggridTableForPaginationTable.js';
+import { v4 as uuidv4 } from 'uuid';
+import { paidOpt, statusOpt } from '../../components/Componentkeyword';
 
 const useStyles = makeStyles((theme) => ({
   inputs: {
-    display: "none",
+    display: 'none',
   },
   preview: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     marginTop: theme.spacing(2),
-    "& > *": {
+    '& > *': {
       margin: theme.spacing(1),
     },
   },
@@ -115,11 +114,11 @@ const useStyles = makeStyles((theme) => ({
 
 const LoadingBackdrop = ({ open }) => {
   return (
-    <Backdrop sx={{ color: "#ffffff", zIndex: (theme) => theme.zIndex.modal + 999 }} open={open}>
+    <Backdrop sx={{ color: '#ffffff', zIndex: (theme) => theme.zIndex.modal + 999 }} open={open}>
       <div className="pulsating-circle">
         <CircularProgress color="inherit" className="loading-spinner" />
       </div>
-      <Typography variant="h6" sx={{ marginLeft: 2, color: "#ffffff", fontWeight: "bold" }}>
+      <Typography variant="h6" sx={{ marginLeft: 2, color: '#ffffff', fontWeight: 'bold' }}>
         please wait...
       </Typography>
     </Backdrop>
@@ -133,12 +132,12 @@ function Stockmaster() {
   let Expensetotal = 0;
 
   const particularModeOptions = [
-    { label: "Stock Material", value: "Stock Material" },
+    { label: 'Stock Material', value: 'Stock Material' },
     // { label: "Others", value: "Others" },
   ];
 
-  const [stockCategoryAuto, setStockCategoryAuto] = useState("");
-  const [stockItemAuto, setStockItemAuto] = useState("");
+  const [stockCategoryAuto, setStockCategoryAuto] = useState('');
+  const [stockItemAuto, setStockItemAuto] = useState('');
 
   const [isErrorOpenAmount, setIsErrorOpenAmount] = useState(false);
 
@@ -152,71 +151,71 @@ function Stockmaster() {
 
   //state and method to show current date onload
   let today1 = new Date();
-  var dd = String(today1.getDate()).padStart(2, "0");
-  var mm = String(today1.getMonth() + 1).padStart(2, "0");
+  var dd = String(today1.getDate()).padStart(2, '0');
+  var mm = String(today1.getMonth() + 1).padStart(2, '0');
   var yyyy = today1.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
   //useStates
   const [date, setDate] = useState(formattedDate);
   const [expensecreate, setExpensecreate] = useState({
-    expansecategory: "Please Select Expense Category",
-    expansesubcategory: "Please Select Expense Sub Category",
-    referenceno: "",
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    vendorname: "Please Select Vendor",
-    purpose: "Please Select Purpose",
-    totalbillamount: "",
+    expansecategory: 'Please Select Expense Category',
+    expansesubcategory: 'Please Select Expense Sub Category',
+    referenceno: '',
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    vendorname: 'Please Select Vendor',
+    purpose: 'Please Select Purpose',
+    totalbillamount: '',
     date,
-    files: "",
-    vendorfrequency: "",
-    paidstatus: "Not Paid",
-    duedate: "",
-    expansenote: "",
-    paidmode: "Please Select Paid Mode",
-    expensetotal: "",
-    balanceamount: "",
-    paidamount: "",
+    files: '',
+    vendorfrequency: '',
+    paidstatus: 'Not Paid',
+    duedate: '',
+    expansenote: '',
+    paidmode: 'Please Select Paid Mode',
+    expensetotal: '',
+    balanceamount: '',
+    paidamount: '',
   });
 
   const [todoDetails, setTodoDetails] = useState({
-    particularmode: "Please Select Particular Mode",
-    category: "Please Select Category",
-    subcategory: "Please Select Sub Category",
-    materialnew: "Please Select Item Name",
-    uomnew: "",
-    rate: "",
-    quantitynew: "",
-    amount: "",
-    productdetailsnew: "",
+    particularmode: 'Please Select Particular Mode',
+    category: 'Please Select Category',
+    subcategory: 'Please Select Sub Category',
+    materialnew: 'Please Select Item Name',
+    uomnew: '',
+    rate: '',
+    quantitynew: '',
+    amount: '',
+    productdetailsnew: '',
   });
 
   const [vendorstock, setVendorNewstock] = useState({
-    bankname: "",
-    bankbranchname: "",
-    accountholdername: "",
-    accountnumber: "",
-    ifsccode: "",
-    upinumber: "",
-    chequenumber: "",
-    cardnumber: "",
-    cardholdername: "",
-    cardtransactionnumber: "",
-    cardtype: "",
-    cardmonth: "",
-    cardyear: "",
-    cardsecuritycode: "",
+    bankname: '',
+    bankbranchname: '',
+    accountholdername: '',
+    accountnumber: '',
+    ifsccode: '',
+    upinumber: '',
+    chequenumber: '',
+    cardnumber: '',
+    cardholdername: '',
+    cardtransactionnumber: '',
+    cardtype: '',
+    cardmonth: '',
+    cardyear: '',
+    cardsecuritycode: '',
   });
 
   const [educationtodo, setEducationtodo] = useState([]);
   const [upload, setUpload] = useState([]);
   const [expanseOpt, setExpanse] = useState([]);
   const [expansesubOpt, setExpanseSub] = useState([]);
-  const [frequencyValue, setFrequencyValue] = useState("");
-  const [frequencyValueedit, setFrequencyValueedit] = useState("");
+  const [frequencyValue, setFrequencyValue] = useState('');
+  const [frequencyValueedit, setFrequencyValueedit] = useState('');
   const [groupedVendorNames, setGroupedVendorNames] = useState([]);
-  const [vendorId, setVendorId] = useState("");
+  const [vendorId, setVendorId] = useState('');
   const [vendorModeOfPayments, setVendorModeOfPayments] = useState([]);
   const [espenseCheck, setExpenseCheck] = useState(false);
   const [purposes, setPurposes] = useState([]);
@@ -236,7 +235,7 @@ function Stockmaster() {
       });
 
       setAllStockValues(res_status?.data?.managestockitems);
-      setStockItemAuto("");
+      setStockItemAuto('');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -256,7 +255,7 @@ function Stockmaster() {
         })
       );
       setAllStockCategory(response?.data?.stockcategory);
-      setStockCategoryAuto("");
+      setStockCategoryAuto('');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -273,14 +272,14 @@ function Stockmaster() {
   const [columnApi, setColumnApi] = useState(null);
   const [filteredDataItems, setFilteredDataItems] = useState([]);
   //  const [filteredRowData, setFilteredRowData] = useState([]);
-  const [logicOperator, setLogicOperator] = useState("AND");
+  const [logicOperator, setLogicOperator] = useState('AND');
 
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [filterValue, setFilterValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [filterValue, setFilterValue] = useState('');
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = ["Contains", "Does Not Contain", "Equals", "Does Not Equal", "Begins With", "Ends With", "Blank", "Not Blank"]; // AgGrid-like conditions
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
 
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
@@ -289,14 +288,14 @@ function Stockmaster() {
 
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
-  const [searchedString, setSearchedString] = useState("");
+  const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTableImg = useRef(null);
   const gridRefTable = useRef(null);
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
     setBtnSubmit(false);
@@ -306,8 +305,8 @@ function Stockmaster() {
     setBtnSubmit(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
     setBtnSubmit(false);
@@ -317,8 +316,31 @@ function Stockmaster() {
     setBtnSubmit(false);
   };
 
-  let exportColumnNames = ["Company", "Branch", "Unit", "Floor", "Area", "Location", "Request Mode For", "Vendor Group", "Vendor", "Gst No", "Bill Number", "Asset Type", "Asset Head", "Material", "Warranty", "Purchasedate", "Product Details", "Warranty Details", "Quantity", "Quantity & UOM", "Rate", "Bill Date"];
-  let exportRowValues = ["company", "branch", "unit", "floor", "area", "location", "requestmode", "vendorgroup", "vendor", "gstno", "billno", "assettype", "producthead", "productname", "warranty", "purchasedate", "productdetails", "warrantydetails", "quantity", "uom", "rate", "billdate"];
+  let exportColumnNames = [
+    'Company',
+    'Branch',
+    'Unit',
+    'Floor',
+    'Area',
+    'Location',
+    'Request Mode For',
+    'Vendor Group',
+    'Vendor',
+    'Gst No',
+    'Bill Number',
+    'Asset Type',
+    'Asset Head',
+    'Material',
+    'Warranty',
+    'Purchasedate',
+    'Product Details',
+    'Warranty Details',
+    'Quantity',
+    'Quantity & UOM',
+    'Rate',
+    'Bill Date',
+  ];
+  let exportRowValues = ['company', 'branch', 'unit', 'floor', 'area', 'location', 'requestmode', 'vendorgroup', 'vendor', 'gstno', 'billno', 'assettype', 'producthead', 'productname', 'warranty', 'purchasedate', 'productdetails', 'warrantydetails', 'quantity', 'uom', 'rate', 'billdate'];
 
   //Access Module
   const pathname = window.location.pathname;
@@ -329,7 +351,7 @@ function Stockmaster() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Stock Purchase"),
+      pagename: String('Stock Purchase'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -347,13 +369,13 @@ function Stockmaster() {
   }, []);
 
   const [assetSpecificationType, setAssetSpecificationType] = useState({
-    name: "",
-    code: "",
+    name: '',
+    code: '',
   });
-  const [assetModel, setAssetModel] = useState({ name: "", code: "" });
-  const [assetSize, setAssetSize] = useState({ name: "", code: "" });
-  const [assetVariant, setAssetVariant] = useState({ name: "", code: "" });
-  const [brandMaster, setBrandMaster] = useState({ name: "", code: "" });
+  const [assetModel, setAssetModel] = useState({ name: '', code: '' });
+  const [assetSize, setAssetSize] = useState({ name: '', code: '' });
+  const [assetVariant, setAssetVariant] = useState({ name: '', code: '' });
+  const [brandMaster, setBrandMaster] = useState({ name: '', code: '' });
 
   const [btnSubmit, setBtnSubmit] = useState(false);
 
@@ -361,8 +383,8 @@ function Stockmaster() {
 
   //new changes
   const requestModeOptions = [
-    { label: "Asset Material", value: "Asset Material" },
-    { label: "Stock Material", value: "Stock Material" },
+    { label: 'Asset Material', value: 'Asset Material' },
+    { label: 'Stock Material', value: 'Stock Material' },
   ];
   const [isStockMaterial, setIsStockMaterial] = useState(false);
   const [categoryOption, setCategoryOption] = useState([]);
@@ -373,87 +395,87 @@ function Stockmaster() {
   const [changeTable, setChangeTable] = useState([]);
 
   const [stockmaster, setStockmaster] = useState({
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    floor: "Please Select Floor",
-    area: "Please Select Area",
-    location: "Please Select Location",
-    workstation: "Please Select Workstation",
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    floor: 'Please Select Floor',
+    area: 'Please Select Area',
+    location: 'Please Select Location',
+    workstation: 'Please Select Workstation',
     workcheck: false,
-    producthead: "",
-    vendorname: "Please Select Vendor",
-    productname: "Please Select Material",
-    component: "Please Select Component",
-    gstno: "",
-    billno: "",
-    assettype: "",
-    asset: "",
-    productdetails: "",
-    warrantydetails: "",
-    uom: "Please Select UOM",
-    quantity: "",
-    rate: "",
-    billdate: "",
-    files: "",
-    warrantyfiles: "",
-    totalbillamount: "",
-    warranty: "Yes",
-    warrantycalculation: "",
-    estimation: "",
-    estimationtime: "Days",
-    purchasedate: "",
+    producthead: '',
+    vendorname: 'Please Select Vendor',
+    productname: 'Please Select Material',
+    component: 'Please Select Component',
+    gstno: '',
+    billno: '',
+    assettype: '',
+    asset: '',
+    productdetails: '',
+    warrantydetails: '',
+    uom: 'Please Select UOM',
+    quantity: '',
+    rate: '',
+    billdate: '',
+    files: '',
+    warrantyfiles: '',
+    totalbillamount: '',
+    warranty: 'Yes',
+    warrantycalculation: '',
+    estimation: '',
+    estimationtime: 'Days',
+    purchasedate: '',
 
-    addedby: "",
-    updatedby: "",
+    addedby: '',
+    updatedby: '',
 
-    requestmode: "Please Select Request Mode",
-    stockcategory: "Please Select Stock Category",
-    stocksubcategory: "Please Select Stock Sub Category",
-    uomnew: "",
-    quantitynew: "",
-    materialnew: "Please Select Material",
-    productdetailsnew: "",
+    requestmode: 'Please Select Request Mode',
+    stockcategory: 'Please Select Stock Category',
+    stocksubcategory: 'Please Select Stock Sub Category',
+    uomnew: '',
+    quantitynew: '',
+    materialnew: 'Please Select Material',
+    productdetailsnew: '',
   });
 
   const [stockmasteredit, setStockmasteredit] = useState({
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    floor: "Please Select Floor",
-    area: "Please Select Area",
-    location: "Please Select Location",
-    workstation: "Please Select Workstation",
-    producthead: "",
-    vendorname: "Please Select Vendor",
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    floor: 'Please Select Floor',
+    area: 'Please Select Area',
+    location: 'Please Select Location',
+    workstation: 'Please Select Workstation',
+    producthead: '',
+    vendorname: 'Please Select Vendor',
 
-    productname: "Please Select Material",
+    productname: 'Please Select Material',
 
-    component: "Please Select Component",
-    gstno: "",
-    billno: "",
-    productdetails: "",
-    warrantydetails: "",
-    uom: "Please Select UOM",
-    quantity: "",
-    rate: "",
-    billdate: "",
-    files: "",
-    warrantyfiles: "",
+    component: 'Please Select Component',
+    gstno: '',
+    billno: '',
+    productdetails: '',
+    warrantydetails: '',
+    uom: 'Please Select UOM',
+    quantity: '',
+    rate: '',
+    billdate: '',
+    files: '',
+    warrantyfiles: '',
 
-    warranty: "",
-    warrantycalculation: "",
-    estimation: "",
-    estimationtime: "",
-    purchasedate: "",
+    warranty: '',
+    warrantycalculation: '',
+    estimation: '',
+    estimationtime: '',
+    purchasedate: '',
 
-    requestmode: "Please Select Request Mode",
-    stockcategory: "Please Select Stock Category",
-    stocksubcategory: "Please Select Stock Sub Category",
-    uomnew: "",
-    quantitynew: "",
-    materialnew: "Please Select Material",
-    productdetailsnew: "",
+    requestmode: 'Please Select Request Mode',
+    stockcategory: 'Please Select Stock Category',
+    stocksubcategory: 'Please Select Stock Sub Category',
+    uomnew: '',
+    quantitynew: '',
+    materialnew: 'Please Select Material',
+    productdetailsnew: '',
   });
 
   const [stockArray, setStockArray] = useState([]);
@@ -466,13 +488,13 @@ function Stockmaster() {
 
   const [uomcodes, setuomcodes] = useState([]);
 
-  const [vendorGroup, setVendorGroup] = useState("Choose Vendor Group");
+  const [vendorGroup, setVendorGroup] = useState('Choose Vendor Group');
   const [vendorGroupOpt, setVendorGroupopt] = useState([]);
   const [vendorOverall, setVendorOverall] = useState([]);
-  const [vendorNew, setVendorNew] = useState("Choose Vendor");
-  const [vendorNewEdit, setVendorNewEdit] = useState("Choose Vendor");
+  const [vendorNew, setVendorNew] = useState('Choose Vendor');
+  const [vendorNewEdit, setVendorNewEdit] = useState('Choose Vendor');
 
-  const [vendorGroupEdit, setVendorGroupEdit] = useState("Choose Vendor Group");
+  const [vendorGroupEdit, setVendorGroupEdit] = useState('Choose Vendor Group');
   const [vendorOptEdit, setVendoroptEdit] = useState([]);
 
   const [vendorOptIndEdit, setVendoroptIndEdit] = useState([]);
@@ -591,7 +613,7 @@ function Stockmaster() {
     });
     setVendoropt([
       ...res?.data?.vendordetails
-        ?.filter((item) => item.vendorstatus === "Active")
+        ?.filter((item) => item.vendorstatus === 'Active')
         ?.map((t) => ({
           ...t,
           label: t.vendorname,
@@ -603,29 +625,29 @@ function Stockmaster() {
 
   const handleStockArray = () => {
     const isNameMatch = stockArray.some((item) => item.materialnew == stockmaster.materialnew && item.uomnew === String(stockmaster.uomnew) && item.quantitynew == stockmaster.quantitynew);
-    if (stockmaster.stockcategory === "Please Select Stock Category" || stockmaster.stockcategory === "") {
-      setPopupContentMalert("Please Select Stock Category!");
-      setPopupSeverityMalert("info");
+    if (stockmaster.stockcategory === 'Please Select Stock Category' || stockmaster.stockcategory === '') {
+      setPopupContentMalert('Please Select Stock Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmaster.stocksubcategory === "Please Select Stock Sub Category" || stockmaster.stocksubcategory === "") {
-      setPopupContentMalert("Please Select Stock Sub Category!");
-      setPopupSeverityMalert("info");
+    } else if (stockmaster.stocksubcategory === 'Please Select Stock Sub Category' || stockmaster.stocksubcategory === '') {
+      setPopupContentMalert('Please Select Stock Sub Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmaster.materialnew === "Please Select Material" || stockmaster.materialnew === "") {
-      setPopupContentMalert("Please Select Material!");
-      setPopupSeverityMalert("info");
+    } else if (stockmaster.materialnew === 'Please Select Material' || stockmaster.materialnew === '') {
+      setPopupContentMalert('Please Select Material!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmaster.uomnew === "" || stockmaster.uomnew === undefined) {
-      setPopupContentMalert("Please Enter UOM!");
-      setPopupSeverityMalert("info");
+    } else if (stockmaster.uomnew === '' || stockmaster.uomnew === undefined) {
+      setPopupContentMalert('Please Enter UOM!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmaster.quantitynew === "" || stockmaster.quantitynew === undefined) {
-      setPopupContentMalert("Please Enter Quantityy!");
-      setPopupSeverityMalert("info");
+    } else if (stockmaster.quantitynew === '' || stockmaster.quantitynew === undefined) {
+      setPopupContentMalert('Please Enter Quantityy!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Todo Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Todo Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       try {
@@ -645,14 +667,14 @@ function Stockmaster() {
 
         setStockmaster({
           ...stockmaster,
-          uomnew: "",
-          quantitynew: "",
-          materialnew: "Please Select Material",
-          productdetailsnew: "",
+          uomnew: '',
+          quantitynew: '',
+          materialnew: 'Please Select Material',
+          productdetailsnew: '',
         });
       } catch (e) {
-        setPopupContentMalert("UOM is not found! Hence cannot get a UOM Code!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('UOM is not found! Hence cannot get a UOM Code!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -697,7 +719,7 @@ function Stockmaster() {
       });
       // setLoading(true);
       let filteredData = res_project?.data?.stock.filter((data) => {
-        return data.requestmode === "Stock Material";
+        return data.requestmode === 'Stock Material';
       });
       setStockMaterial(filteredData);
     } catch (err) {
@@ -788,7 +810,7 @@ function Stockmaster() {
 
   const handleClickCloseCapacity = () => {
     setOpenCapacity(false);
-    setcapacityname("");
+    setcapacityname('');
   };
 
   //alert model for Type details
@@ -800,7 +822,7 @@ function Stockmaster() {
 
   const handleClickCloseType = () => {
     setOpenType(false);
-    setAssetSpecificationType({ name: "", code: "" });
+    setAssetSpecificationType({ name: '', code: '' });
   };
 
   //alert model for Model details
@@ -812,7 +834,7 @@ function Stockmaster() {
 
   const handleClickCloseModel = () => {
     setOpenmodel(false);
-    setAssetModel({ name: "", code: "" });
+    setAssetModel({ name: '', code: '' });
   };
 
   //alert model for Size details
@@ -824,7 +846,7 @@ function Stockmaster() {
 
   const handleClickCloseSize = () => {
     setOpensize(false);
-    setAssetSize({ name: "", code: "" });
+    setAssetSize({ name: '', code: '' });
   };
 
   //alert model for Variant details
@@ -836,7 +858,7 @@ function Stockmaster() {
 
   const handleClickCloseVariant = () => {
     setOpenvariant(false);
-    setAssetVariant({ name: "", code: "" });
+    setAssetVariant({ name: '', code: '' });
   };
 
   //alert model for Brand details
@@ -848,32 +870,32 @@ function Stockmaster() {
 
   const handleClickCloseBrand = () => {
     setOpenbrand(false);
-    setBrandMaster({ name: "", code: "" });
+    setBrandMaster({ name: '', code: '' });
   };
 
   //  Datefield
   var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = yyyy + "-" + mm + "-" + dd;
+  today = yyyy + '-' + mm + '-' + dd;
 
   const gridRef = useRef(null);
 
   const [vomMaster, setVomMaster] = useState({
-    name: "",
+    name: '',
   });
   const [vomMasterget, setVomMasterget] = useState([]);
 
   const [assetmaster, setAssetmaster] = useState([]);
 
   const [asset, setAsset] = useState({
-    name: "",
-    materialcode: "",
-    assethead: "",
+    name: '',
+    materialcode: '',
+    assethead: '',
   });
-  const [vendorAuto, setVendorAuto] = useState("");
-  const [selectedassethead, setSelectedAssethead] = useState("Please Select Assethead");
+  const [vendorAuto, setVendorAuto] = useState('');
+  const [selectedassethead, setSelectedAssethead] = useState('Please Select Assethead');
 
   const handleAssetChange = (e) => {
     const selectedassethead = e.value;
@@ -881,17 +903,17 @@ function Stockmaster() {
   };
 
   const [vendor, setVendor] = useState({
-    vendorname: "",
-    emailid: "",
-    phonenumber: "",
-    whatsappnumber: "",
-    contactperson: "",
-    address: "",
-    gstnumber: "",
-    bankname: "Please Select Bank Name",
-    accountname: "",
-    accountnumber: "",
-    ifsccode: "",
+    vendorname: '',
+    emailid: '',
+    phonenumber: '',
+    whatsappnumber: '',
+    contactperson: '',
+    address: '',
+    gstnumber: '',
+    bankname: 'Please Select Bank Name',
+    accountname: '',
+    accountnumber: '',
+    ifsccode: '',
     phonecheck: false,
   });
 
@@ -899,64 +921,64 @@ function Stockmaster() {
 
   //bank name options
   const accounttypes = [
-    { value: "ALLAHABAD BANK", label: "ALLAHABAD BANK" },
-    { value: "ANDHRA BANK", label: "ANDHRA BANK" },
-    { value: "AXIS BANK", label: "AXIS BANK" },
-    { value: "STATE BANK OF INDIA", label: "STATE BANK OF INDIA" },
-    { value: "BANK OF BARODA", label: "BANK OF BARODA" },
-    { value: "CITY UNION BANK", label: "CITY UNION BANK" },
-    { value: "UCO BANK", label: "UCO BANK" },
-    { value: "TMB BANK", label: "TMB BANK" },
-    { value: "UNION BANK OF INDIA", label: "UNION BANK OF INDIA" },
-    { value: "BANK OF INDIA", label: "BANK OF INDIA" },
-    { value: "BANDHAN BANK LIMITED", label: "BANDHAN BANK LIMITED" },
-    { value: "CANARA BANK", label: "CANARA BANK" },
-    { value: "GRAMIN VIKASH BANK", label: "GRAMIN VIKASH BANK" },
-    { value: "CORPORATION BANK", label: "CORPORATION BANK" },
-    { value: "INDIAN BANK", label: "INDIAN BANK" },
-    { value: "INDIAN OVERSEAS BANK", label: "INDIAN OVERSEAS BANK" },
-    { value: "ORIENTAL BANK OF COMMERCE", label: "ORIENTAL BANK OF COMMERCE" },
-    { value: "PUNJAB AND SIND BANK", label: "PUNJAB AND SIND BANK" },
-    { value: "PUNJAB NATIONAL BANK", label: "PUNJAB NATIONAL BANK" },
-    { value: "RESERVE BANK OF INDIA", label: "RESERVE BANK OF INDIA" },
-    { value: "SOUTH INDIAN BANK", label: "SOUTH INDIAN BANK" },
-    { value: "UNITED BANK OF INDIA", label: "UNITED BANK OF INDIA" },
-    { value: "CENTRAL BANK OF INDIA", label: "CENTRAL BANK OF INDIA" },
-    { value: "VIJAYA BANK", label: "VIJAYA BANK" },
-    { value: "DENA BANK", label: "DENA BANK" },
+    { value: 'ALLAHABAD BANK', label: 'ALLAHABAD BANK' },
+    { value: 'ANDHRA BANK', label: 'ANDHRA BANK' },
+    { value: 'AXIS BANK', label: 'AXIS BANK' },
+    { value: 'STATE BANK OF INDIA', label: 'STATE BANK OF INDIA' },
+    { value: 'BANK OF BARODA', label: 'BANK OF BARODA' },
+    { value: 'CITY UNION BANK', label: 'CITY UNION BANK' },
+    { value: 'UCO BANK', label: 'UCO BANK' },
+    { value: 'TMB BANK', label: 'TMB BANK' },
+    { value: 'UNION BANK OF INDIA', label: 'UNION BANK OF INDIA' },
+    { value: 'BANK OF INDIA', label: 'BANK OF INDIA' },
+    { value: 'BANDHAN BANK LIMITED', label: 'BANDHAN BANK LIMITED' },
+    { value: 'CANARA BANK', label: 'CANARA BANK' },
+    { value: 'GRAMIN VIKASH BANK', label: 'GRAMIN VIKASH BANK' },
+    { value: 'CORPORATION BANK', label: 'CORPORATION BANK' },
+    { value: 'INDIAN BANK', label: 'INDIAN BANK' },
+    { value: 'INDIAN OVERSEAS BANK', label: 'INDIAN OVERSEAS BANK' },
+    { value: 'ORIENTAL BANK OF COMMERCE', label: 'ORIENTAL BANK OF COMMERCE' },
+    { value: 'PUNJAB AND SIND BANK', label: 'PUNJAB AND SIND BANK' },
+    { value: 'PUNJAB NATIONAL BANK', label: 'PUNJAB NATIONAL BANK' },
+    { value: 'RESERVE BANK OF INDIA', label: 'RESERVE BANK OF INDIA' },
+    { value: 'SOUTH INDIAN BANK', label: 'SOUTH INDIAN BANK' },
+    { value: 'UNITED BANK OF INDIA', label: 'UNITED BANK OF INDIA' },
+    { value: 'CENTRAL BANK OF INDIA', label: 'CENTRAL BANK OF INDIA' },
+    { value: 'VIJAYA BANK', label: 'VIJAYA BANK' },
+    { value: 'DENA BANK', label: 'DENA BANK' },
     {
-      value: "BHARATIYA MAHILA BANK LIMITED",
-      label: "BHARATIYA MAHILA BANK LIMITED",
+      value: 'BHARATIYA MAHILA BANK LIMITED',
+      label: 'BHARATIYA MAHILA BANK LIMITED',
     },
-    { value: "FEDERAL BANK LTD", label: "FEDERAL BANK LTD" },
-    { value: "HDFC BANK LTD", label: "HDFC BANK LTD" },
-    { value: "ICICI BANK LTD", label: "ICICI BANK LTD" },
-    { value: "IDBI BANK LTD", label: "IDBI BANK LTD" },
-    { value: "PAYTM BANK", label: "PAYTM BANK" },
-    { value: "FINO PAYMENT BANK", label: "FINO PAYMENT BANK" },
-    { value: "INDUSIND BANK LTD", label: "INDUSIND BANK LTD" },
-    { value: "KARNATAKA BANK LTD", label: "KARNATAKA BANK LTD" },
-    { value: "KOTAK MAHINDRA BANK", label: "KOTAK MAHINDRA BANK" },
-    { value: "YES BANK LTD", label: "YES BANK LTD" },
-    { value: "SYNDICATE BANK", label: "SYNDICATE BANK" },
-    { value: "BANK OF MAHARASHTRA", label: "BANK OF MAHARASHTRA" },
-    { value: "DCB BANK", label: "DCB BANK" },
-    { value: "IDFC BANK", label: "IDFC BANK" },
+    { value: 'FEDERAL BANK LTD', label: 'FEDERAL BANK LTD' },
+    { value: 'HDFC BANK LTD', label: 'HDFC BANK LTD' },
+    { value: 'ICICI BANK LTD', label: 'ICICI BANK LTD' },
+    { value: 'IDBI BANK LTD', label: 'IDBI BANK LTD' },
+    { value: 'PAYTM BANK', label: 'PAYTM BANK' },
+    { value: 'FINO PAYMENT BANK', label: 'FINO PAYMENT BANK' },
+    { value: 'INDUSIND BANK LTD', label: 'INDUSIND BANK LTD' },
+    { value: 'KARNATAKA BANK LTD', label: 'KARNATAKA BANK LTD' },
+    { value: 'KOTAK MAHINDRA BANK', label: 'KOTAK MAHINDRA BANK' },
+    { value: 'YES BANK LTD', label: 'YES BANK LTD' },
+    { value: 'SYNDICATE BANK', label: 'SYNDICATE BANK' },
+    { value: 'BANK OF MAHARASHTRA', label: 'BANK OF MAHARASHTRA' },
+    { value: 'DCB BANK', label: 'DCB BANK' },
+    { value: 'IDFC BANK', label: 'IDFC BANK' },
     {
-      value: "JAMMU AND KASHMIR BANK BANK",
-      label: "JAMMU AND KASHMIR BANK BANK",
+      value: 'JAMMU AND KASHMIR BANK BANK',
+      label: 'JAMMU AND KASHMIR BANK BANK',
     },
-    { value: "KARUR VYSYA BANK", label: "KARUR VYSYA BANK" },
-    { value: "RBL BANK", label: "RBL BANK" },
-    { value: "DHANLAXMI BANK", label: "DHANLAXMI BANK" },
-    { value: "CSB BANK", label: "CSB BANK" },
+    { value: 'KARUR VYSYA BANK', label: 'KARUR VYSYA BANK' },
+    { value: 'RBL BANK', label: 'RBL BANK' },
+    { value: 'DHANLAXMI BANK', label: 'DHANLAXMI BANK' },
+    { value: 'CSB BANK', label: 'CSB BANK' },
   ];
 
   const getPhoneNumber = () => {
     if (vendor.phonecheck) {
       setVendor({ ...vendor, whatsappnumber: vendor.phonenumber });
     } else {
-      setVendor({ ...vendor, whatsappnumber: "" });
+      setVendor({ ...vendor, whatsappnumber: '' });
     }
   };
 
@@ -982,17 +1004,17 @@ function Stockmaster() {
 
   //first allexcel....
   const getFileIcon = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1013,7 +1035,7 @@ function Stockmaster() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) {
           const reader = new FileReader();
           reader.onload = () => {
@@ -1022,7 +1044,7 @@ function Stockmaster() {
               size: file.size,
               type: file.type,
               preview: reader.result,
-              base64: reader.result.split(",")[1],
+              base64: reader.result.split(',')[1],
             });
             setRefImage(newSelectedFiles);
             setRefImgbillfilenames(newSelectedFiles.map((d) => d.name));
@@ -1031,13 +1053,13 @@ function Stockmaster() {
           };
           reader.readAsDataURL(file);
         } else {
-          setPopupContentMalert("File size should be less than 5MB!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('File size should be less than 5MB!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         }
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1054,14 +1076,14 @@ function Stockmaster() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImage = () => {
-    setGetImg("");
-    setFile("");
+    setGetImg('');
+    setFile('');
     setRefImage([]);
     setPreviewURL(null);
   };
@@ -1103,17 +1125,17 @@ function Stockmaster() {
 
   //first allexcel....
   const getFileIconwarranty = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1128,7 +1150,7 @@ function Stockmaster() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -1136,7 +1158,7 @@ function Stockmaster() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImagewarranty(newSelectedFiles);
           setRefImgWarrantyfilenames(newSelectedFiles.map((d) => d.name));
@@ -1144,8 +1166,8 @@ function Stockmaster() {
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1162,14 +1184,14 @@ function Stockmaster() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImagewarranty = () => {
-    setGetImgwarranty("");
-    setFilewarranty("");
+    setGetImgwarranty('');
+    setFilewarranty('');
     setRefImagewarranty([]);
     setPreviewURLwarranty(null);
   };
@@ -1204,24 +1226,24 @@ function Stockmaster() {
   };
   const handleUploadPopupClosewarrantyedit = () => {
     setUploadPopupOpenwarrantyedit(false);
-    setGetImgwarrantyedit("");
-    setFilewarrantyedit("");
+    setGetImgwarrantyedit('');
+    setFilewarrantyedit('');
     setPreviewURLwarrantyedit(null);
   };
 
   //first allexcel....
   const getFileIconwarrantyedit = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1242,7 +1264,7 @@ function Stockmaster() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -1250,7 +1272,7 @@ function Stockmaster() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImagewarrantyedit(newSelectedFiles);
           setRefImgWarrantyfilenamesEdit(newSelectedFiles.map((d) => d.name));
@@ -1258,8 +1280,8 @@ function Stockmaster() {
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1303,17 +1325,9 @@ function Stockmaster() {
 
   //first deletefile
 
-
-
   const handleFetchWarranty = (data) => {
     const files = Array.from(data); // Ensure it's an array
-    const imageFiles = files.filter(file => file.type.startsWith("image/"));
-
-    if (imageFiles.length !== files.length) {
-      setPopupContentMalert("Only Accept Images!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
     const fileReaders = [];
     const newSelectedFiles = [];
@@ -1346,8 +1360,6 @@ function Stockmaster() {
     });
   };
 
-
-
   const handleDeleteFilewarrantyedit = (index) => {
     const newSelectedFiles = refImagewarrantyedit;
     newSelectedFiles.splice(index, 1);
@@ -1364,14 +1376,14 @@ function Stockmaster() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImagewarrantyedit = () => {
-    setGetImgwarrantyedit("");
-    setFilewarrantyedit("");
+    setGetImgwarrantyedit('');
+    setFilewarrantyedit('');
     setRefImagewarrantyedit([]);
     setPreviewURLwarrantyedit(null);
   };
@@ -1406,24 +1418,24 @@ function Stockmaster() {
   };
   const handleUploadPopupCloseedit = () => {
     setUploadPopupOpenedit(false);
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setPreviewURLedit(null);
   };
 
   //first allexcel....
   const getFileIconedit = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1438,7 +1450,7 @@ function Stockmaster() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) {
           const reader = new FileReader();
           reader.onload = () => {
@@ -1447,7 +1459,7 @@ function Stockmaster() {
               size: file.size,
               type: file.type,
               preview: reader.result,
-              base64: reader.result.split(",")[1],
+              base64: reader.result.split(',')[1],
             });
             setRefImageedit(newSelectedFiles);
             setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
@@ -1455,13 +1467,13 @@ function Stockmaster() {
           };
           reader.readAsDataURL(file);
         } else {
-          setPopupContentMalert("File size should be less than 5MB!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('File size should be less than 5MB!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         }
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1505,16 +1517,9 @@ function Stockmaster() {
 
   //first deletefile
 
-
   const handleFetchBill = (data) => {
     const files = Array.from(data); // Ensure it's an array
-    const imageFiles = files.filter(file => file.type.startsWith("image/"));
-
-    if (imageFiles.length !== files.length) {
-      setPopupContentMalert("Only Accept Images!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
     const fileReaders = [];
     const newSelectedFiles = [];
@@ -1545,10 +1550,8 @@ function Stockmaster() {
       setRefImageedit(newSelectedFiles);
       setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
       setRefImgWarrantyBillEdit((existingFiles) => [...existingFiles, originalFiles]);
-
     });
   };
-
 
   const handleDeleteFileedit = (index) => {
     const newSelectedFiles = [...refImageedit];
@@ -1566,14 +1569,14 @@ function Stockmaster() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImageedit = () => {
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setRefImageedit([]);
     setPreviewURLedit(null);
   };
@@ -1599,19 +1602,19 @@ function Stockmaster() {
   const [teamstabledata, setTeamstableData] = useState([]);
   const [account, setAccount] = useState([]);
 
-  const [selectedBranch, setSelectedBranch] = useState("Please Select Branch");
-  const [selectedBranchedit, setSelectedBranchedit] = useState("Please Select Branch");
-  const [selectedUnit, setSelectedUnit] = useState("Please Select Unit");
-  const [selectedUnitedit, setSelectedUnitedit] = useState("Please Select Unit");
+  const [selectedBranch, setSelectedBranch] = useState('Please Select Branch');
+  const [selectedBranchedit, setSelectedBranchedit] = useState('Please Select Branch');
+  const [selectedUnit, setSelectedUnit] = useState('Please Select Unit');
+  const [selectedUnitedit, setSelectedUnitedit] = useState('Please Select Unit');
 
   const [assetType, setAssetType] = useState([]);
-  const [selectedassetType, setSelectedAssetType] = useState("");
-  const [selectedassetTypeEdit, setSelectedAssetTypeEdit] = useState("");
+  const [selectedassetType, setSelectedAssetType] = useState('');
+  const [selectedassetTypeEdit, setSelectedAssetTypeEdit] = useState('');
 
-  const [selectedProducthead, setSelectedProducthead] = useState("Please Select Assethead");
-  const [selectedProductheadedit, setSelectedProductheadedit] = useState("Please Select Assethead");
-  const [selectedProductname, setSelectedProductname] = useState("Please Select Materila Name");
-  const [selectedProductnameedit, setSelectedProductnameedit] = useState("Please Select Materila Name");
+  const [selectedProducthead, setSelectedProducthead] = useState('Please Select Assethead');
+  const [selectedProductheadedit, setSelectedProductheadedit] = useState('Please Select Assethead');
+  const [selectedProductname, setSelectedProductname] = useState('Please Select Materila Name');
+  const [selectedProductnameedit, setSelectedProductnameedit] = useState('Please Select Materila Name');
 
   const [filteredUnit, setFilteredUnit] = useState([]);
   const [filteredUnitEdit, setFilteredUnitEdit] = useState([]);
@@ -1619,26 +1622,26 @@ function Stockmaster() {
   const [filteredProductname, setFilteredProductname] = useState([]);
   const [filteredProductnameEdit, setFilteredProductnameEdit] = useState([]);
 
-  const [newcheckteam, setNewcheckTeam] = useState("Please Select Team");
-  const [newcheckresperson, setNewcheckResperson] = useState("Please Select Responsible Person");
+  const [newcheckteam, setNewcheckTeam] = useState('Please Select Team');
+  const [newcheckresperson, setNewcheckResperson] = useState('Please Select Responsible Person');
 
-  const [newcheckteamedit, setNewcheckTeamedit] = useState("Please Select Team");
-  const [newcheckrespersonedit, setNewcheckRespersonedit] = useState("Please Select Responsible Person");
-  const [newcheckbranchedit, setNewcheckBranchedit] = useState("Please Select Branch");
+  const [newcheckteamedit, setNewcheckTeamedit] = useState('Please Select Team');
+  const [newcheckrespersonedit, setNewcheckRespersonedit] = useState('Please Select Responsible Person');
+  const [newcheckbranchedit, setNewcheckBranchedit] = useState('Please Select Branch');
 
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
 
-  const dropdowndata = [{ label: "All", value: "All" }];
+  const dropdowndata = [{ label: 'All', value: 'All' }];
 
   //  Datefield
   var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = yyyy + "-" + mm + "-" + dd;
+  today = yyyy + '-' + mm + '-' + dd;
 
-  const [selectedPurchaseDate, setSelectedPurchaseDate] = useState("");
-  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState("");
+  const [selectedPurchaseDate, setSelectedPurchaseDate] = useState('');
+  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState('');
 
   //change form
   const handleChangephonenumber = (e) => {
@@ -1646,7 +1649,7 @@ function Stockmaster() {
     const regex = /^\d*\.?\d*$/;
     const inputValue = e.target.value;
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setStockmaster({ ...stockmaster, estimation: inputValue });
     }
@@ -1657,7 +1660,7 @@ function Stockmaster() {
     const regex = /^\d*\.?\d*$/;
     const inputValue = e.target.value;
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setStockmasteredit({ ...stockmasteredit, estimation: inputValue });
     }
@@ -1689,28 +1692,28 @@ function Stockmaster() {
 
   const formatDateString = (date) => {
     const d = new Date(date);
-    const day = d.getDate().toString().padStart(2, "0");
-    const month = (d.getMonth() + 1).toString().padStart(2, "0");
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
 
   const calculateExpiryDate = () => {
-    if (stockmaster.estimationtime !== "" && stockmaster.purchasedate) {
+    if (stockmaster.estimationtime !== '' && stockmaster.purchasedate) {
       const currentDate = new Date(stockmaster.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (stockmaster.estimationtime === "Days") {
+      if (stockmaster.estimationtime === 'Days') {
         expiryDate.setDate(currentDate.getDate() + parseInt(stockmaster.estimation));
-      } else if (stockmaster.estimationtime === "Month") {
+      } else if (stockmaster.estimationtime === 'Month') {
         expiryDate.setMonth(currentDate.getMonth() + parseInt(stockmaster.estimation));
-      } else if (stockmaster.estimationtime === "Year") {
+      } else if (stockmaster.estimationtime === 'Year') {
         expiryDate.setFullYear(currentDate.getFullYear() + parseInt(stockmaster.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
 
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN") ? "" : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       setStockmaster({
         ...stockmaster,
@@ -1732,17 +1735,17 @@ function Stockmaster() {
       const currentDate = new Date(stockmasteredit.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (stockmasteredit.estimationtime === "Days") {
+      if (stockmasteredit.estimationtime === 'Days') {
         expiryDate.setDate(currentDate.getDate() + parseInt(stockmasteredit.estimation));
-      } else if (stockmasteredit.estimationtime === "Month") {
+      } else if (stockmasteredit.estimationtime === 'Month') {
         expiryDate.setMonth(currentDate.getMonth() + parseInt(stockmasteredit.estimation));
-      } else if (stockmasteredit.estimationtime === "Year") {
+      } else if (stockmasteredit.estimationtime === 'Year') {
         expiryDate.setFullYear(currentDate.getFullYear() + parseInt(stockmasteredit.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
 
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN") ? "" : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       setStockmasteredit({
         ...stockmasteredit,
@@ -1785,7 +1788,7 @@ function Stockmaster() {
   const [units, setUnits] = useState([]);
   const [users, setUsers] = useState([]);
   const [teams, setTeams] = useState([]);
-  const [newcheckbranch, setNewcheckBranch] = useState("Choose Branch");
+  const [newcheckbranch, setNewcheckBranch] = useState('Choose Branch');
   const [floors, setFloors] = useState([]);
 
   //filter fields
@@ -1796,12 +1799,12 @@ function Stockmaster() {
   const [unitsEdit, setUnitsEdit] = useState([]);
 
   const [capacities, setCapacities] = useState([]);
-  const [capacityname, setcapacityname] = useState("");
+  const [capacityname, setcapacityname] = useState('');
 
   const [areas, setAreas] = useState([]);
-  const [locations, setLocations] = useState([{ label: "ALL", value: "ALL" }]);
+  const [locations, setLocations] = useState([{ label: 'ALL', value: 'ALL' }]);
   const [areasEdit, setAreasEdit] = useState([]);
-  const [locationsEdit, setLocationsEdit] = useState([{ label: "ALL", value: "ALL" }]);
+  const [locationsEdit, setLocationsEdit] = useState([{ label: 'ALL', value: 'ALL' }]);
   const [floorsEdit, setFloorEdit] = useState([]);
   const [stockCodeCount, setStockCodeCount] = useState(0);
   const [workStationOpt, setWorkStationOpt] = useState([]);
@@ -1810,7 +1813,7 @@ function Stockmaster() {
   const [Specificationedit, setSpecificationedit] = useState([]);
 
   const [materialOpt, setMaterialopt] = useState([]);
-  const [materialOptEdit, setMaterialoptEdit] = useState("Please Select Material");
+  const [materialOptEdit, setMaterialoptEdit] = useState('Please Select Material');
 
   // const handleVendorChange = (e) => {
   //     const selectedvendorname = e.value;
@@ -1858,49 +1861,49 @@ function Stockmaster() {
   const { auth, setAuth } = useContext(AuthContext);
   const [projectCheck, setProjectCheck] = useState(false);
 
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [window.location.pathname?.substring(1), window.location.pathname];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
+
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
 
   const handleBranchChange = (e) => {
     const selectedBranch = e.value;
     setSelectedBranch(selectedBranch);
-    setSelectedUnit("Please Select Unit");
+    setSelectedUnit('Please Select Unit');
   };
 
   const handleProductChange = (e) => {
     const selectedProducthead = e.value;
     setSelectedProducthead(selectedProducthead);
-    setSelectedProductname("Please Select Materila Name");
+    setSelectedProductname('Please Select Materila Name');
   };
 
   //Datatable
@@ -1919,15 +1922,15 @@ function Stockmaster() {
 
   const [projectData, setProjectData] = useState([]);
   const [items, setItems] = useState([]);
-  const [sorting, setSorting] = useState({ column: "", direction: "" });
-  const [searchQuery, setSearchQuery] = useState("");
+  const [sorting, setSorting] = useState({ column: '', direction: '' });
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [checkvendor, setCheckvendor] = useState();
   const [checkcategory, setCheckcategory] = useState();
   const [checksubcategory, setChecksubcategory] = useState();
   const [checktimepoints, setChecktimepoints] = useState();
 
-  const [copiedData, setCopiedData] = useState("");
+  const [copiedData, setCopiedData] = useState('');
 
   const [canvasState, setCanvasState] = useState(false);
 
@@ -1936,10 +1939,10 @@ function Stockmaster() {
       domtoimage
         .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Asset Purchase List.png");
+          saveAs(blob, 'Asset Purchase List.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -2028,17 +2031,27 @@ function Stockmaster() {
   };
 
   const [vendorgetid, setVendorgetid] = useState({});
-  const [vendornameid, setVendornameid] = useState({});
+  const [vendornameid, setVendornameid] = useState('');
 
   const vendorid = async (id) => {
     try {
-      let res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-      });
-      setVendorgetid(res?.data?.svendordetails);
-      setVendornameid(id);
+      if (id) {
+        let res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
+        setVendorgetid(res?.data?.svendordetails);
+        setVendornameid(id);
+      } else {
+        setVendorgetid({
+          ...vendorgetid,
+          gstnumber: '',
+          address: '',
+          phonenumber: '',
+        });
+        setVendornameid('');
+      }
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -2047,7 +2060,7 @@ function Stockmaster() {
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   const username = isUserRoleAccess.username;
@@ -2070,11 +2083,11 @@ function Stockmaster() {
   };
   const handleCloseManageColumns1 = () => {
     setManageColumnsOpen1(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl1);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   // Styles for the resizable column
   const ResizableColumn = styled(Resizable)`
@@ -2090,9 +2103,9 @@ function Stockmaster() {
 
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.data.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   // Show All Columns & Manage Columns
@@ -2190,10 +2203,10 @@ function Stockmaster() {
       handleCloseMod();
       setSelectedRows([]);
       setPage(1);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -2217,10 +2230,10 @@ function Stockmaster() {
 
       handleCloseModcheckbox();
       setSelectedRows([]);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
       setSelectAllChecked(false);
       setPage(1);
     } catch (err) {
@@ -2229,7 +2242,7 @@ function Stockmaster() {
   };
   //add function
   const sendRequest = async () => {
-    setChangeTable("new");
+    setChangeTable('new');
     const uniqueId = uuidv4();
     try {
       let stockcreate = await axios.post(SERVICE.STOCKPURCHASE_CREATE, {
@@ -2242,22 +2255,22 @@ function Stockmaster() {
         floor: String(stockmaster.floor),
         location: String(stockmaster.location),
         area: String(stockmaster.area),
-        workstation: String(stockmaster.workcheck ? stockmaster.workstation : ""),
+        workstation: String(stockmaster.workcheck ? stockmaster.workstation : ''),
         totalbillamount: stockmaster.quantity * stockmaster.rate,
         totalbillamountstock: stockmaster.totalbillamount,
         workcheck: String(stockmaster.workcheck),
-        assettype: String(stockmaster.assettype === undefined ? "" : stockmaster.assettype),
+        assettype: String(stockmaster.assettype === undefined ? '' : stockmaster.assettype),
         asset: String(stockmaster.asset),
-        productname: String(stockmaster.productname === "Please Select Material" ? "" : stockmaster.productname),
+        productname: String(stockmaster.productname === 'Please Select Material' ? '' : stockmaster.productname),
         vendorfrequency: String(frequencyValue),
-        component: String(stockmaster.component === "Please Select Component" ? "" : stockmaster.component),
+        component: String(stockmaster.component === 'Please Select Component' ? '' : stockmaster.component),
 
-        producthead: String(stockmaster.producthead === "Please Select Assethead" ? "" : stockmaster.producthead),
+        producthead: String(stockmaster.producthead === 'Please Select Assethead' ? '' : stockmaster.producthead),
 
         vendor: String(vendorNew),
         vendorgroup: String(vendorGroup),
-        vendorid: String(vendornameid),
-        gstno: String(vendorgetid.gstnumber === undefined ? "" : vendorgetid.gstnumber),
+        vendorid: String(vendornameid) ? String(vendornameid) : '',
+        gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
         address: String(vendorgetid.address),
         phonenumber: String(vendorgetid.phonenumber),
         billno: Number(stockmaster.billno),
@@ -2266,7 +2279,7 @@ function Stockmaster() {
 
         warrantydetails: String(stockmaster.warrantydetails),
 
-        uom: stockmaster.uom === "Please Select UOM" ? "" : String(stockmaster.uom),
+        uom: stockmaster.uom === 'Please Select UOM' ? '' : String(stockmaster.uom),
 
         quantity: Number(stockmaster.quantity),
 
@@ -2283,76 +2296,76 @@ function Stockmaster() {
         // warrantyfiles: [...refImagewarranty],
         warranty: String(stockmaster.warranty),
         estimation: String(stockmaster.estimation),
-        estimationtime: String(stockmaster.estimationtime) ? stockmaster.estimationtime : "Days",
+        estimationtime: String(stockmaster.estimationtime) ? stockmaster.estimationtime : 'Days',
         warrantycalculation: String(stockmaster.warrantycalculation),
         purchasedate: selectedPurchaseDate,
 
         requestmode: String(stockmaster.requestmode),
-        stockcategory: stockmaster.stockcategory === "Please Select Stock Category" ? "" : String(stockmaster.stockcategory),
-        stocksubcategory: stockmaster.stocksubcategory === "Please Select Stock Sub Category" ? "" : String(stockmaster.stocksubcategory),
+        stockcategory: stockmaster.stockcategory === 'Please Select Stock Category' ? '' : String(stockmaster.stockcategory),
+        stocksubcategory: stockmaster.stocksubcategory === 'Please Select Stock Sub Category' ? '' : String(stockmaster.stocksubcategory),
         // stockmaterialarray: stockArray,
 
         tododetails: [...educationtodo],
         paidstatus: String(expensecreate.paidstatus),
 
-        bankname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankname) : "",
-        bankbranchname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankbranchname) : "",
-        accountholdername: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.accountholdername) : "",
-        accountnumber: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.accountnumber) : "",
-        ifsccode: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.ifsccode) : "",
+        bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+        bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankbranchname) : '',
+        accountholdername: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountholdername) : '',
+        accountnumber: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountnumber) : '',
+        ifsccode: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.ifsccode) : '',
 
-        upinumber: expensecreate.paidmode === "UPI" ? String(vendorstock.upinumber) : "",
+        upinumber: expensecreate.paidmode === 'UPI' ? String(vendorstock.upinumber) : '',
 
-        cardnumber: expensecreate.paidmode === "Card" ? String(vendorstock.cardnumber) : "",
-        cardholdername: expensecreate.paidmode === "Card" ? String(vendorstock.cardholdername) : "",
-        cardtransactionnumber: expensecreate.paidmode === "Card" ? String(vendorstock.cardtransactionnumber) : "",
-        cardtype: expensecreate.paidmode === "Card" ? String(vendorstock.cardtype) : "",
-        cardmonth: expensecreate.paidmode === "Card" ? String(vendorstock.cardmonth) : "",
-        cardyear: expensecreate.paidmode === "Card" ? String(vendorstock.cardyear) : "",
-        cardsecuritycode: expensecreate.paidmode === "Card" ? String(vendorstock.cardsecuritycode) : "",
+        cardnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardnumber) : '',
+        cardholdername: expensecreate.paidmode === 'Card' ? String(vendorstock.cardholdername) : '',
+        cardtransactionnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtransactionnumber) : '',
+        cardtype: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtype) : '',
+        cardmonth: expensecreate.paidmode === 'Card' ? String(vendorstock.cardmonth) : '',
+        cardyear: expensecreate.paidmode === 'Card' ? String(vendorstock.cardyear) : '',
+        cardsecuritycode: expensecreate.paidmode === 'Card' ? String(vendorstock.cardsecuritycode) : '',
 
-        chequenumber: expensecreate.paidmode === "Cheque" ? String(vendor.chequenumber) : "",
+        chequenumber: expensecreate.paidmode === 'Cheque' ? String(vendor.chequenumber) : '',
 
-        cash: expensecreate.paidmode === "Cash" ? String("Cash") : "",
+        cash: expensecreate.paidmode === 'Cash' ? String('Cash') : '',
 
-        paidmode: String(expensecreate.paidstatus === "Not Paid" ? "" : expensecreate.paidmode),
-        paidamount: Number(expensecreate.paidstatus === "Not Paid" ? 0 : expensecreate.paidamount),
-        balanceamount: Number(expensecreate.paidstatus === "Not Paid" ? stockmaster.totalbillamount : expensecreate.balanceamount),
-        sortdate: String(expensecreate.paidstatus === "Not Paid" ? "" : new Date()),
-        billstatus: expensecreate.paidstatus === "Not Paid" ? "InComplete" : expensecreate.paidstatus === "Paid" && Number(expensecreate.paidamount) !== Number(Expensetotal) ? "Partially Paid" : "Completed",
+        paidmode: String(expensecreate.paidstatus === 'Not Paid' ? '' : expensecreate.paidmode),
+        paidamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+        balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmaster.totalbillamount : expensecreate.balanceamount),
+        sortdate: String(expensecreate.paidstatus === 'Not Paid' ? '' : new Date()),
+        billstatus: expensecreate.paidstatus === 'Not Paid' ? 'InComplete' : expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal) ? 'Partially Paid' : 'Completed',
         paymentduereminderlog:
-          expensecreate.paidstatus === "Paid"
+          expensecreate.paidstatus === 'Paid'
             ? [
-              {
-                balanceamount: Number(expensecreate.paidstatus === "Not Paid" ? stockmaster.totalbillamount : expensecreate.balanceamount),
-                expensetotal: stockmaster.totalbillamount,
-                modeofpayments: expensecreate.paidmode,
-                payamountdate: expensecreate.date,
-                payamount: Number(expensecreate.paidstatus === "Not Paid" ? 0 : expensecreate.paidamount),
-                bankname: expensecreate.paidmode === "Bank Transfer" ? String(vendorstock.bankname) : "",
-                bankbranchname: expensecreate.paidmode === "Bank Transfer" ? vendorstock.bankbranchname : "",
-                accountholdername: expensecreate.paidmode === "Bank Transfer" ? vendorstock.accountholdername : "",
-                accountnumber: expensecreate.paidmode === "Bank Transfer" ? vendorstock.accountnumber : "",
-                ifsccode: expensecreate.paidmode === "Bank Transfer" ? vendorstock.ifsccode : "",
+                {
+                  balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmaster.totalbillamount : expensecreate.balanceamount),
+                  expensetotal: stockmaster.totalbillamount,
+                  modeofpayments: expensecreate.paidmode,
+                  payamountdate: expensecreate.date,
+                  payamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+                  bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+                  bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.bankbranchname : '',
+                  accountholdername: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountholdername : '',
+                  accountnumber: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountnumber : '',
+                  ifsccode: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.ifsccode : '',
 
-                upinumber: expensecreate.paidmode === "UPI" ? vendorstock.upinumber : "",
+                  upinumber: expensecreate.paidmode === 'UPI' ? vendorstock.upinumber : '',
 
-                cardnumber: expensecreate.paidmode === "Card" ? vendorstock.cardnumber : "",
-                cardholdername: expensecreate.paidmode === "Card" ? vendorstock.cardholdername : "",
-                cardtransactionnumber: expensecreate.paidmode === "Card" ? vendorstock.cardtransactionnumber : "",
-                cardtype: expensecreate.paidmode === "Card" ? vendorstock.cardtype : "",
-                cardmonth: expensecreate.paidmode === "Card" ? vendorstock.cardmonth : "",
-                cardyear: expensecreate.paidmode === "Card" ? vendorstock.cardyear : "",
-                cardsecuritycode: expensecreate.paidmode === "Card" ? vendorstock.cardsecuritycode : "",
-                chequenumber: expensecreate.paidmode === "Cheque" ? vendorstock.chequenumber : "",
-                addedby: [
-                  {
-                    name: String(isUserRoleAccess.companyname),
-                    date: String(new Date()),
-                  },
-                ],
-              },
-            ]
+                  cardnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardnumber : '',
+                  cardholdername: expensecreate.paidmode === 'Card' ? vendorstock.cardholdername : '',
+                  cardtransactionnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardtransactionnumber : '',
+                  cardtype: expensecreate.paidmode === 'Card' ? vendorstock.cardtype : '',
+                  cardmonth: expensecreate.paidmode === 'Card' ? vendorstock.cardmonth : '',
+                  cardyear: expensecreate.paidmode === 'Card' ? vendorstock.cardyear : '',
+                  cardsecuritycode: expensecreate.paidmode === 'Card' ? vendorstock.cardsecuritycode : '',
+                  chequenumber: expensecreate.paidmode === 'Cheque' ? vendorstock.chequenumber : '',
+                  addedby: [
+                    {
+                      name: String(isUserRoleAccess.companyname),
+                      date: String(new Date()),
+                    },
+                  ],
+                },
+              ]
             : [],
         addedby: [
           {
@@ -2361,13 +2374,13 @@ function Stockmaster() {
           },
         ],
       });
-      await handleFileUpload(refImgWarranty, "todo", uniqueId);
-      await handleFileUpload(refImgWarrantyBill, "bill", uniqueId);
+      await handleFileUpload(refImgWarranty, 'todo', uniqueId);
+      await handleFileUpload(refImgWarrantyBill, 'bill', uniqueId);
       // await fetchStock("Filtered");
       // await fetchEbSort()
       setBtnSubmit(false);
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       // setStockmaster(stockcreate.data);
       // await fetchEbSort()
@@ -2375,38 +2388,38 @@ function Stockmaster() {
       setStockArray([]);
       setStockmaster({
         ...stockmaster,
-        gstno: "",
-        billno: "",
-        productname: "",
-        productdetails: "",
-        warrantydetails: "",
-        quantity: "",
-        rate: "",
-        billdate: "",
-        warrantyfiles: "",
-        addedby: "",
-        updatedby: "",
+        gstno: '',
+        billno: '',
+        productname: '',
+        productdetails: '',
+        warrantydetails: '',
+        quantity: '',
+        rate: '',
+        billdate: '',
+        warrantyfiles: '',
+        addedby: '',
+        updatedby: '',
 
-        warranty: "Yes",
-        warrantycalculation: "",
-        estimation: "",
-        estimationtime: "Days",
-        purchasedate: "",
+        warranty: 'Yes',
+        warrantycalculation: '',
+        estimation: '',
+        estimationtime: 'Days',
+        purchasedate: '',
 
-        vendorname: "Please Select Vendor",
-        productname: "Please Select Material",
-        component: "Please Select Component",
+        vendorname: 'Please Select Vendor',
+        productname: 'Please Select Material',
+        component: 'Please Select Component',
       });
 
       setRefImage([]);
-      setFile("");
+      setFile('');
       setGetImg(null);
       setRefImagewarranty([]);
-      setFilewarranty("");
+      setFilewarranty('');
       setGetImgwarranty(null);
       setTodos([]);
-      setChangeTable("old");
-      setSelectedPurchaseDate("");
+      setChangeTable('old');
+      setSelectedPurchaseDate('');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -2444,18 +2457,18 @@ function Stockmaster() {
                 // console.log(chunk, "chunk");
 
                 const formData = new FormData();
-                formData.append("file", chunk);
-                formData.append("chunkNumber", chunkNumber);
-                formData.append("totalChunks", totalChunks);
-                formData.append("filesize", selectedFile.size);
-                formData.append("originalname", `${uniqueId}$${type}$${selectedFile.name}`);
+                formData.append('file', chunk);
+                formData.append('chunkNumber', chunkNumber);
+                formData.append('totalChunks', totalChunks);
+                formData.append('filesize', selectedFile.size);
+                formData.append('originalname', `${uniqueId}$${type}$${selectedFile.name}`);
 
                 // console.log(formData, "formData");
 
                 try {
                   const response = await axios.post(SERVICE.UPLOAD_CHUNK_STOCK, formData, {
                     headers: {
-                      "Content-Type": "multipart/form-data",
+                      'Content-Type': 'multipart/form-data',
                     },
                   });
                   // console.log(response, "response");
@@ -2466,7 +2479,7 @@ function Stockmaster() {
 
                   uploadNextChunk();
                 } catch (err) {
-                  console.log(err, "ERrer");
+                  console.log(err, 'ERrer');
                   handleApiError(err, setShowAlert, handleClickOpenerr);
                 }
               } else {
@@ -2474,7 +2487,7 @@ function Stockmaster() {
                 console.log(`File upload completed for ${selectedFile.name}`);
               }
             } catch (err) {
-              console.log(err, "asdfse");
+              console.log(err, 'asdfse');
             }
           };
 
@@ -2486,16 +2499,16 @@ function Stockmaster() {
 
       uploadFiles();
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
   //submit option for saving
   const handleSubmit = async (e) => {
-    let vendorEmpty = todos.some((item) => item.vendor == "Choose Vendor");
+    let vendorEmpty = todos.some((item) => item.vendor == 'Choose Vendor');
     setBtnSubmit(true);
     e.preventDefault();
-    await fetchStock("Filtered");
+    await fetchStock('Filtered');
     await fetchEbSort();
     if (!isStockMaterial) {
       const isNameMatch = stock.some(
@@ -2542,93 +2555,93 @@ function Stockmaster() {
 
         //   , "cond")
       );
-      if (stockmaster.company === "Please Select Company") {
-        setPopupContentMalert("Please Select Company!");
-        setPopupSeverityMalert("info");
+      if (stockmaster.company === 'Please Select Company') {
+        setPopupContentMalert('Please Select Company!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.branch === "Please Select Branch") {
-        setPopupContentMalert("Please Select Branch!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.branch === 'Please Select Branch') {
+        setPopupContentMalert('Please Select Branch!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.unit === "Please Select Unit") {
-        setPopupContentMalert("Please Select Unit!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.unit === 'Please Select Unit') {
+        setPopupContentMalert('Please Select Unit!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.floor === "Please Select Floor") {
-        setPopupContentMalert("Please Select Floor!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.floor === 'Please Select Floor') {
+        setPopupContentMalert('Please Select Floor!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.area === "Please Select Area") {
-        setPopupContentMalert("Please Select Area!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.area === 'Please Select Area') {
+        setPopupContentMalert('Please Select Area!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.location === "Please Select Location") {
-        setPopupContentMalert("Please Select Location!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.location === 'Please Select Location') {
+        setPopupContentMalert('Please Select Location!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (vendorGroup === "Choose Vendor Group") {
-        setPopupContentMalert("Please Select Vendor Group!");
-        setPopupSeverityMalert("info");
+      } else if (vendorGroup === 'Choose Vendor Group') {
+        setPopupContentMalert('Please Select Vendor Group!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (vendorNew === "Choose Vendor") {
-        setPopupContentMalert("Please Select Vendor!");
-        setPopupSeverityMalert("info");
+      } else if (vendorNew === 'Choose Vendor') {
+        setPopupContentMalert('Please Select Vendor!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.requestmode === "Please Select Request Mode" || stockmaster.requestmode === "") {
-        setPopupContentMalert("Please Select Request Mode For!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
+        setPopupContentMalert('Please Select Request Mode For!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.productname === "" || stockmaster.productname === "Please Select Material") {
-        setPopupContentMalert("Please Select Material!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.productname === '' || stockmaster.productname === 'Please Select Material') {
+        setPopupContentMalert('Please Select Material!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.component === "" || stockmaster.component === "Please Select Component") {
-        setPopupContentMalert("Please Select Component!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.component === '' || stockmaster.component === 'Please Select Component') {
+        setPopupContentMalert('Please Select Component!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.billno === "") {
-        setPopupContentMalert("Please Enter Billno!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.billno === '') {
+        setPopupContentMalert('Please Enter Billno!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.productdetails === "") {
-        setPopupContentMalert("Please Enter Product Details!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.productdetails === '') {
+        setPopupContentMalert('Please Enter Product Details!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.warranty === "Yes" && stockmaster.warrantydetails === "") {
-        setPopupContentMalert("Please Enter Warranty Details!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty === 'Yes' && stockmaster.warrantydetails === '') {
+        setPopupContentMalert('Please Enter Warranty Details!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.uom === "" || stockmaster.uom === "Please Select UOM") {
-        setPopupContentMalert("Please Select Uom!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
+        setPopupContentMalert('Please Select Uom!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.quantity === "") {
-        setPopupContentMalert("Please Enter Quantity!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.quantity === '') {
+        setPopupContentMalert('Please Enter Quantity!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.rate === "") {
-        setPopupContentMalert("Please Enter Rate!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.rate === '') {
+        setPopupContentMalert('Please Enter Rate!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.billdate === "") {
-        setPopupContentMalert("Please Select Bill Date!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.billdate === '') {
+        setPopupContentMalert('Please Select Bill Date!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (refImage.length == 0) {
-        setPopupContentMalert("Please Upload Bill!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Please Upload Bill!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (vendorEmpty) {
-        setPopupContentMalert("Please Select Vendor in All the Sub Dividends!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Please Select Vendor in All the Sub Dividends!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (isNameMatch) {
-        setPopupContentMalert("Data Already Exist!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Data Already Exist!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (todos.length > 0 && todos.some((d) => (d.warranty === "Yes" && (d.subcomponentcheck == true || d.subcomponentcheck == "true") && d.estimation === undefined) || d.estimation === "")) {
-        setPopupContentMalert("Please Enter Warranty Time in Component");
-        setPopupSeverityMalert("info");
+      } else if (todos.length > 0 && todos.some((d) => (d.warranty === 'Yes' && (d.subcomponentcheck == true || d.subcomponentcheck == 'true') && d.estimation === undefined) || d.estimation === '')) {
+        setPopupContentMalert('Please Enter Warranty Time in Component');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else {
         sendRequest();
@@ -2646,7 +2659,6 @@ function Stockmaster() {
           Number(item.billno) == Number(stockmaster.billno) &&
           item.requestmode == stockmaster.requestmode &&
           item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
-
           item.rate == stockmaster.rate &&
           item.billdate == stockmaster.billdate
 
@@ -2672,29 +2684,29 @@ function Stockmaster() {
         //   item.billdate == stockmaster.billdate, "condstock")
       );
 
-      if (stockmaster.company === "Please Select Company") {
-        setPopupContentMalert("Please Select Company!");
-        setPopupSeverityMalert("info");
+      if (stockmaster.company === 'Please Select Company') {
+        setPopupContentMalert('Please Select Company!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.branch === "Please Select Branch") {
-        setPopupContentMalert("Please Select Branch!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.branch === 'Please Select Branch') {
+        setPopupContentMalert('Please Select Branch!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.unit === "Please Select Unit") {
-        setPopupContentMalert("Please Select Unit!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.unit === 'Please Select Unit') {
+        setPopupContentMalert('Please Select Unit!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.floor === "Please Select Floor") {
-        setPopupContentMalert("Please Select Floor!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.floor === 'Please Select Floor') {
+        setPopupContentMalert('Please Select Floor!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.area === "Please Select Area") {
-        setPopupContentMalert("Please Select Area!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.area === 'Please Select Area') {
+        setPopupContentMalert('Please Select Area!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.location === "Please Select Location") {
-        setPopupContentMalert("Please Select Location!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.location === 'Please Select Location') {
+        setPopupContentMalert('Please Select Location!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       // else if (stockmaster.vendorname === "" || stockmaster.vendorname === "Please Select Vendor") {
@@ -2715,60 +2727,47 @@ function Stockmaster() {
       //   );
       //   handleClickOpenerr();
       // }
-      else if (stockmaster.billno === "") {
-        setPopupContentMalert("Please Enter Billno!");
-        setPopupSeverityMalert("info");
+      else if (stockmaster.billno === '') {
+        setPopupContentMalert('Please Enter Billno!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.requestmode === "Please Select Request Mode" || stockmaster.requestmode === "") {
-        setPopupContentMalert("Please Select Request Mode For!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
+        setPopupContentMalert('Please Select Request Mode For!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (stockmaster.warranty === "Yes" && stockmaster.warrantydetails === "") {
-        setPopupContentMalert("Please Enter Warranty Details!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty === 'Yes' && stockmaster.warrantydetails === '') {
+        setPopupContentMalert('Please Enter Warranty Details!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-
-      else if (stockmaster.billdate === "") {
-        setPopupContentMalert("Please Select Bill Date!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.billdate === '') {
+        setPopupContentMalert('Please Select Bill Date!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (refImage.length == 0) {
-        setPopupContentMalert("Please Upload Bill!");
-        setPopupSeverityMalert("info");
+      } else if (refImage.length == 0) {
+        setPopupContentMalert('Please Upload Bill!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (stockmaster.totalbillamount == "") {
-        setPopupContentMalert("Please Enter Totalbillamounts!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.totalbillamount == '') {
+        setPopupContentMalert('Please Enter Totalbillamounts!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (educationtodo.length == 0) {
-        setPopupContentMalert("Please Insert Todo!");
-        setPopupSeverityMalert("info");
+      } else if (educationtodo.length == 0) {
+        setPopupContentMalert('Please Insert Todo!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (expensecreate.paidstatus === "Paid" && expensecreate.paidmode === "Please Select Paid Mode") {
-        setPopupContentMalert("Please Select Paid Mode!");
-        setPopupSeverityMalert("info");
+      } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Please Select Paid Mode') {
+        setPopupContentMalert('Please Select Paid Mode!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (expensecreate.paidstatus === "Paid" && expensecreate.paidamount === "") {
-        setPopupContentMalert("Please Enter Paid Amount!");
-        setPopupSeverityMalert("info");
+      } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidamount === '') {
+        setPopupContentMalert('Please Enter Paid Amount!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }
-      else if (
-        expensecreate.paidstatus === "Paid" &&
-        Number(expensecreate.paidamount) !== Number(Expensetotal)
-      ) {
+      } else if (expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal)) {
         handleClickOpenerrAmount();
-      }
-      else if (isNameMatch) {
-        setPopupContentMalert("Data Already Exist!");
-        setPopupSeverityMalert("info");
+      } else if (isNameMatch) {
+        setPopupContentMalert('Data Already Exist!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else {
         sendRequest();
@@ -2780,71 +2779,68 @@ function Stockmaster() {
     e.preventDefault();
 
     setStockmaster({
-      company: "Please Select Company",
-      branch: "Please Select Branch",
-      unit: "Please Select Unit",
-      floor: "Please Select Floor",
-      area: "Please Select Area",
-      location: "Please Select Location",
-      workstation: "Please Select Workstation",
+      company: 'Please Select Company',
+      branch: 'Please Select Branch',
+      unit: 'Please Select Unit',
+      floor: 'Please Select Floor',
+      area: 'Please Select Area',
+      location: 'Please Select Location',
+      workstation: 'Please Select Workstation',
       workcheck: false,
-      producthead: "",
-      vendorname: "Please Select Vendor",
-      productname: "Please Select Material",
-      component: "Please Select Component",
-      gstno: "",
-      billno: "",
-      assettype: "",
-      asset: "",
-      productdetails: "",
-      warrantydetails: "",
-      uom: "Please Select UOM",
-      quantity: "",
-      rate: "",
-      billdate: "",
-      files: "",
-      warrantyfiles: "",
+      producthead: '',
+      vendorname: 'Please Select Vendor',
+      productname: 'Please Select Material',
+      component: 'Please Select Component',
+      gstno: '',
+      billno: '',
+      assettype: '',
+      asset: '',
+      productdetails: '',
+      warrantydetails: '',
+      uom: 'Please Select UOM',
+      quantity: '',
+      rate: '',
+      billdate: '',
+      files: '',
+      warrantyfiles: '',
 
-      warranty: "Yes",
-      warrantycalculation: "",
-      estimation: "",
-      estimationtime: "Days",
-      purchasedate: "",
+      warranty: 'Yes',
+      warrantycalculation: '',
+      estimation: '',
+      estimationtime: 'Days',
+      purchasedate: '',
 
-      addedby: "",
-      updatedby: "",
+      addedby: '',
+      updatedby: '',
 
-      requestmode: "Please Select Request Mode",
-      stockcategory: "Please Select Stock Category",
-      stocksubcategory: "Please Select Stock Sub Category",
-      uomnew: "",
-      quantitynew: "",
-      materialnew: "Please Select Material",
-      productdetailsnew: "",
+      requestmode: 'Please Select Request Mode',
+      stockcategory: 'Please Select Stock Category',
+      stocksubcategory: 'Please Select Stock Sub Category',
+      uomnew: '',
+      quantitynew: '',
+      materialnew: 'Please Select Material',
+      productdetailsnew: '',
     });
     setExpensecreate({
+      totalbillamount: '',
 
-      totalbillamount: "",
+      paidstatus: 'Not Paid',
 
-      paidstatus: "Not Paid",
-
-      paidmode: "Please Select Paid Mode",
-
+      paidmode: 'Please Select Paid Mode',
     });
     setTodoDetails({
-      particularmode: "Please Select Particular Mode",
-      category: "Please Select Category",
-      subcategory: "Please Select Sub Category",
-      materialnew: "Please Select Item Name",
-      uomnew: "",
-      rate: "",
-      quantitynew: "",
-      amount: "",
+      particularmode: 'Please Select Particular Mode',
+      category: 'Please Select Category',
+      subcategory: 'Please Select Sub Category',
+      materialnew: 'Please Select Item Name',
+      uomnew: '',
+      rate: '',
+      quantitynew: '',
+      amount: '',
     });
     setEducationtodo([]);
-    setVendorModeOfPayments("");
+    setVendorModeOfPayments('');
     setCategoryOption([]);
-
 
     setSubcategoryOption([]);
     setMaterialoptNew([]);
@@ -2854,21 +2850,21 @@ function Stockmaster() {
     setFloors([]);
     setStockArray([]);
     setAreas([]);
-    setLocations([{ label: "ALL", value: "ALL" }]);
-    setSelectedBranch("Please Select Branch");
-    setSelectedUnit("Please Select Unit");
-    setSelectedProducthead("Please Select Assethead");
-    setSelectedProductname("Please Select Materila Name");
+    setLocations([{ label: 'ALL', value: 'ALL' }]);
+    setSelectedBranch('Please Select Branch');
+    setSelectedUnit('Please Select Unit');
+    setSelectedProducthead('Please Select Assethead');
+    setSelectedProductname('Please Select Materila Name');
     setAccount([]);
-    setFile("");
+    setFile('');
     setRefImage([]);
     setGetImg(null);
     setTodos([]);
-    setVendorNew("Choose Vendor");
-    setVendorGroup("Choose Vendor Group");
-    setVendorgetid({ gstnumber: "", address: "", phonenumber: "" });
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setVendorNew('Choose Vendor');
+    setVendorGroup('Choose Vendor Group');
+    setVendorgetid({ gstnumber: '', address: '', phonenumber: '' });
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
 
@@ -2888,7 +2884,7 @@ function Stockmaster() {
         contactperson: String(vendor.contactperson),
         address: String(vendor.address),
         gstnumber: String(vendor.gstnumber),
-        bankname: String(vendor.bankname === "Please Select Bank Name" ? "" : vendor.bankname),
+        bankname: String(vendor.bankname === 'Please Select Bank Name' ? '' : vendor.bankname),
         accountname: String(vendor.accountname),
         accountnumber: Number(vendor.accountnumber),
         ifsccode: String(vendor.ifsccode),
@@ -2901,17 +2897,17 @@ function Stockmaster() {
       });
       await fetchVendor();
       setVendor({
-        vendorname: "",
-        emailid: "",
-        phonenumber: "",
-        whatsappnumber: "",
-        contactperson: "",
-        address: "",
-        gstnumber: "",
-        bankname: "Please Select Bank Name",
-        accountname: "",
-        accountnumber: "",
-        ifsccode: "",
+        vendorname: '',
+        emailid: '',
+        phonenumber: '',
+        whatsappnumber: '',
+        contactperson: '',
+        address: '',
+        gstnumber: '',
+        bankname: 'Please Select Bank Name',
+        accountname: '',
+        accountnumber: '',
+        ifsccode: '',
         phonecheck: false,
       });
       handleCloseviewalertvendor();
@@ -2942,7 +2938,7 @@ function Stockmaster() {
       });
       setVomMaster(vomnamecreate.data);
       await fetchUom();
-      setVomMaster({ name: "" });
+      setVomMaster({ name: '' });
       handleCloseviewalertUom();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -2953,13 +2949,13 @@ function Stockmaster() {
   const handleSubmituom = (e) => {
     e.preventDefault();
     const isNameMatch = vomMasterget?.some((item) => item.name?.toLowerCase() === vomMaster.name?.toLowerCase());
-    if (vomMaster.name === "") {
-      setPopupContentMalert("Please Enter VOM Master Name!");
-      setPopupSeverityMalert("info");
+    if (vomMaster.name === '') {
+      setPopupContentMalert('Please Enter VOM Master Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequestuom();
@@ -2968,7 +2964,7 @@ function Stockmaster() {
 
   const handleclearuom = (e) => {
     e.preventDefault();
-    setVomMaster({ name: "" });
+    setVomMaster({ name: '' });
   };
 
   //post call for asset material
@@ -2992,7 +2988,7 @@ function Stockmaster() {
       });
       await fetchAsset();
       setAsset(subprojectscreate.data);
-      setAsset({ ...asset, name: "", materialcode: "" });
+      setAsset({ ...asset, name: '', materialcode: '' });
       handleCloseviewalertAsset();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -3008,25 +3004,25 @@ function Stockmaster() {
     const isNameMatch = assetmaster?.some((item) => item?.name?.toLowerCase() === asset.name?.toLowerCase() && item.assethead === selectedassethead);
     const isCodeMatch = assetmaster?.some((item) => item?.materialcode?.toLowerCase() === asset.materialcode?.toLowerCase() && item.assethead === selectedassethead);
 
-    if (selectedassethead === "" || selectedassethead == "Please Select Assethead") {
-      setPopupContentMalert("Please Select Assethead!");
-      setPopupSeverityMalert("info");
+    if (selectedassethead === '' || selectedassethead == 'Please Select Assethead') {
+      setPopupContentMalert('Please Select Assethead!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (asset.materialcode === "") {
-      setPopupContentMalert("Please Enter Material Code!");
-      setPopupSeverityMalert("info");
+    } else if (asset.materialcode === '') {
+      setPopupContentMalert('Please Enter Material Code!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (asset.name === "") {
-      setPopupContentMalert("Please Enter Material Name!");
-      setPopupSeverityMalert("info");
+    } else if (asset.name === '') {
+      setPopupContentMalert('Please Enter Material Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isCodeMatch) {
-      setPopupContentMalert("Code already exits!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Code already exits!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequestasset();
@@ -3034,8 +3030,8 @@ function Stockmaster() {
   };
   const handleClearasset = (e) => {
     e.preventDefault();
-    setSelectedAssethead("Please Select Assethead");
-    setAsset({ materialcode: "", name: "" });
+    setSelectedAssethead('Please Select Assethead');
+    setAsset({ materialcode: '', name: '' });
   };
 
   //Edit model...
@@ -3043,27 +3039,27 @@ function Stockmaster() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
     setStockmasteredit({
-      vendorname: "Please Select Vendor",
-      gstno: "",
-      billno: "",
-      productdetails: "",
-      warrantydetails: "",
-      uom: "",
-      quantity: "",
-      warranty: "",
-      rate: "",
-      billdate: "",
-      files: "",
-      warrantyfiles: "",
+      vendorname: 'Please Select Vendor',
+      gstno: '',
+      billno: '',
+      productdetails: '',
+      warrantydetails: '',
+      uom: '',
+      quantity: '',
+      warranty: '',
+      rate: '',
+      billdate: '',
+      files: '',
+      warrantyfiles: '',
     });
-    setSelectedBranch("Please Select Branch");
-    setSelectedUnit("Please Select Unit");
-    setSelectedProducthead("Please Select Assethead");
-    setSelectedProductname("Please Select Materila Name");
-    setVendorgetid({ gstnumber: "" });
+    setSelectedBranch('Please Select Branch');
+    setSelectedUnit('Please Select Unit');
+    setSelectedProducthead('Please Select Assethead');
+    setSelectedProductname('Please Select Materila Name');
+    setVendorgetid({ gstnumber: '' });
   };
 
   const getMultipleFilesAsObjects = async (filenames, type, uniqueId) => {
@@ -3077,7 +3073,7 @@ function Stockmaster() {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
-          responseType: "blob",
+          responseType: 'blob',
         }
       );
 
@@ -3118,17 +3114,19 @@ function Stockmaster() {
         await handleChangeGroupNameIndexBasedEdit({ value: res?.data?.sstock?.subcomponent[i]?.vendorgroup }, i);
       }
 
-      setoldfileNamesBill(res?.data?.sstock?.filenamesbill.map((d) => `${res?.data?.sstock?.uniqueId}$bill$${d}`));
-      setOldfileNamesWar(res?.data?.sstock?.filenames.map((d) => `${res?.data?.sstock?.uniqueId}$todo$${d}`));
+      if (res?.data?.sstock?.filenames.length > 0) {
+        const fileswarranty = await getMultipleFilesAsObjects(res?.data?.sstock?.filenames, 'todo', res?.data?.sstock?.uniqueId);
+        setOldfileNamesWar(res?.data?.sstock?.filenames.map((d) => `${res?.data?.sstock?.uniqueId}$todo$${d}`));
+        // console.log(fileswarranty, 'fileswarranty');
+        handleFetchWarranty(fileswarranty);
+      }
 
-      const fileswarranty = await getMultipleFilesAsObjects(res?.data?.sstock?.filenames, "todo", res?.data?.sstock?.uniqueId);
-
-      handleFetchWarranty(fileswarranty);
-
-      const filesbill = await getMultipleFilesAsObjects(res?.data?.sstock?.filenamesbill, "bill", res?.data?.sstock?.uniqueId);
-
-      handleFetchBill(filesbill);
-
+      if (res?.data?.sstock?.filenamesbill?.length > 0) {
+        const filesbill = await getMultipleFilesAsObjects(res?.data?.sstock?.filenamesbill, 'bill', res?.data?.sstock?.uniqueId);
+        setoldfileNamesBill(res?.data?.sstock?.filenamesbill.map((d) => `${res?.data?.sstock?.uniqueId}$bill$${d}`));
+        // console.log(filesbill, 'filesbill');
+        handleFetchBill(filesbill);
+      }
       setSelectedPurchaseDateEdit(res?.data?.sstock.purchasedate);
       setTodosEdit(res?.data?.sstock?.subcomponent);
 
@@ -3147,7 +3145,15 @@ function Stockmaster() {
           },
         });
         setVendorgetid(resv?.data?.svendordetails);
+      } else {
+        setVendorgetid({
+          ...vendorgetid,
+          gstnumber: '',
+          address: '',
+          phonenumber: '',
+        });
       }
+
       let res1 = await axios.get(SERVICE.ASSETWORKSTAION, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
@@ -3165,7 +3171,7 @@ function Stockmaster() {
 
       setSpecificationedit(resultall);
     } catch (err) {
-      console.log(err, "err");
+      console.log(err, 'err');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
@@ -3210,8 +3216,8 @@ function Stockmaster() {
 
       let setData = {
         ...res?.data?.sstock,
-        uomcode: setDataOne ? setDataOne.code : "",
-        purchasedate: res?.data?.sstock.purchasedate != "" ? moment(res?.data?.sstock.purchasedate).format("DD/MM/YYYY") : "",
+        uomcode: setDataOne ? setDataOne.code : '',
+        purchasedate: res?.data?.sstock.purchasedate != '' ? moment(res?.data?.sstock.purchasedate).format('DD/MM/YYYY') : '',
       };
 
       setStockmasteredit(setData);
@@ -3288,14 +3294,14 @@ function Stockmaster() {
         floor: String(stockmasteredit.floor),
         location: String(stockmasteredit.location),
         area: String(stockmasteredit.area),
-        workstation: String(stockmasteredit.workcheck ? stockmasteredit.workstation : ""),
+        workstation: String(stockmasteredit.workcheck ? stockmasteredit.workstation : ''),
         // workcheck: String(stockmasteredit.workcheck),
-        assettype: String(stockmasteredit.assettype === undefined ? "" : stockmasteredit.assettype),
+        assettype: String(stockmasteredit.assettype === undefined ? '' : stockmasteredit.assettype),
         asset: String(stockmasteredit.asset),
 
-        productname: String(stockmasteredit.productname === "Please Select Material" || stockmasteredit.productname === undefined ? "" : stockmasteredit.productname),
+        productname: String(stockmasteredit.productname === 'Please Select Material' || stockmasteredit.productname === undefined ? '' : stockmasteredit.productname),
 
-        component: String(stockmasteredit.component === "Please Select Component" ? "" : stockmasteredit.component),
+        component: String(stockmasteredit.component === 'Please Select Component' ? '' : stockmasteredit.component),
         subcomponent: todosEdit ? [...todosEdit] : [],
         warranty: String(stockmasteredit.warranty),
         estimation: String(stockmasteredit.estimation),
@@ -3303,16 +3309,18 @@ function Stockmaster() {
         warrantycalculation: String(stockmasteredit.warrantycalculation),
         purchasedate: selectedPurchaseDateEdit,
 
-        producthead: String(stockmasteredit.producthead === "" ? "" : stockmasteredit.producthead),
+        producthead: String(stockmasteredit.producthead === '' ? '' : stockmasteredit.producthead),
 
         vendor: String(vendorNewEdit),
         vendorgroup: String(vendorGroupEdit),
-        gstno: String(vendorgetid.gstnumber === undefined ? "" : vendorgetid.gstnumber),
-        vendorid: String(vendorgetid._id),
+        gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
+        // vendorid: String(vendorgetid) ? String(vendorgetid) : '',
+        vendorid: String(vendornameid) ? String(vendornameid) : '',
+
         billno: Number(stockmasteredit.billno),
         productdetails: String(stockmasteredit.productdetails),
         warrantydetails: String(stockmasteredit.warrantydetails),
-        uom: stockmasteredit.uom === "Please Select UOM" ? "" : String(stockmasteredit.uom),
+        uom: stockmasteredit.uom === 'Please Select UOM' ? '' : String(stockmasteredit.uom),
         quantity: Number(stockmasteredit.quantity),
         rate: Number(stockmasteredit.rate),
         billdate: String(stockmasteredit.billdate),
@@ -3325,11 +3333,11 @@ function Stockmaster() {
         totalbillamount: stockmasteredit.quantity * stockmasteredit.rate,
 
         requestmode: String(stockmasteredit.requestmode),
-        stockcategory: stockmasteredit.stockcategory === "Please Select Stock Category" ? "" : String(stockmasteredit.stockcategory),
-        stocksubcategory: stockmasteredit.stocksubcategory === "Please Select Stock Sub Category" ? "" : String(stockmasteredit.stocksubcategory),
-        uomnew: stockmasteredit.uomnew === "" ? "" : String(stockmasteredit.uomnew),
-        quantitynew: stockmasteredit.quantitynew === "" ? "" : Number(stockmasteredit.quantitynew),
-        materialnew: stockmasteredit.materialnew === "Please Select Material" ? "" : String(stockmasteredit.materialnew),
+        stockcategory: stockmasteredit.stockcategory === 'Please Select Stock Category' ? '' : String(stockmasteredit.stockcategory),
+        stocksubcategory: stockmasteredit.stocksubcategory === 'Please Select Stock Sub Category' ? '' : String(stockmasteredit.stocksubcategory),
+        uomnew: stockmasteredit.uomnew === '' ? '' : String(stockmasteredit.uomnew),
+        quantitynew: stockmasteredit.quantitynew === '' ? '' : Number(stockmasteredit.quantitynew),
+        materialnew: stockmasteredit.materialnew === 'Please Select Material' ? '' : String(stockmasteredit.materialnew),
         productdetailsnew: String(stockmasteredit.productdetailsnew),
         updatedby: [
           ...updateby,
@@ -3341,14 +3349,14 @@ function Stockmaster() {
       });
       await handleFileDeleteOld(oldfileNamesWar);
       await handleFileDeleteOld(oldfileNamesBill);
-      await handleFileUpload(refImgWarrantyEdit, "todo", stockmasteredit.uniqueId);
-      await handleFileUpload(refImgWarrantyBillEdit, "bill", stockmasteredit.uniqueId);
+      await handleFileUpload(refImgWarrantyEdit, 'todo', stockmasteredit.uniqueId);
+      await handleFileUpload(refImgWarrantyBillEdit, 'bill', stockmasteredit.uniqueId);
       setBtnSubmit(false);
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       handleCloseModEdit();
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -3363,14 +3371,14 @@ function Stockmaster() {
         filenames: filenames,
       });
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
   const editSubmit = (e) => {
     setBtnSubmit(true);
     e.preventDefault();
-    let vendorEmpty = todosEdit.some((item) => item.vendor == "Choose Vendor");
+    let vendorEmpty = todosEdit.some((item) => item.vendor == 'Choose Vendor');
     const isNameMatch = stockEdit.some(
       (item) =>
         item.company == stockmasteredit.company &&
@@ -3390,29 +3398,29 @@ function Stockmaster() {
         item.billdate == String(stockmasteredit.billdate)
     );
 
-    if (stockmasteredit.company === "Please Select Company") {
-      setPopupContentMalert("Please Select Company!");
-      setPopupSeverityMalert("info");
+    if (stockmasteredit.company === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.branch === "Please Select Branch") {
-      setPopupContentMalert("Please Select Branch!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.branch === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.unit === "Please Select Unit") {
-      setPopupContentMalert("Please Select Unit!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.unit === 'Please Select Unit') {
+      setPopupContentMalert('Please Select Unit!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.floor === "Please Select Floor") {
-      setPopupContentMalert("Please Select Floor!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.floor === 'Please Select Floor') {
+      setPopupContentMalert('Please Select Floor!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.area === "Please Select Area") {
-      setPopupContentMalert("Please Select Area!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.area === 'Please Select Area') {
+      setPopupContentMalert('Please Select Area!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.location === "Please Select Location") {
-      setPopupContentMalert("Please Select Location!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.location === 'Please Select Location') {
+      setPopupContentMalert('Please Select Location!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     //  else if (stockmasteredit.warranty == "Yes" && stockmasteredit.estimation === "") {
@@ -3420,57 +3428,57 @@ function Stockmaster() {
     //   setPopupSeverityMalert("info");
     //   handleClickOpenPopupMalert();
     // }
-    else if (vendorGroupEdit === "Choose Vendor Group") {
-      setPopupContentMalert("Please Select Vendor Group!");
-      setPopupSeverityMalert("info");
+    else if (vendorGroupEdit === 'Choose Vendor Group') {
+      setPopupContentMalert('Please Select Vendor Group!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (vendorNewEdit === "Choose Vendor") {
-      setPopupContentMalert("Please Select Vendor!");
-      setPopupSeverityMalert("info");
+    } else if (vendorNewEdit === 'Choose Vendor') {
+      setPopupContentMalert('Please Select Vendor!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.billno === "") {
-      setPopupContentMalert("Please Enter Billno!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.billno === '') {
+      setPopupContentMalert('Please Enter Billno!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.productdetails === "") {
-      setPopupContentMalert("Please Enter Product Details!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.productdetails === '') {
+      setPopupContentMalert('Please Enter Product Details!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.warranty === "Yes" && stockmasteredit.warrantydetails === "") {
-      setPopupContentMalert("Please Enter Warranty Details!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.warranty === 'Yes' && stockmasteredit.warrantydetails === '') {
+      setPopupContentMalert('Please Enter Warranty Details!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.uom === "" || stockmasteredit.uom === "Please Select UOM") {
-      setPopupContentMalert("Please Select Uom!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.uom === '' || stockmasteredit.uom === 'Please Select UOM') {
+      setPopupContentMalert('Please Select Uom!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.quantity === "") {
-      setPopupContentMalert("Please Enter Qunatity!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.quantity === '') {
+      setPopupContentMalert('Please Enter Qunatity!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.rate === "") {
-      setPopupContentMalert("Please Enter Rate!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.rate === '') {
+      setPopupContentMalert('Please Enter Rate!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmasteredit.billdate === "") {
-      setPopupContentMalert("Please Select Bill Date!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasteredit.billdate === '') {
+      setPopupContentMalert('Please Select Bill Date!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (refImageedit.length == 0) {
-      setPopupContentMalert("Please Upload Bill!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Upload Bill!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (vendorEmpty) {
-      setPopupContentMalert("Please Select Vendor in All the Sub Dividends!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Vendor in All the Sub Dividends!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todosEdit.length > 0 && todosEdit.some((d) => (d.warranty === "Yes" && (d.subcomponentcheck == true || d.subcomponentcheck == "true") && d.estimation === undefined) || d.estimation === "")) {
-      setPopupContentMalert("Please Enter Warranty Time in Component");
-      setPopupSeverityMalert("info");
+    } else if (todosEdit.length > 0 && todosEdit.some((d) => (d.warranty === 'Yes' && (d.subcomponentcheck == true || d.subcomponentcheck == 'true') && d.estimation === undefined) || d.estimation === '')) {
+      setPopupContentMalert('Please Enter Warranty Time in Component');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequest();
@@ -3570,7 +3578,7 @@ function Stockmaster() {
       let ji = [].concat(...result);
       let jiii = ji.map((data) => data);
       const all = [
-        { label: "ALL", value: "ALL" },
+        { label: 'ALL', value: 'ALL' },
         ...ji.map((d) => ({
           ...d,
           label: d,
@@ -3667,7 +3675,7 @@ function Stockmaster() {
       let result = res_type.data.locationgroupings.filter((d) => d.branch === a && d.floor === b && d.area === c).map((data) => data.location);
       let ji = [].concat(...result);
       const all = [
-        { label: "ALL", value: "ALL" },
+        { label: 'ALL', value: 'ALL' },
         ...ji.map((d) => ({
           ...d,
           label: d,
@@ -3922,7 +3930,7 @@ function Stockmaster() {
 
     const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
+    if (allFilters.length > 0 && selectedColumn !== '') {
       queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
@@ -3930,7 +3938,7 @@ function Stockmaster() {
     }
     try {
       // let res_project = await axios.get(SERVICE.STOCKPURCHASE, {
-      if (e === "Filtered") {
+      if (e === 'Filtered') {
         const [res_employee, res_project_1] = await Promise.all([
           axios.post(SERVICE.STOCK_ACCESS, queryParams, {
             headers: {
@@ -3978,7 +3986,7 @@ function Stockmaster() {
         const codeMap = new Map(codeValues.map(({ name, code }) => [name, code]));
 
         const itemsWithSerialNumber = ans.map((item, index) => {
-          const uomcode = codeMap.get(item.uom) || "";
+          const uomcode = codeMap.get(item.uom) || '';
 
           return {
             ...item,
@@ -3986,8 +3994,8 @@ function Stockmaster() {
             serialNumber: (page - 1) * pageSize + index + 1,
             id: item._id,
             uom: item.uom ? `${item.quantity}#${item.uom}` : item.quantity,
-            billdate: moment(item.billdate).format("DD/MM/YYYY"),
-            purchasedate: item.purchasedate ? moment(item.purchasedate).format("DD/MM/YYYY") : "",
+            billdate: moment(item.billdate).format('DD/MM/YYYY'),
+            purchasedate: item.purchasedate ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
           };
         });
 
@@ -4010,7 +4018,7 @@ function Stockmaster() {
         setProjectCheck(false);
       }
     } catch (err) {
-      console.log(err, "errorororo");
+      console.log(err, 'errorororo');
       setProjectCheck(false);
 
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -4019,19 +4027,19 @@ function Stockmaster() {
 
   useEffect(() => {
     if (items?.length > 0) {
-      fetchStock("Filtered");
+      fetchStock('Filtered');
     }
   }, [page, pageSize, searchQuery]);
 
   // Excel
-  const fileName = "Asset Purchase List";
+  const fileName = 'Asset Purchase List';
 
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Asset Purchase List",
-    pageStyle: "print",
+    documentTitle: 'Asset Purchase List',
+    pageStyle: 'print',
   });
 
   // serial no for listing items
@@ -4075,10 +4083,10 @@ function Stockmaster() {
     setPage(1);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
   const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
@@ -4124,9 +4132,9 @@ function Stockmaster() {
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -4195,10 +4203,10 @@ function Stockmaster() {
     //   headerClassName: "bold-header",
     // },
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -4207,223 +4215,223 @@ function Stockmaster() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 100,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 100,
       hide: !columnVisibility.company,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 100,
       hide: !columnVisibility.branch,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 100,
       hide: !columnVisibility.unit,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "floor",
-      headerName: "Floor",
+      field: 'floor',
+      headerName: 'Floor',
       flex: 0,
       width: 100,
       hide: !columnVisibility.floor,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "area",
-      headerName: "Area",
+      field: 'area',
+      headerName: 'Area',
       flex: 0,
       width: 100,
       hide: !columnVisibility.area,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "location",
-      headerName: "Location",
+      field: 'location',
+      headerName: 'Location',
       flex: 0,
       width: 100,
       hide: !columnVisibility.location,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "requestmode",
-      headerName: "Request Mode For",
+      field: 'requestmode',
+      headerName: 'Request Mode For',
       flex: 0,
       width: 100,
       hide: !columnVisibility.requestmode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "vendorgroup",
-      headerName: "Vendor Group",
+      field: 'vendorgroup',
+      headerName: 'Vendor Group',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.vendorgroup,
     },
 
     {
-      field: "vendor",
-      headerName: "Dealers Name",
+      field: 'vendor',
+      headerName: 'Dealers Name',
       flex: 0,
       width: 120,
       hide: !columnVisibility.vendorname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "gstno",
-      headerName: "Gst No",
+      field: 'gstno',
+      headerName: 'Gst No',
       flex: 0,
       width: 120,
       hide: !columnVisibility.gstno,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "billno",
-      headerName: "Bill Number",
+      field: 'billno',
+      headerName: 'Bill Number',
       flex: 0,
       width: 120,
       hide: !columnVisibility.billno,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "assettype",
-      headerName: "Asset Type",
+      field: 'assettype',
+      headerName: 'Asset Type',
       flex: 0,
       width: 150,
       hide: !columnVisibility.assettype,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "producthead",
-      headerName: "Asset Head",
+      field: 'producthead',
+      headerName: 'Asset Head',
       flex: 0,
       width: 150,
       hide: !columnVisibility.producthead,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "productname",
-      headerName: "Material",
+      field: 'productname',
+      headerName: 'Material',
       flex: 0,
       width: 200,
       hide: !columnVisibility.productname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     // { field: "material", headerName: "Material", flex: 0, width: 150, hide: !columnVisibility.material, headerClassName: "bold-header" },
     {
-      field: "component",
-      headerName: "Component",
+      field: 'component',
+      headerName: 'Component',
       flex: 0,
       width: 150,
       hide: !columnVisibility.component,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "warranty",
-      headerName: "Warranty",
+      field: 'warranty',
+      headerName: 'Warranty',
       flex: 0,
       width: 100,
       hide: !columnVisibility.warranty,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "purchasedate",
-      headerName: "Purchasedate",
+      field: 'purchasedate',
+      headerName: 'Purchasedate',
       flex: 0,
       width: 150,
       hide: !columnVisibility.purchasedate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "productdetails",
-      headerName: "Product Details",
+      field: 'productdetails',
+      headerName: 'Product Details',
       flex: 0,
       width: 130,
       hide: !columnVisibility.productdetails,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "warrantydetails",
-      headerName: "Warranty Details",
+      field: 'warrantydetails',
+      headerName: 'Warranty Details',
       flex: 0,
       width: 130,
       hide: !columnVisibility.warrantydetails,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     {
-      field: "quantity",
-      headerName: "Quantity",
+      field: 'quantity',
+      headerName: 'Quantity',
       flex: 0,
       width: 80,
       hide: !columnVisibility.quantity,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "uom",
-      headerName: "Quantity & UOM",
+      field: 'uom',
+      headerName: 'Quantity & UOM',
       flex: 0,
       width: 100,
       hide: !columnVisibility.uom,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "rate",
-      headerName: "Rate",
+      field: 'rate',
+      headerName: 'Rate',
       flex: 0,
       width: 100,
       hide: !columnVisibility.rate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "billdate",
-      headerName: "Bill Date",
+      field: 'billdate',
+      headerName: 'Bill Date',
       flex: 0,
       width: 120,
       hide: !columnVisibility.billdate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("estockpurchase") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('estockpurchase') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -4434,7 +4442,7 @@ function Stockmaster() {
             </Button>
           )}
 
-          {isUserRoleCompare?.includes("dstockpurchase") && (
+          {isUserRoleCompare?.includes('dstockpurchase') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
@@ -4444,7 +4452,7 @@ function Stockmaster() {
               <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("vstockpurchase") && (
+          {isUserRoleCompare?.includes('vstockpurchase') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -4454,7 +4462,7 @@ function Stockmaster() {
               <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("istockpurchase") && (
+          {isUserRoleCompare?.includes('istockpurchase') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -4469,7 +4477,7 @@ function Stockmaster() {
       ),
     },
   ];
-  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== "checkbox" && data.field !== "actions" && data.field !== "serialNumber");
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = items.map((item, index) => {
     return {
@@ -4532,9 +4540,9 @@ function Stockmaster() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -4542,7 +4550,7 @@ function Stockmaster() {
         aria-label="close"
         onClick={handleCloseManageColumns1}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -4550,16 +4558,16 @@ function Stockmaster() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: "absolute" }} />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent sx={{ minWidth: "auto", height: "200px", position: "relative" }}>
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText sx={{ display: "flex" }} primary={<Switch sx={{ marginTop: "-5px" }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === "checkbox" ? "Checkbox" : column.headerName} />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -4567,7 +4575,7 @@ function Stockmaster() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button variant="text" sx={{ textTransform: "none" }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -4575,7 +4583,7 @@ function Stockmaster() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -4584,7 +4592,7 @@ function Stockmaster() {
                 setColumnVisibility(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -4605,36 +4613,36 @@ function Stockmaster() {
         subname: sub.subcomponent,
         sub: `${index + 1}.${sub.subcomponent}`,
         subcomponentcheck: false,
-        type: sub.type ? "Choose Type" : "",
-        model: sub.model ? "Choose Model" : "",
-        size: sub.size ? "Choose Size" : "",
-        variant: sub.variant ? "Choose variant" : "",
-        brand: sub.brand ? "Choose Brand" : "",
-        serial: sub.serial ? "" : undefined,
-        other: sub.other ? "" : undefined,
-        capacity: sub.capacity ? "Choose Capacity" : "",
-        hdmiport: sub.hdmiport ? "" : undefined,
-        vgaport: sub.vgaport ? "" : undefined,
-        dpport: sub.dpport ? "" : undefined,
-        usbport: sub.usbport ? "" : undefined,
-        paneltypescreen: sub.paneltypescreen ? "Choose Panel Type" : "",
-        resolution: sub.resolution ? "Choose Screen Resolution" : "",
-        connectivity: sub.connectivity ? "Choose Connectivity" : "",
-        daterate: sub.daterate ? "Choose Data Rate" : "",
-        compatibledevice: sub.compatibledevice ? "Choose Compatible Device" : "",
-        outputpower: sub.outputpower ? "Choose Output Power" : "",
-        collingfancount: sub.collingfancount ? "Choose Cooling Fan Count" : "",
-        clockspeed: sub.clockspeed ? "Choose Clock Speed" : "",
-        core: sub.core ? "Choose Core" : "",
-        speed: sub.speed ? "Choose Speed" : "",
-        frequency: sub.frequency ? "Choose Frequency" : "",
-        output: sub.output ? "Choose Output" : "",
-        ethernetports: sub.ethernetports ? "Choose Ethernet Ports" : "",
-        distance: sub.distance ? "Choose Distance" : "",
-        lengthname: sub.lengthname ? "Choose Length" : "",
-        slot: sub.slot ? "Choose Slot" : "",
-        noofchannels: sub.noofchannels ? "Choose No. Of Channels" : "",
-        colours: sub.colours ? "Choose Colour" : "",
+        type: sub.type ? 'Choose Type' : '',
+        model: sub.model ? 'Choose Model' : '',
+        size: sub.size ? 'Choose Size' : '',
+        variant: sub.variant ? 'Choose variant' : '',
+        brand: sub.brand ? 'Choose Brand' : '',
+        serial: sub.serial ? '' : undefined,
+        other: sub.other ? '' : undefined,
+        capacity: sub.capacity ? 'Choose Capacity' : '',
+        hdmiport: sub.hdmiport ? '' : undefined,
+        vgaport: sub.vgaport ? '' : undefined,
+        dpport: sub.dpport ? '' : undefined,
+        usbport: sub.usbport ? '' : undefined,
+        paneltypescreen: sub.paneltypescreen ? 'Choose Panel Type' : '',
+        resolution: sub.resolution ? 'Choose Screen Resolution' : '',
+        connectivity: sub.connectivity ? 'Choose Connectivity' : '',
+        daterate: sub.daterate ? 'Choose Data Rate' : '',
+        compatibledevice: sub.compatibledevice ? 'Choose Compatible Device' : '',
+        outputpower: sub.outputpower ? 'Choose Output Power' : '',
+        collingfancount: sub.collingfancount ? 'Choose Cooling Fan Count' : '',
+        clockspeed: sub.clockspeed ? 'Choose Clock Speed' : '',
+        core: sub.core ? 'Choose Core' : '',
+        speed: sub.speed ? 'Choose Speed' : '',
+        frequency: sub.frequency ? 'Choose Frequency' : '',
+        output: sub.output ? 'Choose Output' : '',
+        ethernetports: sub.ethernetports ? 'Choose Ethernet Ports' : '',
+        distance: sub.distance ? 'Choose Distance' : '',
+        lengthname: sub.lengthname ? 'Choose Length' : '',
+        slot: sub.slot ? 'Choose Slot' : '',
+        noofchannels: sub.noofchannels ? 'Choose No. Of Channels' : '',
+        colours: sub.colours ? 'Choose Colour' : '',
 
         warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
         estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
@@ -4670,36 +4678,36 @@ function Stockmaster() {
         {
           // sub: `${index + 1}.${sub.subcomponent}`,
           subcomponentcheck: false,
-          type: specificationItem.type ? "Choose Type" : "",
-          model: specificationItem.model ? "Choose Model" : "",
-          size: specificationItem.size ? "Choose Size" : "",
-          variant: specificationItem.variant ? "Choose variant" : "",
-          brand: specificationItem.brand ? "Choose Brand" : "",
-          serial: specificationItem.serial ? "" : undefined,
-          other: specificationItem.other ? "" : undefined,
-          capacity: specificationItem.capacity ? "Choose Capacity" : "",
-          hdmiport: specificationItem.hdmiport ? "" : undefined,
-          vgaport: specificationItem.vgaport ? "" : undefined,
-          dpport: specificationItem.dpport ? "" : undefined,
-          usbport: specificationItem.usbport ? "" : undefined,
-          paneltypescreen: specificationItem.paneltypescreen ? "Choose Panel Type" : "",
-          resolution: specificationItem.resolution ? "Choose Screen Resolution" : "",
-          connectivity: specificationItem.connectivity ? "Choose Connectivity" : "",
-          daterate: specificationItem.daterate ? "Choose Data Rate" : "",
-          compatibledevice: specificationItem.compatibledevice ? "Choose Compatible Device" : "",
-          outputpower: specificationItem.outputpower ? "Choose Output Power" : "",
-          collingfancount: specificationItem.collingfancount ? "Choose Cooling Fan Count" : "",
-          clockspeed: specificationItem.clockspeed ? "Choose Clock Speed" : "",
-          core: specificationItem.core ? "Choose Core" : "",
-          speed: specificationItem.speed ? "Choose Speed" : "",
-          frequency: specificationItem.frequency ? "Choose Frequency" : "",
-          output: specificationItem.output ? "Choose Output" : "",
-          ethernetports: specificationItem.ethernetports ? "Choose Ethernet Ports" : "",
-          distance: specificationItem.distance ? "Choose Distance" : "",
-          lengthname: specificationItem.lengthname ? "Choose Length" : "",
-          slot: specificationItem.slot ? "Choose Slot" : "",
-          noofchannels: specificationItem.noofchannels ? "Choose No. Of Channels" : "",
-          colours: specificationItem.colours ? "Choose Colour" : "",
+          type: specificationItem.type ? 'Choose Type' : '',
+          model: specificationItem.model ? 'Choose Model' : '',
+          size: specificationItem.size ? 'Choose Size' : '',
+          variant: specificationItem.variant ? 'Choose variant' : '',
+          brand: specificationItem.brand ? 'Choose Brand' : '',
+          serial: specificationItem.serial ? '' : undefined,
+          other: specificationItem.other ? '' : undefined,
+          capacity: specificationItem.capacity ? 'Choose Capacity' : '',
+          hdmiport: specificationItem.hdmiport ? '' : undefined,
+          vgaport: specificationItem.vgaport ? '' : undefined,
+          dpport: specificationItem.dpport ? '' : undefined,
+          usbport: specificationItem.usbport ? '' : undefined,
+          paneltypescreen: specificationItem.paneltypescreen ? 'Choose Panel Type' : '',
+          resolution: specificationItem.resolution ? 'Choose Screen Resolution' : '',
+          connectivity: specificationItem.connectivity ? 'Choose Connectivity' : '',
+          daterate: specificationItem.daterate ? 'Choose Data Rate' : '',
+          compatibledevice: specificationItem.compatibledevice ? 'Choose Compatible Device' : '',
+          outputpower: specificationItem.outputpower ? 'Choose Output Power' : '',
+          collingfancount: specificationItem.collingfancount ? 'Choose Cooling Fan Count' : '',
+          clockspeed: specificationItem.clockspeed ? 'Choose Clock Speed' : '',
+          core: specificationItem.core ? 'Choose Core' : '',
+          speed: specificationItem.speed ? 'Choose Speed' : '',
+          frequency: specificationItem.frequency ? 'Choose Frequency' : '',
+          output: specificationItem.output ? 'Choose Output' : '',
+          ethernetports: specificationItem.ethernetports ? 'Choose Ethernet Ports' : '',
+          distance: specificationItem.distance ? 'Choose Distance' : '',
+          lengthname: specificationItem.lengthname ? 'Choose Length' : '',
+          slot: specificationItem.slot ? 'Choose Slot' : '',
+          noofchannels: specificationItem.noofchannels ? 'Choose No. Of Channels' : '',
+          colours: specificationItem.colours ? 'Choose Colour' : '',
 
           warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
           estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
@@ -4731,20 +4739,20 @@ function Stockmaster() {
 
     // Calculate expiry date for the updated todo
     const updatedTodo = updatedTodos[index];
-    if (updatedTodo.estimationtime !== "" && updatedTodo.purchasedate && updatedTodo.estimation !== "") {
+    if (updatedTodo.estimationtime !== '' && updatedTodo.purchasedate && updatedTodo.estimation !== '') {
       const currentDate = new Date(updatedTodo.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (updatedTodo.estimationtime === "Days") {
+      if (updatedTodo.estimationtime === 'Days') {
         expiryDate.setDate(currentDate.getDate() + parseInt(updatedTodo.estimation));
-      } else if (updatedTodo.estimationtime === "Month") {
+      } else if (updatedTodo.estimationtime === 'Month') {
         expiryDate.setMonth(currentDate.getMonth() + parseInt(updatedTodo.estimation));
-      } else if (updatedTodo.estimationtime === "Year") {
+      } else if (updatedTodo.estimationtime === 'Year') {
         expiryDate.setFullYear(currentDate.getFullYear() + parseInt(updatedTodo.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN") ? "" : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       // Update the calculated expiry date in the todo
       const updatedTodosCopy = [...updatedTodos];
@@ -4757,7 +4765,7 @@ function Stockmaster() {
     }
 
     const updatedTodovendor = updatedTodos[index];
-    if (updatedTodovendor.vendorname !== "" && id) {
+    if (updatedTodovendor.vendorname !== '' && id) {
       // Fix: Add await here to wait for the result of the axios call
       const res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
         headers: {
@@ -4780,7 +4788,7 @@ function Stockmaster() {
     setTodos(updatedTodos);
     setStockmaster({
       ...stockmaster,
-      component: "Please Select Component",
+      component: 'Please Select Component',
     });
   };
 
@@ -4795,36 +4803,36 @@ function Stockmaster() {
         sub: `${index + 1}.${sub.subcomponent}`,
         subname: sub.subcomponent,
         subcomponentcheck: false,
-        type: sub.type ? "Choose Type" : "",
-        model: sub.model ? "Choose Model" : "",
-        size: sub.size ? "Choose Size" : "",
-        variant: sub.variant ? "Choose variant" : "",
-        brand: sub.brand ? "Choose Brand" : "",
-        serial: sub.serial ? "" : undefined,
-        other: sub.other ? "" : undefined,
-        capacity: sub.capacity ? "Choose Capacity" : "",
-        hdmiport: sub.hdmiport ? "" : undefined,
-        vgaport: sub.vgaport ? "" : undefined,
-        dpport: sub.dpport ? "" : undefined,
-        usbport: sub.usbport ? "" : undefined,
-        paneltypescreen: sub.paneltypescreen ? "Choose Panel Type" : "",
-        resolution: sub.resolution ? "Choose Screen Resolution" : "",
-        connectivity: sub.connectivity ? "Choose Connectivity" : "",
-        daterate: sub.daterate ? "Choose Data Rate" : "",
-        compatibledevice: sub.compatibledevice ? "Choose Compatible Device" : "",
-        outputpower: sub.outputpower ? "Choose Output Power" : "",
-        collingfancount: sub.collingfancount ? "Choose Cooling Fan Count" : "",
-        clockspeed: sub.clockspeed ? "Choose Clock Speed" : "",
-        core: sub.core ? "Choose Core" : "",
-        speed: sub.speed ? "Choose Speed" : "",
-        frequency: sub.frequency ? "Choose Frequency" : "",
-        output: sub.output ? "Choose Output" : "",
-        ethernetports: sub.ethernetports ? "Choose Ethernet Ports" : "",
-        distance: sub.distance ? "Choose Distance" : "",
-        lengthname: sub.lengthname ? "Choose Length" : "",
-        slot: sub.slot ? "Choose Slot" : "",
-        noofchannels: sub.noofchannels ? "Choose No. Of Channels" : "",
-        colours: sub.colours ? "Choose Colour" : "",
+        type: sub.type ? 'Choose Type' : '',
+        model: sub.model ? 'Choose Model' : '',
+        size: sub.size ? 'Choose Size' : '',
+        variant: sub.variant ? 'Choose variant' : '',
+        brand: sub.brand ? 'Choose Brand' : '',
+        serial: sub.serial ? '' : undefined,
+        other: sub.other ? '' : undefined,
+        capacity: sub.capacity ? 'Choose Capacity' : '',
+        hdmiport: sub.hdmiport ? '' : undefined,
+        vgaport: sub.vgaport ? '' : undefined,
+        dpport: sub.dpport ? '' : undefined,
+        usbport: sub.usbport ? '' : undefined,
+        paneltypescreen: sub.paneltypescreen ? 'Choose Panel Type' : '',
+        resolution: sub.resolution ? 'Choose Screen Resolution' : '',
+        connectivity: sub.connectivity ? 'Choose Connectivity' : '',
+        daterate: sub.daterate ? 'Choose Data Rate' : '',
+        compatibledevice: sub.compatibledevice ? 'Choose Compatible Device' : '',
+        outputpower: sub.outputpower ? 'Choose Output Power' : '',
+        collingfancount: sub.collingfancount ? 'Choose Cooling Fan Count' : '',
+        clockspeed: sub.clockspeed ? 'Choose Clock Speed' : '',
+        core: sub.core ? 'Choose Core' : '',
+        speed: sub.speed ? 'Choose Speed' : '',
+        frequency: sub.frequency ? 'Choose Frequency' : '',
+        output: sub.output ? 'Choose Output' : '',
+        ethernetports: sub.ethernetports ? 'Choose Ethernet Ports' : '',
+        distance: sub.distance ? 'Choose Distance' : '',
+        lengthname: sub.lengthname ? 'Choose Length' : '',
+        slot: sub.slot ? 'Choose Slot' : '',
+        noofchannels: sub.noofchannels ? 'Choose No. Of Channels' : '',
+        colours: sub.colours ? 'Choose Colour' : '',
 
         warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
         estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
@@ -4857,36 +4865,36 @@ function Stockmaster() {
         {
           // sub: `${index + 1}.${sub.subcomponent}`,
           subcomponentcheck: false,
-          type: specificationItem.type ? "Choose Type" : "",
-          model: specificationItem.model ? "Choose Model" : "",
-          size: specificationItem.size ? "Choose Size" : "",
-          variant: specificationItem.variant ? "Choose variant" : "",
-          brand: specificationItem.brand ? "Choose Brand" : "",
-          serial: specificationItem.serial ? "" : undefined,
-          other: specificationItem.other ? "" : undefined,
-          capacity: specificationItem.capacity ? "Choose Capacity" : "",
-          hdmiport: specificationItem.hdmiport ? "" : undefined,
-          vgaport: specificationItem.vgaport ? "" : undefined,
-          dpport: specificationItem.dpport ? "" : undefined,
-          usbport: specificationItem.usbport ? "" : undefined,
-          paneltypescreen: specificationItem.paneltypescreen ? "Choose Panel Type" : "",
-          resolution: specificationItem.resolution ? "Choose Screen Resolution" : "",
-          connectivity: specificationItem.connectivity ? "Choose Connectivity" : "",
-          daterate: specificationItem.daterate ? "Choose Data Rate" : "",
-          compatibledevice: specificationItem.compatibledevice ? "Choose Compatible Device" : "",
-          outputpower: specificationItem.outputpower ? "Choose Output Power" : "",
-          collingfancount: specificationItem.collingfancount ? "Choose Cooling Fan Count" : "",
-          clockspeed: specificationItem.clockspeed ? "Choose Clock Speed" : "",
-          core: specificationItem.core ? "Choose Core" : "",
-          speed: specificationItem.speed ? "Choose Speed" : "",
-          frequency: specificationItem.frequency ? "Choose Frequency" : "",
-          output: specificationItem.output ? "Choose Output" : "",
-          ethernetports: specificationItem.ethernetports ? "Choose Ethernet Ports" : "",
-          distance: specificationItem.distance ? "Choose Distance" : "",
-          lengthname: specificationItem.lengthname ? "Choose Length" : "",
-          slot: specificationItem.slot ? "Choose Slot" : "",
-          noofchannels: specificationItem.noofchannels ? "Choose No. Of Channels" : "",
-          colours: specificationItem.colours ? "Choose Colour" : "",
+          type: specificationItem.type ? 'Choose Type' : '',
+          model: specificationItem.model ? 'Choose Model' : '',
+          size: specificationItem.size ? 'Choose Size' : '',
+          variant: specificationItem.variant ? 'Choose variant' : '',
+          brand: specificationItem.brand ? 'Choose Brand' : '',
+          serial: specificationItem.serial ? '' : undefined,
+          other: specificationItem.other ? '' : undefined,
+          capacity: specificationItem.capacity ? 'Choose Capacity' : '',
+          hdmiport: specificationItem.hdmiport ? '' : undefined,
+          vgaport: specificationItem.vgaport ? '' : undefined,
+          dpport: specificationItem.dpport ? '' : undefined,
+          usbport: specificationItem.usbport ? '' : undefined,
+          paneltypescreen: specificationItem.paneltypescreen ? 'Choose Panel Type' : '',
+          resolution: specificationItem.resolution ? 'Choose Screen Resolution' : '',
+          connectivity: specificationItem.connectivity ? 'Choose Connectivity' : '',
+          daterate: specificationItem.daterate ? 'Choose Data Rate' : '',
+          compatibledevice: specificationItem.compatibledevice ? 'Choose Compatible Device' : '',
+          outputpower: specificationItem.outputpower ? 'Choose Output Power' : '',
+          collingfancount: specificationItem.collingfancount ? 'Choose Cooling Fan Count' : '',
+          clockspeed: specificationItem.clockspeed ? 'Choose Clock Speed' : '',
+          core: specificationItem.core ? 'Choose Core' : '',
+          speed: specificationItem.speed ? 'Choose Speed' : '',
+          frequency: specificationItem.frequency ? 'Choose Frequency' : '',
+          output: specificationItem.output ? 'Choose Output' : '',
+          ethernetports: specificationItem.ethernetports ? 'Choose Ethernet Ports' : '',
+          distance: specificationItem.distance ? 'Choose Distance' : '',
+          lengthname: specificationItem.lengthname ? 'Choose Length' : '',
+          slot: specificationItem.slot ? 'Choose Slot' : '',
+          noofchannels: specificationItem.noofchannels ? 'Choose No. Of Channels' : '',
+          colours: specificationItem.colours ? 'Choose Colour' : '',
 
           warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
           estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
@@ -4914,20 +4922,20 @@ function Stockmaster() {
 
     // Calculate expiry date for the updated todo
     const updatedTodo = updatedTodos[index];
-    if (updatedTodo.estimationtime !== "" && updatedTodo.purchasedate && updatedTodo.estimation !== "") {
+    if (updatedTodo.estimationtime !== '' && updatedTodo.purchasedate && updatedTodo.estimation !== '') {
       const currentDate = new Date(updatedTodo.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (updatedTodo.estimationtime === "Days") {
+      if (updatedTodo.estimationtime === 'Days') {
         expiryDate.setDate(currentDate.getDate() + parseInt(updatedTodo.estimation));
-      } else if (updatedTodo.estimationtime === "Month") {
+      } else if (updatedTodo.estimationtime === 'Month') {
         expiryDate.setMonth(currentDate.getMonth() + parseInt(updatedTodo.estimation));
-      } else if (updatedTodo.estimationtime === "Year") {
+      } else if (updatedTodo.estimationtime === 'Year') {
         expiryDate.setFullYear(currentDate.getFullYear() + parseInt(updatedTodo.estimation));
       }
 
       const formattedExpiryDate = formatDateString(expiryDate);
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN") ? "" : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
 
       // Update the calculated expiry date in the todo
       const updatedTodosCopy = [...updatedTodos];
@@ -4939,7 +4947,7 @@ function Stockmaster() {
     }
 
     const updatedTodovendor = updatedTodos[index];
-    if (updatedTodovendor.vendorname !== "" && id) {
+    if (updatedTodovendor.vendorname !== '' && id) {
       // Fix: Add await here to wait for the result of the axios call
       const res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
         headers: {
@@ -4973,12 +4981,12 @@ function Stockmaster() {
   const exportToExcel = (excelData, fileName) => {
     try {
       const ws = XLSX.utils.json_to_sheet(excelData);
-      const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
 
       // Check if the browser supports Blob and FileSaver
       if (!Blob || !FileSaver) {
-        console.error("Blob or FileSaver not supported");
+        console.error('Blob or FileSaver not supported');
         return;
       }
 
@@ -4986,13 +4994,13 @@ function Stockmaster() {
 
       // Check if FileSaver.saveAs is available
       if (!FileSaver.saveAs) {
-        console.error("FileSaver.saveAs is not available");
+        console.error('FileSaver.saveAs is not available');
         return;
       }
 
       FileSaver.saveAs(data, fileName + fileExtension);
     } catch (error) {
-      console.error("Error exporting to Excel", error);
+      console.error('Error exporting to Excel', error);
     }
   };
 
@@ -5000,7 +5008,7 @@ function Stockmaster() {
     return data.map((item, index) => {
       let finalData = {};
       for (let i = 0; i < exportColumnNames?.length; i++) {
-        finalData[exportColumnNames[i]] = Array.isArray(item[exportRowValues[i]]) ? item[exportRowValues[i]]?.join(",") : item[exportRowValues[i]];
+        finalData[exportColumnNames[i]] = Array.isArray(item[exportRowValues[i]]) ? item[exportRowValues[i]]?.join(',') : item[exportRowValues[i]];
       }
       return {
         Sno: index + 1,
@@ -5011,8 +5019,8 @@ function Stockmaster() {
 
   const handleDownloadExcel = async (type) => {
     try {
-      if (type === "filtered") {
-        exportToExcel(formatData(rowDataTable), `${"Stock Purchase"}`);
+      if (type === 'filtered') {
+        exportToExcel(formatData(rowDataTable), `${'Stock Purchase'}`);
         setIsFilterOpen(false);
       } else {
         setLoader(true);
@@ -5023,10 +5031,10 @@ function Stockmaster() {
             headers: {
               Authorization: `Bearer ${auth.APIToken}`,
             },
-            mode: "Asset Material",
+            mode: 'Asset Material',
           },
           {
-            responseType: "blob", // Ensure response type is 'blob'
+            responseType: 'blob', // Ensure response type is 'blob'
           }
         );
         // console.log(res_employee, "res_employee"); // Log the response to check data
@@ -5038,36 +5046,36 @@ function Stockmaster() {
           // Check if it's a valid Blob object
           if (blob instanceof Blob) {
             const url = window.URL.createObjectURL(blob); // Create a URL for the blob
-            const link = document.createElement("a"); // Create a temporary link element
+            const link = document.createElement('a'); // Create a temporary link element
             link.href = url; // Set the href to the created blob URL
-            link.setAttribute("download", "Stock_Purchase_Asset.xlsx"); // Specify the filename
+            link.setAttribute('download', 'Stock_Purchase_Asset.xlsx'); // Specify the filename
             document.body.appendChild(link); // Append the link to the document body
             link.click(); // Programmatically click the link to trigger the download
             document.body.removeChild(link); // Remove the link after download is triggered
           } else {
-            console.error("Error: Blob data not returned");
+            console.error('Error: Blob data not returned');
           }
         } else {
-          console.error("Error: No data returned from server");
+          console.error('Error: No data returned from server');
         }
 
         setLoader(false);
       }
     } catch (err) {
       setLoader(false);
-      console.log("Error downloading Excel file: ", err);
+      console.log('Error downloading Excel file: ', err);
     }
   };
 
   const handleDownloadExcelPDf = async (type) => {
     try {
-      if (type === "filtered") {
+      if (type === 'filtered') {
         const doc = new jsPDF();
 
         // Initialize serial number counter
         // Modify columns to include serial number column
         const columnsWithSerial = [
-          { title: "S.No", dataKey: "serialNumber" }, // Serial number column
+          { title: 'S.No', dataKey: 'serialNumber' }, // Serial number column
           ...columnDataTable.map((col) => ({ title: col.headerName, dataKey: col.field })),
         ];
 
@@ -5076,13 +5084,13 @@ function Stockmaster() {
 
         // Generate PDF
         doc.autoTable({
-          theme: "grid",
+          theme: 'grid',
           columns: columnsWithSerial,
           body: dataWithSerial,
           styles: { fontSize: 4 },
         });
 
-        doc.save(`${"Stock Purchase Asset"}.pdf`);
+        doc.save(`${'Stock Purchase Asset'}.pdf`);
         setIsPdfFilterOpen(false);
       } else {
         setLoader(true);
@@ -5093,10 +5101,10 @@ function Stockmaster() {
             headers: {
               Authorization: `Bearer ${auth.APIToken}`,
             },
-            mode: "Asset Material",
+            mode: 'Asset Material',
           },
           {
-            responseType: "blob", // Ensure response type is 'blob'
+            responseType: 'blob', // Ensure response type is 'blob'
           }
         );
         // console.log(res_employee, "res_employee"); // Log the response to check data
@@ -5108,22 +5116,22 @@ function Stockmaster() {
           // Check if it's a valid Blob object
           if (blob instanceof Blob) {
             const url = window.URL.createObjectURL(blob); // Create a URL for the blob
-            const link = document.createElement("a"); // Create a temporary link element
+            const link = document.createElement('a'); // Create a temporary link element
             link.href = url; // Set the href to the created blob URL
-            link.setAttribute("download", "Stock_Purchase_Asset.pdf"); // Specify the filename
+            link.setAttribute('download', 'Stock_Purchase_Asset.pdf'); // Specify the filename
             document.body.appendChild(link); // Append the link to the document body
             link.click(); // Programmatically click the link to trigger the download
             document.body.removeChild(link); // Remove the link after download is triggered
           }
         } else {
-          console.error("Error: No data returned from server");
+          console.error('Error: No data returned from server');
         }
 
         setLoader(false);
       }
     } catch (err) {
       setLoader(false);
-      console.log("Error downloading Excel file: ", err);
+      console.log('Error downloading Excel file: ', err);
     }
   };
 
@@ -5163,19 +5171,19 @@ function Stockmaster() {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("");
-  const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = fileFormat === "xl" ? ".xlsx" : ".csv";
+  const [fileFormat, setFormat] = useState('');
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+  const fileExtension = fileFormat === 'xl' ? '.xlsx' : '.csv';
   const exportToCSV = (csvData, fileName) => {
     const ws = XLSX.utils.json_to_sheet(csvData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
     FileSaver.saveAs(data, fileName + fileExtension);
   };
 
   const handleExportXL = (isfilter) => {
-    if (isfilter === "filtered") {
+    if (isfilter === 'filtered') {
       exportToCSV(
         rowDataTable?.map((t, index) => ({
           Sno: index + 1,
@@ -5185,26 +5193,26 @@ function Stockmaster() {
           Floor: t.floor,
           Area: t.area,
           Location: t.location,
-          "Request Mode For": t.requestmode,
-          "Vendor Group": t.vendorgroup,
+          'Request Mode For': t.requestmode,
+          'Vendor Group': t.vendorgroup,
           Vendor: t.vendor,
-          "Gst No": t.gstno,
-          "Bill Number": t.billno,
-          "Asset Head": t.producthead,
+          'Gst No': t.gstno,
+          'Bill Number': t.billno,
+          'Asset Head': t.producthead,
           Material: t.productname,
           Component: t.component,
           Warranty: t.warrantydetails,
           Purchasedate: t.purchasedate,
-          "Product Details": t.productdetails,
-          "Warranty Details": t.warrantydetails,
+          'Product Details': t.productdetails,
+          'Warranty Details': t.warrantydetails,
           Quantity: t.quantity,
-          "Quantity & UOM": t.uom,
+          'Quantity & UOM': t.uom,
           Rate: t.rate,
-          "Bill Date": t.billdate,
+          'Bill Date': t.billdate,
         })),
         fileName
       );
-    } else if (isfilter === "overall") {
+    } else if (isfilter === 'overall') {
       exportToCSV(
         stock.map((t, index) => ({
           Sno: index + 1,
@@ -5214,22 +5222,22 @@ function Stockmaster() {
           Floor: t.floor,
           Area: t.area,
           Location: t.location,
-          "Request Mode For": t.requestmode,
-          "Vendor Group": t.vendorgroup,
+          'Request Mode For': t.requestmode,
+          'Vendor Group': t.vendorgroup,
           Vendor: t.vendor,
-          "Gst No": t.gstno,
-          "Bill Number": t.billno,
-          "Asset Head": t.producthead,
+          'Gst No': t.gstno,
+          'Bill Number': t.billno,
+          'Asset Head': t.producthead,
           Material: t.productname,
           Component: t.component,
           Warranty: t.warrantydetails,
-          Purchasedate: t.purchasedate != "" ? moment(t.purchasedate).format("DD/MM/YYYY") : "",
-          "Product Details": t.productdetails,
-          "Warranty Details": t.warrantydetails,
+          Purchasedate: t.purchasedate != '' ? moment(t.purchasedate).format('DD/MM/YYYY') : '',
+          'Product Details': t.productdetails,
+          'Warranty Details': t.warrantydetails,
           Quantity: t.quantity,
-          "Quantity & UOM": t.uom !== "" ? `${t.quantity}#${t.uom}` : t.quantity,
+          'Quantity & UOM': t.uom !== '' ? `${t.quantity}#${t.uom}` : t.quantity,
           Rate: t.rate,
-          "Bill Date": moment(t.billdate).format("DD/MM/YYYY"),
+          'Bill Date': moment(t.billdate).format('DD/MM/YYYY'),
         })),
         fileName
       );
@@ -5264,22 +5272,22 @@ function Stockmaster() {
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
-  const idSearch = openSearch ? "simple-popover" : undefined;
+  const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if ((selectedColumn && filterValue) || ["Blank", "Not Blank"].includes(selectedCondition)) {
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
       setAdditionalFilters([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
@@ -5291,7 +5299,7 @@ function Stockmaster() {
           let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
           return `${showname} ${filter.condition} "${filter.value}"`;
         })
-        .join(" " + (advancedFilter.length > 1 ? advancedFilter[1].condition : "") + " ");
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
@@ -5305,12 +5313,12 @@ function Stockmaster() {
     // Reset all filters and pagination state
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
@@ -5321,7 +5329,7 @@ function Stockmaster() {
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
+    if (allFilters.length > 0 && selectedColumn !== '') {
       queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
@@ -5361,16 +5369,16 @@ function Stockmaster() {
         const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
         // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-        return matchingItem ? { ...item, uomcode: matchingItem.code } : { ...item, uomcode: "" };
+        return matchingItem ? { ...item, uomcode: matchingItem.code } : { ...item, uomcode: '' };
       });
 
       const itemsWithSerialNumber = setData?.map((item, index) => ({
         ...item,
         serialNumber: (page - 1) * pageSize + index + 1,
         id: item._id,
-        uom: item.uom !== "" ? `${item.quantity}#${item.uom}` : item.quantity,
-        billdate: moment(item.billdate).format("DD/MM/YYYY"),
-        purchasedate: item.purchasedate != "" ? moment(item.purchasedate).format("DD/MM/YYYY") : "",
+        uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
+        billdate: moment(item.billdate).format('DD/MM/YYYY'),
+        purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
       }));
 
       setStock(itemsWithSerialNumber);
@@ -5378,11 +5386,11 @@ function Stockmaster() {
       setOverallFilterdata(
         res_employee?.data?.totalProjectsData?.length > 0
           ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-            return {
-              ...item,
-              serialNumber: (page - 1) * pageSize + index + 1,
-            };
-          })
+              return {
+                ...item,
+                serialNumber: (page - 1) * pageSize + index + 1,
+              };
+            })
           : []
       );
 
@@ -5422,7 +5430,7 @@ function Stockmaster() {
   };
 
   const customValueRendererRequest = (valueRequestMode, _categoryname) => {
-    return valueRequestMode?.length ? valueRequestMode.map(({ label }) => label)?.join(", ") : "Please Select Request Mode";
+    return valueRequestMode?.length ? valueRequestMode.map(({ label }) => label)?.join(', ') : 'Please Select Request Mode';
   };
 
   //company multiselect
@@ -5444,7 +5452,7 @@ function Stockmaster() {
   };
 
   const customValueRendererCompany = (valueCompanyCat, _categoryname) => {
-    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(", ") : "Please Select Company";
+    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(', ') : 'Please Select Company';
   };
 
   //branch multiselect
@@ -5463,7 +5471,7 @@ function Stockmaster() {
   };
 
   const customValueRendererBranch = (valueBranchCat, _categoryname) => {
-    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(", ") : "Please Select Branch";
+    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(', ') : 'Please Select Branch';
   };
 
   //unit multiselect
@@ -5480,7 +5488,7 @@ function Stockmaster() {
   };
 
   const customValueRendererUnit = (valueUnitCat, _categoryname) => {
-    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(", ") : "Please Select Unit";
+    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(', ') : 'Please Select Unit';
   };
 
   //auto select all dropdowns
@@ -5553,11 +5561,11 @@ function Stockmaster() {
   const handleSubmitFilter = (e) => {
     e.preventDefault();
     if (selectedOptionsCompany?.length === 0 && selectedOptionsBranch?.length === 0 && selectedOptionsUnit?.length === 0) {
-      setPopupContentMalert("Please Select Any One");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Any One');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
-      fetchStock("Filtered");
+      fetchStock('Filtered');
     }
   };
 
@@ -5575,8 +5583,8 @@ function Stockmaster() {
     setValueCompanyCat([]);
     setValueBranchCat([]);
     setValueUnitCat([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
 
@@ -5603,7 +5611,7 @@ function Stockmaster() {
 
   const educationTodo = () => {
     const isNameMatch = educationtodo?.some((item) => {
-      if (stockmaster?.requestmode === "Stock Material") {
+      if (stockmaster?.requestmode === 'Stock Material') {
         return item?.category === todoDetails?.category && item?.subcategory === todoDetails?.subcategory && item?.itemname?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
       } else {
         return item?.materialnew?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
@@ -5614,61 +5622,58 @@ function Stockmaster() {
     //   setPopupSeverityMalert("info");
     //   handleClickOpenPopupMalert();
     // } else
-    if (todoDetails.category === "Please Select Category") {
-      setPopupContentMalert("Please Select Category!");
-      setPopupSeverityMalert("info");
+    if (todoDetails.category === 'Please Select Category') {
+      setPopupContentMalert('Please Select Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (todoDetails.subcategory === "Please Select Sub Category") {
-      setPopupContentMalert("Please Select Sub Category!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.subcategory === 'Please Select Sub Category') {
+      setPopupContentMalert('Please Select Sub Category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.particularmode !== "Others" && todoDetails.materialnew === "Please Select Item Name") {
-      setPopupContentMalert("Please Select Item Name!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.particularmode !== 'Others' && todoDetails.materialnew === 'Please Select Item Name') {
+      setPopupContentMalert('Please Select Item Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.particularmode === "Others" && todoDetails.materialnew === "") {
-      setPopupContentMalert("Please Enter Item Name!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.particularmode === 'Others' && todoDetails.materialnew === '') {
+      setPopupContentMalert('Please Enter Item Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.particularmode === "Others" && todoDetails.uomnew === "") {
-      setPopupContentMalert("Please Enter UOM!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.particularmode === 'Others' && todoDetails.uomnew === '') {
+      setPopupContentMalert('Please Enter UOM!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.rate === "" || todoDetails.rate == 0) {
-      setPopupContentMalert("Please Enter Rate!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.rate === '' || todoDetails.rate == 0) {
+      setPopupContentMalert('Please Enter Rate!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.quantitynew === "" || todoDetails.quantitynew == 0) {
-      setPopupContentMalert("Please Enter Quantity!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.quantitynew === '' || todoDetails.quantitynew == 0) {
+      setPopupContentMalert('Please Enter Quantity!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails.amount === "" || todoDetails.amount == 0) {
-      setPopupContentMalert("Please Enter Amount!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.amount === '' || todoDetails.amount == 0) {
+      setPopupContentMalert('Please Enter Amount!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (todoDetails.productdetailsnew === "") {
-      setPopupContentMalert("Please Enter Product Details!");
-      setPopupSeverityMalert("info");
+    } else if (todoDetails.productdetailsnew === '') {
+      setPopupContentMalert('Please Enter Product Details!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (isNameMatch) {
-      setPopupContentMalert("Item Already Exists!");
-      setPopupSeverityMalert("info");
+    } else if (isNameMatch) {
+      setPopupContentMalert('Item Already Exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (Number(todoDetails.amount) + Number(Expensetotal) > Number(stockmaster.totalbillamount)) {
-      setPopupContentMalert("Amount Exceeds Total Bill Amount!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Amount Exceeds Total Bill Amount!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (todoDetails !== "") {
+    } else if (todoDetails !== '') {
       setEducationtodo([...educationtodo, todoDetails]);
       setTodoDetails({
         ...todoDetails,
 
-        rate: "",
-        quantitynew: "",
-        amount: "",
+        rate: '',
+        quantitynew: '',
+        amount: '',
       });
     }
   };
@@ -5678,22 +5683,22 @@ function Stockmaster() {
     setEducationtodo(newTasks);
     setExpensecreate({
       ...expensecreate,
-      paidstatus: "Not Paid",
-      paidmode: "Please Select Paid Mode",
-      paidamount: "",
-      balanceamount: "",
+      paidstatus: 'Not Paid',
+      paidmode: 'Please Select Paid Mode',
+      paidamount: '',
+      balanceamount: '',
     });
   };
 
   return (
     <Box>
-      <Headtitle title={"Purchase Details"} />
+      <Headtitle title={'Purchase Details'} />
       {/* ****** Header Content ****** */}
 
       {/* <Typography sx={userStyle.HeaderText}>Purchase Details</Typography> */}
       <PageHeading title="Purchase Details" modulename="Asset" submodulename="Stock" mainpagename="Stock Purchase" subpagename="" subsubpagename="" />
 
-      {isUserRoleCompare?.includes("astockpurchase") && (
+      {isUserRoleCompare?.includes('astockpurchase') && (
         <>
           <Box sx={userStyle.selectcontainer}>
             <>
@@ -5707,7 +5712,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Company<b style={{ color: "red" }}>*</b>
+                      Company<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={companys}
@@ -5728,17 +5733,17 @@ function Stockmaster() {
                         setStockmaster({
                           ...stockmaster,
                           company: e.value,
-                          branch: "Please Select Branch",
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          branch: 'Please Select Branch',
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setBranchs([]);
                         setUnits([]);
                         setFloors([]);
                         setAreas([]);
-                        setLocations([{ label: "ALL", value: "ALL" }]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
                         fetchBranchDropdowns(e);
                       }}
                     />
@@ -5747,7 +5752,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Branch<b style={{ color: "red" }}>*</b>
+                      Branch<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={branchs}
@@ -5770,15 +5775,15 @@ function Stockmaster() {
                         setStockmaster({
                           ...stockmaster,
                           branch: e.value,
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setUnits([]);
                         // setFloors([]);
                         setAreas([]);
-                        setLocations([{ label: "ALL", value: "ALL" }]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
                         fetchUnits(e);
                         fetchFloor(e);
                       }}
@@ -5788,7 +5793,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Unit<b style={{ color: "red" }}>*</b>
+                      Unit<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={units}
@@ -5810,7 +5815,7 @@ function Stockmaster() {
                         setStockmaster({
                           ...stockmaster,
                           unit: e.value,
-                          location: "Please Select Location",
+                          location: 'Please Select Location',
                         });
                         // setLocations([{ label: "ALL", value: "ALL" }]);
                         // setAreas([]);
@@ -5821,7 +5826,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Floor<b style={{ color: "red" }}>*</b>
+                      Floor<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={floors}
@@ -5834,11 +5839,11 @@ function Stockmaster() {
                         setStockmaster({
                           ...stockmaster,
                           floor: e.value,
-                          workstation: "",
-                          area: "Please Select Area",
+                          workstation: '',
+                          area: 'Please Select Area',
                         });
                         // setAreas([]);
-                        setLocations([{ label: "ALL", value: "ALL" }]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
                         fetchArea(e.value);
                       }}
                     />
@@ -5847,7 +5852,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Area<b style={{ color: "red" }}>*</b>
+                      Area<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={areas}
@@ -5860,10 +5865,10 @@ function Stockmaster() {
                         setStockmaster({
                           ...stockmaster,
                           area: e.value,
-                          workstation: "",
-                          location: "Please Select Location",
+                          workstation: '',
+                          location: 'Please Select Location',
                         });
-                        setLocations([{ label: "ALL", value: "ALL" }]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
                         fetchLocation(e.value);
                       }}
                     />
@@ -5872,7 +5877,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Location<b style={{ color: "red" }}>*</b>
+                      Location<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={locations}
@@ -5885,7 +5890,7 @@ function Stockmaster() {
                         setStockmaster({
                           ...stockmaster,
                           location: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -5908,15 +5913,15 @@ function Stockmaster() {
                       }}
                     >
                       <MenuItem value="" disabled>
-                        {" "}
+                        {' '}
                         Please Select
                       </MenuItem>
-                      <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                      <MenuItem value="No"> {"No"} </MenuItem>
+                      <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                      <MenuItem value="No"> {'No'} </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
-                {stockmaster.warranty === "Yes" && (
+                {stockmaster.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <Grid container>
@@ -5939,12 +5944,12 @@ function Stockmaster() {
                             onChange={handleEstimationChange}
                           >
                             <MenuItem value="" disabled>
-                              {" "}
+                              {' '}
                               Please Select
                             </MenuItem>
-                            <MenuItem value="Days"> {"Days"} </MenuItem>
-                            <MenuItem value="Month"> {"Month"} </MenuItem>
-                            <MenuItem value="Year"> {"Year"} </MenuItem>
+                            <MenuItem value="Days"> {'Days'} </MenuItem>
+                            <MenuItem value="Month"> {'Month'} </MenuItem>
+                            <MenuItem value="Year"> {'Year'} </MenuItem>
                           </Select>
                         </Grid>
                       </Grid>
@@ -5965,7 +5970,7 @@ function Stockmaster() {
                     />
                   </FormControl>
                 </Grid>
-                {stockmaster.warranty === "Yes" && (
+                {stockmaster.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
@@ -5975,9 +5980,9 @@ function Stockmaster() {
                           type="text"
                           placeholder=""
                           value={stockmaster.warrantycalculation}
-                        // onChange={(e) => {
-                        //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
-                        // }}
+                          // onChange={(e) => {
+                          //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
+                          // }}
                         />
                       </FormControl>
                     </Grid>
@@ -5987,8 +5992,8 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      {" "}
-                      Vendor Group Name<b style={{ color: "red" }}>*</b>{" "}
+                      {' '}
+                      Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       // options={vendorGroupOpt}
@@ -6002,17 +6007,17 @@ function Stockmaster() {
                         setExpensecreate({
                           ...expensecreate,
                           vendorgrouping: e.value,
-                          vendorname: "Please Select Vendor",
-                          vendorfrequency: "",
-                          duedate: "",
-                          paidmode: "Please Select Paid Mode",
+                          vendorname: 'Please Select Vendor',
+                          vendorfrequency: '',
+                          duedate: '',
+                          paidmode: 'Please Select Paid Mode',
                         });
                         setVendorGroup(e.value);
-                        setFrequencyValue("");
+                        setFrequencyValue('');
                         setGroupedVendorNames(vendorGroupOpt?.filter((item) => item.name === e.value)?.map((data) => data?.vendor));
-                        setVendorModeOfPayments("");
-                        setFrequencyValue("");
-                        setVendorNew("Choose Vendor");
+                        setVendorModeOfPayments('');
+                        setFrequencyValue('');
+                        setVendorNew('Choose Vendor');
                       }}
                     />
                   </FormControl>
@@ -6021,7 +6026,7 @@ function Stockmaster() {
                 <Grid item md={2.5} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <Typography>
-                      Vendor Name <b style={{ color: "red" }}>*</b>{" "}
+                      Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       // options={vendorOpt}
@@ -6045,48 +6050,39 @@ function Stockmaster() {
                 <Grid item md={0.5} sm={1} xs={1}>
                   <Button
                     variant="contained"
-                    disabled={!isUserRoleCompare?.includes("avendormaster")}
+                    disabled={!isUserRoleCompare?.includes('avendormaster')}
                     style={{
-                      height: "30px",
-                      minWidth: "20px",
-                      padding: "19px 13px",
-                      color: "white",
-                      marginTop: "23px",
-                      marginLeft: "-10px",
-                      background: "rgb(25, 118, 210)",
+                      height: '30px',
+                      minWidth: '20px',
+                      padding: '19px 13px',
+                      color: 'white',
+                      marginTop: '23px',
+                      marginLeft: '-10px',
+                      background: 'rgb(25, 118, 210)',
                     }}
                     onClick={() => {
                       handleClickOpenviewalertvendor();
                     }}
                   >
-                    <FaPlus style={{ fontSize: "15px" }} />
+                    <FaPlus style={{ fontSize: '15px' }} />
                   </Button>
                 </Grid>
                 <Grid item lg={3} md={3} xs={12} sm={6}>
                   <FormControl size="small" fullWidth>
                     <Typography>Frequency</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      sx={userStyle.input}
-                      placeholder="Please Enter Frequency"
-                      value={frequencyValue}
-                      readOnly
-                    />
+                    <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValue} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      GST No
-                    </Typography>
+                    <Typography>GST No</Typography>
                     <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Bill No <b style={{ color: "red" }}>*</b>{" "}
+                      Bill No <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -6104,14 +6100,11 @@ function Stockmaster() {
                   </FormControl>
                 </Grid>
 
-
-
-
-                {stockmaster.warranty === "Yes" && (
+                {stockmaster.warranty === 'Yes' && (
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Warranty Details <b style={{ color: "red" }}>*</b>{" "}
+                        Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -6129,11 +6122,11 @@ function Stockmaster() {
                     </FormControl>
                   </Grid>
                 )}
-                {stockmaster.requestmode === "Asset Material" && (
+                {stockmaster.requestmode === 'Asset Material' && (
                   <Grid item md={3} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Rate<b style={{ color: "red" }}>*</b>{" "}
+                        Rate<b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -6151,12 +6144,12 @@ function Stockmaster() {
                     </FormControl>
                   </Grid>
                 )}
-                {stockmaster.requestmode === "Stock Material" && (
+                {stockmaster.requestmode === 'Stock Material' && (
                   <>
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Total Bill Amounts<b style={{ color: "red" }}>*</b>{" "}
+                          Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -6175,12 +6168,12 @@ function Stockmaster() {
                     </Grid>
                   </>
                 )}
-                {stockmaster.requestmode === "Asset Material" && (
+                {stockmaster.requestmode === 'Asset Material' && (
                   <>
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Total Bill Amount<b style={{ color: "red" }}>*</b>{" "}
+                          Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={stockmaster.quantity * stockmaster.rate} />
                       </FormControl>
@@ -6190,7 +6183,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Bill Date <b style={{ color: "red" }}>*</b>{" "}
+                      Bill Date <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <TextField
                       size="small"
@@ -6207,19 +6200,19 @@ function Stockmaster() {
                 </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>
-                    Bill <b style={{ color: "red" }}>*</b>{" "}
+                    Bill <b style={{ color: 'red' }}>*</b>{' '}
                   </Typography>
-                  <Box sx={{ display: "flex", justifyContent: "left" }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                     <Button variant="contained" onClick={handleClickUploadPopupOpen}>
                       Upload
                     </Button>
                   </Box>
                 </Grid>
 
-                {stockmaster.warranty === "Yes" && (
+                {stockmaster.warranty === 'Yes' && (
                   <Grid item md={1.5} xs={12} sm={12}>
                     <Typography>Warranty Card </Typography>
-                    <Box sx={{ display: "flex", justifyContent: "left" }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                       <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
                         Upload
                       </Button>
@@ -6227,12 +6220,10 @@ function Stockmaster() {
                   </Grid>
                 )}
 
-
-
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Request Mode For<b style={{ color: "red" }}>*</b>
+                      Request Mode For<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={requestModeOptions}
@@ -6246,36 +6237,36 @@ function Stockmaster() {
                         setStockmaster({
                           ...stockmaster,
                           requestmode: e.value,
-                          productname: "Please Select Material",
-                          component: "Please Select Component",
+                          productname: 'Please Select Material',
+                          component: 'Please Select Component',
 
-                          assettype: "",
-                          asset: "",
-                          productdetails: "",
+                          assettype: '',
+                          asset: '',
+                          productdetails: '',
 
-                          uom: "Please Select UOM",
-                          quantity: "",
+                          uom: 'Please Select UOM',
+                          quantity: '',
 
-                          files: "",
-                          warrantyfiles: "",
+                          files: '',
+                          warrantyfiles: '',
 
                           // warranty: "Yes",
                           // warrantycalculation: "",
                           // estimation: "",
                           // estimationtime: "Days",
-                          purchasedate: "",
+                          purchasedate: '',
 
-                          addedby: "",
-                          updatedby: "",
+                          addedby: '',
+                          updatedby: '',
 
-                          stockcategory: "Please Select Stock Category",
-                          stocksubcategory: "Please Select Stock Sub Category",
-                          uomnew: "",
-                          quantitynew: "",
-                          materialnew: "Please Select Material",
-                          productdetailsnew: "",
+                          stockcategory: 'Please Select Stock Category',
+                          stocksubcategory: 'Please Select Stock Sub Category',
+                          uomnew: '',
+                          quantitynew: '',
+                          materialnew: 'Please Select Material',
+                          productdetailsnew: '',
                         });
-                        if (e.value === "Stock Material") {
+                        if (e.value === 'Stock Material') {
                           setIsStockMaterial(true);
                         } else {
                           setIsStockMaterial(false);
@@ -6289,17 +6280,17 @@ function Stockmaster() {
                 </Grid>
               </Grid>
               <br />
-              {stockmaster.requestmode === "Asset Material" && (
+              {stockmaster.requestmode === 'Asset Material' && (
                 <>
                   <Grid container spacing={2}>
                     <Grid item md={12} xs={12} sm={12}>
-                      {" "}
+                      {' '}
                       <Typography variant="h6">Asset Material List</Typography>
                     </Grid>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Material<b style={{ color: "red" }}>*</b>
+                          Material<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           options={materialOpt}
@@ -6315,7 +6306,7 @@ function Stockmaster() {
                               productname: e.value,
                               assettype: e.assettype,
                               producthead: e.assethead,
-                              component: "Please Select Component",
+                              component: 'Please Select Component',
                             });
 
                             fetchspecification(e.value);
@@ -6340,7 +6331,7 @@ function Stockmaster() {
                     <Grid item md={3} sm={6} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Component<b style={{ color: "red" }}>*</b>
+                          Component<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           options={Specification}
@@ -6382,22 +6373,22 @@ function Stockmaster() {
                                                     <Switch
                                                       // color="success"
                                                       sx={{
-                                                        "& .MuiSwitch-switchBase.Mui-checked": {
-                                                          color: "green", // Thumb color when checked
+                                                        '& .MuiSwitch-switchBase.Mui-checked': {
+                                                          color: 'green', // Thumb color when checked
                                                         },
-                                                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                          backgroundColor: "green", // Track color when checked
+                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                          backgroundColor: 'green', // Track color when checked
                                                         },
-                                                        "& .MuiSwitch-switchBase": {
-                                                          color: "#ff0000a3", // Thumb color when not checked
+                                                        '& .MuiSwitch-switchBase': {
+                                                          color: '#ff0000a3', // Thumb color when not checked
                                                         },
-                                                        "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                          backgroundColor: "#ff0000a3", // Track color when not checked
+                                                        '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                          backgroundColor: '#ff0000a3', // Track color when not checked
                                                         },
                                                       }}
                                                       checked={todo.subcomponentcheck}
                                                       onChange={(e) => {
-                                                        handleChange(index, "subcomponentcheck", e.target.checked);
+                                                        handleChange(index, 'subcomponentcheck', e.target.checked);
                                                       }}
                                                     />
                                                   }
@@ -6433,7 +6424,7 @@ function Stockmaster() {
                                                           value: todo.type,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "type", e.value);
+                                                          handleChange(index, 'type', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6445,19 +6436,19 @@ function Stockmaster() {
                                                       disabled
                                                       size="small"
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         // color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenType();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -6486,7 +6477,7 @@ function Stockmaster() {
                                                           value: todo.model,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "model", e.value);
+                                                          handleChange(index, 'model', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6497,19 +6488,19 @@ function Stockmaster() {
                                                       disabled
                                                       size="small"
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenModel();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -6539,7 +6530,7 @@ function Stockmaster() {
                                                           value: todo.size,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "size", e.value);
+                                                          handleChange(index, 'size', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6550,19 +6541,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenSize();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -6592,7 +6583,7 @@ function Stockmaster() {
                                                           value: todo.variant,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "variant", e.value);
+                                                          handleChange(index, 'variant', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6603,19 +6594,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenVariant();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -6645,7 +6636,7 @@ function Stockmaster() {
                                                           value: todo.brand,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "brand", e.value);
+                                                          handleChange(index, 'brand', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6656,19 +6647,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenBrand();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -6691,7 +6682,7 @@ function Stockmaster() {
                                                       placeholder="Please Enter Serial"
                                                       value={todo.serial}
                                                       onChange={(e) => {
-                                                        handleChange(index, "serial", e.target.value);
+                                                        handleChange(index, 'serial', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -6715,7 +6706,7 @@ function Stockmaster() {
                                                       placeholder="Please Enter Other"
                                                       value={todo.other}
                                                       onChange={(e) => {
-                                                        handleChange(index, "other", e.target.value);
+                                                        handleChange(index, 'other', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -6745,7 +6736,7 @@ function Stockmaster() {
                                                           value: todo.capacity,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "capacity", e.value);
+                                                          handleChange(index, 'capacity', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6757,19 +6748,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -6798,8 +6789,8 @@ function Stockmaster() {
                                                         // Regex to allow only non-negative numbers
                                                         const validatedInput = inputText.match(/^\d*$/);
 
-                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                        handleChange(index, "hdmiport", sanitizedInput);
+                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                        handleChange(index, 'hdmiport', sanitizedInput);
                                                       }}
                                                     />
                                                   </Grid>
@@ -6826,8 +6817,8 @@ function Stockmaster() {
                                                         // Regex to allow only non-negative numbers
                                                         const validatedInput = inputText.match(/^\d*$/);
 
-                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                        handleChange(index, "vgaport", sanitizedInput);
+                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                        handleChange(index, 'vgaport', sanitizedInput);
                                                       }}
                                                     />
                                                   </Grid>
@@ -6854,8 +6845,8 @@ function Stockmaster() {
                                                         // Regex to allow only non-negative numbers
                                                         const validatedInput = inputText.match(/^\d*$/);
 
-                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                        handleChange(index, "dpport", sanitizedInput);
+                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                        handleChange(index, 'dpport', sanitizedInput);
                                                       }}
                                                     />
                                                   </Grid>
@@ -6882,8 +6873,8 @@ function Stockmaster() {
                                                         // Regex to allow only non-negative numbers
                                                         const validatedInput = inputText.match(/^\d*$/);
 
-                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                        handleChange(index, "usbport", sanitizedInput);
+                                                        const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                        handleChange(index, 'usbport', sanitizedInput);
                                                       }}
                                                     />
                                                   </Grid>
@@ -6913,7 +6904,7 @@ function Stockmaster() {
                                                           value: todo.paneltypescreen,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "paneltypescreen", e.value);
+                                                          handleChange(index, 'paneltypescreen', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6925,19 +6916,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -6966,7 +6957,7 @@ function Stockmaster() {
                                                           value: todo.resolution,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "resolution", e.value);
+                                                          handleChange(index, 'resolution', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -6978,19 +6969,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7019,7 +7010,7 @@ function Stockmaster() {
                                                           value: todo.connectivity,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "connectivity", e.value);
+                                                          handleChange(index, 'connectivity', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7031,19 +7022,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7072,7 +7063,7 @@ function Stockmaster() {
                                                           value: todo.daterate,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "daterate", e.value);
+                                                          handleChange(index, 'daterate', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7084,19 +7075,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7125,7 +7116,7 @@ function Stockmaster() {
                                                           value: todo.compatibledevice,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "compatibledevice", e.value);
+                                                          handleChange(index, 'compatibledevice', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7137,19 +7128,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7178,7 +7169,7 @@ function Stockmaster() {
                                                           value: todo.outputpower,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "outputpower", e.value);
+                                                          handleChange(index, 'outputpower', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7190,19 +7181,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7231,7 +7222,7 @@ function Stockmaster() {
                                                           value: todo.collingfancount,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "collingfancount", e.value);
+                                                          handleChange(index, 'collingfancount', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7243,19 +7234,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7284,7 +7275,7 @@ function Stockmaster() {
                                                           value: todo.clockspeed,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "clockspeed", e.value);
+                                                          handleChange(index, 'clockspeed', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7296,19 +7287,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7337,7 +7328,7 @@ function Stockmaster() {
                                                           value: todo.core,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "core", e.value);
+                                                          handleChange(index, 'core', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7349,19 +7340,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7390,7 +7381,7 @@ function Stockmaster() {
                                                           value: todo.speed,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "speed", e.value);
+                                                          handleChange(index, 'speed', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7402,19 +7393,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7443,7 +7434,7 @@ function Stockmaster() {
                                                           value: todo.frequency,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "frequency", e.value);
+                                                          handleChange(index, 'frequency', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7455,19 +7446,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7496,7 +7487,7 @@ function Stockmaster() {
                                                           value: todo.output,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "output", e.value);
+                                                          handleChange(index, 'output', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7508,19 +7499,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7549,7 +7540,7 @@ function Stockmaster() {
                                                           value: todo.ethernetports,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "ethernetports", e.value);
+                                                          handleChange(index, 'ethernetports', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7561,19 +7552,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7602,7 +7593,7 @@ function Stockmaster() {
                                                           value: todo.distance,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "distance", e.value);
+                                                          handleChange(index, 'distance', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7614,19 +7605,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7655,7 +7646,7 @@ function Stockmaster() {
                                                           value: todo.lengthname,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "lengthname", e.value);
+                                                          handleChange(index, 'lengthname', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7667,19 +7658,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7708,7 +7699,7 @@ function Stockmaster() {
                                                           value: todo.slot,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "slot", e.value);
+                                                          handleChange(index, 'slot', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7720,19 +7711,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7761,7 +7752,7 @@ function Stockmaster() {
                                                           value: todo.noofchannels,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "noofchannels", e.value);
+                                                          handleChange(index, 'noofchannels', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7773,19 +7764,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7814,7 +7805,7 @@ function Stockmaster() {
                                                           value: todo.colours,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "colours", e.value);
+                                                          handleChange(index, 'colours', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -7826,19 +7817,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -7852,7 +7843,7 @@ function Stockmaster() {
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
-                                                      Warranty <b style={{ color: "red" }}>*</b>
+                                                      Warranty <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Select
                                                       fullWidth
@@ -7865,15 +7856,15 @@ function Stockmaster() {
                                                       // }}
                                                       // value={todo.serial}
                                                       onChange={(e) => {
-                                                        handleChange(index, "warranty", e.target.value);
+                                                        handleChange(index, 'warranty', e.target.value);
                                                       }}
                                                     >
                                                       <MenuItem value="" disabled>
-                                                        {" "}
+                                                        {' '}
                                                         Please Select
                                                       </MenuItem>
-                                                      <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                                                      <MenuItem value="No"> {"No"} </MenuItem>
+                                                      <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                                      <MenuItem value="No"> {'No'} </MenuItem>
                                                     </Select>
                                                   </FormControl>
                                                 </Grid>
@@ -7881,13 +7872,13 @@ function Stockmaster() {
                                             </Grid>
                                           </>
 
-                                          {todo.warranty === "Yes" && (
+                                          {todo.warranty === 'Yes' && (
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
                                                   <Grid item md={6} xs={6} sm={6}>
                                                     <Typography>
-                                                      Warranty Time <b style={{ color: "red" }}>*</b>
+                                                      Warranty Time <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <FormControl fullWidth size="small">
                                                       <OutlinedInput
@@ -7897,16 +7888,16 @@ function Stockmaster() {
                                                         disabled={todo.subcomponentcheck === false}
                                                         value={todo.estimation}
                                                         onChange={(e) => {
-                                                          handleChange(index, "estimation", e.target.value);
+                                                          handleChange(index, 'estimation', e.target.value);
                                                           // handleChangephonenumber(e)
                                                         }}
-                                                      // onChange={(e) => handleChangephonenumber(e)}
+                                                        // onChange={(e) => handleChangephonenumber(e)}
                                                       />
                                                     </FormControl>
                                                   </Grid>
                                                   <Grid item md={6} xs={6} sm={6}>
                                                     <Typography>
-                                                      Estimation <b style={{ color: "red" }}>*</b>
+                                                      Estimation <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Select
                                                       fullWidth
@@ -7918,18 +7909,18 @@ function Stockmaster() {
                                                       //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
                                                       // }}
                                                       onChange={(e) => {
-                                                        handleChange(index, "estimationtime", e.target.value);
+                                                        handleChange(index, 'estimationtime', e.target.value);
                                                         // handleEstimationChange()
                                                       }}
-                                                    // onChange={handleEstimationChange}
+                                                      // onChange={handleEstimationChange}
                                                     >
                                                       <MenuItem value="" disabled>
-                                                        {" "}
+                                                        {' '}
                                                         Please Select
                                                       </MenuItem>
-                                                      <MenuItem value="Days"> {"Days"} </MenuItem>
-                                                      <MenuItem value="Month"> {"Month"} </MenuItem>
-                                                      <MenuItem value="Year"> {"Year"} </MenuItem>
+                                                      <MenuItem value="Days"> {'Days'} </MenuItem>
+                                                      <MenuItem value="Month"> {'Month'} </MenuItem>
+                                                      <MenuItem value="Year"> {'Year'} </MenuItem>
                                                     </Select>
                                                   </Grid>
                                                 </Grid>
@@ -7949,17 +7940,17 @@ function Stockmaster() {
                                                       disabled={todo.subcomponentcheck === false}
                                                       value={todo.purchasedate}
                                                       onChange={(e) => {
-                                                        handleChange(index, "purchasedate", e.target.value);
+                                                        handleChange(index, 'purchasedate', e.target.value);
                                                         // handlePurchaseDateChange()
                                                       }}
-                                                    // onChange={handlePurchaseDateChange}
+                                                      // onChange={handlePurchaseDateChange}
                                                     />
                                                   </FormControl>
                                                 </Grid>
                                               </Grid>
                                             </Grid>
                                           </>
-                                          {todo.warranty === "Yes" && (
+                                          {todo.warranty === 'Yes' && (
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
@@ -7972,9 +7963,9 @@ function Stockmaster() {
                                                         disabled={todo.subcomponentcheck === false}
                                                         placeholder=""
                                                         value={todo.warrantycalculation}
-                                                      // onChange={(e) => {
-                                                      //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                      // }}
+                                                        // onChange={(e) => {
+                                                        //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
+                                                        // }}
                                                       />
                                                     </FormControl>
                                                   </Grid>
@@ -7990,7 +7981,7 @@ function Stockmaster() {
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
                                                       Vendor Group Name
-                                                      <b style={{ color: "red" }}>*</b>
+                                                      <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Selects
                                                       options={vendorGroupOpt}
@@ -8002,10 +7993,10 @@ function Stockmaster() {
                                                       }}
                                                       onChange={(e) => {
                                                         handleChangeGroupNameIndexBased(e, index);
-                                                        handleChange(index, "vendorgroup", e.value);
+                                                        handleChange(index, 'vendorgroup', e.value);
                                                         setTodos((prev) => {
                                                           const updated = [...prev];
-                                                          updated[index].vendor = "Choose Vendor";
+                                                          updated[index].vendor = 'Choose Vendor';
                                                           return updated;
                                                         });
                                                       }}
@@ -8020,7 +8011,7 @@ function Stockmaster() {
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
                                                       Vendor
-                                                      <b style={{ color: "red" }}>*</b>
+                                                      <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Selects
                                                       options={vendorOptInd[index]}
@@ -8031,7 +8022,7 @@ function Stockmaster() {
                                                         value: todo.vendor,
                                                       }}
                                                       onChange={(e) => {
-                                                        handleChange(index, "vendor", e.value, e._id);
+                                                        handleChange(index, 'vendor', e.value, e._id);
                                                         // setVendor(e.value);
                                                         // vendorid(e._id);
                                                       }}
@@ -8126,22 +8117,22 @@ function Stockmaster() {
                                                     <Switch
                                                       // color="success"
                                                       sx={{
-                                                        "& .MuiSwitch-switchBase.Mui-checked": {
-                                                          color: "green", // Thumb color when checked
+                                                        '& .MuiSwitch-switchBase.Mui-checked': {
+                                                          color: 'green', // Thumb color when checked
                                                         },
-                                                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                          backgroundColor: "green", // Track color when checked
+                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                          backgroundColor: 'green', // Track color when checked
                                                         },
-                                                        "& .MuiSwitch-switchBase": {
-                                                          color: "#ff0000a3", // Thumb color when not checked
+                                                        '& .MuiSwitch-switchBase': {
+                                                          color: '#ff0000a3', // Thumb color when not checked
                                                         },
-                                                        "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                          backgroundColor: "#ff0000a3", // Track color when not checked
+                                                        '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                          backgroundColor: '#ff0000a3', // Track color when not checked
                                                         },
                                                       }}
                                                       checked={todo.subcomponentcheck}
                                                       onChange={(e) => {
-                                                        handleChange(index, "subcomponentcheck", e.target.checked);
+                                                        handleChange(index, 'subcomponentcheck', e.target.checked);
                                                       }}
                                                     />
                                                   }
@@ -8177,7 +8168,7 @@ function Stockmaster() {
                                                           value: todo.type,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "type", e.value);
+                                                          handleChange(index, 'type', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8189,19 +8180,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenType();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8230,7 +8221,7 @@ function Stockmaster() {
                                                           value: todo.model,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "model", e.value);
+                                                          handleChange(index, 'model', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8241,19 +8232,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenModel();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8283,7 +8274,7 @@ function Stockmaster() {
                                                           value: todo.size,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "size", e.value);
+                                                          handleChange(index, 'size', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8294,19 +8285,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenSize();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8336,7 +8327,7 @@ function Stockmaster() {
                                                           value: todo.variant,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "variant", e.value);
+                                                          handleChange(index, 'variant', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8347,19 +8338,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenVariant();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8389,7 +8380,7 @@ function Stockmaster() {
                                                           value: todo.brand,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "brand", e.value);
+                                                          handleChange(index, 'brand', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8400,19 +8391,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenBrand();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8435,7 +8426,7 @@ function Stockmaster() {
                                                       value={todo.serial}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(index, "serial", e.target.value);
+                                                        handleChange(index, 'serial', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -8459,7 +8450,7 @@ function Stockmaster() {
                                                       value={todo.other}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(index, "other", e.target.value);
+                                                        handleChange(index, 'other', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -8489,7 +8480,7 @@ function Stockmaster() {
                                                           value: todo.capacity,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "capacity", e.value);
+                                                          handleChange(index, 'capacity', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8501,19 +8492,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8535,7 +8526,7 @@ function Stockmaster() {
                                                       value={todo.hdmiport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(index, "hdmiport", e.target.value);
+                                                        handleChange(index, 'hdmiport', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -8558,7 +8549,7 @@ function Stockmaster() {
                                                       value={todo.vgaport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(index, "vgaport", e.target.value);
+                                                        handleChange(index, 'vgaport', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -8581,7 +8572,7 @@ function Stockmaster() {
                                                       value={todo.dpport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(index, "dpport", e.target.value);
+                                                        handleChange(index, 'dpport', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -8604,7 +8595,7 @@ function Stockmaster() {
                                                       value={todo.usbport}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(index, "usbport", e.target.value);
+                                                        handleChange(index, 'usbport', e.target.value);
                                                       }}
                                                     />
                                                   </Grid>
@@ -8634,7 +8625,7 @@ function Stockmaster() {
                                                           value: todo.paneltypescreen,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "paneltypescreen", e.value);
+                                                          handleChange(index, 'paneltypescreen', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8646,19 +8637,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8687,7 +8678,7 @@ function Stockmaster() {
                                                           value: todo.resolution,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "resolution", e.value);
+                                                          handleChange(index, 'resolution', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8699,19 +8690,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8740,7 +8731,7 @@ function Stockmaster() {
                                                           value: todo.connectivity,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "connectivity", e.value);
+                                                          handleChange(index, 'connectivity', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8752,19 +8743,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8793,7 +8784,7 @@ function Stockmaster() {
                                                           value: todo.daterate,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "daterate", e.value);
+                                                          handleChange(index, 'daterate', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8805,19 +8796,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8846,7 +8837,7 @@ function Stockmaster() {
                                                           value: todo.compatibledevice,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "compatibledevice", e.value);
+                                                          handleChange(index, 'compatibledevice', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8858,19 +8849,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8899,7 +8890,7 @@ function Stockmaster() {
                                                           value: todo.outputpower,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "outputpower", e.value);
+                                                          handleChange(index, 'outputpower', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8911,19 +8902,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -8952,7 +8943,7 @@ function Stockmaster() {
                                                           value: todo.collingfancount,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "collingfancount", e.value);
+                                                          handleChange(index, 'collingfancount', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -8964,19 +8955,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9005,7 +8996,7 @@ function Stockmaster() {
                                                           value: todo.clockspeed,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "clockspeed", e.value);
+                                                          handleChange(index, 'clockspeed', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9017,19 +9008,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9058,7 +9049,7 @@ function Stockmaster() {
                                                           value: todo.core,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "core", e.value);
+                                                          handleChange(index, 'core', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9070,19 +9061,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9111,7 +9102,7 @@ function Stockmaster() {
                                                           value: todo.speed,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "speed", e.value);
+                                                          handleChange(index, 'speed', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9123,19 +9114,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9164,7 +9155,7 @@ function Stockmaster() {
                                                           value: todo.frequency,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "frequency", e.value);
+                                                          handleChange(index, 'frequency', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9176,19 +9167,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9217,7 +9208,7 @@ function Stockmaster() {
                                                           value: todo.output,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "output", e.value);
+                                                          handleChange(index, 'output', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9229,19 +9220,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9270,7 +9261,7 @@ function Stockmaster() {
                                                           value: todo.ethernetports,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "ethernetports", e.value);
+                                                          handleChange(index, 'ethernetports', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9282,19 +9273,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9323,7 +9314,7 @@ function Stockmaster() {
                                                           value: todo.distance,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "distance", e.value);
+                                                          handleChange(index, 'distance', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9335,19 +9326,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9376,7 +9367,7 @@ function Stockmaster() {
                                                           value: todo.lengthname,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "lengthname", e.value);
+                                                          handleChange(index, 'lengthname', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9388,19 +9379,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9429,7 +9420,7 @@ function Stockmaster() {
                                                           value: todo.slot,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "slot", e.value);
+                                                          handleChange(index, 'slot', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9441,19 +9432,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9482,7 +9473,7 @@ function Stockmaster() {
                                                           value: todo.noofchannels,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "noofchannels", e.value);
+                                                          handleChange(index, 'noofchannels', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9494,19 +9485,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9535,7 +9526,7 @@ function Stockmaster() {
                                                           value: todo.colours,
                                                         }}
                                                         onChange={(e) => {
-                                                          handleChange(index, "colours", e.value);
+                                                          handleChange(index, 'colours', e.value);
                                                         }}
                                                       />
                                                     </FormControl>
@@ -9547,19 +9538,19 @@ function Stockmaster() {
                                                       size="small"
                                                       disabled
                                                       style={{
-                                                        height: "30px",
-                                                        minWidth: "20px",
-                                                        padding: "19px 13px",
+                                                        height: '30px',
+                                                        minWidth: '20px',
+                                                        padding: '19px 13px',
                                                         //  color: "white",
-                                                        marginTop: "23px",
-                                                        marginLeft: "-10px",
+                                                        marginTop: '23px',
+                                                        marginLeft: '-10px',
                                                         // background: "rgb(25, 118, 210)",
                                                       }}
                                                       onClick={() => {
                                                         handleClickOpenCapacity();
                                                       }}
                                                     >
-                                                      <FaPlus style={{ fontSize: "15px" }} />
+                                                      <FaPlus style={{ fontSize: '15px' }} />
                                                     </Button>
                                                   </Grid>
                                                 </Grid>
@@ -9573,7 +9564,7 @@ function Stockmaster() {
                                                 <Grid item md={10} sm={10} xs={10}>
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
-                                                      Warranty <b style={{ color: "red" }}>*</b>
+                                                      Warranty <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Select
                                                       fullWidth
@@ -9587,15 +9578,15 @@ function Stockmaster() {
                                                       // }}
                                                       // value={todo.serial}
                                                       onChange={(e) => {
-                                                        handleChange(index, "warranty", e.target.value);
+                                                        handleChange(index, 'warranty', e.target.value);
                                                       }}
                                                     >
                                                       <MenuItem value="" disabled>
-                                                        {" "}
+                                                        {' '}
                                                         Please Select
                                                       </MenuItem>
-                                                      <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                                                      <MenuItem value="No"> {"No"} </MenuItem>
+                                                      <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                                      <MenuItem value="No"> {'No'} </MenuItem>
                                                     </Select>
                                                   </FormControl>
                                                 </Grid>
@@ -9603,13 +9594,13 @@ function Stockmaster() {
                                             </Grid>
                                           </>
 
-                                          {todo.warranty === "Yes" && (
+                                          {todo.warranty === 'Yes' && (
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container>
                                                   <Grid item md={6} xs={6} sm={6}>
                                                     <Typography>
-                                                      Warranty Time <b style={{ color: "red" }}>*</b>
+                                                      Warranty Time <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <FormControl fullWidth size="small">
                                                       <OutlinedInput
@@ -9619,16 +9610,16 @@ function Stockmaster() {
                                                         value={todo.estimation}
                                                         disabled={todo.subcomponentcheck === false}
                                                         onChange={(e) => {
-                                                          handleChange(index, "estimation", e.target.value);
+                                                          handleChange(index, 'estimation', e.target.value);
                                                           handleChangephonenumber(e);
                                                         }}
-                                                      // onChange={(e) => handleChangephonenumber(e)}
+                                                        // onChange={(e) => handleChangephonenumber(e)}
                                                       />
                                                     </FormControl>
                                                   </Grid>
                                                   <Grid item md={6} xs={6} sm={6}>
                                                     <Typography>
-                                                      Estimation <b style={{ color: "red" }}>*</b>
+                                                      Estimation <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Select
                                                       fullWidth
@@ -9639,18 +9630,18 @@ function Stockmaster() {
                                                       //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
                                                       // }}
                                                       onChange={(e) => {
-                                                        handleChange(index, "estimationtime", e.target.value);
+                                                        handleChange(index, 'estimationtime', e.target.value);
                                                         // handleEstimationChange()
                                                       }}
-                                                    // onChange={handleEstimationChange}
+                                                      // onChange={handleEstimationChange}
                                                     >
                                                       <MenuItem value="" disabled>
-                                                        {" "}
+                                                        {' '}
                                                         Please Select
                                                       </MenuItem>
-                                                      <MenuItem value="Days"> {"Days"} </MenuItem>
-                                                      <MenuItem value="Month"> {"Month"} </MenuItem>
-                                                      <MenuItem value="Year"> {"Year"} </MenuItem>
+                                                      <MenuItem value="Days"> {'Days'} </MenuItem>
+                                                      <MenuItem value="Month"> {'Month'} </MenuItem>
+                                                      <MenuItem value="Year"> {'Year'} </MenuItem>
                                                     </Select>
                                                   </Grid>
                                                 </Grid>
@@ -9670,17 +9661,17 @@ function Stockmaster() {
                                                       value={todo.purchasedate}
                                                       disabled={todo.subcomponentcheck === false}
                                                       onChange={(e) => {
-                                                        handleChange(index, "purchasedate", e.target.value);
+                                                        handleChange(index, 'purchasedate', e.target.value);
                                                         // handlePurchaseDateChange()
                                                       }}
-                                                    // onChange={handlePurchaseDateChange}
+                                                      // onChange={handlePurchaseDateChange}
                                                     />
                                                   </FormControl>
                                                 </Grid>
                                               </Grid>
                                             </Grid>
                                           </>
-                                          {todos.warranty === "Yes" && (
+                                          {todos.warranty === 'Yes' && (
                                             <>
                                               <Grid item md={3} sm={6} xs={12}>
                                                 <Grid container spacing={2}>
@@ -9693,9 +9684,9 @@ function Stockmaster() {
                                                         disabled={todo.subcomponentcheck === false}
                                                         placeholder=""
                                                         value={todo.warrantycalculation}
-                                                      // onChange={(e) => {
-                                                      //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                      // }}
+                                                        // onChange={(e) => {
+                                                        //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
+                                                        // }}
                                                       />
                                                     </FormControl>
                                                   </Grid>
@@ -9711,7 +9702,7 @@ function Stockmaster() {
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
                                                       Vendor Group Name
-                                                      <b style={{ color: "red" }}>*</b>
+                                                      <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Selects
                                                       options={vendorGroupOpt}
@@ -9723,10 +9714,10 @@ function Stockmaster() {
                                                       }}
                                                       onChange={(e) => {
                                                         handleChangeGroupNameIndexBased(e, index);
-                                                        handleChange(index, "vendorgroup", e.value);
+                                                        handleChange(index, 'vendorgroup', e.value);
                                                         setTodos((prev) => {
                                                           const updated = [...prev];
-                                                          updated[index].vendor = "Choose Vendor";
+                                                          updated[index].vendor = 'Choose Vendor';
                                                           return updated;
                                                         });
                                                       }}
@@ -9741,7 +9732,7 @@ function Stockmaster() {
                                                   <FormControl fullWidth size="small">
                                                     <Typography>
                                                       Vendor
-                                                      <b style={{ color: "red" }}>*</b>
+                                                      <b style={{ color: 'red' }}>*</b>
                                                     </Typography>
                                                     <Selects
                                                       options={vendorOptInd[index]}
@@ -9751,7 +9742,7 @@ function Stockmaster() {
                                                         value: todo.vendor,
                                                       }}
                                                       onChange={(e) => {
-                                                        handleChange(index, "vendor", e.value, e._id);
+                                                        handleChange(index, 'vendor', e.value, e._id);
                                                         // setVendor(e.value);
                                                         // vendorid(e._id);
                                                       }}
@@ -9836,7 +9827,7 @@ function Stockmaster() {
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Product Details <b style={{ color: "red" }}>*</b>{" "}
+                          Product Details <b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <TextareaAutosize
                           aria-label="minimum height"
@@ -9856,7 +9847,7 @@ function Stockmaster() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl size="small" fullWidth>
                         <Typography>
-                          UOM <b style={{ color: "red" }}>*</b>{" "}
+                          UOM <b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <Selects
                           options={vomMasterget}
@@ -9874,7 +9865,7 @@ function Stockmaster() {
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Qty<b style={{ color: "red" }}>*</b>{" "}
+                          Qty<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -9900,14 +9891,14 @@ function Stockmaster() {
               <br />
               {/* <br /> */}
 
-              {stockmaster.requestmode === "Stock Material" && (
+              {stockmaster.requestmode === 'Stock Material' && (
                 <>
                   <Grid item md={12} xs={12} sm={12}>
-                    {" "}
+                    {' '}
                     <Typography variant="h6">Stock Purchase Todo List</Typography>
                   </Grid>
                   <Grid item md={12} sm={12} xs={12}>
-                    <Grid container spacing={3} sx={{ display: "flex" }}>
+                    <Grid container spacing={3} sx={{ display: 'flex' }}>
                       {/* <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
@@ -9939,7 +9930,7 @@ function Stockmaster() {
                         </FormControl>
                       </Grid> */}
 
-                      {stockmaster.requestmode === "Stock Material" && (
+                      {stockmaster.requestmode === 'Stock Material' && (
                         <>
                           <Grid item md={2.5} sm={6} xs={12}>
                             <FormControl fullWidth size="small">
@@ -9956,35 +9947,35 @@ function Stockmaster() {
                                   setTodoDetails({
                                     ...todoDetails,
                                     category: e.value,
-                                    subcategory: "Please Select Sub Category",
-                                    materialnew: todoDetails.particularmode === "Others" ? "" : "Please Select Item Name",
-                                    uomnew: "",
-                                    rate: "",
-                                    quantitynew: "",
-                                    amount: "",
+                                    subcategory: 'Please Select Sub Category',
+                                    materialnew: todoDetails.particularmode === 'Others' ? '' : 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
                             </FormControl>
                           </Grid>
-                          {isUserRoleCompare?.includes("astockcategory") && (
+                          {isUserRoleCompare?.includes('astockcategory') && (
                             <Grid item md={0.5} sm={1} xs={1}>
                               <Button
                                 variant="contained"
                                 style={{
-                                  height: "30px",
-                                  minWidth: "20px",
-                                  padding: "19px 13px",
-                                  color: "white",
-                                  marginTop: "23px",
-                                  marginLeft: "-10px",
-                                  background: "rgb(25, 118, 210)",
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
                                 }}
                                 onClick={() => {
                                   handleClickOpenviewalertstockcategory();
                                 }}
                               >
-                                <FaPlus style={{ fontSize: "15px" }} />
+                                <FaPlus style={{ fontSize: '15px' }} />
                               </Button>
                             </Grid>
                           )}
@@ -10007,7 +9998,7 @@ function Stockmaster() {
                                   value: todoDetails.subcategory,
                                 }}
                                 onChange={(e) => {
-                                  if (e.value !== "Please Select Sub Category") {
+                                  if (e.value !== 'Please Select Sub Category') {
                                     setItemAllShow(false);
                                   } else {
                                     setItemAllShow(true);
@@ -10015,12 +10006,12 @@ function Stockmaster() {
                                   setTodoDetails({
                                     ...todoDetails,
                                     subcategory: e.value,
-                                    materialnew: todoDetails.particularmode === "Others" ? "" : "Please Select Item Name",
-                                    uomnew: "",
-                                    rate: "",
-                                    quantitynew: "",
-                                    productdetailsnew: "",
-                                    amount: "",
+                                    materialnew: todoDetails.particularmode === 'Others' ? '' : 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
@@ -10029,23 +10020,23 @@ function Stockmaster() {
                           <Grid item md={2.5} sm={6} xs={12}>
                             <FormControl fullWidth size="small">
                               <Typography>
-                                Item Name <b style={{ color: "red" }}>*</b>
+                                Item Name <b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <Selects
                                 options={
                                   !itemAllShow
                                     ? allStockValues
-                                      .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
-                                      .map((item) => ({
+                                        .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
+                                        .map((item) => ({
+                                          label: item.itemname,
+                                          value: item.itemname,
+                                          uom: item.uom,
+                                        }))
+                                    : allStockValues.map((item) => ({
                                         label: item.itemname,
                                         value: item.itemname,
                                         uom: item.uom,
                                       }))
-                                    : allStockValues.map((item) => ({
-                                      label: item.itemname,
-                                      value: item.itemname,
-                                      uom: item.uom,
-                                    }))
                                 }
                                 styles={colourStyles}
                                 value={{
@@ -10057,33 +10048,33 @@ function Stockmaster() {
                                     ...todoDetails,
                                     materialnew: e.value,
                                     uomnew: e.uom,
-                                    rate: "",
-                                    quantitynew: "",
-                                    productdetailsnew: "",
-                                    amount: "",
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
                                   });
                                 }}
                               />
                             </FormControl>
                           </Grid>
-                          {isUserRoleCompare?.includes("amanagestockitems") && (
+                          {isUserRoleCompare?.includes('amanagestockitems') && (
                             <Grid item md={0.5} sm={1} xs={1}>
                               <Button
                                 variant="contained"
                                 style={{
-                                  height: "30px",
-                                  minWidth: "20px",
-                                  padding: "19px 13px",
-                                  color: "white",
-                                  marginTop: "23px",
-                                  marginLeft: "-10px",
-                                  background: "rgb(25, 118, 210)",
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
                                 }}
                                 onClick={() => {
                                   handleClickOpenviewalertstockitem();
                                 }}
                               >
-                                <FaPlus style={{ fontSize: "15px" }} />
+                                <FaPlus style={{ fontSize: '15px' }} />
                               </Button>
                             </Grid>
                           )}
@@ -10099,7 +10090,7 @@ function Stockmaster() {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Rate <b style={{ color: "red" }}>*</b>
+                            Rate <b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -10111,7 +10102,7 @@ function Stockmaster() {
                             onChange={(e) => {
                               const value = e.target.value;
                               const regex = /^\d*\.?\d{0,2}$/;
-                              if (regex.test(value) || value === "") {
+                              if (regex.test(value) || value === '') {
                                 setTodoDetails({
                                   ...todoDetails,
                                   rate: value,
@@ -10125,7 +10116,7 @@ function Stockmaster() {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Quantity <b style={{ color: "red" }}>*</b>
+                            Quantity <b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -10148,15 +10139,14 @@ function Stockmaster() {
                       <Grid item md={3} sm={6} xs={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Amount<b style={{ color: "red" }}>*</b>
+                            Amount<b style={{ color: 'red' }}>*</b>
                           </Typography>
-                          <OutlinedInput id="component-outlined" type="number" placeholder="Please Enter Amount"
-                            sx={userStyle.input} value={todoDetails.amount} readOnly />
+                          <OutlinedInput id="component-outlined" type="number" placeholder="Please Enter Amount" sx={userStyle.input} value={todoDetails.amount} readOnly />
                         </FormControl>
                       </Grid>
-                      <Grid item md={todoDetails.particularmode !== "Others" ? 2.5 : 3} sm={6} xs={12}>
+                      <Grid item md={todoDetails.particularmode !== 'Others' ? 2.5 : 3} sm={6} xs={12}>
                         <Typography>
-                          Product Details<b style={{ color: "red" }}>*</b>
+                          Product Details<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <TextareaAutosize
                           aria-label="minimum height"
@@ -10172,15 +10162,15 @@ function Stockmaster() {
                           }}
                         />
                       </Grid>
-                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: "-20px" }}>
+                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: '-20px' }}>
                         <Button
                           variant="contained"
                           color="success"
                           style={{
-                            height: "30px",
-                            minWidth: "20px",
-                            padding: "19px 13px",
-                            marginTop: "25px",
+                            height: '30px',
+                            minWidth: '20px',
+                            padding: '19px 13px',
+                            marginTop: '25px',
                           }}
                           onClick={educationTodo}
                         >
@@ -10188,14 +10178,13 @@ function Stockmaster() {
                         </Button>
                       </Grid>
                     </Grid>
-                  </Grid>{" "}
+                  </Grid>{' '}
                   <br />
-
                   <Grid container spacing={2}>
                     <Grid item md={12} xs={12} sm={12}>
                       <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable">
-                          <TableHead sx={{ fontWeight: "600" }}>
+                          <TableHead sx={{ fontWeight: '600' }}>
                             <StyledTableRow>
                               <StyledTableCell>SNo</StyledTableCell>
                               <StyledTableCell>Item Name</StyledTableCell>
@@ -10220,7 +10209,7 @@ function Stockmaster() {
                                   <StyledTableCell>{row.productdetailsnew}</StyledTableCell>
                                   <StyledTableCell>
                                     <CloseIcon
-                                      sx={{ color: "red", cursor: "pointer" }}
+                                      sx={{ color: 'red', cursor: 'pointer' }}
                                       onClick={() => {
                                         educationTodoremove(index);
                                       }}
@@ -10230,15 +10219,15 @@ function Stockmaster() {
                               ))
                             ) : (
                               <StyledTableRow>
-                                {" "}
+                                {' '}
                                 <StyledTableCell colSpan={8} align="center">
                                   No Data Available
-                                </StyledTableCell>{" "}
+                                </StyledTableCell>{' '}
                               </StyledTableRow>
                             )}
                             <StyledTableRow></StyledTableRow>
                           </TableBody>
-                          <TableFooter sx={{ backgroundColor: "#9591914f", height: "50px" }}>
+                          <TableFooter sx={{ backgroundColor: '#9591914f', height: '50px' }}>
                             {educationtodo &&
                               educationtodo.forEach((item) => {
                                 Expensetotal += +item.amount;
@@ -10252,17 +10241,15 @@ function Stockmaster() {
                             </StyledTableRow>
                           </TableFooter>
                         </Table>
-                      </TableContainer>{" "}
-
+                      </TableContainer>{' '}
                     </Grid>
                   </Grid>
-
                   <br />
-                  <Grid container spacing={2} sx={{ display: "flex" }}>
+                  <Grid container spacing={2} sx={{ display: 'flex' }}>
                     <Grid item lg={3} md={4} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Paid Status<b style={{ color: "red" }}>*</b>
+                          Paid Status<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           maxMenuHeight={250}
@@ -10276,7 +10263,7 @@ function Stockmaster() {
                             setExpensecreate({
                               ...expensecreate,
                               paidstatus: e.value,
-                              paidmode: "Please Select Paid Mode",
+                              paidmode: 'Please Select Paid Mode',
                             });
                           }}
                           isDisabled={Number(Expensetotal) !== Number(stockmaster.totalbillamount)}
@@ -10284,10 +10271,10 @@ function Stockmaster() {
                       </FormControl>
                     </Grid>
                     <Grid item lg={3} md={4} xs={12} sm={6}>
-                      {expensecreate.paidstatus === "Paid" && (
+                      {expensecreate.paidstatus === 'Paid' && (
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Paid Mode<b style={{ color: "red" }}>*</b>
+                            Paid Mode<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <Selects
                             maxMenuHeight={250}
@@ -10308,10 +10295,10 @@ function Stockmaster() {
                       )}
                     </Grid>
                     <Grid item lg={3} md={4} xs={12} sm={6}>
-                      {expensecreate.paidstatus === "Paid" && (
+                      {expensecreate.paidstatus === 'Paid' && (
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Paid Amount<b style={{ color: "red" }}>*</b>
+                            Paid Amount<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -10333,41 +10320,41 @@ function Stockmaster() {
                       )}
                     </Grid>
                     <Grid item lg={3} md={4} xs={12} sm={6}>
-                      {expensecreate.paidstatus === "Paid" && (
+                      {expensecreate.paidstatus === 'Paid' && (
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Balance Amount<b style={{ color: "red" }}>*</b>
+                            Balance Amount<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput readOnly id="component-outlined" type="number" sx={userStyle.input} placeholder="Please Enter Balance Amount" value={expensecreate.balanceamount} />
                         </FormControl>
                       )}
                     </Grid>
                     <br /> <br />
-                    {expensecreate.paidstatus === "Paid" && expensecreate.paidmode === "Cash" && (
+                    {expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Cash' && (
                       <>
                         <br />
                         <br />
                         <br />
 
-                        <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
-                            <Typography sx={{ fontWeight: "bold" }}>Cash</Typography>
+                            <Typography sx={{ fontWeight: 'bold' }}>Cash</Typography>
                             <br />
 
-                            <OutlinedInput id="component-outlined" type="text" readOnly={true} value={"Cash"} onChange={(e) => { }} />
+                            <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => {}} />
                           </FormControl>
                         </Grid>
                       </>
                     )}
                     <br />
                     <br />
-                    {expensecreate.paidmode === "Bank Transfer" && expensecreate.paidstatus === "Paid" && (
+                    {expensecreate.paidmode === 'Bank Transfer' && expensecreate.paidstatus === 'Paid' && (
                       <>
                         <br />
                         <br />
 
                         <Grid item md={12} xs={8}>
-                          <Typography sx={{ fontWeight: "bold" }}>Bank Details</Typography>
+                          <Typography sx={{ fontWeight: 'bold' }}>Bank Details</Typography>
                         </Grid>
 
                         <br />
@@ -10397,7 +10384,7 @@ function Stockmaster() {
                             <OutlinedInput readOnly={true} value={vendorstock.accountnumber} />
                           </FormControl>
                         </Grid>
-                        <Grid item md={4} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={4} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>IFSC Code</Typography>
                             <OutlinedInput readOnly={true} value={vendor.ifsccode} />
@@ -10406,16 +10393,16 @@ function Stockmaster() {
                       </>
                     )}
                     <br /> <br />
-                    {expensecreate.paidmode === "UPI" && expensecreate.paidstatus === "Paid" && (
+                    {expensecreate.paidmode === 'UPI' && expensecreate.paidstatus === 'Paid' && (
                       <>
                         <Grid item md={12} xs={8}>
-                          <Typography sx={{ fontWeight: "bold" }}>UPI Details</Typography>
+                          <Typography sx={{ fontWeight: 'bold' }}>UPI Details</Typography>
                         </Grid>
 
                         <br />
                         <br />
 
-                        <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>UPI Number</Typography>
                             <OutlinedInput readOnly={true} value={vendorstock.upinumber} />
@@ -10424,10 +10411,10 @@ function Stockmaster() {
                       </>
                     )}
                     <br /> <br />
-                    {expensecreate.paidmode === "Card" && expensecreate.paidstatus === "Paid" && (
+                    {expensecreate.paidmode === 'Card' && expensecreate.paidstatus === 'Paid' && (
                       <>
                         <Grid md={12} item xs={8}>
-                          <Typography sx={{ fontWeight: "bold" }}>Card Details</Typography>
+                          <Typography sx={{ fontWeight: 'bold' }}>Card Details</Typography>
                         </Grid>
 
                         <br />
@@ -10470,7 +10457,7 @@ function Stockmaster() {
                             </Grid>
                           </Grid>
                         </Grid>
-                        <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>Security Code</Typography>
                             <OutlinedInput readOnly={true} value={vendorstock.cardsecuritycode} />
@@ -10480,15 +10467,15 @@ function Stockmaster() {
                     )}
                     <br />
                     <br />
-                    {expensecreate.paidmode === "Cheque" && expensecreate.paidstatus === "Paid" && (
+                    {expensecreate.paidmode === 'Cheque' && expensecreate.paidstatus === 'Paid' && (
                       <>
                         <Grid item md={12} xs={8}>
-                          <Typography sx={{ fontWeight: "bold" }}>Cheque Details</Typography>
+                          <Typography sx={{ fontWeight: 'bold' }}>Cheque Details</Typography>
                         </Grid>
 
                         <br />
 
-                        <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                        <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>Cheque Number</Typography>
                             <OutlinedInput readOnly={true} value={vendorstock.chequenumber} />
@@ -10497,14 +10484,12 @@ function Stockmaster() {
                       </>
                     )}
                   </Grid>
-
-
                 </>
               )}
               <Grid container spacing={2}>
                 <Grid item md={3} xs={12} sm={6} marginTop={3}>
                   {btnSubmit ? (
-                    <Box sx={{ display: "flex" }}>
+                    <Box sx={{ display: 'flex' }}>
                       <CircularProgress />
                     </Box>
                   ) : (
@@ -10521,15 +10506,14 @@ function Stockmaster() {
                   </Button>
                 </Grid>
               </Grid>
-
             </>
           </Box>
         </>
       )}
       <Box>
         {/* Edit DIALOG */}
-        <Dialog open={isEditOpen} onClose={handleCloseModEdit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: "95px" }} fullWidth={true}>
-          <Box sx={{ padding: "20px 50px" }}>
+        <Dialog open={isEditOpen} onClose={handleCloseModEdit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '95px' }} fullWidth={true}>
+          <Box sx={{ padding: '20px 50px' }}>
             <>
               <Grid container spacing={2}>
                 <Typography sx={userStyle.HeaderText}>Edit Asset Purchase</Typography>
@@ -10539,7 +10523,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Company<b style={{ color: "red" }}>*</b>
+                      Company<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={companysEdit}
@@ -10560,17 +10544,17 @@ function Stockmaster() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           company: e.value,
-                          branch: "Please Select Branch",
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          branch: 'Please Select Branch',
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setBranchsEdit([]);
                         setAreasEdit([]);
                         setUnitsEdit([]);
                         setFloorEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchBranchDropdownsEdit(e.value);
                       }}
                     />
@@ -10579,7 +10563,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Branch<b style={{ color: "red" }}>*</b>
+                      Branch<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={branchsEdit}
@@ -10602,14 +10586,14 @@ function Stockmaster() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           branch: e.value,
-                          unit: "Please Select Unit",
-                          floor: "Please Select Floor",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          unit: 'Please Select Unit',
+                          floor: 'Please Select Floor',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setUnitsEdit([]);
                         setAreasEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         // setFloorEdit([]);
                         fetchUnitsEdit(e.value);
                         fetchFloorEdit(e.value);
@@ -10620,7 +10604,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Unit<b style={{ color: "red" }}>*</b>
+                      Unit<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       // options={unitsEdit}
@@ -10642,7 +10626,7 @@ function Stockmaster() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           unit: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -10651,7 +10635,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Floor<b style={{ color: "red" }}>*</b>
+                      Floor<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={floorsEdit}
@@ -10664,12 +10648,12 @@ function Stockmaster() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           floor: e.value,
-                          workstation: "",
-                          area: "Please Select Area",
-                          location: "Please Select Location",
+                          workstation: '',
+                          area: 'Please Select Area',
+                          location: 'Please Select Location',
                         });
                         // setAreasEdit([]);
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchAreaEdit(stockmasteredit.branch, e.value);
                         fetchAllLocationEdit(stockmasteredit.branch, e.value, stockmasteredit.area);
                       }}
@@ -10679,7 +10663,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Area<b style={{ color: "red" }}>*</b>
+                      Area<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={areasEdit}
@@ -10692,10 +10676,10 @@ function Stockmaster() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           area: e.value,
-                          workstation: "",
-                          location: "Please Select Location",
+                          workstation: '',
+                          location: 'Please Select Location',
                         });
-                        setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         fetchAllLocationEdit(
                           stockmasteredit.branch,
                           stockmasteredit.floor,
@@ -10709,7 +10693,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Location<b style={{ color: "red" }}>*</b>
+                      Location<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={locationsEdit}
@@ -10722,7 +10706,7 @@ function Stockmaster() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           location: e.value,
-                          workstation: "",
+                          workstation: '',
                         });
                       }}
                     />
@@ -10778,15 +10762,15 @@ function Stockmaster() {
                       }}
                     >
                       <MenuItem value="" disabled>
-                        {" "}
+                        {' '}
                         Please Select
                       </MenuItem>
-                      <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                      <MenuItem value="No"> {"No"} </MenuItem>
+                      <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                      <MenuItem value="No"> {'No'} </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
-                {stockmasteredit.warranty === "Yes" && (
+                {stockmasteredit.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <Grid container>
@@ -10810,12 +10794,12 @@ function Stockmaster() {
                             onChange={handleEstimationChangeEdit}
                           >
                             <MenuItem value="" disabled>
-                              {" "}
+                              {' '}
                               Please Select
                             </MenuItem>
-                            <MenuItem value="Days"> {"Days"} </MenuItem>
-                            <MenuItem value="Month"> {"Month"} </MenuItem>
-                            <MenuItem value="Year"> {"Year"} </MenuItem>
+                            <MenuItem value="Days"> {'Days'} </MenuItem>
+                            <MenuItem value="Month"> {'Month'} </MenuItem>
+                            <MenuItem value="Year"> {'Year'} </MenuItem>
                           </Select>
                         </Grid>
                       </Grid>
@@ -10836,7 +10820,7 @@ function Stockmaster() {
                     />
                   </FormControl>
                 </Grid>
-                {stockmasteredit.warranty === "Yes" && (
+                {stockmasteredit.warranty === 'Yes' && (
                   <>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
@@ -10849,8 +10833,8 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      {" "}
-                      Vendor Group Name<b style={{ color: "red" }}>*</b>{" "}
+                      {' '}
+                      Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={vendorGroupOpt}
@@ -10859,8 +10843,8 @@ function Stockmaster() {
                       onChange={(e) => {
                         handleChangeGroupNameEdit(e);
                         setVendorGroupEdit(e.value);
-                        setFrequencyValueedit("")
-                        setVendorNewEdit("Choose Vendor");
+                        setFrequencyValueedit('');
+                        setVendorNewEdit('Choose Vendor');
                       }}
                     />
                   </FormControl>
@@ -10868,7 +10852,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <Typography>
-                      Vendor Name <b style={{ color: "red" }}>*</b>{" "}
+                      Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       // options={vendormaster}
@@ -10878,7 +10862,7 @@ function Stockmaster() {
                       onChange={(e) => {
                         setVendorNewEdit(e.value);
                         vendorid(e._id);
-                        setFrequencyValueedit(e.paymentfrequency)
+                        setFrequencyValueedit(e.paymentfrequency);
                       }}
                     />
                   </FormControl>
@@ -10886,14 +10870,7 @@ function Stockmaster() {
                 <Grid item lg={2.5} md={4} xs={12} sm={6}>
                   <FormControl size="small" fullWidth>
                     <Typography>Frequency</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      sx={userStyle.input}
-                      placeholder="Please Enter Frequency"
-                      value={frequencyValueedit}
-                      readOnly
-                    />
+                    <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValueedit} readOnly />
                   </FormControl>
                 </Grid>
 
@@ -10915,16 +10892,14 @@ function Stockmaster() {
                 </Grid> */}
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      GST No
-                    </Typography>
+                    <Typography>GST No</Typography>
                     <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Bill No <b style={{ color: "red" }}>*</b>{" "}
+                      Bill No <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -10941,11 +10916,11 @@ function Stockmaster() {
                   </FormControl>
                 </Grid>
 
-                {stockmasteredit.requestmode == "Asset Material" && (
+                {stockmasteredit.requestmode == 'Asset Material' && (
                   <Grid item md={3} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Rate<b style={{ color: "red" }}>*</b>{" "}
+                        Rate<b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -10966,7 +10941,7 @@ function Stockmaster() {
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Total Bill Amount<b style={{ color: "red" }}>*</b>{" "}
+                      Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={stockmasteredit.quantity * stockmasteredit.rate} />
                   </FormControl>
@@ -10975,7 +10950,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Bill Date <b style={{ color: "red" }}>*</b>{" "}
+                      Bill Date <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <TextField
                       size="small"
@@ -10992,18 +10967,18 @@ function Stockmaster() {
                 </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>
-                    Bill <b style={{ color: "red" }}>*</b>{" "}
+                    Bill <b style={{ color: 'red' }}>*</b>{' '}
                   </Typography>
-                  <Box sx={{ display: "flex", justifyContent: "left" }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                     <Button variant="contained" onClick={handleClickUploadPopupOpenedit}>
                       Upload
                     </Button>
                   </Box>
                 </Grid>
-                {stockmasteredit.warranty === "Yes" && (
+                {stockmasteredit.warranty === 'Yes' && (
                   <Grid item md={1.5} xs={12} sm={12}>
                     <Typography>Warranty Card </Typography>
-                    <Box sx={{ display: "flex", justifyContent: "left" }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                       <Button variant="contained" onClick={handleClickUploadPopupOpenwarrantyedit}>
                         Upload
                       </Button>
@@ -11016,10 +10991,12 @@ function Stockmaster() {
                     <OutlinedInput value={stockmasteredit.requestmode} readOnly={true} />
                   </FormControl>
                 </Grid>
-                <Grid item md={3} xs={12} sm={12}> </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  {' '}
+                </Grid>
 
                 <Grid item md={12} xs={12} sm={12}>
-                  {" "}
+                  {' '}
                   <Typography variant="h6">Asset Material List</Typography>
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
@@ -11084,22 +11061,22 @@ function Stockmaster() {
                                             <Switch
                                               // color="success"
                                               sx={{
-                                                "& .MuiSwitch-switchBase.Mui-checked": {
-                                                  color: "green", // Thumb color when checked
+                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                  color: 'green', // Thumb color when checked
                                                 },
-                                                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                  backgroundColor: "green", // Track color when checked
+                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                  backgroundColor: 'green', // Track color when checked
                                                 },
-                                                "& .MuiSwitch-switchBase": {
-                                                  color: "#ff0000a3", // Thumb color when not checked
+                                                '& .MuiSwitch-switchBase': {
+                                                  color: '#ff0000a3', // Thumb color when not checked
                                                 },
-                                                "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                  backgroundColor: "#ff0000a3", // Track color when not checked
+                                                '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                  backgroundColor: '#ff0000a3', // Track color when not checked
                                                 },
                                               }}
                                               checked={todo.subcomponentcheck}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "subcomponentcheck", e.target.checked);
+                                                handleChangeEdit(index, 'subcomponentcheck', e.target.checked);
                                               }}
                                             />
                                           }
@@ -11134,7 +11111,7 @@ function Stockmaster() {
                                                   value: todo.type,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "type", e.value);
+                                                  handleChangeEdit(index, 'type', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11145,19 +11122,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenType();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11186,7 +11163,7 @@ function Stockmaster() {
                                                   value: todo.model,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "model", e.value);
+                                                  handleChangeEdit(index, 'model', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11197,19 +11174,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenModel();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11238,7 +11215,7 @@ function Stockmaster() {
                                                   value: todo.size,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "size", e.value);
+                                                  handleChangeEdit(index, 'size', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11249,19 +11226,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenSize();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11290,7 +11267,7 @@ function Stockmaster() {
                                                   value: todo.variant,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "variant", e.value);
+                                                  handleChangeEdit(index, 'variant', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11301,19 +11278,19 @@ function Stockmaster() {
                                               variant="contained"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenVariant();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11342,7 +11319,7 @@ function Stockmaster() {
                                                   value: todo.brand,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "brand", e.value);
+                                                  handleChangeEdit(index, 'brand', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11353,19 +11330,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenBrand();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11387,7 +11364,7 @@ function Stockmaster() {
                                               value={todo.serial}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "serial", e.target.value);
+                                                handleChangeEdit(index, 'serial', e.target.value);
                                               }}
                                             />
                                           </Grid>
@@ -11409,7 +11386,7 @@ function Stockmaster() {
                                               placeholder="Please Enter Other"
                                               value={todo.other}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "other", e.target.value);
+                                                handleChangeEdit(index, 'other', e.target.value);
                                               }}
                                             />
                                           </Grid>
@@ -11439,7 +11416,7 @@ function Stockmaster() {
                                                   value: todo.capacity,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "capacity", e.value);
+                                                  handleChangeEdit(index, 'capacity', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11451,19 +11428,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11489,8 +11466,8 @@ function Stockmaster() {
                                                 // Regex to allow only non-negative numbers
                                                 const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                handleChangeEdit(index, "hdmiport", sanitizedInput);
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'hdmiport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -11517,8 +11494,8 @@ function Stockmaster() {
                                                 // Regex to allow only non-negative numbers
                                                 const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                handleChangeEdit(index, "vgaport", sanitizedInput);
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'vgaport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -11545,8 +11522,8 @@ function Stockmaster() {
                                                 // Regex to allow only non-negative numbers
                                                 const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                handleChangeEdit(index, "dpport", sanitizedInput);
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'dpport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -11573,8 +11550,8 @@ function Stockmaster() {
                                                 // Regex to allow only non-negative numbers
                                                 const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                handleChangeEdit(index, "usbport", sanitizedInput);
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'usbport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -11604,7 +11581,7 @@ function Stockmaster() {
                                                   value: todo.paneltypescreen,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "paneltypescreen", e.value);
+                                                  handleChangeEdit(index, 'paneltypescreen', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11616,19 +11593,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11657,7 +11634,7 @@ function Stockmaster() {
                                                   value: todo.resolution,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "resolution", e.value);
+                                                  handleChangeEdit(index, 'resolution', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11669,19 +11646,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
-                                                color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
-                                                background: "rgb(25, 118, 210)",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
+                                                color: 'white',
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
+                                                background: 'rgb(25, 118, 210)',
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11710,7 +11687,7 @@ function Stockmaster() {
                                                   value: todo.connectivity,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "connectivity", e.value);
+                                                  handleChangeEdit(index, 'connectivity', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11722,19 +11699,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11763,7 +11740,7 @@ function Stockmaster() {
                                                   value: todo.daterate,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "daterate", e.value);
+                                                  handleChangeEdit(index, 'daterate', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11775,19 +11752,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11816,7 +11793,7 @@ function Stockmaster() {
                                                   value: todo.compatibledevice,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "compatibledevice", e.value);
+                                                  handleChangeEdit(index, 'compatibledevice', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11828,19 +11805,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11869,7 +11846,7 @@ function Stockmaster() {
                                                   value: todo.outputpower,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "outputpower", e.value);
+                                                  handleChangeEdit(index, 'outputpower', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11881,19 +11858,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11922,7 +11899,7 @@ function Stockmaster() {
                                                   value: todo.collingfancount,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "collingfancount", e.value);
+                                                  handleChangeEdit(index, 'collingfancount', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11934,19 +11911,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -11975,7 +11952,7 @@ function Stockmaster() {
                                                   value: todo.clockspeed,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "clockspeed", e.value);
+                                                  handleChangeEdit(index, 'clockspeed', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -11987,19 +11964,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12028,7 +12005,7 @@ function Stockmaster() {
                                                   value: todo.core,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "core", e.value);
+                                                  handleChangeEdit(index, 'core', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12040,19 +12017,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12081,7 +12058,7 @@ function Stockmaster() {
                                                   value: todo.speed,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "speed", e.value);
+                                                  handleChangeEdit(index, 'speed', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12093,19 +12070,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12134,7 +12111,7 @@ function Stockmaster() {
                                                   value: todo.frequency,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "frequency", e.value);
+                                                  handleChangeEdit(index, 'frequency', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12146,19 +12123,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12187,7 +12164,7 @@ function Stockmaster() {
                                                   value: todo.output,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "output", e.value);
+                                                  handleChangeEdit(index, 'output', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12199,19 +12176,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12240,7 +12217,7 @@ function Stockmaster() {
                                                   value: todo.ethernetports,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "ethernetports", e.value);
+                                                  handleChangeEdit(index, 'ethernetports', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12252,19 +12229,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12292,7 +12269,7 @@ function Stockmaster() {
                                                   value: todo.distance,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "distance", e.value);
+                                                  handleChangeEdit(index, 'distance', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12304,19 +12281,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12345,7 +12322,7 @@ function Stockmaster() {
                                                   value: todo.lengthname,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "lengthname", e.value);
+                                                  handleChangeEdit(index, 'lengthname', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12357,19 +12334,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12398,7 +12375,7 @@ function Stockmaster() {
                                                   value: todo.slot,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "slot", e.value);
+                                                  handleChangeEdit(index, 'slot', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12410,19 +12387,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12451,7 +12428,7 @@ function Stockmaster() {
                                                   value: todo.noofchannels,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "noofchannels", e.value);
+                                                  handleChangeEdit(index, 'noofchannels', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12463,19 +12440,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12504,7 +12481,7 @@ function Stockmaster() {
                                                   value: todo.colours,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "colours", e.value);
+                                                  handleChangeEdit(index, 'colours', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12516,19 +12493,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12548,15 +12525,15 @@ function Stockmaster() {
                                               value={todo.warranty}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "warranty", e.target.value);
+                                                handleChangeEdit(index, 'warranty', e.target.value);
                                               }}
                                             >
                                               <MenuItem value="" disabled>
-                                                {" "}
+                                                {' '}
                                                 Please Select
                                               </MenuItem>
-                                              <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                                              <MenuItem value="No"> {"No"} </MenuItem>
+                                              <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                              <MenuItem value="No"> {'No'} </MenuItem>
                                             </Select>
                                           </FormControl>
                                         </Grid>
@@ -12564,7 +12541,7 @@ function Stockmaster() {
                                     </Grid>
                                   </>
 
-                                  {todo.warranty === "Yes" && (
+                                  {todo.warranty === 'Yes' && (
                                     <>
                                       <Grid item md={3} sm={6} xs={12}>
                                         <Grid container>
@@ -12579,7 +12556,7 @@ function Stockmaster() {
                                                 value={todo.estimation}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "estimation", e.target.value);
+                                                  handleChangeEdit(index, 'estimation', e.target.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12594,16 +12571,16 @@ function Stockmaster() {
                                               value={todo.estimationtime}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "estimationtime", e.target.value);
+                                                handleChangeEdit(index, 'estimationtime', e.target.value);
                                               }}
                                             >
                                               <MenuItem value="" disabled>
-                                                {" "}
+                                                {' '}
                                                 Please Select
                                               </MenuItem>
-                                              <MenuItem value="Days"> {"Days"} </MenuItem>
-                                              <MenuItem value="Month"> {"Month"} </MenuItem>
-                                              <MenuItem value="Year"> {"Year"} </MenuItem>
+                                              <MenuItem value="Days"> {'Days'} </MenuItem>
+                                              <MenuItem value="Month"> {'Month'} </MenuItem>
+                                              <MenuItem value="Year"> {'Year'} </MenuItem>
                                             </Select>
                                           </Grid>
                                         </Grid>
@@ -12624,7 +12601,7 @@ function Stockmaster() {
                                               value={todo.purchasedate}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "purchasedate", e.target.value);
+                                                handleChangeEdit(index, 'purchasedate', e.target.value);
                                               }}
                                             />
                                           </FormControl>
@@ -12632,7 +12609,7 @@ function Stockmaster() {
                                       </Grid>
                                     </Grid>
                                   </>
-                                  {todo.warranty === "Yes" && (
+                                  {todo.warranty === 'Yes' && (
                                     <>
                                       <Grid item md={3} sm={6} xs={12}>
                                         <Grid container spacing={2}>
@@ -12654,7 +12631,7 @@ function Stockmaster() {
                                           <FormControl fullWidth size="small">
                                             <Typography>
                                               Vendor Group Name
-                                              <b style={{ color: "red" }}>*</b>
+                                              <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Selects
                                               options={vendorGroupOpt}
@@ -12666,11 +12643,11 @@ function Stockmaster() {
                                               }}
                                               onChange={(e) => {
                                                 handleChangeGroupNameIndexBasedEdit(e, index);
-                                                handleChangeEdit(index, "vendorgroup", e.value);
+                                                handleChangeEdit(index, 'vendorgroup', e.value);
 
                                                 setTodosEdit((prev) => {
                                                   const updated = [...prev];
-                                                  updated[index].vendor = "Choose Vendor";
+                                                  updated[index].vendor = 'Choose Vendor';
                                                   return updated;
                                                 });
                                               }}
@@ -12685,7 +12662,7 @@ function Stockmaster() {
                                           <FormControl fullWidth size="small">
                                             <Typography>
                                               Vendor
-                                              <b style={{ color: "red" }}>*</b>
+                                              <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Selects
                                               options={vendorOptIndEdit[index]}
@@ -12696,7 +12673,7 @@ function Stockmaster() {
                                                 value: todo.vendor,
                                               }}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "vendor", e.value, e._id);
+                                                handleChangeEdit(index, 'vendor', e.value, e._id);
 
                                                 // vendoridEdit(e._id);
                                               }}
@@ -12789,22 +12766,22 @@ function Stockmaster() {
                                             <Switch
                                               // color="success"
                                               sx={{
-                                                "& .MuiSwitch-switchBase.Mui-checked": {
-                                                  color: "green", // Thumb color when checked
+                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                  color: 'green', // Thumb color when checked
                                                 },
-                                                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                  backgroundColor: "green", // Track color when checked
+                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                  backgroundColor: 'green', // Track color when checked
                                                 },
-                                                "& .MuiSwitch-switchBase": {
-                                                  color: "#ff0000a3", // Thumb color when not checked
+                                                '& .MuiSwitch-switchBase': {
+                                                  color: '#ff0000a3', // Thumb color when not checked
                                                 },
-                                                "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                  backgroundColor: "#ff0000a3", // Track color when not checked
+                                                '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                  backgroundColor: '#ff0000a3', // Track color when not checked
                                                 },
                                               }}
                                               checked={todo.subcomponentcheck}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "subcomponentcheck", e.target.checked);
+                                                handleChangeEdit(index, 'subcomponentcheck', e.target.checked);
                                               }}
                                             />
                                           }
@@ -12838,7 +12815,7 @@ function Stockmaster() {
                                                   value: todo.type,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "type", e.value);
+                                                  handleChangeEdit(index, 'type', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12849,19 +12826,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenType();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12890,7 +12867,7 @@ function Stockmaster() {
                                                   value: todo.model,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "model", e.value);
+                                                  handleChangeEdit(index, 'model', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12901,19 +12878,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenModel();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12942,7 +12919,7 @@ function Stockmaster() {
                                                   value: todo.size,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "size", e.value);
+                                                  handleChangeEdit(index, 'size', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -12953,19 +12930,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenSize();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -12994,7 +12971,7 @@ function Stockmaster() {
                                                   value: todo.variant,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "variant", e.value);
+                                                  handleChangeEdit(index, 'variant', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13005,19 +12982,19 @@ function Stockmaster() {
                                               variant="contained"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenVariant();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13046,7 +13023,7 @@ function Stockmaster() {
                                                   value: todo.brand,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "brand", e.value);
+                                                  handleChangeEdit(index, 'brand', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13057,19 +13034,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenBrand();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13091,7 +13068,7 @@ function Stockmaster() {
                                               value={todo.serial}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "serial", e.target.value);
+                                                handleChangeEdit(index, 'serial', e.target.value);
                                               }}
                                             />
                                           </Grid>
@@ -13114,7 +13091,7 @@ function Stockmaster() {
                                               value={todo.other}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "other", e.target.value);
+                                                handleChangeEdit(index, 'other', e.target.value);
                                               }}
                                             />
                                           </Grid>
@@ -13144,7 +13121,7 @@ function Stockmaster() {
                                                   value: todo.capacity,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "capacity", e.value);
+                                                  handleChangeEdit(index, 'capacity', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13156,19 +13133,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13194,8 +13171,8 @@ function Stockmaster() {
                                                 // Regex to allow only non-negative numbers
                                                 const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                handleChangeEdit(index, "hdmiport", sanitizedInput);
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'hdmiport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -13222,8 +13199,8 @@ function Stockmaster() {
                                                 // Regex to allow only non-negative numbers
                                                 const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                handleChangeEdit(index, "vgaport", sanitizedInput);
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'vgaport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -13250,8 +13227,8 @@ function Stockmaster() {
                                                 // Regex to allow only non-negative numbers
                                                 const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                handleChangeEdit(index, "dpport", sanitizedInput);
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'dpport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -13278,8 +13255,8 @@ function Stockmaster() {
                                                 // Regex to allow only non-negative numbers
                                                 const validatedInput = inputText.match(/^\d*$/);
 
-                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : "0";
-                                                handleChangeEdit(index, "usbport", sanitizedInput);
+                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                handleChangeEdit(index, 'usbport', sanitizedInput);
                                               }}
                                             />
                                           </Grid>
@@ -13310,7 +13287,7 @@ function Stockmaster() {
                                                   value: todo.paneltypescreen,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "paneltypescreen", e.value);
+                                                  handleChangeEdit(index, 'paneltypescreen', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13322,19 +13299,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13363,7 +13340,7 @@ function Stockmaster() {
                                                   value: todo.resolution,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "resolution", e.value);
+                                                  handleChangeEdit(index, 'resolution', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13375,19 +13352,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13416,7 +13393,7 @@ function Stockmaster() {
                                                   value: todo.connectivity,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "connectivity", e.value);
+                                                  handleChangeEdit(index, 'connectivity', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13428,19 +13405,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13469,7 +13446,7 @@ function Stockmaster() {
                                                   value: todo.daterate,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "daterate", e.value);
+                                                  handleChangeEdit(index, 'daterate', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13481,19 +13458,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13522,7 +13499,7 @@ function Stockmaster() {
                                                   value: todo.compatibledevice,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "compatibledevice", e.value);
+                                                  handleChangeEdit(index, 'compatibledevice', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13534,19 +13511,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13575,7 +13552,7 @@ function Stockmaster() {
                                                   value: todo.outputpower,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "outputpower", e.value);
+                                                  handleChangeEdit(index, 'outputpower', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13587,19 +13564,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13628,7 +13605,7 @@ function Stockmaster() {
                                                   value: todo.collingfancount,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "collingfancount", e.value);
+                                                  handleChangeEdit(index, 'collingfancount', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13640,19 +13617,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13681,7 +13658,7 @@ function Stockmaster() {
                                                   value: todo.clockspeed,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "clockspeed", e.value);
+                                                  handleChangeEdit(index, 'clockspeed', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13693,19 +13670,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13734,7 +13711,7 @@ function Stockmaster() {
                                                   value: todo.core,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "core", e.value);
+                                                  handleChangeEdit(index, 'core', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13746,19 +13723,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13787,7 +13764,7 @@ function Stockmaster() {
                                                   value: todo.speed,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "speed", e.value);
+                                                  handleChangeEdit(index, 'speed', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13799,19 +13776,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13840,7 +13817,7 @@ function Stockmaster() {
                                                   value: todo.frequency,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "frequency", e.value);
+                                                  handleChangeEdit(index, 'frequency', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13852,19 +13829,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13893,7 +13870,7 @@ function Stockmaster() {
                                                   value: todo.output,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "output", e.value);
+                                                  handleChangeEdit(index, 'output', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13905,19 +13882,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13946,7 +13923,7 @@ function Stockmaster() {
                                                   value: todo.ethernetports,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "ethernetports", e.value);
+                                                  handleChangeEdit(index, 'ethernetports', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -13958,19 +13935,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -13999,7 +13976,7 @@ function Stockmaster() {
                                                   value: todo.distance,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "distance", e.value);
+                                                  handleChangeEdit(index, 'distance', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14011,19 +13988,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14052,7 +14029,7 @@ function Stockmaster() {
                                                   value: todo.lengthname,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "lengthname", e.value);
+                                                  handleChangeEdit(index, 'lengthname', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14064,19 +14041,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14105,7 +14082,7 @@ function Stockmaster() {
                                                   value: todo.slot,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "slot", e.value);
+                                                  handleChangeEdit(index, 'slot', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14117,19 +14094,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14158,7 +14135,7 @@ function Stockmaster() {
                                                   value: todo.noofchannels,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "noofchannels", e.value);
+                                                  handleChangeEdit(index, 'noofchannels', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14170,19 +14147,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14211,7 +14188,7 @@ function Stockmaster() {
                                                   value: todo.colours,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "colours", e.value);
+                                                  handleChangeEdit(index, 'colours', e.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -14223,19 +14200,19 @@ function Stockmaster() {
                                               size="small"
                                               disabled
                                               style={{
-                                                height: "30px",
-                                                minWidth: "20px",
-                                                padding: "19px 13px",
+                                                height: '30px',
+                                                minWidth: '20px',
+                                                padding: '19px 13px',
                                                 // color: "white",
-                                                marginTop: "23px",
-                                                marginLeft: "-10px",
+                                                marginTop: '23px',
+                                                marginLeft: '-10px',
                                                 // background: "rgb(25, 118, 210)",
                                               }}
                                               onClick={() => {
                                                 handleClickOpenCapacity();
                                               }}
                                             >
-                                              <FaPlus style={{ fontSize: "15px" }} />
+                                              <FaPlus style={{ fontSize: '15px' }} />
                                             </Button>
                                           </Grid>
                                         </Grid>
@@ -14249,7 +14226,7 @@ function Stockmaster() {
                                         <Grid item md={10} sm={10} xs={10}>
                                           <FormControl fullWidth size="small">
                                             <Typography>
-                                              Warranty <b style={{ color: "red" }}>*</b>
+                                              Warranty <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Select
                                               fullWidth
@@ -14263,15 +14240,15 @@ function Stockmaster() {
                                               // }}
                                               // value={todo.serial}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "warranty", e.target.value);
+                                                handleChangeEdit(index, 'warranty', e.target.value);
                                               }}
                                             >
                                               <MenuItem value="" disabled>
-                                                {" "}
+                                                {' '}
                                                 Please Select
                                               </MenuItem>
-                                              <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                                              <MenuItem value="No"> {"No"} </MenuItem>
+                                              <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                              <MenuItem value="No"> {'No'} </MenuItem>
                                             </Select>
                                           </FormControl>
                                         </Grid>
@@ -14279,13 +14256,13 @@ function Stockmaster() {
                                     </Grid>
                                   </>
 
-                                  {todo.warranty === "Yes" && (
+                                  {todo.warranty === 'Yes' && (
                                     <>
                                       <Grid item md={3} sm={6} xs={12}>
                                         <Grid container>
                                           <Grid item md={6} xs={6} sm={6}>
                                             <Typography>
-                                              Warranty Time <b style={{ color: "red" }}>*</b>
+                                              Warranty Time <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <FormControl fullWidth size="small">
                                               <OutlinedInput
@@ -14296,14 +14273,14 @@ function Stockmaster() {
                                                 value={todo.estimation}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(index, "estimation", e.target.value);
+                                                  handleChangeEdit(index, 'estimation', e.target.value);
                                                 }}
                                               />
                                             </FormControl>
                                           </Grid>
                                           <Grid item md={6} xs={6} sm={6}>
                                             <Typography>
-                                              Estimation <b style={{ color: "red" }}>*</b>
+                                              Estimation <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Select
                                               fullWidth
@@ -14313,18 +14290,18 @@ function Stockmaster() {
                                               value={todo.estimationtime}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "estimationtime", e.target.value);
+                                                handleChangeEdit(index, 'estimationtime', e.target.value);
                                                 // handleEstimationChange()
                                               }}
-                                            // onChange={handleEstimationChange}
+                                              // onChange={handleEstimationChange}
                                             >
                                               <MenuItem value="" disabled>
-                                                {" "}
+                                                {' '}
                                                 Please Select
                                               </MenuItem>
-                                              <MenuItem value="Days"> {"Days"} </MenuItem>
-                                              <MenuItem value="Month"> {"Month"} </MenuItem>
-                                              <MenuItem value="Year"> {"Year"} </MenuItem>
+                                              <MenuItem value="Days"> {'Days'} </MenuItem>
+                                              <MenuItem value="Month"> {'Month'} </MenuItem>
+                                              <MenuItem value="Year"> {'Year'} </MenuItem>
                                             </Select>
                                           </Grid>
                                         </Grid>
@@ -14345,17 +14322,17 @@ function Stockmaster() {
                                               value={todo.purchasedate}
                                               disabled={todo.subcomponentcheck === false}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "purchasedate", e.target.value);
+                                                handleChangeEdit(index, 'purchasedate', e.target.value);
                                                 // handlePurchaseDateChange()
                                               }}
-                                            // onChange={handlePurchaseDateChange}
+                                              // onChange={handlePurchaseDateChange}
                                             />
                                           </FormControl>
                                         </Grid>
                                       </Grid>
                                     </Grid>
                                   </>
-                                  {todo.warranty === "Yes" && (
+                                  {todo.warranty === 'Yes' && (
                                     <>
                                       <Grid item md={3} sm={6} xs={12}>
                                         <Grid container spacing={2}>
@@ -14369,9 +14346,9 @@ function Stockmaster() {
                                                 placeholder=""
                                                 disabled={todo.subcomponentcheck === false}
                                                 value={todo.warrantycalculation}
-                                              // onChange={(e) => {
-                                              //   setAssetdetail({ ...assetdetail, warrantyCalculation: e.target.value });
-                                              // }}
+                                                // onChange={(e) => {
+                                                //   setAssetdetail({ ...assetdetail, warrantyCalculation: e.target.value });
+                                                // }}
                                               />
                                             </FormControl>
                                           </Grid>
@@ -14387,7 +14364,7 @@ function Stockmaster() {
                                           <FormControl fullWidth size="small">
                                             <Typography>
                                               Vendor Group Name
-                                              <b style={{ color: "red" }}>*</b>
+                                              <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Selects
                                               options={vendorGroupOpt}
@@ -14399,11 +14376,11 @@ function Stockmaster() {
                                               }}
                                               onChange={(e) => {
                                                 handleChangeGroupNameIndexBasedEdit(e, index);
-                                                handleChangeEdit(index, "vendorgroup", e.value);
+                                                handleChangeEdit(index, 'vendorgroup', e.value);
 
                                                 setTodosEdit((prev) => {
                                                   const updated = [...prev];
-                                                  updated[index].vendor = "Choose Vendor";
+                                                  updated[index].vendor = 'Choose Vendor';
                                                   return updated;
                                                 });
                                               }}
@@ -14418,7 +14395,7 @@ function Stockmaster() {
                                           <FormControl fullWidth size="small">
                                             <Typography>
                                               Vendor
-                                              <b style={{ color: "red" }}>*</b>
+                                              <b style={{ color: 'red' }}>*</b>
                                             </Typography>
                                             <Selects
                                               options={vendorOptIndEdit[index]}
@@ -14429,7 +14406,7 @@ function Stockmaster() {
                                                 value: todo.vendor,
                                               }}
                                               onChange={(e) => {
-                                                handleChangeEdit(index, "vendor", e.value, e._id);
+                                                handleChangeEdit(index, 'vendor', e.value, e._id);
 
                                                 // vendoridEdit(e._id);
                                               }}
@@ -14517,7 +14494,7 @@ function Stockmaster() {
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Product Details <b style={{ color: "red" }}>*</b>{" "}
+                      Product Details <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <TextareaAutosize
                       aria-label="minimum height"
@@ -14533,11 +14510,11 @@ function Stockmaster() {
                     />
                   </FormControl>
                 </Grid>
-                {stockmasteredit.warranty === "Yes" && (
+                {stockmasteredit.warranty === 'Yes' && (
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Warranty Details <b style={{ color: "red" }}>*</b>{" "}
+                        Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -14558,7 +14535,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <Typography>
-                      UOM <b style={{ color: "red" }}>*</b>{" "}
+                      UOM <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={vomMasterget}
@@ -14579,7 +14556,7 @@ function Stockmaster() {
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Qty<b style={{ color: "red" }}>*</b>{" "}
+                      Qty<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -14596,19 +14573,18 @@ function Stockmaster() {
                     />
                   </FormControl>
                 </Grid>
-
               </Grid>
               <br /> <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
                   {btnSubmit ? (
-                    <Box sx={{ display: "flex" }}>
+                    <Box sx={{ display: 'flex' }}>
                       <CircularProgress />
                     </Box>
                   ) : (
                     <>
                       <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
-                        {" "}
+                        {' '}
                         Update
                       </Button>
                     </>
@@ -14617,8 +14593,8 @@ function Stockmaster() {
                 <br />
                 <Grid item md={6} xs={12} sm={12}>
                   <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
-                    {" "}
-                    Cancel{" "}
+                    {' '}
+                    Cancel{' '}
                   </Button>
                 </Grid>
               </Grid>
@@ -14629,7 +14605,7 @@ function Stockmaster() {
       <br />
 
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lstockpurchase") && (
+      {isUserRoleCompare?.includes('lstockpurchase') && (
         <Box sx={userStyle.container}>
           {/* ******************************************************EXPORT Buttons****************************************************** */}
           <Grid item xs={8}>
@@ -14707,7 +14683,7 @@ function Stockmaster() {
             <br />
 
             <Grid item md={2} sm={12} xs={12} marginTop={3}>
-              <Grid sx={{ display: "flex", gap: "15px" }}>
+              <Grid sx={{ display: 'flex', gap: '15px' }}>
                 <Button
                   variant="contained"
                   sx={buttonStyles.buttonsubmit}
@@ -14715,7 +14691,7 @@ function Stockmaster() {
                     handleSubmitFilter(e);
                   }}
                 >
-                  {" "}
+                  {' '}
                   Filter
                 </Button>
                 <Button
@@ -14724,7 +14700,7 @@ function Stockmaster() {
                     handleClearFilter();
                   }}
                 >
-                  {" "}
+                  {' '}
                   CLEAR
                 </Button>
               </Grid>
@@ -14747,7 +14723,7 @@ function Stockmaster() {
                     },
                   }}
                   onChange={handlePageSizeChange}
-                  sx={{ width: "77px" }}
+                  sx={{ width: '77px' }}
                 >
                   <MenuItem value={1}>1</MenuItem>
                   <MenuItem value={5}>5</MenuItem>
@@ -14765,17 +14741,17 @@ function Stockmaster() {
               xs={12}
               sm={12}
               sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
               <Box>
-                {isUserRoleCompare?.includes("excelstockpurchase") && (
+                {isUserRoleCompare?.includes('excelstockpurchase') && (
                   <Button
                     onClick={(e) => {
                       handleOpenFilterMod();
-                      setFormat("xl");
+                      setFormat('xl');
                     }}
                     sx={userStyle.buttongrp}
                   >
@@ -14784,13 +14760,13 @@ function Stockmaster() {
                   </Button>
                 )}
 
-                {isUserRoleCompare?.includes("csvstockpurchase") && (
+                {isUserRoleCompare?.includes('csvstockpurchase') && (
                   <>
                     <Button
                       onClick={(e) => {
                         // setIsFilterOpen(true);
                         handleOpenFilterMod();
-                        setFormat("csv");
+                        setFormat('csv');
                       }}
                       sx={userStyle.buttongrp}
                     >
@@ -14799,7 +14775,7 @@ function Stockmaster() {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("printstockpurchase") && (
+                {isUserRoleCompare?.includes('printstockpurchase') && (
                   <>
                     <Button sx={userStyle.buttongrp} onClick={handleprint}>
                       &ensp;
@@ -14808,7 +14784,7 @@ function Stockmaster() {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("pdfstockpurchase") && (
+                {isUserRoleCompare?.includes('pdfstockpurchase') && (
                   <>
                     <Button
                       sx={userStyle.buttongrp}
@@ -14822,11 +14798,11 @@ function Stockmaster() {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("imagestockpurchase") && (
+                {isUserRoleCompare?.includes('imagestockpurchase') && (
                   <>
                     <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                      {" "}
-                      <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   </>
                 )}
@@ -14851,13 +14827,13 @@ function Stockmaster() {
                       )}
                       <Tooltip title="Show search options">
                         <span>
-                          <IoMdOptions style={{ cursor: "pointer" }} onClick={handleClickSearch} />
+                          <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
                         </span>
                       </Tooltip>
                     </InputAdornment>
                   }
                   aria-describedby="outlined-weight-helper-text"
-                  inputProps={{ "aria-label": "weight" }}
+                  inputProps={{ 'aria-label': 'weight' }}
                   type="text"
                   value={getSearchDisplay()}
                   onChange={handleSearchChange}
@@ -14867,14 +14843,14 @@ function Stockmaster() {
               </FormControl>
             </Grid>
 
-            <Popover id={idSearch} open={openSearch} anchorEl1={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
-              <Box style={{ padding: "10px", maxWidth: "450px" }}>
+            <Popover id={idSearch} open={openSearch} anchorEl1={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+              <Box style={{ padding: '10px', maxWidth: '450px' }}>
                 <Typography variant="h6">Advance Search</Typography>
                 <IconButton
                   aria-label="close"
                   onClick={handleCloseSearch}
                   sx={{
-                    position: "absolute",
+                    position: 'absolute',
                     right: 8,
                     top: 8,
                     color: (theme) => theme.palette.grey[500],
@@ -14882,19 +14858,19 @@ function Stockmaster() {
                 >
                   <CloseIcon />
                 </IconButton>
-                <DialogContent sx={{ width: "100%" }}>
+                <DialogContent sx={{ width: '100%' }}>
                   <Box
                     sx={{
-                      width: "350px",
-                      maxHeight: "400px",
-                      overflow: "hidden",
-                      position: "relative",
+                      width: '350px',
+                      maxHeight: '400px',
+                      overflow: 'hidden',
+                      position: 'relative',
                     }}
                   >
                     <Box
                       sx={{
-                        maxHeight: "300px",
-                        overflowY: "auto",
+                        maxHeight: '300px',
+                        overflowY: 'auto',
                         // paddingRight: '5px'
                       }}
                     >
@@ -14908,7 +14884,7 @@ function Stockmaster() {
                               PaperProps: {
                                 style: {
                                   maxHeight: 200,
-                                  width: "auto",
+                                  width: 'auto',
                                 },
                               },
                             }}
@@ -14936,7 +14912,7 @@ function Stockmaster() {
                               PaperProps: {
                                 style: {
                                   maxHeight: 200,
-                                  width: "auto",
+                                  width: 'auto',
                                 },
                               },
                             }}
@@ -14957,16 +14933,16 @@ function Stockmaster() {
                           <TextField
                             fullWidth
                             size="small"
-                            value={["Blank", "Not Blank"].includes(selectedCondition) ? "" : filterValue}
+                            value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
                             onChange={(e) => setFilterValue(e.target.value)}
-                            disabled={["Blank", "Not Blank"].includes(selectedCondition)}
-                            placeholder={["Blank", "Not Blank"].includes(selectedCondition) ? "Disabled" : "Enter value"}
+                            disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                            placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
                             sx={{
-                              "& .MuiOutlinedInput-root.Mui-disabled": {
-                                backgroundColor: "rgb(0 0 0 / 26%)",
+                              '& .MuiOutlinedInput-root.Mui-disabled': {
+                                backgroundColor: 'rgb(0 0 0 / 26%)',
                               },
-                              "& .MuiOutlinedInput-input.Mui-disabled": {
-                                cursor: "not-allowed",
+                              '& .MuiOutlinedInput-input.Mui-disabled': {
+                                cursor: 'not-allowed',
                               },
                             }}
                           />
@@ -14983,7 +14959,7 @@ function Stockmaster() {
                         )}
                         {additionalFilters.length === 0 && (
                           <Grid item md={4} sm={12} xs={12}>
-                            <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                            <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
                               Add Filter
                             </Button>
                           </Grid>
@@ -14993,12 +14969,12 @@ function Stockmaster() {
                           <Button
                             variant="contained"
                             onClick={() => {
-                              fetchStock("Filtered");
+                              fetchStock('Filtered');
                               setIsSearchActive(true);
                               setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
                             }}
-                            sx={{ textTransform: "capitalize" }}
-                            disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
+                            sx={{ textTransform: 'capitalize' }}
+                            disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
                           >
                             Search
                           </Button>
@@ -15015,10 +14991,10 @@ function Stockmaster() {
             <Grid item md={6} xs={12} sm={12}>
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "left",
-                  flexWrap: "wrap",
-                  gap: "10px",
+                  display: 'flex',
+                  justifyContent: 'left',
+                  flexWrap: 'wrap',
+                  gap: '10px',
                 }}
               >
                 <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
@@ -15027,7 +15003,7 @@ function Stockmaster() {
                 <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns1}>
                   Manage Columns
                 </Button>
-                {isUserRoleCompare?.includes("bdstockpurchase") && (
+                {isUserRoleCompare?.includes('bdstockpurchase') && (
                   <Button variant="contained" sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
                     Bulk Delete
                   </Button>
@@ -15041,8 +15017,8 @@ function Stockmaster() {
               open={isManageColumnsOpen}
               anchorEl1={anchorEl1}
               onClose={handleCloseManageColumns1}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-            // transformOrigin={{ vertical: 'center', horizontal: 'right', }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              // transformOrigin={{ vertical: 'center', horizontal: 'right', }}
             >
               {manageColumnsContent}
             </Popover>
@@ -15052,9 +15028,9 @@ function Stockmaster() {
             <Box>
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  minHeight: "350px",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  minHeight: '350px',
                 }}
               >
                 <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
@@ -15063,7 +15039,7 @@ function Stockmaster() {
             </Box>
           ) : (
             <>
-              <Box style={{ width: "100%", overflowY: "hidden" }}>
+              <Box style={{ width: '100%', overflowY: 'hidden' }}>
                 <>
                   <AggridTableForPaginationTable
                     rowDataTable={rowDataTable}
@@ -15093,8 +15069,8 @@ function Stockmaster() {
       {/* ****** Table End ****** */}
 
       {/* view model */}
-      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth={true} sx={{ marginTop: "95px" }}>
-        <Box sx={{ padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth={true} sx={{ marginTop: '95px' }}>
+        <Box sx={{ padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}> View Asset Purchase</Typography>
             <br /> <br />
@@ -15223,7 +15199,7 @@ function Stockmaster() {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Quantity & UOM</Typography>
-                  <Typography>{stockmasteredit.uomcode !== "" || stockmasteredit.uomcode !== undefined ? `${stockmasteredit.quantity}#${stockmasteredit.uomcode}` : ""}</Typography>
+                  <Typography>{stockmasteredit.uomcode !== '' || stockmasteredit.uomcode !== undefined ? `${stockmasteredit.quantity}#${stockmasteredit.uomcode}` : ''}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
@@ -15235,15 +15211,15 @@ function Stockmaster() {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Bill Date</Typography>
-                  <Typography>{moment(stockmasteredit.billdate).format("DD/MM/YYYY")}</Typography>
+                  <Typography>{moment(stockmasteredit.billdate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
               <Button variant="contained" color="primary" onClick={handleCloseview}>
-                {" "}
-                Back{" "}
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
@@ -15253,16 +15229,16 @@ function Stockmaster() {
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpenpop} onClose={handleCloseerrpop} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth={true}>
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlertpop}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={() => {
                 sendEditRequest();
@@ -15273,15 +15249,15 @@ function Stockmaster() {
             </Button>
             <Button
               style={{
-                backgroundColor: "#f4f4f4",
-                color: "#444",
-                boxShadow: "none",
-                borderRadius: "3px",
-                padding: "7px 13px",
-                border: "1px solid #0000006b",
-                "&:hover": {
-                  "& .css-bluauu-MuiButtonBase-root-MuiButton-root": {
-                    backgroundColor: "#f4f4f4",
+                backgroundColor: '#f4f4f4',
+                color: '#444',
+                boxShadow: 'none',
+                borderRadius: '3px',
+                padding: '7px 13px',
+                border: '1px solid #0000006b',
+                '&:hover': {
+                  '& .css-bluauu-MuiButtonBase-root-MuiButton-root': {
+                    backgroundColor: '#f4f4f4',
                   },
                 },
               }}
@@ -15296,16 +15272,16 @@ function Stockmaster() {
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={handleCloseerr}
             >
@@ -15317,34 +15293,34 @@ function Stockmaster() {
 
       {/* ALERT DIALOG */}
       <Dialog open={isCheckOpen} onClose={handleCloseCheck} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-          <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: "orange" }} />
-          <Typography variant="h6" sx={{ color: "black", textAlign: "center" }}>
+        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+          <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
             {checkvendor?.length > 0 && checkcategory?.length > 0 && checksubcategory?.length > 0 && checktimepoints?.length > 0 ? (
               <>
-                <span style={{ fontWeight: "700", color: "#777" }}>{`${deleteproject.name} `}</span>
-                was linked in <span style={{ fontWeight: "700" }}>Vendor, Category, Subcategory & Time and points </span>
+                <span style={{ fontWeight: '700', color: '#777' }}>{`${deleteproject.name} `}</span>
+                was linked in <span style={{ fontWeight: '700' }}>Vendor, Category, Subcategory & Time and points </span>
               </>
             ) : checkvendor?.length > 0 || checkcategory?.length > 0 || checksubcategory?.length > 0 || checktimepoints?.length > 0 ? (
               <>
-                <span style={{ fontWeight: "700", color: "#777" }}>{`${deleteproject.name} `}</span>
-                was linked in{" "}
-                <span style={{ fontWeight: "700" }}>
-                  {checkvendor?.length ? " Vendor" : ""}
-                  {checkcategory?.length ? " Category" : ""}
-                  {checksubcategory?.length ? " Subcategory" : ""}
-                  {checktimepoints?.length ? " Time and points" : ""}
+                <span style={{ fontWeight: '700', color: '#777' }}>{`${deleteproject.name} `}</span>
+                was linked in{' '}
+                <span style={{ fontWeight: '700' }}>
+                  {checkvendor?.length ? ' Vendor' : ''}
+                  {checkcategory?.length ? ' Category' : ''}
+                  {checksubcategory?.length ? ' Subcategory' : ''}
+                  {checktimepoints?.length ? ' Time and points' : ''}
                 </span>
               </>
             ) : (
-              ""
+              ''
             )}
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseCheck} autoFocus variant="contained" color="error">
-            {" "}
-            OK{" "}
+            {' '}
+            OK{' '}
           </Button>
         </DialogActions>
       </Dialog>
@@ -15357,7 +15333,7 @@ function Stockmaster() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
-        sx={{ marginTop: "95px" }}
+        sx={{ marginTop: '95px' }}
         // sx={{
         //     overflow: "visible",
         //     "& .MuiPaper-root": {
@@ -15377,9 +15353,9 @@ function Stockmaster() {
         aria-describedby="alert-dialog-description"
         maxWidth="md"
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
         fullWidth={true}
@@ -15396,7 +15372,7 @@ function Stockmaster() {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography>
-                    Name<b style={{ color: "red" }}>*</b>
+                    Name<b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <OutlinedInput
                     id="component-outlined"
@@ -15442,9 +15418,9 @@ function Stockmaster() {
         maxWidth="md"
         fullWidth={true}
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
       >
@@ -15457,16 +15433,16 @@ function Stockmaster() {
       </Dialog>
 
       {/* UPLOAD BILL CREATE IMAGE DIALOG */}
-      <Dialog open={uploadPopupOpen} onClose={handleUploadPopupClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: "95px" }}>
-        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}>
+      <Dialog open={uploadPopupOpen} onClose={handleUploadPopupClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
+                <Grid sx={{ display: 'flex' }}>
                   <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
                     <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChange} />
@@ -15481,18 +15457,18 @@ function Stockmaster() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
@@ -15506,40 +15482,40 @@ function Stockmaster() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreview(file)}
                       >
-                        <VisibilityOutlinedIcon style={{ fontsize: "12px", color: "#357AE8" }} />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFile(index)}
                       >
-                        <FaTrash style={{ color: "#a73131", fontSize: "12px" }} />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -15562,16 +15538,16 @@ function Stockmaster() {
       </Dialog>
 
       {/* UPLOAD BILL IMAGE DIALOG EDIT*/}
-      <Dialog open={uploadPopupOpenedit} onClose={handleUploadPopupCloseedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: "95px" }}>
-        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}>
+      <Dialog open={uploadPopupOpenedit} onClose={handleUploadPopupCloseedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
+                <Grid sx={{ display: 'flex' }}>
                   <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
                     <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangeedit} />
@@ -15586,18 +15562,18 @@ function Stockmaster() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
@@ -15611,40 +15587,40 @@ function Stockmaster() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewedit(file)}
                       >
-                        <VisibilityOutlinedIcon style={{ fontsize: "12px", color: "#357AE8" }} />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFileedit(index)}
                       >
-                        <FaTrash style={{ color: "#a73131", fontSize: "12px" }} />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -15667,16 +15643,16 @@ function Stockmaster() {
       </Dialog>
 
       {/* UPLOAD WARRANTY IMAGE DIALOG    CREATE*/}
-      <Dialog open={uploadPopupOpenwarranty} onClose={handleUploadPopupClosewarranty} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: "95px" }}>
-        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}>
+      <Dialog open={uploadPopupOpenwarranty} onClose={handleUploadPopupClosewarranty} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
+                <Grid sx={{ display: 'flex' }}>
                   <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
                     <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangewarranty} />
@@ -15691,18 +15667,18 @@ function Stockmaster() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
@@ -15716,40 +15692,40 @@ function Stockmaster() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewwarranty(file)}
                       >
-                        <VisibilityOutlinedIcon style={{ fontsize: "12px", color: "#357AE8" }} />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFilewarranty(index)}
                       >
-                        <FaTrash style={{ color: "#a73131", fontSize: "12px" }} />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -15779,14 +15755,14 @@ function Stockmaster() {
         aria-describedby="alert-dialog-description"
         maxWidth="md"
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
         fullWidth={true}
       >
-        {isUserRoleCompare?.includes("aassetcapacity") ? (
+        {isUserRoleCompare?.includes('aassetcapacity') ? (
           <Box sx={userStyle.dialogbox}>
             <>
               <Grid container spacing={2}>
@@ -15799,7 +15775,7 @@ function Stockmaster() {
                 <Grid item md={4} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Name <b style={{ color: "red" }}>*</b>
+                      Name <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -15830,7 +15806,7 @@ function Stockmaster() {
                 <Grid item md={3} xs={12} sm={6}>
                   <Button
                     sx={buttonStyles.btncancel}
-                  // onClick={handleclearCapacity}
+                    // onClick={handleclearCapacity}
                   >
                     Clear
                   </Button>
@@ -15853,7 +15829,7 @@ function Stockmaster() {
               </Grid>
               <br />
               <br />
-              <Box sx={{ textAlign: "center" }}>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography>No Access</Typography>
               </Box>
               <br />
@@ -15869,16 +15845,16 @@ function Stockmaster() {
       </Dialog>
 
       {/* UPLOAD WARRANTY IMAGE DIALOG EDIT*/}
-      <Dialog open={uploadPopupOpenwarrantyedit} onClose={handleUploadPopupClosewarrantyedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: "95px" }}>
-        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}>
+      <Dialog open={uploadPopupOpenwarrantyedit} onClose={handleUploadPopupClosewarrantyedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
+                <Grid sx={{ display: 'flex' }}>
                   <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
                     <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangewarrantyedit} />
@@ -15893,18 +15869,18 @@ function Stockmaster() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
@@ -15918,40 +15894,40 @@ function Stockmaster() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreviewwarrantyedit(file)}
                       >
-                        <VisibilityOutlinedIcon style={{ fontsize: "12px", color: "#357AE8" }} />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFilewarrantyedit(index)}
                       >
-                        <FaTrash style={{ color: "#a73131", fontSize: "12px" }} />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -15979,19 +15955,19 @@ function Stockmaster() {
       <Dialog open={isFilterOpen} onClose={handleCloseFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent
           sx={{
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
           }}
         >
-          {fileFormat === "xl" ? (
+          {fileFormat === 'xl' ? (
             <>
               <IconButton
                 aria-label="close"
                 onClick={handleCloseFilterMod}
                 sx={{
-                  position: "absolute",
+                  position: 'absolute',
                   right: 8,
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
@@ -16000,8 +15976,8 @@ function Stockmaster() {
                 <CloseIcon />
               </IconButton>
 
-              <FaFileExcel style={{ fontSize: "80px", color: "green" }} />
-              <Typography variant="h5" sx={{ textAlign: "center" }}>
+              <FaFileExcel style={{ fontSize: '80px', color: 'green' }} />
+              <Typography variant="h5" sx={{ textAlign: 'center' }}>
                 Choose Export
               </Typography>
             </>
@@ -16011,7 +15987,7 @@ function Stockmaster() {
                 aria-label="close"
                 onClick={handleCloseFilterMod}
                 sx={{
-                  position: "absolute",
+                  position: 'absolute',
                   right: 8,
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
@@ -16020,8 +15996,8 @@ function Stockmaster() {
                 <CloseIcon />
               </IconButton>
 
-              <FaFileCsv style={{ fontSize: "80px", color: "green" }} />
-              <Typography variant="h5" sx={{ textAlign: "center" }}>
+              <FaFileCsv style={{ fontSize: '80px', color: 'green' }} />
+              <Typography variant="h5" sx={{ textAlign: 'center' }}>
                 Choose Export
               </Typography>
             </>
@@ -16032,7 +16008,7 @@ function Stockmaster() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              handleDownloadExcel("filtered");
+              handleDownloadExcel('filtered');
             }}
           >
             Export Filtered Data
@@ -16042,7 +16018,7 @@ function Stockmaster() {
             loading={loader}
             variant="contained"
             onClick={(e) => {
-              handleDownloadExcel("overall");
+              handleDownloadExcel('overall');
             }}
           >
             Export Over All Data
@@ -16053,17 +16029,17 @@ function Stockmaster() {
       <Dialog open={isPdfFilterOpen} onClose={handleClosePdfFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent
           sx={{
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
           }}
         >
           <IconButton
             aria-label="close"
             onClick={handleClosePdfFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -16071,8 +16047,8 @@ function Stockmaster() {
           >
             <CloseIcon />
           </IconButton>
-          <PictureAsPdfIcon sx={{ fontSize: "80px", color: "red" }} />
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          <PictureAsPdfIcon sx={{ fontSize: '80px', color: 'red' }} />
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -16080,7 +16056,7 @@ function Stockmaster() {
           <Button
             variant="contained"
             onClick={(e) => {
-              handleDownloadExcelPDf("filtered");
+              handleDownloadExcelPDf('filtered');
               // setIsPdfFilterOpen(false);
             }}
           >
@@ -16089,7 +16065,7 @@ function Stockmaster() {
           <Button
             variant="contained"
             onClick={(e) => {
-              handleDownloadExcelPDf("overall");
+              handleDownloadExcelPDf('overall');
               // setIsPdfFilterOpen(false);
             }}
           >
@@ -16114,7 +16090,7 @@ function Stockmaster() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={overallFilterdata ?? []}
-        filename={"AssetPurchase"}
+        filename={'AssetPurchase'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
@@ -16130,7 +16106,7 @@ function Stockmaster() {
       <LoadingBackdrop open={isLoading} />
       {/* EXTERNAL COMPONENTS -------------- END */}
 
-      <Dialog open={openviewalertstockcategory} onClose={handleClickOpenviewalertstockcategory} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: "50px" }} fullWidth={true}>
+      <Dialog open={openviewalertstockcategory} onClose={handleClickOpenviewalertstockcategory} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '50px' }} fullWidth={true}>
         <StockCategoryPopup setStockCategoryAuto={setStockCategoryAuto} handleCloseviewalertstockcategory={handleCloseviewalertstockcategory} />
       </Dialog>
       {/* dialog box for manage stock items */}
@@ -16142,9 +16118,9 @@ function Stockmaster() {
         aria-describedby="alert-dialog-description"
         maxWidth="lg"
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
         fullWidth={true}
@@ -16154,42 +16130,30 @@ function Stockmaster() {
 
       {/* Amount Mismatch Alert Dialog */}
       <Box>
-        <Dialog
-          open={isErrorOpenAmount}
-          onClose={handleCloseerrAmount}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
+        <Dialog open={isErrorOpenAmount} onClose={handleCloseerrAmount} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
           <DialogContent
             sx={{
-              width: "350px",
-              textAlign: "center",
-              alignItems: "center",
+              width: '350px',
+              textAlign: 'center',
+              alignItems: 'center',
             }}
           >
-            <ErrorOutlineOutlinedIcon
-              sx={{ fontSize: "100px", color: "orange" }}
-            />
-            <Typography variant="h6" style={{ color: "red" }}>
-              {
-                "Are you sure? Paid Amount is less than Total Bill Amount.Do you want to save?"
-              }
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+            <Typography variant="h6" style={{ color: 'red' }}>
+              {'Are you sure? Paid Amount is less than Total Bill Amount.Do you want to save?'}
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button
-              sx={buttonStyles.btncancel}
-              onClick={handleCloseerrAmount}
-            >
+            <Button sx={buttonStyles.btncancel} onClick={handleCloseerrAmount}>
               Cancel
             </Button>
             &nbsp;
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={sendRequest}
             >

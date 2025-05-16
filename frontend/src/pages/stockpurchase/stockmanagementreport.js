@@ -2110,42 +2110,7 @@ function StockManagementReport() {
             sortable: false,
             hide: !columnVisibility.handover,
             headerClassName: "bold-header",
-            // cellRenderer: (params) => (
-            //     <>
-            //         {
-            //             params.data.handover === "handover" ?
-
-            //                 <Button
-            //                     variant="outlined"
-            //                     color="success"
-            //                     size="small"
-
-            //                 >
-            //                     HandOver
-            //                 </Button>
-
-            //                 :
-            //                 params.data.handover === "return" ?
-            //                     <Button
-            //                         variant="outlined"
-            //                         color="error"
-            //                         size="small"
-
-            //                     >
-            //                         Return
-            //                     </Button>
-            //                     :
-            //                     <Button
-            //                         variant="outlined"
-            //                         color="primary"
-            //                         size="small"
-            //                     >
-            //                         Usage Count
-            //                     </Button>
-
-            //         }
-            //     </>
-            // )
+           
             cellRenderer: (params) => {
                 let buttonStyles = {};
 

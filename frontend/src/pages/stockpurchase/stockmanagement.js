@@ -527,6 +527,7 @@ function StockManagement() {
     setviewusagecount(data.productname)
     setHandover({
       ...handover,
+      status:data.status,
       company: company,
       branch: branch,
       unit: unit,
@@ -535,7 +536,8 @@ function StockManagement() {
       location: location,
       productname: productname,
       usagecount: usagecount,
-      requestmode: requestmode
+      requestmode: requestmode,
+      
     });
 
     setStockManagehand({
@@ -687,6 +689,8 @@ function StockManagement() {
     usagedate: "",
     description: "",
     usagetime: "",
+    allotdate: "",
+    allottime: "",
     employeenameto: "Please Select Employee",
     countquantity: "",
     team: "Please Select Team",
@@ -3993,8 +3997,11 @@ function StockManagement() {
 
           employeenameto: String(stockManagehand.employeenameto),
           countquantity: String(stockManagehand.countquantity),
-
+          allotdate: String(stockManagehand.allotdate),
+          allottime: String(stockManagehand.allottime),
           handover: String("handover"),
+
+
           addedby: [
             {
               name: String(isUserRoleAccess.companyname),
@@ -4243,7 +4250,17 @@ function StockManagement() {
       setPopupContentMalert("Please Select Employee!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
-    } else if (handover.balancedcount < stockManagehand.countquantity) {
+    }
+    else if (stockManagehand.usagedate === "") {
+      setPopupContentMalert("Please Select Date!");
+      setPopupSeverityMalert("info");
+      handleClickOpenPopupMalert();
+    } else if (stockManagehand.usagetime === "") {
+      setPopupContentMalert("Please Select Time!");
+      setPopupSeverityMalert("info");
+      handleClickOpenPopupMalert();
+    }
+     else if (handover.balancedcount < stockManagehand.countquantity) {
       setPopupContentMalert("Please Enter Less Than Balance Count!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
@@ -6181,37 +6198,7 @@ function StockManagement() {
                 </Grid>
 
 
-                {/* <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Team<b style={{ color: "red" }}>*</b>
-                    </Typography>
-                    <Selects
-                      options={teamoption
-                        .filter((d) => d.unit === stockManagehand.unit)
-                        .map((d) => ({
-                          ...d,
-                          label: d.teamname,
-                          value: d.teamname,
-                        }))}
-                      styles={colourStyles}
-                      value={{
-                        label: stockManagehand.team,
-                        value: stockManagehand.team,
-                      }}
-                      onChange={(e) => {
-                        setStockManagehand({
-                          ...stockManagehand,
-
-                          team: e.value,
-                          employeenameto: "Please Select Employee",
-                        });
-                        setLocations([{ label: "ALL", value: "ALL" }]);
-                        fetchArea(e.value);
-                      }}
-                    />
-                  </FormControl>
-                </Grid> */}
+               
 
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
@@ -6275,6 +6262,38 @@ function StockManagement() {
                           ...stockManagehand,
                           countquantity:
                             e.target.value > 0 ? e.target.value : 0,
+                        });
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
+                    <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>Date<b style={{ color: "red" }}>*</b> </Typography>
+                    <OutlinedInput
+                      id="component-outlined"
+                      type="date"
+                      value={stockManagehand.allotdate}
+                      onChange={(e) => {
+                        setStockManagehand({
+                          ...stockManagehand,
+                          allotdate: e.target.value,
+                        });
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>Time <b style={{ color: "red" }}>*</b></Typography>
+                    <OutlinedInput
+                      id="component-outlined"
+                      type="time"
+                      value={stockManagehand.allottime}
+                      onChange={(e) => {
+                        setStockManagehand({
+                          ...stockManagehand,
+                          allottime: e.target.value,
                         });
                       }}
                     />
@@ -7107,7 +7126,13 @@ function StockManagement() {
                           Company<b style={{ color: "red" }}>*</b>
                         </Typography>
                         <Selects
-                          options={companys}
+                          // options={companys}
+                             options={accessbranch?.map(data => ({
+                        label: data.company,
+                        value: data.company,
+                      })).filter((item, index, self) => {
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                      })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.company,
@@ -7145,7 +7170,16 @@ function StockManagement() {
                           Branch<b style={{ color: "red" }}>*</b>
                         </Typography>
                         <Selects
-                          options={branchs}
+                          // options={branchs}
+                           options={accessbranch?.filter(
+                        (comp) =>
+                          stockManagehand.company === comp.company
+                      )?.map(data => ({
+                        label: data.branch,
+                        value: data.branch,
+                      })).filter((item, index, self) => {
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                      })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.branch,
@@ -7178,7 +7212,16 @@ function StockManagement() {
                           Unit<b style={{ color: "red" }}>*</b>
                         </Typography>
                         <Selects
-                          options={units}
+                          // options={units}
+                              options={accessbranch?.filter(
+                        (comp) =>
+                          stockManagehand.branch === comp.bracnh
+                      )?.map(data => ({
+                        label: data.unit,
+                        value: data.unit,
+                      })).filter((item, index, self) => {
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                      })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.unit,
@@ -7346,7 +7389,13 @@ function StockManagement() {
                           Company<b style={{ color: "red" }}>*</b>
                         </Typography>
                         <Selects
-                          options={companys}
+                          // options={companys}
+                            options={accessbranch?.map(data => ({
+                        label: data.company,
+                        value: data.company,
+                      })).filter((item, index, self) => {
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                      })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.company,
@@ -7384,7 +7433,16 @@ function StockManagement() {
                           Branch<b style={{ color: "red" }}>*</b>
                         </Typography>
                         <Selects
-                          options={branchs}
+                          // options={branchs}
+                            options={accessbranch?.filter(
+                        (comp) =>
+                          stockManagehand.company === comp.company
+                      )?.map(data => ({
+                        label: data.branch,
+                        value: data.branch,
+                      })).filter((item, index, self) => {
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                      })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.branch,
@@ -7418,7 +7476,16 @@ function StockManagement() {
                           Unit<b style={{ color: "red" }}>*</b>
                         </Typography>
                         <Selects
-                          options={units}
+                          // options={units}
+                           options={accessbranch?.filter(
+                        (comp) =>
+                          stockManagehand.branch === comp.bracnh
+                      )?.map(data => ({
+                        label: data.unit,
+                        value: data.unit,
+                      })).filter((item, index, self) => {
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                      })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.unit,

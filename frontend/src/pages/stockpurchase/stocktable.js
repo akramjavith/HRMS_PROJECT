@@ -95,6 +95,7 @@ import ManageStockItemsPopup from '../expenses/ManageStockItemsPopup';
 import StockCategoryPopup from '../expenses/StockCategoryPopup';
 import { paidOpt, statusOpt } from '../../components/Componentkeyword';
 
+
 const useStyles = makeStyles((theme) => ({
   inputs: {
     display: 'none',
@@ -114,6 +115,22 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
   let Expensetotal = 0;
 
+    const [selectedRows, setSelectedRows] = useState([]);
+
+        const exportColumnNamescom = [
+        'Status', 'Material', 'Company',
+        'Branch', 'Unit',
+        'Floor', 'Area',
+        'Location', 'Employee', 'User Company', 'User Branch', 'User Unit', 'Quantity','Date','Time'
+    ]
+    const exportRowValuescom = [
+        'handover', 'productname', 'company',
+        'branch', 'unit',
+        'floor', 'area',
+        'location', 'employeenameto', 'usercompany', 'userbranch', 'userunit', 'countquantity', 'usagedate','usagetime'
+    ]
+
+
   const particularModeOptions = [
     { label: 'Stock Material', value: 'Stock Material' },
     // { label: "Others", value: "Others" },
@@ -121,6 +138,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
   const [stockCategoryAuto, setStockCategoryAuto] = useState('');
   const [stockItemAuto, setStockItemAuto] = useState('');
+      const [isusercompleted, setisusercompleted] = useState([]);
+      const [isAttandance, setIsAttandance] = useState(false);
 
   const [isErrorOpenAmount, setIsErrorOpenAmount] = useState(false);
 
@@ -130,6 +149,569 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const handleCloseerrAmount = () => {
     setIsErrorOpenAmount(false);
   };
+
+  
+
+    //completed
+      const [filteredRowDatacom, setFilteredRowDatacom] = useState([]);
+      const [filteredChangescom, setFilteredChangescom] = useState(null);
+      const [isHandleChangecom, setIsHandleChangecom] = useState(false);
+      const [searchedStringcom, setSearchedStringcom] = useState("");
+      const gridRefTablecom = useRef(null);
+      const gridRefTableImgcom = useRef(null);
+
+
+        const [searchQueryManagecom, setSearchQueryManagecom] = useState("");
+          const [searchQuerycom, setSearchQuerycom] = useState("");
+
+
+          
+              const handleCaptureImagecom = () => {
+                  if (gridRefTableImgcom.current) {
+                      domtoimage.toBlob(gridRefTableImgcom.current)
+                          .then((blob) => {
+                              saveAs(blob, "Error Upload Confirm.png");
+                          })
+                          .catch((error) => {
+                              console.error("dom-to-image error: ", error);
+                          });
+                  }
+              };
+
+
+                const [isFilterOpencom, setIsFilterOpencom] = useState(false);
+                  const [isPdfFilterOpencom, setIsPdfFilterOpencom] = useState(false);
+              
+                  // page refersh reload
+                  const handleCloseFilterModcom = () => {
+                      setIsFilterOpencom(false);
+                  };
+              
+                  const handleClosePdfFilterModcom = () => {
+                      setIsPdfFilterOpencom(false);
+                  };
+              
+              
+              
+                  const componentRefcom = useRef();
+                  const handleprintcom = useReactToPrint({
+                      content: () => componentRefcom.current,
+                      documentTitle: "Status List",
+                      pageStyle: "print",
+                  });
+
+
+                    const [pagecom, setPagecom] = useState(1);
+                      const [pageSizecom, setPageSizecom] = useState(10);
+
+
+                       // Manage Columns
+                          const [isManageColumnsOpencom, setManageColumnsOpencom] = useState(false);
+                          const [anchorElcom, setAnchorElcom] = useState(null);
+                      
+                          const handleOpenManageColumnscom = (event) => {
+                              setAnchorElcom(event.currentTarget);
+                              setManageColumnsOpencom(true);
+                          };
+                          const handleCloseManageColumnscom = () => {
+                              setManageColumnsOpencom(false);
+                              setSearchQueryManagecom("");
+                          };
+                      
+                          const opencom = Boolean(anchorElcom);
+                          const idcom = opencom ? "simple-popover" : undefined;
+                      
+                      
+                      
+                          // Show All Columns & Manage Columns
+                          const initialColumnVisibilitycom = {
+                              serialNumber: true,
+        checkbox: true,
+        company: true,
+        branch: true,
+        addedby: true,
+        countquantity: true,
+        employeenameto: true,
+        unit: true,
+        floor: true,
+        area: true,
+        location: true,
+        productname: true,
+        quantity: true,
+        material: true,
+        materialnew: true,
+ usagedate: true,
+        usagetime: true,
+        employeenameto: true,
+        purchasecount: true,
+        purchasecountstock: true,
+        requestmode: true,
+        usedcount: true,
+        usedcountstock: true,
+        balancedcount: true,
+        actions: true,
+        viewactions: true,
+        assetviewactions: true,
+        handovercount: true,
+        returncount: true,
+        actions: true,
+        handovercountbtn: true,
+        returncountbtn: true,
+        usagecountbtn: true,
+        usercompany: true,
+        userbranch: true,
+        userunit: true,
+        userfloor: true,
+        userarea: true,
+        userlocation: true,
+        userteam: true,
+        handover: true,
+        actions:true
+                          };
+                      
+                          const [columnVisibilitycom, setColumnVisibilitycom] = useState(
+                              initialColumnVisibilitycom
+                          );
+                      
+                          const [itemscom, setItemscom] = useState([]);
+                      
+                          // const addSerialNumber = () => {
+                          //     const itemsWithSerialNumber = isuser?.map((item, index) => ({
+                          //         ...item, serialNumber: index + 1,
+                          //         fromdate: moment(item.fromdate).format("DD/MM/YYYY"),
+                          //     }));
+                          //     setItems(itemsWithSerialNumber);
+                          // };
+                      
+                          const addSerialNumbercom = (datas) => {
+                              // const itemsWithSerialNumber = datas?.map((item, index) => {
+                      
+                      
+                              //     return {
+                              //         ...item,
+                              //         serialNumber: index + 1,
+                      
+                              //         date: moment(item.date).format("DD/MM/YYYY"),
+                              //     }
+                              // });
+                              setItemscom(datas);
+                          };
+                      
+                          useEffect(() => {
+                              addSerialNumbercom(isusercompleted);
+                          }, [isusercompleted]);
+                      
+                          // console.log(isuser, "isuser")
+                      
+                          //Datatable
+                          const handlePageChangecom = (newPage) => {
+                              setPagecom(newPage);
+                              setSelectedRows([]);
+                              // setSelectAllChecked(false);
+                          };
+                      
+                          const handlePageSizeChangecom = (event) => {
+                              setPageSizecom(Number(event.target.value));
+                              setSelectedRows([]);
+                              // setSelectAllChecked(false);
+                              setPagecom(1);
+                          };
+                      
+                          //datatable....
+                          const handleSearchChangecom = (event) => {
+                              setSearchQuerycom(event.target.value);
+                          };
+                          // Split the search query into individual terms
+                          const searchTermscom = searchQuerycom.toLowerCase().split(" ");
+                          // Modify the filtering logic to check each term
+                          const filteredDatascom = itemscom?.filter((item) => {
+                              return searchTermscom.every((term) =>
+                                  Object.values(item).join(" ").toLowerCase().includes(term)
+                              );
+                          });
+                      
+                          const filteredDatacom = filteredDatascom?.slice(
+                              (pagecom - 1) * pageSizecom,
+                              pagecom * pageSizecom
+                          );
+                      
+                          const totalPagescom = Math.ceil(filteredDatascom?.length / pageSizecom);
+                      
+                          const visiblePagescom = Math.min(totalPagescom, 3);
+                      
+                          const firstVisiblePagecom = Math.max(1, pagecom - 1);
+                          const lastVisiblePagecom = Math.min(
+                              firstVisiblePagecom + visiblePagescom - 1,
+                              totalPagescom
+                          );
+                      
+                          const pageNumberscom = [];
+                      
+                          const indexOfLastItemcom = pagecom * pageSizecom;
+                      
+                          for (let i = firstVisiblePagecom; i <= lastVisiblePagecom; i++) {
+                              pageNumberscom.push(i);
+                          }
+                      
+                      
+                      
+                          const columnDataTablecom = [
+                        {
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
+      headerStyle: {
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
+        // Add any other CSS styles as needed
+      },
+
+      sortable: false, // Optionally, you can make this column not sortable
+      width: 90,
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
+      hide: !columnVisibilitycom.checkbox,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
+    },
+                              {
+                                  field: "serialNumber",
+                                  headerName: "SNo",
+                                  flex: 0,
+                                  width: 80,
+                                  hide: !columnVisibilitycom.serialNumber,
+                                  headerClassName: "bold-header",
+                                  pinned: 'left',
+                              },
+                               {
+                                         field: "handover",
+                                         headerName: "Status",
+                                         flex: 0,
+                                         width: 180,
+                                         minHeight: "40px !important",
+                                         sortable: false,
+                                         hide: !columnVisibilitycom.handover,
+                                         headerClassName: "bold-header",
+                                        
+                                         cellRenderer: (params) => {
+                                             let buttonStyles = {};
+                             
+                                             if (params.data.handover === "handover") {
+                                                 buttonStyles = { backgroundColor: "#DFF6DD", color: "#2E7D32", borderColor: "#2E7D32" };
+                                             } else if (params.data.handover === "return") {
+                                                 buttonStyles = { backgroundColor: "#FFEBEE", color: "#D32F2F", borderColor: "#D32F2F" };
+                                             } else {
+                                                 buttonStyles = { backgroundColor: "#E3F2FD", color: "#1565C0", borderColor: "#1565C0" };
+                                             }
+                             
+                                             return (
+                                                 <Button
+                                                     variant="outlined"
+                                                     size="small"
+                                                     sx={buttonStyles}
+                                                 >
+                                                     {params.data.handover === "handover" ? "Allot" :
+                                                         params.data.handover === "return" ? "Return" : "Usage Count"}
+                                                 </Button>
+                                             );
+                                         }
+                                     },
+                              {
+            field: "productname",
+            headerName: "Material",
+            flex: 0,
+            width: 200,
+            hide: !columnVisibilitycom.productname,
+            headerClassName: "bold-header",
+        },
+                               {
+            field: "company",
+            headerName: "Company",
+            flex: 0,
+            width: 100,
+            hide: !columnVisibilitycom.company,
+            headerClassName: "bold-header",
+        },
+        {
+            field: "branch",
+            headerName: "Branch",
+            flex: 0,
+            width: 150,
+            hide: !columnVisibilitycom.branch,
+            headerClassName: "bold-header",
+        },
+        {
+            field: "unit",
+            headerName: "Unit",
+            flex: 0,
+            width: 140,
+            hide: !columnVisibilitycom.unit,
+            headerClassName: "bold-header",
+        },
+              {
+            field: "floor",
+            headerName: "Floor",
+            flex: 0,
+            width: 100,
+            hide: !columnVisibilitycom.floor,
+            headerClassName: "bold-header",
+        },
+        {
+            field: "area",
+            headerName: "Area",
+            flex: 0,
+            width: 150,
+            hide: !columnVisibilitycom.area,
+            headerClassName: "bold-header",
+        },
+        {
+            field: "location",
+            headerName: "Location",
+            flex: 0,
+            width: 140,
+            hide: !columnVisibilitycom.location,
+            headerClassName: "bold-header",
+        },
+        {
+            field: "employeenameto",
+            headerName: "Employee",
+            flex: 0,
+            width: 190,
+            hide: !columnVisibilitycom.employeenameto,
+            headerClassName: "bold-header",
+        },
+
+        {
+            field: "usercompany",
+            headerName: "User Company",
+            flex: 0,
+            width: 100,
+            hide: !columnVisibilitycom.usercompany,
+            headerClassName: "bold-header",
+        },
+        {
+            field: "userbranch",
+            headerName: "User Branch",
+            flex: 0,
+            width: 150,
+            hide: !columnVisibilitycom.userbranch,
+            headerClassName: "bold-header",
+        },
+        {
+            field: "userunit",
+            headerName: "User Unit",
+            flex: 0,
+            width: 140,
+            hide: !columnVisibilitycom.userunit,
+            headerClassName: "bold-header",
+        },
+        // {
+        //     field: "userfloor",
+        //     headerName: "User Floor",
+        //     flex: 0,
+        //     width: 140,
+        //     hide: !columnVisibilitycom.userfloor,
+        //     headerClassName: "bold-header",
+        // },
+        // {
+        //     field: "userarea",
+        //     headerName: "User Area",
+        //     flex: 0,
+        //     width: 140,
+        //     hide: !columnVisibilitycom.userarea,
+        //     headerClassName: "bold-header",
+        // },
+        // {
+        //     field: "userlocation",
+        //     headerName: "User Location",
+        //     flex: 0,
+        //     width: 140,
+        //     hide: !columnVisibilitycom.userlocation,
+        //     headerClassName: "bold-header",
+        // },
+
+
+
+        {
+            field: "countquantity",
+            headerName: "Quantity",
+            flex: 0,
+            width: 180,
+            hide: !columnVisibilitycom.countquantity,
+            headerClassName: "bold-header",
+        },
+        {
+            field: "usagedate",
+            headerName: "Date",
+            flex: 0,
+            width: 250,
+            hide: !columnVisibilitycom.usagedate,
+            headerClassName: "bold-header",
+        },
+             {
+            field: "usagetime",
+            headerName: "Time",
+            flex: 0,
+            width: 250,
+            hide: !columnVisibilitycom.usagetime,
+            headerClassName: "bold-header",
+        },
+          {
+      field: 'actions',
+      headerName: 'Action',
+      flex: 0,
+      width: 250,
+      sortable: false,
+      hide: !columnVisibilitycom.actions,
+      cellRenderer: (params) => (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('dstockpurchase') && (
+            <Button
+              sx={userStyle.buttondelete}
+              onClick={(e) => {
+                getinfoCode(params.data.id);
+                handleClickOpen();
+              }}
+            >
+              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
+            </Button>
+          )}
+        </Grid>
+      ),
+    },
+                      
+                          ];
+                        
+                      
+                          const rowDataTablecom = filteredDatacom.map((item, index) => {
+                              return {
+                                  ...item,
+                                  id: item.id,
+                                  serialNumber: item.serialNumber,
+                              }
+                          });
+                          console.log(rowDataTablecom, "rowdat")
+                          const rowsWithCheckboxescom = rowDataTablecom?.map((row) => ({
+                              ...row,
+                              // Create a custom field for rendering the checkbox
+                              checkbox: selectedRows.includes(row.id),
+                          }));
+                      
+                          // Show All Columns functionality
+                          const handleShowAllColumnscom = () => {
+                              const updatedVisibilitycom = { ...columnVisibilitycom };
+                              for (const columnKey in updatedVisibilitycom) {
+                                  updatedVisibilitycom[columnKey] = true;
+                              }
+                              setColumnVisibilitycom(updatedVisibilitycom);
+                          };
+                      
+                          // // Function to filter columns based on search query
+                          const filteredColumnscom = columnDataTablecom.filter((column) =>
+                              column.headerName.toLowerCase().includes(searchQueryManagecom.toLowerCase())
+                          );
+                      
+                          // Manage Columns functionality
+                          const toggleColumnVisibilitycom = (field) => {
+                              setColumnVisibilitycom((prevVisibility) => ({
+                                  ...prevVisibility,
+                                  [field]: !prevVisibility[field],
+                              }));
+                          };
+                      
+                          // JSX for the "Manage Columns" popover content
+                          const manageColumnsContentcom = (
+                              <Box
+                                  style={{
+                                      padding: "10px",
+                                      minWidth: "325px",
+                                      "& .MuiDialogContent-root": { padding: "10px 0" },
+                                  }}
+                              >
+                                  <Typography variant="h6">Manage Columns</Typography>
+                                  <IconButton
+                                      aria-label="close"
+                                      onClick={handleCloseManageColumnscom}
+                                      sx={{
+                                          position: "absolute",
+                                          right: 8,
+                                          top: 8,
+                                          color: (theme) => theme.palette.grey[500],
+                                      }}
+                                  >
+                                      <CloseIcon />
+                                  </IconButton>
+                                  <Box sx={{ position: "relative", margin: "10px" }}>
+                                      <TextField
+                                          label="Find column"
+                                          variant="standard"
+                                          fullWidth
+                                          value={searchQueryManagecom}
+                                          onChange={(e) => setSearchQueryManagecom(e.target.value)}
+                                          sx={{ marginBottom: 5, position: "absolute" }}
+                                      />
+                                  </Box>
+                                  <br />
+                                  <br />
+                                  <DialogContent
+                                      sx={{ minWidth: "auto", height: "200px", position: "relative" }}
+                                  >
+                                      <List sx={{ overflow: "auto", height: "100%" }}>
+                                          {filteredColumnscom.map((column) => (
+                                              <ListItem key={column.field}>
+                                                  <ListItemText
+                                                      sx={{ display: "flex" }}
+                                                      primary={
+                                                          <Switch
+                                                              sx={{ marginTop: "-5px" }}
+                                                              size="small"
+                                                              checked={columnVisibilitycom[column.field]}
+                                                              onChange={() => toggleColumnVisibilitycom(column.field)}
+                                                          />
+                                                      }
+                                                      secondary={
+                                                          column.field === "checkbox" ? "Checkbox" : column.headerName
+                                                      }
+                                                  // secondary={column.headerName }
+                                                  />
+                                              </ListItem>
+                                          ))}
+                                      </List>
+                                  </DialogContent>
+                                  <DialogActions>
+                                      <Grid container>
+                                          <Grid item md={4}>
+                                              <Button
+                                                  variant="text"
+                                                  sx={{ textTransform: "none" }}
+                                                  onClick={() => setColumnVisibilitycom(initialColumnVisibilitycom)}
+                                              >
+                                                  Show All
+                                              </Button>
+                                          </Grid>
+                                          <Grid item md={4}></Grid>
+                                          <Grid item md={4}>
+                                              <Button
+                                                  variant="text"
+                                                  sx={{ textTransform: "none" }}
+                                                  onClick={() => {
+                                                      const newColumnVisibilitycom = {};
+                                                      columnDataTablecom.forEach((column) => {
+                                                          newColumnVisibilitycom[column.field] = false; // Set hide property to true
+                                                      });
+                                                      setColumnVisibilitycom(newColumnVisibilitycom);
+                                                  }}
+                                              >
+                                                  Hide All
+                                              </Button>
+                                          </Grid>
+                                      </Grid>
+                                  </DialogActions>
+                              </Box>
+                          );
+                      
+  
+
+
 
   const [stockmanagemasteredit, setStockmanagemasteredit] = useState({
     company: 'Please Select Company',
@@ -469,7 +1051,6 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [searchQueryManage, setSearchQueryManage] = useState('');
-  const [selectedRows, setSelectedRows] = useState([]);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [viewInfo, setViewInfo] = useState([]);
   const [openView, setOpenView] = useState(false);
@@ -1486,6 +2067,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       setPopupSeverity('success');
       handleClickOpenPopup();
       await fetchStock('Filtered');
+      await fetchStockManagementStatus()
       setSelectedRows([]);
       setPage(1);
     } catch (err) {
@@ -1561,25 +2143,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         },
       });
 
-      // let quantityNew = res?.data?.sstock.tododetails.map((data, newindex) => {
-      //   return ` ${data.quantitynew}`;
-      // });
-      // setQuantityNeww(quantityNew.toString());
-
-      // let materialNew = res?.data?.sstock.tododetails.map((data, newindex) => {
-      //   return ` ${data.materialnew}`;
-      // });
-      // setMaterialNeww(materialNew.toString());
-
-      // let productdetailsNew = res?.data?.sstock.tododetails.map((data, newindex) => {
-      //   return ` ${data.productdetailsnew}`;
-      // });
-      // setProductdetailsNeww(productdetailsNew.toString());
-
-      // let quantityAndUom = res?.data?.sstock.tododetails.map((data, newindex) => {
-      //   return ` ${data.quantitynew}#${data.uomnew}`;
-      // });
-      // setQuantityAndUom(quantityAndUom.toString());
+     
 
       let codeValues = res_project_1?.data?.vommaster.map((data) => ({
         name: data.name,
@@ -2423,63 +2987,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setOpeninfo(false);
   };
 
-  //get all project.
-  // const fetchStock = async () => {
-  //   setPageName(!pageName)
-
-  //   setLoading(true)
-
-  //   try {
-  //     // let res_project = await axios.get(SERVICE.STOCKPURCHASE, {
-
-  //     let res_project = await axios.post(SERVICE.STOCK_ACCESS, {
-  //       headers: {
-  //         Authorization: `Bearer ${auth.APIToken}`,
-  //       },
-  //       assignbranch: accessbranch,
-
-  //     });
-
-  //     let filteredData = res_project?.data?.stock
-  //       .filter((data) => {
-  //         return (
-  //           data.requestmode === "Stock Material" || data.status === "Transfer"
-  //         );
-  //       });
-  //     console.log(filteredData, "filteredData")
-  //     let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
-  //       headers: {
-  //         Authorization: `Bearer ${auth.APIToken}`,
-  //       },
-  //     });
-
-  //     let codeValues = res_project_1?.data?.vommaster.map((data) => ({
-  //       name: data.name,
-  //       code: data.code,
-  //     }));
-  //     // setuomcodes(codeValues);
-
-  //     let setData = filteredData.map((item) => {
-  //       // Find the corresponding item in codeValues array
-  //       const matchingItem = codeValues.find(
-  //         (item1) => item.uomnew === item1.name
-  //       );
-
-  //       // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-  //       return matchingItem
-  //         ? { ...item, uomcode: matchingItem.code }
-  //         : { ...item, uomcode: "" };
-  //     });
-  //     console.log(setData, "setData")
-  //     setStockmanage(setData);
-  //     setLoading(false)
-  //   } catch (err) {
-  //     console.log(err, "erororor")
-  //     setLoading(false)
-  //     handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-  //   }
-
-  // }
+  
 
   //get all project.
   const fetchStock = async (e) => {
@@ -2503,8 +3011,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       queryParams.searchQuery = searchQuery;
     }
     try {
-      // let res_project = await axios.get(SERVICE.STOCKPURCHASE, {
+
+
+     
       if (e === 'Filtered') {
+
         let res_employee = await axios.post(SERVICE.STOCK_ACCESS_PAGINATION, queryParams, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
@@ -2519,73 +3030,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           },
         });
 
-        // let codeValues = res_project_1?.data?.vommaster.map((data) => ({
-        //   name: data.name,
-        //   code: data.code,
-        // }));
-
-        // let setData = ans.map((item) => {
-        //   // Find the corresponding item in codeValues array
-        //   const matchingItem = codeValues.find(
-        //     (item1) => item.uom === item1.name
-        //   );
-
-        //   // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-        //   return matchingItem
-        //     ? { ...item, uomcode: matchingItem.code }
-        //     : { ...item, uomcode: "" };
-        // });
-
-        // const itemsWithSerialNumber = setData?.map((item, index) => {
-        //   let quantityNew = item.tododetails.map((data, newindex) => {
-        //     return ` ${data.quantitynew}`;
-        //   });
-
-        //   let materialNew = item.tododetails.map((data, newindex) => {
-        //     return ` ${data.materialnew}`;
-        //   });
-
-        //   let productdetailsNew = item.tododetails.map((data, newindex) => {
-        //     return ` ${data.productdetailsnew}`;
-        //   });
-
-        //   let quantityAndUom = item.tododetails.map((data, newindex) => {
-        //     return ` ${data.quantitynew}#${data.uomnew}`;
-        //   });
-        //   return {
-        //     id: item._id,
-        //     serialNumber: (page - 1) * pageSize + index + 1,
-        //     company: item.company,
-        //     branch: item.branch,
-        //     unit: item.unit,
-        //     floor: item.floor,
-        //     area: item.area,
-        //     location: item.location,
-        //     requestmode: item.requestmode,
-        //     stockcategory: item.stockcategory,
-        //     stocksubcategory: item.stocksubcategory,
-
-        //     uomnew: quantityAndUom.join(","),
-        //     quantitynew: quantityNew.join(","),
-        //     materialnew: materialNew.join(",").toString(),
-        //     productdetailsnew:
-        //       item.tododetails.length > 0 ? productdetailsNew.join(",") : "",
-
-        //     gstno: item.gstno,
-        //     billno: item.billno,
-        //     warrantydetails: item.warrantydetails,
-        //     warranty: item.warranty,
-        //     purchasedate:
-        //       item.purchasedate != ""
-        //         ? moment(item.purchasedate).format("DD/MM/YYYY")
-        //         : "",
-        //     billdate: moment(item.billdate).format("DD/MM/YYYY"),
-        //     rate: item.rate,
-        //     vendor: item.vendor,
-        //     vendorgroup: item.vendorgroup,
-        //   };
-        // });
-        // setStockmanage(itemsWithSerialNumber);
+     
 
         const codeMap = new Map(res_project_1?.data?.vommaster.map((data) => [data.name, data.code]));
 
@@ -2658,7 +3103,11 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       } else {
         setLoading(false);
       }
-    } catch (err) {
+
+
+    } 
+    
+    catch (err) {
       console.log(err, 'errorororo');
       setLoading(false);
 
@@ -2671,6 +3120,36 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       fetchStock('Filtered');
     }
   }, [page, pageSize, searchQuery]);
+
+
+    const fetchStockManagementStatus = async () => {
+      setIsAttandance(true)
+    try {
+      let res = await axios.get(SERVICE.STOCK_MANAGEMENT_STATUS, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+      setisusercompleted(res?.data?.stock?.map((item, index) => {
+                      
+                      
+                                  return {
+                                      ...item,
+                                      id:item._id,
+                                      serialNumber: index + 1,
+                                        usagedate: moment(item?.usagedate).format("DD/MM/YYYY"),
+                                  }
+                              }));
+        setIsAttandance(false)
+    } catch (err) {
+        setIsAttandance(false)
+      console.log(err, 'errfile');
+    }
+  };
+
+  useEffect(() =>{
+    fetchStockManagementStatus()
+  },[])
 
   // Error Popup model
   const handleClickOpenerr = () => {
@@ -2818,6 +3297,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       setSelectAllChecked(false);
       setPage(1);
       await fetchStock('Filtered');
+      await fetchStockManagementStatus();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -4505,8 +4985,226 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           </>
         )}
       </>
+      <br />
+ <Box sx={userStyle.dialogbox}>
+                            <>
+                                <Grid item xs={8}>
+                                    <Typography sx={userStyle.importheadtext}>Status List</Typography>
+                                </Grid>
+                                <Grid container spacing={2} style={userStyle.dataTablestyle}>
+                                    <Grid item md={2} xs={12} sm={12}>
+                                        <Box>
+                                            <label>Show entries:</label>
+                                            <Select
+                                                id="pageSizeSelect"
+                                                value={pageSizecom}
+                                                MenuProps={{
+                                                    PaperProps: {
+                                                        style: {
+                                                            maxHeight: 180,
+                                                            width: 80,
+                                                        },
+                                                    },
+                                                }}
+                                                onChange={handlePageSizeChangecom}
+                                                sx={{ width: "77px" }}
+                                            >
+                                                <MenuItem value={1}>1</MenuItem>
+                                                <MenuItem value={5}>5</MenuItem>
+                                                <MenuItem value={10}>10</MenuItem>
+                                                <MenuItem value={25}>25</MenuItem>
+                                                <MenuItem value={50}>50</MenuItem>
+                                                <MenuItem value={100}>100</MenuItem>
+                                                <MenuItem value={isusercompleted?.length}>All</MenuItem>
+                                            </Select>
+                                        </Box>
+                                    </Grid>
+                                    <Grid
+                                        item
+                                        md={8}
+                                        xs={12}
+                                        sm={12}
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <Box>
+                                            {isUserRoleCompare?.includes(
+                                                "excelerroruploadconfirm"
+                                            ) && (
+                                                    <>
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                setIsFilterOpencom(true);
+                                                                setFormat("xl");
+                                                            }}
+                                                            sx={userStyle.buttongrp}
+                                                        >
+                                                            <FaFileExcel />
+                                                            &ensp;Export to Excel&ensp;
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            {isUserRoleCompare?.includes(
+                                                "csverroruploadconfirm"
+                                            ) && (
+                                                    <>
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                setIsFilterOpencom(true);
+                                                                setFormat("csv");
+                                                            }}
+                                                            sx={userStyle.buttongrp}
+                                                        >
+                                                            <FaFileCsv />
+                                                            &ensp;Export to CSV&ensp;
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            {isUserRoleCompare?.includes(
+                                                "printerroruploadconfirm"
+                                            ) && (
+                                                    <>
+                                                        <Button sx={userStyle.buttongrp} onClick={handleprintcom}>
+                                                            &ensp;
+                                                            <FaPrint />
+                                                            &ensp;Print&ensp;
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            {isUserRoleCompare?.includes(
+                                                "pdferroruploadconfirm"
+                                            ) && (
+                                                    <>
+                                                        <Button
+                                                            sx={userStyle.buttongrp}
+                                                            onClick={() => {
+                                                                setIsPdfFilterOpencom(true);
+                                                            }}
+                                                        >
+                                                            <FaFilePdf />
+                                                            &ensp;Export to PDF&ensp;
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            {isUserRoleCompare?.includes(
+                                                "imageerroruploadconfirm"
+                                            ) && (
+                                                    <Button
+                                                        sx={userStyle.buttongrp}
+                                                        onClick={handleCaptureImagecom}
+                                                    >
+                                                        {" "}
+                                                        <ImageIcon
+                                                            sx={{ fontSize: "15px" }}
+                                                        /> &ensp;Image&ensp;{" "}
+                                                    </Button>
+                                                )}
+                                        </Box>
+                                    </Grid>
+                                    <Grid item md={2} xs={6} sm={6}>
+                                        <Box>
+                                            {/* <FormControl fullWidth size="small">
+                                        <Typography>Search</Typography>
+                                        <OutlinedInput
+                                            id="component-outlined"
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={handleSearchChange}
+                                        />
+                                    </FormControl> */}
+                                            <AggregatedSearchBar
+                                                columnDataTable={columnDataTablecom}
+                                                setItems={setItemscom}
+                                                addSerialNumber={addSerialNumbercom}
+                                                setPage={setPagecom}
+                                                maindatas={isusercompleted}
+                                                setSearchedString={setSearchedStringcom}
+                                                searchQuery={searchQuerycom}
+                                                setSearchQuery={setSearchQuerycom}
+                                                paginated={false}
+                                                totalDatas={isusercompleted}
+                                            />
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                                <br />
+                                <Button sx={userStyle.buttongrp} onClick={handleShowAllColumnscom}>
+                                    Show All Columns
+                                </Button>
+                                &ensp;
+                                <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumnscom}>
+                                    Manage Columns
+                                </Button>
+                                 <Button variant="contained" sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
+                  Bulk Delete
+                </Button>
+                                {/* Show "Load More" button if there's more data */}
 
-      
+                                <Popover
+                                    id={idcom}
+                                    open={isManageColumnsOpencom}
+                                    anchorEl={anchorElcom}
+                                    onClose={handleCloseManageColumnscom}
+                                    anchorOrigin={{
+                                        vertical: "bottom",
+                                        horizontal: "left",
+                                    }}
+                                >
+                                    {manageColumnsContentcom}
+                                </Popover>
+                                <br />
+                                <br />
+                                {isAttandance ? (
+                                    <>
+                                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                                            <ThreeDots
+                                                height="80"
+                                                width="80"
+                                                radius="9"
+                                                color="#1976d2"
+                                                ariaLabel="three-dots-loading"
+                                                wrapperStyle={{}}
+                                                wrapperClassName=""
+                                                visible={true}
+                                            />
+                                        </Box>
+                                    </>
+                                ) : (
+                                    <>
+                                        <AggridTable
+                                            rowDataTable={rowDataTablecom}
+                                            columnDataTable={columnDataTablecom}
+                                            columnVisibility={columnVisibilitycom}
+                                            page={pagecom}
+                                            setPage={setPagecom}
+                                            pageSize={pageSizecom}
+                                            totalPages={totalPagescom}
+                                            setColumnVisibility={setColumnVisibilitycom}
+                                            isHandleChange={isHandleChange}
+                                            items={itemscom}
+                                            selectedRows={selectedRows}
+                                            setSelectedRows={setSelectedRows}
+                                            gridRefTable={gridRefTablecom}
+                                            paginated={false}
+                                            filteredDatas={filteredDatascom}
+                                            // totalDatas={totalDatas}
+                                            searchQuery={searchedStringcom}
+                                            handleShowAllColumns={handleShowAllColumnscom}
+                                            setFilteredRowData={setFilteredRowDatacom}
+                                            filteredRowData={filteredRowDatacom}
+                                            setFilteredChanges={setFilteredChangescom}
+                                            filteredChanges={filteredChangescom}
+                                            gridRefTableImg={gridRefTableImgcom}
+                                            itemsList={isusercompleted}
+                                        />
+                                    </>
+                                )}
+                            </>
+                        </Box>
+
 
       {/* this is info view details */}
       <Dialog open={openInfo} onClose={handleCloseinfo} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
@@ -6186,6 +6884,23 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           </DialogActions>
         </Dialog>
       </Box>
+
+        <ExportData
+                      isFilterOpen={isFilterOpencom}
+                      handleCloseFilterMod={handleCloseFilterModcom}
+                      fileFormat={fileFormat}
+                      setIsFilterOpen={setIsFilterOpencom}
+                      isPdfFilterOpen={isPdfFilterOpencom}
+                      setIsPdfFilterOpen={setIsPdfFilterOpencom}
+                      handleClosePdfFilterMod={handleClosePdfFilterModcom}
+                      filteredDataTwo={(filteredChangescom !== null ? filteredRowDatacom : rowDataTablecom) ?? []}
+                      itemsTwo={isusercompleted ?? []}
+                      filename={"Completed List"}
+                      exportColumnNames={exportColumnNamescom}
+                      exportRowValues={exportRowValuescom}
+                      componentRef={componentRefcom}
+                  />
+
     </Box>
   );
 }

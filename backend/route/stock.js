@@ -12,9 +12,11 @@ const { getAllStock, getAllStockAccess, addStock, getSingleStock, getOverallStoc
     getAllStockPurchaseLimitedOverallReport, getAllStockPurchaseStockCountUsage, getAllStockPurchaseLimitedBalanceCount,
     getAllStockExcelDownloadStock, getAllStockExcelDownloadAsset, getAllStockPdfDownloadAssetPDF, getAllStockBillno,
     getAllStockPurchaseLimitedAssetDetails, getAllStockPurchaseLimitedReorder, uploadChunkStock, getAllStockTodoDelete, getAllStockTodoEditFetch,
-    getAllStockReorderFetch
+    getAllStockReorderFetch,getAllStockManagementStatus,getAllStockManagementStatusManual
 } = require("../controller/modules/stockpurchase/stock");
 stockRoute.route("/stocks").get(getAllStock);
+stockRoute.route("/stockmanagementstatus").get(getAllStockManagementStatus);
+stockRoute.route("/stockmanagementstatusmanual").get(getAllStockManagementStatusManual);
 
 stockRoute.route("/uploadchunkstock").post(uploadChunkStock);
 stockRoute.route("/stockreorderfetch").post(getAllStockReorderFetch);

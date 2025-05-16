@@ -225,6 +225,119 @@ function Stockmaster() {
   const [allStockCategory, setAllStockCategory] = useState([]);
   const [itemAllShow, setItemAllShow] = useState(true);
 
+  const [holidays, setHolidays] = useState([])
+  
+    const fetchHoliday = async () => {
+      setPageName(!pageName);
+      try {
+        let res_status = await axios.post(SERVICE.ALL_HOLIDAY, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+          assignbranch: accessbranch,
+        });
+  
+  
+  
+        setHolidays(res_status?.data?.holiday);
+      } catch (err) {
+        handleApiError(
+          err,
+          setPopupContentMalert,
+          setPopupSeverityMalert,
+          handleClickOpenPopupMalert
+        );
+      }
+    };
+  
+    // Helper function to find the next available date that's not a Sunday or a holiday
+    const getNextValidDate = (date, holidays) => {
+      const holidaysSet = new Set(holidays); // Store holidays for quick lookup
+      let nextDate = moment(date); // Convert the date to a Moment instance
+  
+      // Increment the date until it's not a Sunday or a holiday
+      while (nextDate.day() === 0 || holidaysSet.has(nextDate.format("YYYY-MM-DD"))) {
+        nextDate.add(1, 'day'); // Move to the next day
+      }
+  
+      return nextDate;
+    };
+  
+
+
+   const setDueDate = (e) => {
+      let dueDate = ""; // Default value if not monthly
+      if (e.paymentfrequency === "Monthly" && e.monthlyfrequency) {
+        // Get the current month and year
+        const today = moment();
+        let proposedDate = moment(`${today.year()}-${today.month() + 1}-${e.monthlyfrequency}`, "YYYY-MM-DD");
+  
+        // If proposedDate is in the past, set it to next month
+        if (proposedDate.isBefore(today, 'day')) {
+          proposedDate.add(1, 'month');
+        }
+  
+        // Filter holidays specific to the selected company, branch, and unit
+        let mappedHolidays = holidays
+          ?.filter(data =>
+            data.company?.includes(stockmaster?.company) &&
+            data.applicablefor?.includes(stockmaster?.branch) &&
+            data.unit?.includes(stockmaster?.unit)
+          )
+          ?.map(item => item?.date);
+  
+  
+        // Get the valid due date (not Sunday or a holiday)
+        const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+        dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+      } else if (e.paymentfrequency === "Weekly" && e.weeklyfrequency) {
+        // Set today to "2024-05-17"
+        const today = moment(expensecreate?.date);
+  
+        // Map days of the week to their numeric values (Sunday = 0, Monday = 1, ..., Saturday = 6)
+        const dayMapping = {
+          Sunday: 0,
+          Monday: 1,
+          Tuesday: 2,
+          Wednesday: 3,
+          Thursday: 4,
+          Friday: 5,
+          Saturday: 6
+        };
+  
+        // Get the numeric value of the desired day
+        const targetDay = dayMapping[e.weeklyfrequency];
+  
+        // Calculate the next target day from today
+        let proposedDate = today.clone().isoWeekday(targetDay);
+  
+        // If the proposed day is earlier than today, move to the next week
+        if (proposedDate.isBefore(today, 'day')) {
+          proposedDate.add(1, 'week');
+        }
+  
+        // Filter holidays specific to the selected company, branch, and unit
+        let mappedHolidays = holidays
+          ?.filter(data =>
+            data.company?.includes(stockmaster?.company) &&
+            data.applicablefor?.includes(stockmaster?.branch) &&
+            data.unit?.includes(stockmaster?.unit)
+          )
+          ?.map(item => item?.date);
+  
+        // Get the valid due date (not a holiday)
+        const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+        dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+      }
+  
+      setExpensecreate({
+        ...expensecreate,
+        vendorname: e.value,
+        vendorfrequency: e.paymentfrequency,
+        duedate: dueDate
+      });
+    };
+
   //get stock items.
   const fetchStockItems = async () => {
     try {
@@ -264,6 +377,7 @@ function Stockmaster() {
   useEffect(() => {
     getStockCategory();
     fetchStockItems();
+    fetchHoliday()
   }, []);
 
   // State to track advanced filter
@@ -2254,6 +2368,7 @@ function Stockmaster() {
         unit: String(stockmaster.unit),
         floor: String(stockmaster.floor),
         location: String(stockmaster.location),
+           duedate: String(expensecreate.duedate ? expensecreate.duedate : ""),
         area: String(stockmaster.area),
         workstation: String(stockmaster.workcheck ? stockmaster.workstation : ''),
         totalbillamount: stockmaster.quantity * stockmaster.rate,
@@ -6034,6 +6149,7 @@ function Stockmaster() {
                       styles={colourStyles}
                       value={{ label: vendorNew, value: vendorNew }}
                       onChange={(e) => {
+                        setDueDate(e)
                         setVendorNew(e.value);
                         setFrequencyValue(e.paymentfrequency);
                         setVendorModeOfPayments(e?.modeofpayments);
@@ -6122,7 +6238,7 @@ function Stockmaster() {
                     </FormControl>
                   </Grid>
                 )}
-                {stockmaster.requestmode === 'Asset Material' && (
+                {/* {stockmaster.requestmode === 'Asset Material' && (
                   <Grid item md={3} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
@@ -6143,43 +6259,9 @@ function Stockmaster() {
                       />
                     </FormControl>
                   </Grid>
-                )}
-                {stockmaster.requestmode === 'Stock Material' && (
-                  <>
-                    <Grid item md={3} sm={12} xs={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="number"
-                          sx={userStyle.input}
-                          // value={totalQuantityStock * stockmaster.rate}
-                          value={stockmaster.totalbillamount}
-                          onChange={(e) => {
-                            setStockmaster({
-                              ...stockmaster,
-                              totalbillamount: e.target.value,
-                            });
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                  </>
-                )}
-                {stockmaster.requestmode === 'Asset Material' && (
-                  <>
-                    <Grid item md={3} sm={12} xs={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={stockmaster.quantity * stockmaster.rate} />
-                      </FormControl>
-                    </Grid>
-                  </>
-                )}
+                )} */}
+              
+              
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
@@ -6198,6 +6280,26 @@ function Stockmaster() {
                     />
                   </FormControl>
                 </Grid>
+                  <Grid item lg={2} md={4} xs={12} sm={6}>
+                                  <FormControl fullWidth size="small">
+                                    <Typography>Due Date</Typography>
+                                    <OutlinedInput
+                                      id="to-date"
+                                      type="date"
+                                      value={expensecreate.duedate}
+                                      onChange={(e) => {
+                                        setExpensecreate({
+                                          ...expensecreate,
+                                          duedate: e.target.value,
+                                        });
+                                      }}
+                                      inputProps={{
+                                        min: expensecreate.date,
+                                        // max: today
+                                      }}
+                                    />
+                                  </FormControl>
+                                </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>
                     Bill <b style={{ color: 'red' }}>*</b>{' '}
@@ -6278,6 +6380,62 @@ function Stockmaster() {
                     />
                   </FormControl>
                 </Grid>
+                  {stockmaster.requestmode === 'Stock Material' && (
+                  <>
+                    <Grid item md={3} sm={12} xs={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
+                        </Typography>
+                        <OutlinedInput
+                          id="component-outlined"
+                          type="number"
+                          sx={userStyle.input}
+                          // value={totalQuantityStock * stockmaster.rate}
+                          value={stockmaster.totalbillamount}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              totalbillamount: e.target.value,
+                            });
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                  </>
+                )}
+                  {stockmaster.requestmode === 'Asset Material' && (
+                  <>
+                   <Grid item md={3} sm={12} xs={12}>
+                    <FormControl fullWidth size="small">
+                      <Typography>
+                        Rate<b style={{ color: 'red' }}>*</b>{' '}
+                      </Typography>
+                      <OutlinedInput
+                        id="component-outlined"
+                        type="number"
+                        sx={userStyle.input}
+                        placeholder="Please Enter Rate"
+                        value={stockmaster.rate}
+                        onChange={(e) => {
+                          setStockmaster({
+                            ...stockmaster,
+                            rate: e.target.value,
+                          });
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                    <Grid item md={3} sm={12} xs={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
+                        </Typography>
+                        <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={stockmaster.quantity * stockmaster.rate} />
+                      </FormControl>
+                    </Grid>
+                  </>
+                )}
               </Grid>
               <br />
               {stockmaster.requestmode === 'Asset Material' && (

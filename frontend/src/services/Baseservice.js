@@ -5780,6 +5780,9 @@ export const SERVICE = {
 
       PENALTYERRORUPLOADS_BY_DATE_NEW: `${BASE_URL}/api/penaltyerroruploadsbydatenew`,
     BULKRRORUPLOADS_FETCH_BY_DATE_NEW: `${BASE_URL}/api/bulkerroruploadfetchbydatenew`,
+    STOCK_MANAGEMENT_STATUS: `${BASE_URL}/api/stockmanagementstatus`,
+    STOCK_MANAGEMENT__MANUAL_STATUS: `${BASE_URL}/api/stockmanagementstatusmanual`,
+
 
     
 };

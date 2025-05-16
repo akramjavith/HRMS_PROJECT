@@ -55,6 +55,46 @@ exports.getAllStock = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+exports.getAllStockManagementStatus = catchAsyncErrors(async (req, res, next) => {
+  let stock;
+  try {
+    let query ={ }
+    query.handover={$in:["handover","return","usagecount"]}
+
+    stock = await Stock.find(query,{employeenameto:1,handover:1,company:1,branch:1,unit:1,floor:1,
+      usagedate:1,usagetime:1,
+      area:1,location:1,countquantity:1,productname:1,usercompany:1,userbranch:1,userunit:1,userteam:1,addedby:1,createdAt:1});
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+  if (!stock) {
+    return next(new ErrorHandler("Stock not found!", 404));
+  }
+  return res.status(200).json({
+    stock,
+  });
+});
+
+exports.getAllStockManagementStatusManual = catchAsyncErrors(async (req, res, next) => {
+  let stock;
+  try {
+    let query ={ }
+    query.handover={$in:["handover","return","usagecount"]}
+
+    stock = await Manualstock.find(query,{employeenameto:1,handover:1,company:1,branch:1,unit:1,floor:1,
+      usagedate:1,usagetime:1,
+      area:1,location:1,countquantity:1,productname:1,usercompany:1,userbranch:1,userunit:1,userteam:1,addedby:1,createdAt:1});
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+  if (!stock) {
+    return next(new ErrorHandler("Stock not found!", 404));
+  }
+  return res.status(200).json({
+    stock,
+  });
+});
+
 exports.getAllStockBillno = catchAsyncErrors(async (req, res, next) => {
   let stock;
   try {
@@ -200,8 +240,8 @@ exports.getAllStockAccess = catchAsyncErrors(async (req, res, next) => {
 
 
           // {
-          //   // Add condition for array `tododetails`
-          //   tododetails: {
+          //   // Add condition for array `stockmaterialarray`
+          //   stockmaterialarray: {
           //     $elemMatch: {
           //       $or: [
           //         { uomnew: regex },
@@ -308,6 +348,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
   query = {
     $or: branchFilter,
     requestmode: "Stock Material",
+    handover:{$exists:false},
     // status: "Transfer"
   };
   if (company && company?.length > 0) {
@@ -331,7 +372,8 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
   }));
 
   queryoverall = {
-    $or: branchFilterOverall, requestmode: "Stock Material"
+    $or: branchFilterOverall, requestmode: "Stock Material",
+    handover:{$exists:false},
     // , status: "Transfer"
   };
   if (company && company?.length > 0) {
@@ -420,7 +462,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
         $or: [
           ...regexFields.map(field => ({ [field]: regex })),
           {
-            // Add condition for array `tododetails`
+            // Add condition for array `stockmaterialarray`
             tododetails: {
               $elemMatch: {
                 $or: [
@@ -467,6 +509,9 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
 
     const [totalProjects, result, totalProjectsData,] = await Promise.all([
       Stock.countDocuments(query),
+
+
+
       Stock.find(query, {
         company: 1,
         totalbillamountstock:1,
@@ -493,7 +538,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
         rate: 1,
         vendorgroup: 1,
         vendor: 1,
-        tododetails: 1,
+        stockmaterialarray: 1,
         tododetails:1,
         quantitynew: 1,
         tododetails: 1
@@ -528,7 +573,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
       //   rate: 1,
       //   vendorgroup: 1,
       //   vendor: 1,
-      //   tododetails: 1,
+      //   stockmaterialarray: 1,
       //   quantitynew: 1
       // }),
 
@@ -613,7 +658,7 @@ exports.getAllStockPurchaseLimitedTransfer = catchAsyncErrors(async (req, res, n
   try {
 
     stock = await Stock.find({ status: "Transfer" },
-      { requestmode: 1, company: 1, status: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, tododetails: 1,tododetails:1, quantity: 1 });
+      { requestmode: 1, company: 1, status: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, stockmaterialarray: 1,tododetails:1, quantity: 1 });
 
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
@@ -639,7 +684,7 @@ exports.getAllStockPurchaseLimitedTransferLog = catchAsyncErrors(async (req, res
     },
       {
         requestmode: 1, company: 1, status: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, employeenameto: 1, countquantity: 1,
-        tododetails: 1,tododetails:1, quantity: 1, addedby: 1
+        stockmaterialarray: 1,tododetails:1, quantity: 1, addedby: 1
       });
     // console.log(stock, "viewstock")
   } catch (err) {
@@ -675,7 +720,7 @@ exports.getAllStockPurchaseLimitedAssetDetails = catchAsyncErrors(async (req, re
           $project: {
             requestmode: 1, company: 1, branch: 1, unit: 1,
             floor: 1, area: 1, location: 1, productname: 1,
-            quantity: 1, tododetails: 1,tododetails:1,
+            quantity: 1, stockmaterialarray: 1,tododetails:1,
 
           }
         }
@@ -723,7 +768,7 @@ exports.getAllStockPurchaseLimited = catchAsyncErrors(async (req, res, next) => 
           $project: {
             requestmode: 1, company: 1, branch: 1, unit: 1,
             floor: 1, area: 1, location: 1, productname: 1,
-            quantity: 1, tododetails: 1,tododetails:1,
+            quantity: 1, stockmaterialarray: 1,tododetails:1,
             status: { $literal: "Stock" } // Adding status directly
           }
         }
@@ -743,7 +788,7 @@ exports.getAllStockPurchaseLimited = catchAsyncErrors(async (req, res, next) => 
           $project: {
             requestmode: 1, company: 1, branch: 1, unit: 1,
             floor: 1, area: 1, location: 1, productname: 1,
-            quantity: 1, tododetails: 1,tododetails:1,
+            quantity: 1, stockmaterialarray: 1,tododetails:1,
             status: { $literal: "Manual" }
           }
         }
@@ -809,7 +854,7 @@ exports.getAllStockPurchaseLimitedBalanceCount = catchAsyncErrors(async (req, re
       Stock.find(filterConditions, {
         requestmode: 1, company: 1, branch: 1, unit: 1,
         floor: 1, area: 1, location: 1, productname: 1,
-        quantity: 1, tododetails: 1,tododetails:1, status: 1
+        quantity: 1, stockmaterialarray: 1,tododetails:1, status: 1
 
       }),
       Stock.find(filterreturnhandover, {
@@ -820,13 +865,13 @@ exports.getAllStockPurchaseLimitedBalanceCount = catchAsyncErrors(async (req, re
       Manualstock.find(filterConditions, {
         requestmode: 1, company: 1, branch: 1, unit: 1,
         floor: 1, area: 1, location: 1, productname: 1,
-        quantity: 1, tododetails: 1,tododetails:1,tododetails:1, 
+        quantity: 1, stockmaterialarray: 1,tododetails:1,tododetails:1, 
       }),
 
       Manualstock.find(filterreturnhandover, {
         requestmode: 1, company: 1, branch: 1, unit: 1,
         floor: 1, area: 1, location: 1, productname: 1,tododetails:1, 
-        quantity: 1, tododetails: 1, tododetails:1,countquantity: 1, handover: 1
+        quantity: 1, stockmaterialarray: 1, tododetails:1,countquantity: 1, handover: 1
       }),
 
     ]);
@@ -839,8 +884,8 @@ exports.getAllStockPurchaseLimitedBalanceCount = catchAsyncErrors(async (req, re
 
     }
     else {
-      // stock = stocklimited.flatMap(item => item.tododetails).reduce((sum, item) => sum + Number(item.quantitynew), 0);
-      // manual = manuallimited.flatMap(item => item.tododetails).reduce((sum, item) => sum + Number(item.quantitynew), 0);
+      // stock = stocklimited.flatMap(item => item.stockmaterialarray).reduce((sum, item) => sum + Number(item.quantitynew), 0);
+      // manual = manuallimited.flatMap(item => item.stockmaterialarray).reduce((sum, item) => sum + Number(item.quantitynew), 0);
 
       stock = stocklimited.flatMap(item => item.tododetails.map(d => {
         return {
@@ -853,7 +898,7 @@ exports.getAllStockPurchaseLimitedBalanceCount = catchAsyncErrors(async (req, re
       }));
 
 
-      // manual = manuallimited.flatMap(item => item.tododetails);
+      // manual = manuallimited.flatMap(item => item.stockmaterialarray);
       manual = manuallimited.flatMap(item => item.tododetails.map(d => {
         return {
           ...d,
@@ -1952,12 +1997,12 @@ exports.getAllStockManagementViewDateStockMaterial = catchAsyncErrors(async (req
     if (status == "Stock") {
       stock = await Stock.find(query, {
         company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, requestmode: 1, quantity: 1,
-        addedby: 1, tododetails: 1,tododetails:1,
+        addedby: 1, stockmaterialarray: 1,tododetails:1,
       });
     } else {
       stock = await Manualstock.find(query, {
         company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, requestmode: 1, quantity: 1,
-        addedby: 1, tododetails: 1,tododetails:1,
+        addedby: 1, stockmaterialarray: 1,tododetails:1,
       });
     }
 
@@ -2064,7 +2109,7 @@ exports.getAllStockManagementViewDateStockMaterialIndividual = catchAsyncErrors(
     //   floor: floor,
     //   area: area,
     //   location: location,
-    //   "tododetails.materialnew": productname,
+    //   "stockmaterialarray.materialnew": productname,
     //   requestmode: requestmode,
     //   handover: "return"
     // }
@@ -2150,7 +2195,7 @@ exports.getAllStockPurchaseLimitedOverallReport = catchAsyncErrors(async (req, r
     //   {
     //     requestmode: 1, company: 1, branch: 1, unit: 1,
     //     usercompany: 1, userbranch: 1, userunit: 1, userfloor: 1, userarea: 1, userlocation: 1, userteam: 1,
-    //     floor: 1, area: 1, location: 1, productname: 1, quantity: 1, tododetails: 1, countquantity: 1, employeenameto: 1, handover: 1, addedby: 1
+    //     floor: 1, area: 1, location: 1, productname: 1, quantity: 1, stockmaterialarray: 1, countquantity: 1, employeenameto: 1, handover: 1, addedby: 1
     //   });
 
 
@@ -2163,7 +2208,7 @@ exports.getAllStockPurchaseLimitedOverallReport = catchAsyncErrors(async (req, r
     //   {
     //     requestmode: 1, company: 1, branch: 1, unit: 1,
     //     usercompany: 1, userbranch: 1, userunit: 1, userfloor: 1, userarea: 1, userlocation: 1, userteam: 1,
-    //     floor: 1, area: 1, location: 1, productname: 1, quantity: 1, tododetails: 1, countquantity: 1, employeenameto: 1, handover: 1, addedby: 1
+    //     floor: 1, area: 1, location: 1, productname: 1, quantity: 1, stockmaterialarray: 1, countquantity: 1, employeenameto: 1, handover: 1, addedby: 1
     //   });
 
     // stock = [...stocklimited, ...manuallimited]
@@ -2180,7 +2225,7 @@ exports.getAllStockPurchaseLimitedOverallReport = catchAsyncErrors(async (req, r
     const projectionFields = {
       requestmode: 1, company: 1, branch: 1, unit: 1,
       usercompany: 1, userbranch: 1, userunit: 1, userfloor: 1, userarea: 1, userlocation: 1, userteam: 1,
-      floor: 1, area: 1, location: 1, productname: 1, quantity: 1, tododetails: 1,tododetails:1,
+      floor: 1, area: 1, location: 1, productname: 1, quantity: 1, stockmaterialarray: 1,tododetails:1,
       countquantity: 1, employeenameto: 1, handover: 1, addedby: 1
     };
 
@@ -2238,7 +2283,7 @@ exports.getAllStockExcelDownloadStock = catchAsyncErrors(async (req, res, next) 
       rate: 1,
       vendorgroup: 1,
       vendor: 1,
-      tododetails: 1,
+      stockmaterialarray: 1,
       tododetails:1,
       quantitynew: 1
     });
@@ -2291,7 +2336,7 @@ const capitalizeHeader = (str) => {
 //       rate: 1,
 //       vendorgroup: 1,
 //       vendor: 1,
-//       tododetails: 1,
+//       stockmaterialarray: 1,
 //       quantitynew: 1
 //     }).lean();
 //     if (!firstDoc) return res.status(404).send("No data found");
@@ -2338,7 +2383,7 @@ const capitalizeHeader = (str) => {
 //       rate: 1,
 //       vendorgroup: 1,
 //       vendor: 1,
-//       tododetails: 1,
+//       stockmaterialarray: 1,
 //       quantitynew: 1
 //     }).cursor();
 //     for await (let doc of dataStream) {
@@ -2634,13 +2679,6 @@ exports.getAllStockPdfDownloadAssetPDF = async (req, res, next) => {
 exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, next) => {
 
   try {
-    const {assignbranch} = req.body
-    const branchFilter = assignbranch.map((branchObj) => ({
-      branch: branchObj.branch,
-      company: branchObj.company,
-      unit: branchObj.unit,
-    }));
-  
 
     const [stock, stockData, managestockitems] = await Promise.all([
       Stock.aggregate([
@@ -2649,7 +2687,6 @@ exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, ne
             requestmode: req.body.assetmat,
             handover: { $exists: false },
             status: { $ne: "Transfer" },
-            $or: branchFilter,
           },
         },
         {
@@ -2663,14 +2700,14 @@ exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, ne
             location: 1,
             productname: 1,
             quantity: 1,
-            tododetails: 1,
+            stockmaterialarray: 1,
+            tododetails:1,
           },
         },
       ]),
 
       Stock.find(
-        { handover: { $in: ["return", "handover", "usagecount"] }, 
-        requestmode: req.body.assetmat, $or: branchFilter },
+        { handover: { $in: ["return", "handover", "usagecount"] }, requestmode: req.body.assetmat },
         {
           company: 1,
           branch: 1,
@@ -2849,13 +2886,6 @@ exports.getAllStockTodoEditFetch = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-
-
-
-
-
-
-
 //get All Stocks =>/api/stock
 exports.getAllStockReorderFetch = catchAsyncErrors(async (req, res, next) => {
   let stock;
@@ -2863,7 +2893,7 @@ exports.getAllStockReorderFetch = catchAsyncErrors(async (req, res, next) => {
 const {id} = req.body
 
     stock = await Stock.findOne({"tododetails._id": id},{company:1,branch:1,unit:1,floor:1,area:1,location:1,tododetails:1,requestmode:1});
-
+//console.log(stock,id,"ids")
 
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
@@ -2873,3 +2903,9 @@ const {id} = req.body
     stock,
   });
 });
+
+
+
+
+
+

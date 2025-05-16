@@ -8,6 +8,10 @@ const StockSchema = new Schema({
         type: String,
         required: false,
     },
+      duedate: {
+    type: String,
+    required: false,
+  },
     
     vendorfrequency: {
         type: String,

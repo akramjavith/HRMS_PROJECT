@@ -39,22 +39,6 @@ function createFilterCondition(column, condition, value) {
   }
 }
 
-//get All Stocks =>/api/stock
-exports.getAllStock = catchAsyncErrors(async (req, res, next) => {
-  let stock;
-  try {
-    stock = await Stock.find();
-  } catch (err) {
-    return next(new ErrorHandler("Records not found!", 404));
-  }
-  if (!stock) {
-    return next(new ErrorHandler("Stock not found!", 404));
-  }
-  return res.status(200).json({
-    stock,
-  });
-});
-
 exports.getAllStockManagementStatus = catchAsyncErrors(async (req, res, next) => {
   let stock;
   try {
@@ -111,8 +95,24 @@ exports.getAllStockManagementStatusManual = catchAsyncErrors(async (req, res, ne
     // query.handover={$in:["handover","return","usagecount"]}
 
     stock = await Manualstock.find(query,{employeenameto:1,handover:1,company:1,branch:1,unit:1,floor:1,
-      usagedate:1,usagetime:1,    allotdate:1,allottime:1,
+      usagedate:1,usagetime:1,allotdate:1,allottime:1,
       area:1,location:1,countquantity:1,productname:1,usercompany:1,userbranch:1,userunit:1,userteam:1,addedby:1,createdAt:1});
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+  if (!stock) {
+    return next(new ErrorHandler("Stock not found!", 404));
+  }
+  return res.status(200).json({
+    stock,
+  });
+});
+
+//get All Stocks =>/api/stock
+exports.getAllStock = catchAsyncErrors(async (req, res, next) => {
+  let stock;
+  try {
+    stock = await Stock.find();
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
   }
@@ -1165,30 +1165,25 @@ exports.getAllStockPurchaseLimitedHandover = catchAsyncErrors(async (req, res, n
 exports.getAllStockPurchaseLimitedUsageCount = catchAsyncErrors(async (req, res, next) => {
   let stock = [], stocklimited, manuallimited;
   try {
+   const {assignbranch} = req.body;
 
-    // stocklimited = await Stock.find({ handover: "usagecount" },
-    //   {
-    //     company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,
-    //     employeenameto: 1, usagedate: 1, usagetime: 1, usercompany: 1, userbranch: 1, userunit: 1,
-    //     userfloor: 1, userarea: 1, userlocation: 1, useremployee: 1, userteam: 1, description: 1, filesusagecount: 1, requestmode: 1
-    //   });
+    
+      const branchFilter = assignbranch.map((branchObj) => ({
+    branch: branchObj.branch,
+    company: branchObj.company,
+    unit: branchObj.unit,
+  }));
 
-    // manuallimited = await Manualstock.find({ handover: "usagecount" },
-    //   {
-    //     company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,
-    //     employeenameto: 1, usagedate: 1, usagetime: 1, usercompany: 1, userbranch: 1, userunit: 1,
-    //     userfloor: 1, userarea: 1, userlocation: 1, useremployee: 1, userteam: 1, description: 1, filesusagecount: 1, requestmode: 1
-    //   });
-
-    // stock = [...stocklimited, manuallimited]
     const [stocklimited, manuallimited] = await Promise.all([
       Stock.aggregate([
         {
-          $match: { handover: "usagecount" }
+          $match: { 
+          $or:branchFilter,
+          handover: "usagecount" }
         },
         {
           $project: {
-            company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,
+            company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,addedby:1,
             employeenameto: 1, usagedate: 1, usagetime: 1, usercompany: 1, userbranch: 1, userunit: 1,
             userfloor: 1, userarea: 1, userlocation: 1, useremployee: 1, userteam: 1, description: 1,
             filesusagecount: 1, requestmode: 1,
@@ -1202,7 +1197,7 @@ exports.getAllStockPurchaseLimitedUsageCount = catchAsyncErrors(async (req, res,
         },
         {
           $project: {
-            company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,
+            company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,addedby:1,
             employeenameto: 1, usagedate: 1, usagetime: 1, usercompany: 1, userbranch: 1, userunit: 1,
             userfloor: 1, userarea: 1, userlocation: 1, useremployee: 1, userteam: 1, description: 1,
             filesusagecount: 1, requestmode: 1,
@@ -1213,7 +1208,7 @@ exports.getAllStockPurchaseLimitedUsageCount = catchAsyncErrors(async (req, res,
     ]);
 
     stock = [...stocklimited, ...manuallimited];
-
+// console.log(stock,"stockusagecoutn")
 
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));

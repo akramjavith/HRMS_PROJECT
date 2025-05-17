@@ -142,6 +142,15 @@ function StockManagement() {
 
   const [usageCountAllcheck, setUsageCountAllcheck] = useState(false)
 
+  const [handover, setHandover] = useState({
+    company: "",
+    branch: "",
+    unit: "",
+    floor: "",
+    area: "",
+    location: "",
+    productname: "",
+  });
 
 
   const [usageCountAll, setUsageCountAll] = useState([])
@@ -156,14 +165,23 @@ function StockManagement() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
         assignbranch: accessbranchtable
+
       });
 
-      setUsageCountAll(res_usagecount.data?.stock?.map((item, index) => ({
+      setUsageCountAll(res_usagecount.data?.stock.filter(d =>
+         d.company === handover.company &&
+         d.branch === handover.branch &&
+         d.unit === handover.unit &&
+         d.floor === handover.floor &&
+         d.area === handover.area &&
+         d.location === handover.location  &&
+         d.productname === handover.productname 
+         )?.map((item, index) => ({
         ...item,
         id: item._id,
         serialNumber: index + 1,
         usagedate: moment(item?.usagedate).format("DD/MM/YYYY"),
-
+        addedbyname: item.addedby[0].name,
 
       })))
       setUsageCountAllcheck(false)
@@ -175,7 +193,7 @@ function StockManagement() {
 
   useEffect(() => {
     fetchUsageAll();
-  }, [])
+  }, [handover])
 
   const [isHandleChange, setIsHandleChange] = useState(false);
 
@@ -484,6 +502,7 @@ function StockManagement() {
     "Date",
     "Time",
     "Description",
+    "Added By",
   ];
   let exportRowValuesViewusage = [
     "usercompany",
@@ -497,7 +516,8 @@ function StockManagement() {
     "countquantity",
     "usagedate",
     "usagetime",
-    "description"
+    "description",
+    "addedby"
   ];
 
   const statusOpt = [
@@ -562,6 +582,8 @@ function StockManagement() {
       countquantity: "",
       team: "Please Select Team",
     });
+
+
     setRefImageDrag([])
     setRefImage([])
     setCapturedImages([])
@@ -701,15 +723,6 @@ function StockManagement() {
     employeenameto: "Please Select Employee",
     countquantity: "",
     team: "Please Select Team",
-  });
-  const [handover, setHandover] = useState({
-    company: "",
-    branch: "",
-    unit: "",
-    floor: "",
-    area: "",
-    location: "",
-    productname: "",
   });
 
 
@@ -1222,6 +1235,7 @@ function StockManagement() {
     description: true,
     employeenameto: true,
     productname: true,
+    addedbyname:true,
   };
   const [columnVisibilityviewusage, setColumnVisibilityviewusage] = useState(
     initialColumnVisibilityviewusage
@@ -1422,7 +1436,14 @@ function StockManagement() {
       hide: !columnVisibilityviewusage.description,
       headerClassName: "bold-header",
     },
-
+   {
+      field: "addedbyname",
+      headerName: "Added By",
+      flex: 0,
+      width: 200,
+      hide: !columnVisibilityviewusage.addedbyname,
+      headerClassName: "bold-header",
+    },
     {
       field: "filesusagecount",
       headerName: "Attachment",
@@ -3136,6 +3157,7 @@ function StockManagement() {
       setColumnVisibility(initialColumnVisibility)
 
       if (stockManagefilter.requestmode === "Asset Material") {
+         setColumnVisibility(initialColumnVisibility)
         let res_project = await axios.post(SERVICE.STOCKPURCHASELIMITED, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
@@ -3492,6 +3514,7 @@ function StockManagement() {
       }
 
       else if (stockManagefilter.requestmode === "Stock Material") {
+         setColumnVisibility(initialColumnVisibility)
         let res_project = await axios.post(SERVICE.STOCKPURCHASELIMITED, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,

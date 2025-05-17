@@ -32,7 +32,7 @@ stockRoute.route("/stockpurchasesort").post(getOverallStockTableSort);
 stockRoute.route("/stockpurchaselimited").post(getAllStockPurchaseLimited);
 stockRoute.route("/stockpurchaselimitedassetdetails").post(getAllStockPurchaseLimitedAssetDetails);
 stockRoute.route("/stockpurchaselimitedhand").get(getAllStockPurchaseLimitedHandover);
-stockRoute.route("/stockpurchaselimitedusagecount").get(getAllStockPurchaseLimitedUsageCount);
+stockRoute.route("/stockpurchaselimitedusagecount").post(getAllStockPurchaseLimitedUsageCount);
 stockRoute.route("/stockpurchaselimitedusagecountcreatelist").post(getAllStockPurchaseLimitedUsageCountCreateList);
 stockRoute.route("/stockpurchaselimitedusagecountnotification").post(getAllStockPurchaseLimitedUsageCountNotification);
 stockRoute.route("/stockpurchaselimitedusagecountnotificationlist").post(getAllStockPurchaseLimitedUsageCountNotificationList);

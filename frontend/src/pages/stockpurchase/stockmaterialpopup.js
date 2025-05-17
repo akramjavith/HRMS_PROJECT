@@ -119,7 +119,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
   const [brandMaster, setBrandMaster] = useState({ name: '', code: '' });
 
   const [btnSubmit, setBtnSubmit] = useState(false);
-
+ const { allProjects, isUserRoleAccess } = useContext(UserRoleAccessContext);
   let Expensetotal = 0;
 
   const [vendorOpt, setVendoropt] = useState([]);
@@ -157,6 +157,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
     vendorname: 'Please Select Vendor',
     purpose: 'Please Select Purpose',
     totalbillamount: '',
+    duedate:'',
     date,
     files: '',
     vendorfrequency: '',
@@ -348,7 +349,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
     billdate: '',
     files: '',
     warrantyfiles: '',
-
+totalbillamount:'',
     warranty: 'Yes',
     warrantycalculation: '',
     estimation: '',
@@ -1592,9 +1593,15 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
     setOpenviewalertAsset(false);
   };
 
-  const { isUserRoleCompare, buttonStyles, allProjects, isUserRoleAccess, allCompany, allBranch, allUnit, allTeam } = useContext(UserRoleAccessContext);
+  const { isUserRoleCompare, isAssignBranch, allCompany, allBranch, allUnit, allTeam, buttonStyles, pageName, setPageName } = useContext(UserRoleAccessContext);
   const { auth, setAuth } = useContext(AuthContext);
   const [projectCheck, setProjectCheck] = useState(false);
+
+    const accessbranchtable = isAssignBranch?.map((data) => ({
+      branch: data.branch,
+      company: data.company,
+      unit: data.unit,
+    }));
 
   const handleBranchChange = (e) => {
     const selectedBranch = e.value;
@@ -1948,7 +1955,9 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
         unit: String(stockmaster.unit),
         floor: String(stockmaster.floor),
         location: String(stockmaster.location),
-        area: String(stockmaster.area),
+         duedate: String(expensecreate.duedate ? expensecreate.duedate : ""),
+         totalbillamountstock: stockmaster.totalbillamount,
+         area: String(stockmaster.area),
         status: String('Transfer'),
         workstation: String(stockmaster.workcheck ? stockmaster.workstation : ''),
         workcheck: String(stockmaster.workcheck),
@@ -2199,171 +2208,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
     setBtnSubmit(true);
     e.preventDefault();
     await fetchStock();
-    // if (!isStockMaterial) {
-    //     const isNameMatch = stock.some((item) =>
-    //         item.company == stockmaster.company &&
-    //         item.branch == stockmaster.branch &&
-    //         item.unit == stockmaster.unit &&
-    //         item.floor == stockmaster.floor &&
-    //         item.area == stockmaster.area &&
-    //         item.location == stockmaster.location &&
-
-    //         item.vendorname == stockmaster.vendorname &&
-    //         item.billno == stockmaster.billno &&
-    //         item.assettype == stockmaster.assettype &&
-    //         item.assethead == stockmaster.assethead &&
-    //         item.component == stockmaster.component &&
-    //         item.productdetails.toLowerCase() == stockmaster.productdetails.toLowerCase() &&
-    //         item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
-    //         item.uom == stockmaster.uom &&
-    //         item.quantity == stockmaster.quantity &&
-    //         item.rate == stockmaster.rate &&
-    //         item.billdate == stockmaster.billdate);
-    //     if (stockmaster.company === "Please Select Company") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Company"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     } else if (stockmaster.branch === "Please Select Branch") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Branch"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     } else if (stockmaster.unit === "Please Select Unit") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Unit"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     } else if (stockmaster.floor === "Please Select Floor") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Floor"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     } else if (stockmaster.area === "Please Select Area") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Area"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     } else if (stockmaster.location === "Please Select Location") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Location"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     }
-    //     else if (stockmaster.requestmode === "Please Select Request Mode" || stockmaster.requestmode === "") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Request Mode For"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     }
-
-    //     else if (stockmaster.billno === "") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter Billno"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     }
-    //     // else if (stockmaster.productdetails === "") {
-    //     //     setShowAlert(
-    //     //         <>
-    //     //             <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //     //             <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter Product Details"}</p>
-    //     //         </>
-    //     //     );
-    //     //     handleClickOpenerr();
-    //     // }
-    //     //  else if (stockmaster.warrantydetails === "") {
-    //     //     setShowAlert(
-    //     //         <>
-    //     //             <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //     //             <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter Warranty Details"}</p>
-    //     //         </>
-    //     //     );
-    //     //     handleClickOpenerr();
-    //     // }
-    //     // else if (stockmaster.uom === "" || stockmaster.uom === "Please Select UOM") {
-    //     //     setShowAlert(
-    //     //         <>
-    //     //             <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //     //             <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Uom"}</p>
-    //     //         </>
-    //     //     );
-    //     //     handleClickOpenerr();
-    //     // }
-    //     // else if (stockmaster.quantity === "") {
-    //     //     setShowAlert(
-    //     //         <>
-    //     //             <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //     //             <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter Quantity"}</p>
-    //     //         </>
-    //     //     );
-    //     //     handleClickOpenerr();
-    //     // }
-    //     else if (stockmaster.rate === "") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter Rate"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     } else if (stockmaster.billdate === "") {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Bill Date"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     } else if (refImage.length == 0) {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Upload Bill"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     }
-    //     else if (isNameMatch) {
-    //         setShowAlert(
-    //             <>
-    //                 <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //                 <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Data Already Exist!"}</p>
-    //             </>
-    //         );
-    //         handleClickOpenerr();
-    //     }
-
-    //     else {
-    //         sendRequest();
-    //     }
-    // }
-
-    // else {
+   
     let sum = 0;
     stockArray.forEach((item) => {
       sum += parseInt(item.quantitynew);
@@ -2465,7 +2310,8 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
       handleClickOpenPopupMalert();
     } else if (expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal)) {
       handleClickOpenerrAmount();
-    } else if (isNameMatch) {
+    } 
+    else if (isNameMatch) {
       setPopupContentMalert('Data Already Exist!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
@@ -4591,7 +4437,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
   const handleCloseviewalertstockitem = () => {
     setOpenviewalertstockitem(false);
   };
-
+console.log(stockmaster.totalbillamount,"billamount")
   const educationTodo = () => {
     const isNameMatch = educationtodo?.some((item) => {
       if (stockmaster?.requestmode === 'Stock Material') {
@@ -4641,7 +4487,13 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
       setPopupContentMalert('Item Already Exists!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (Number(todoDetails.amount) + Number(Expensetotal) > Number(stockmaster.totalbillamount)) {
+    }
+     else if (stockmaster.totalbillamount === "") {
+      setPopupContentMalert('Please Enter Total Bill Amount!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    }
+     else if (Number(todoDetails.amount) + Number(Expensetotal) > Number(stockmaster.totalbillamount)) {
       setPopupContentMalert('Amount Exceeds Total Bill Amount!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
@@ -4668,6 +4520,123 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
       balanceamount: '',
     });
   };
+
+    const [holidays, setHolidays] = useState([])
+  
+    const fetchHoliday = async () => {
+      setPageName(!pageName);
+      try {
+        let res_status = await axios.post(SERVICE.ALL_HOLIDAY, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+          assignbranch: accessbranchtable,
+        });
+  
+  
+  
+        setHolidays(res_status?.data?.holiday);
+      } catch (err) {
+        handleApiError(
+          err,
+          setPopupContentMalert,
+          setPopupSeverityMalert,
+          handleClickOpenPopupMalert
+        );
+      }
+    };
+  
+    // Helper function to find the next available date that's not a Sunday or a holiday
+    const getNextValidDate = (date, holidays) => {
+      const holidaysSet = new Set(holidays); // Store holidays for quick lookup
+      let nextDate = moment(date); // Convert the date to a Moment instance
+  
+      // Increment the date until it's not a Sunday or a holiday
+      while (nextDate.day() === 0 || holidaysSet.has(nextDate.format("YYYY-MM-DD"))) {
+        nextDate.add(1, 'day'); // Move to the next day
+      }
+  
+      return nextDate;
+    };
+  
+  
+  
+    const setDueDate = (e) => {
+      let dueDate = ""; // Default value if not monthly
+      if (e.paymentfrequency === "Monthly" && e.monthlyfrequency) {
+        // Get the current month and year
+        const today = moment();
+        let proposedDate = moment(`${today.year()}-${today.month() + 1}-${e.monthlyfrequency}`, "YYYY-MM-DD");
+  
+        // If proposedDate is in the past, set it to next month
+        if (proposedDate.isBefore(today, 'day')) {
+          proposedDate.add(1, 'month');
+        }
+  
+        // Filter holidays specific to the selected company, branch, and unit
+        let mappedHolidays = holidays
+          ?.filter(data =>
+            data.company?.includes(stockmaster?.company) &&
+            data.applicablefor?.includes(stockmaster?.branch) &&
+            data.unit?.includes(stockmaster?.unit)
+          )
+          ?.map(item => item?.date);
+  
+  
+        // Get the valid due date (not Sunday or a holiday)
+        const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+        dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+      } else if (e.paymentfrequency === "Weekly" && e.weeklyfrequency) {
+        // Set today to "2024-05-17"
+        const today = moment(expensecreate?.date);
+  
+        // Map days of the week to their numeric values (Sunday = 0, Monday = 1, ..., Saturday = 6)
+        const dayMapping = {
+          Sunday: 0,
+          Monday: 1,
+          Tuesday: 2,
+          Wednesday: 3,
+          Thursday: 4,
+          Friday: 5,
+          Saturday: 6
+        };
+  
+        // Get the numeric value of the desired day
+        const targetDay = dayMapping[e.weeklyfrequency];
+  
+        // Calculate the next target day from today
+        let proposedDate = today.clone().isoWeekday(targetDay);
+  
+        // If the proposed day is earlier than today, move to the next week
+        if (proposedDate.isBefore(today, 'day')) {
+          proposedDate.add(1, 'week');
+        }
+  
+        // Filter holidays specific to the selected company, branch, and unit
+        let mappedHolidays = holidays
+          ?.filter(data =>
+            data.company?.includes(stockmaster?.company) &&
+            data.applicablefor?.includes(stockmaster?.branch) &&
+            data.unit?.includes(stockmaster?.unit)
+          )
+          ?.map(item => item?.date);
+  
+        // Get the valid due date (not a holiday)
+        const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+        dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+      }
+  
+      setExpensecreate({
+        ...expensecreate,
+        vendorname: e.value,
+        vendorfrequency: e.paymentfrequency,
+        duedate: dueDate
+      });
+    };
+
+    useEffect(() =>{
+      fetchHoliday()
+    },[])
 
   return (
     <Box>
@@ -4832,6 +4801,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
                           <Select
                             fullWidth
                             labelId="demo-select-small"
+                            size='small'
                             id="demo-select-small"
                             value={stockmaster.estimationtime}
                             // onChange={(e) => {
@@ -4914,6 +4884,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
                       styles={colourStyles}
                       value={{ label: vendorNew, value: vendorNew }}
                       onChange={(e) => {
+                        setDueDate(e)
                         setVendorNew(e.value);
                         setFrequencyValue(e?.paymentfrequency);
 
@@ -4999,53 +4970,12 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
                       styles={colourStyles}
                       readOnly
                       value={{ label: stockmaster.requestmode, value: stockmaster.requestmode }}
-                    // onChange={(e) => {
-                    //     // fetchAsset();
-                    //     setStockmaster({
-                    //         ...stockmaster,
-                    //         requestmode: e.value,
-                    //         productname: "Please Select Material",
-                    //         component: "Please Select Component",
-
-                    //         assettype: "",
-                    //         asset: "",
-                    //         productdetails: "",
-
-                    //         uom: "Please Select UOM",
-                    //         quantity: "",
-
-                    //         files: "",
-                    //         warrantyfiles: "",
-
-                    //         // warranty: "Yes",
-                    //         // warrantycalculation: "",
-                    //         // estimation: "",
-                    //         // estimationtime: "Days",
-                    //         purchasedate: "",
-
-                    //         addedby: "",
-                    //         updatedby: "",
-
-                    //         stockcategory: "Please Select Stock Category",
-                    //         stocksubcategory: "Please Select Stock Sub Category",
-                    //         uomnew: "",
-                    //         quantitynew: "",
-                    //         productdetailsnew: "",
-                    //     });
-                    //     if (e.value === "Stock Material") {
-                    //         setIsStockMaterial(true);
-                    //     } else {
-                    //         setIsStockMaterial(false);
-                    //     }
-                    //     setTodos([]);
-                    //     setSubcategoryOption([]);
-                    //     // setMaterialoptNew([]);
-
-                    // }}
+                  
                     />
                   </FormControl>
                 </Grid>
-
+  {stockmaster.warranty === 'Yes' && (
+                  <>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
@@ -5063,7 +4993,8 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
                     />
                   </FormControl>
                 </Grid>
-
+  </>
+                )}
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
@@ -5074,11 +5005,51 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
                       type="date"
                       value={stockmaster.billdate}
                       onChange={(e) => {
-                        setStockmaster({ ...stockmaster, billdate: e.target.value });
+                        setStockmaster({ ...stockmaster, billdate: e.target.value,duedate:'' });
                       }}
                     />
                   </FormControl>
                 </Grid>
+                    <Grid item lg={2} md={4} xs={12} sm={6}>
+                                  <FormControl fullWidth size="small">
+                                    <Typography>Due Date</Typography>
+                                    <OutlinedInput
+                                      id="to-date"
+                                      type="date"
+                                      value={expensecreate.duedate}
+                                      onChange={(e) => {
+                                        setExpensecreate({
+                                          ...expensecreate,
+                                          duedate: e.target.value,
+                                        });
+                                      }}
+                                      inputProps={{
+                                        min: stockmaster.billdate,
+                                        // max: today
+                                      }}
+                                    />
+                                  </FormControl>
+                                </Grid>
+                                  <Grid item md={3} sm={12} xs={12}>
+                                                  <FormControl fullWidth size="small">
+                                                    <Typography>
+                                                      Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
+                                                    </Typography>
+                                                    <OutlinedInput
+                                                      id="component-outlined"
+                                                      type="number"
+                                                      sx={userStyle.input}
+                                                      //  value={totalQuantityStock * stockmanagemasteredit.rate}
+                                                      value={stockmaster.totalbillamount}
+                                                      onChange={(e) => {
+                                                        setStockmaster({
+                                                          ...stockmaster,
+                                                          totalbillamount: e.target.value,
+                                                        });
+                                                      }}
+                                                    />
+                                                  </FormControl>
+                                                </Grid>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>
                     Bill <b style={{ color: 'red' }}>*</b>{' '}
@@ -5089,6 +5060,8 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
                     </Button>
                   </Box>
                 </Grid>
+                 {stockmaster.warranty === 'Yes' && (
+                  <>
                 <Grid item md={1.5} xs={12} sm={12}>
                   <Typography>Warranty Card </Typography>
                   <Box sx={{ display: 'flex', justifyContent: 'left' }}>
@@ -5097,6 +5070,8 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, hand
                     </Button>
                   </Box>
                 </Grid>
+                </>
+                 )}
               </Grid>
               <br />
               {stockmaster.requestmode === 'Stock Material' && (

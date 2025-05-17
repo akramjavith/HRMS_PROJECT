@@ -1290,7 +1290,6 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
     setVendoroptInd(spreaded);
   };
-
   const handleChangeGroupNameEdit = async (e) => {
     let foundDatas = vendorOverall
       .filter((data) => {
@@ -2096,6 +2095,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       console.log(res?.data?.sstock, 'stock');
       // let groupings = await fetchVendorGrouping();
       setGroupedVendorNames(vendorOverall?.filter((item) => item.name === res?.data?.sstock?.vendorgroup)?.map((data) => data?.vendor));
+      handleChangeGroupNameEdit({ value: res?.data?.sstock?.vendorgroup });
 
       const alldata = { ...res?.data?.sstock, calculationbalamount: Number(res?.data?.sstock?.balanceamount) };
       setExpensecreate(alldata);
@@ -5710,6 +5710,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       styles={colourStyles}
                       value={{ label: vendorGroup, value: vendorGroup }}
                       onChange={(e) => {
+                        handleChangeGroupNameEdit(e);
                         setExpensecreate({
                           ...expensecreate,
                           vendorgrouping: e.value,

@@ -11,32 +11,43 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { MultiSelect } from 'react-multi-select-component';
+import { StyledTableCell, StyledTableRow } from '../../components/Table';
+import ManageStockItemsPopup from '../expenses/ManageStockItemsPopup';
+import StockCategoryPopup from '../expenses/StockCategoryPopup';
 import {
+  Backdrop,
   Box,
-  Radio,
-  InputAdornment,
-  RadioGroup,
-  Tooltip,
-  FormControlLabel,
   Button,
+  Divider,
   Checkbox,
-  FormGroup,
   Dialog,
+  TableBody,
+  TableFooter,
+  TableHead,
+  Table,
+  Paper,
+  TableContainer,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   Grid,
   IconButton,
+  InputAdornment,
   List,
   ListItem,
   ListItemText,
   MenuItem,
   OutlinedInput,
   Popover,
+  Radio,
+  RadioGroup,
   Select,
   TextField,
   TextareaAutosize,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -85,6 +96,9 @@ import AdvancedSearchBar from '../../components/Searchbar';
 import AggregatedSearchBar from '../../components/AggregatedSearchBar';
 import AggridTable from '../../components/AggridTable';
 import AggridTableForPaginationTable from '../../components/AggridTableForPaginationTable.js';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { v4 as uuidv4 } from 'uuid';
+import { paidOpt, statusOpt } from '../../components/Componentkeyword';
 
 const useStyles = makeStyles((theme) => ({
   inputs: {
@@ -102,12 +116,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleCloseviewalertvendormanual }) {
+  let Expensetotal = 0;
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
   const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTableImg = useRef(null);
   const gridRefTable = useRef(null);
+  const [totalAmount, setAmount] = useState(0);
+  const [totalAmountEdit, setAmountEdit] = useState(0);
+  const [frequencyValue, setFrequencyValue] = useState('');
+  const [frequencyValueedit, setFrequencyValueedit] = useState('');
+
+  const [refImgWarrantyEdit, setRefImgWarrantyEdit] = useState([]);
+  const [refImgWarrantyBillEdit, setRefImgWarrantyBillEdit] = useState([]);
+
+  const [refImgWarrantyfilenamesEdit, setRefImgWarrantyfilenamesEdit] = useState([]);
+  const [refImgbillfilenamesEdit, setRefImgbillfilenamesEdit] = useState([]);
+
+  const [groupedVendorNamesedit, setGroupedVendorNamesedit] = useState([]);
+
+
 
   // State to track advanced filter
   const [advancedFilter, setAdvancedFilter] = useState(null);
@@ -127,6 +156,179 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
+  const particularModeOptions = [
+    { label: 'Stock Material', value: 'Stock Material' },
+    // { label: "Others", value: "Others" },
+  ];
+
+  const [stockCategoryAuto, setStockCategoryAuto] = useState('');
+  const [stockItemAuto, setStockItemAuto] = useState('');
+
+  const [isErrorOpenAmount, setIsErrorOpenAmount] = useState(false);
+
+  //amount mismatch Popup model
+  const handleClickOpenerrAmount = () => {
+    setIsErrorOpenAmount(true);
+  };
+  const handleCloseerrAmount = () => {
+    setIsErrorOpenAmount(false);
+  };
+
+  //state and method to show current date onload
+  let today1 = new Date();
+  var dd = String(today1.getDate()).padStart(2, '0');
+  var mm = String(today1.getMonth() + 1).padStart(2, '0');
+  var yyyy = today1.getFullYear();
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
+  //useStates
+  const [date, setDate] = useState(formattedDate);
+  const [expensecreate, setExpensecreate] = useState({
+    expansecategory: 'Please Select Expense Category',
+    expansesubcategory: 'Please Select Expense Sub Category',
+    referenceno: '',
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    vendorname: 'Please Select Vendor',
+    purpose: 'Please Select Purpose',
+    totalbillamount: '',
+    date,
+    files: '',
+    vendorfrequency: '',
+    paidstatus: 'Not Paid',
+    duedate: '',
+    expansenote: '',
+    paidmode: 'Please Select Paid Mode',
+    expensetotal: '',
+    balanceamount: '',
+    paidamount: '',
+  });
+
+  const [expensecreateedit, setExpensecreateedit] = useState({
+    expansecategory: 'Please Select Expense Category',
+    expansesubcategory: 'Please Select Expense Sub Category',
+    referenceno: '',
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    vendorname: 'Please Select Vendor',
+    purpose: 'Please Select Purpose',
+    totalbillamount: '',
+    date,
+    files: '',
+    duedate: "",
+    vendorfrequency: '',
+    paidstatus: 'Not Paid',
+    duedate: '',
+    expansenote: '',
+    paidmode: 'Please Select Paid Mode',
+    expensetotal: '',
+    balanceamount: '',
+    paidamount: '',
+  });
+
+  const [vendorstockedit, setVendorNewstockedit] = useState({
+    bankname: '',
+    bankbranchname: '',
+    accountholdername: '',
+    accountnumber: '',
+    ifsccode: '',
+    upinumber: '',
+    chequenumber: '',
+    cardnumber: '',
+    cardholdername: '',
+    cardtransactionnumber: '',
+    cardtype: '',
+    cardmonth: '',
+    cardyear: '',
+    cardsecuritycode: '',
+  });
+
+  const [todoDetails, setTodoDetails] = useState({
+    particularmode: 'Please Select Particular Mode',
+    category: 'Please Select Category',
+    subcategory: 'Please Select Sub Category',
+    materialnew: 'Please Select Item Name',
+    uomnew: '',
+    rate: '',
+    quantitynew: '',
+    amount: '',
+    productdetailsnew: '',
+  });
+
+  const [vendorstock, setVendorNewstock] = useState({
+    bankname: '',
+    bankbranchname: '',
+    accountholdername: '',
+    accountnumber: '',
+    ifsccode: '',
+    upinumber: '',
+    chequenumber: '',
+    cardnumber: '',
+    cardholdername: '',
+    cardtransactionnumber: '',
+    cardtype: '',
+    cardmonth: '',
+    cardyear: '',
+    cardsecuritycode: '',
+  });
+
+  const [educationtodo, setEducationtodo] = useState([]);
+  const [upload, setUpload] = useState([]);
+  const [expanseOpt, setExpanse] = useState([]);
+  const [expansesubOpt, setExpanseSub] = useState([]);
+  const [groupedVendorNames, setGroupedVendorNames] = useState([]);
+  const [vendorId, setVendorId] = useState('');
+  const [vendorModeOfPayments, setVendorModeOfPayments] = useState([]);
+  const [espenseCheck, setExpenseCheck] = useState(false);
+  const [purposes, setPurposes] = useState([]);
+
+  const [stockCategoryOptions, setStockCategoryOptions] = useState([]);
+  const [allStockValues, setAllStockValues] = useState([]);
+  const [allStockCategory, setAllStockCategory] = useState([]);
+  const [itemAllShow, setItemAllShow] = useState(true);
+
+  //get stock items.
+  const fetchStockItems = async () => {
+    try {
+      let res_status = await axios.get(SERVICE.MANAGESTOCKITEMS, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+
+      setAllStockValues(res_status?.data?.managestockitems);
+      setStockItemAuto('');
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
+
+  const getStockCategory = async () => {
+    try {
+      let response = await axios.get(`${SERVICE.STOCKCATEGORY}`, {
+        headers: { Authorization: `Bearer ${auth.APIToken}` },
+      });
+      setStockCategoryOptions(
+        response?.data?.stockcategory.map((item) => {
+          return {
+            label: item.categoryname,
+            value: item.categoryname,
+          };
+        })
+      );
+      setAllStockCategory(response?.data?.stockcategory);
+      setStockCategoryAuto('');
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
+
+  useEffect(() => {
+    getStockCategory();
+    fetchStockItems();
+  }, []);
 
   const [stock, setStock] = useState([]);
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
@@ -175,11 +377,36 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     'Quantity',
     'Quantity & UOM',
     'Rate',
+    'Bill Amount',
     'Bill Date',
     'Vendor Group',
     'Vendor Name',
   ];
-  let exportRowValues = ['company', 'branch', 'unit', 'floor', 'area', 'location', 'requestmode', 'producthead', 'productname', 'warranty', 'purchasedate', 'vendorname', 'gstno', 'billno', 'productdetails', 'warrantydetails', 'quantity', 'uom', 'rate', 'billdate', 'vendorgroup', 'vendorname'];
+  let exportRowValues = [
+    'company',
+    'branch',
+    'unit',
+    'floor',
+    'area',
+    'location',
+    'requestmode',
+    'producthead',
+    'productname',
+    'warranty',
+    'purchasedate',
+    'vendorname',
+    'gstno',
+    'billno',
+    'productdetails',
+    'warrantydetails',
+    'quantity',
+    'uom',
+    'rate',
+    'totalbillamount',
+    'billdate',
+    'vendorgroup',
+    'vendorname',
+  ];
 
   //Access Module
   const pathname = window.location.pathname;
@@ -227,9 +454,11 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     { label: 'Stock Material', value: 'Stock Material' },
   ];
   const vendorModeOptions = [
+    { label: 'Manual', value: 'Manual', _id: '' },
     { label: 'Old Stock', value: 'Old Stock', _id: '' },
     { label: 'Unknown', value: 'Unknown', _id: '' },
   ];
+
   const [isStockMaterial, setIsStockMaterial] = useState(false);
   const [categoryOption, setCategoryOption] = useState([]);
   const [subcategoryOpt, setSubcategoryOption] = useState([]);
@@ -239,15 +468,17 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   const [changeTable, setChangeTable] = useState([]);
 
   const [stockmaster, setStockmaster] = useState({
-    company: stockmaterialedit.company,
+ company: stockmaterialedit.company,
     branch: stockmaterialedit.branch,
     unit: stockmaterialedit.unit,
     floor: stockmaterialedit.floor,
     area: stockmaterialedit.area,
     location: stockmaterialedit.location,
+    totalbillamount: '',
     workstation: 'Please Select Workstation',
     workcheck: false,
     producthead: '',
+    totalbillamount: '',
     vendorname: 'Please Select Vendor',
     productname: 'Please Select Material',
     component: 'Please Select Component',
@@ -273,12 +504,12 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     addedby: '',
     updatedby: '',
 
-    requestmode: 'Please Select Stock Mode For',
+    requestmode: 'Stock Material',
     stockcategory: 'Please Select Stock Category',
     stocksubcategory: 'Please Select Stock Sub Category',
     uomnew: '',
     quantitynew: 1,
-    materialnew: stockmaterialedit.productname,
+    materialnew: 'Please Select Material',
     productdetailsnew: '',
   });
 
@@ -376,6 +607,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
             quantitynew: stockmaster.quantitynew,
             materialnew: stockmaster.materialnew,
             productdetailsnew: stockmaster.productdetailsnew,
+            totalbillamount: totalAmount,
             uomcodenew: findData.code,
           },
         ]);
@@ -799,7 +1031,47 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     }
   };
 
+  const [refImgWarranty, setRefImgWarranty] = useState([]);
+  const [refImgWarrantyBill, setRefImgWarrantyBill] = useState([]);
+
+  const [refImgWarrantyfilenames, setRefImgWarrantyfilenames] = useState([]);
+  const [refImgbillfilenames, setRefImgbillfilenames] = useState([]);
+
   //reference images
+  // const handleInputChange = (event) => {
+  //   const files = event.target.files;
+  //   let newSelectedFiles = [...refImage];
+
+  //   for (let i = 0; i < files.length; i++) {
+  //     const file = files[i];
+  //     // Check if the file is an image
+  //     if (file.type.startsWith("image/")) {
+  //       if (file.size <= 5 * 1024 * 1024) {
+  //         const reader = new FileReader();
+  //         reader.onload = () => {
+  //           newSelectedFiles.push({
+  //             name: file.name,
+  //             size: file.size,
+  //             type: file.type,
+  //             preview: reader.result,
+  //             base64: reader.result.split(",")[1],
+  //           });
+  //           setRefImage(newSelectedFiles);
+  //         };
+  //         reader.readAsDataURL(file);
+  //       } else {
+  //         setPopupContentMalert("File size should be less than 5MB!");
+  //         setPopupSeverityMalert("info");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     } else {
+  //       setPopupContentMalert("Only Accept Images!");
+  //       setPopupSeverityMalert("info");
+  //       handleClickOpenPopupMalert();
+  //     }
+  //   }
+  // };
+
   const handleInputChange = (event) => {
     const files = event.target.files;
     let newSelectedFiles = [...refImage];
@@ -819,6 +1091,9 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
               base64: reader.result.split(',')[1],
             });
             setRefImage(newSelectedFiles);
+            setRefImgbillfilenames(newSelectedFiles.map((d) => d.name));
+
+            setRefImgWarrantyBill((existingFiles) => [...existingFiles, file]);
           };
           reader.readAsDataURL(file);
         } else {
@@ -912,6 +1187,41 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   };
 
   //reference images
+  // const handleInputChangewarranty = (event) => {
+  //   const files = event.target.files;
+  //   let newSelectedFiles = [...refImagewarranty];
+
+  //   for (let i = 0; i < files.length; i++) {
+  //     const file = files[i];
+  //     // Check if the file is an image
+  //     if (file.type.startsWith("image/")) {
+  //       if (file.size <= 5 * 1024 * 1024) {
+  //         const reader = new FileReader();
+  //         reader.onload = () => {
+  //           newSelectedFiles.push({
+  //             name: file.name,
+  //             size: file.size,
+  //             type: file.type,
+  //             preview: reader.result,
+  //             base64: reader.result.split(",")[1],
+  //           });
+  //           setRefImagewarranty(newSelectedFiles);
+  //         };
+  //         reader.readAsDataURL(file);
+  //       } else {
+  //         setPopupContentMalert("File size should be less than 5MB!");
+  //         setPopupSeverityMalert("info");
+  //         handleClickOpenPopupMalert();
+  //       }
+
+  //     } else {
+  //       setPopupContentMalert("Only Accept Images!");
+  //       setPopupSeverityMalert("info");
+  //       handleClickOpenPopupMalert();
+  //     }
+  //   }
+  // };
+
   const handleInputChangewarranty = (event) => {
     const files = event.target.files;
     let newSelectedFiles = [...refImagewarranty];
@@ -920,24 +1230,20 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       const file = files[i];
       // Check if the file is an image
       if (file.type.startsWith('image/')) {
-        if (file.size <= 5 * 1024 * 1024) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            newSelectedFiles.push({
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              preview: reader.result,
-              base64: reader.result.split(',')[1],
-            });
-            setRefImagewarranty(newSelectedFiles);
-          };
-          reader.readAsDataURL(file);
-        } else {
-          setPopupContentMalert('File size should be less than 5MB!');
-          setPopupSeverityMalert('info');
-          handleClickOpenPopupMalert();
-        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          newSelectedFiles.push({
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            preview: reader.result,
+            base64: reader.result.split(',')[1],
+          });
+          setRefImagewarranty(newSelectedFiles);
+          setRefImgWarrantyfilenames(newSelectedFiles.map((d) => d.name));
+          setRefImgWarranty((existingFiles) => [...existingFiles, file]);
+        };
+        reader.readAsDataURL(file);
       } else {
         setPopupContentMalert('Only Accept Images!');
         setPopupSeverityMalert('info');
@@ -1024,32 +1330,62 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   };
 
   //reference images
+  // const handleInputChangewarrantyedit = (event) => {
+  //   const files = event.target.files;
+  //   let newSelectedFiles = [...refImagewarrantyedit];
+
+  //   for (let i = 0; i < files.length; i++) {
+  //     const file = files[i];
+  //     // Check if the file is an image
+  //     if (file.type.startsWith("image/")) {
+  //       if (file.size <= 5 * 1024 * 1024) {
+  //         const reader = new FileReader();
+  //         reader.onload = () => {
+  //           newSelectedFiles.push({
+  //             name: file.name,
+  //             size: file.size,
+  //             type: file.type,
+  //             preview: reader.result,
+  //             base64: reader.result.split(",")[1],
+  //           });
+  //           setRefImagewarrantyedit(newSelectedFiles);
+  //         };
+  //         reader.readAsDataURL(file);
+  //       } else {
+  //         setPopupContentMalert("File size should be less than 5MB!");
+  //         setPopupSeverityMalert("info");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     } else {
+  //       setPopupContentMalert("Only Accept Images!");
+  //       setPopupSeverityMalert("info");
+  //       handleClickOpenPopupMalert();
+  //     }
+  //   }
+  // };
+
   const handleInputChangewarrantyedit = (event) => {
     const files = event.target.files;
-    let newSelectedFiles = [...refImagewarrantyedit];
+    let newSelectedFiles = Array.isArray(refImagewarrantyedit) ? refImagewarrantyedit : [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
       if (file.type.startsWith('image/')) {
-        if (file.size <= 5 * 1024 * 1024) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            newSelectedFiles.push({
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              preview: reader.result,
-              base64: reader.result.split(',')[1],
-            });
-            setRefImagewarrantyedit(newSelectedFiles);
-          };
-          reader.readAsDataURL(file);
-        } else {
-          setPopupContentMalert('File size should be less than 5MB!');
-          setPopupSeverityMalert('info');
-          handleClickOpenPopupMalert();
-        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          newSelectedFiles.push({
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            preview: reader.result,
+            base64: reader.result.split(',')[1],
+          });
+          setRefImagewarrantyedit(newSelectedFiles);
+          setRefImgWarrantyfilenamesEdit(newSelectedFiles.map((d) => d.name));
+          setRefImgWarrantyEdit((existingFiles) => [...existingFiles, file]);
+        };
+        reader.readAsDataURL(file);
       } else {
         setPopupContentMalert('Only Accept Images!');
         setPopupSeverityMalert('info');
@@ -1058,11 +1394,58 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     }
   };
 
+  const handleFetchWarranty = (data) => {
+    const files = Array.from(data); // Ensure it's an array
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+
+    // if (imageFiles.length !== files.length) {
+    //   setPopupContentMalert('Only Accept Images!');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    // }
+
+    const fileReaders = [];
+    const newSelectedFiles = [];
+
+    imageFiles.forEach((file) => {
+      const reader = new FileReader();
+
+      const readerPromise = new Promise((resolve) => {
+        reader.onload = () => {
+          const fileData = {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            preview: reader.result,
+          };
+          newSelectedFiles.push(fileData);
+          resolve(file);
+        };
+      });
+
+      reader.readAsDataURL(file);
+      fileReaders.push(readerPromise);
+    });
+
+    Promise.all(fileReaders).then((originalFiles) => {
+      // console.log(newSelectedFiles, "newSelectedFiles");
+      setRefImagewarrantyedit(newSelectedFiles);
+      setRefImgWarrantyfilenamesEdit(newSelectedFiles.map((d) => d.name));
+      setRefImgWarrantyEdit((existingFiles) => [...existingFiles, ...originalFiles]);
+    });
+  };
+
   //first deletefile
   const handleDeleteFilewarrantyedit = (index) => {
-    const newSelectedFiles = [...refImagewarrantyedit];
+    const newSelectedFiles = refImagewarrantyedit;
     newSelectedFiles.splice(index, 1);
     setRefImagewarrantyedit(newSelectedFiles);
+
+    setRefImgWarrantyfilenamesEdit(newSelectedFiles.map((d) => d.name));
+
+    const newSelectedFilesUpload = [...refImgWarrantyEdit];
+    newSelectedFilesUpload.splice(index, 1);
+    setRefImgWarrantyEdit(newSelectedFilesUpload);
   };
 
   const renderFilePreviewwarrantyedit = async (file) => {
@@ -1136,6 +1519,40 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   };
 
   //reference images
+  // const handleInputChangeedit = (event) => {
+  //   const files = event.target.files;
+  //   let newSelectedFiles = [...refImageedit];
+
+  //   for (let i = 0; i < files.length; i++) {
+  //     const file = files[i];
+  //     // Check if the file is an image
+  //     if (file.type.startsWith("image/")) {
+  //       if (file.size <= 5 * 1024 * 1024) {
+  //         const reader = new FileReader();
+  //         reader.onload = () => {
+  //           newSelectedFiles.push({
+  //             name: file.name,
+  //             size: file.size,
+  //             type: file.type,
+  //             preview: reader.result,
+  //             base64: reader.result.split(",")[1],
+  //           });
+  //           setRefImageedit(newSelectedFiles);
+  //         };
+  //         reader.readAsDataURL(file);
+  //       } else {
+  //         setPopupContentMalert("File size should be less than 5MB!");
+  //         setPopupSeverityMalert("info");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     } else {
+  //       setPopupContentMalert("Only Accept Images!");
+  //       setPopupSeverityMalert("info");
+  //       handleClickOpenPopupMalert();
+  //     }
+  //   }
+  // };
+
   const handleInputChangeedit = (event) => {
     const files = event.target.files;
     let newSelectedFiles = [...refImageedit];
@@ -1155,6 +1572,8 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
               base64: reader.result.split(',')[1],
             });
             setRefImageedit(newSelectedFiles);
+            setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
+            setRefImgWarrantyBillEdit((existingFiles) => [...existingFiles, file]);
           };
           reader.readAsDataURL(file);
         } else {
@@ -1171,10 +1590,59 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   };
 
   //first deletefile
+
+  const handleFetchBill = (data) => {
+    const files = Array.from(data); // Ensure it's an array
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+
+    // if (imageFiles.length !== files.length) {
+    //   setPopupContentMalert('Only Accept Images!');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    // }
+
+    const fileReaders = [];
+    const newSelectedFiles = [];
+
+    imageFiles.forEach((file) => {
+      const reader = new FileReader();
+
+      const readerPromise = new Promise((resolve) => {
+        reader.onload = () => {
+          const fileData = {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            preview: reader.result,
+          };
+          newSelectedFiles.push(fileData);
+          resolve(file);
+        };
+      });
+
+      reader.readAsDataURL(file);
+      fileReaders.push(readerPromise);
+    });
+
+    Promise.all(fileReaders).then((originalFiles) => {
+      // console.log(newSelectedFiles, "newSelectedFiles");
+
+      setRefImageedit(newSelectedFiles);
+      setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
+      setRefImgWarrantyBillEdit((existingFiles) => [...existingFiles, originalFiles]);
+    });
+  };
+
   const handleDeleteFileedit = (index) => {
     const newSelectedFiles = [...refImageedit];
     newSelectedFiles.splice(index, 1);
     setRefImageedit(newSelectedFiles);
+
+    setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
+
+    const newSelectedFilesupload = [...refImgWarrantyBillEdit];
+    newSelectedFilesupload.splice(index, 1);
+    setRefImgWarrantyBillEdit(newSelectedFilesupload);
   };
 
   const renderFilePreviewedit = async (file) => {
@@ -1424,7 +1892,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   };
 
   const handleDataFromChild = () => {
-    fetchVendor();
+    fetchVendorGrouping();
   };
 
   //alert model for Uom details
@@ -1460,36 +1928,36 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
 
   const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
+      branch: data.branch,
+      company: data.company,
+      unit: data.unit,
+    }))
+    : isAssignBranch
+      ?.filter((data) => {
+        let fetfinalurl = [];
+
+        if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.subsubpagenameurl;
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.subpagenameurl;
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.mainpagenameurl;
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.submodulenameurl;
+        } else if (data?.modulenameurl?.length !== 0) {
+          fetfinalurl = data.modulenameurl;
+        } else {
+          fetfinalurl = [];
+        }
+
+        const remove = [window.location.pathname?.substring(1), window.location.pathname];
+        return fetfinalurl?.some((item) => remove?.includes(item));
+      })
+      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }))
-    : isAssignBranch
-        ?.filter((data) => {
-          let fetfinalurl = [];
-
-          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.subsubpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.subpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.mainpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.submodulenameurl;
-          } else if (data?.modulenameurl?.length !== 0) {
-            fetfinalurl = data.modulenameurl;
-          } else {
-            fetfinalurl = [];
-          }
-
-          const remove = [window.location.pathname?.substring(1), window.location.pathname];
-          return fetfinalurl?.some((item) => remove?.includes(item));
-        })
-        ?.map((data) => ({
-          branch: data.branch,
-          company: data.company,
-          unit: data.unit,
-        }));
+      }));
 
   const handleBranchChange = (e) => {
     const selectedBranch = e.value;
@@ -1633,11 +2101,11 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   };
 
   const [vendorgetid, setVendorgetid] = useState({});
-  const [vendornameid, setVendornameid] = useState({});
+  const [vendornameid, setVendornameid] = useState('');
 
   const vendorid = async (id) => {
     try {
-      if (id !== '' && id !== undefined) {
+      if (id) {
         let res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
@@ -1718,6 +2186,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     branch: true,
     unit: true,
     floor: true,
+    totalbillamount: true,
     area: true,
     location: true,
     requestmode: true,
@@ -1743,22 +2212,35 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
 
   const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
-  const fetchVendor = async () => {
+  const fetchExcelLimited = async () => {
+    try {
+      let res1 = await axios.get(SERVICE.MANUAL_STOCK_EXCEL_ASSET, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+      setOverallFilterdata(res1.data.manualstock);
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
+
+  const fetchVendorGrouping = async () => {
     try {
       let res1 = await axios.get(SERVICE.ALL_VENDORGROUPING, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const allGroup = Array.from(new Set(res1?.data?.vendorgrouping.map((d) => d.name))).map((item) => {
-        return {
-          label: item,
-          value: item,
-        };
-      });
-
-      setVendorGroupopt(allGroup);
       setVendorOverall(res1?.data?.vendorgrouping);
+      let datas = [
+        ...res1?.data?.vendorgrouping?.map((t) => ({
+          ...t,
+          label: t.name,
+          value: t.name,
+        })),
+      ];
+      setVendorGroupopt(datas);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -1787,11 +2269,20 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     let final = all.filter((data) => {
       return foundDatas.includes(data.value);
     });
-
-    setVendoropt(final);
+    setVendoropt([
+      ...res?.data?.vendordetails
+        ?.filter((item) => item.vendorstatus === 'Active')
+        ?.map((t) => ({
+          ...t,
+          label: t.vendorname,
+          value: t.vendorname,
+        })),
+    ]);
+    // setVendoropt(final);
   };
 
   const handleChangeGroupNameEdit = async (e) => {
+    console.log(e.value, "valuie")
     let foundDatas = vendorOverall
       .filter((data) => {
         return data.name == e.value;
@@ -1814,8 +2305,16 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     let final = all.filter((data) => {
       return foundDatas.includes(data.value);
     });
+    setVendoroptEdit([
+      ...res?.data?.vendordetails
+        ?.filter((item) => item.vendorstatus === 'Active')
+        ?.map((t) => ({
+          ...t,
+          label: t.vendorname,
+          value: t.vendorname,
+        })),
+    ]);
 
-    setVendoroptEdit(final);
   };
 
   //set function to get particular row
@@ -1889,6 +2388,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   const sendRequest = async () => {
     setPageName(!pageName);
     setChangeTable('new');
+    const uniqueId = uuidv4();
     try {
       let stockcreate = await axios.post(SERVICE.MANUAL_STOCKPURCHASE_CREATE, {
         headers: {
@@ -1900,8 +2400,14 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
         floor: String(stockmaster.floor),
         location: String(stockmaster.location),
         area: String(stockmaster.area),
-        workstation: String(stockmaster.workcheck ? stockmaster.workstation : ''),
-        workcheck: String(stockmaster.workcheck),
+        // totalbillamount: Number(stockmaster.quantity) * Number(stockmaster.rate),
+        totalbillamountstock: stockmaster.totalbillamount,
+        duedate: String(expensecreate.duedate ? expensecreate.duedate : ""),
+
+        // workstation: String(
+        //   stockmaster.workcheck ? stockmaster.workstation : ""
+        // ),
+        // workcheck: String(stockmaster.workcheck),
         assettype: String(stockmaster.assettype === undefined ? '' : stockmaster.assettype),
         // asset: String(stockmaster.asset),
         productname: String(stockmaster.productname === 'Please Select Material' ? '' : stockmaster.productname),
@@ -1912,7 +2418,9 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
 
         vendorgroup: String(vendorGroup),
         vendorname: String(vendorNew),
-        vendorid: String(vendornameid),
+        vendorfrequency: String(frequencyValue === undefined ? '' : frequencyValue),
+
+        vendorid: String(vendornameid) ? String(vendornameid) : '',
         gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
         address: String(vendorgetid.address),
         phonenumber: String(vendorgetid.phonenumber),
@@ -1924,17 +2432,102 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
         rate: Number(stockmaster.rate),
         billdate: String(stockmaster.billdate),
         subcomponent: todos ? [...todos] : [],
-        files: [...refImage],
-        warrantyfiles: [...refImagewarranty],
+        // files: [...refImage],
+        // warrantyfiles: [...refImagewarranty],
         warranty: String(stockmaster.warranty),
         estimation: String(stockmaster.estimation),
         estimationtime: String(stockmaster.estimationtime) ? stockmaster.estimationtime : 'Days',
         warrantycalculation: String(stockmaster.warrantycalculation),
         purchasedate: selectedPurchaseDate,
         requestmode: String(stockmaster.requestmode),
-        stockcategory: stockmaster.stockcategory === 'Please Select Stock Category' ? '' : String(stockmaster.stockcategory),
-        stocksubcategory: stockmaster.stocksubcategory === 'Please Select Stock Sub Category' ? '' : String(stockmaster.stocksubcategory),
-        stockmaterialarray: stockArray,
+        // stockcategory:
+        //   stockmaster.stockcategory === "Please Select Stock Category"
+        //     ? ""
+        //     : String(stockmaster.stockcategory),
+        // stocksubcategory:
+        //   stockmaster.stocksubcategory === "Please Select Stock Sub Category"
+        //     ? ""
+        //     : String(stockmaster.stocksubcategory),
+        // stockmaterialarray: stockArray,
+        filenames: refImgWarrantyfilenames,
+        filenamesbill: refImgbillfilenames,
+
+        uniqueId: uniqueId,
+        // files: [...refImage],
+        // warrantyfiles: [...refImagewarranty],
+        warranty: String(stockmaster.warranty),
+        estimation: String(stockmaster.estimation),
+        estimationtime: String(stockmaster.estimationtime) ? stockmaster.estimationtime : 'Days',
+        warrantycalculation: String(stockmaster.warrantycalculation),
+        purchasedate: selectedPurchaseDate,
+
+        requestmode: String(stockmaster.requestmode),
+        // stockcategory: stockmaster.stockcategory === "Please Select Stock Category" ? "" : String(stockmaster.stockcategory),
+        // stocksubcategory: stockmaster.stocksubcategory === "Please Select Stock Sub Category" ? "" : String(stockmaster.stocksubcategory),
+        // stockmaterialarray: stockArray,
+
+        tododetails: [...educationtodo],
+        paidstatus: String(expensecreate.paidstatus),
+
+        bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+        bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankbranchname) : '',
+        accountholdername: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountholdername) : '',
+        accountnumber: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.accountnumber) : '',
+        ifsccode: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.ifsccode) : '',
+
+        upinumber: expensecreate.paidmode === 'UPI' ? String(vendorstock.upinumber) : '',
+
+        cardnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardnumber) : '',
+        cardholdername: expensecreate.paidmode === 'Card' ? String(vendorstock.cardholdername) : '',
+        cardtransactionnumber: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtransactionnumber) : '',
+        cardtype: expensecreate.paidmode === 'Card' ? String(vendorstock.cardtype) : '',
+        cardmonth: expensecreate.paidmode === 'Card' ? String(vendorstock.cardmonth) : '',
+        cardyear: expensecreate.paidmode === 'Card' ? String(vendorstock.cardyear) : '',
+        cardsecuritycode: expensecreate.paidmode === 'Card' ? String(vendorstock.cardsecuritycode) : '',
+
+        chequenumber: expensecreate.paidmode === 'Cheque' ? String(vendor.chequenumber) : '',
+
+        cash: expensecreate.paidmode === 'Cash' ? String('Cash') : '',
+
+        paidmode: String(expensecreate.paidstatus === 'Not Paid' ? '' : expensecreate.paidmode),
+        paidamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+        balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmaster.totalbillamount : expensecreate.balanceamount),
+        sortdate: String(expensecreate.paidstatus === 'Not Paid' ? '' : new Date()),
+        billstatus: expensecreate.paidstatus === 'Not Paid' ? 'InComplete' : expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal) ? 'Partially Paid' : 'Completed',
+        paymentduereminderlog:
+          expensecreate.paidstatus === 'Paid'
+            ? [
+              {
+                balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmaster.totalbillamount : expensecreate.balanceamount),
+                expensetotal: stockmaster.totalbillamount,
+                modeofpayments: expensecreate.paidmode,
+                payamountdate: expensecreate.date,
+                payamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+                bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+                bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.bankbranchname : '',
+                accountholdername: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountholdername : '',
+                accountnumber: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountnumber : '',
+                ifsccode: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.ifsccode : '',
+
+                upinumber: expensecreate.paidmode === 'UPI' ? vendorstock.upinumber : '',
+
+                cardnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardnumber : '',
+                cardholdername: expensecreate.paidmode === 'Card' ? vendorstock.cardholdername : '',
+                cardtransactionnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardtransactionnumber : '',
+                cardtype: expensecreate.paidmode === 'Card' ? vendorstock.cardtype : '',
+                cardmonth: expensecreate.paidmode === 'Card' ? vendorstock.cardmonth : '',
+                cardyear: expensecreate.paidmode === 'Card' ? vendorstock.cardyear : '',
+                cardsecuritycode: expensecreate.paidmode === 'Card' ? vendorstock.cardsecuritycode : '',
+                chequenumber: expensecreate.paidmode === 'Cheque' ? vendorstock.chequenumber : '',
+                addedby: [
+                  {
+                    name: String(isUserRoleAccess.companyname),
+                    date: String(new Date()),
+                  },
+                ],
+              },
+            ]
+            : [],
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
@@ -1943,13 +2536,17 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
         ],
       });
       setBtnSubmit(false);
+      await handleFileUpload(refImgWarranty, 'todo', uniqueId);
+      await handleFileUpload(refImgWarrantyBill, 'bill', uniqueId);
+      setRefImgWarrantyfilenames([]);
+       handleCloseviewalertvendormanual();
+         sendDataToParentUIManual(true);
+      setRefImgbillfilenames([]);
       setPopupContent('Added Successfully');
       setPopupSeverity('success');
       handleClickOpenPopup();
-      setStockmaster(stockcreate.data);
-      sendDataToParentUIManual(true);
-      await fetchStock('Filtered');
-      await fetchStockStockMaterial();
+      // setStockmaster(stockcreate.data);
+
       setStockArray([]);
       setStockmaster({
         ...stockmaster,
@@ -1976,7 +2573,6 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
         component: 'Please Select Component',
       });
 
-      handleCloseviewalertvendormanual();
       setRefImage([]);
       setFile('');
       setGetImg(null);
@@ -1991,136 +2587,95 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     }
   };
 
+  const handleFileUpload = async (selectedFilesall, type, uniqueId) => {
+    try {
+      // console.log(selectedFilesall, "selectedFilesall");
+      let selectedFiles = selectedFilesall;
+      // .flatMap(t => [{ ...t.files, uniqueId: t.uniqueId }])
+      // let uniqueId = selectedFilesall[0].uniqueId
+      // let selectedFiles = selectedFilesall.flatMap(t =>
+      //   Array.from(t.files).map(file => ({ ...file, uniqueId: t.uniqueId }))
+      // );
+
+      const uploadFiles = async () => {
+        for (const selectedFile of selectedFiles) {
+          // console.log(selectedFile, "selectedFile");
+          const chunkSize = 5 * 1024 * 1024; // 5MB (adjust based on your requirements)
+          const totalChunks = Math.ceil(selectedFile.size / chunkSize);
+          const chunkProgress = 100 / totalChunks;
+          let chunkNumber = 0;
+          let start = 0;
+          let end = 0;
+
+          const uploadNextChunk = async () => {
+            try {
+              if (end < selectedFile.size) {
+                end = start + chunkSize;
+                if (end > selectedFile.size) {
+                  end = selectedFile.size;
+                }
+
+                const chunk = selectedFile.slice(start, end, selectedFile.type);
+                // console.log(chunk, "chunk");
+
+                const formData = new FormData();
+                formData.append('file', chunk);
+                formData.append('chunkNumber', chunkNumber);
+                formData.append('totalChunks', totalChunks);
+                formData.append('filesize', selectedFile.size);
+                formData.append('originalname', `${uniqueId}$${type}$${selectedFile.name}`);
+
+                // console.log(formData, "formData");
+
+                try {
+                  const response = await axios.post(SERVICE.UPLOAD_CHUNK_MANUAL, formData, {
+                    headers: {
+                      'Content-Type': 'multipart/form-data',
+                    },
+                  });
+                  // console.log(response, "response");
+                  const temp = `Chunk ${chunkNumber + 1}/${totalChunks} uploaded successfully for ${selectedFile.name}`;
+
+                  start = end;
+                  chunkNumber++;
+
+                  uploadNextChunk();
+                } catch (err) {
+                  console.log(err, 'ERrer');
+                  handleApiError(err, setShowAlert, handleClickOpenerr);
+                }
+              } else {
+                // setProgress(100);
+                console.log(`File upload completed for ${selectedFile.name}`);
+              }
+            } catch (err) {
+              console.log(err, 'asdfse');
+            }
+          };
+
+          await uploadNextChunk();
+        }
+        // setSelectedFiles([]);
+        // console.log("All file uploads completed");
+      };
+
+      uploadFiles();
+    } catch (err) {
+      console.log(err, 'errfile');
+    }
+  };
+
   //submit option for saving
   const handleSubmit = async (e) => {
     setBtnSubmit(true);
     setPageName(!pageName);
     e.preventDefault();
 
-    await fetchStock('Filtered');
+    // await fetchStock("Filtered");
 
-    let vendorEmpty = todos.some((item) => item.vendor == 'Choose Vendor');
+    // let vendorEmpty = todos.some((item) => item.vendor == "Choose Vendor");
 
-    if (!isStockMaterial) {
-      const isNameMatch = stock.some(
-        (item) =>
-          item.company == stockmaster.company &&
-          item.branch == stockmaster.branch &&
-          item.unit == stockmaster.unit &&
-          item.floor == stockmaster.floor &&
-          item.area == stockmaster.area &&
-          item.location == stockmaster.location &&
-          item.vendorgroup == vendorGroup &&
-          Number(item.billno) === Number(stockmaster.billno) &&
-          item.assettype == stockmaster.assettype &&
-          item.assethead == stockmaster.assethead &&
-          item.component == stockmaster.component &&
-          item.productdetails.toLowerCase() == stockmaster.productdetails.toLowerCase() &&
-          item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
-          item.uom == stockmaster.uom &&
-          item.quantity == stockmaster.quantity &&
-          item.rate == stockmaster.rate &&
-          item.billdate == stockmaster.billdate
-      );
 
-      let vendorEmpty = todos.some((item) => item.vendor == 'Choose Vendor');
-      if (stockmaster.company === 'Please Select Company') {
-        setPopupContentMalert('Please Select Company!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.branch === 'Please Select Branch') {
-        setPopupContentMalert('Please Select Branch!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.unit === 'Please Select Unit') {
-        setPopupContentMalert('Please Select Unit!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.floor === 'Please Select Floor') {
-        setPopupContentMalert('Please Select Floor!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.area === 'Please Select Area') {
-        setPopupContentMalert('Please Select Area!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.location === 'Please Select Location') {
-        setPopupContentMalert('Please Select Location!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-      //  else if (vendorGroup === "Choose Vendor Group") {
-      //   setPopupContentMalert("Please Select Vendor Group!");
-      //   setPopupSeverityMalert("info");
-      //   handleClickOpenPopupMalert();
-      // } else if (vendorNew === "Choose Vendor") {
-      //   setPopupContentMalert("Please Select Vendor!");
-      //   setPopupSeverityMalert("info");
-      //   handleClickOpenPopupMalert();
-      // }
-      else if (stockmaster.requestmode === 'Please Select Stock Mode For' || stockmaster.requestmode === '') {
-        setPopupContentMalert('Please Select Stock Mode For!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.productname === '' || stockmaster.productname === 'Please Select Material') {
-        setPopupContentMalert('Please Select Asset Material!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.component === '' || stockmaster.component === 'Please Select Component') {
-        setPopupContentMalert('Please Select Component!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-      // else if (stockmaster.billno === "") {
-      //   setPopupContentMalert("Please Enter Billno!");
-      //   setPopupSeverityMalert("info");
-      //   handleClickOpenPopupMalert();
-      // }
-      else if (stockmaster.productdetails === '') {
-        setPopupContentMalert('Please Enter Product Details!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-      //  else if (stockmaster.warrantydetails === "") {
-      //   setPopupContentMalert("Please Enter Warranty Details!");
-      //   setPopupSeverityMalert("info");
-      //   handleClickOpenPopupMalert();
-      // }
-      else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
-        setPopupContentMalert('Please Select Uom!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.quantity === '') {
-        setPopupContentMalert('Please Enter Quantity!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.rate === '') {
-        setPopupContentMalert('Please Enter Rate!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-      //  else if (stockmaster.billdate === "") {
-      //   setPopupContentMalert("Please Select Bill Date!");
-      //   setPopupSeverityMalert("info");
-      //   handleClickOpenPopupMalert();
-      // }
-      // else if (refImage.length == 0) {
-      //   setPopupContentMalert("Please Upload Bill!");
-      //   setPopupSeverityMalert("info");
-      //   handleClickOpenPopupMalert();
-      // }
-      else if (vendorEmpty) {
-        setPopupContentMalert('Please Select Vendor in All the Sub Dividends!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (isNameMatch) {
-        setPopupContentMalert('Data Already Exist!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else {
-        sendRequest();
-      }
-    } else {
       const isNameMatch = stockMaterial.some(
         (item) =>
           item.company == stockmaster.company &&
@@ -2130,19 +2685,18 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
           item.area == stockmaster.area &&
           item.location == stockmaster.location &&
           item.vendorname == stockmaster.vendorname &&
-          // item.billno == stockmaster.billno &&
-
+          Number(item.billno) == Number(stockmaster.billno) &&
           // item.productdetailsnew.toLowerCase() == stockmaster.productdetailsnew.toLowerCase() &&
-          item.requestmode == stockmaster.requestmode &&
-          item.stockcategory == stockmaster.stockcategory &&
-          item.stocksubcategory == stockmaster.stocksubcategory &&
-          // item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
+          item.requestmode == stockmaster.requestmode
+        // item.stockcategory == stockmaster.stockcategory &&
+        // item.stocksubcategory == stockmaster.stocksubcategory &&
+        // item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
 
-          // item.uomnew == stockmaster.uomnew &&
-          // item.quantitynew == stockmaster.quantitynew &&
-          // item.materialnew == stockmaster.materialnew &&
+        // item.uomnew == stockmaster.uomnew &&
+        // item.quantitynew == stockmaster.quantitynew &&
+        // item.materialnew == stockmaster.materialnew &&
 
-          item.rate == stockmaster.rate
+        // item.rate == stockmaster.rate
         // &&
         // item.billdate == stockmaster.billdate
       );
@@ -2194,15 +2748,22 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
         setPopupContentMalert('Please Select Stock Mode For!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.stockcategory === 'Please Select Stock Category' || stockmaster.stockcategory === '') {
-        setPopupContentMalert('Please Select Stock Category!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.stocksubcategory === 'Please Select Stock Sub Category' || stockmaster.stocksubcategory === '') {
-        setPopupContentMalert('Please Select Stock Sub Category!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
       }
+      // else if (
+      //   stockmaster.stockcategory === "Please Select Stock Category" ||
+      //   stockmaster.stockcategory === ""
+      // ) {
+      //   setPopupContentMalert("Please Select Stock Category!");
+      //   setPopupSeverityMalert("info");
+      //   handleClickOpenPopupMalert();
+      // } else if (
+      //   stockmaster.stocksubcategory === "Please Select Stock Sub Category" ||
+      //   stockmaster.stocksubcategory === ""
+      // ) {
+      //   setPopupContentMalert("Please Select Stock Sub Category!");
+      //   setPopupSeverityMalert("info");
+      //   handleClickOpenPopupMalert();
+      // }
       // else if (stockmaster.uomnew === "" || stockmaster.uomnew === "Please Select UOM") {
       //   setShowAlert(
       //     <>
@@ -2232,20 +2793,31 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       // else if (stockmaster.productdetailsnew === "") {
       //   setShowAlert(
       //     <>
-      //       <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
+      //       <ErrorOutlineOutlinedIcon sx={{ font
+      // Size: "100px", color: "orange" }} />
       //       <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter Productdetails"}</p>
       //     </>
       //   );
       //   handleClickOpenerr();
       // }
-      else if (stockArray.length === 0) {
-        setPopupContentMalert('Please Insert Stock Todo List!');
+      else if (stockmaster.totalbillamount === '') {
+        setPopupContentMalert('Please Enter Totalbillamount!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.rate === '') {
-        setPopupContentMalert('Please Enter Rate!');
+      } else if (educationtodo.length == 0) {
+        setPopupContentMalert('Please Insert Todo!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
+      } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Please Select Paid Mode') {
+        setPopupContentMalert('Please Select Paid Mode!');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+      } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidamount === '') {
+        setPopupContentMalert('Please Enter Paid Amount!');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+      } else if (expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal)) {
+        handleClickOpenerrAmount();
       } else if (isNameMatch) {
         setPopupContentMalert('Data Already Exist!');
         setPopupSeverityMalert('info');
@@ -2253,7 +2825,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       } else {
         sendRequest();
       }
-    }
+ 
   };
 
   const handleclear = (e) => {
@@ -2303,6 +2875,30 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       materialnew: 'Please Select Material',
       productdetailsnew: '',
     });
+    setExpensecreate({
+      totalbillamount: '',
+
+      paidstatus: 'Not Paid',
+
+      paidmode: 'Please Select Paid Mode',
+    });
+    setTodoDetails({
+      particularmode: 'Please Select Particular Mode',
+      category: 'Please Select Category',
+      subcategory: 'Please Select Sub Category',
+      materialnew: 'Please Select Item Name',
+      uomnew: '',
+      rate: '',
+      quantitynew: '',
+      amount: '',
+    });
+    setEducationtodo([]);
+    setVendorModeOfPayments('');
+    setCategoryOption([]);
+    setRefImgWarrantyfilenames([]);
+    setRefImgbillfilenames([]);
+
+    setSubcategoryOption([]);
     setCategoryOption([]);
     setSubcategoryOption([]);
     setMaterialoptNew([]);
@@ -2358,7 +2954,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
           },
         ],
       });
-      await fetchVendor();
+      await fetchVendorGrouping();
       setVendor({
         vendorname: '',
         emailid: '',
@@ -2528,6 +3124,71 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   const [vendorNew, setVendorNew] = useState('Choose Vendor');
   const [vendorNewEdit, setVendorNewEdit] = useState('Choose Vendor');
 
+  //   const getMultipleFilesAsObjects = async (filenames, type, uniqueId) => {
+  //     const files = [];
+
+  //     for (const name of filenames) {
+  //       const res = await axios.post(
+  //         SERVICE.MANUAL_TODO_EDIT_FETCH,
+  //         { filename: `${uniqueId}$${type}$${name}` },
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${auth.APIToken}`,
+  //           },
+  //           responseType: 'blob',
+  //         }
+  //       );
+  // if(res.data.message == "File not found"){
+  //   return [];
+  // }
+  // else{
+  //       const blob = res.data;
+  //       const file = new File([blob], name, { type: blob.type });
+  //       files.push(file);
+
+  //     return files;
+  // }
+  //   };
+
+  const getMultipleFilesAsObjects = async (filenames, type, uniqueId) => {
+    const files = [];
+
+    for (const name of filenames) {
+      try {
+        const res = await axios.post(
+          SERVICE.MANUAL_TODO_EDIT_FETCH,
+          { filename: `${uniqueId}$${type}$${name}` },
+          {
+            headers: {
+              Authorization: `Bearer ${auth.APIToken}`,
+            },
+            responseType: 'blob',
+          }
+        );
+
+        // Check for "File not found" in blob content
+        const contentType = res.headers['content-type'];
+        if (contentType.includes('application/json')) {
+          const text = await res.data.text();
+          const json = JSON.parse(text);
+          if (json.message === 'File not found') {
+            continue; // Skip this file
+          }
+        }
+
+        const blob = res.data;
+        const file = new File([blob], name, { type: blob.type });
+        files.push(file);
+      } catch (err) {
+        console.error(`Error fetching file ${name}:`, err);
+      }
+    }
+
+    return files;
+  };
+
+  const [oldfileNamesWar, setOldfileNamesWar] = useState([]);
+  const [oldfileNamesBill, setoldfileNamesBill] = useState([]);
   //get single row to edit....
   const getCode = async (e) => {
     setPageName(!pageName);
@@ -2537,14 +3198,30 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
+      const alldata = { ...res?.data?.smanualstock, calculationbalamount: Number(res?.data?.smanualstock?.balanceamount) };
 
+      setAmountEdit(res?.data?.smanualstock?.totalbillamount);
       setStockmasteredit(res?.data?.smanualstock);
+      setFrequencyValueedit(res?.data?.smanualstock?.vendorfrequency === undefined ? '' : res?.data?.smanualstock?.vendorfrequency);
+      setGroupedVendorNamesedit(vendorOverall?.filter((item) => item.name === res?.data?.smanualstock?.vendorgroup)?.map((data) => data?.vendor));
+
       setSelectedBranchedit(res?.data?.smanualstock.branch);
       setVendorGroupEdit(res?.data?.smanualstock?.vendorgroup);
       setVendorNewEdit(res?.data?.smanualstock?.vendorname);
       handleChangeGroupNameEdit({
         value: res?.data?.smanualstock?.vendorgroup,
       });
+
+      setoldfileNamesBill(res?.data?.smanualstock?.filenamesbill.map((d) => `${res?.data?.smanualstock?.uniqueId}$bill$${d}`));
+      setOldfileNamesWar(res?.data?.smanualstock?.filenames.map((d) => `${res?.data?.smanualstock?.uniqueId}$todo$${d}`));
+
+      const fileswarranty = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenames, 'todo', res?.data?.smanualstock?.uniqueId);
+
+      handleFetchWarranty(fileswarranty);
+
+      const filesbill = await getMultipleFilesAsObjects(res?.data?.smanualstock?.filenamesbill, 'bill', res?.data?.smanualstock?.uniqueId);
+
+      handleFetchBill(filesbill);
 
       setVendoroptIndEdit(new Array(res?.data?.smanualstock?.subcomponent?.length).fill([]));
       for (let i = 0; i < res?.data?.smanualstock?.subcomponent?.length; i++) {
@@ -2553,12 +3230,16 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       setSelectedUnitedit(res?.data?.smanualstock.unit);
       setSelectedProductheadedit(res?.data?.smanualstock.producthead);
       setSelectedProductnameedit(res?.data?.smanualstock.productname);
-      setRefImageedit(res?.data?.smanualstock?.files);
-      setRefImagewarrantyedit(res?.data?.smanualstock?.warrantyfiles ? res?.data?.smanualstock?.warrantyfiles : []);
+      // setRefImageedit(res?.data?.smanualstock?.files);
+      // setRefImagewarrantyedit(
+      //   res?.data?.smanualstock?.warrantyfiles
+      //     ? res?.data?.smanualstock?.warrantyfiles
+      //     : []
+      // );
       setSelectedAssetTypeEdit(res?.data?.smanualstock?.assettype);
 
       setSelectedPurchaseDateEdit(res?.data?.smanualstock.purchasedate);
-      setTodosEdit(res?.data?.smanualstock?.subcomponent);
+      // setTodosEdit(res?.data?.smanualstock?.subcomponent);
 
       await fetchBranchDropdownsEdit(res?.data?.smanualstock?.company);
       await fetchUnitsEdit(res?.data?.smanualstock.branch);
@@ -2566,13 +3247,20 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       await fetchAreaEdit(res?.data?.smanualstock?.branch, res?.data?.smanualstock?.floor);
       await fetchAllLocationEdit(res?.data?.smanualstock?.branch, res?.data?.smanualstock?.floor, res?.data?.smanualstock?.area);
 
-      if (res?.data?.smanualstock.vendorid !== '' && res?.data?.smanualstock.vendorid !== undefined) {
+      if (res?.data?.smanualstock.vendorid) {
         let resv = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.smanualstock.vendorid}`, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
         });
         setVendorgetid(resv?.data?.svendordetails);
+      } else {
+        setVendorgetid({
+          ...vendorgetid,
+          gstnumber: '',
+          address: '',
+          phonenumber: '',
+        });
       }
       // let res1 = await axios.get(SERVICE.ASSETWORKSTAION, {
       //   headers: {
@@ -2686,173 +3374,21 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
 
   let maintenanceid = stockmasteredit?._id;
 
-  //editing the single data...
-  const sendEditRequest = async () => {
-    setPageName(!pageName);
+
+  const handleFileDeleteOld = async (filenames) => {
     try {
-      let res = await axios.put(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${maintenanceid}`, {
+      let res_project = await axios.post(SERVICE.EDIT_OLDDATA_DELETE_MANUAL, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
-        company: String(stockmasteredit.company),
-        branch: String(stockmasteredit.branch),
-        unit: String(stockmasteredit.unit),
-        floor: String(stockmasteredit.floor),
-        location: String(stockmasteredit.location),
-        area: String(stockmasteredit.area),
-        workstation: String(stockmasteredit.workcheck ? stockmasteredit.workstation : ''),
-        // workcheck: String(stockmasteredit.workcheck),
-        assettype: String(stockmasteredit.assettype === undefined ? '' : stockmasteredit.assettype),
-        asset: String(stockmasteredit.asset),
-
-        productname: String(stockmasteredit.productname === 'Please Select Material' || stockmasteredit.productname === undefined ? '' : stockmasteredit.productname),
-
-        component: String(stockmasteredit.component === 'Please Select Component' ? '' : stockmasteredit.component),
-        subcomponent: todosEdit ? [...todosEdit] : [],
-        warranty: String(stockmasteredit.warranty),
-        estimation: String(stockmasteredit.estimation),
-        estimationtime: String(stockmasteredit.estimationtime),
-        warrantycalculation: String(stockmasteredit.warrantycalculation),
-        purchasedate: selectedPurchaseDateEdit,
-
-        producthead: String(stockmasteredit.producthead === '' ? '' : stockmasteredit.producthead),
-
-        vendorname: String(vendorNew),
-        vendorgroup: String(vendorGroupEdit),
-        gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
-        vendorid: String(vendorgetid._id),
-        billno: Number(stockmasteredit.billno),
-        productdetails: String(stockmasteredit.productdetails),
-        warrantydetails: String(stockmasteredit.warrantydetails),
-        uom: stockmasteredit.uom === 'Please Select UOM' ? '' : String(stockmasteredit.uom),
-        quantity: Number(stockmasteredit.quantity),
-        rate: Number(stockmasteredit.rate),
-        billdate: String(stockmasteredit.billdate),
-        files: [...refImageedit],
-        warrantyfiles: [...refImagewarrantyedit],
-
-        requestmode: String(stockmasteredit.requestmode),
-        stockcategory: stockmasteredit.stockcategory === 'Please Select Stock Category' ? '' : String(stockmasteredit.stockcategory),
-        stocksubcategory: stockmasteredit.stocksubcategory === 'Please Select Stock Sub Category' ? '' : String(stockmasteredit.stocksubcategory),
-        uomnew: stockmasteredit.uomnew === '' ? '' : String(stockmasteredit.uomnew),
-        quantitynew: stockmasteredit.quantitynew === '' ? '' : Number(stockmasteredit.quantitynew),
-        materialnew: stockmasteredit.materialnew === 'Please Select Material' ? '' : String(stockmasteredit.materialnew),
-        productdetailsnew: String(stockmasteredit.productdetailsnew),
-        updatedby: [
-          ...updateby,
-          {
-            name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
-          },
-        ],
+        filenames: filenames,
       });
-      await fetchStock('Filtered');
-      await fetchStockStockMaterial();
-      setBtnSubmit(false);
-      setPopupContent('Updated Successfully');
-      setPopupSeverity('success');
-      handleClickOpenPopup();
-      handleCloseModEdit();
     } catch (err) {
-      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+      console.log(err, 'errfile');
     }
   };
 
-  const editSubmit = (e) => {
-    setBtnSubmit(true);
-    e.preventDefault();
-
-    let vendorEmpty = todosEdit.some((item) => item.vendor == 'Choose Vendor');
-
-    const isNameMatch = stockEdit.some(
-      (item) =>
-        item.company == stockmasteredit.company &&
-        item.branch == stockmasteredit.branch &&
-        item.unit == stockmasteredit.unit &&
-        item.floor == stockmasteredit.floor &&
-        item.area == stockmasteredit.area &&
-        item.location == stockmasteredit.location &&
-        item.assettype == stockmasteredit.assettype &&
-        item.vendorgroup == vendorGroupEdit &&
-        Number(item.billno) === Number(stockmasteredit.billno) &&
-        item.productdetails.toLowerCase() == String(stockmasteredit.productdetails.toLowerCase()) &&
-        item.warrantydetails == String(stockmasteredit.warrantydetails) &&
-        item.uom == String(stockmasteredit.uom) &&
-        item.quantity == Number(stockmasteredit.quantity) &&
-        item.rate == Number(stockmasteredit.rate) &&
-        item.billdate == String(stockmasteredit.billdate)
-    );
-
-    if (stockmasteredit.company === 'Please Select Company') {
-      setPopupContentMalert('Please Select Company!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmasteredit.branch === 'Please Select Branch') {
-      setPopupContentMalert('Please Select Branch!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmasteredit.unit === 'Please Select Unit') {
-      setPopupContentMalert('Please Select Unit!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmasteredit.floor === 'Please Select Floor') {
-      setPopupContentMalert('Please Select Floor!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmasteredit.area === 'Please Select Area') {
-      setPopupContentMalert('Please Select Area!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmasteredit.location === 'Please Select Location') {
-      setPopupContentMalert('Please Select Location!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (vendorGroupEdit === 'Choose Vendor Group') {
-      setPopupContentMalert('Please Select Vendor Group!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (vendorNewEdit === 'Choose Vendor') {
-      setPopupContentMalert('Please Select Vendor!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    }
-    // else if (stockmasteredit.warranty == "Yes" && stockmasteredit.estimation === "") {
-    //   setShowAlert(
-    //     <>
-    //       <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //       <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter Warranty Time or Check Purchase and Expiry Date"}</p>
-    //     </>
-    //   );
-    //   handleClickOpenerr();
-    // }
-    else if (stockmasteredit.productdetails === '') {
-      setPopupContentMalert('Please Enter Product Details!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmasteredit.uom === '' || stockmasteredit.uom === 'Please Select UOM') {
-      setPopupContentMalert('Please Select Uom!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmasteredit.quantity === '') {
-      setPopupContentMalert('Please Enter Qunatity!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmasteredit.rate === '') {
-      setPopupContentMalert('Please Enter Rate!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (vendorEmpty) {
-      setPopupContentMalert('Please Select Vendor in All the Sub Dividends!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (isNameMatch) {
-      setPopupContentMalert('Data Already Exist!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else {
-      sendEditRequest();
-    }
-  };
+ 
 
   const fetchCompanyDropdowns = async () => {
     try {
@@ -2941,7 +3477,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_floor.data.floors.filter((d) => d.branch === e.value);
+      let result = res_floor.data.floors.filter((d) => d.branch === e);
       const floorall = result.map((d) => ({
         ...d,
         label: d.name,
@@ -2952,14 +3488,14 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-  const fetchArea = async (e) => {
+  const fetchArea = async (branch, floor) => {
     try {
       let res_type = await axios.get(SERVICE.AREAGROUPING, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_type.data.areagroupings.filter((d) => d.branch === newcheckbranch && d.floor === e).map((data) => data.area);
+      let result = res_type.data.areagroupings.filter((d) => d.branch === branch && d.floor === floor).map((data) => data.area);
       let ji = [].concat(...result);
       let jiii = ji.map((data) => data);
       const all = ji.map((d) => ({
@@ -2972,14 +3508,14 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-  const fetchLocation = async (e) => {
+  const fetchLocation = async (branch, floor, area) => {
     try {
       let res_type = await axios.get(SERVICE.LOCATIONGROUPING, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_type.data.locationgroupings.filter((d) => d.branch === newcheckbranch && d.floor === stockmaster.floor && d.area === e).map((data) => data.location);
+      let result = res_type.data.locationgroupings.filter((d) => d.branch === branch && d.floor === floor && d.area === area).map((data) => data.location);
       let ji = [].concat(...result);
       let jiii = ji.map((data) => data);
       const all = [
@@ -3095,6 +3631,14 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   useEffect(() => {
     fetchAllLocationEdit();
   }, [isEditOpen, stockmasteredit.floor]);
+
+    useEffect(() => {
+      fetchBranchDropdowns(stockmaterialedit.company);
+      fetchUnits(stockmaterialedit.branch);
+      fetchFloor(stockmaterialedit.branch);
+      fetchArea(stockmaterialedit.branch, stockmaterialedit.floor);
+      fetchLocation(stockmaterialedit.branch, stockmaterialedit.floor, stockmaterialedit.area);
+    }, [stockmaterialedit, isEditOpen]);
 
   const fetchAssetTypeDropdowns = async () => {
     try {
@@ -3384,19 +3928,23 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
 
         setStockEdit(ans.filter((item) => item._id !== stockmasteredit._id));
 
-        setOverallFilterdata(
-          res_employee?.data?.totalProjectsData?.length > 0
-            ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-                return {
-                  ...item,
-                  serialNumber: (page - 1) * pageSize + index + 1,
-                  uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
-                  billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
-                  purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
-                };
-              })
-            : []
-        );
+        // setOverallFilterdata(res_employee?.data?.totalProjectsData?.length > 0 ?
+        //   res_employee?.data?.totalProjectsData?.map((item, index) => {
+        //     return {
+        //       ...item,
+        //       serialNumber: (page - 1) * pageSize + index + 1,
+        //       uom: item.uom !== "" ? `${item.quantity}#${item.uom}` : item.quantity,
+        //       billdate: item.billdate === "" ? "" : moment(item.billdate).format("DD/MM/YYYY"),
+        //       purchasedate:
+        //         item.purchasedate != ""
+        //           ? moment(item.purchasedate).format("DD/MM/YYYY")
+        //           : "",
+
+        //     }
+        //   }
+
+        //   ) : []
+        // );
 
         setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
         setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
@@ -3503,12 +4051,12 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     fetchAssetType();
     fetchteams();
     fetchEmployee();
-    fetchVendor();
+    fetchVendorGrouping();
     fetchMaterialAll();
     fetchAssetTypeDropdowns();
   }, []);
   useEffect(() => {
-    fetchVendor();
+    fetchVendorGrouping();
   }, [vendorAuto]);
 
   // useEffect(() => {
@@ -3785,6 +4333,14 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       headerClassName: 'bold-header',
     },
     {
+      field: 'totalbillamount',
+      headerName: 'Bill Amount',
+      flex: 0,
+      width: 100,
+      hide: !columnVisibility.totalbillamount,
+      headerClassName: 'bold-header',
+    },
+    {
       field: 'billdate',
       headerName: 'Bill Date',
       flex: 0,
@@ -3854,6 +4410,8 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
 
   const rowDataTable = items.map((item, index) => {
     return {
+      ...item,
+      totalbillamount: item.totalbillamount,
       id: item._id,
       serialNumber: item.serialNumber,
       company: item.company,
@@ -4096,7 +4654,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     }
 
     setTodos(result);
-    setVendoroptInd(new Array(result.length).fill(vendorOpt));
+    setVendoroptInd(new Array(result?.length).fill(vendorOpt));
   };
 
   const handleChange = async (index, name, value, id) => {
@@ -4343,6 +4901,10 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
 
+  useEffect(() => {
+    fetchExcelLimited();
+  }, [isFilterOpen]);
+
   // page refersh reload
   const handleCloseFilterMod = () => {
     setIsFilterOpen(false);
@@ -4461,6 +5023,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
         ...item,
         id: item._id,
         serialNumber: (page - 1) * pageSize + index + 1,
+        totalbillamount: Number(item.quantity) * Number(item.rate),
         uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
         billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
         purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
@@ -4473,14 +5036,14 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       setOverallFilterdata(
         res_employee?.data?.totalProjectsData?.length > 0
           ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-              return {
-                ...item,
-                serialNumber: (page - 1) * pageSize + index + 1,
-                uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
-                billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
-                purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
-              };
-            })
+            return {
+              ...item,
+              serialNumber: (page - 1) * pageSize + index + 1,
+              uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
+              billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
+              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+            };
+          })
           : []
       );
 
@@ -4653,18 +5216,292 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
     setPopupSeverity('success');
     handleClickOpenPopup();
   };
+  //alert model for stock category
+  const [openviewalertstockcategory, setOpenviewalertstockcategory] = useState(false);
+  // view model
+  const handleClickOpenviewalertstockcategory = () => {
+    setOpenviewalertstockcategory(true);
+  };
+
+  const handleCloseviewalertstockcategory = () => {
+    setOpenviewalertstockcategory(false);
+  };
+  //alert model for manage stock Item
+  const [openviewalertstockitem, setOpenviewalertstockitem] = useState(false);
+  // view model
+  const handleClickOpenviewalertstockitem = () => {
+    setOpenviewalertstockitem(true);
+  };
+
+  const handleCloseviewalertstockitem = () => {
+    setOpenviewalertstockitem(false);
+  };
+
+  const educationTodo = () => {
+    const isNameMatch = educationtodo?.some((item) => {
+      if (stockmaster?.requestmode === 'Stock Material') {
+        return item?.category === todoDetails?.category && item?.subcategory === todoDetails?.subcategory && item?.itemname?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
+      } else {
+        return item?.materialnew?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
+      }
+    });
+    // if (todoDetails.particularmode === "Please Select Particular Mode") {
+    //   setPopupContentMalert("Please Select Particular Mode!");
+    //   setPopupSeverityMalert("info");
+    //   handleClickOpenPopupMalert();
+    // } else
+    if (todoDetails.category === 'Please Select Category') {
+      setPopupContentMalert('Please Select Category!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (todoDetails.subcategory === 'Please Select Sub Category') {
+      setPopupContentMalert('Please Select Sub Category!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (todoDetails.materialnew === 'Please Select Item Name') {
+      setPopupContentMalert('Please Select Item Name!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (todoDetails.uomnew === '') {
+      setPopupContentMalert('Please Enter UOM!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (todoDetails.rate === '' || todoDetails.rate == 0) {
+      setPopupContentMalert('Please Enter Rate!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (todoDetails.quantitynew === '' || todoDetails.quantitynew == 0) {
+      setPopupContentMalert('Please Enter Quantity!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (todoDetails.amount === '' || todoDetails.amount == 0) {
+      setPopupContentMalert('Please Enter Amount!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (todoDetails.productdetailsnew === '') {
+      setPopupContentMalert('Please Enter Product Details!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (isNameMatch) {
+      setPopupContentMalert('Item Already Exists!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (Number(todoDetails.amount) + Number(Expensetotal) > Number(stockmaster.totalbillamount)) {
+      setPopupContentMalert('Amount Exceeds Total Bill Amount!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (todoDetails !== '') {
+      setEducationtodo([...educationtodo, todoDetails]);
+      setTodoDetails({
+        ...todoDetails,
+
+        rate: '',
+        quantitynew: '',
+        amount: '',
+      });
+    }
+  };
+  const educationTodoremove = (index) => {
+    const newTasks = [...educationtodo];
+    newTasks.splice(index, 1);
+    setEducationtodo(newTasks);
+    setExpensecreate({
+      ...expensecreate,
+      paidstatus: 'Not Paid',
+      paidmode: 'Please Select Paid Mode',
+      paidamount: '',
+      balanceamount: '',
+    });
+  };
+
+  const [holidays, setHolidays] = useState([])
+  const fetchHoliday = async () => {
+    setPageName(!pageName);
+    try {
+      let res_status = await axios.post(SERVICE.ALL_HOLIDAY, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        assignbranch: accessbranch,
+      });
+
+
+
+      setHolidays(res_status?.data?.holiday);
+    } catch (err) {
+      handleApiError(
+        err,
+        setPopupContentMalert,
+        setPopupSeverityMalert,
+        handleClickOpenPopupMalert
+      );
+    }
+  };
+
+  // Helper function to find the next available date that's not a Sunday or a holiday
+  const getNextValidDate = (date, holidays) => {
+    const holidaysSet = new Set(holidays); // Store holidays for quick lookup
+    let nextDate = moment(date); // Convert the date to a Moment instance
+
+    // Increment the date until it's not a Sunday or a holiday
+    while (nextDate.day() === 0 || holidaysSet.has(nextDate.format("YYYY-MM-DD"))) {
+      nextDate.add(1, 'day'); // Move to the next day
+    }
+
+    return nextDate;
+  };
+
+
+
+  const setDueDate = (e) => {
+    let dueDate = ""; // Default value if not monthly
+    if (e.paymentfrequency === "Monthly" && e.monthlyfrequency) {
+      // Get the current month and year
+      const today = moment();
+      let proposedDate = moment(`${today.year()}-${today.month() + 1}-${e.monthlyfrequency}`, "YYYY-MM-DD");
+
+      // If proposedDate is in the past, set it to next month
+      if (proposedDate.isBefore(today, 'day')) {
+        proposedDate.add(1, 'month');
+      }
+
+      // Filter holidays specific to the selected company, branch, and unit
+      let mappedHolidays = holidays
+        ?.filter(data =>
+          data.company?.includes(stockmaster?.company) &&
+          data.applicablefor?.includes(stockmaster?.branch) &&
+          data.unit?.includes(stockmaster?.unit)
+        )
+        ?.map(item => item?.date);
+
+
+      // Get the valid due date (not Sunday or a holiday)
+      const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+      dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+    } else if (e.paymentfrequency === "Weekly" && e.weeklyfrequency) {
+      // Set today to "2024-05-17"
+      const today = moment(expensecreate?.date);
+
+      // Map days of the week to their numeric values (Sunday = 0, Monday = 1, ..., Saturday = 6)
+      const dayMapping = {
+        Sunday: 0,
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 6
+      };
+
+      // Get the numeric value of the desired day
+      const targetDay = dayMapping[e.weeklyfrequency];
+
+      // Calculate the next target day from today
+      let proposedDate = today.clone().isoWeekday(targetDay);
+
+      // If the proposed day is earlier than today, move to the next week
+      if (proposedDate.isBefore(today, 'day')) {
+        proposedDate.add(1, 'week');
+      }
+
+      // Filter holidays specific to the selected company, branch, and unit
+      let mappedHolidays = holidays
+        ?.filter(data =>
+          data.company?.includes(stockmaster?.company) &&
+          data.applicablefor?.includes(stockmaster?.branch) &&
+          data.unit?.includes(stockmaster?.unit)
+        )
+        ?.map(item => item?.date);
+
+      // Get the valid due date (not a holiday)
+      const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+      dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+    }
+
+    setExpensecreate({
+      ...expensecreate,
+      vendorname: e.value,
+      vendorfrequency: e.paymentfrequency,
+      duedate: dueDate
+    });
+  };
+
+  const setDueDateEdit = (e) => {
+    let dueDate = ""; // Default value if not monthly
+    if (e.paymentfrequency === "Monthly" && e.monthlyfrequency) {
+      // Get the current month and year
+      const today = moment();
+      let proposedDate = moment(`${today.year()}-${today.month() + 1}-${e.monthlyfrequency}`, "YYYY-MM-DD");
+
+      // If proposedDate is in the past, set it to next month
+      if (proposedDate.isBefore(today, 'day')) {
+        proposedDate.add(1, 'month');
+      }
+
+      // Filter holidays specific to the selected company, branch, and unit
+      let mappedHolidays = holidays
+        ?.filter(data =>
+          data.company?.includes(stockmasteredit?.company) &&
+          data.applicablefor?.includes(stockmasteredit?.branch) &&
+          data.unit?.includes(stockmasteredit?.unit)
+        )
+        ?.map(item => item?.date);
+
+
+      // Get the valid due date (not Sunday or a holiday)
+      const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+      dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+    } else if (e.paymentfrequency === "Weekly" && e.weeklyfrequency) {
+      // Set today to "2024-05-17"
+      const today = moment(expensecreateedit?.date);
+
+      // Map days of the week to their numeric values (Sunday = 0, Monday = 1, ..., Saturday = 6)
+      const dayMapping = {
+        Sunday: 0,
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 6
+      };
+
+      // Get the numeric value of the desired day
+      const targetDay = dayMapping[e.weeklyfrequency];
+
+      // Calculate the next target day from today
+      let proposedDate = today.clone().isoWeekday(targetDay);
+
+      // If the proposed day is earlier than today, move to the next week
+      if (proposedDate.isBefore(today, 'day')) {
+        proposedDate.add(1, 'week');
+      }
+
+      // Filter holidays specific to the selected company, branch, and unit
+      let mappedHolidays = holidays
+        ?.filter(data =>
+          data.company?.includes(stockmasteredit?.company) &&
+          data.applicablefor?.includes(stockmasteredit?.branch) &&
+          data.unit?.includes(stockmasteredit?.unit)
+        )
+        ?.map(item => item?.date);
+
+      // Get the valid due date (not a holiday)
+      const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+      dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+    }
+
+    setExpensecreateedit({
+      ...expensecreateedit,
+      vendorname: e.value,
+      vendorfrequency: e.paymentfrequency,
+      duedate: dueDate
+    });
+  };
 
   useEffect(() => {
-    fetchBranchDropdowns(stockmaterialedit.company);
-    fetchUnits(stockmaterialedit.branch);
-    fetchFloor(stockmaterialedit.branch);
-    fetchArea(stockmaterialedit.branch, stockmaterialedit.floor);
-    fetchLocation(stockmaterialedit.branch, stockmaterialedit.floor, stockmaterialedit.area);
-  }, [stockmaterialedit, isEditOpen]);
-
-  useEffect(() => {
-    fetchMaterialNew();
-  }, [stockmaterialedit]);
+    fetchHoliday()
+  }, []);
 
   return (
     <Box>
@@ -4758,7 +5595,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                         setAreas([]);
                         setLocations([{ label: 'ALL', value: 'ALL' }]);
                         fetchUnits(e);
-                        fetchFloor(e);
+                        fetchFloor(e.value);
                       }}
                     />
                   </FormControl>
@@ -4820,7 +5657,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                         });
                         // setAreas([]);
                         setLocations([{ label: 'ALL', value: 'ALL' }]);
-                        fetchArea(e.value);
+                        fetchArea(stockmaster.branch, e.value);
                       }}
                     />
                   </FormControl>
@@ -4845,7 +5682,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                           location: 'Please Select Location',
                         });
                         setLocations([{ label: 'ALL', value: 'ALL' }]);
-                        fetchLocation(e.value);
+                        fetchLocation(stockmaster.branch, stockmaster.floor, stockmaster.area, e.value);
                       }}
                     />
                   </FormControl>
@@ -4956,16 +5793,16 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                           type="text"
                           placeholder=""
                           value={stockmaster.warrantycalculation}
-                          // onChange={(e) => {
-                          //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
-                          // }}
+                        // onChange={(e) => {
+                        //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
+                        // }}
                         />
                       </FormControl>
                     </Grid>
                   </>
                 )}
 
-                <Grid item md={2.5} xs={12} sm={12}>
+                <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
                       {' '}
@@ -4973,12 +5810,29 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                       {/* <b style={{ color: "red" }}>*</b>{" "} */}
                     </Typography>
                     <Selects
-                      options={vendorGroupOpt}
+                      // options={[...vendorModeOptions, ...vendorGroupOpt]}
+                      options={[
+                        ...vendorModeOptions,
+                        ...vendorGroupOpt.filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        }),
+                      ]}
                       styles={colourStyles}
                       value={{ label: vendorGroup, value: vendorGroup }}
                       onChange={(e) => {
                         handleChangeGroupName(e);
+                        setExpensecreate({
+                          ...expensecreate,
+                          vendorgrouping: e.value,
+                          vendorname: 'Please Select Vendor',
+                          vendorfrequency: '',
+                          duedate: '',
+                          paidmode: 'Please Select Paid Mode',
+                        });
                         setVendorGroup(e.value);
+                        setFrequencyValue('');
+                        setGroupedVendorNames(vendorGroupOpt?.filter((item) => item.name === e.value)?.map((data) => data?.vendor));
+                        setVendorModeOfPayments('');
                         setVendorNew('Choose Vendor');
                       }}
                     />
@@ -4992,13 +5846,22 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                       {/* <b style={{ color: "red" }}>*</b>{" "} */}
                     </Typography>
                     <Selects
-                      options={[...vendorOpt, ...vendorModeOptions]}
+                      // options={[...vendorModeOptions, ...vendorOpt]}
+                      options={[
+                        ...vendorModeOptions,
+                        ...vendorOpt?.filter((data) => groupedVendorNames?.includes?.(data?.value))
+                      ]}
                       styles={colourStyles}
                       value={{ label: vendorNew, value: vendorNew }}
                       onChange={(e) => {
+                        setDueDate(e)
                         setVendorNew(e.value);
-
-                        // e.value === "Old Stock" || "Unknown" ? "" :
+                        setFrequencyValue(e.paymentfrequency);
+                        setVendorModeOfPayments(e?.modeofpayments);
+                        setVendorNewstock((prev) => ({
+                          ...prev,
+                          ...e,
+                        }));
                         vendorid(e._id);
                       }}
                     />
@@ -5022,6 +5885,12 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                   >
                     <FaPlus style={{ fontSize: '15px' }} />
                   </Button>
+                </Grid>
+                <Grid item lg={3} md={3} xs={12} sm={6}>
+                  <FormControl size="small" fullWidth>
+                    <Typography>Frequency</Typography>
+                    <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValue} readOnly />
+                  </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
@@ -5047,6 +5916,87 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                     />
                   </FormControl>
                 </Grid>
+
+                {stockmaster.warranty === 'Yes' && (
+                  <Grid item md={3} xs={12} sm={12}>
+                    <FormControl fullWidth size="small">
+                      <Typography>Warranty Details</Typography>
+                      <OutlinedInput
+                        id="component-outlined"
+                        type="text"
+                        value={stockmaster.warrantydetails}
+                        sx={userStyle.input}
+                        placeholder="Please Enter Warranty Details"
+                        onChange={(e) => {
+                          setStockmaster({
+                            ...stockmaster,
+                            warrantydetails: e.target.value,
+                          });
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                )}
+
+
+
+
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>Bill Date</Typography>
+                    <TextField
+                      size="small"
+                      type="date"
+                      value={stockmaster.billdate}
+                      onChange={(e) => {
+                        setStockmaster({
+                          ...stockmaster,
+                          billdate: e.target.value,
+                          duedate: ''
+                        });
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item lg={2} md={4} xs={12} sm={6}>
+                  <FormControl fullWidth size="small">
+                    <Typography>Due Date</Typography>
+                    <OutlinedInput
+                      id="to-date"
+                      type="date"
+                      value={expensecreate.duedate}
+                      onChange={(e) => {
+                        setExpensecreate({
+                          ...expensecreate,
+                          duedate: e.target.value,
+                        });
+                      }}
+                      inputProps={{
+                        min: stockmaster.date,
+                        // max: today
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item md={1.5} xs={12} sm={12}>
+                  <Typography>Bill</Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                    <Button variant="contained" onClick={handleClickUploadPopupOpen}>
+                      Upload
+                    </Button>
+                  </Box>
+                </Grid>
+                {stockmaster.warranty === 'Yes' && (
+                  <Grid item md={1.5} xs={12} sm={12}>
+                    <Typography>Warranty Card </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                      <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
+                        Upload
+                      </Button>
+                    </Box>
+                  </Grid>
+                )}
+
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
@@ -5105,3962 +6055,699 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                     />
                   </FormControl>
                 </Grid>
-                {isStockMaterial ? (
-                  <>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Stock Category<b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <Selects
-                          options={categoryOption}
-                          styles={colourStyles}
-                          value={{
-                            label: stockmaster.stockcategory,
-                            value: stockmaster.stockcategory,
-                          }}
-                          onChange={(e) => {
-                            setStockmaster({
-                              ...stockmaster,
-                              stockcategory: e.value,
-                              stocksubcategory: 'Please Select Stock Sub Category',
-                              materialnew: 'Please Select Material',
-                              uomnew: '',
-                            });
-                            setMaterialoptNew([]);
-                            fetchSubcategoryBased(e);
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Stock Sub-category<b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <Selects
-                          options={subcategoryOpt}
-                          styles={colourStyles}
-                          value={{
-                            label: stockmaster.stocksubcategory,
-                            value: stockmaster.stocksubcategory,
-                          }}
-                          onChange={(e) => {
-                            setStockmaster({
-                              ...stockmaster,
-                              stocksubcategory: e.value,
-                              materialnew: 'Please Select Material',
-                              uomnew: '',
-                            });
-                            fetchMaterialNew(e);
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Material<b style={{ color: 'red' }}>*</b>
-                        </Typography>
-                        <Selects
-                          options={materialOptNew}
-                          styles={colourStyles}
-                          value={{
-                            label: stockmaster.materialnew,
-                            value: stockmaster.materialnew,
-                          }}
-                          onChange={(e) => {
-                            fetchAsset();
-                            setStockmaster({
-                              ...stockmaster,
-                              materialnew: e.value,
-                            });
-
-                            fetchVomMaster(e);
-                            // fetchspecification(e);
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          UOM<b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <OutlinedInput readOnly={true} value={stockmaster.uomnew} onChange={(e) => {}} />
-                        {/* <Selects
-                          options={uomOpt}
-                          styles={colourStyles}
-                          value={{
-                            label: stockmaster.uomnew,
-                            value: stockmaster.uomnew,
-                          }}
-                          onChange={(e) => {
-
-                            setStockmaster({
-                              ...stockmaster,
-                              uomnew: e.value, materialnew: "Please Select Material"
-                            });
-
-                          }}
-                        /> */}
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={3} sm={12} xs={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Qty<b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="number"
-                          sx={userStyle.input}
-                          placeholder="Please Enter Quantity"
-                          value={stockmaster.quantitynew}
-                          onChange={(e) => {
-                            setStockmaster({
-                              ...stockmaster,
-                              quantitynew: e.target.value > 0 ? e.target.value : 0,
-                            });
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={2.5} sm={12} xs={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>Product Details</Typography>
-                        <TextareaAutosize
-                          aria-label="minimum height"
-                          minRows={2}
-                          value={stockmaster.productdetailsnew}
-                          placeholder="Please Enter Product Details"
-                          onChange={(e) => {
-                            setStockmaster({
-                              ...stockmaster,
-                              productdetailsnew: e.target.value,
-                            });
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={0.5} sm={1} xs={1}>
-                      <Button
-                        variant="contained"
-                        style={{
-                          height: '30px',
-                          minWidth: '20px',
-                          padding: '19px 13px',
-                          color: 'white',
-                          marginTop: '23px',
-                          marginLeft: '-10px',
-                        }}
-                        color="success"
-                        onClick={() => {
-                          handleStockArray();
-                        }}
-                      >
-                        <FaPlus style={{ fontSize: '15px' }} />
-                      </Button>
-                    </Grid>
-                  </>
-                ) : (
-                  <>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Material<b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <Selects
-                          options={materialOpt}
-                          styles={colourStyles}
-                          value={{
-                            label: stockmaster.productname,
-                            value: stockmaster.productname,
-                          }}
-                          onChange={(e) => {
-                            fetchAsset();
-                            setStockmaster({
-                              ...stockmaster,
-                              productname: e.value,
-                              assettype: e.assettype,
-                              producthead: e.assethead,
-                              component: 'Please Select Component',
-                            });
-
-                            fetchspecification(e);
-                            setTodos([]);
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>Asset Type</Typography>
-                        <OutlinedInput id="component-outlined" type="text" value={stockmaster.assettype} readOnly />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>Asset Head</Typography>
-                        <OutlinedInput id="component-outlined" type="text" value={stockmaster.producthead} readOnly />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={3} sm={6} xs={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Component<b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <Selects
-                          options={Specification}
-                          styles={colourStyles}
-                          value={{
-                            label: stockmaster.component,
-                            value: stockmaster.component,
-                          }}
-                          onChange={(e) => {
-                            setStockmaster({
-                              ...stockmaster,
-                              component: e.value,
-                            });
-                            setTodos([]);
-                            handleAddInput(e.value);
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                    {todos &&
-                      todos.map((todo, index) => {
-                        return (
-                          <>
-                            {todo.sub ? (
-                              <Grid container key={index} spacing={1}>
-                                <Grid item md={2} sm={2} xs={2} marginTop={2}>
-                                  <Typography>{todo.sub}</Typography>
-                                </Grid>
-                                <Grid item md={10} sm={10} xs={10} marginTop={2}>
-                                  <Grid container key={index} spacing={1}>
-                                    <>
-                                      <Grid item md={3} sm={6} xs={12}>
-                                        <Grid container spacing={2}>
-                                          <Grid item md={10} sm={10} xs={10}>
-                                            <FormGroup>
-                                              <FormControlLabel
-                                                control={
-                                                  <Switch
-                                                    // color="success"
-                                                    sx={{
-                                                      '& .MuiSwitch-switchBase.Mui-checked': {
-                                                        color: 'green', // Thumb color when checked
-                                                      },
-                                                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                                        backgroundColor: 'green', // Track color when checked
-                                                      },
-                                                      '& .MuiSwitch-switchBase': {
-                                                        color: '#ff0000a3', // Thumb color when not checked
-                                                      },
-                                                      '& .MuiSwitch-switchBase + .MuiSwitch-track': {
-                                                        backgroundColor: '#ff0000a3', // Track color when not checked
-                                                      },
-                                                    }}
-                                                    checked={todo.subcomponentcheck}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'subcomponentcheck', e.target.checked);
-                                                    }}
-                                                  />
-                                                }
-                                                label="Enable Subcomponent"
-                                              />
-                                            </FormGroup>
-                                          </Grid>
-                                        </Grid>
-                                      </Grid>
-                                    </>
-
-                                    {todo.subcomponentcheck === true && (
-                                      <>
-                                        {todo.type && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Type</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.type?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.type,
-                                                        value: todo.type,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'type', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    disabled
-                                                    size="small"
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      // color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenType();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.model && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Model</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.model?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.model,
-                                                        value: todo.model,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'model', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    disabled
-                                                    size="small"
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenModel();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.size && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Size</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.size?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.size,
-                                                        value: todo.size,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'size', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenSize();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.variant && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Variants</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.variant?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.variant,
-                                                        value: todo.variant,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'variant', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenVariant();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.brand && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl size="small" fullWidth>
-                                                    <Typography>Brand</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.brand?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.brand,
-                                                        value: todo.brand,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'brand', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenBrand();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.serial !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>Serial</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="text"
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    size="small"
-                                                    placeholder="Please Enter Serial"
-                                                    value={todo.serial}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'serial', e.target.value);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.other !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>Others</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="text"
-                                                    size="small"
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    placeholder="Please Enter Other"
-                                                    value={todo.other}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'other', e.target.value);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.capacity && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Capacity</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.capacity?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.capacity,
-                                                        value: todo.capacity,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'capacity', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.hdmiport !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>HDMI Port</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="number"
-                                                    size="small"
-                                                    placeholder="Please Enter HDMI Port"
-                                                    value={todo.hdmiport}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    // onChange={(e) => {
-                                                    //   handleChange(index, "hdmiport", e.target.value);
-                                                    // }}
-                                                    onChange={(e) => {
-                                                      const inputText = e.target.value;
-                                                      // Regex to allow only non-negative numbers
-                                                      const validatedInput = inputText.match(/^\d*$/);
-
-                                                      const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
-                                                      handleChange(index, 'hdmiport', sanitizedInput);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.vgaport !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>VGA Port</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="number"
-                                                    size="small"
-                                                    placeholder="Please Enter VGA Port"
-                                                    value={todo.vgaport}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    onChange={(e) => {
-                                                      const inputText = e.target.value;
-                                                      // Regex to allow only non-negative numbers
-                                                      const validatedInput = inputText.match(/^\d*$/);
-
-                                                      const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
-                                                      handleChange(index, 'vgaport', sanitizedInput);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.dpport !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>DP Port</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="number"
-                                                    size="small"
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    placeholder="Please Enter DP Port"
-                                                    value={todo.dpport}
-                                                    onChange={(e) => {
-                                                      const inputText = e.target.value;
-                                                      // Regex to allow only non-negative numbers
-                                                      const validatedInput = inputText.match(/^\d*$/);
-
-                                                      const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
-                                                      handleChange(index, 'dpport', sanitizedInput);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.usbport !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>USB Port</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="number"
-                                                    size="small"
-                                                    placeholder="Please Enter USB Port"
-                                                    value={todo.usbport}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    onChange={(e) => {
-                                                      const inputText = e.target.value;
-                                                      // Regex to allow only non-negative numbers
-                                                      const validatedInput = inputText.match(/^\d*$/);
-
-                                                      const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
-                                                      handleChange(index, 'usbport', sanitizedInput);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.paneltypescreen && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Panel Type</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.paneltype?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.paneltypescreen,
-                                                        value: todo.paneltypescreen,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'paneltypescreen', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.resolution && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Screen Resolution</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.screenresolution?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.resolution,
-                                                        value: todo.resolution,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'resolution', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.connectivity && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Connectivity</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.connectivity?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.connectivity,
-                                                        value: todo.connectivity,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'connectivity', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.daterate && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Data Rate</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.datarate?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.daterate,
-                                                        value: todo.daterate,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'daterate', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.compatibledevice && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Compatible Device</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.compatibledevices?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.compatibledevice,
-                                                        value: todo.compatibledevice,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'compatibledevice', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.outputpower && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Output Power</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.outputpower?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.outputpower,
-                                                        value: todo.outputpower,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'outputpower', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.collingfancount && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Cooling Fan Count</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => item.subcomponent === todo.subname)
-                                                        ?.coolingfancount?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.collingfancount,
-                                                        value: todo.collingfancount,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'collingfancount', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.clockspeed && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Clock Speed</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.clockspeed?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.clockspeed,
-                                                        value: todo.clockspeed,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'clockspeed', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.core && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Core</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.core?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.core,
-                                                        value: todo.core,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'core', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.speed && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Speed</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.speed?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.speed,
-                                                        value: todo.speed,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'speed', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.frequency && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Frequency</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.frequency?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.frequency,
-                                                        value: todo.frequency,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'frequency', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.output && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Output</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.output?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.output,
-                                                        value: todo.output,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'output', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.ethernetports && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Ethernet Ports</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.ethernetports?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.ethernetports,
-                                                        value: todo.ethernetports,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'ethernetports', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.distance && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Distance</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.distance?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.distance,
-                                                        value: todo.distance,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'distance', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.lengthname && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Length</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.lengthname?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.lengthname,
-                                                        value: todo.lengthname,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'lengthname', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.slot && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Slot</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.slot?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.slot,
-                                                        value: todo.slot,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'slot', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.noofchannels && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>No. Of Channels</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.noofchannels?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.noofchannels,
-                                                        value: todo.noofchannels,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'noofchannels', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.colours && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Colour</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        ?.find((item) => item.subcomponent === todo.subname)
-                                                        ?.colours?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.colours,
-                                                        value: todo.colours,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'colours', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>
-                                                    Warranty <b style={{ color: 'red' }}>*</b>
-                                                  </Typography>
-                                                  <Select
-                                                    fullWidth
-                                                    labelId="demo-select-small"
-                                                    id="demo-select-small"
-                                                    value={todo.warranty}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    // onChange={(e) => {
-                                                    //   setAssetdetail({ ...stockmaster, warranty: e.target.value });
-                                                    // }}
-                                                    // value={todo.serial}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'warranty', e.target.value);
-                                                    }}
-                                                  >
-                                                    <MenuItem value="" disabled>
-                                                      {' '}
-                                                      Please Select
-                                                    </MenuItem>
-                                                    <MenuItem value="Yes"> {'Yes'} </MenuItem>
-                                                    <MenuItem value="No"> {'No'} </MenuItem>
-                                                  </Select>
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-
-                                        {todo.warranty === 'Yes' && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={6} xs={6} sm={6}>
-                                                  <Typography>
-                                                    Warranty Time <b style={{ color: 'red' }}>*</b>
-                                                  </Typography>
-                                                  <FormControl fullWidth size="small">
-                                                    <OutlinedInput
-                                                      id="component-outlined"
-                                                      type="text"
-                                                      placeholder="Enter Time"
-                                                      disabled={todo.subcomponentcheck === false}
-                                                      value={todo.estimation}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'estimation', e.target.value);
-                                                        // handleChangephonenumber(e)
-                                                      }}
-                                                      // onChange={(e) => handleChangephonenumber(e)}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={6} xs={6} sm={6}>
-                                                  <Typography>
-                                                    Estimation <b style={{ color: 'red' }}>*</b>
-                                                  </Typography>
-                                                  <Select
-                                                    fullWidth
-                                                    labelId="demo-select-small"
-                                                    id="demo-select-small"
-                                                    value={todo.estimationtime}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    // onChange={(e) => {
-                                                    //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
-                                                    // }}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'estimationtime', e.target.value);
-                                                      // handleEstimationChange()
-                                                    }}
-                                                    // onChange={handleEstimationChange}
-                                                  >
-                                                    <MenuItem value="" disabled>
-                                                      {' '}
-                                                      Please Select
-                                                    </MenuItem>
-                                                    <MenuItem value="Days"> {'Days'} </MenuItem>
-                                                    <MenuItem value="Month"> {'Month'} </MenuItem>
-                                                    <MenuItem value="Year"> {'Year'} </MenuItem>
-                                                  </Select>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>Purchase date </Typography>
-                                                  <OutlinedInput
-                                                    id="component-outlined"
-                                                    type="date"
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    value={todo.purchasedate}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'purchasedate', e.target.value);
-                                                      // handlePurchaseDateChange()
-                                                    }}
-                                                    // onChange={handlePurchaseDateChange}
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-                                        {todo.warranty === 'Yes' && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Expiry Date </Typography>
-                                                    <OutlinedInput
-                                                      id="component-outlined"
-                                                      type="text"
-                                                      disabled={todo.subcomponentcheck === false}
-                                                      placeholder=""
-                                                      value={todo.warrantycalculation}
-                                                      // onChange={(e) => {
-                                                      //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                      // }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>
-                                                    Vendor Group Name
-                                                    {/* <b style={{ color: "red" }}>
-                                                      *
-                                                    </b> */}
-                                                  </Typography>
-                                                  <Selects
-                                                    options={vendorGroupOpt}
-                                                    styles={colourStyles}
-                                                    isDisabled={todo.subcomponentcheck === false}
-                                                    value={{
-                                                      label: todo.vendorgroup,
-                                                      value: todo.vendorgroup,
-                                                    }}
-                                                    onChange={(e) => {
-                                                      handleChangeGroupNameIndexBased(e, index);
-                                                      handleChange(index, 'vendorgroup', e.value);
-                                                      setTodos((prev) => {
-                                                        const updated = [...prev];
-                                                        updated[index].vendor = 'Choose Vendor';
-                                                        return updated;
-                                                      });
-                                                    }}
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>
-                                                    Vendor
-                                                    <b style={{ color: 'red' }}>*</b>
-                                                  </Typography>
-                                                  <Selects
-                                                    options={vendorOptInd[index]}
-                                                    styles={colourStyles}
-                                                    isDisabled={todo.subcomponentcheck === false}
-                                                    value={{
-                                                      label: todo.vendor,
-                                                      value: todo.vendor,
-                                                    }}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'vendor', e.value, e._id);
-                                                      // setVendor(e.value);
-                                                      // vendorid(e._id);
-                                                    }}
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>Address</Typography>
-                                                  <OutlinedInput
-                                                    id="component-outlined"
-                                                    type="text"
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    // value={vendorgetid?.address}
-                                                    value={todo?.address}
-                                                    readOnly
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>Phone Number</Typography>
-                                                  <OutlinedInput
-                                                    id="component-outlined"
-                                                    type="text"
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    // value={vendorgetid?.phonenumber}
-                                                    value={todo?.phonenumber}
-                                                    readOnly
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-                                      </>
-                                    )}
-
-                                    {/* <Grid item md={1} sm={3} xs={3}>
-                                      {todos.length > 0 && (
-                                        <>
-                                          <Button
-                                            sx={{
-                                              padding: "14px 14px",
-                                              marginTop: "16px",
-                                              minWidth: "40px !important",
-                                              borderRadius: "50% !important",
-                                              ":hover": {
-                                                backgroundColor: "#80808036", // theme.palette.primary.main
-                                              },
-                                            }}
-                                            onClick={() => handleDelete(index)}
-                                          >
-                                            <FaTrash
-                                              style={{
-                                                fontSize: "large",
-                                                color: "#a73131",
-                                              }}
-                                            />
-                                          </Button>
-                                        </>
-                                      )}
-                                    </Grid> */}
-                                  </Grid>
-                                </Grid>
-                              </Grid>
-                            ) : (
-                              <Grid container key={index} spacing={1}>
-                                <Grid item md={12} sm={12} xs={12} marginTop={2}>
-                                  <Grid container key={index} spacing={1}>
-                                    <>
-                                      <Grid item md={3} sm={6} xs={12}>
-                                        <Grid container spacing={2}>
-                                          <Grid item md={10} sm={10} xs={10}>
-                                            <FormGroup>
-                                              <FormControlLabel
-                                                control={
-                                                  <Switch
-                                                    // color="success"
-                                                    sx={{
-                                                      '& .MuiSwitch-switchBase.Mui-checked': {
-                                                        color: 'green', // Thumb color when checked
-                                                      },
-                                                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                                        backgroundColor: 'green', // Track color when checked
-                                                      },
-                                                      '& .MuiSwitch-switchBase': {
-                                                        color: '#ff0000a3', // Thumb color when not checked
-                                                      },
-                                                      '& .MuiSwitch-switchBase + .MuiSwitch-track': {
-                                                        backgroundColor: '#ff0000a3', // Track color when not checked
-                                                      },
-                                                    }}
-                                                    checked={todo.subcomponentcheck}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'subcomponentcheck', e.target.checked);
-                                                    }}
-                                                  />
-                                                }
-                                                label="Enable Subcomponent"
-                                              />
-                                            </FormGroup>
-                                          </Grid>
-                                        </Grid>
-                                      </Grid>
-                                    </>
-
-                                    {todo.subcomponentcheck === true && (
-                                      <>
-                                        {todo.type && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Type</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.type?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.type,
-                                                        value: todo.type,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'type', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenType();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.model && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Model</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.model?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.model,
-                                                        value: todo.model,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'model', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenModel();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.size && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Size</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.size?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.size,
-                                                        value: todo.size,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'size', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenSize();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.variant && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Variants</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.variant?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.variant,
-                                                        value: todo.variant,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'variant', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenVariant();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.brand && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl size="small" fullWidth>
-                                                    <Typography>Brand</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.brand?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.brand,
-                                                        value: todo.brand,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'brand', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenBrand();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.serial !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>Serial</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="text"
-                                                    size="small"
-                                                    placeholder="Please Enter Serial"
-                                                    value={todo.serial}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'serial', e.target.value);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        {todo.other !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>Others</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="text"
-                                                    size="small"
-                                                    placeholder="Please Enter Other"
-                                                    value={todo.other}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'other', e.target.value);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.capacity && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Capacity</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.capacity?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      disabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.capacity,
-                                                        value: todo.capacity,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'capacity', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.hdmiport !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>HDMI Port</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="number"
-                                                    size="small"
-                                                    placeholder="Please Enter HDMI Port"
-                                                    value={todo.hdmiport}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'hdmiport', e.target.value);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.vgaport !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>VGA Port</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="text"
-                                                    size="small"
-                                                    placeholder="Please Enter VGA Port"
-                                                    value={todo.vgaport}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'vgaport', e.target.value);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.dpport !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>DP Port</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="text"
-                                                    size="small"
-                                                    placeholder="Please Enter DP Port"
-                                                    value={todo.dpport}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'dpport', e.target.value);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.usbport !== undefined && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={11.6} sm={10} xs={10}>
-                                                  <Typography>USB Port</Typography>
-
-                                                  <OutlinedInput
-                                                    fullWidth
-                                                    type="text"
-                                                    size="small"
-                                                    placeholder="Please Enter USB Port"
-                                                    value={todo.usbport}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'usbport', e.target.value);
-                                                    }}
-                                                  />
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.paneltypescreen && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Panel Type</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.paneltype?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.paneltypescreen,
-                                                        value: todo.paneltypescreen,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'paneltypescreen', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.resolution && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Screen Resolution</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.screenresolution?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.resolution,
-                                                        value: todo.resolution,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'resolution', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.connectivity && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Connectivity</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.connectivity?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.connectivity,
-                                                        value: todo.connectivity,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'connectivity', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.daterate && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Data Rate</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.datarate?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.daterate,
-                                                        value: todo.daterate,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'daterate', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.compatibledevice && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Compatible Device</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.compatibledevices?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.compatibledevice,
-                                                        value: todo.compatibledevice,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'compatibledevice', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.outputpower && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Output Power</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.outputpower?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.outputpower,
-                                                        value: todo.outputpower,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'outputpower', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.collingfancount && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Cooling Fan Count</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.coolingfancount?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.collingfancount,
-                                                        value: todo.collingfancount,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'collingfancount', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.clockspeed && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Clock Speed</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.clockspeed?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.clockspeed,
-                                                        value: todo.clockspeed,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'clockspeed', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.core && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Core</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.core?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.core,
-                                                        value: todo.core,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'core', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.speed && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Speed</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.speed?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.speed,
-                                                        value: todo.speed,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'speed', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.frequency && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Frequency</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.frequency?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.frequency,
-                                                        value: todo.frequency,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'frequency', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.output && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Output</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.output?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.output,
-                                                        value: todo.output,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'output', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.ethernetports && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Ethernet Ports</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.ethernetports?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.ethernetports,
-                                                        value: todo.ethernetports,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'ethernetports', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.distance && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Distance</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.distance?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.distance,
-                                                        value: todo.distance,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'distance', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.lengthname && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Length</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.lengthname?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.lengthname,
-                                                        value: todo.lengthname,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'lengthname', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.slot && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Slot</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.slot?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.slot,
-                                                        value: todo.slot,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'slot', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.noofchannels && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>No. Of Channels</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.noofchannels?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.noofchannels,
-                                                        value: todo.noofchannels,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'noofchannels', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-                                        {todo.colours && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Colour</Typography>
-                                                    <Selects
-                                                      options={specificationGrouping
-                                                        .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                        ?.colours?.map((item) => ({
-                                                          ...item,
-                                                          label: item,
-                                                          value: item,
-                                                        }))}
-                                                      styles={colourStyles}
-                                                      isDisabled={todo.subcomponentcheck === false}
-                                                      value={{
-                                                        label: todo.colours,
-                                                        value: todo.colours,
-                                                      }}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'colours', e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-
-                                                <Grid item md={2} sm={2} xs={2}>
-                                                  <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    disabled
-                                                    style={{
-                                                      height: '30px',
-                                                      minWidth: '20px',
-                                                      padding: '19px 13px',
-                                                      //  color: "white",
-                                                      marginTop: '23px',
-                                                      marginLeft: '-10px',
-                                                      // background: "rgb(25, 118, 210)",
-                                                    }}
-                                                    onClick={() => {
-                                                      handleClickOpenCapacity();
-                                                    }}
-                                                  >
-                                                    <FaPlus style={{ fontSize: '15px' }} />
-                                                  </Button>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>
-                                                    Warranty <b style={{ color: 'red' }}>*</b>
-                                                  </Typography>
-                                                  <Select
-                                                    fullWidth
-                                                    labelId="demo-select-small"
-                                                    id="demo-select-small"
-                                                    value={todo.warranty}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    // onChange={(e) => {
-
-                                                    //   setAssetdetail({ ...stockmaster, warranty: e.target.value });
-                                                    // }}
-                                                    // value={todo.serial}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'warranty', e.target.value);
-                                                    }}
-                                                  >
-                                                    <MenuItem value="" disabled>
-                                                      {' '}
-                                                      Please Select
-                                                    </MenuItem>
-                                                    <MenuItem value="Yes"> {'Yes'} </MenuItem>
-                                                    <MenuItem value="No"> {'No'} </MenuItem>
-                                                  </Select>
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-
-                                        {todo.warranty === 'Yes' && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container>
-                                                <Grid item md={6} xs={6} sm={6}>
-                                                  <Typography>
-                                                    Warranty Time <b style={{ color: 'red' }}>*</b>
-                                                  </Typography>
-                                                  <FormControl fullWidth size="small">
-                                                    <OutlinedInput
-                                                      id="component-outlined"
-                                                      type="text"
-                                                      placeholder="Enter Time"
-                                                      value={todo.estimation}
-                                                      disabled={todo.subcomponentcheck === false}
-                                                      onChange={(e) => {
-                                                        handleChange(index, 'estimation', e.target.value);
-                                                        handleChangephonenumber(e);
-                                                      }}
-                                                      // onChange={(e) => handleChangephonenumber(e)}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={6} xs={6} sm={6}>
-                                                  <Typography>
-                                                    Estimation <b style={{ color: 'red' }}>*</b>
-                                                  </Typography>
-                                                  <Select
-                                                    fullWidth
-                                                    labelId="demo-select-small"
-                                                    id="demo-select-small"
-                                                    value={todo.estimationtime}
-                                                    // onChange={(e) => {
-                                                    //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
-                                                    // }}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'estimationtime', e.target.value);
-                                                      // handleEstimationChange()
-                                                    }}
-                                                    // onChange={handleEstimationChange}
-                                                  >
-                                                    <MenuItem value="" disabled>
-                                                      {' '}
-                                                      Please Select
-                                                    </MenuItem>
-                                                    <MenuItem value="Days"> {'Days'} </MenuItem>
-                                                    <MenuItem value="Month"> {'Month'} </MenuItem>
-                                                    <MenuItem value="Year"> {'Year'} </MenuItem>
-                                                  </Select>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>Purchase date </Typography>
-                                                  <OutlinedInput
-                                                    id="component-outlined"
-                                                    type="date"
-                                                    value={todo.purchasedate}
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'purchasedate', e.target.value);
-                                                      // handlePurchaseDateChange()
-                                                    }}
-                                                    // onChange={handlePurchaseDateChange}
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-                                        {todos.warranty === 'Yes' && (
-                                          <>
-                                            <Grid item md={3} sm={6} xs={12}>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={10} sm={10} xs={10}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Expiry Date </Typography>
-                                                    <OutlinedInput
-                                                      id="component-outlined"
-                                                      type="text"
-                                                      disabled={todo.subcomponentcheck === false}
-                                                      placeholder=""
-                                                      value={todo.warrantycalculation}
-                                                      // onChange={(e) => {
-                                                      //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                      // }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                              </Grid>
-                                            </Grid>
-                                          </>
-                                        )}
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>
-                                                    {/* Vendor Group Name
-                                                    <b style={{ color: "red" }}>
-                                                      *
-                                                    </b> */}
-                                                  </Typography>
-                                                  <Selects
-                                                    options={vendorGroupOpt}
-                                                    styles={colourStyles}
-                                                    isDisabled={todo.subcomponentcheck === false}
-                                                    value={{
-                                                      label: todo.vendorgroup,
-                                                      value: todo.vendorgroup,
-                                                    }}
-                                                    onChange={(e) => {
-                                                      handleChangeGroupNameIndexBased(e, index);
-                                                      handleChange(index, 'vendorgroup', e.value);
-                                                      setTodos((prev) => {
-                                                        const updated = [...prev];
-                                                        updated[index].vendor = 'Choose Vendor';
-                                                        return updated;
-                                                      });
-                                                    }}
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>
-                                                    Vendor
-                                                    <b style={{ color: 'red' }}>*</b>
-                                                  </Typography>
-                                                  <Selects
-                                                    options={vendorOptInd[index]}
-                                                    styles={colourStyles}
-                                                    value={{
-                                                      label: todo.vendor,
-                                                      value: todo.vendor,
-                                                    }}
-                                                    onChange={(e) => {
-                                                      handleChange(index, 'vendor', e.value, e._id);
-                                                      // setVendor(e.value);
-                                                      // vendorid(e._id);
-                                                    }}
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>Address</Typography>
-                                                  <OutlinedInput
-                                                    id="component-outlined"
-                                                    type="text"
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    // value={vendorgetid?.address}
-                                                    value={todo?.address}
-                                                    readOnly
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-
-                                        <>
-                                          <Grid item md={3} sm={6} xs={12}>
-                                            <Grid container spacing={2}>
-                                              <Grid item md={10} sm={10} xs={10}>
-                                                <FormControl fullWidth size="small">
-                                                  <Typography>Phone Number</Typography>
-                                                  <OutlinedInput
-                                                    id="component-outlined"
-                                                    type="text"
-                                                    disabled={todo.subcomponentcheck === false}
-                                                    // value={vendorgetid?.phonenumber}
-                                                    value={todo?.phonenumber}
-                                                    readOnly
-                                                  />
-                                                </FormControl>
-                                              </Grid>
-                                            </Grid>
-                                          </Grid>
-                                        </>
-                                      </>
-                                    )}
-                                    {/* <Grid item md={1} sm={3} xs={3}>
-                                      <Button
-                                        sx={{
-                                          padding: "14px 14px",
-                                          marginTop: "16px",
-                                          minWidth: "40px !important",
-                                          borderRadius: "50% !important",
-                                          ":hover": {
-                                            backgroundColor: "#80808036", // theme.palette.primary.main
-                                          },
-                                        }}
-                                        onClick={() => handleDelete(index)}
-                                      >
-                                        <FaTrash
-                                          style={{
-                                            fontSize: "large",
-                                            color: "#a73131",
-                                          }}
-                                        />
-                                      </Button>
-                                    </Grid> */}
-                                  </Grid>
-                                </Grid>
-                              </Grid>
-                            )}
-                            <br />
-                          </>
-                        );
-                      })}
-
-                    <Grid item md={3} sm={12} xs={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Product Details <b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <TextareaAutosize
-                          aria-label="minimum height"
-                          minRows={2}
-                          value={stockmaster.productdetails}
-                          placeholder="Please Enter Product Details"
-                          onChange={(e) => {
-                            setStockmaster({
-                              ...stockmaster,
-                              productdetails: e.target.value,
-                            });
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl size="small" fullWidth>
-                        <Typography>
-                          UOM <b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <Selects
-                          options={vomMasterget}
-                          styles={colourStyles}
-                          value={{
-                            label: stockmaster.uom,
-                            value: stockmaster.uom,
-                          }}
-                          onChange={(e) => {
-                            setStockmaster({ ...stockmaster, uom: e.value });
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={3} sm={12} xs={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>
-                          Qty<b style={{ color: 'red' }}>*</b>{' '}
-                        </Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="number"
-                          sx={userStyle.input}
-                          placeholder="Please Enter Quantity"
-                          value={stockmaster.quantity}
-                          onChange={(e) => {
-                            setStockmaster({
-                              ...stockmaster,
-                              quantity: e.target.value,
-                            });
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                  </>
-                )}
-              </Grid>
-              <br />
-              <br />
-              <Grid container spacing={2}>
-                {stockmaster.warranty === 'Yes' && (
-                  <Grid item md={3} xs={12} sm={12}>
+                {stockmaster.requestmode === 'Asset Material' && (
+                  <Grid item md={3} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
-                      <Typography>Warranty Details</Typography>
+                      <Typography>
+                        Rate<b style={{ color: 'red' }}>*</b>{' '}
+                      </Typography>
                       <OutlinedInput
                         id="component-outlined"
-                        type="text"
-                        value={stockmaster.warrantydetails}
+                        type="number"
                         sx={userStyle.input}
-                        placeholder="Please Enter Warranty Details"
+                        placeholder="Please Enter Rate"
+                        value={stockmaster.rate}
                         onChange={(e) => {
+                          const quantity = stockmaster.requestmode == 'Stock Material' ? Number(stockmaster.quantitynew) : Number(stockmaster.quantity);
                           setStockmaster({
                             ...stockmaster,
-                            warrantydetails: e.target.value,
+                            rate: e.target.value,
                           });
+                          setAmount(Number(e.target.value) * Number(quantity));
                         }}
                       />
                     </FormControl>
                   </Grid>
                 )}
+
+                {/* {stockmaster.requestmode === 'Asset Material' && (
+                  <Grid item md={3} sm={12} xs={12}>
+                    <FormControl fullWidth size="small">
+                      <Typography>
+                        Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
+                      </Typography>
+                      <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={Number(totalAmount)} />
+                    </FormControl>
+                  </Grid>
+                )}
+                {stockmaster.requestmode === 'Stock Material' && (
+                  <Grid item md={3} sm={12} xs={12}>
+                    <FormControl fullWidth size="small">
+                      <Typography>
+                        Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
+                      </Typography>
+                      <OutlinedInput
+                        id="component-outlined"
+                        type="number"
+                        sx={userStyle.input}
+                        // value={Number(totalAmount)}
+                        value={stockmaster.totalbillamount}
+                        onChange={(e) => {
+                          setStockmaster({
+                            ...stockmaster,
+                            totalbillamount: e.target.value,
+                          });
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                )} */}
                 <Grid item md={3} sm={12} xs={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Rate<b style={{ color: 'red' }}>*</b>{' '}
+                      Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
                       type="number"
                       sx={userStyle.input}
-                      placeholder="Please Enter Rate"
-                      value={stockmaster.rate}
-                      onChange={(e) => {
-                        setStockmaster({
-                          ...stockmaster,
-                          rate: e.target.value,
-                        });
-                      }}
+
+                      value={stockmaster.requestmode === 'Stock Material' ? stockmaster.totalbillamount : Number(totalAmount)}
+
+                      // onChange={(e) => {
+                      //   setStockmaster({
+                      //     ...stockmaster,
+                      //     totalbillamount: e.target.value,
+                      //   });
+                      // }}
+                      onChange={
+                        stockmaster.requestmode === 'Stock Material'
+                          ? (e) =>
+                            setStockmaster({
+                              ...stockmaster,
+                              totalbillamount: e.target.value,
+                            })
+                          : undefined
+                      }
+
+
                     />
                   </FormControl>
                 </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>Bill Date</Typography>
-                    <TextField
-                      size="small"
-                      type="date"
-                      value={stockmaster.billdate}
-                      onChange={(e) => {
-                        setStockmaster({
-                          ...stockmaster,
-                          billdate: e.target.value,
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <Typography>Bill</Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                    <Button variant="contained" onClick={handleClickUploadPopupOpen}>
-                      Upload
-                    </Button>
-                  </Box>
-                </Grid>
-                {stockmaster.warranty === 'Yes' && (
-                  <Grid item md={3} xs={12} sm={12}>
-                    <Typography>Warranty Card </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                      <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
-                        Upload
-                      </Button>
-                    </Box>
+              </Grid>
+              <br />
+
+            
+
+              {/* stock todo */}
+              {stockmaster.requestmode === 'Stock Material' && (
+                <>
+                  <Grid item md={12} xs={12} sm={12}>
+                    {' '}
+                    <Typography variant="h6">Stock Purchase Todo List</Typography>
                   </Grid>
-                )}
-                {stockArray.length > 0 && (
-                  <>
-                    <Grid item md={12} xs={12} sm={12}>
-                      {' '}
-                      <Typography variant="h6">Stock Purchase Todo List</Typography>
-                    </Grid>
+                  <Grid item md={12} sm={12} xs={12}>
+                    <Grid container spacing={3} sx={{ display: 'flex' }}>
+                      {stockmaster.requestmode === 'Stock Material' && (
+                        <>
+                          <Grid item md={2.5} sm={6} xs={12}>
+                            <FormControl fullWidth size="small">
+                              <Typography>Category</Typography>
+                              <Selects
+                                options={stockCategoryOptions}
+                                styles={colourStyles}
+                                value={{
+                                  label: todoDetails.category,
+                                  value: todoDetails.category,
+                                }}
+                                onChange={(e) => {
+                                  setItemAllShow(false);
+                                  setTodoDetails({
+                                    ...todoDetails,
+                                    category: e.value,
+                                    subcategory: 'Please Select Sub Category',
+                                    materialnew: todoDetails.particularmode === 'Others' ? '' : 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    amount: '',
+                                  });
+                                }}
+                              />
+                            </FormControl>
+                          </Grid>
+                          {isUserRoleCompare?.includes('astockcategory') && (
+                            <Grid item md={0.5} sm={1} xs={1}>
+                              <Button
+                                variant="contained"
+                                style={{
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
+                                }}
+                                onClick={() => {
+                                  handleClickOpenviewalertstockcategory();
+                                }}
+                              >
+                                <FaPlus style={{ fontSize: '15px' }} />
+                              </Button>
+                            </Grid>
+                          )}
+                          <Grid item md={3} sm={6} xs={12}>
+                            <FormControl fullWidth size="small">
+                              <Typography>Sub Category</Typography>
+                              <Selects
+                                options={allStockCategory
+                                  .filter((item) => item.categoryname === todoDetails.category)
+                                  .map((item) => {
+                                    return item.subcategoryname.map((subCatName) => ({
+                                      label: subCatName,
+                                      value: subCatName,
+                                    }));
+                                  })
+                                  .flat()}
+                                styles={colourStyles}
+                                value={{
+                                  label: todoDetails.subcategory,
+                                  value: todoDetails.subcategory,
+                                }}
+                                onChange={(e) => {
+                                  if (e.value !== 'Please Select Sub Category') {
+                                    setItemAllShow(false);
+                                  } else {
+                                    setItemAllShow(true);
+                                  }
+                                  setTodoDetails({
+                                    ...todoDetails,
+                                    subcategory: e.value,
+                                    materialnew: todoDetails.particularmode === 'Others' ? '' : 'Please Select Item Name',
+                                    uomnew: '',
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
+                                  });
+                                }}
+                              />
+                            </FormControl>
+                          </Grid>
+                          <Grid item md={2.5} sm={6} xs={12}>
+                            <FormControl fullWidth size="small">
+                              <Typography>
+                                Item Name <b style={{ color: 'red' }}>*</b>
+                              </Typography>
+                              <Selects
+                                options={
+                                  !itemAllShow
+                                    ? allStockValues
+                                      .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
+                                      .map((item) => ({
+                                        label: item.itemname,
+                                        value: item.itemname,
+                                        uom: item.uom,
+                                      }))
+                                    : allStockValues.map((item) => ({
+                                      label: item.itemname,
+                                      value: item.itemname,
+                                      uom: item.uom,
+                                    }))
+                                }
+                                styles={colourStyles}
+                                value={{
+                                  label: todoDetails.materialnew,
+                                  value: todoDetails.materialnew,
+                                }}
+                                onChange={(e) => {
+                                  setTodoDetails({
+                                    ...todoDetails,
+                                    materialnew: e.value,
+                                    uomnew: e.uom,
+                                    rate: '',
+                                    quantitynew: '',
+                                    productdetailsnew: '',
+                                    amount: '',
+                                  });
+                                }}
+                              />
+                            </FormControl>
+                          </Grid>
+                          {isUserRoleCompare?.includes('amanagestockitems') && (
+                            <Grid item md={0.5} sm={1} xs={1}>
+                              <Button
+                                variant="contained"
+                                style={{
+                                  height: '30px',
+                                  minWidth: '20px',
+                                  padding: '19px 13px',
+                                  color: 'white',
+                                  marginTop: '23px',
+                                  marginLeft: '-10px',
+                                  background: 'rgb(25, 118, 210)',
+                                }}
+                                onClick={() => {
+                                  handleClickOpenviewalertstockitem();
+                                }}
+                              >
+                                <FaPlus style={{ fontSize: '15px' }} />
+                              </Button>
+                            </Grid>
+                          )}
+                          <Grid item md={3} sm={6} xs={12}>
+                            <FormControl fullWidth size="small">
+                              <Typography>UOM</Typography>
+                              <OutlinedInput id="component-outlined" type="text" placeholder="Please Enter UOM" value={todoDetails.uomnew} readOnly />
+                            </FormControl>
+                          </Grid>
+                        </>
+                      )}
 
-                    {/* <Grid item md={3} xs={12} sm={12}></Grid>
-                    <Grid item md={3} xs={12} sm={12}></Grid>
-                    <Grid item md={3} xs={12} sm={12}></Grid> */}
-                  </>
-                )}
-                {stockArray.length > 0 &&
-                  stockArray.map((item, index) => {
-                    return (
-                      <>
-                        <Grid item md={3} xs={3} sm={3}>
-                          <FormControl fullWidth size="small">
-                            <Typography>Material</Typography>
-                            <OutlinedInput readOnly={true} value={item.materialnew} />
-                          </FormControl>
-                        </Grid>
-                        <Grid item md={3} xs={3} sm={3}>
-                          <FormControl fullWidth size="small">
-                            <Typography>UOM </Typography>
-                            <OutlinedInput readOnly={true} value={item.uomnew} />
-                          </FormControl>
-                        </Grid>
-                        <Grid item md={3} sm={3} xs={3}>
-                          <FormControl fullWidth size="small">
-                            <Typography>Qty </Typography>
-                            <OutlinedInput readOnly={true} value={item.quantitynew} />
-                          </FormControl>
-                        </Grid>
-                        <Grid item md={3} sm={3} xs={3} sx={{ display: 'flex' }}>
-                          <FormControl fullWidth size="small">
-                            <Typography>Product Details</Typography>
-
-                            <TextareaAutosize aria-label="minimum height" minRows={2} readOnly={true} value={item.productdetailsnew} placeholder="Please Enter Product Details" />
-                          </FormControl>
-                          &nbsp; &emsp;
-                          <Button
-                            variant="contained"
-                            color="error"
-                            type="button"
-                            onClick={(e) => deleteTodo(index)}
-                            sx={{
-                              height: '30px',
-                              minWidth: '30px',
-                              marginTop: '28px',
-                              padding: '6px 10px',
+                      <Grid item md={3} sm={6} xs={12}>
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Rate <b style={{ color: 'red' }}>*</b>
+                          </Typography>
+                          <OutlinedInput
+                            id="component-outlined"
+                            type="text"
+                            placeholder="Please Enter Rate"
+                            inputMode="decimal"
+                            pattern="[0-9]*"
+                            value={todoDetails.rate}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const regex = /^\d*\.?\d{0,2}$/;
+                              if (regex.test(value) || value === '') {
+                                setTodoDetails({
+                                  ...todoDetails,
+                                  rate: value,
+                                  amount: Number(value) * Number(todoDetails.quantitynew),
+                                });
+                              }
                             }}
-                          >
-                            <AiOutlineClose />
-                          </Button>
+                          />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={3} sm={6} xs={12}>
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Quantity <b style={{ color: 'red' }}>*</b>
+                          </Typography>
+                          <OutlinedInput
+                            id="component-outlined"
+                            type="text"
+                            placeholder="Please Enter Quantity"
+                            value={todoDetails.quantitynew}
+                            onChange={(e) => {
+                              const input = e.target.value;
+                              if (/^\d*\.?\d*$/.test(input) && input >= 0) {
+                                setTodoDetails({
+                                  ...todoDetails,
+                                  quantitynew: input,
+                                  amount: Number(input) * Number(todoDetails.rate),
+                                });
+                              }
+                            }}
+                          />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={3} sm={6} xs={12}>
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Amount<b style={{ color: 'red' }}>*</b>
+                          </Typography>
+                          <OutlinedInput id="component-outlined" type="number" placeholder="Please Enter Amount" sx={userStyle.input} value={todoDetails.amount} readOnly />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={todoDetails.particularmode !== 'Others' ? 2.5 : 3} sm={6} xs={12}>
+                        <Typography>
+                          Product Details<b style={{ color: 'red' }}>*</b>
+                        </Typography>
+                        <TextareaAutosize
+                          aria-label="minimum height"
+                          minRows={3}
+                          minCols={10}
+                          value={todoDetails.productdetailsnew}
+                          placeholder="Please Enter Product Details"
+                          onChange={(e) => {
+                            setTodoDetails({
+                              ...todoDetails,
+                              productdetailsnew: e.target.value,
+                            });
+                          }}
+                        />
+                      </Grid>
+                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: '-20px' }}>
+                        <Button
+                          variant="contained"
+                          color="success"
+                          style={{
+                            height: '30px',
+                            minWidth: '20px',
+                            padding: '19px 13px',
+                            marginTop: '25px',
+                          }}
+                          onClick={educationTodo}
+                        >
+                          <FaPlus />
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Grid>{' '}
+                  <br />
+                  <Grid container spacing={2}>
+                    <Grid item md={12} xs={12} sm={12}>
+                      <TableContainer component={Paper}>
+                        <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable">
+                          <TableHead sx={{ fontWeight: '600' }}>
+                            <StyledTableRow>
+                              <StyledTableCell>SNo</StyledTableCell>
+                              <StyledTableCell>Item Name</StyledTableCell>
+                              <StyledTableCell>UOM</StyledTableCell>
+                              <StyledTableCell>Rate</StyledTableCell>
+                              <StyledTableCell>Quantity</StyledTableCell>
+                              <StyledTableCell>Amount</StyledTableCell>
+                              <StyledTableCell>Product Details</StyledTableCell>
+                              <StyledTableCell>Actions</StyledTableCell>
+                            </StyledTableRow>
+                          </TableHead>
+                          <TableBody align="left">
+                            {educationtodo?.length > 0 ? (
+                              educationtodo?.map((row, index) => (
+                                <StyledTableRow>
+                                  <StyledTableCell>{index + 1}</StyledTableCell>
+                                  <StyledTableCell>{row.materialnew}</StyledTableCell>
+                                  <StyledTableCell>{row.uomnew}</StyledTableCell>
+                                  <StyledTableCell>{row.rate}</StyledTableCell>
+                                  <StyledTableCell>{row.quantitynew}</StyledTableCell>
+                                  <StyledTableCell>{row.amount}</StyledTableCell>
+                                  <StyledTableCell>{row.productdetailsnew}</StyledTableCell>
+                                  <StyledTableCell>
+                                    <CloseIcon
+                                      sx={{ color: 'red', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        educationTodoremove(index);
+                                      }}
+                                    />
+                                  </StyledTableCell>
+                                </StyledTableRow>
+                              ))
+                            ) : (
+                              <StyledTableRow>
+                                {' '}
+                                <StyledTableCell colSpan={8} align="center">
+                                  No Data Available
+                                </StyledTableCell>{' '}
+                              </StyledTableRow>
+                            )}
+                            <StyledTableRow></StyledTableRow>
+                          </TableBody>
+                          <TableFooter sx={{ backgroundColor: '#9591914f', height: '50px' }}>
+                            {educationtodo &&
+                              educationtodo.forEach((item) => {
+                                Expensetotal += +item.amount;
+                              })}
+                            <StyledTableRow className="table2_total">
+                              <StyledTableCell align="left" colSpan={4}></StyledTableCell>
+                              <StyledTableCell align="left">Manual Total (Rs.)</StyledTableCell>
+                              <StyledTableCell align="left">{Expensetotal.toFixed(2)}</StyledTableCell>
+                              <StyledTableCell align="left"></StyledTableCell>
+                              <StyledTableCell align="left"></StyledTableCell>
+                            </StyledTableRow>
+                          </TableFooter>
+                        </Table>
+                      </TableContainer>{' '}
+                    </Grid>
+                  </Grid>
+                  <br />
+                  <Grid container spacing={2} sx={{ display: 'flex' }}>
+                    <Grid item lg={3} md={4} xs={12} sm={6}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Paid Status<b style={{ color: 'red' }}>*</b>
+                        </Typography>
+                        <Selects
+                          maxMenuHeight={250}
+                          options={statusOpt}
+                          placeholder="Please Select Status"
+                          value={{
+                            label: expensecreate.paidstatus,
+                            value: expensecreate.paidstatus,
+                          }}
+                          onChange={(e) => {
+                            setExpensecreate({
+                              ...expensecreate,
+                              paidstatus: e.value,
+                              paidmode: 'Please Select Paid Mode',
+                            });
+                          }}
+                          isDisabled={Number(Expensetotal) !== Number(stockmaster.totalbillamount)}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item lg={3} md={4} xs={12} sm={6}>
+                      {expensecreate.paidstatus === 'Paid' && (
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Paid Mode<b style={{ color: 'red' }}>*</b>
+                          </Typography>
+                          <Selects
+                            maxMenuHeight={250}
+                            options={paidOpt?.filter((data) => vendorModeOfPayments?.includes(data?.label))}
+                            placeholder="Please Select Paid Mode"
+                            value={{
+                              label: expensecreate.paidmode,
+                              value: expensecreate.paidmode,
+                            }}
+                            onChange={(e) => {
+                              setExpensecreate({
+                                ...expensecreate,
+                                paidmode: e.value,
+                              });
+                            }}
+                          />
+                        </FormControl>
+                      )}
+                    </Grid>
+                    <Grid item lg={3} md={4} xs={12} sm={6}>
+                      {expensecreate.paidstatus === 'Paid' && (
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Paid Amount<b style={{ color: 'red' }}>*</b>
+                          </Typography>
+                          <OutlinedInput
+                            id="component-outlined"
+                            type="number"
+                            placeholder="Please Enter Paid Amount"
+                            sx={userStyle.input}
+                            value={expensecreate.paidamount}
+                            onChange={(e) => {
+                              if (Number(e.target.value) <= Number(stockmaster.totalbillamount)) {
+                                setExpensecreate({
+                                  ...expensecreate,
+                                  paidamount: e.target.value,
+                                  balanceamount: stockmaster.totalbillamount - e.target.value,
+                                });
+                              }
+                            }}
+                          />
+                        </FormControl>
+                      )}
+                    </Grid>
+                    <Grid item lg={3} md={4} xs={12} sm={6}>
+                      {expensecreate.paidstatus === 'Paid' && (
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Balance Amount<b style={{ color: 'red' }}>*</b>
+                          </Typography>
+                          <OutlinedInput readOnly id="component-outlined" type="number" sx={userStyle.input} placeholder="Please Enter Balance Amount" value={expensecreate.balanceamount} />
+                        </FormControl>
+                      )}
+                    </Grid>
+                    <br /> <br />
+                    {expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Cash' && (
+                      <>
+                        <br />
+                        <br />
+                        <br />
+
+                        <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: 'flex' }}>
+                          <FormControl fullWidth size="small">
+                            <Typography sx={{ fontWeight: 'bold' }}>Cash</Typography>
+                            <br />
+
+                            <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => { }} />
+                          </FormControl>
                         </Grid>
                       </>
-                    );
-                  })}
-              </Grid>
-              <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Grid item lg={1} md={2} sm={2} xs={12}>
-                  {btnSubmit ? (
-                    <Box sx={{ display: 'flex' }}>
-                      <CircularProgress />
-                    </Box>
-                  ) : (
-                    <>
-                      <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
-                        Create
-                      </Button>
-                    </>
-                  )}
-                </Grid>
-                <Grid item lg={1} md={2} sm={2} xs={12}>
-                  <Button sx={buttonStyles.btncancel} onClick={handleclear}>
-                    Clear
-                  </Button>
-                </Grid>
-                <Grid item lg={1} md={2} sm={2} xs={12}>
-                  <Button sx={userStyle.btncancel} onClick={handleCloseviewalertvendormanual}>
-                    Cancel
-                  </Button>
-                </Grid>
-              </Grid>
+                    )}
+                    <br />
+                    <br />
+                    {expensecreate.paidmode === 'Bank Transfer' && expensecreate.paidstatus === 'Paid' && (
+                      <>
+                        <br />
+                        <br />
 
-              <br />
-              <br />
+                        <Grid item md={12} xs={8}>
+                          <Typography sx={{ fontWeight: 'bold' }}>Bank Details</Typography>
+                        </Grid>
 
-              <Grid container>
-                {/* <Grid item md={3} xs={12} sm={6}>
-                  {btnSubmit ? (
+                        <br />
+                        <br />
+
+                        <Grid item md={4} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Bank Name</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.bankname} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={4} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Bank Branch Name</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.bankbranchname} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={4} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Account Holder Name</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.accountholdername} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={4} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Account Number</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.accountnumber} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={4} xs={12} sm={12} sx={{ display: 'flex' }}>
+                          <FormControl fullWidth size="small">
+                            <Typography>IFSC Code</Typography>
+                            <OutlinedInput readOnly={true} value={vendor.ifsccode} />
+                          </FormControl>
+                        </Grid>
+                      </>
+                    )}
+                    <br /> <br />
+                    {expensecreate.paidmode === 'UPI' && expensecreate.paidstatus === 'Paid' && (
+                      <>
+                        <Grid item md={12} xs={8}>
+                          <Typography sx={{ fontWeight: 'bold' }}>UPI Details</Typography>
+                        </Grid>
+
+                        <br />
+                        <br />
+
+                        <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
+                          <FormControl fullWidth size="small">
+                            <Typography>UPI Number</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.upinumber} />
+                          </FormControl>
+                        </Grid>
+                      </>
+                    )}
+                    <br /> <br />
+                    {expensecreate.paidmode === 'Card' && expensecreate.paidstatus === 'Paid' && (
+                      <>
+                        <Grid md={12} item xs={8}>
+                          <Typography sx={{ fontWeight: 'bold' }}>Card Details</Typography>
+                        </Grid>
+
+                        <br />
+                        <Grid item md={3} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Card Number</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.cardnumber} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={3} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Card Holder Name</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.cardholdername} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={3} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Card Transaction Number</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.cardtransactionnumber} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={3} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Card Type</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.cardtype} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={3} xs={12} sm={6}>
+                          <Typography>Expire At</Typography>
+                          <Grid container spacing={1}>
+                            <Grid item md={6} xs={12} sm={6}>
+                              <FormControl fullWidth size="small">
+                                <OutlinedInput readOnly={true} value={vendorstock.cardmonth} />
+                              </FormControl>
+                            </Grid>
+                            <Grid item md={6} xs={12} sm={6}>
+                              <FormControl fullWidth size="small">
+                                <OutlinedInput readOnly={true} value={vendorstock.cardyear} />
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                        <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Security Code</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.cardsecuritycode} />
+                          </FormControl>
+                        </Grid>
+                      </>
+                    )}
+                    <br />
+                    <br />
+                    {expensecreate.paidmode === 'Cheque' && expensecreate.paidstatus === 'Paid' && (
+                      <>
+                        <Grid item md={12} xs={8}>
+                          <Typography sx={{ fontWeight: 'bold' }}>Cheque Details</Typography>
+                        </Grid>
+
+                        <br />
+
+                        <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Cheque Number</Typography>
+                            <OutlinedInput readOnly={true} value={vendorstock.chequenumber} />
+                          </FormControl>
+                        </Grid>
+                      </>
+                    )}
+                  </Grid>
+                </>
+              )}
+
+              <Grid container spacing={2}>
+                <Grid item lg={1} md={2} sm={2} xs={12} marginTop={3}>
+                  {/* {btnSubmit ? (
                     <Box sx={{ display: "flex" }}>
                       <CircularProgress />
                     </Box>
                   ) : (
-                    <>
-                      <Button
-                        variant="contained"
-                        sx={buttonStyles.buttonsubmit}
-                        onClick={handleSubmit}
-                      >
-                        Create
-                      </Button>
-                    </>
-                  )}
+                    <> */}
+                  <LoadingButton loading={btnSubmit} variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
+                    Create
+                  </LoadingButton>
+                  {/* </>
+                  )} */}
                 </Grid>
-                <Grid item md={3} xs={12} sm={6}>
+                <Grid item lg={1} md={2} sm={2} xs={12} marginTop={3}>
                   <Button sx={buttonStyles.btncancel} onClick={handleclear}>
                     Clear
                   </Button>
-                </Grid> */}
+                </Grid>
+                 <Grid item lg={1} md={2} sm={2} xs={12} marginTop={3}>
+                  <Button sx={buttonStyles.btncancel} onClick={handleCloseviewalertvendormanual}>
+                    Cancel
+                  </Button>
+                </Grid>
               </Grid>
             </>
           </Box>
         </>
       )}
+  
+
+ 
+
 
       {/* dialog box for vendor details */}
 
@@ -9528,7 +7215,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                   <Button
                     variant="contained"
                     sx={buttonStyles.buttonsubmit}
-                    //  onClick={handleSubmitCapacity}
+                  //  onClick={handleSubmitCapacity}
                   >
                     Submit
                   </Button>
@@ -9537,7 +7224,7 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
                 <Grid item md={3} xs={12} sm={6}>
                   <Button
                     sx={buttonStyles.btncancel}
-                    // onClick={handleclearCapacity}
+                  // onClick={handleclearCapacity}
                   >
                     Clear
                   </Button>
@@ -9713,6 +7400,60 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
       {/* PLEASE SELECT ANY ROW */}
       <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
       {/* EXTERNAL COMPONENTS -------------- END */}
+
+      <Dialog open={openviewalertstockcategory} onClose={handleClickOpenviewalertstockcategory} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '50px' }} fullWidth={true}>
+        <StockCategoryPopup setStockCategoryAuto={setStockCategoryAuto} handleCloseviewalertstockcategory={handleCloseviewalertstockcategory} />
+      </Dialog>
+      {/* dialog box for manage stock items */}
+
+      <Dialog
+        open={openviewalertstockitem}
+        onClose={handleClickOpenviewalertstockitem}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="lg"
+        sx={{
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
+          },
+        }}
+        fullWidth={true}
+      >
+        <ManageStockItemsPopup setStockItemAuto={setStockItemAuto} handleCloseviewalertstockitem={handleCloseviewalertstockitem} />
+      </Dialog>
+
+      <Dialog open={isErrorOpenAmount} onClose={handleCloseerrAmount} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <DialogContent
+          sx={{
+            width: '350px',
+            textAlign: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <Typography variant="h6" style={{ color: 'red' }}>
+            {'Are you sure? Paid Amount is less than Total Bill Amount.Do you want to save?'}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button sx={buttonStyles.btncancel} onClick={handleCloseerrAmount}>
+            Cancel
+          </Button>
+          &nbsp;
+          <Button
+            variant="contained"
+            style={{
+              padding: '7px 13px',
+              color: 'white',
+              background: 'rgb(25, 118, 210)',
+            }}
+            onClick={sendRequest}
+          >
+            ok
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

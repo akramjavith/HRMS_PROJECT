@@ -630,22 +630,22 @@ function ManuaStockTable({ vendorAuto }) {
   const [vendorNewEdit, setVendorNewEdit] = useState('Choose Vendor');
   const [vendorOverall, setVendorOverall] = useState([]);
 
-  const fetchVendor = async () => {
+  const fetchVendorGrouping = async () => {
     try {
       let res1 = await axios.get(SERVICE.ALL_VENDORGROUPING, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const allGroup = Array.from(new Set(res1?.data?.vendorgrouping.map((d) => d.name))).map((item) => {
-        return {
-          label: item,
-          value: item,
-        };
-      });
 
-      setVendorGroupopt(allGroup);
       setVendorOverall(res1?.data?.vendorgrouping);
+      setVendorGroupopt([
+        ...res1?.data?.vendorgrouping?.map((t) => ({
+          ...t,
+          label: t.name,
+          value: t.name,
+        })),
+      ]);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -1308,6 +1308,7 @@ function ManuaStockTable({ vendorAuto }) {
 
       const alldata = { ...res?.data?.smanualstock, calculationbalamount: Number(res?.data?.smanualstock?.balanceamount) };
       setFrequencyValue(res?.data?.smanualstock?.vendorfrequency === undefined ? '' : res?.data?.smanualstock?.vendorfrequency);
+      setGroupedVendorNames(vendorOverall?.filter((item) => item.name === res?.data?.smanualstock?.vendorgroup)?.map((data) => data?.vendor));
 
       setExpensecreate(alldata);
       setEducationtodo(res?.data?.smanualstock?.tododetails);
@@ -1530,7 +1531,7 @@ function ManuaStockTable({ vendorAuto }) {
     fetchCompanyDropdowns();
     fetchCategoryAll();
     fetchUom();
-    fetchVendor();
+    fetchVendorGrouping();
   }, [vendorAuto]);
 
   useEffect(() => {
@@ -5419,11 +5420,26 @@ function ManuaStockTable({ vendorAuto }) {
                     </Typography>
                     <Selects
                       // options={vendorGroupOpt}
-                      options={[...vendorModeOptions, ...vendorGroupOpt]}
+                      // options={[...vendorModeOptions, ...vendorGroupOpt]}
+                        options={[
+                        ...vendorModeOptions,
+                        ...vendorGroupOpt.filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        }),
+                      ]}
                       styles={colourStyles}
                       value={{ label: vendorGroupEdit, value: vendorGroupEdit }}
                       onChange={(e) => {
                         handleChangeGroupNameEdit(e);
+                         setExpensecreate({
+                          ...expensecreate,
+                          vendorgrouping: e.value,
+                          vendorname: 'Please Select Vendor',
+                          vendorfrequency: '',
+                          duedate: '',
+                          paidmode: 'Please Select Paid Mode',
+                        });
+                          setGroupedVendorNames(vendorGroupOpt?.filter((item) => item.name === e.value)?.map((data) => data?.vendor));
                         setVendorGroupEdit(e.value);
                         setVendorNewEdit('Choose Vendor');
                         setFrequencyValue('');
@@ -5437,12 +5453,21 @@ function ManuaStockTable({ vendorAuto }) {
                       Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
-                      options={[...vendorModeOptions, ...vendorOptEdit]}
+                      // options={[...vendorModeOptions, ...vendorOptEdit]}
+                       options={[
+                        ...vendorModeOptions,
+                        ...vendorOptEdit?.filter((data) => groupedVendorNames?.includes?.(data?.value))
+                      ]}
                       styles={colourStyles}
                       value={{ label: vendorNewEdit, value: vendorNewEdit }}
                       onChange={(e) => {
+                        setDueDate(e)
                         setVendorNewEdit(e.value);
                         setFrequencyValue(e?.paymentfrequency);
+                         setVendorNewstock((prev) => ({
+                          ...prev,
+                          ...e,
+                        }));
                         vendorid(e._id);
                       }}
                     />

@@ -80,7 +80,6 @@ import MessageAlert from '../../components/MessageAlert';
 import PageHeading from '../../components/PageHeading';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
-import Stockmaster from './stockrequeststockmaterialpopup.js';
 
 //new table
 import { IoMdOptions } from 'react-icons/io';
@@ -135,32 +134,7 @@ function Stockpurchaserequest() {
     setVendorgrpOpen({ open: false, data: '' });
   };
 
-
-  const [filterid, setFilterid] = useState('');
   let newval = 'VEN0001';
-
-
-  const [stockmaterialedit, setStockmaterialedit] = useState([]);
-
-  const handleDataFromChildUIDeignStock = (data) => {
-    // Handle the data received from the child component
-    // setDataFromChildUIDeign(data);
-    if (data === true) {
-      fetchStock();
-    }
-  };
-
-  const [openviewalertvendorstock, setOpenviewalertvendrostock] =
-    useState(false);
-  // view model
-  const handleClickOpenviewalertvendorstock = () => {
-    setOpenviewalertvendrostock(true);
-  };
-
-  const handleCloseviewalertvendorstock = () => {
-    setOpenviewalertvendrostock(false);
-  };
-
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -424,23 +398,23 @@ function Stockpurchaserequest() {
       // setCroppedImage(response?.data?.image);
       from === 'upload'
         ? setRefImage((prev) => {
-          let updated = [...prev];
-          let currentObject = {
-            ...updated[index],
-            preview: `${response?.data?.image}`,
-          };
-          updated[index] = currentObject;
-          return updated;
-        })
+            let updated = [...prev];
+            let currentObject = {
+              ...updated[index],
+              preview: `${response?.data?.image}`,
+            };
+            updated[index] = currentObject;
+            return updated;
+          })
         : setCapturedImages((prev) => {
-          let updated = [...prev];
-          let currentObject = {
-            ...updated[index],
-            preview: `${response?.data?.image}`,
-          };
-          updated[index] = currentObject;
-          return updated;
-        });
+            let updated = [...prev];
+            let currentObject = {
+              ...updated[index],
+              preview: `${response?.data?.image}`,
+            };
+            updated[index] = currentObject;
+            return updated;
+          });
     } catch (error) {
       console.error('Error uploading image:', error);
     } finally {
@@ -2069,36 +2043,36 @@ function Stockpurchaserequest() {
   //   }))
   const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [window.location.pathname?.substring(1), window.location.pathname];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
+
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
 
   const { auth, setAuth } = useContext(AuthContext);
   const [projectCheck, setProjectCheck] = useState(false);
@@ -3497,21 +3471,15 @@ function Stockpurchaserequest() {
     setAsset({ materialcode: '', name: '' });
   };
 
-const [itemsName,setitemsName] = useState([])
+  const [filterid, setFilterid] = useState('');
   //get single row to edit....
-  const getCode = async (id, data) => {
+  const getCode = async (id) => {
     try {
       let res = await axios.get(`${SERVICE.STOCKMANAGE_SINGLE}/${id}`, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-       if (data.requestmode === 'Stock Material') {
-       
-          let materialNew = data.stockmaterialarray.map(data =>({label:data.materialnew,value:data.materialnew}));
-
-      setitemsName(materialNew)
-      }
 
       setStockmaster({
         ...res?.data?.sstockmanage,
@@ -3552,24 +3520,7 @@ const [itemsName,setitemsName] = useState([])
       // );
 
       setFilterid(id);
-      // handleClickOpenstock();
-      setStockmaterialedit({
-        ...stockmaterialedit,
-        ...res?.data?.sstockmanage,
-        company: data.company,
-        branch: data.branch,
-        unit: data.unit,
-        floor: data.floor,
-        area: data.area,
-        location: data.location,
-        // productname:  data.productname,
-        // balancedcount:  data.balancedcount,
-        // status:  data.status
-        // ,
-        // assettype: assettype, producthead: producthead, component: component,
-      });
-
-      handleClickOpenviewalertvendorstock();
+      handleClickOpenstock();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -3687,7 +3638,54 @@ const [itemsName,setitemsName] = useState([])
   };
 
   //get all project.
+  const fetchStock1 = async () => {
+    setPageName(!pageName);
+    setProjectCheck(true);
 
+    try {
+      // let res_project = await axios.get(SERVICE.STOCKMANAGEFILTERED, {
+      let res_project = await axios.post(SERVICE.STOCK_MANAGE_FILTER, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        assignbranch: accessbranch,
+      });
+
+      let filteredData = res_project?.data?.stockmanage;
+
+      let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+
+      let codeValues = res_project_1?.data?.vommaster.map((data) => ({
+        name: data.name,
+        code: data.code,
+      }));
+
+      let setData = filteredData.map((item) => {
+        const matchingItem = codeValues.find((item1) => item.uom === item1.name);
+
+        const matchingItem1 = codeValues.find((item1) => item.uomnew === item1.name);
+
+        if (matchingItem) {
+          return { ...item, uomcode: matchingItem.code };
+        } else if (matchingItem1) {
+          return { ...item, uomcode: matchingItem1.code };
+        } else {
+          return { ...item };
+        }
+      });
+
+      setStockmanage(setData);
+
+      setProjectCheck(false);
+    } catch (err) {
+      setProjectCheck(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
 
   const fetchStock = async (e) => {
     setPageName(!pageName);
@@ -3831,7 +3829,6 @@ const [itemsName,setitemsName] = useState([])
               productdetailsnew: item.productdetails,
               uomnew: `${item.quantity}#${item.uomcode}`,
               quantitynew: item.quantity,
-             
             };
           }
         });
@@ -3840,65 +3837,65 @@ const [itemsName,setitemsName] = useState([])
         setOverallFilterdata(
           res_employee?.data?.totalProjectsData?.length > 0
             ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-              if (item.requestmode === 'Stock Material') {
-                let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
+                if (item.requestmode === 'Stock Material') {
+                  let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
-                let materialNew = item.stockmaterialarray.map((data, newindex) => {
-                  return ` ${data.materialnew}`;
-                });
+                  let materialNew = item.stockmaterialarray.map((data, newindex) => {
+                    return ` ${data.materialnew}`;
+                  });
 
-                let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
-                  return ` ${data.productdetailsnew}`;
-                });
+                  let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+                    return ` ${data.productdetailsnew}`;
+                  });
 
-                let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
-                  return ` ${data.quantitynew}#${data.uomcodenew}`;
-                });
+                  let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+                    return ` ${data.quantitynew}#${data.uomcodenew}`;
+                  });
 
-                const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
-                const result = nonEmptyParts.join(',');
+                  const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+                  const result = nonEmptyParts.join(',');
 
-                return {
-                  ...item,
-                  id: item._id,
-                  serialNumber: (page - 1) * pageSize + index + 1,
-                  company: item.company,
-                  branch: item.branch,
-                  unit: item.unit,
-                  requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
-                  expecttdate: moment(item.expecttdate).format('DD/MM/YYYY'),
-                  expecttime: item.expecttime,
-                  requesttime: item.requesttime,
-                  floor: item.floor,
-                  area: item.area,
-                  location: item.location,
-                  requestmode: item.requestmode,
+                  return {
+                    ...item,
+                    id: item._id,
+                    serialNumber: (page - 1) * pageSize + index + 1,
+                    company: item.company,
+                    branch: item.branch,
+                    unit: item.unit,
+                    requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+                    expecttdate: moment(item.expecttdate).format('DD/MM/YYYY'),
+                    expecttime: item.expecttime,
+                    requesttime: item.requesttime,
+                    floor: item.floor,
+                    area: item.area,
+                    location: item.location,
+                    requestmode: item.requestmode,
 
-                  // uomnew: quantityAndUom.join(","),
-                  uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
-                  // quantitynew: quantityNew.join(","),
-                  quantitynew: quantityNew,
+                    // uomnew: quantityAndUom.join(","),
+                    uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
+                    // quantitynew: quantityNew.join(","),
+                    quantitynew: quantityNew,
 
-                  // materialnew: materialNew.join(',').toString(),
-                  // productdetailsnew:
-                  //   item.stockmaterialarray.length > 0
-                  //     ? productdetailsNew.join(",")
-                  //     : "",
-                  productdetailsnew:
-                    // productdetailsNew.join(",")
-                    productdetailsNew.filter((item) => item.trim() !== '').join(','),
-                };
-              } else {
-                return {
-                  ...item,
-                  serialNumber: (page - 1) * pageSize + index + 1,
-                  requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
-                  requesttime: item.requesttime,
-                  // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
-                  // expecttime: item.expecttime,
-                };
-              }
-            })
+                    // materialnew: materialNew.join(',').toString(),
+                    // productdetailsnew:
+                    //   item.stockmaterialarray.length > 0
+                    //     ? productdetailsNew.join(",")
+                    //     : "",
+                    productdetailsnew:
+                      // productdetailsNew.join(",")
+                      productdetailsNew.filter((item) => item.trim() !== '').join(','),
+                  };
+                } else {
+                  return {
+                    ...item,
+                    serialNumber: (page - 1) * pageSize + index + 1,
+                    requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+                    requesttime: item.requesttime,
+                    // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
+                    // expecttime: item.expecttime,
+                  };
+                }
+              })
             : []
         );
 
@@ -4246,7 +4243,7 @@ const [itemsName,setitemsName] = useState([])
             sx={userStyle.buttonedit}
             onClick={() => {
               // handleClickOpenstock();
-              getCode(params.data.id, params.data);
+              getCode(params.data.id);
             }}
           >
             <FaPlus style={{ fontsize: 'large' }} />
@@ -4617,56 +4614,56 @@ const [itemsName,setitemsName] = useState([])
       setOverallFilterdata(
         res_employee?.data?.totalProjectsData?.length > 0
           ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-            if (item.requestmode === 'Stock Material') {
-              let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
+              if (item.requestmode === 'Stock Material') {
+                let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
-              let materialNew = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.materialnew}`;
-              });
+                let materialNew = item.stockmaterialarray.map((data, newindex) => {
+                  return ` ${data.materialnew}`;
+                });
 
-              let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.productdetailsnew}`;
-              });
+                let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+                  return ` ${data.productdetailsnew}`;
+                });
 
-              let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.quantitynew}#${data.uomcodenew}`;
-              });
+                let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+                  return ` ${data.quantitynew}#${data.uomcodenew}`;
+                });
 
-              const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
-              const result = nonEmptyParts.join(',');
+                const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+                const result = nonEmptyParts.join(',');
 
-              return {
-                id: item._id,
-                serialNumber: (page - 1) * pageSize + index + 1,
-                company: item.company,
-                branch: item.branch,
-                unit: item.unit,
-                floor: item.floor,
-                area: item.area,
-                location: item.location,
-                requestmode: item.requestmode,
+                return {
+                  id: item._id,
+                  serialNumber: (page - 1) * pageSize + index + 1,
+                  company: item.company,
+                  branch: item.branch,
+                  unit: item.unit,
+                  floor: item.floor,
+                  area: item.area,
+                  location: item.location,
+                  requestmode: item.requestmode,
 
-                // uomnew: quantityAndUom.join(","),
-                uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
-                // quantitynew: quantityNew.join(","),
-                quantitynew: quantityNew,
+                  // uomnew: quantityAndUom.join(","),
+                  uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
+                  // quantitynew: quantityNew.join(","),
+                  quantitynew: quantityNew,
 
-                // materialnew: materialNew.join(',').toString(),
-                // productdetailsnew:
-                //   item.stockmaterialarray.length > 0
-                //     ? productdetailsNew.join(",")
-                //     : "",
-                productdetailsnew:
-                  // productdetailsNew.join(",")
-                  productdetailsNew.filter((item) => item.trim() !== '').join(','),
-              };
-            } else {
-              return {
-                ...item,
-                serialNumber: (page - 1) * pageSize + index + 1,
-              };
-            }
-          })
+                  // materialnew: materialNew.join(',').toString(),
+                  // productdetailsnew:
+                  //   item.stockmaterialarray.length > 0
+                  //     ? productdetailsNew.join(",")
+                  //     : "",
+                  productdetailsnew:
+                    // productdetailsNew.join(",")
+                    productdetailsNew.filter((item) => item.trim() !== '').join(','),
+                };
+              } else {
+                return {
+                  ...item,
+                  serialNumber: (page - 1) * pageSize + index + 1,
+                };
+              }
+            })
           : []
       );
 
@@ -5532,28 +5529,657 @@ const [itemsName,setitemsName] = useState([])
         </Box>
 
         {/* stock model */}
+        <Dialog open={openstock} onClose={handleClickOpenstock} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" fullWidth={true} sx={{ marginTop: '95px' }}>
+          <Box sx={{ padding: '20px 50px' }}>
+            <>
+              <Box>
+                <>
+                  <Grid container spacing={2}>
+                    <Grid item xs={8}>
+                      <Typography sx={userStyle.importheadtext}>Manage Purchase Details</Typography>
+                    </Grid>
+                  </Grid>
+                  <br />
 
-        <Dialog
-          open={openviewalertvendorstock}
-          onClose={handleClickOpenviewalertvendorstock}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="lg"
-          sx={{
-            marginTop: "95px"
-          }}
-          fullWidth={true}
-        >
-          <Stockmaster
-            sendDataToParentUIStock={handleDataFromChildUIDeignStock}
-            openpop={!openviewalertvendorstock}
-            stockmaterialedit={stockmaterialedit}
-            itemsName={itemsName}
-            handleCloseviewalertvendorstock={handleCloseviewalertvendorstock}
-          />
+                  {/* {
+                    selectedRowsRequestPurchase.map((item) =>
+                      <> */}
+                  <Grid container spacing={2}>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Company<b style={{ color: 'red' }}>*</b>
+                        </Typography>
+                        <Selects
+                          // options={companysEdit}
+                          options={accessbranch
+                            ?.map((data) => ({
+                              label: data.company,
+                              value: data.company,
+                            }))
+                            .filter((item, index, self) => {
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                            })}
+                          styles={colourStyles}
+                          value={{
+                            label: stockmaster.company,
+                            value: stockmaster.company,
+                          }}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              company: e.value,
+                              branch: 'Please Select Branch',
+                              unit: 'Please Select Unit',
+                              floor: 'Please Select Floor',
+                              area: 'Please Select Area',
+                              location: 'Please Select Location',
+                            });
+                            setBranches([]);
+                            setFilteredUnit([]);
+                            setSelectedBranch('Please Select Branch');
+                            setSelectedUnit('Please Select Unit');
+                            setAreasEdit([]);
+                            setFloorEdit([]);
+                            setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
+                            fetchBranchDropdownsEdit(e.value);
+                            fetchbranches(e.value);
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={3} sm={12} xs={12}>
+                      <Typography>
+                        Branch <b style={{ color: 'red' }}>*</b>
+                      </Typography>
+                      <FormControl size="small" fullWidth>
+                        <Selects
+                          // options={branches}
+                          options={accessbranch
+                            ?.filter((comp) => stockmaster.company === comp.company)
+                            ?.map((data) => ({
+                              label: data.branch,
+                              value: data.branch,
+                            }))
+                            .filter((item, index, self) => {
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                            })}
+                          styles={colourStyles}
+                          value={{
+                            label: selectedBranch,
+                            value: selectedBranch,
+                          }}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              branch: 'Please Select Branch',
+                              unit: 'Please Select Unit',
+                              floor: 'Please Select Floor',
+                              area: 'Please Select Area',
+                              location: 'Please Select Location',
+                            });
+                            fetchFloorEdit(e.value);
+                            handleBranchChange(e);
+                            setSelectedUnit('Please Select Unit');
+                            setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
+                            setAreasEdit([]);
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <Typography>
+                        Unit <b style={{ color: 'red' }}>*</b>
+                      </Typography>
+                      <FormControl size="small" fullWidth>
+                        <Selects
+                          // options={filteredUnit}
+                          options={accessbranch
+                            ?.filter((comp) => stockmaster.company === comp.company && selectedBranch === comp.branch)
+                            ?.map((data) => ({
+                              label: data.unit,
+                              value: data.unit,
+                            }))
+                            .filter((item, index, self) => {
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                            })}
+                          styles={colourStyles}
+                          placeholder={'please select'}
+                          value={{ label: selectedUnit, value: selectedUnit }}
+                          onChange={(e) => setSelectedUnit(e.value)}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Floor<b style={{ color: 'red' }}>*</b>
+                        </Typography>
+                        <Selects
+                          options={floorsEdit}
+                          styles={colourStyles}
+                          value={{
+                            label: stockmaster.floor,
+                            value: stockmaster.floor,
+                          }}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              floor: e.value,
+                              workstation: '',
+                              area: 'Please Select Area',
+                              location: 'Please Select Location',
+                            });
+                            setAreasEdit([]);
+                            setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
+                            fetchAreaEdit(selectedBranch, e.value);
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Area<b style={{ color: 'red' }}>*</b>
+                        </Typography>
+                        <Selects
+                          options={areasEdit}
+                          styles={colourStyles}
+                          value={{
+                            label: stockmaster.area,
+                            value: stockmaster.area,
+                          }}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              area: e.value,
+                              workstation: '',
+                              location: 'Please Select Location',
+                            });
+                            setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
+                            fetchAllLocationEdit(selectedBranch, stockmaster.floor, e.value);
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Location<b style={{ color: 'red' }}>*</b>
+                        </Typography>
+                        <Selects
+                          options={locationsEdit}
+                          styles={colourStyles}
+                          value={{
+                            label: stockmaster.location,
+                            value: stockmaster.location,
+                          }}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              location: e.value,
+                              workstation: '',
+                            });
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Date<b style={{ color: 'red' }}>*</b>{' '}
+                        </Typography>
+                        <OutlinedInput
+                          id="component-outlined"
+                          type="date"
+                          value={stockmaster.requestdate}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              requestdate: e.target.value,
+                            });
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Time<b style={{ color: 'red' }}>*</b>{' '}
+                        </Typography>
+                        <OutlinedInput
+                          id="component-outlined"
+                          type="time"
+                          value={stockmaster.requesttime}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              requesttime: e.target.value,
+                            });
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Warranty<b style={{ color: 'red' }}>*</b>
+                        </Typography>
+                        <Select
+                          fullWidth
+                          labelId="demo-select-small"
+                          id="demo-select-small"
+                          value={stockmaster.warranty}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              warranty: e.target.value,
+                            });
+                          }}
+                        >
+                          <MenuItem value="" disabled>
+                            {' '}
+                            Please Select
+                          </MenuItem>
+                          <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                          <MenuItem value="No"> {'No'} </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    {stockmaster.warranty === 'Yes' && (
+                      <>
+                        <Grid item md={3} xs={12} sm={12}>
+                          <Grid container>
+                            <Grid item md={6} xs={6} sm={6}>
+                              <Typography>
+                                Warranty Time<b style={{ color: 'red' }}>*</b>
+                              </Typography>
+                              <FormControl fullWidth size="small">
+                                <OutlinedInput id="component-outlined" type="text" size="small" placeholder="Enter Time" value={stockmaster.estimation} onChange={(e) => handleChangephonenumber(e)} />
+                              </FormControl>
+                            </Grid>
+                            <Grid item md={6} xs={6} sm={6}>
+                              <Typography>
+                                Estimation<b style={{ color: 'red' }}>*</b>
+                              </Typography>
+                              <Select
+                                fullWidth
+                                labelId="demo-select-small"
+                                id="demo-select-small"
+                                size="small"
+                                value={stockmaster.estimationtime}
+                                // onChange={(e) => {
+                                //   setStockmaster({ ...stockmaster, estimationtime: e.target.value });
+                                // }}
+                                onChange={handleEstimationChange}
+                              >
+                                <MenuItem value="" disabled>
+                                  {' '}
+                                  Please Select
+                                </MenuItem>
+                                <MenuItem value="Days"> {'Days'} </MenuItem>
+                                <MenuItem value="Month"> {'Month'} </MenuItem>
+                                <MenuItem value="Year"> {'Year'} </MenuItem>
+                              </Select>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </>
+                    )}
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>Request Mode For</Typography>
+                        <OutlinedInput value={stockmaster.requestmode} readOnly={true} />
+                      </FormControl>
+                    </Grid>
+                    {stockmaster.requestmode === 'Asset Material' ? (
+                      <>
+                        <Grid item md={3} xs={12} sm={12}>
+                          <Typography>Asset Type </Typography>
+                          <FormControl size="small" fullWidth>
+                            <OutlinedInput readOnly={true} value={selectedAssetType} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={3} xs={12} sm={12}>
+                          <Typography>Product Head </Typography>
+                          <FormControl size="small" fullWidth>
+                            <OutlinedInput readOnly={true} value={selectedProducthead} />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item md={3} xs={12} sm={12}>
+                          <FormControl size="small" fullWidth>
+                            <Typography>Product Name </Typography>
+
+                            <OutlinedInput readOnly={true} value={selectedProductname} />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item md={3} sm={12} xs={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Product Details</Typography>
+                            <OutlinedInput readOnly={true} value={stockmaster.productdetails} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={3} xs={12} sm={12}>
+                          <FormControl size="small" fullWidth>
+                            <Typography>UOM </Typography>
+
+                            <OutlinedInput readOnly={true} value={stockmaster.uom} />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item md={3} sm={12} xs={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Qty</Typography>
+                            <OutlinedInput readOnly={true} value={stockmaster.quantity} />
+                          </FormControl>
+                        </Grid>
+                      </>
+                    ) : (
+                      <>
+                        <Grid item md={3} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Stock Category</Typography>
+                            <OutlinedInput readOnly={true} value={stockmaster.stockcategory} />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={3} xs={12} sm={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>Stock Sub-category</Typography>
+                            <OutlinedInput readOnly={true} value={stockmaster.stocksubcategory} />
+                          </FormControl>
+                        </Grid>
+                      </>
+                    )}
+                  </Grid>
+                  <br />
+                  <Grid container spacing={2}>
+                    {stockArray.length > 0 && (
+                      <>
+                        <Grid item md={3} xs={12} sm={12}>
+                          {' '}
+                          <Typography variant="h6">Stock Todo List</Typography>
+                        </Grid>
+
+                        <Grid item md={3} xs={12} sm={12}></Grid>
+                        <Grid item md={3} xs={12} sm={12}></Grid>
+                        <Grid item md={3} xs={12} sm={12}></Grid>
+                      </>
+                    )}
+                    {stockArray.length > 0 &&
+                      stockArray.map((item, index) => {
+                        return (
+                          <>
+                            <Grid item md={3} xs={3} sm={3}>
+                              <FormControl fullWidth size="small">
+                                <Typography>Material</Typography>
+                                <OutlinedInput readOnly={true} value={item.materialnew} />
+                              </FormControl>
+                            </Grid>
+                            <Grid item md={3} xs={3} sm={3}>
+                              <FormControl fullWidth size="small">
+                                <Typography>UOM </Typography>
+                                <OutlinedInput readOnly={true} value={item.uomnew} />
+                              </FormControl>
+                            </Grid>
+                            <Grid item md={3} sm={3} xs={3}>
+                              <FormControl fullWidth size="small">
+                                <Typography>Qty </Typography>
+                                <OutlinedInput readOnly={true} value={item.quantitynew} />
+                              </FormControl>
+                            </Grid>
+
+                            <Grid item md={3} sm={3} xs={3} sx={{ display: 'flex' }}>
+                              <FormControl fullWidth size="small">
+                                <Typography>Product Details</Typography>
+
+                                <TextareaAutosize
+                                  aria-label="minimum height"
+                                  minRows={2}
+                                  readOnly={true}
+                                  value={item.productdetailsnew}
+                                  // placeholder="Please Enter Product Details"
+                                />
+                              </FormControl>
+                              &nbsp; &emsp;
+                            </Grid>
+                          </>
+                        );
+                      })}
+
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          {' '}
+                          Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
+                        </Typography>
+                        <Selects
+                          options={vendorGroupOpt}
+                          styles={colourStyles}
+                          value={{ label: vendorGroup, value: vendorGroup }}
+                          onChange={(e) => {
+                            handleChangeGroupName(e);
+                            setVendorGroup(e.value);
+                            // setVendorNew("Choose Vendor");
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <Grid container spacing={1}>
+                        <Grid item md={10} xs={10} sm={10}>
+                          <FormControl size="small" fullWidth>
+                            <Typography>
+                              Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
+                            </Typography>
+                            <Selects
+                              options={vendormaster}
+                              styles={colourStyles}
+                              value={{
+                                label: stockmaster.vendorname,
+                                value: stockmaster.vendorname,
+                              }}
+                              onChange={(e) => {
+                                setStockmaster({
+                                  ...stockmaster,
+                                  vendorname: e.value,
+                                });
+                                vendorid(e._id);
+                              }}
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={2} sm={2} xs={2} marginTop={3}>
+                          <Button
+                            variant="contained"
+                            style={{
+                              height: '30px',
+                              minWidth: '20px',
+                              padding: '19px 13px',
+                              color: 'white',
+                              background: 'rgb(25, 118, 210)',
+                            }}
+                            onClick={() => {
+                              handleClickOpenviewalertvendor();
+                            }}
+                          >
+                            <FaPlus style={{ fontSize: '15px' }} />
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>GST No </Typography>
+                        <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={3} sm={12} xs={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Bill No <b style={{ color: 'red' }}>*</b>{' '}
+                        </Typography>
+                        <OutlinedInput
+                          id="component-outlined"
+                          type="number"
+                          sx={userStyle.input}
+                          placeholder="Please Enter Billno"
+                          value={stockmaster.billno}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              billno: e.target.value,
+                            });
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    {stockmaster.warranty === 'Yes' && (
+                      <Grid item md={3} xs={12} sm={12}>
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
+                          </Typography>
+                          <OutlinedInput
+                            id="component-outlined"
+                            type="text"
+                            value={stockmaster.warrantydetails}
+                            sx={userStyle.input}
+                            placeholder="Please Enter Warranty Details"
+                            onChange={(e) => {
+                              setStockmaster({
+                                ...stockmaster,
+                                warrantydetails: e.target.value,
+                              });
+                            }}
+                          />
+                        </FormControl>
+                      </Grid>
+                    )}
+                    <Grid item md={3} sm={12} xs={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Rate<b style={{ color: 'red' }}>*</b>{' '}
+                        </Typography>
+                        <OutlinedInput
+                          id="component-outlined"
+                          type="number"
+                          sx={userStyle.input}
+                          placeholder="Please Enter Rate"
+                          value={stockmaster.rate}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              rate: e.target.value,
+                            });
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    {stockmaster.requestmode === 'Stock Material' && (
+                      <>
+                        <Grid item md={3} sm={12} xs={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>
+                              Total Bill Amounts
+                              <b style={{ color: 'red' }}>*</b>{' '}
+                            </Typography>
+                            <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={totalQuantityStock * stockmaster.rate} />
+                          </FormControl>
+                        </Grid>
+                      </>
+                    )}
+                    {stockmaster.requestmode === 'Asset Material' && (
+                      <>
+                        <Grid item md={3} sm={12} xs={12}>
+                          <FormControl fullWidth size="small">
+                            <Typography>
+                              Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
+                            </Typography>
+                            <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={stockmaster.quantity * stockmaster.rate} />
+                          </FormControl>
+                        </Grid>
+                      </>
+                    )}
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Bill Date <b style={{ color: 'red' }}>*</b>{' '}
+                        </Typography>
+                        <TextField
+                          size="small"
+                          type="date"
+                          value={stockmaster.billdate}
+                          onChange={(e) => {
+                            setStockmaster({
+                              ...stockmaster,
+                              billdate: e.target.value,
+                            });
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <Typography>
+                        Bill <b style={{ color: 'red' }}>*</b>{' '}
+                      </Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                        <Button variant="contained" onClick={() => handleClickUploadPopupOpenedit()}>
+                          Upload
+                        </Button>
+                      </Box>
+                    </Grid>
+                    {stockmaster.warranty === 'Yes' && (
+                      <Grid item md={3} xs={12} sm={12}>
+                        <Typography>Warranty Card </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                          <Button variant="contained" onClick={() => handleClickUploadPopupOpenwarrantyedit()}>
+                            Upload
+                          </Button>
+                        </Box>
+                      </Grid>
+                    )}
+                  </Grid>
+
+                  <br />
+                  <br />
+
+                  <Grid container>
+                    <Grid item md={3} xs={12} sm={6}>
+                      {btnSubmit ? (
+                        <Box sx={{ display: 'flex' }}>
+                          <CircularProgress />
+                        </Box>
+                      ) : (
+                        <>
+                          <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
+                            Create
+                          </Button>
+                        </>
+                      )}
+                    </Grid>
+                    <Grid item md={3} xs={12} sm={6}>
+                      <Button sx={buttonStyles.btncancel} onClick={handleclear}>
+                        Clear
+                      </Button>
+                    </Grid>
+                    <Grid item md={3} xs={12} sm={6}>
+                      <Button variant="contained" color="primary" onClick={handleClosestock}>
+                        {' '}
+                        Back{' '}
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </>
+              </Box>
+              <br />
+            </>
+          </Box>
         </Dialog>
-
-
 
         {/* stock update model */}
 
@@ -6633,7 +7259,7 @@ const [itemsName,setitemsName] = useState([])
                           <Typography sx={{ fontWeight: 'bold' }}>
                             Cash <b style={{ color: 'red' }}>*</b>
                           </Typography>
-                          <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => { }} />
+                          <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => {}} />
                         </FormControl>
                         &nbsp; &emsp;
                         <Button

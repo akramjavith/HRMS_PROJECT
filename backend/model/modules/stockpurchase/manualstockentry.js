@@ -18,6 +18,19 @@ const ManualstockSchema = new Schema
             type: String,
             required: false,
         },
+          duedate: {
+    type: String,
+    required: false,
+  },
+       allotdate: {
+    type: String,
+    required: false,
+  },
+       allottime: {
+    type: String,
+    required: false,
+  },
+    
         totalbillamountstock: {
             type: String,
             required: false,

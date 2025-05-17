@@ -15,8 +15,8 @@ const { getAllStock, getAllStockAccess, addStock, getSingleStock, getOverallStoc
     getAllStockReorderFetch,getAllStockManagementStatus,getAllStockManagementStatusManual
 } = require("../controller/modules/stockpurchase/stock");
 stockRoute.route("/stocks").get(getAllStock);
-stockRoute.route("/stockmanagementstatus").get(getAllStockManagementStatus);
-stockRoute.route("/stockmanagementstatusmanual").get(getAllStockManagementStatusManual);
+stockRoute.route("/stockmanagementstatus").post(getAllStockManagementStatus);
+stockRoute.route("/stockmanagementstatusmanual").post(getAllStockManagementStatusManual);
 
 stockRoute.route("/uploadchunkstock").post(uploadChunkStock);
 stockRoute.route("/stockreorderfetch").post(getAllStockReorderFetch);

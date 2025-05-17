@@ -58,11 +58,25 @@ exports.getAllStock = catchAsyncErrors(async (req, res, next) => {
 exports.getAllStockManagementStatus = catchAsyncErrors(async (req, res, next) => {
   let stock;
   try {
+    // let query ={ }
+    // query.handover={$in:["handover","return","usagecount"]}
+      const {assignbranch} = req.body;
+
     let query ={ }
-    query.handover={$in:["handover","return","usagecount"]}
+      const branchFilter = assignbranch.map((branchObj) => ({
+    branch: branchObj.branch,
+    company: branchObj.company,
+    unit: branchObj.unit,
+  }));
+
+  
+  query = {
+    $or: branchFilter,
+   handover:{$in:["handover","return","usagecount"]}
+  }
 
     stock = await Stock.find(query,{employeenameto:1,handover:1,company:1,branch:1,unit:1,floor:1,
-      usagedate:1,usagetime:1,
+      usagedate:1,usagetime:1,      allotdate:1,allottime:1,
       area:1,location:1,countquantity:1,productname:1,usercompany:1,userbranch:1,userunit:1,userteam:1,addedby:1,createdAt:1});
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
@@ -78,11 +92,26 @@ exports.getAllStockManagementStatus = catchAsyncErrors(async (req, res, next) =>
 exports.getAllStockManagementStatusManual = catchAsyncErrors(async (req, res, next) => {
   let stock;
   try {
+      const {assignbranch} = req.body;
+
     let query ={ }
-    query.handover={$in:["handover","return","usagecount"]}
+      const branchFilter = assignbranch.map((branchObj) => ({
+    branch: branchObj.branch,
+    company: branchObj.company,
+    unit: branchObj.unit,
+  }));
+
+  
+  query = {
+    $or: branchFilter,
+   handover:{$in:["handover","return","usagecount"]}
+  }
+
+
+    // query.handover={$in:["handover","return","usagecount"]}
 
     stock = await Manualstock.find(query,{employeenameto:1,handover:1,company:1,branch:1,unit:1,floor:1,
-      usagedate:1,usagetime:1,
+      usagedate:1,usagetime:1,    allotdate:1,allottime:1,
       area:1,location:1,countquantity:1,productname:1,usercompany:1,userbranch:1,userunit:1,userteam:1,addedby:1,createdAt:1});
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));

@@ -151,10 +151,11 @@ function StockManagement() {
   const fetchUsageAll = async () => {
     setUsageCountAllcheck(true)
     try {
-      let res_usagecount = await axios.get(SERVICE.STOCKPURCHASELIMITED_USAGE_COUNT, {
+      let res_usagecount = await axios.post(SERVICE.STOCKPURCHASELIMITED_USAGE_COUNT, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
+        assignbranch: accessbranchtable
       });
 
       setUsageCountAll(res_usagecount.data?.stock?.map((item, index) => ({
@@ -199,6 +200,12 @@ function StockManagement() {
     allUnit,
     allTeam,
   } = useContext(UserRoleAccessContext);
+
+  const accessbranchtable = isAssignBranch?.map((data) => ({
+    branch: data.branch,
+    company: data.company,
+    unit: data.unit,
+  }));
 
   // console.log(isUserRoleAccess, "isUserRoleAccess")
 
@@ -486,7 +493,7 @@ function StockManagement() {
     "userarea",
     "userlocation",
     "userteam",
-    "useremployee",
+    "employeenameto",
     "countquantity",
     "usagedate",
     "usagetime",
@@ -527,7 +534,7 @@ function StockManagement() {
     setviewusagecount(data.productname)
     setHandover({
       ...handover,
-      status:data.status,
+      status: data.status,
       company: company,
       branch: branch,
       unit: unit,
@@ -537,7 +544,7 @@ function StockManagement() {
       productname: productname,
       usagecount: usagecount,
       requestmode: requestmode,
-      
+
     });
 
     setStockManagehand({
@@ -1213,6 +1220,7 @@ function StockManagement() {
     usagedate: true,
     usagetime: true,
     description: true,
+    employeenameto: true,
     productname: true,
   };
   const [columnVisibilityviewusage, setColumnVisibilityviewusage] = useState(
@@ -1365,11 +1373,11 @@ function StockManagement() {
     },
 
     {
-      field: "useremployee",
+      field: "employeenameto",
       headerName: "Employee",
       flex: 0,
       width: 180,
-      hide: !columnVisibilityviewusage.useremployee,
+      hide: !columnVisibilityviewusage.employeenameto,
       headerClassName: "bold-header",
     },
 
@@ -1776,7 +1784,7 @@ function StockManagement() {
 
   const getCodeStockLog = async (data) => {
     try {
-
+      setColumnVisibilityView(initialColumnVisibilityView);
       let res = await axios.post(SERVICE.STOCKMANAGEMENT_VIEW_DATE_STOCK_MATERIAL, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
@@ -1850,6 +1858,8 @@ function StockManagement() {
   const getCodeAssetLog = async (data) => {
     // console.log(data, "data")
     try {
+      setColumnVisibilityViewasset(initialColumnVisibilityViewasset)
+
       let res = await axios.post(SERVICE.STOCKMANAGEMENT_VIEW_DATE, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
@@ -1866,6 +1876,7 @@ function StockManagement() {
       });
 
       setAssetLog(res.data.stock);
+
       // setAssetLog([]);
       handleViewOpenAsset();
     } catch (err) {
@@ -3122,7 +3133,7 @@ function StockManagement() {
     setColumnsnew(columnsnew1)
     try {
       setProjectCheck(true);
-
+      setColumnVisibility(initialColumnVisibility)
 
       if (stockManagefilter.requestmode === "Asset Material") {
         let res_project = await axios.post(SERVICE.STOCKPURCHASELIMITED, {
@@ -3150,10 +3161,11 @@ function StockManagement() {
         });
 
 
-        let res_usagecount = await axios.get(SERVICE.STOCKPURCHASELIMITED_USAGE_COUNT, {
+        let res_usagecount = await axios.post(SERVICE.STOCKPURCHASELIMITED_USAGE_COUNT, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
+          assignbranch: accessbranchtable
         });
 
 
@@ -3504,10 +3516,11 @@ function StockManagement() {
         });
 
 
-        let res_usagecount = await axios.get(SERVICE.STOCKPURCHASELIMITED_USAGE_COUNT, {
+        let res_usagecount = await axios.post(SERVICE.STOCKPURCHASELIMITED_USAGE_COUNT, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
+          assignbranch: accessbranchtable
         });
 
 
@@ -3810,7 +3823,7 @@ function StockManagement() {
         setColumnVisibility(initialColumnVisibility)
       }
 
-      setColumnVisibility(initialColumnVisibility)
+
       setProjectCheck(false);
     } catch (err) {
       setProjectCheck(false);
@@ -4028,7 +4041,8 @@ function StockManagement() {
           location: String(handover.location),
           requestmode: String(handover.requestmode),
           usercompany: String(stockManagehand.company),
-
+          allotdate: String(stockManagehand.allotdate),
+          allottime: String(stockManagehand.allottime),
           userbranch: String(stockManagehand.branch),
           userunit: String(stockManagehand.unit),
           userteam: String(stockManagehand.team),
@@ -4251,16 +4265,16 @@ function StockManagement() {
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
     }
-    else if (stockManagehand.usagedate === "") {
+    else if (stockManagehand.allotdate === "") {
       setPopupContentMalert("Please Select Date!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
-    } else if (stockManagehand.usagetime === "") {
+    } else if (stockManagehand.allottime === "") {
       setPopupContentMalert("Please Select Time!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
     }
-     else if (handover.balancedcount < stockManagehand.countquantity) {
+    else if (handover.balancedcount < stockManagehand.countquantity) {
       setPopupContentMalert("Please Enter Less Than Balance Count!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
@@ -4281,8 +4295,8 @@ function StockManagement() {
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
     }
-    else if (stockManagehand.unit === "Please Select Area") {
-      setPopupContentMalert("Please Select Area!");
+    else if (stockManagehand.unit === "Please Select Unit") {
+      setPopupContentMalert("Please Select Unit!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
     }
@@ -4399,6 +4413,7 @@ function StockManagement() {
     addedby: true,
     addedbyname: true,
     countquantity: true,
+    quantitynew: true,
     actions: true,
   };
 
@@ -6198,7 +6213,7 @@ function StockManagement() {
                 </Grid>
 
 
-               
+
 
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
@@ -6267,7 +6282,7 @@ function StockManagement() {
                     />
                   </FormControl>
                 </Grid>
-                    <Grid item md={3} xs={12} sm={12}>
+                <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>Date<b style={{ color: "red" }}>*</b> </Typography>
                     <OutlinedInput
@@ -7127,12 +7142,12 @@ function StockManagement() {
                         </Typography>
                         <Selects
                           // options={companys}
-                             options={accessbranch?.map(data => ({
-                        label: data.company,
-                        value: data.company,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                          options={accessbranch?.map(data => ({
+                            label: data.company,
+                            value: data.company,
+                          })).filter((item, index, self) => {
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                          })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.company,
@@ -7171,15 +7186,15 @@ function StockManagement() {
                         </Typography>
                         <Selects
                           // options={branchs}
-                           options={accessbranch?.filter(
-                        (comp) =>
-                          stockManagehand.company === comp.company
-                      )?.map(data => ({
-                        label: data.branch,
-                        value: data.branch,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                          options={accessbranch?.filter(
+                            (comp) =>
+                              stockManagehand.company === comp.company
+                          )?.map(data => ({
+                            label: data.branch,
+                            value: data.branch,
+                          })).filter((item, index, self) => {
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                          })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.branch,
@@ -7213,15 +7228,15 @@ function StockManagement() {
                         </Typography>
                         <Selects
                           // options={units}
-                              options={accessbranch?.filter(
-                        (comp) =>
-                          stockManagehand.branch === comp.bracnh
-                      )?.map(data => ({
-                        label: data.unit,
-                        value: data.unit,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                          options={accessbranch?.filter(
+                            (comp) =>
+                              stockManagehand.branch === comp.branch
+                          )?.map(data => ({
+                            label: data.unit,
+                            value: data.unit,
+                          })).filter((item, index, self) => {
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                          })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.unit,
@@ -7390,12 +7405,12 @@ function StockManagement() {
                         </Typography>
                         <Selects
                           // options={companys}
-                            options={accessbranch?.map(data => ({
-                        label: data.company,
-                        value: data.company,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                          options={accessbranch?.map(data => ({
+                            label: data.company,
+                            value: data.company,
+                          })).filter((item, index, self) => {
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                          })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.company,
@@ -7434,15 +7449,15 @@ function StockManagement() {
                         </Typography>
                         <Selects
                           // options={branchs}
-                            options={accessbranch?.filter(
-                        (comp) =>
-                          stockManagehand.company === comp.company
-                      )?.map(data => ({
-                        label: data.branch,
-                        value: data.branch,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                          options={accessbranch?.filter(
+                            (comp) =>
+                              stockManagehand.company === comp.company
+                          )?.map(data => ({
+                            label: data.branch,
+                            value: data.branch,
+                          })).filter((item, index, self) => {
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                          })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.branch,
@@ -7477,15 +7492,15 @@ function StockManagement() {
                         </Typography>
                         <Selects
                           // options={units}
-                           options={accessbranch?.filter(
-                        (comp) =>
-                          stockManagehand.branch === comp.bracnh
-                      )?.map(data => ({
-                        label: data.unit,
-                        value: data.unit,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                          options={accessbranch?.filter(
+                            (comp) =>
+                              stockManagehand.branch === comp.branch
+                          )?.map(data => ({
+                            label: data.unit,
+                            value: data.unit,
+                          })).filter((item, index, self) => {
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                          })}
                           styles={colourStyles}
                           value={{
                             label: stockManagehand.unit,
@@ -8074,7 +8089,7 @@ function StockManagement() {
                   <label>Show entries:</label>
                   <Select
                     id="pageSizeSelect"
-                    value={pageSize}
+                    value={pageSizeviewusage}
                     MenuProps={{
                       PaperProps: {
                         style: {

@@ -12,6 +12,14 @@ const StockSchema = new Schema({
     type: String,
     required: false,
   },
+       allotdate: {
+    type: String,
+    required: false,
+  },
+       allottime: {
+    type: String,
+    required: false,
+  },
     
     vendorfrequency: {
         type: String,

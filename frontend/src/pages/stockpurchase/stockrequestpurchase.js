@@ -1,16 +1,16 @@
-import { makeStyles } from "@material-ui/core";
-import CloseIcon from "@mui/icons-material/Close";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import ImageIcon from "@mui/icons-material/Image";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { City, Country, State } from "country-state-city";
-import { AiOutlineClose } from "react-icons/ai";
-import * as faceapi from "face-api.js";
-import { MultiSelect } from "react-multi-select-component";
+import { makeStyles } from '@material-ui/core';
+import CloseIcon from '@mui/icons-material/Close';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ImageIcon from '@mui/icons-material/Image';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { City, Country, State } from 'country-state-city';
+import { AiOutlineClose } from 'react-icons/ai';
+import * as faceapi from 'face-api.js';
+import { MultiSelect } from 'react-multi-select-component';
 import {
   Box,
   Radio,
@@ -45,75 +45,56 @@ import {
   TextField,
   TextareaAutosize,
   Typography,
-  Skeleton
-} from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import { saveAs } from "file-saver";
+  Skeleton,
+} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import Switch from '@mui/material/Switch';
+import axios from '../../axiosInstance';
+import { saveAs } from 'file-saver';
 // import html2canvas from "html2canvas";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useContext,
-  useMemo,
-  useCallback,
-} from "react";
-import {
-  FaFileCsv,
-  FaFileExcel,
-  FaFilePdf,
-  FaTrash,
-  FaPrint,
-  FaSearch,
-  FaPlus,
-  FaEdit,
-} from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import csvIcon from "../../components/Assets/CSV.png";
-import excelIcon from "../../components/Assets/excel-icon.png";
-import fileIcon from "../../components/Assets/file-icons.png";
-import pdfIcon from "../../components/Assets/pdf-icon.png";
-import wordIcon from "../../components/Assets/word-icon.png";
-import { handleApiError } from "../../components/Errorhandling";
-import Headtitle from "../../components/Headtitle";
-import { StyledTableCell, StyledTableRow } from "../../components/Table";
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from 'react';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaTrash, FaPrint, FaSearch, FaPlus, FaEdit } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import csvIcon from '../../components/Assets/CSV.png';
+import excelIcon from '../../components/Assets/excel-icon.png';
+import fileIcon from '../../components/Assets/file-icons.png';
+import pdfIcon from '../../components/Assets/pdf-icon.png';
+import wordIcon from '../../components/Assets/word-icon.png';
+import { handleApiError } from '../../components/Errorhandling';
+import Headtitle from '../../components/Headtitle';
+import { StyledTableCell, StyledTableRow } from '../../components/Table';
 // import StyledDataGrid from "../../components/TableStyle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { colourStyles, userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
-import LoadingButton from "@mui/lab/LoadingButton";
-import AlertDialog from "../../components/Alert";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../components/DeleteConfirmation.js";
-import ExportData from "../../components/ExportData";
-import InfoPopup from "../../components/InfoPopup.js";
-import MessageAlert from "../../components/MessageAlert";
-import PageHeading from "../../components/PageHeading";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import FormatColorFillIcon from "@mui/icons-material/FormatColorFill";
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { colourStyles, userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
+import LoadingButton from '@mui/lab/LoadingButton';
+import AlertDialog from '../../components/Alert';
+import { DeleteConfirmation, PleaseSelectRow } from '../../components/DeleteConfirmation.js';
+import ExportData from '../../components/ExportData';
+import InfoPopup from '../../components/InfoPopup.js';
+import MessageAlert from '../../components/MessageAlert';
+import PageHeading from '../../components/PageHeading';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 
 //new table
-import { IoMdOptions } from "react-icons/io";
-import { MdClose } from "react-icons/md";
-import domtoimage from "dom-to-image";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import AdvancedSearchBar from "../../components/Searchbar";
-import AggregatedSearchBar from "../../components/AggregatedSearchBar";
-import AggridTable from "../../components/AggridTable";
-import AggridTableForPaginationTable from "../../components/AggridTableForPaginationTable.js";
-import VendorPopup from "../asset/VendorPopup";
-import Webcamimage from "../../components/WebCamVendorDuplicate";
-let name = "create";
+import { IoMdOptions } from 'react-icons/io';
+import { MdClose } from 'react-icons/md';
+import domtoimage from 'dom-to-image';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import AdvancedSearchBar from '../../components/Searchbar';
+import AggregatedSearchBar from '../../components/AggregatedSearchBar';
+import AggridTable from '../../components/AggridTable';
+import AggridTableForPaginationTable from '../../components/AggridTableForPaginationTable.js';
+import VendorPopup from '../asset/VendorPopup';
+import Webcamimage from '../../components/WebCamVendorDuplicate';
+let name = 'create';
 
 function calculateLuminance(hex) {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -129,31 +110,31 @@ function calculateLuminance(hex) {
 
 const useStyles = makeStyles((theme) => ({
   inputs: {
-    display: "none",
+    display: 'none',
   },
   preview: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     marginTop: theme.spacing(2),
-    "& > *": {
+    '& > *': {
       margin: theme.spacing(1),
     },
   },
 }));
 
 function Stockpurchaserequest() {
-  const [vendorGrpOpen, setVendorgrpOpen] = useState({ open: false, data: "" });
-  const [vendorgroup, setVendorgroup] = useState({ vendorgroupname: "" });
+  const [vendorGrpOpen, setVendorgrpOpen] = useState({ open: false, data: '' });
+  const [vendorgroup, setVendorgroup] = useState({ vendorgroupname: '' });
   //vendor grouping add popup
   const handleClickVendorgrpOpen = (data) => {
     setVendorgrpOpen({ open: true, data: data });
   };
   const handleClickVendorgrpClose = () => {
-    setVendorgrpOpen({ open: false, data: "" });
+    setVendorgrpOpen({ open: false, data: '' });
   };
 
-  let newval = "VEN0001";
+  let newval = 'VEN0001';
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -161,15 +142,14 @@ function Stockpurchaserequest() {
   const [isExitsVendor, setIsExitsVendor] = useState(false);
   const [stockmanages, setStockmanage] = useState([]);
 
-  const [selectedRowsRequestPurchase, setSelectedRowsRequestPurchase] =
-    useState([]);
+  const [selectedRowsRequestPurchase, setSelectedRowsRequestPurchase] = useState([]);
 
   const [stockArray, setStockArray] = useState([]);
 
   const totalQuantity = selectedRowsRequestPurchase.reduce((sum, item) => {
-    if (item.requestmode === "Asset Material") {
+    if (item.requestmode === 'Asset Material') {
       return sum + (item.quantity || 0);
-    } else if (item.requestmode === "Stock Material") {
+    } else if (item.requestmode === 'Stock Material') {
       return sum + (item.quantitynew || 0);
     }
     return sum;
@@ -183,99 +163,82 @@ function Stockpurchaserequest() {
 
   //  Datefield
   var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = yyyy + "-" + mm + "-" + dd;
+  today = yyyy + '-' + mm + '-' + dd;
 
   let now = new Date();
 
   let hours = now.getHours();
-  let minutes = String(now.getMinutes()).padStart(2, "0");
-  let seconds = String(now.getSeconds()).padStart(2, "0");
+  let minutes = String(now.getMinutes()).padStart(2, '0');
+  let seconds = String(now.getSeconds()).padStart(2, '0');
 
   let currtime = `${hours}:${minutes}`;
 
   const handlechangephonenumber = (e) => {
     const regex = /^[0-9]+$/;
     const inputValue = e.target.value?.slice(0, 10);
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       return inputValue;
     }
   };
 
   // Country city state datas
-  const [selectedCountryp, setSelectedCountryp] = useState(
-    Country.getAllCountries().find((country) => country.name === "India")
-  );
-  const [selectedStatep, setSelectedStatep] = useState(
-    State.getStatesOfCountry(selectedCountryp?.isoCode).find(
-      (state) => state.name === "Tamil Nadu"
-    )
-  );
-  const [selectedCityp, setSelectedCityp] = useState(
-    City.getCitiesOfState(
-      selectedStatep?.countryCode,
-      selectedStatep?.isoCode
-    ).find((city) => city.name === "Tiruchirappalli")
-  );
+  const [selectedCountryp, setSelectedCountryp] = useState(Country.getAllCountries().find((country) => country.name === 'India'));
+  const [selectedStatep, setSelectedStatep] = useState(State.getStatesOfCountry(selectedCountryp?.isoCode).find((state) => state.name === 'Tamil Nadu'));
+  const [selectedCityp, setSelectedCityp] = useState(City.getCitiesOfState(selectedStatep?.countryCode, selectedStatep?.isoCode).find((city) => city.name === 'Tiruchirappalli'));
 
   const handleClear = (e) => {
     e.preventDefault();
     setVendor({
-      vendorname: "",
-      monthlyfrequency: "",
-      vendorstatus: "",
-      emailid: "",
-      phonenumber: "",
-      phonenumberone: "",
-      phonenumbertwo: "",
-      phonenumberthree: "",
-      phonenumberfour: "",
-      whatsappnumber: "",
-      contactperson: "",
-      address: "",
-      country: "",
-      state: "",
-      city: "",
-      pincode: "",
-      gstnumber: "",
-      creditdays: "",
-      bankname: "Please Select Bank Name",
-      bankbranchname: "",
-      accountholdername: "",
-      accountnumber: "",
-      ifsccode: "",
+      vendorname: '',
+      monthlyfrequency: '',
+      vendorstatus: '',
+      emailid: '',
+      phonenumber: '',
+      phonenumberone: '',
+      phonenumbertwo: '',
+      phonenumberthree: '',
+      phonenumberfour: '',
+      whatsappnumber: '',
+      contactperson: '',
+      address: '',
+      country: '',
+      state: '',
+      city: '',
+      pincode: '',
+      gstnumber: '',
+      creditdays: '',
+      bankname: 'Please Select Bank Name',
+      bankbranchname: '',
+      accountholdername: '',
+      accountnumber: '',
+      ifsccode: '',
       phonecheck: false,
-      modeofpayments: "Please Select Mode of Payments",
-      upinumber: "",
-      chequenumber: "",
-      cardnumber: "",
-      cardholdername: "",
-      cardtransactionnumber: "",
-      cardtype: "Please Select Card Type",
-      cardmonth: "Month",
-      cardyear: "Year",
-      cardsecuritycode: "",
-      paymentfrequency: "Please Select Payment Frequency",
+      modeofpayments: 'Please Select Mode of Payments',
+      upinumber: '',
+      chequenumber: '',
+      cardnumber: '',
+      cardholdername: '',
+      cardtransactionnumber: '',
+      cardtype: 'Please Select Card Type',
+      cardmonth: 'Month',
+      cardyear: 'Year',
+      cardsecuritycode: '',
+      paymentfrequency: 'Please Select Payment Frequency',
     });
-    const country = Country.getAllCountries().find(
-      (country) => country.name === "India"
-    );
-    const state = State.getStatesOfCountry(country?.isoCode).find(
-      (state) => state.name === "Tamil Nadu"
-    );
-    const city = City.getCitiesOfState(state?.countryCode, state?.isoCode).find(
-      (city) => city.name === "Tiruchirappalli"
-    );
+    const country = Country.getAllCountries().find((country) => country.name === 'India');
+    const state = State.getStatesOfCountry(country?.isoCode).find((state) => state.name === 'Tamil Nadu');
+    const city = City.getCitiesOfState(state?.countryCode, state?.isoCode).find((city) => city.name === 'Tiruchirappalli');
     setSelectedCountryp(country);
     setSelectedStatep(state);
     setSelectedCityp(city);
-    setStdCode("");
-    setLanNumber("");
+    setStdCode('');
+    setLanNumber('');
     setmodeofpay([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
 
@@ -289,32 +252,32 @@ function Stockpurchaserequest() {
   const [lanNumber, setLanNumber] = useState();
 
   const vendorstatusopt = [
-    { value: "Active", label: "Active" },
-    { value: "In Active", label: "In Active" },
+    { value: 'Active', label: 'Active' },
+    { value: 'In Active', label: 'In Active' },
   ];
 
   const paymentfrequency = [
-    { value: "Daily", label: "Daily" },
-    { value: "Monthly", label: "Monthly" },
-    { value: "BillWise", label: "BillWise" },
-    { value: "Weekly", label: "Weekly" },
+    { value: 'Daily', label: 'Daily' },
+    { value: 'Monthly', label: 'Monthly' },
+    { value: 'BillWise', label: 'BillWise' },
+    { value: 'Weekly', label: 'Weekly' },
   ];
 
   const handlechangecpincode = (e) => {
     const regex = /^[0-9]+$/;
     const inputValue = e.target.value?.slice(0, 6);
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       setVendor({ ...vendor, pincode: inputValue });
     }
   };
 
   const [imageDragEdit, setImageDragEdit] = useState([]);
-  const [fileEdit, setFileEdit] = useState("");
+  const [fileEdit, setFileEdit] = useState('');
 
   const [color, setColor] = useState([]);
   const [bgbtn, setBgbtn] = useState([]);
 
-  const [colorDrag, setColorDrag] = useState("#FFFFFF");
+  const [colorDrag, setColorDrag] = useState('#FFFFFF');
   const [bgbtnDrag, setBgbtnDrag] = useState(false);
   const handleColorChangeDrag = (e) => {
     setColorDrag(e.target.value);
@@ -324,12 +287,12 @@ function Stockpurchaserequest() {
     if (!image || !color) return;
 
     const formData = new FormData();
-    formData.append("image", imageDrag);
-    formData.append("color", colorDrag);
+    formData.append('image', imageDrag);
+    formData.append('color', colorDrag);
 
     try {
       const response = await axios.post(SERVICE.REMOVEBG, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       // setCroppedImage(response?.data?.image); // Set the base64 image
@@ -345,7 +308,7 @@ function Stockpurchaserequest() {
       setBgbtnDrag(false);
     } catch (error) {
       setBgbtnDrag(false);
-      console.error("Error uploading image:", error);
+      console.error('Error uploading image:', error);
     }
   };
 
@@ -382,11 +345,11 @@ function Stockpurchaserequest() {
 
   const handleSubmitNew = async (index, from) => {
     if (index === undefined || index < 0) {
-      console.error("Invalid index provided.");
+      console.error('Invalid index provided.');
       return;
     }
 
-    if (from === "upload") {
+    if (from === 'upload') {
       setBgbtn((prev) => {
         const newState = [...prev];
         newState[index] = true;
@@ -400,15 +363,13 @@ function Stockpurchaserequest() {
       });
     }
 
-    const selectedImage =
-      from === "upload" ? image?.[index] : capturedImage?.[index];
-    const selectedColor =
-      from === "upload" ? color?.[index] : colorCaptured?.[index];
+    const selectedImage = from === 'upload' ? image?.[index] : capturedImage?.[index];
+    const selectedColor = from === 'upload' ? color?.[index] : colorCaptured?.[index];
 
     if (!selectedImage || !selectedColor) {
-      console.error("Image or color not provided.");
+      console.error('Image or color not provided.');
       // Reset the button states in case of an error.
-      if (from === "upload") {
+      if (from === 'upload') {
         setBgbtn((prev) => {
           const newState = [...prev];
           newState[index] = false;
@@ -425,40 +386,40 @@ function Stockpurchaserequest() {
     }
 
     const formData = new FormData();
-    formData.append("image", selectedImage);
-    formData.append("color", selectedColor);
+    formData.append('image', selectedImage);
+    formData.append('color', selectedColor);
 
     try {
       const response = await axios.post(SERVICE.REMOVEBG, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       // Example: Set the cropped image (if needed).
       // setCroppedImage(response?.data?.image);
-      from === "upload"
+      from === 'upload'
         ? setRefImage((prev) => {
-          let updated = [...prev];
-          let currentObject = {
-            ...updated[index],
-            preview: `${response?.data?.image}`,
-          };
-          updated[index] = currentObject;
-          return updated;
-        })
+            let updated = [...prev];
+            let currentObject = {
+              ...updated[index],
+              preview: `${response?.data?.image}`,
+            };
+            updated[index] = currentObject;
+            return updated;
+          })
         : setCapturedImages((prev) => {
-          let updated = [...prev];
-          let currentObject = {
-            ...updated[index],
-            preview: `${response?.data?.image}`,
-          };
-          updated[index] = currentObject;
-          return updated;
-        });
+            let updated = [...prev];
+            let currentObject = {
+              ...updated[index],
+              preview: `${response?.data?.image}`,
+            };
+            updated[index] = currentObject;
+            return updated;
+          });
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error('Error uploading image:', error);
     } finally {
       // Reset button states after the operation, regardless of success or failure.
-      if (from === "upload") {
+      if (from === 'upload') {
         setBgbtn((prev) => {
           const newState = [...prev];
           newState[index] = false;
@@ -509,7 +470,7 @@ function Stockpurchaserequest() {
     capturedImages.forEach((item) => {
       if (!item?.preview) return;
 
-      const base64Data = item.preview.split(",")[1]; // Extract base64 data
+      const base64Data = item.preview.split(',')[1]; // Extract base64 data
       const binaryData = atob(base64Data); // Decode base64 data
       const uint8Array = new Uint8Array(binaryData.length);
 
@@ -519,12 +480,12 @@ function Stockpurchaserequest() {
       }
 
       // Create a Blob from the binary data
-      const blob = new Blob([uint8Array], { type: "image/png" });
+      const blob = new Blob([uint8Array], { type: 'image/png' });
       newBlobs.push(blob);
 
       // Add default values for bgbtnCaptured and colors
       newBgbtnCaptured.push(false);
-      newColors.push("#ffffff");
+      newColors.push('#ffffff');
     });
 
     // Update states with the accumulated values
@@ -539,12 +500,12 @@ function Stockpurchaserequest() {
 
   const webcamClose = () => {
     setIsWebcamOpen(false);
-    setGetImg("");
+    setGetImg('');
   };
   const webcamDataStore = () => {
     setIsWebcamCapture(true);
     webcamClose();
-    setGetImg("");
+    setGetImg('');
   };
   const showWebcam = () => {
     webcamOpen();
@@ -554,9 +515,9 @@ function Stockpurchaserequest() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const removeCapturedImage = (index) => {
@@ -596,7 +557,7 @@ function Stockpurchaserequest() {
   };
 
   const resetImage = () => {
-    setGetImg("");
+    setGetImg('');
     setRefImage([]);
     setPreviewURL(null);
     setRefImageDrag([]);
@@ -619,9 +580,9 @@ function Stockpurchaserequest() {
     event.preventDefault();
     const clipboardItems = event.clipboardData.items;
     for (let item of clipboardItems) {
-      if (item.type.startsWith("image")) {
+      if (item.type.startsWith('image')) {
         const file = item.getAsFile();
-        console.log(file, "file");
+        console.log(file, 'file');
         if (file) {
           previewFile(file); // Preview the image
           await handleChangeImageDrag({ dataTransfer: { files: [file] } }); // Process the image
@@ -645,28 +606,22 @@ function Stockpurchaserequest() {
 
       image.onload = async () => {
         try {
-          const detections = await faceapi
-            .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceDescriptors();
+          const detections = await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
 
           if (detections.length > 0) {
             const faceDescriptor = detections[0].descriptor;
 
-            const response = await axios.post(
-              `${SERVICE.VENDORDUPLICATEFACEDETECTION}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${auth.APIToken}`,
-                },
-                faceDescriptor: Array.from(faceDescriptor),
-              }
-            );
+            const response = await axios.post(`${SERVICE.VENDORDUPLICATEFACEDETECTION}`, {
+              headers: {
+                Authorization: `Bearer ${auth.APIToken}`,
+              },
+              faceDescriptor: Array.from(faceDescriptor),
+            });
 
             if (response?.data?.matchfound) {
               setIsLoading(false);
-              setPopupContentMalert("Image Already In Use!");
-              setPopupSeverityMalert("info");
+              setPopupContentMalert('Image Already In Use!');
+              setPopupSeverityMalert('info');
               handleClickOpenPopupMalert();
             } else {
               const files = e.target.files;
@@ -674,7 +629,7 @@ function Stockpurchaserequest() {
               for (let i = 0; i < files.length; i++) {
                 const file = files[i];
 
-                if (file.type.startsWith("image/")) {
+                if (file.type.startsWith('image/')) {
                   const reader = new FileReader();
                   reader.onload = () => {
                     newSelectedFiles.push({
@@ -682,11 +637,11 @@ function Stockpurchaserequest() {
                       size: file.size,
                       type: file.type,
                       preview: reader.result,
-                      base64: reader.result.split(",")[1],
+                      base64: reader.result.split(',')[1],
                     });
                     setRefImage(newSelectedFiles);
 
-                    const base64Data = reader.result.split(",")[1]; // Get base64 data (without the prefix)
+                    const base64Data = reader.result.split(',')[1]; // Get base64 data (without the prefix)
                     const binaryData = atob(base64Data); // Decode base64 data
                     const arrayBuffer = new ArrayBuffer(binaryData.length);
                     const uint8Array = new Uint8Array(arrayBuffer);
@@ -697,7 +652,7 @@ function Stockpurchaserequest() {
                     }
 
                     // Create a Blob from the binary data
-                    const blob = new Blob([uint8Array], { type: "image/png" });
+                    const blob = new Blob([uint8Array], { type: 'image/png' });
                     setImage((prev) => [...prev, blob]);
                     setBgbtn((prev) => {
                       let availed = [...prev];
@@ -713,18 +668,14 @@ function Stockpurchaserequest() {
 
                       // Check if there are any existing colors in the state
                       if (availed.length > 0) {
-                        availed.push("#ffffff");
+                        availed.push('#ffffff');
                       } else {
                         // If no colors are present, create a new array with default colors
-                        availed = Array(newSelectedFiles.length).fill(
-                          "#ffffff"
-                        );
+                        availed = Array(newSelectedFiles.length).fill('#ffffff');
                       }
 
                       // Calculate luminance for the updated array of colors
-                      const updated = availed.map((color) =>
-                        calculateLuminance(color)
-                      );
+                      const updated = availed.map((color) => calculateLuminance(color));
 
                       // Update the state for color and light color
                       setIsLightColor(updated);
@@ -746,15 +697,15 @@ function Stockpurchaserequest() {
             setIsLoading(false);
           } else {
             setIsLoading(false);
-            setPopupContentMalert("No face detected!");
-            setPopupSeverityMalert("info");
+            setPopupContentMalert('No face detected!');
+            setPopupSeverityMalert('info');
             handleClickOpenPopupMalert();
           }
         } catch (error) {
           console.log(error);
           setIsLoading(false);
-          setPopupContentMalert("Error in face detection!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('Error in face detection!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         } finally {
           setIsLoading(false);
@@ -763,8 +714,8 @@ function Stockpurchaserequest() {
       };
 
       image.onerror = (err) => {
-        setPopupContentMalert("Error loading image!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Error loading image!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
         setBtnUpload(false); // Disable loader in case of error
       };
@@ -772,10 +723,8 @@ function Stockpurchaserequest() {
       setFile(URL.createObjectURL(file));
     } else {
       setIsLoading(false);
-      setPopupContentMalert(
-        "File size is greater than 1MB, please upload a file below 1MB.!"
-      );
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('File size is greater than 1MB, please upload a file below 1MB.!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
       setBtnUpload(false); // Disable loader if file is too large
     }
@@ -795,32 +744,26 @@ function Stockpurchaserequest() {
 
       image.onload = async () => {
         try {
-          const detections = await faceapi
-            .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceDescriptors();
+          const detections = await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
 
           if (detections.length > 0) {
             const faceDescriptor = detections[0].descriptor;
 
-            const response = await axios.post(
-              `${SERVICE.VENDORDUPLICATEFACEDETECTION}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${auth.APIToken}`,
-                },
-                faceDescriptor: Array.from(faceDescriptor),
-              }
-            );
+            const response = await axios.post(`${SERVICE.VENDORDUPLICATEFACEDETECTION}`, {
+              headers: {
+                Authorization: `Bearer ${auth.APIToken}`,
+              },
+              faceDescriptor: Array.from(faceDescriptor),
+            });
 
             if (response?.data?.matchfound) {
-              setPopupContentMalert("Image Already In Use!");
-              setPopupSeverityMalert("info");
+              setPopupContentMalert('Image Already In Use!');
+              setPopupSeverityMalert('info');
               handleClickOpenPopupMalert();
             } else {
               let newSelectedFilesDrag = [...refImageDrag];
 
-              if (file.type.startsWith("image/")) {
+              if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = () => {
                   newSelectedFilesDrag.push({
@@ -828,11 +771,11 @@ function Stockpurchaserequest() {
                     size: file.size,
                     type: file.type,
                     preview: reader.result,
-                    base64: reader.result.split(",")[1],
+                    base64: reader.result.split(',')[1],
                   });
                   setRefImageDrag(newSelectedFilesDrag);
 
-                  const base64Data = reader.result.split(",")[1]; // Get base64 data (without the prefix)
+                  const base64Data = reader.result.split(',')[1]; // Get base64 data (without the prefix)
                   const binaryData = atob(base64Data); // Decode base64 data
                   const arrayBuffer = new ArrayBuffer(binaryData.length);
                   const uint8Array = new Uint8Array(arrayBuffer);
@@ -843,25 +786,25 @@ function Stockpurchaserequest() {
                   }
 
                   // Create a Blob from the binary data
-                  const blob = new Blob([uint8Array], { type: "image/png" });
+                  const blob = new Blob([uint8Array], { type: 'image/png' });
                   setImageDrag(blob);
                 };
                 reader.readAsDataURL(file);
               } else {
-                setPopupContentMalert("Only Accept Images");
-                setPopupSeverityMalert("info");
+                setPopupContentMalert('Only Accept Images');
+                setPopupSeverityMalert('info');
                 handleClickOpenPopupMalert();
               }
             }
           } else {
-            setPopupContentMalert("No face detected!");
-            setPopupSeverityMalert("info");
+            setPopupContentMalert('No face detected!');
+            setPopupSeverityMalert('info');
             handleClickOpenPopupMalert();
             return false;
           }
         } catch (error) {
-          setPopupContentMalert("Error in face detection!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('Error in face detection!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
           return false;
         } finally {
@@ -871,8 +814,8 @@ function Stockpurchaserequest() {
       };
 
       image.onerror = (err) => {
-        setPopupContentMalert("Error loading image!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Error loading image!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
         setBtnUpload(false); // Disable loader in case of error
         return false;
@@ -880,10 +823,8 @@ function Stockpurchaserequest() {
 
       setFile(URL.createObjectURL(file));
     } else {
-      setPopupContentMalert(
-        "File size is greater than 1MB, please upload a file below 1MB.!"
-      );
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('File size is greater than 1MB, please upload a file below 1MB.!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
       setBtnUpload(false);
       setIsLoading(false);
@@ -900,23 +841,23 @@ function Stockpurchaserequest() {
       };
       reader.readAsDataURL(xhr.response);
     };
-    xhr.open("GET", url);
-    xhr.responseType = "blob";
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
     xhr.send();
   }
 
   const getFileIcon = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -938,22 +879,13 @@ function Stockpurchaserequest() {
             value: d.name,
           }))
           .filter((item, index, self) => {
-            return (
-              self.findIndex(
-                (i) => i.label === item.label && i.value === item.value
-              ) === index
-            );
+            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
           }),
       ];
 
       setIsVendorGroungMaster(all);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -969,23 +901,14 @@ function Stockpurchaserequest() {
   const [columnApi, setColumnApi] = useState(null);
   const [filteredDataItems, setFilteredDataItems] = useState([]);
   //  const [filteredRowData, setFilteredRowData] = useState([]);
-  const [logicOperator, setLogicOperator] = useState("AND");
+  const [logicOperator, setLogicOperator] = useState('AND');
 
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [filterValue, setFilterValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [filterValue, setFilterValue] = useState('');
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = [
-    "Contains",
-    "Does Not Contain",
-    "Equals",
-    "Does Not Equal",
-    "Begins With",
-    "Ends With",
-    "Blank",
-    "Not Blank",
-  ]; // AgGrid-like conditions
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
 
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
@@ -994,7 +917,7 @@ function Stockpurchaserequest() {
 
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
-  const [searchedString, setSearchedString] = useState("");
+  const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTableImg = useRef(null);
   const gridRefTable = useRef(null);
@@ -1002,8 +925,8 @@ function Stockpurchaserequest() {
   const [cateCode, setCatCode] = useState([]);
   const [isBtn, setIsBtn] = useState(false);
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
     setBtnSubmit(false);
@@ -1014,8 +937,8 @@ function Stockpurchaserequest() {
     setIsBtn(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
     setBtnSubmit(false);
@@ -1029,40 +952,10 @@ function Stockpurchaserequest() {
   const [vendorGroupOpt, setVendorGroupopt] = useState([]);
   const [vendorOverall, setVendorOverall] = useState([]);
 
-  const [vendorGroup, setVendorGroup] = useState("Please Select Vendor Group");
+  const [vendorGroup, setVendorGroup] = useState('Please Select Vendor Group');
 
-  let exportColumnNames = [
-    "Company",
-    "Branch",
-    "Unit",
-    "Floor",
-    "Area",
-    "Location",
-    "Date",
-    "Time",
-    "Expected Date",
-    "Expected Time",
-    "Request Mode For",
-    "Product Details",
-    "Quantity",
-    "Quantity & UOM",
-  ];
-  let exportRowValues = [
-    "company",
-    "branch",
-    "unit",
-    "floor",
-    "area",
-    "location",
-    "requestdate",
-    "requesttime",
-    "expecttdate",
-    "expecttime",
-    "requestmode",
-    "productdetailsnew",
-    "quantitynew",
-    "uomnew",
-  ];
+  let exportColumnNames = ['Company', 'Branch', 'Unit', 'Floor', 'Area', 'Location', 'Date', 'Time', 'Expected Date', 'Expected Time', 'Request Mode For', 'Product Details', 'Quantity', 'Quantity & UOM'];
+  let exportRowValues = ['company', 'branch', 'unit', 'floor', 'area', 'location', 'requestdate', 'requesttime', 'expecttdate', 'expecttime', 'requestmode', 'productdetailsnew', 'quantitynew', 'uomnew'];
 
   //Access Module
   const pathname = window.location.pathname;
@@ -1073,7 +966,7 @@ function Stockpurchaserequest() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Stock Purchase Request"),
+      pagename: String('Stock Purchase Request'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -1092,29 +985,27 @@ function Stockpurchaserequest() {
 
   //  Datefield
   var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = yyyy + "-" + mm + "-" + dd;
+  today = yyyy + '-' + mm + '-' + dd;
 
   const gridRef = useRef(null);
 
   const [vomMaster, setVomMaster] = useState({
-    name: "",
+    name: '',
   });
   const [vomMasterget, setVomMasterget] = useState([]);
 
   const [assetmaster, setAssetmaster] = useState([]);
 
   const [asset, setAsset] = useState({
-    name: "",
-    materialcode: "",
-    assethead: "",
+    name: '',
+    materialcode: '',
+    assethead: '',
   });
 
-  const [selectedassethead, setSelectedAssethead] = useState(
-    "Please Select Assethead"
-  );
+  const [selectedassethead, setSelectedAssethead] = useState('Please Select Assethead');
 
   const [btnSubmit, setBtnSubmit] = useState(false);
 
@@ -1124,42 +1015,42 @@ function Stockpurchaserequest() {
   };
 
   const [vendor, setVendor] = useState({
-    vendorname: "",
-    emailid: "",
-    phonenumber: "",
-    phonenumberone: "",
-    phonenumbertwo: "",
-    phonenumberthree: "",
-    phonenumberfour: "",
-    whatsappnumber: "",
-    contactperson: "",
-    address: "",
-    country: "",
-    state: "",
-    city: "",
-    pincode: "",
-    gstnumber: "",
-    creditdays: "",
-    bankname: "Please Select Bank Name",
-    bankbranchname: "",
-    accountholdername: "",
-    accountnumber: "",
-    ifsccode: "",
+    vendorname: '',
+    emailid: '',
+    phonenumber: '',
+    phonenumberone: '',
+    phonenumbertwo: '',
+    phonenumberthree: '',
+    phonenumberfour: '',
+    whatsappnumber: '',
+    contactperson: '',
+    address: '',
+    country: '',
+    state: '',
+    city: '',
+    pincode: '',
+    gstnumber: '',
+    creditdays: '',
+    bankname: 'Please Select Bank Name',
+    bankbranchname: '',
+    accountholdername: '',
+    accountnumber: '',
+    ifsccode: '',
     phonecheck: false,
-    modeofpayments: "Please Select Mode of Payments",
-    paymentfrequency: "Please Select Payment Frequency",
-    monthlyfrequency: "",
-    weeklyfrequency: "",
-    vendorstatus: "",
-    upinumber: "",
-    chequenumber: "",
-    cardnumber: "",
-    cardholdername: "",
-    cardtransactionnumber: "",
-    cardtype: "Please Select Card Type",
-    cardmonth: "Month",
-    cardyear: "Year",
-    cardsecuritycode: "",
+    modeofpayments: 'Please Select Mode of Payments',
+    paymentfrequency: 'Please Select Payment Frequency',
+    monthlyfrequency: '',
+    weeklyfrequency: '',
+    vendorstatus: '',
+    upinumber: '',
+    chequenumber: '',
+    cardnumber: '',
+    cardholdername: '',
+    cardtransactionnumber: '',
+    cardtype: 'Please Select Card Type',
+    cardmonth: 'Month',
+    cardyear: 'Year',
+    cardsecuritycode: '',
   });
 
   const maxLength = 15;
@@ -1167,65 +1058,65 @@ function Stockpurchaserequest() {
   const [stock, setStock] = useState([]);
 
   const [stockmaster, setStockmaster] = useState({
-    branch: "",
-    unit: "",
-    producthead: "",
-    vendorname: "Please Select Vendor",
-    gstno: "",
-    totalbillamount: "",
-    billno: "",
+    branch: '',
+    unit: '',
+    producthead: '',
+    vendorname: 'Please Select Vendor',
+    gstno: '',
+    totalbillamount: '',
+    billno: '',
     requesttime: currtime,
     requestdate: today,
-    productname: "",
-    productdetails: "",
-    warrantydetails: "",
-    uom: "Please Select UOM",
-    quantity: "",
-    rate: "",
-    billdate: "",
-    files: "",
-    warrantyfiles: "",
-    warranty: "Yes",
-    addedby: "",
-    updatedby: "",
-    requestmode: "Please Select Request Mode",
-    stockcategory: "Please Select Stock Category",
-    stocksubcategory: "Please Select Stock Sub Category",
-    uomnew: "Please Select UOM",
-    quantitynew: "",
-    materialnew: "Please Select Material",
-    productdetailsnew: "",
+    productname: '',
+    productdetails: '',
+    warrantydetails: '',
+    uom: 'Please Select UOM',
+    quantity: '',
+    rate: '',
+    billdate: '',
+    files: '',
+    warrantyfiles: '',
+    warranty: 'Yes',
+    addedby: '',
+    updatedby: '',
+    requestmode: 'Please Select Request Mode',
+    stockcategory: 'Please Select Stock Category',
+    stocksubcategory: 'Please Select Stock Sub Category',
+    uomnew: 'Please Select UOM',
+    quantitynew: '',
+    materialnew: 'Please Select Material',
+    productdetailsnew: '',
   });
 
   const [stockmasterupdate, setStockmasterupdate] = useState({
-    branch: "",
-    unit: "",
-    producthead: "",
-    vendorname: "Please Select Vendor",
-    gstno: "",
-    totalbillamount: "",
-    billno: "",
+    branch: '',
+    unit: '',
+    producthead: '',
+    vendorname: 'Please Select Vendor',
+    gstno: '',
+    totalbillamount: '',
+    billno: '',
     requesttime: currtime,
     requestdate: today,
-    productname: "",
-    productdetails: "",
-    warrantydetails: "",
-    uom: "Please Select UOM",
-    quantity: "",
-    rate: "",
-    billdate: "",
-    files: "",
-    warrantyfiles: "",
-    warranty: "Yes",
-    addedby: "",
-    updatedby: "",
-    requestmode: "Please Select Request Mode",
-    stockcategory: "Please Select Stock Category",
-    stocksubcategory: "Please Select Stock Sub Category",
-    uomnew: "Please Select UOM",
-    quantitynew: "",
-    materialnew: "Please Select Material",
-    productdetailsnew: "",
+    productname: '',
+    productdetails: '',
+    warrantydetails: '',
+    uom: 'Please Select UOM',
+    quantity: '',
+    rate: '',
+    billdate: '',
+    files: '',
+    warrantyfiles: '',
+    warranty: 'Yes',
+    addedby: '',
+    updatedby: '',
+    requestmode: 'Please Select Request Mode',
+    stockcategory: 'Please Select Stock Category',
+    stocksubcategory: 'Please Select Stock Sub Category',
+    uomnew: 'Please Select UOM',
+    quantitynew: '',
+    materialnew: 'Please Select Material',
+    productdetailsnew: '',
   });
 
   const handleChangephonenumber = (e) => {
@@ -1233,7 +1124,7 @@ function Stockpurchaserequest() {
     const regex = /^\d*\.?\d*$/;
     const inputValue = e.target.value;
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setStockmaster({ ...stockmaster, estimation: inputValue });
     }
@@ -1244,7 +1135,7 @@ function Stockpurchaserequest() {
     const regex = /^\d*\.?\d*$/;
     const inputValue = e.target.value;
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setStockmasterupdate({ ...stockmasterupdate, estimation: inputValue });
     }
@@ -1266,9 +1157,7 @@ function Stockpurchaserequest() {
 
   const [floorsEdit, setFloorEdit] = useState([]);
   const [areasEdit, setAreasEdit] = useState([]);
-  const [locationsEdit, setLocationsEdit] = useState([
-    { label: "ALL", value: "ALL" },
-  ]);
+  const [locationsEdit, setLocationsEdit] = useState([{ label: 'ALL', value: 'ALL' }]);
   const [companysEdit, setCompanysEdit] = useState([]);
 
   //get all Locations edit.
@@ -1279,12 +1168,10 @@ function Stockpurchaserequest() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let result = res_type.data.locationgroupings
-        .filter((d) => d.branch === a && d.floor === b && d.area === c)
-        .map((data) => data.location);
+      let result = res_type.data.locationgroupings.filter((d) => d.branch === a && d.floor === b && d.area === c).map((data) => data.location);
       let ji = [].concat(...result);
       const all = [
-        { label: "ALL", value: "ALL" },
+        { label: 'ALL', value: 'ALL' },
         ...ji.map((d) => ({
           ...d,
           label: d,
@@ -1293,12 +1180,7 @@ function Stockpurchaserequest() {
       ];
       setLocationsEdit(all);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1321,12 +1203,7 @@ function Stockpurchaserequest() {
       // setCompanys(companyall);
       setCompanysEdit(companyall);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1345,12 +1222,7 @@ function Stockpurchaserequest() {
       }));
       setBranchsEdit(branchall);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1362,9 +1234,7 @@ function Stockpurchaserequest() {
         },
       });
 
-      let result = res_type.data.areagroupings
-        .filter((d) => d.branch === a && d.floor === e)
-        .map((data) => data.area);
+      let result = res_type.data.areagroupings.filter((d) => d.branch === a && d.floor === e).map((data) => data.area);
       let ji = [].concat(...result);
       const all = ji.map((d) => ({
         ...d,
@@ -1373,12 +1243,7 @@ function Stockpurchaserequest() {
       }));
       setAreasEdit(all);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1392,11 +1257,7 @@ function Stockpurchaserequest() {
       });
 
       let getdata = res_vom.data.managestockitems.filter((data) => {
-        return (
-          data.itemname === e.value &&
-          data.stockcategory === stockmaster.stockcategory &&
-          data.stocksubcategory === stockmaster.stocksubcategory
-        );
+        return data.itemname === e.value && data.stockcategory === stockmaster.stockcategory && data.stocksubcategory === stockmaster.stocksubcategory;
       });
 
       setStockmaster((prev) => ({
@@ -1404,12 +1265,7 @@ function Stockpurchaserequest() {
         uomnew: getdata[0].uom,
       }));
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1436,12 +1292,7 @@ function Stockpurchaserequest() {
       //     })),
       // ]);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1470,12 +1321,7 @@ function Stockpurchaserequest() {
       setSubcategoryOption(subcatOpt);
       // setStocksubcategoryOptEdit(subcatOpt)
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1488,10 +1334,7 @@ function Stockpurchaserequest() {
       });
 
       const resultall = res.data.managestockitems.filter((data) => {
-        return (
-          data.stockcategory === stockcategory &&
-          data.stocksubcategory === e.value
-        );
+        return data.stockcategory === stockcategory && data.stocksubcategory === e.value;
       });
 
       const assetmaterialuniqueArray = resultall.map((item) => ({
@@ -1500,12 +1343,7 @@ function Stockpurchaserequest() {
       }));
       setMaterialoptNew(assetmaterialuniqueArray);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1524,31 +1362,26 @@ function Stockpurchaserequest() {
       }));
       setFloorEdit(floorall);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
   const [stockmasteredit, setStockmasteredit] = useState({
-    branch: "",
-    unit: "",
-    producthead: "",
-    vendorname: "Please Select Vendor",
-    gstno: "",
-    billno: "",
-    productname: "",
-    productdetails: "",
-    warrantydetails: "",
-    uom: "Please Select UOM",
-    quantity: "",
-    rate: "",
-    billdate: "",
-    files: "",
-    warrantyfiles: "",
+    branch: '',
+    unit: '',
+    producthead: '',
+    vendorname: 'Please Select Vendor',
+    gstno: '',
+    billno: '',
+    productname: '',
+    productdetails: '',
+    warrantydetails: '',
+    uom: 'Please Select UOM',
+    quantity: '',
+    rate: '',
+    billdate: '',
+    files: '',
+    warrantyfiles: '',
   });
 
   const [vendorgetid, setVendorgetid] = useState({});
@@ -1564,12 +1397,7 @@ function Stockpurchaserequest() {
       setVendorgetid(res?.data?.svendordetails);
       setVendornameid(id);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1578,80 +1406,80 @@ function Stockpurchaserequest() {
   const [yearsOption, setYearsOption] = useState([]);
 
   const dayOptions = [
-    { label: "Monday", value: "Monday" },
-    { label: "Tuesday", value: "Tuesday" },
-    { label: "Wednesday", value: "Wednesday" },
-    { label: "Thursday", value: "Thursday" },
-    { label: "Friday", value: "Friday" },
-    { label: "Saturday", value: "Saturday" },
-    { label: "Sunday", value: "Sunday" },
+    { label: 'Monday', value: 'Monday' },
+    { label: 'Tuesday', value: 'Tuesday' },
+    { label: 'Wednesday', value: 'Wednesday' },
+    { label: 'Thursday', value: 'Thursday' },
+    { label: 'Friday', value: 'Friday' },
+    { label: 'Saturday', value: 'Saturday' },
+    { label: 'Sunday', value: 'Sunday' },
   ];
   //bank name options
   const accounttypes = [
-    { value: "ALLAHABAD BANK", label: "ALLAHABAD BANK" },
-    { value: "ANDHRA BANK", label: "ANDHRA BANK" },
-    { value: "AXIS BANK", label: "AXIS BANK" },
-    { value: "STATE BANK OF INDIA", label: "STATE BANK OF INDIA" },
-    { value: "BANK OF BARODA", label: "BANK OF BARODA" },
-    { value: "CITY UNION BANK", label: "CITY UNION BANK" },
-    { value: "UCO BANK", label: "UCO BANK" },
-    { value: "TMB BANK", label: "TMB BANK" },
-    { value: "UNION BANK OF INDIA", label: "UNION BANK OF INDIA" },
-    { value: "BANK OF INDIA", label: "BANK OF INDIA" },
-    { value: "BANDHAN BANK LIMITED", label: "BANDHAN BANK LIMITED" },
-    { value: "CANARA BANK", label: "CANARA BANK" },
-    { value: "GRAMIN VIKASH BANK", label: "GRAMIN VIKASH BANK" },
-    { value: "CORPORATION BANK", label: "CORPORATION BANK" },
-    { value: "INDIAN BANK", label: "INDIAN BANK" },
-    { value: "INDIAN OVERSEAS BANK", label: "INDIAN OVERSEAS BANK" },
-    { value: "ORIENTAL BANK OF COMMERCE", label: "ORIENTAL BANK OF COMMERCE" },
-    { value: "PUNJAB AND SIND BANK", label: "PUNJAB AND SIND BANK" },
-    { value: "PUNJAB NATIONAL BANK", label: "PUNJAB NATIONAL BANK" },
-    { value: "RESERVE BANK OF INDIA", label: "RESERVE BANK OF INDIA" },
-    { value: "SOUTH INDIAN BANK", label: "SOUTH INDIAN BANK" },
-    { value: "UNITED BANK OF INDIA", label: "UNITED BANK OF INDIA" },
-    { value: "CENTRAL BANK OF INDIA", label: "CENTRAL BANK OF INDIA" },
-    { value: "VIJAYA BANK", label: "VIJAYA BANK" },
-    { value: "DENA BANK", label: "DENA BANK" },
+    { value: 'ALLAHABAD BANK', label: 'ALLAHABAD BANK' },
+    { value: 'ANDHRA BANK', label: 'ANDHRA BANK' },
+    { value: 'AXIS BANK', label: 'AXIS BANK' },
+    { value: 'STATE BANK OF INDIA', label: 'STATE BANK OF INDIA' },
+    { value: 'BANK OF BARODA', label: 'BANK OF BARODA' },
+    { value: 'CITY UNION BANK', label: 'CITY UNION BANK' },
+    { value: 'UCO BANK', label: 'UCO BANK' },
+    { value: 'TMB BANK', label: 'TMB BANK' },
+    { value: 'UNION BANK OF INDIA', label: 'UNION BANK OF INDIA' },
+    { value: 'BANK OF INDIA', label: 'BANK OF INDIA' },
+    { value: 'BANDHAN BANK LIMITED', label: 'BANDHAN BANK LIMITED' },
+    { value: 'CANARA BANK', label: 'CANARA BANK' },
+    { value: 'GRAMIN VIKASH BANK', label: 'GRAMIN VIKASH BANK' },
+    { value: 'CORPORATION BANK', label: 'CORPORATION BANK' },
+    { value: 'INDIAN BANK', label: 'INDIAN BANK' },
+    { value: 'INDIAN OVERSEAS BANK', label: 'INDIAN OVERSEAS BANK' },
+    { value: 'ORIENTAL BANK OF COMMERCE', label: 'ORIENTAL BANK OF COMMERCE' },
+    { value: 'PUNJAB AND SIND BANK', label: 'PUNJAB AND SIND BANK' },
+    { value: 'PUNJAB NATIONAL BANK', label: 'PUNJAB NATIONAL BANK' },
+    { value: 'RESERVE BANK OF INDIA', label: 'RESERVE BANK OF INDIA' },
+    { value: 'SOUTH INDIAN BANK', label: 'SOUTH INDIAN BANK' },
+    { value: 'UNITED BANK OF INDIA', label: 'UNITED BANK OF INDIA' },
+    { value: 'CENTRAL BANK OF INDIA', label: 'CENTRAL BANK OF INDIA' },
+    { value: 'VIJAYA BANK', label: 'VIJAYA BANK' },
+    { value: 'DENA BANK', label: 'DENA BANK' },
     {
-      value: "BHARATIYA MAHILA BANK LIMITED",
-      label: "BHARATIYA MAHILA BANK LIMITED",
+      value: 'BHARATIYA MAHILA BANK LIMITED',
+      label: 'BHARATIYA MAHILA BANK LIMITED',
     },
-    { value: "FEDERAL BANK LTD", label: "FEDERAL BANK LTD" },
-    { value: "HDFC BANK LTD", label: "HDFC BANK LTD" },
-    { value: "ICICI BANK LTD", label: "ICICI BANK LTD" },
-    { value: "IDBI BANK LTD", label: "IDBI BANK LTD" },
-    { value: "PAYTM BANK", label: "PAYTM BANK" },
-    { value: "FINO PAYMENT BANK", label: "FINO PAYMENT BANK" },
-    { value: "INDUSIND BANK LTD", label: "INDUSIND BANK LTD" },
-    { value: "KARNATAKA BANK LTD", label: "KARNATAKA BANK LTD" },
-    { value: "KOTAK MAHINDRA BANK", label: "KOTAK MAHINDRA BANK" },
-    { value: "YES BANK LTD", label: "YES BANK LTD" },
-    { value: "SYNDICATE BANK", label: "SYNDICATE BANK" },
-    { value: "BANK OF MAHARASHTRA", label: "BANK OF MAHARASHTRA" },
-    { value: "DCB BANK", label: "DCB BANK" },
-    { value: "IDFC BANK", label: "IDFC BANK" },
+    { value: 'FEDERAL BANK LTD', label: 'FEDERAL BANK LTD' },
+    { value: 'HDFC BANK LTD', label: 'HDFC BANK LTD' },
+    { value: 'ICICI BANK LTD', label: 'ICICI BANK LTD' },
+    { value: 'IDBI BANK LTD', label: 'IDBI BANK LTD' },
+    { value: 'PAYTM BANK', label: 'PAYTM BANK' },
+    { value: 'FINO PAYMENT BANK', label: 'FINO PAYMENT BANK' },
+    { value: 'INDUSIND BANK LTD', label: 'INDUSIND BANK LTD' },
+    { value: 'KARNATAKA BANK LTD', label: 'KARNATAKA BANK LTD' },
+    { value: 'KOTAK MAHINDRA BANK', label: 'KOTAK MAHINDRA BANK' },
+    { value: 'YES BANK LTD', label: 'YES BANK LTD' },
+    { value: 'SYNDICATE BANK', label: 'SYNDICATE BANK' },
+    { value: 'BANK OF MAHARASHTRA', label: 'BANK OF MAHARASHTRA' },
+    { value: 'DCB BANK', label: 'DCB BANK' },
+    { value: 'IDFC BANK', label: 'IDFC BANK' },
     {
-      value: "JAMMU AND KASHMIR BANK BANK",
-      label: "JAMMU AND KASHMIR BANK BANK",
+      value: 'JAMMU AND KASHMIR BANK BANK',
+      label: 'JAMMU AND KASHMIR BANK BANK',
     },
-    { value: "KARUR VYSYA BANK", label: "KARUR VYSYA BANK" },
-    { value: "RBL BANK", label: "RBL BANK" },
-    { value: "DHANLAXMI BANK", label: "DHANLAXMI BANK" },
-    { value: "CSB BANK", label: "CSB BANK" },
+    { value: 'KARUR VYSYA BANK', label: 'KARUR VYSYA BANK' },
+    { value: 'RBL BANK', label: 'RBL BANK' },
+    { value: 'DHANLAXMI BANK', label: 'DHANLAXMI BANK' },
+    { value: 'CSB BANK', label: 'CSB BANK' },
   ];
 
   const cardtypes = [
-    { value: "Credit Card", label: "Credit Card" },
-    { value: "Debit Card", label: "Debit Card" },
-    { value: "Visa Card", label: "Visa Card" },
-    { value: "Master Card", label: "Master Card" },
+    { value: 'Credit Card', label: 'Credit Card' },
+    { value: 'Debit Card', label: 'Debit Card' },
+    { value: 'Visa Card', label: 'Visa Card' },
+    { value: 'Master Card', label: 'Master Card' },
   ];
 
   const handleMobile = (e) => {
     if (e.length > 10) {
       setPopupContentMalert("Mobile number can't more than 10 characters!");
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
       let num = e.slice(0, 10);
       setVendor({ ...vendor, phonenumber: num });
@@ -1660,7 +1488,7 @@ function Stockpurchaserequest() {
   const handlewhatsapp = (e) => {
     if (e.length > 10) {
       setPopupContentMalert("Whats app number can't more than 10 characters!");
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
       let num = e.slice(0, 10);
       setVendor({ ...vendor, whatsappnumber: num });
@@ -1670,7 +1498,7 @@ function Stockpurchaserequest() {
     if (vendor.phonecheck) {
       setVendor({ ...vendor, whatsappnumber: vendor.phonenumber });
     } else {
-      setVendor({ ...vendor, whatsappnumber: "" });
+      setVendor({ ...vendor, whatsappnumber: '' });
     }
   };
 
@@ -1682,17 +1510,13 @@ function Stockpurchaserequest() {
 
   //submit option for saving
   const handlemodeofpay = () => {
-    if (
-      modeofpay.includes(
-        vendor.modeofpayments === "Please Select Mode of Payments"
-      )
-    ) {
-      setPopupContentMalert("Please Select Mode of Payments");
-      setPopupSeverityMalert("info");
+    if (modeofpay.includes(vendor.modeofpayments === 'Please Select Mode of Payments')) {
+      setPopupContentMalert('Please Select Mode of Payments');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (modeofpay.includes(vendor.modeofpayments)) {
-      setPopupContentMalert("ToDo is Already Added!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('ToDo is Already Added!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       setmodeofpay([...modeofpay, vendor.modeofpayments]);
@@ -1706,32 +1530,32 @@ function Stockpurchaserequest() {
       })
     );
     switch (index) {
-      case "Bank Transfer":
+      case 'Bank Transfer':
         setVendor({
           ...vendor,
-          bankname: "Please Select Bank Name",
-          bankbranchname: "",
-          accountholdername: "",
-          accountnumber: "",
-          ifsccode: "",
+          bankname: 'Please Select Bank Name',
+          bankbranchname: '',
+          accountholdername: '',
+          accountnumber: '',
+          ifsccode: '',
         });
         break;
-      case "UPI":
-        setVendor({ ...vendor, upinumber: "" });
+      case 'UPI':
+        setVendor({ ...vendor, upinumber: '' });
         break;
-      case "Cheque":
-        setVendor({ ...vendor, chequenumber: "" });
+      case 'Cheque':
+        setVendor({ ...vendor, chequenumber: '' });
         break;
-      case "Card":
+      case 'Card':
         setVendor({
           ...vendor,
-          cardnumber: "",
-          cardholdername: "",
-          cardtransactionnumber: "",
-          cardtype: "Please Select Card Type",
-          cardmonth: "Month",
-          cardyear: "Year",
-          cardsecuritycode: "",
+          cardnumber: '',
+          cardholdername: '',
+          cardtransactionnumber: '',
+          cardtype: 'Please Select Card Type',
+          cardmonth: 'Month',
+          cardyear: 'Year',
+          cardsecuritycode: '',
         });
         break;
     }
@@ -1761,7 +1585,7 @@ function Stockpurchaserequest() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -1769,14 +1593,14 @@ function Stockpurchaserequest() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImage(newSelectedFiles);
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1804,17 +1628,17 @@ function Stockpurchaserequest() {
 
   //first allexcel....
   const getFileIconwarranty = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1829,7 +1653,7 @@ function Stockpurchaserequest() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -1837,14 +1661,14 @@ function Stockpurchaserequest() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImagewarranty(newSelectedFiles);
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1861,14 +1685,14 @@ function Stockpurchaserequest() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImagewarranty = () => {
-    setGetImgwarranty("");
-    setFilewarranty("");
+    setGetImgwarranty('');
+    setFilewarranty('');
     setRefImagewarranty([]);
     setPreviewURLwarranty(null);
   };
@@ -1897,31 +1721,30 @@ function Stockpurchaserequest() {
   const [filewarrantyedit, setFilewarrantyedit] = useState();
 
   // Upload Popup
-  const [uploadPopupOpenwarrantyedit, setUploadPopupOpenwarrantyedit] =
-    useState(false);
+  const [uploadPopupOpenwarrantyedit, setUploadPopupOpenwarrantyedit] = useState(false);
   const handleClickUploadPopupOpenwarrantyedit = () => {
     setUploadPopupOpenwarrantyedit(true);
   };
   const handleUploadPopupClosewarrantyedit = () => {
     setUploadPopupOpenwarrantyedit(false);
-    setGetImgwarrantyedit("");
-    setFilewarrantyedit("");
+    setGetImgwarrantyedit('');
+    setFilewarrantyedit('');
     setPreviewURLwarrantyedit(null);
   };
 
   //first allexcel....
   const getFileIconwarrantyedit = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1936,7 +1759,7 @@ function Stockpurchaserequest() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -1944,14 +1767,14 @@ function Stockpurchaserequest() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImagewarrantyedit(newSelectedFiles);
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -1968,14 +1791,14 @@ function Stockpurchaserequest() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImagewarrantyedit = () => {
-    setGetImgwarrantyedit("");
-    setFilewarrantyedit("");
+    setGetImgwarrantyedit('');
+    setFilewarrantyedit('');
     setRefImagewarrantyedit([]);
     setPreviewURLwarrantyedit(null);
   };
@@ -2007,17 +1830,17 @@ function Stockpurchaserequest() {
   const handlechangestdcode = (e) => {
     const regex = /^[0-9]+$/;
     const inputValue = e.target.value?.slice(0, 4);
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       setStdCode(inputValue);
     }
   };
 
   const modeofpayments = [
-    { value: "Cash", label: "Cash" },
-    { value: "Bank Transfer", label: "Bank Transfer" },
-    { value: "UPI", label: "UPI" },
-    { value: "Card", label: "Card" },
-    { value: "Cheque", label: "Cheque" },
+    { value: 'Cash', label: 'Cash' },
+    { value: 'Bank Transfer', label: 'Bank Transfer' },
+    { value: 'UPI', label: 'UPI' },
+    { value: 'Card', label: 'Card' },
+    { value: 'Cheque', label: 'Cheque' },
   ];
 
   // Upload Popup
@@ -2027,24 +1850,24 @@ function Stockpurchaserequest() {
   };
   const handleUploadPopupCloseedit = () => {
     setUploadPopupOpenedit(false);
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setPreviewURLedit(null);
   };
 
   //first allexcel....
   const getFileIconedit = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -2060,7 +1883,7 @@ function Stockpurchaserequest() {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         // Check if the file is an image
-        if (file.type.startsWith("image/")) {
+        if (file.type.startsWith('image/')) {
           const reader = new FileReader();
           reader.onload = () => {
             newSelectedFiles.push({
@@ -2068,20 +1891,20 @@ function Stockpurchaserequest() {
               size: file.size,
               type: file.type,
               preview: reader.result,
-              base64: reader.result.split(",")[1],
+              base64: reader.result.split(',')[1],
             });
             setRefImageedit(newSelectedFiles);
           };
 
           reader.readAsDataURL(file);
         } else {
-          setPopupContentMalert("Only Accept Images!");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('Only Accept Images!');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
         }
       }
     } catch (err) {
-      console.log(err, "image");
+      console.log(err, 'image');
     }
   };
 
@@ -2096,14 +1919,14 @@ function Stockpurchaserequest() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const resetImageedit = () => {
-    setGetImgedit("");
-    setFileedit("");
+    setGetImgedit('');
+    setFileedit('');
     setRefImageedit([]);
     setPreviewURLedit(null);
   };
@@ -2133,27 +1956,16 @@ function Stockpurchaserequest() {
 
   const [units, setUnits] = useState([]);
 
-  const [selectedBranch, setSelectedBranch] = useState("Please Select Branch");
-  const [selectedBranchedit, setSelectedBranchedit] = useState(
-    "Please Select Branch"
-  );
-  const [selectedUnit, setSelectedUnit] = useState("Please Select Unit");
-  const [selectedUnitedit, setSelectedUnitedit] =
-    useState("Please Select Unit");
+  const [selectedBranch, setSelectedBranch] = useState('Please Select Branch');
+  const [selectedBranchedit, setSelectedBranchedit] = useState('Please Select Branch');
+  const [selectedUnit, setSelectedUnit] = useState('Please Select Unit');
+  const [selectedUnitedit, setSelectedUnitedit] = useState('Please Select Unit');
 
-  const [selectedProducthead, setSelectedProducthead] = useState(
-    "Please Select Producthead"
-  );
-  const [selectedAssetType, setSelectedAssetType] = useState("");
-  const [selectedProductheadedit, setSelectedProductheadedit] = useState(
-    "Please Select Producthead"
-  );
-  const [selectedProductname, setSelectedProductname] = useState(
-    "Please Select Productname"
-  );
-  const [selectedProductnameedit, setSelectedProductnameedit] = useState(
-    "Please Select Productname"
-  );
+  const [selectedProducthead, setSelectedProducthead] = useState('Please Select Producthead');
+  const [selectedAssetType, setSelectedAssetType] = useState('');
+  const [selectedProductheadedit, setSelectedProductheadedit] = useState('Please Select Producthead');
+  const [selectedProductname, setSelectedProductname] = useState('Please Select Productname');
+  const [selectedProductnameedit, setSelectedProductnameedit] = useState('Please Select Productname');
 
   const [filteredUnit, setFilteredUnit] = useState([]);
   const [filteredUnitEdit, setFilteredUnitEdit] = useState([]);
@@ -2161,23 +1973,23 @@ function Stockpurchaserequest() {
   const [filteredProductname, setFilteredProductname] = useState([]);
   const [filteredProductnameEdit, setFilteredProductnameEdit] = useState([]);
 
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
 
   //  Datefield
   var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = yyyy + "-" + mm + "-" + dd;
+  today = yyyy + '-' + mm + '-' + dd;
 
   const [stockmanagemasteredit, setStockmanagemasteredit] = useState({
-    branch: "",
-    unit: "",
-    producthead: "",
-    productname: "",
-    productdetails: "",
-    uom: "Please Select UOM",
-    quantity: "",
+    branch: '',
+    unit: '',
+    producthead: '',
+    productname: '',
+    productdetails: '',
+    uom: 'Please Select UOM',
+    quantity: '',
   });
 
   // const handleVendorChange = (e) => {
@@ -2219,85 +2031,48 @@ function Stockpurchaserequest() {
   };
 
   const [projEdit, setProjedit] = useState({
-    name: "",
+    name: '',
   });
 
-  const {
-    isUserRoleCompare,
-    allProjects,
-    pageName,
-    setPageName,
-    isUserRoleAccess,
-    isAssignBranch,
-    allCompany,
-    allBranch,
-    allUnit,
-    allTeam,
-    buttonStyles,
-  } = useContext(UserRoleAccessContext);
+  const { isUserRoleCompare, allProjects, pageName, setPageName, isUserRoleAccess, isAssignBranch, allCompany, allBranch, allUnit, allTeam, buttonStyles } = useContext(UserRoleAccessContext);
   // const accessbranch = isAssignBranch
   //   ?.map((data) => ({
   //     branch: data.branch,
   //     company: data.company,
   //     unit: data.unit,
   //   }))
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [
-          window.location.pathname?.substring(1),
-          window.location.pathname,
-        ];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
+
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
 
   const { auth, setAuth } = useContext(AuthContext);
   const [projectCheck, setProjectCheck] = useState(false);
@@ -2305,13 +2080,13 @@ function Stockpurchaserequest() {
   const handleBranchChange = (e) => {
     const selectedBranch = e.value;
     setSelectedBranch(selectedBranch);
-    setSelectedUnit("Please Select Unit");
+    setSelectedUnit('Please Select Unit');
   };
 
   const handleProductChange = (e) => {
     const selectedProducthead = e.value;
     setSelectedProducthead(selectedProducthead);
-    setSelectedProductname("Please Select Productname");
+    setSelectedProductname('Please Select Productname');
   };
 
   //Datatable
@@ -2329,14 +2104,14 @@ function Stockpurchaserequest() {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const [items, setItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [checkvendor, setCheckvendor] = useState();
   const [checkcategory, setCheckcategory] = useState();
   const [checksubcategory, setChecksubcategory] = useState();
   const [checktimepoints, setChecktimepoints] = useState();
 
-  const [copiedData, setCopiedData] = useState("");
+  const [copiedData, setCopiedData] = useState('');
 
   //image
 
@@ -2345,10 +2120,10 @@ function Stockpurchaserequest() {
       domtoimage
         .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "StockRequest_Purchase.png");
+          saveAs(blob, 'StockRequest_Purchase.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -2406,30 +2181,30 @@ function Stockpurchaserequest() {
     setOpenstockupdate(false);
     setStockmasterupdate({
       ...stockmasterupdate,
-      gstno: "",
-      billno: "",
-      productname: "",
-      productdetails: "",
-      warrantydetails: "",
-      quantity: "",
-      rate: "",
-      billdate: "",
-      warrantyfiles: "",
-      addedby: "",
-      updatedby: "",
+      gstno: '',
+      billno: '',
+      productname: '',
+      productdetails: '',
+      warrantydetails: '',
+      quantity: '',
+      rate: '',
+      billdate: '',
+      warrantyfiles: '',
+      addedby: '',
+      updatedby: '',
     });
 
     setVendorgetid({});
     setRefImageedit([]);
     setRefImage([]);
-    setFile("");
+    setFile('');
     setGetImg(null);
     setGetImgedit(null);
     setRefImagewarranty([]);
     setRefImagewarrantyedit([]);
-    setFilewarranty("");
+    setFilewarranty('');
     setGetImgwarranty(null);
-    setFilewarrantyedit("");
+    setFilewarrantyedit('');
     setGetImgwarrantyedit(null);
     setBtnSubmit(false);
   };
@@ -2463,7 +2238,7 @@ function Stockpurchaserequest() {
 
   //Delete model
   const [isDeleteOpenalert, setIsDeleteOpenalert] = useState(false);
-  console.log(selectedRowsRequestPurchase, "selectedRowsRequestPurchase")
+
   const handleClickOpenalert = () => {
     if (selectedRowsRequestPurchase.length == 0) {
       setIsDeleteOpenalert(true);
@@ -2488,7 +2263,7 @@ function Stockpurchaserequest() {
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
   const classes = useStyles();
 
@@ -2502,17 +2277,17 @@ function Stockpurchaserequest() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   const getRowClassName = (params) => {
     if (selectedRowsRequestPurchase.includes(params.data.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   // Show All Columns & Manage Columns
@@ -2538,9 +2313,7 @@ function Stockpurchaserequest() {
     actions: true,
   };
 
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
   const fetchVendor = async () => {
     try {
@@ -2559,12 +2332,7 @@ function Stockpurchaserequest() {
       setVendormaster(vendorall);
       setCatCode(res_vendor?.data?.vendordetails);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -2578,12 +2346,7 @@ function Stockpurchaserequest() {
 
       setCatCode(res_vendor?.data?.vendordetails);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
   useEffect(() => {
@@ -2597,9 +2360,7 @@ function Stockpurchaserequest() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const allGroup = Array.from(
-        new Set(res1?.data?.vendorgrouping.map((d) => d.name))
-      ).map((item) => {
+      const allGroup = Array.from(new Set(res1?.data?.vendorgrouping.map((d) => d.name))).map((item) => {
         return {
           label: item,
           value: item,
@@ -2609,12 +2370,7 @@ function Stockpurchaserequest() {
       setVendorGroupopt(allGroup);
       setVendorOverall(res1?.data?.vendorgrouping);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -2643,7 +2399,7 @@ function Stockpurchaserequest() {
     });
 
     setVendormaster(final);
-    setStockmaster({ ...stockmaster, vendorname: "Please Select Vendor" });
+    setStockmaster({ ...stockmaster, vendorname: 'Please Select Vendor' });
   };
 
   //set function to get particular row
@@ -2657,12 +2413,7 @@ function Stockpurchaserequest() {
       setDeleteproject(res?.data?.sstockmanage);
       handleClickOpen();
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -2675,20 +2426,15 @@ function Stockpurchaserequest() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
       handleCloseMod();
       setSelectedRowsRequestPurchase([]);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       setPage(1);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -2705,21 +2451,16 @@ function Stockpurchaserequest() {
       // Wait for all delete requests to complete
       await Promise.all(deletePromises);
 
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
       handleCloseModcheckbox();
       setSelectedRowsRequestPurchase([]);
       setSelectAllChecked(false);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       setPage(1);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -2742,40 +2483,21 @@ function Stockpurchaserequest() {
         component: String(stockmaster.component),
         warranty: String(stockmaster.warranty),
         estimation: String(stockmaster.estimation),
-        estimationtime: String(stockmaster.estimationtime)
-          ? stockmaster.estimationtime
-          : "Days",
+        estimationtime: String(stockmaster.estimationtime) ? stockmaster.estimationtime : 'Days',
         assettype: selectedAssetType,
-        producthead: String(
-          selectedProducthead === "Please Select Assethead"
-            ? ""
-            : selectedProducthead
-        ),
+        producthead: String(selectedProducthead === 'Please Select Assethead' ? '' : selectedProducthead),
 
         vendor: String(stockmaster.vendorname),
         vendorgroup: String(vendorGroup),
         vendorid: String(vendornameid),
-        gstno: String(
-          vendorgetid.gstnumber === undefined ? "" : vendorgetid.gstnumber
-        ),
+        gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
         billno: Number(stockmaster.billno),
 
-        productname: String(
-          selectedProductname === "Please Select Material"
-            ? ""
-            : selectedProductname
-        ),
+        productname: String(selectedProductname === 'Please Select Material' ? '' : selectedProductname),
 
         productdetails: String(stockmaster.productdetails),
-        warrantydetails: String(
-          stockmaster.warrantydetails == undefined ||
-            stockmaster.warrantydetails == "undefined"
-            ? ""
-            : stockmaster.warrantydetails
-        ),
-        uom: String(
-          stockmaster.uom === "Please Select UOM" ? "" : stockmaster.uom
-        ),
+        warrantydetails: String(stockmaster.warrantydetails == undefined || stockmaster.warrantydetails == 'undefined' ? '' : stockmaster.warrantydetails),
+        uom: String(stockmaster.uom === 'Please Select UOM' ? '' : stockmaster.uom),
         quantity: Number(stockmaster.quantity),
         rate: Number(stockmaster.rate),
         billdate: String(stockmaster.billdate),
@@ -2783,14 +2505,8 @@ function Stockpurchaserequest() {
         warrantyfiles: [...refImagewarrantyedit],
 
         requestmode: String(stockmaster.requestmode),
-        stockcategory:
-          stockmaster.stockcategory === "Please Select Stock Category"
-            ? ""
-            : String(stockmaster.stockcategory),
-        stocksubcategory:
-          stockmaster.stocksubcategory === "Please Select Stock Sub Category"
-            ? ""
-            : String(stockmaster.stocksubcategory),
+        stockcategory: stockmaster.stockcategory === 'Please Select Stock Category' ? '' : String(stockmaster.stockcategory),
+        stocksubcategory: stockmaster.stocksubcategory === 'Please Select Stock Sub Category' ? '' : String(stockmaster.stocksubcategory),
         stockmaterialarray: stockArray,
         addedby: [
           {
@@ -2803,45 +2519,40 @@ function Stockpurchaserequest() {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
-        updating: String("updated"),
+        updating: String('updated'),
       });
 
       setStockmaster(stockcreate.data);
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
       setStockmaster({
         ...stockmaster,
-        gstno: "",
-        billno: "",
-        productname: "",
-        productdetails: "",
-        warrantydetails: "",
-        quantity: "",
-        rate: "",
-        billdate: "",
-        warrantyfiles: "",
-        addedby: "",
-        updatedby: "",
+        gstno: '',
+        billno: '',
+        productname: '',
+        productdetails: '',
+        warrantydetails: '',
+        quantity: '',
+        rate: '',
+        billdate: '',
+        warrantyfiles: '',
+        addedby: '',
+        updatedby: '',
       });
 
       setVendorgetid({});
       setRefImage([]);
-      setFile("");
+      setFile('');
       setGetImg(null);
       setRefImagewarranty([]);
-      setFilewarranty("");
+      setFilewarranty('');
       setGetImgwarranty(null);
       setBtnSubmit(false);
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       handleClosestock();
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -2866,18 +2577,14 @@ function Stockpurchaserequest() {
           component: String(item.component),
           warranty: String(stockmasterupdate.warranty),
           estimation: String(stockmasterupdate.estimation),
-          estimationtime: String(stockmasterupdate.estimationtime)
-            ? stockmasterupdate.estimationtime
-            : "Days",
+          estimationtime: String(stockmasterupdate.estimationtime) ? stockmasterupdate.estimationtime : 'Days',
           assettype: item.assettype,
           producthead: item.asset,
 
           vendor: String(stockmaster.vendorname),
           vendorgroup: String(vendorGroup),
           vendorid: String(vendornameid),
-          gstno: String(
-            vendorgetid.gstnumber === undefined ? "" : vendorgetid.gstnumber
-          ),
+          gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
           billno: Number(stockmasterupdate.billno),
 
           productname: item.material,
@@ -2910,45 +2617,40 @@ function Stockpurchaserequest() {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
-          updating: String("updated"),
+          updating: String('updated'),
         });
       });
 
-      await fetchStock("Filtered");
+      await fetchStock('Filtered');
       setStockmasterupdate({
         ...stockmasterupdate,
-        gstno: "",
-        billno: "",
-        productname: "",
-        productdetails: "",
-        warrantydetails: "",
-        quantity: "",
-        rate: "",
-        billdate: "",
-        warrantyfiles: "",
-        addedby: "",
-        updatedby: "",
+        gstno: '',
+        billno: '',
+        productname: '',
+        productdetails: '',
+        warrantydetails: '',
+        quantity: '',
+        rate: '',
+        billdate: '',
+        warrantyfiles: '',
+        addedby: '',
+        updatedby: '',
       });
 
       setVendorgetid({});
       setRefImageedit([]);
       setRefImage([]);
-      setFile("");
+      setFile('');
       setGetImg(null);
       setGetImgedit(null);
       setRefImagewarranty([]);
       setRefImagewarrantyedit([]);
-      setFilewarranty("");
+      setFilewarranty('');
       setGetImgwarranty(null);
-      setFilewarrantyedit("");
+      setFilewarrantyedit('');
       setGetImgwarrantyedit(null);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -2965,38 +2667,27 @@ function Stockpurchaserequest() {
 
     const isBillMatch = res.data.stock > 0;
 
-    if (stockmasterupdate.requestdate === "") {
-      setPopupContentMalert("Please Select Date");
-      setPopupSeverityMalert("warning");
+    if (stockmasterupdate.requestdate === '') {
+      setPopupContentMalert('Please Select Date');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (stockmasterupdate.requesttime === "") {
-      setPopupContentMalert("Please Select Time");
-      setPopupSeverityMalert("warning");
+    } else if (stockmasterupdate.requesttime === '') {
+      setPopupContentMalert('Please Select Time');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
     }
 
-    if (
-      stockmasterupdate.warranty === "" ||
-      stockmasterupdate.warranty === undefined
-    ) {
-      setPopupContentMalert("Please Select Warranty");
-      setPopupSeverityMalert("info");
+    if (stockmasterupdate.warranty === '' || stockmasterupdate.warranty === undefined) {
+      setPopupContentMalert('Please Select Warranty');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmasterupdate.warranty == "Yes" &&
-      (stockmasterupdate.estimation === "" ||
-        stockmasterupdate.estimation === undefined)
-    ) {
-      setPopupContentMalert("Please Enter Warranty Time");
-      setPopupSeverityMalert("info");
+    } else if (stockmasterupdate.warranty == 'Yes' && (stockmasterupdate.estimation === '' || stockmasterupdate.estimation === undefined)) {
+      setPopupContentMalert('Please Enter Warranty Time');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmasterupdate.warranty == "Yes" &&
-      (stockmasterupdate.estimationtime === "" ||
-        stockmasterupdate.estimationtime === undefined)
-    ) {
-      setPopupContentMalert("Please select Estimation");
-      setPopupSeverityMalert("info");
+    } else if (stockmasterupdate.warranty == 'Yes' && (stockmasterupdate.estimationtime === '' || stockmasterupdate.estimationtime === undefined)) {
+      setPopupContentMalert('Please select Estimation');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     // else if (
@@ -3007,54 +2698,37 @@ function Stockpurchaserequest() {
     //   setPopupSeverityMalert("info");
     //   handleClickOpenPopupMalert();
     // }
-    else if (vendorGroup === "Please Select Vendor Group") {
-      setPopupContentMalert("Please Select Vendor Group!");
-      setPopupSeverityMalert("info");
+    else if (vendorGroup === 'Please Select Vendor Group') {
+      setPopupContentMalert('Please Select Vendor Group!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmaster.vendorname === "" ||
-      stockmaster.vendorname === "Please Select Vendor" ||
-      stockmaster.vendorname === undefined
-    ) {
-      setPopupContentMalert("Please Select Vendor!");
-      setPopupSeverityMalert("info");
+    } else if (stockmaster.vendorname === '' || stockmaster.vendorname === 'Please Select Vendor' || stockmaster.vendorname === undefined) {
+      setPopupContentMalert('Please Select Vendor!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmasterupdate.billno === "" ||
-      stockmasterupdate.billno === undefined
-    ) {
-      setPopupContentMalert("Please Enter Bill No!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasterupdate.billno === '' || stockmasterupdate.billno === undefined) {
+      setPopupContentMalert('Please Enter Bill No!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isBillMatch) {
-      setPopupContentMalert(" Bill No Already Added!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert(' Bill No Already Added!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      (stockmasterupdate.warranty === "Yes" &&
-        stockmasterupdate.warrantydetails === "") ||
-      stockmasterupdate.warrantydetails === undefined
-    ) {
-      setPopupContentMalert("Please Enter Warranty Details!");
-      setPopupSeverityMalert("info");
+    } else if ((stockmasterupdate.warranty === 'Yes' && stockmasterupdate.warrantydetails === '') || stockmasterupdate.warrantydetails === undefined) {
+      setPopupContentMalert('Please Enter Warranty Details!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmasterupdate.rate === "" ||
-      stockmasterupdate.rate === undefined
-    ) {
-      setPopupContentMalert("Please Enter Rate!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasterupdate.rate === '' || stockmasterupdate.rate === undefined) {
+      setPopupContentMalert('Please Enter Rate!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      stockmasterupdate.billdate === "" ||
-      stockmasterupdate.billdate === undefined
-    ) {
-      setPopupContentMalert("Please Select Bill Date!");
-      setPopupSeverityMalert("info");
+    } else if (stockmasterupdate.billdate === '' || stockmasterupdate.billdate === undefined) {
+      setPopupContentMalert('Please Select Bill Date!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (refImageedit.length == 0) {
-      setPopupContentMalert("Please Upload Bill!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Upload Bill!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequestUpdate();
@@ -3074,231 +2748,146 @@ function Stockpurchaserequest() {
 
     const isBillMatch = res.data.stock > 0;
 
-    if (stockmaster.requestmode === "Asset Material") {
-      if (
-        stockmaster.company === "" ||
-        stockmaster.company === "Please Select Company"
-      ) {
-        setPopupContentMalert("Please Select Company!");
-        setPopupSeverityMalert("info");
+    if (stockmaster.requestmode === 'Asset Material') {
+      if (stockmaster.company === '' || stockmaster.company === 'Please Select Company') {
+        setPopupContentMalert('Please Select Company!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        selectedBranch === "" ||
-        selectedBranch == "Please Select Branch"
-      ) {
-        setPopupContentMalert("Please Select Branch!");
-        setPopupSeverityMalert("info");
+      } else if (selectedBranch === '' || selectedBranch == 'Please Select Branch') {
+        setPopupContentMalert('Please Select Branch!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (selectedUnit === "" || selectedUnit == "Please Select Unit") {
-        setPopupContentMalert("Please Select Unit!");
-        setPopupSeverityMalert("info");
+      } else if (selectedUnit === '' || selectedUnit == 'Please Select Unit') {
+        setPopupContentMalert('Please Select Unit!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.floor === "" ||
-        stockmaster.floor === "Please Select Floor"
-      ) {
-        setPopupContentMalert("Please Select Floor!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.floor === '' || stockmaster.floor === 'Please Select Floor') {
+        setPopupContentMalert('Please Select Floor!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.area === "" ||
-        stockmaster.area === "Please Select Area"
-      ) {
-        setPopupContentMalert("Please Select Area!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.area === '' || stockmaster.area === 'Please Select Area') {
+        setPopupContentMalert('Please Select Area!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.location === "" ||
-        stockmaster.location === "Please Select Location"
-      ) {
-        setPopupContentMalert("Please Select Location!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.location === '' || stockmaster.location === 'Please Select Location') {
+        setPopupContentMalert('Please Select Location!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.warranty === "" ||
-        stockmaster.warranty === undefined
-      ) {
-        setPopupContentMalert("Please Select Warranty");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty === '' || stockmaster.warranty === undefined) {
+        setPopupContentMalert('Please Select Warranty');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.warranty == "Yes" &&
-        (stockmaster.estimation === "" || stockmaster.estimation === undefined)
-      ) {
-        setPopupContentMalert("Please Enter Warranty Time");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty == 'Yes' && (stockmaster.estimation === '' || stockmaster.estimation === undefined)) {
+        setPopupContentMalert('Please Enter Warranty Time');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.warranty == "Yes" &&
-        (stockmaster.estimationtime === "" ||
-          stockmaster.estimationtime === undefined)
-      ) {
-        setPopupContentMalert("Please select Estimation");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty == 'Yes' && (stockmaster.estimationtime === '' || stockmaster.estimationtime === undefined)) {
+        setPopupContentMalert('Please select Estimation');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        selectedProducthead === "" ||
-        selectedProducthead == "Please Select Producthead"
-      ) {
-        setPopupContentMalert("Please Select Product Head!");
-        setPopupSeverityMalert("info");
+      } else if (selectedProducthead === '' || selectedProducthead == 'Please Select Producthead') {
+        setPopupContentMalert('Please Select Product Head!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        selectedProductname === "" ||
-        selectedProductname == "Please Select Productname"
-      ) {
-        setPopupContentMalert("Please Select Product Name!");
-        setPopupSeverityMalert("info");
+      } else if (selectedProductname === '' || selectedProductname == 'Please Select Productname') {
+        setPopupContentMalert('Please Select Product Name!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.productdetails === "" ||
-        stockmaster.productdetails === undefined
-      ) {
-        setPopupContentMalert("Please Enter Product Details!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.productdetails === '' || stockmaster.productdetails === undefined) {
+        setPopupContentMalert('Please Enter Product Details!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.uom === "" ||
-        stockmaster.uom === "Please Select UOM"
-      ) {
-        setPopupContentMalert("Please Select UOM!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
+        setPopupContentMalert('Please Select UOM!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.quantity === "" ||
-        stockmaster.quantity === undefined
-      ) {
-        setPopupContentMalert("Please Enter Quantity!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.quantity === '' || stockmaster.quantity === undefined) {
+        setPopupContentMalert('Please Enter Quantity!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (vendorGroup === "Please Select Vendor Group") {
-        setPopupContentMalert("Please Select Vendor Group!");
-        setPopupSeverityMalert("info");
+      } else if (vendorGroup === 'Please Select Vendor Group') {
+        setPopupContentMalert('Please Select Vendor Group!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.vendorname === "" ||
-        stockmaster.vendorname === "Please Select Vendor" ||
-        stockmaster.vendorname === undefined
-      ) {
-        setPopupContentMalert("Please Select Vendor!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.vendorname === '' || stockmaster.vendorname === 'Please Select Vendor' || stockmaster.vendorname === undefined) {
+        setPopupContentMalert('Please Select Vendor!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.billno === "" ||
-        stockmaster.billno === undefined
-      ) {
-        setPopupContentMalert("Please Enter Bill No!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.billno === '' || stockmaster.billno === undefined) {
+        setPopupContentMalert('Please Enter Bill No!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (isBillMatch) {
-        setPopupContentMalert(" Bill No Already Added!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert(' Bill No Already Added!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.warranty === "Yes" &&
-        (stockmaster.warrantydetails === "" ||
-          stockmaster.warrantydetails === undefined)
-      ) {
-        setPopupContentMalert("Please Enter Warranty Details!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty === 'Yes' && (stockmaster.warrantydetails === '' || stockmaster.warrantydetails === undefined)) {
+        setPopupContentMalert('Please Enter Warranty Details!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.rate === "" || stockmaster.rate === undefined) {
-        setPopupContentMalert("Please Enter Rate!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.rate === '' || stockmaster.rate === undefined) {
+        setPopupContentMalert('Please Enter Rate!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.billdate === "" ||
-        stockmaster.billdate === undefined
-      ) {
-        setPopupContentMalert("Please Select Bill Date!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.billdate === '' || stockmaster.billdate === undefined) {
+        setPopupContentMalert('Please Select Bill Date!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (refImageedit.length == 0) {
-        setPopupContentMalert("Please Upload Bill!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Please Upload Bill!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else {
         sendRequest();
       }
     } else {
-      if (
-        stockmaster.company === "" ||
-        stockmaster.company === "Please Select Company"
-      ) {
-        setPopupContentMalert("Please Select Company!");
-        setPopupSeverityMalert("info");
+      if (stockmaster.company === '' || stockmaster.company === 'Please Select Company') {
+        setPopupContentMalert('Please Select Company!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        selectedBranch === "" ||
-        selectedBranch == "Please Select Branch"
-      ) {
-        setPopupContentMalert("Please Select Branch!");
-        setPopupSeverityMalert("info");
+      } else if (selectedBranch === '' || selectedBranch == 'Please Select Branch') {
+        setPopupContentMalert('Please Select Branch!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (selectedUnit === "" || selectedUnit == "Please Select Unit") {
-        setPopupContentMalert("Please Select Unit!");
-        setPopupSeverityMalert("info");
+      } else if (selectedUnit === '' || selectedUnit == 'Please Select Unit') {
+        setPopupContentMalert('Please Select Unit!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.floor === "" ||
-        stockmaster.floor === "Please Select Floor"
-      ) {
-        setPopupContentMalert("Please Select Floor!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.floor === '' || stockmaster.floor === 'Please Select Floor') {
+        setPopupContentMalert('Please Select Floor!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.area === "" ||
-        stockmaster.area === "Please Select Area"
-      ) {
-        setPopupContentMalert("Please Select Area!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.area === '' || stockmaster.area === 'Please Select Area') {
+        setPopupContentMalert('Please Select Area!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.location === "" ||
-        stockmaster.location === "Please Select Location"
-      ) {
-        setPopupContentMalert("Please Select Location!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.location === '' || stockmaster.location === 'Please Select Location') {
+        setPopupContentMalert('Please Select Location!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.warranty === "" ||
-        stockmaster.warranty === undefined
-      ) {
-        setPopupContentMalert("Please Select Warranty");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty === '' || stockmaster.warranty === undefined) {
+        setPopupContentMalert('Please Select Warranty');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.warranty == "Yes" &&
-        (stockmaster.estimation === "" || stockmaster.estimation === undefined)
-      ) {
-        setPopupContentMalert("Please Enter Warranty Time");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty == 'Yes' && (stockmaster.estimation === '' || stockmaster.estimation === undefined)) {
+        setPopupContentMalert('Please Enter Warranty Time');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.warranty == "Yes" &&
-        (stockmaster.estimationtime === "" ||
-          stockmaster.estimationtime === undefined)
-      ) {
-        setPopupContentMalert("Please select Estimation");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty == 'Yes' && (stockmaster.estimationtime === '' || stockmaster.estimationtime === undefined)) {
+        setPopupContentMalert('Please select Estimation');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.stockcategory === "" ||
-        stockmaster.stockcategory === "Please Select Stock Category"
-      ) {
-        setPopupContentMalert("Please Select Stock Category!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.stockcategory === '' || stockmaster.stockcategory === 'Please Select Stock Category') {
+        setPopupContentMalert('Please Select Stock Category!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.stocksubcategory === "" ||
-        stockmaster.stocksubcategory === "Please Select Stock Sub Category"
-      ) {
-        setPopupContentMalert("Please Select Stock Sub Category!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.stocksubcategory === '' || stockmaster.stocksubcategory === 'Please Select Stock Sub Category') {
+        setPopupContentMalert('Please Select Stock Sub Category!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (stockArray.length === 0) {
-        setPopupContentMalert("To Do List is Missing!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('To Do List is Missing!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       // else if (stockmaster.uomnew === "" || stockmaster.uomnew === "Please Select UOM") {
@@ -3340,47 +2929,33 @@ function Stockpurchaserequest() {
       //     );
       //     handleClickOpenerr();
       // }
-      else if (vendorGroup === "Please Select Vendor Group") {
-        setPopupContentMalert("Please Select Vendor Group!");
-        setPopupSeverityMalert("info");
+      else if (vendorGroup === 'Please Select Vendor Group') {
+        setPopupContentMalert('Please Select Vendor Group!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.vendorname === "" ||
-        stockmaster.vendorname === "Please Select Vendor" ||
-        stockmaster.vendorname === undefined
-      ) {
-        setPopupContentMalert("Please Select Vendor!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.vendorname === '' || stockmaster.vendorname === 'Please Select Vendor' || stockmaster.vendorname === undefined) {
+        setPopupContentMalert('Please Select Vendor!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.billno === "" ||
-        stockmaster.billno === undefined
-      ) {
-        setPopupContentMalert("Please Enter Bill No!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.billno === '' || stockmaster.billno === undefined) {
+        setPopupContentMalert('Please Enter Bill No!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (isBillMatch) {
-        setPopupContentMalert(" Bill No Already Added!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert(' Bill No Already Added!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.warranty === "Yes" &&
-        (stockmaster.warrantydetails === "" ||
-          stockmaster.warrantydetails === undefined)
-      ) {
-        setPopupContentMalert("Please Enter Warranty Details!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.warranty === 'Yes' && (stockmaster.warrantydetails === '' || stockmaster.warrantydetails === undefined)) {
+        setPopupContentMalert('Please Enter Warranty Details!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.rate === "" || stockmaster.rate === undefined) {
-        setPopupContentMalert("Please Enter Rate!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.rate === '' || stockmaster.rate === undefined) {
+        setPopupContentMalert('Please Enter Rate!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (
-        stockmaster.billdate === "" ||
-        stockmaster.billdate === undefined
-      ) {
-        setPopupContentMalert("Please Select Bill Date!");
-        setPopupSeverityMalert("info");
+      } else if (stockmaster.billdate === '' || stockmaster.billdate === undefined) {
+        setPopupContentMalert('Please Select Bill Date!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       //  else if (refImage.length == 0) {
@@ -3399,74 +2974,74 @@ function Stockpurchaserequest() {
 
     setStockmaster({
       ...stockmaster,
-      company: "Please Select Company",
-      branch: "",
-      floor: "Please Select floor",
-      area: "Please Select Area",
-      location: "Please Select Location",
-      unit: "",
-      vendorname: "Please Select Vendor",
-      gstno: "",
-      billno: "",
-      warrantydetails: "",
-      rate: "",
-      billdate: "",
-      files: "",
-      warrantyfiles: "",
-      addedby: "",
-      updatedby: "",
+      company: 'Please Select Company',
+      branch: '',
+      floor: 'Please Select floor',
+      area: 'Please Select Area',
+      location: 'Please Select Location',
+      unit: '',
+      vendorname: 'Please Select Vendor',
+      gstno: '',
+      billno: '',
+      warrantydetails: '',
+      rate: '',
+      billdate: '',
+      files: '',
+      warrantyfiles: '',
+      addedby: '',
+      updatedby: '',
     });
     setStockmasterupdate({
       ...stockmasterupdate,
-      company: "Please Select Company",
-      branch: "",
-      floor: "Please Select floor",
-      area: "Please Select Area",
-      location: "Please Select Location",
-      unit: "",
-      vendorname: "Please Select Vendor",
-      gstno: "",
-      billno: "",
-      warrantydetails: "",
-      rate: "",
-      billdate: "",
-      files: "",
+      company: 'Please Select Company',
+      branch: '',
+      floor: 'Please Select floor',
+      area: 'Please Select Area',
+      location: 'Please Select Location',
+      unit: '',
+      vendorname: 'Please Select Vendor',
+      gstno: '',
+      billno: '',
+      warrantydetails: '',
+      rate: '',
+      billdate: '',
+      files: '',
       requesttime: currtime,
       requestdate: today,
-      warrantyfiles: "",
-      Warranty: "Yes",
+      warrantyfiles: '',
+      Warranty: 'Yes',
     });
-    setVendorGroup("Please Select Vendor Group");
-    setSelectedBranch("Please Select Branch");
-    setSelectedUnit("Please Select Unit");
+    setVendorGroup('Please Select Vendor Group');
+    setSelectedBranch('Please Select Branch');
+    setSelectedUnit('Please Select Unit');
     // setSelectedProducthead("Please Select Producthead");
     // setSelectedProductname("Please Select Productname");
-    setFile("");
+    setFile('');
     setRefImage([]);
     setGetImg(null);
-    setVendorgetid({ gstnumber: "" });
+    setVendorgetid({ gstnumber: '' });
     setVendormaster([]);
     setBranches([]);
     setAreasEdit([]);
     setFloorEdit([]);
-    setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+    setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
     setMaterialoptNew([]);
     setSubcategoryOption([]);
     setVendorgetid({});
     setRefImageedit([]);
     setRefImage([]);
-    setFile("");
+    setFile('');
     setGetImg(null);
     setGetImgedit(null);
     setRefImagewarranty([]);
     setRefImagewarrantyedit([]);
-    setFilewarranty("");
+    setFilewarranty('');
     setGetImgwarranty(null);
-    setFilewarrantyedit("");
+    setFilewarrantyedit('');
     setGetImgwarrantyedit(null);
     setBtnSubmit(false);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
   // vendro details create
@@ -3490,76 +3065,43 @@ function Stockpurchaserequest() {
         phonecheck: Boolean(vendor.phonecheck),
         contactperson: String(vendor.contactperson),
         address: String(vendor.address),
-        country: String(
-          selectedCountryp?.name == undefined ? "" : selectedCountryp?.name
-        ),
-        state: String(
-          selectedStatep?.name == undefined ? "" : selectedStatep?.name
-        ),
-        city: String(
-          selectedCityp?.name == undefined ? "" : selectedCityp?.name
-        ),
+        country: String(selectedCountryp?.name == undefined ? '' : selectedCountryp?.name),
+        state: String(selectedStatep?.name == undefined ? '' : selectedStatep?.name),
+        city: String(selectedCityp?.name == undefined ? '' : selectedCityp?.name),
         pincode: Number(vendor.pincode),
         gstnumber: String(vendor.gstnumber),
-        landline: String(stdCode && lanNumber ? `${stdCode}${lanNumber}` : ""),
+        landline: String(stdCode && lanNumber ? `${stdCode}${lanNumber}` : ''),
         creditdays: Number(vendor.creditdays),
         modeofpayments: [...filtered],
 
-        paymentfrequency: String(
-          vendor.paymentfrequency === "Please Select Payment Frequency"
-            ? ""
-            : vendor.paymentfrequency
-        ),
+        paymentfrequency: String(vendor.paymentfrequency === 'Please Select Payment Frequency' ? '' : vendor.paymentfrequency),
         vendorstatus: String(vendor.vendorstatus),
-        monthlyfrequency: String(
-          vendor.paymentfrequency === "Monthly" ? vendor.monthlyfrequency : ""
-        ),
-        weeklyfrequency: String(
-          vendor.paymentfrequency === "Weekly" ? vendor.weeklyfrequency : ""
-        ),
+        monthlyfrequency: String(vendor.paymentfrequency === 'Monthly' ? vendor.monthlyfrequency : ''),
+        weeklyfrequency: String(vendor.paymentfrequency === 'Weekly' ? vendor.weeklyfrequency : ''),
 
-        bankname: filtered.includes("Bank Transfer")
-          ? String(vendor.bankname)
-          : "",
-        bankbranchname: filtered.includes("Bank Transfer")
-          ? String(vendor.bankbranchname)
-          : "",
-        accountholdername: filtered.includes("Bank Transfer")
-          ? String(vendor.accountholdername)
-          : "",
-        accountnumber: filtered.includes("Bank Transfer")
-          ? String(vendor.accountnumber)
-          : "",
-        ifsccode: filtered.includes("Bank Transfer")
-          ? String(vendor.ifsccode)
-          : "",
+        bankname: filtered.includes('Bank Transfer') ? String(vendor.bankname) : '',
+        bankbranchname: filtered.includes('Bank Transfer') ? String(vendor.bankbranchname) : '',
+        accountholdername: filtered.includes('Bank Transfer') ? String(vendor.accountholdername) : '',
+        accountnumber: filtered.includes('Bank Transfer') ? String(vendor.accountnumber) : '',
+        ifsccode: filtered.includes('Bank Transfer') ? String(vendor.ifsccode) : '',
 
-        upinumber: filtered.includes("UPI") ? String(vendor.upinumber) : "",
+        upinumber: filtered.includes('UPI') ? String(vendor.upinumber) : '',
 
-        cardnumber: filtered.includes("Card") ? String(vendor.cardnumber) : "",
-        cardholdername: filtered.includes("Card")
-          ? String(vendor.cardholdername)
-          : "",
-        cardtransactionnumber: filtered.includes("Card")
-          ? String(vendor.cardtransactionnumber)
-          : "",
-        cardtype: filtered.includes("Card") ? String(vendor.cardtype) : "",
-        cardmonth: filtered.includes("Card") ? String(vendor.cardmonth) : "",
-        cardyear: filtered.includes("Card") ? String(vendor.cardyear) : "",
-        cardsecuritycode: filtered.includes("Card")
-          ? String(vendor.cardsecuritycode)
-          : "",
+        cardnumber: filtered.includes('Card') ? String(vendor.cardnumber) : '',
+        cardholdername: filtered.includes('Card') ? String(vendor.cardholdername) : '',
+        cardtransactionnumber: filtered.includes('Card') ? String(vendor.cardtransactionnumber) : '',
+        cardtype: filtered.includes('Card') ? String(vendor.cardtype) : '',
+        cardmonth: filtered.includes('Card') ? String(vendor.cardmonth) : '',
+        cardyear: filtered.includes('Card') ? String(vendor.cardyear) : '',
+        cardsecuritycode: filtered.includes('Card') ? String(vendor.cardsecuritycode) : '',
 
-        faceDescriptor:
-          vendor?.faceDescriptor?.length > 0 ? vendor?.faceDescriptor : [],
+        faceDescriptor: vendor?.faceDescriptor?.length > 0 ? vendor?.faceDescriptor : [],
 
         files: allUploadedFiles.concat(refImage, refImageDrag, capturedImages),
 
         // files: allUploadedFiles.concat(refImage, refImageDrag, capturedImages),
 
-        chequenumber: filtered.includes("Cheque")
-          ? String(vendor.chequenumber)
-          : "",
+        chequenumber: filtered.includes('Cheque') ? String(vendor.chequenumber) : '',
 
         addedby: [
           {
@@ -3573,25 +3115,20 @@ function Stockpurchaserequest() {
 
       setVendor({
         // vendorname: "",
-        emailid: "",
-        phonenumber: "",
-        whatsappnumber: "",
-        contactperson: "",
-        address: "",
-        gstnumber: "",
-        bankname: "Please Select Bank Name",
-        accountname: "",
-        accountnumber: "",
-        ifsccode: "",
+        emailid: '',
+        phonenumber: '',
+        whatsappnumber: '',
+        contactperson: '',
+        address: '',
+        gstnumber: '',
+        bankname: 'Please Select Bank Name',
+        accountname: '',
+        accountnumber: '',
+        ifsccode: '',
         phonecheck: false,
       });
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
   //valid email verification
@@ -3601,9 +3138,9 @@ function Stockpurchaserequest() {
   };
 
   const updateVendor = async () => {
-    if (vendorgroup.vendorgroupname === "") {
-      setPopupContentMalert("Please Select/Enter VendorGroup Name");
-      setPopupSeverityMalert("info");
+    if (vendorgroup.vendorgroupname === '') {
+      setPopupContentMalert('Please Select/Enter VendorGroup Name');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       let addvend = await axios.post(
@@ -3628,60 +3165,53 @@ function Stockpurchaserequest() {
       handleClickVendorgrpClose();
       await fetchVendor();
       await fetchVendorGroup();
-      setVendorgroup({ vendorgroupname: "" });
+      setVendorgroup({ vendorgroupname: '' });
       setVendor({
         ...vendor,
-        vendorname: "",
-        emailid: "",
-        phonenumber: "",
-        phonenumberone: "",
-        phonenumbertwo: "",
-        phonenumberthree: "",
-        phonenumberfour: "",
-        whatsappnumber: "",
-        contactperson: "",
-        address: "",
-        country: "",
-        state: "",
-        city: "",
-        pincode: "",
-        gstnumber: "",
-        creditdays: "",
-        bankbranchname: "",
-        accountholdername: "",
-        accountnumber: "",
-        ifsccode: "",
-        upinumber: "",
-        cardnumber: "",
-        cardholdername: "",
-        cardtransactionnumber: "",
-        cardsecuritycode: "",
-        chequenumber: "",
+        vendorname: '',
+        emailid: '',
+        phonenumber: '',
+        phonenumberone: '',
+        phonenumbertwo: '',
+        phonenumberthree: '',
+        phonenumberfour: '',
+        whatsappnumber: '',
+        contactperson: '',
+        address: '',
+        country: '',
+        state: '',
+        city: '',
+        pincode: '',
+        gstnumber: '',
+        creditdays: '',
+        bankbranchname: '',
+        accountholdername: '',
+        accountnumber: '',
+        ifsccode: '',
+        upinumber: '',
+        cardnumber: '',
+        cardholdername: '',
+        cardtransactionnumber: '',
+        cardsecuritycode: '',
+        chequenumber: '',
         phonecheck: false,
       });
       setStockmaster({
         ...stockmaster,
-        vendorname: "Please Select Vendor",
+        vendorname: 'Please Select Vendor',
       });
       setVendormaster([]);
       setmodeofpay([]);
-      setStdCode("");
-      setLanNumber("");
-      const country = Country.getAllCountries().find(
-        (country) => country.name === "India"
-      );
-      const state = State.getStatesOfCountry(country?.isoCode).find(
-        (state) => state.name === "Tamil Nadu"
-      );
-      const city = City.getCitiesOfState(
-        state?.countryCode,
-        state?.isoCode
-      ).find((city) => city.name === "Tiruchirappalli");
+      setStdCode('');
+      setLanNumber('');
+      const country = Country.getAllCountries().find((country) => country.name === 'India');
+      const state = State.getStatesOfCountry(country?.isoCode).find((state) => state.name === 'Tamil Nadu');
+      const city = City.getCitiesOfState(state?.countryCode, state?.isoCode).find((city) => city.name === 'Tiruchirappalli');
       setSelectedCountryp(country);
       setSelectedStatep(state);
       setSelectedCityp(city);
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       setRefImage([]);
       // setRefImageDrag([]);
@@ -3694,13 +3224,10 @@ function Stockpurchaserequest() {
   const handleSubmitvendor = (e) => {
     setIsBtn(true);
     e.preventDefault();
-    const isNameMatch = vendormaster.some(
-      (item) =>
-        item.vendorname.toLowerCase() === vendor.vendorname.toLowerCase()
-    );
-    if (vendor.vendorname === "") {
-      setPopupContentMalert("Please Enter Vendor Name!");
-      setPopupSeverityMalert("info");
+    const isNameMatch = vendormaster.some((item) => item.vendorname.toLowerCase() === vendor.vendorname.toLowerCase());
+    if (vendor.vendorname === '') {
+      setPopupContentMalert('Please Enter Vendor Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
     // else if (!validateEmail(vendor.emailid)) {
@@ -3708,128 +3235,101 @@ function Stockpurchaserequest() {
     //   setPopupSeverityMalert("info");
     //   handleClickOpenPopupMalert();
     // }
-    else if (vendor.address === "") {
-      setPopupContentMalert("Please Enter Address!");
-      setPopupSeverityMalert("info");
+    else if (vendor.address === '') {
+      setPopupContentMalert('Please Enter Address!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (selectedCountryp?.isoCode !== selectedStatep?.countryCode) {
-      setPopupContentMalert("Please Select The Correct State!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select The Correct State!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      selectedCountryp?.isoCode !== selectedCityp?.countryCode ||
-      selectedStatep?.isoCode !== selectedCityp?.stateCode
-    ) {
-      setPopupContentMalert("Please Select The Correct City!");
-      setPopupSeverityMalert("info");
+    } else if (selectedCountryp?.isoCode !== selectedCityp?.countryCode || selectedStatep?.isoCode !== selectedCityp?.stateCode) {
+      setPopupContentMalert('Please Select The Correct City!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (vendor.vendorstatus === "") {
-      setPopupContentMalert("Please Select Status!");
-      setPopupSeverityMalert("info");
+    } else if (vendor.vendorstatus === '') {
+      setPopupContentMalert('Please Select Status!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (vendor.paymentfrequency === "Please Select Payment Frequency") {
-      setPopupContentMalert("Please Select Payment Frequency!");
-      setPopupSeverityMalert("info");
+    } else if (vendor.paymentfrequency === 'Please Select Payment Frequency') {
+      setPopupContentMalert('Please Select Payment Frequency!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      vendor.paymentfrequency === "Monthly" &&
-      (vendor.monthlyfrequency === "" || !vendor.monthlyfrequency)
-    ) {
-      setPopupContentMalert("Please Select Monthly Date!");
-      setPopupSeverityMalert("info");
+    } else if (vendor.paymentfrequency === 'Monthly' && (vendor.monthlyfrequency === '' || !vendor.monthlyfrequency)) {
+      setPopupContentMalert('Please Select Monthly Date!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      vendor.paymentfrequency === "Weekly" &&
-      (vendor.weeklyfrequency === "" || !vendor.weeklyfrequency)
-    ) {
-      setPopupContentMalert("Please Select Weekly Day!");
-      setPopupSeverityMalert("info");
+    } else if (vendor.paymentfrequency === 'Weekly' && (vendor.weeklyfrequency === '' || !vendor.weeklyfrequency)) {
+      setPopupContentMalert('Please Select Weekly Day!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (vendor.modeofpayments === "Please Select Mode of Payments") {
-      setPopupContentMalert("Please Select Mode of Payments!");
-      setPopupSeverityMalert("info");
+    } else if (vendor.modeofpayments === 'Please Select Mode of Payments') {
+      setPopupContentMalert('Please Select Mode of Payments!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      modeofpay.includes("Bank Transfer") &&
-      vendor.bankname === "Please Select Bank Name"
-    ) {
-      setPopupContentMalert("Please Select Bank Name!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Bank Transfer') && vendor.bankname === 'Please Select Bank Name') {
+      setPopupContentMalert('Please Select Bank Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      modeofpay.includes("Bank Transfer") &&
-      vendor.bankbranchname === ""
-    ) {
-      setPopupContentMalert("Please Enter Bank Branch Name!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Bank Transfer') && vendor.bankbranchname === '') {
+      setPopupContentMalert('Please Enter Bank Branch Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      modeofpay.includes("Bank Transfer") &&
-      vendor.accountholdername === ""
-    ) {
-      setPopupContentMalert("Please Enter Account Holder Name!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Bank Transfer') && vendor.accountholdername === '') {
+      setPopupContentMalert('Please Enter Account Holder Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      modeofpay.includes("Bank Transfer") &&
-      vendor.accountnumber === ""
-    ) {
-      setPopupContentMalert("Please Enter Account Number!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Bank Transfer') && vendor.accountnumber === '') {
+      setPopupContentMalert('Please Enter Account Number!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (modeofpay.includes("Bank Transfer") && vendor.ifsccode === "") {
-      setPopupContentMalert("Please Enter IFSC Code!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Bank Transfer') && vendor.ifsccode === '') {
+      setPopupContentMalert('Please Enter IFSC Code!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (modeofpay.includes("UPI") && vendor.upinumber === "") {
-      setPopupContentMalert("Please Enter UPI Number!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('UPI') && vendor.upinumber === '') {
+      setPopupContentMalert('Please Enter UPI Number!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (modeofpay.includes("Card") && vendor.cardnumber === "") {
-      setPopupContentMalert("Please Enter Card Number!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Card') && vendor.cardnumber === '') {
+      setPopupContentMalert('Please Enter Card Number!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (modeofpay.includes("Card") && vendor.cardholdername === "") {
-      setPopupContentMalert("Please Enter Card Holder Name!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Card') && vendor.cardholdername === '') {
+      setPopupContentMalert('Please Enter Card Holder Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      modeofpay.includes("Card") &&
-      vendor.cardtransactionnumber === ""
-    ) {
-      setPopupContentMalert("Please Enter Card Transaction Number!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Card') && vendor.cardtransactionnumber === '') {
+      setPopupContentMalert('Please Enter Card Transaction Number!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      modeofpay.includes("Card") &&
-      vendor.cardtype === "Please Select Card Type"
-    ) {
-      setPopupContentMalert("Please Select Card Type!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Card') && vendor.cardtype === 'Please Select Card Type') {
+      setPopupContentMalert('Please Select Card Type!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (modeofpay.includes("Card") && vendor.cardmonth === "Month") {
-      setPopupContentMalert("Please Select Expire Month!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Card') && vendor.cardmonth === 'Month') {
+      setPopupContentMalert('Please Select Expire Month!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (modeofpay.includes("Card") && vendor.cardyear === "Year") {
-      setPopupContentMalert("Please Select Expire Year!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Card') && vendor.cardyear === 'Year') {
+      setPopupContentMalert('Please Select Expire Year!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (modeofpay.includes("Card") && vendor.cardsecuritycode === "") {
-      setPopupContentMalert("Please Enter Card Security Code!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Card') && vendor.cardsecuritycode === '') {
+      setPopupContentMalert('Please Enter Card Security Code!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (modeofpay.includes("Cheque") && vendor.chequenumber === "") {
-      setPopupContentMalert("Please Enter Cheque Number!");
-      setPopupSeverityMalert("info");
+    } else if (modeofpay.includes('Cheque') && vendor.chequenumber === '') {
+      setPopupContentMalert('Please Enter Cheque Number!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (modeofpay.length === 0) {
-      setPopupContentMalert("Please Insert Mode of Payments!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Insert Mode of Payments!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already exist!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already exist!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequestvendor();
@@ -3838,17 +3338,17 @@ function Stockpurchaserequest() {
   const handleClearvendor = (e) => {
     e.preventDefault();
     setVendor({
-      vendorname: "",
-      emailid: "",
-      phonenumber: "",
-      whatsappnumber: "",
-      contactperson: "",
-      address: "",
-      gstnumber: "",
-      bankname: "Please Select Bank Name",
-      accountname: "",
-      accountnumber: "",
-      ifsccode: "",
+      vendorname: '',
+      emailid: '',
+      phonenumber: '',
+      whatsappnumber: '',
+      contactperson: '',
+      address: '',
+      gstnumber: '',
+      bankname: 'Please Select Bank Name',
+      accountname: '',
+      accountnumber: '',
+      ifsccode: '',
       phonecheck: false,
     });
   };
@@ -3873,15 +3373,10 @@ function Stockpurchaserequest() {
       setVomMaster(vomnamecreate.data);
       await fetchUom();
       // await fetchVomMaster();
-      setVomMaster({ name: "" });
+      setVomMaster({ name: '' });
       handleCloseviewalertUom();
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -3889,16 +3384,14 @@ function Stockpurchaserequest() {
   const handleSubmituom = (e) => {
     e.preventDefault();
 
-    const isNameMatch = vomMasterget?.some(
-      (item) => item.name?.toLowerCase() === vomMaster.name?.toLowerCase()
-    );
-    if (vomMaster.name === "") {
-      setPopupContentMalert("Please Enter VOM Master Name!");
-      setPopupSeverityMalert("info");
+    const isNameMatch = vomMasterget?.some((item) => item.name?.toLowerCase() === vomMaster.name?.toLowerCase());
+    if (vomMaster.name === '') {
+      setPopupContentMalert('Please Enter VOM Master Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("VOM Master Name already exits!!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('VOM Master Name already exits!!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequestuom();
@@ -3907,7 +3400,7 @@ function Stockpurchaserequest() {
 
   const handleclearuom = (e) => {
     e.preventDefault();
-    setVomMaster({ name: "" });
+    setVomMaster({ name: '' });
   };
 
   //post call for asset material
@@ -3932,15 +3425,10 @@ function Stockpurchaserequest() {
       });
       await fetchAsset();
       setAsset(subprojectscreate.data);
-      setAsset({ ...asset, name: "", materialcode: "" });
+      setAsset({ ...asset, name: '', materialcode: '' });
       handleCloseviewalertAsset();
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -3950,40 +3438,28 @@ function Stockpurchaserequest() {
 
     // const isNameMatch = assetmaster?.some(item => item?.name?.toLowerCase() === (asset.name)?.toLowerCase() && item.assethead === selectedassethead);
     // const isCodeMatch = assetmaster?.some(item => item?.headcode?.toLowerCase() === (asset.headcode)?.toLowerCase() && item.name?.toLowerCase() === (asset.name)?.toLowerCase() && item?.assethead === selectedassethead);
-    const isNameMatch = assetmaster?.some(
-      (item) =>
-        item?.name?.toLowerCase() === asset.name?.toLowerCase() &&
-        item.assethead === selectedassethead
-    );
-    const isCodeMatch = assetmaster?.some(
-      (item) =>
-        item?.materialcode?.toLowerCase() ===
-        asset.materialcode?.toLowerCase() &&
-        item.assethead === selectedassethead
-    );
+    const isNameMatch = assetmaster?.some((item) => item?.name?.toLowerCase() === asset.name?.toLowerCase() && item.assethead === selectedassethead);
+    const isCodeMatch = assetmaster?.some((item) => item?.materialcode?.toLowerCase() === asset.materialcode?.toLowerCase() && item.assethead === selectedassethead);
 
-    if (
-      selectedassethead === "" ||
-      selectedassethead == "Please Select Assethead"
-    ) {
-      setPopupContentMalert("Please Select Assethead!");
-      setPopupSeverityMalert("info");
+    if (selectedassethead === '' || selectedassethead == 'Please Select Assethead') {
+      setPopupContentMalert('Please Select Assethead!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (asset.materialcode === "") {
-      setPopupContentMalert("Please Enter Material Code!");
-      setPopupSeverityMalert("info");
+    } else if (asset.materialcode === '') {
+      setPopupContentMalert('Please Enter Material Code!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (asset.name === "") {
-      setPopupContentMalert("Please Enter Material Name!");
-      setPopupSeverityMalert("info");
+    } else if (asset.name === '') {
+      setPopupContentMalert('Please Enter Material Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Name already exits!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Name already exits!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isCodeMatch) {
-      setPopupContentMalert("Code already exits!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Code already exits!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequestasset();
@@ -3991,11 +3467,11 @@ function Stockpurchaserequest() {
   };
   const handleClearasset = (e) => {
     e.preventDefault();
-    setSelectedAssethead("Please Select Assethead");
-    setAsset({ materialcode: "", name: "" });
+    setSelectedAssethead('Please Select Assethead');
+    setAsset({ materialcode: '', name: '' });
   };
 
-  const [filterid, setFilterid] = useState("");
+  const [filterid, setFilterid] = useState('');
   //get single row to edit....
   const getCode = async (id) => {
     try {
@@ -4007,7 +3483,7 @@ function Stockpurchaserequest() {
 
       setStockmaster({
         ...res?.data?.sstockmanage,
-        vendorname: "Please Select Vendor",
+        vendorname: 'Please Select Vendor',
         productdetails: res?.data?.sstockmanage.productdetails,
         uom: res?.data?.sstockmanage.uom,
         quantity: res?.data?.sstockmanage.quantity,
@@ -4034,15 +3510,8 @@ function Stockpurchaserequest() {
         },
         res?.data?.sstockmanage.stockcategory
       );
-      await fetchAllLocationEdit(
-        res?.data?.sstockmanage?.branch,
-        res?.data?.sstockmanage?.floor,
-        res?.data?.sstockmanage?.area
-      );
-      await fetchAreaEdit(
-        res?.data?.sstockmanage?.branch,
-        res?.data?.sstockmanage?.floor
-      );
+      await fetchAllLocationEdit(res?.data?.sstockmanage?.branch, res?.data?.sstockmanage?.floor, res?.data?.sstockmanage?.area);
+      await fetchAreaEdit(res?.data?.sstockmanage?.branch, res?.data?.sstockmanage?.floor);
       // setRefImageedit(res?.data?.sstockmanage?.files);
       // setRefImagewarrantyedit(
       //   res?.data?.smanualstock?.warrantyfiles
@@ -4053,12 +3522,7 @@ function Stockpurchaserequest() {
       setFilterid(id);
       handleClickOpenstock();
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -4085,12 +3549,7 @@ function Stockpurchaserequest() {
       }));
       setBranches(branchall);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -4111,12 +3570,7 @@ function Stockpurchaserequest() {
       ];
       setUnits(unitall);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -4137,12 +3591,7 @@ function Stockpurchaserequest() {
       ];
       setAccount(deptall);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -4162,12 +3611,7 @@ function Stockpurchaserequest() {
       ];
       setAssetmaster(deptall);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -4189,12 +3633,7 @@ function Stockpurchaserequest() {
       ];
       setVomMasterget(deptall);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -4226,13 +3665,9 @@ function Stockpurchaserequest() {
       }));
 
       let setData = filteredData.map((item) => {
-        const matchingItem = codeValues.find(
-          (item1) => item.uom === item1.name
-        );
+        const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
-        const matchingItem1 = codeValues.find(
-          (item1) => item.uomnew === item1.name
-        );
+        const matchingItem1 = codeValues.find((item1) => item.uomnew === item1.name);
 
         if (matchingItem) {
           return { ...item, uomcode: matchingItem.code };
@@ -4248,12 +3683,7 @@ function Stockpurchaserequest() {
       setProjectCheck(false);
     } catch (err) {
       setProjectCheck(false);
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -4279,7 +3709,7 @@ function Stockpurchaserequest() {
       },
     ];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
+    if (allFilters.length > 0 && selectedColumn !== '') {
       queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
@@ -4287,21 +3717,14 @@ function Stockpurchaserequest() {
     }
 
     try {
-      if (e === "Filtered") {
-        let res_employee = await axios.post(
-          SERVICE.STOCK_MANAGE_FILTER,
-          queryParams,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-          }
-        );
+      if (e === 'Filtered') {
+        let res_employee = await axios.post(SERVICE.STOCK_MANAGE_FILTER, queryParams, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
 
-        const ans =
-          res_employee?.data?.result?.length > 0
-            ? res_employee?.data?.result
-            : [];
+        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
 
         // let filteredData = ans.filter((data) => {
         //   return data.requestmode === "Asset Material";
@@ -4320,13 +3743,9 @@ function Stockpurchaserequest() {
         // setuomcodes(codeValues);
 
         let setData = ans.map((item) => {
-          const matchingItem = codeValues.find(
-            (item1) => item.uom === item1.name
-          );
+          const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
-          const matchingItem1 = codeValues.find(
-            (item1) => item.uomnew === item1.name
-          );
+          const matchingItem1 = codeValues.find((item1) => item.uomnew === item1.name);
 
           if (matchingItem) {
             return { ...item, uomcode: matchingItem.code };
@@ -4343,41 +3762,32 @@ function Stockpurchaserequest() {
         // }));
 
         const itemsWithSerialNumber = setData?.map((item, index) => {
-          if (item.requestmode === "Stock Material") {
-            let quantityNew = item.stockmaterialarray.reduce(
-              (total, person) => total + Number(person.quantitynew),
-              0
-            );
+          if (item.requestmode === 'Stock Material') {
+            let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
             let materialNew = item.stockmaterialarray.map((data, newindex) => {
               return ` ${data.materialnew}`;
             });
 
-            let productdetailsNew = item.stockmaterialarray.map(
-              (data, newindex) => {
-                return ` ${data.productdetailsnew}`;
-              }
-            );
+            let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.productdetailsnew}`;
+            });
 
-            let quantityAndUom = item.stockmaterialarray.map(
-              (data, newindex) => {
-                return ` ${data.quantitynew}#${data.uomcodenew}`;
-              }
-            );
+            let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.quantitynew}#${data.uomcodenew}`;
+            });
 
-            const nonEmptyParts = productdetailsNew.filter(
-              (part) => part.trim() !== ""
-            );
-            const result = nonEmptyParts.join(",");
+            const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+            const result = nonEmptyParts.join(',');
 
             return {
               ...item,
               id: item._id,
               serialNumber: (page - 1) * pageSize + index + 1,
               company: item.company,
-              requestdate: moment(item.requestdate).format("DD/MM/YYYY"),
+              requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
               requesttime: item.requesttime,
-              expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
+              expecttdate: moment(item.expecttdate).format('DD/MM/YYYY'),
               expecttime: item.expecttime,
               branch: item.branch,
               unit: item.unit,
@@ -4387,9 +3797,7 @@ function Stockpurchaserequest() {
               requestmode: item.requestmode,
 
               // uomnew: quantityAndUom.join(","),
-              uomnew: quantityAndUom
-                .filter((item) => item.trim() !== "")
-                .join(","),
+              uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
               // quantitynew: quantityNew.join(","),
               quantitynew: quantityNew,
 
@@ -4400,9 +3808,7 @@ function Stockpurchaserequest() {
               //     : "",
               productdetailsnew:
                 // productdetailsNew.join(",")
-                productdetailsNew
-                  .filter((item) => item.trim() !== "")
-                  .join(","),
+                productdetailsNew.filter((item) => item.trim() !== '').join(','),
             };
           } else {
             return {
@@ -4416,7 +3822,7 @@ function Stockpurchaserequest() {
               area: item.area,
               location: item.location,
               requestmode: item.requestmode,
-              requestdate: moment(item.requestdate).format("DD/MM/YYYY"),
+              requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
               // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
               // expecttime: item.expecttime,
               requesttime: item.requesttime,
@@ -4431,86 +3837,69 @@ function Stockpurchaserequest() {
         setOverallFilterdata(
           res_employee?.data?.totalProjectsData?.length > 0
             ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-              if (item.requestmode === "Stock Material") {
-                let quantityNew = item.stockmaterialarray.reduce(
-                  (total, person) => total + Number(person.quantitynew),
-                  0
-                );
+                if (item.requestmode === 'Stock Material') {
+                  let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
-                let materialNew = item.stockmaterialarray.map(
-                  (data, newindex) => {
+                  let materialNew = item.stockmaterialarray.map((data, newindex) => {
                     return ` ${data.materialnew}`;
-                  }
-                );
+                  });
 
-                let productdetailsNew = item.stockmaterialarray.map(
-                  (data, newindex) => {
+                  let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
                     return ` ${data.productdetailsnew}`;
-                  }
-                );
+                  });
 
-                let quantityAndUom = item.stockmaterialarray.map(
-                  (data, newindex) => {
+                  let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
                     return ` ${data.quantitynew}#${data.uomcodenew}`;
-                  }
-                );
+                  });
 
-                const nonEmptyParts = productdetailsNew.filter(
-                  (part) => part.trim() !== ""
-                );
-                const result = nonEmptyParts.join(",");
+                  const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+                  const result = nonEmptyParts.join(',');
 
-                return {
-                  ...item,
-                  id: item._id,
-                  serialNumber: (page - 1) * pageSize + index + 1,
-                  company: item.company,
-                  branch: item.branch,
-                  unit: item.unit,
-                  requestdate: moment(item.requestdate).format("DD/MM/YYYY"),
-                  expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
-                  expecttime: item.expecttime,
-                  requesttime: item.requesttime,
-                  floor: item.floor,
-                  area: item.area,
-                  location: item.location,
-                  requestmode: item.requestmode,
+                  return {
+                    ...item,
+                    id: item._id,
+                    serialNumber: (page - 1) * pageSize + index + 1,
+                    company: item.company,
+                    branch: item.branch,
+                    unit: item.unit,
+                    requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+                    expecttdate: moment(item.expecttdate).format('DD/MM/YYYY'),
+                    expecttime: item.expecttime,
+                    requesttime: item.requesttime,
+                    floor: item.floor,
+                    area: item.area,
+                    location: item.location,
+                    requestmode: item.requestmode,
 
-                  // uomnew: quantityAndUom.join(","),
-                  uomnew: quantityAndUom
-                    .filter((item) => item.trim() !== "")
-                    .join(","),
-                  // quantitynew: quantityNew.join(","),
-                  quantitynew: quantityNew,
+                    // uomnew: quantityAndUom.join(","),
+                    uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
+                    // quantitynew: quantityNew.join(","),
+                    quantitynew: quantityNew,
 
-                  // materialnew: materialNew.join(',').toString(),
-                  // productdetailsnew:
-                  //   item.stockmaterialarray.length > 0
-                  //     ? productdetailsNew.join(",")
-                  //     : "",
-                  productdetailsnew:
-                    // productdetailsNew.join(",")
-                    productdetailsNew
-                      .filter((item) => item.trim() !== "")
-                      .join(","),
-                };
-              } else {
-                return {
-                  ...item,
-                  serialNumber: (page - 1) * pageSize + index + 1,
-                  requestdate: moment(item.requestdate).format("DD/MM/YYYY"),
-                  requesttime: item.requesttime,
-                  // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
-                  // expecttime: item.expecttime,
-                };
-              }
-            })
+                    // materialnew: materialNew.join(',').toString(),
+                    // productdetailsnew:
+                    //   item.stockmaterialarray.length > 0
+                    //     ? productdetailsNew.join(",")
+                    //     : "",
+                    productdetailsnew:
+                      // productdetailsNew.join(",")
+                      productdetailsNew.filter((item) => item.trim() !== '').join(','),
+                  };
+                } else {
+                  return {
+                    ...item,
+                    serialNumber: (page - 1) * pageSize + index + 1,
+                    requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+                    requesttime: item.requesttime,
+                    // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
+                    // expecttime: item.expecttime,
+                  };
+                }
+              })
             : []
         );
 
-        setTotalProjects(
-          ans?.length > 0 ? res_employee?.data?.totalProjects : 0
-        );
+        setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
         setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
         setPageSize((data) => {
           return ans?.length > 0 ? data : 10;
@@ -4524,18 +3913,13 @@ function Stockpurchaserequest() {
       }
     } catch (err) {
       setProjectCheck(false);
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
   useEffect(() => {
     if (items?.length > 0) {
-      fetchStock("Filtered");
+      fetchStock('Filtered');
     }
   }, [page, pageSize, searchQuery]);
 
@@ -4543,8 +3927,8 @@ function Stockpurchaserequest() {
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Stock Request to Purchase",
-    pageStyle: "print",
+    documentTitle: 'Stock Request to Purchase',
+    pageStyle: 'print',
   });
 
   // serial no for listing items
@@ -4644,28 +4028,20 @@ function Stockpurchaserequest() {
   };
 
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
-  const filteredData = filteredDatas.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
 
   // const totalPages = Math.ceil(filteredDatas.length / pageSize);
 
   const visiblePages = Math.min(totalPages, 3);
 
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
 
   const pageNumbers = [];
 
@@ -4691,9 +4067,9 @@ function Stockpurchaserequest() {
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -4715,10 +4091,10 @@ function Stockpurchaserequest() {
 
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -4727,142 +4103,142 @@ function Stockpurchaserequest() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 100,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 120,
       hide: !columnVisibility.company,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 120,
       hide: !columnVisibility.branch,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 120,
       hide: !columnVisibility.unit,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "floor",
-      headerName: "Floor",
+      field: 'floor',
+      headerName: 'Floor',
       flex: 0,
       width: 120,
       hide: !columnVisibility.floor,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "area",
-      headerName: "Area",
+      field: 'area',
+      headerName: 'Area',
       flex: 0,
       width: 120,
       hide: !columnVisibility.area,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "location",
-      headerName: "Location",
+      field: 'location',
+      headerName: 'Location',
       flex: 0,
       width: 120,
       hide: !columnVisibility.location,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "requestdate",
-      headerName: "Date",
+      field: 'requestdate',
+      headerName: 'Date',
       flex: 0,
       width: 180,
       hide: !columnVisibility.requestdate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "requesttime",
-      headerName: "Time",
+      field: 'requesttime',
+      headerName: 'Time',
       flex: 0,
       width: 100,
       hide: !columnVisibility.requesttime,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "duedate",
-      headerName: "Expected Date",
+      field: 'duedate',
+      headerName: 'Expected Date',
       flex: 0,
       width: 180,
       hide: !columnVisibility.duedate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     {
-      field: "requestmode",
-      headerName: "Request Mode For",
+      field: 'requestmode',
+      headerName: 'Request Mode For',
       flex: 0,
       width: 120,
       hide: !columnVisibility.requestmode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     {
-      field: "productdetailsnew",
-      headerName: "Product Details",
+      field: 'productdetailsnew',
+      headerName: 'Product Details',
       flex: 0,
       width: 120,
       hide: !columnVisibility.productdetailsnew,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     {
-      field: "quantitynew",
-      headerName: "Quantity",
+      field: 'quantitynew',
+      headerName: 'Quantity',
       flex: 0,
       width: 120,
       hide: !columnVisibility.quantitynew,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "uomnew",
-      headerName: "Quantity & UOM",
+      field: 'uomnew',
+      headerName: 'Quantity & UOM',
       flex: 0,
       width: 200,
       hide: !columnVisibility.uomnew,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 80,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
+        <Grid sx={{ display: 'flex' }}>
           <Button
             sx={userStyle.buttonedit}
             onClick={() => {
@@ -4870,18 +4246,13 @@ function Stockpurchaserequest() {
               getCode(params.data.id);
             }}
           >
-            <FaPlus style={{ fontsize: "large" }} />
+            <FaPlus style={{ fontsize: 'large' }} />
           </Button>
         </Grid>
       ),
     },
   ];
-  const filteredSelectedColumn = columnDataTable.filter(
-    (data) =>
-      data.field !== "checkbox" &&
-      data.field !== "actions" &&
-      data.field !== "serialNumber"
-  );
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = items.map((item, index) => {
     return {
@@ -4920,9 +4291,7 @@ function Stockpurchaserequest() {
   };
 
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
 
   function debounce(func, wait) {
     let timeout;
@@ -4941,9 +4310,7 @@ function Stockpurchaserequest() {
       const visible_columns = event.columnApi
         .getAllColumns()
         .filter((col) => {
-          const colState = event.columnApi
-            .getColumnState()
-            .find((state) => state.colId === col.colId);
+          const colState = event.columnApi.getColumnState().find((state) => state.colId === col.colId);
           return colState && !colState.hide;
         })
         .map((col) => col.colId);
@@ -4984,9 +4351,9 @@ function Stockpurchaserequest() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -4994,7 +4361,7 @@ function Stockpurchaserequest() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -5002,38 +4369,16 @@ function Stockpurchaserequest() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -5041,11 +4386,7 @@ function Stockpurchaserequest() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -5053,7 +4394,7 @@ function Stockpurchaserequest() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -5082,27 +4423,24 @@ function Stockpurchaserequest() {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("");
+  const [fileFormat, setFormat] = useState('');
 
   // Search bar
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
-  const idSearch = openSearch ? "simple-popover" : undefined;
+  const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if (
-      (selectedColumn && filterValue) ||
-      ["Blank", "Not Blank"].includes(selectedCondition)
-    ) {
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
       setAdditionalFilters([
         ...additionalFilters,
         {
@@ -5111,9 +4449,9 @@ function Stockpurchaserequest() {
           value: filterValue,
         },
       ]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
@@ -5122,16 +4460,10 @@ function Stockpurchaserequest() {
     if (advancedFilter && advancedFilter.length > 0) {
       return advancedFilter
         .map((filter, index) => {
-          let showname = columnDataTable.find(
-            (col) => col.field === filter.column
-          )?.headerName;
+          let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
           return `${showname} ${filter.condition} "${filter.value}"`;
         })
-        .join(
-          " " +
-          (advancedFilter.length > 1 ? advancedFilter[1].condition : "") +
-          " "
-        );
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
@@ -5145,12 +4477,12 @@ function Stockpurchaserequest() {
     // Reset all filters and pagination state
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
@@ -5161,7 +4493,7 @@ function Stockpurchaserequest() {
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
+    if (allFilters.length > 0 && selectedColumn !== '') {
       queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
@@ -5172,20 +4504,13 @@ function Stockpurchaserequest() {
 
     try {
       // let res_project = await axios.get(SERVICE.STOCKMANAGE, {
-      let res_employee = await axios.post(
-        SERVICE.STOCK_MANAGE_FILTER,
-        queryParams,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        }
-      );
+      let res_employee = await axios.post(SERVICE.STOCK_MANAGE_FILTER, queryParams, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
 
-      const ans =
-        res_employee?.data?.result?.length > 0
-          ? res_employee?.data?.result
-          : [];
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
 
       // let filteredData = ans.filter((data) => {
       //   return data.requestmode === "Asset Material";
@@ -5204,13 +4529,9 @@ function Stockpurchaserequest() {
       // setuomcodes(codeValues);
 
       let setData = ans.map((item) => {
-        const matchingItem = codeValues.find(
-          (item1) => item.uom === item1.name
-        );
+        const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
-        const matchingItem1 = codeValues.find(
-          (item1) => item.uomnew === item1.name
-        );
+        const matchingItem1 = codeValues.find((item1) => item.uomnew === item1.name);
 
         if (matchingItem) {
           return { ...item, uomcode: matchingItem.code };
@@ -5227,30 +4548,23 @@ function Stockpurchaserequest() {
       // }));
 
       const itemsWithSerialNumber = setData?.map((item, index) => {
-        if (item.requestmode === "Stock Material") {
-          let quantityNew = item.stockmaterialarray.reduce(
-            (total, person) => total + Number(person.quantitynew),
-            0
-          );
+        if (item.requestmode === 'Stock Material') {
+          let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
           let materialNew = item.stockmaterialarray.map((data, newindex) => {
             return ` ${data.materialnew}`;
           });
 
-          let productdetailsNew = item.stockmaterialarray.map(
-            (data, newindex) => {
-              return ` ${data.productdetailsnew}`;
-            }
-          );
+          let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+            return ` ${data.productdetailsnew}`;
+          });
 
           let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
             return ` ${data.quantitynew}#${data.uomcodenew}`;
           });
 
-          const nonEmptyParts = productdetailsNew.filter(
-            (part) => part.trim() !== ""
-          );
-          const result = nonEmptyParts.join(",");
+          const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+          const result = nonEmptyParts.join(',');
 
           return {
             id: item._id,
@@ -5264,9 +4578,7 @@ function Stockpurchaserequest() {
             requestmode: item.requestmode,
 
             // uomnew: quantityAndUom.join(","),
-            uomnew: quantityAndUom
-              .filter((item) => item.trim() !== "")
-              .join(","),
+            uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
             // quantitynew: quantityNew.join(","),
             quantitynew: quantityNew,
 
@@ -5277,7 +4589,7 @@ function Stockpurchaserequest() {
             //     : "",
             productdetailsnew:
               // productdetailsNew.join(",")
-              productdetailsNew.filter((item) => item.trim() !== "").join(","),
+              productdetailsNew.filter((item) => item.trim() !== '').join(','),
           };
         } else {
           return {
@@ -5302,71 +4614,56 @@ function Stockpurchaserequest() {
       setOverallFilterdata(
         res_employee?.data?.totalProjectsData?.length > 0
           ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-            if (item.requestmode === "Stock Material") {
-              let quantityNew = item.stockmaterialarray.reduce(
-                (total, person) => total + Number(person.quantitynew),
-                0
-              );
+              if (item.requestmode === 'Stock Material') {
+                let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
-              let materialNew = item.stockmaterialarray.map(
-                (data, newindex) => {
+                let materialNew = item.stockmaterialarray.map((data, newindex) => {
                   return ` ${data.materialnew}`;
-                }
-              );
+                });
 
-              let productdetailsNew = item.stockmaterialarray.map(
-                (data, newindex) => {
+                let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
                   return ` ${data.productdetailsnew}`;
-                }
-              );
+                });
 
-              let quantityAndUom = item.stockmaterialarray.map(
-                (data, newindex) => {
+                let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
                   return ` ${data.quantitynew}#${data.uomcodenew}`;
-                }
-              );
+                });
 
-              const nonEmptyParts = productdetailsNew.filter(
-                (part) => part.trim() !== ""
-              );
-              const result = nonEmptyParts.join(",");
+                const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+                const result = nonEmptyParts.join(',');
 
-              return {
-                id: item._id,
-                serialNumber: (page - 1) * pageSize + index + 1,
-                company: item.company,
-                branch: item.branch,
-                unit: item.unit,
-                floor: item.floor,
-                area: item.area,
-                location: item.location,
-                requestmode: item.requestmode,
+                return {
+                  id: item._id,
+                  serialNumber: (page - 1) * pageSize + index + 1,
+                  company: item.company,
+                  branch: item.branch,
+                  unit: item.unit,
+                  floor: item.floor,
+                  area: item.area,
+                  location: item.location,
+                  requestmode: item.requestmode,
 
-                // uomnew: quantityAndUom.join(","),
-                uomnew: quantityAndUom
-                  .filter((item) => item.trim() !== "")
-                  .join(","),
-                // quantitynew: quantityNew.join(","),
-                quantitynew: quantityNew,
+                  // uomnew: quantityAndUom.join(","),
+                  uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
+                  // quantitynew: quantityNew.join(","),
+                  quantitynew: quantityNew,
 
-                // materialnew: materialNew.join(',').toString(),
-                // productdetailsnew:
-                //   item.stockmaterialarray.length > 0
-                //     ? productdetailsNew.join(",")
-                //     : "",
-                productdetailsnew:
-                  // productdetailsNew.join(",")
-                  productdetailsNew
-                    .filter((item) => item.trim() !== "")
-                    .join(","),
-              };
-            } else {
-              return {
-                ...item,
-                serialNumber: (page - 1) * pageSize + index + 1,
-              };
-            }
-          })
+                  // materialnew: materialNew.join(',').toString(),
+                  // productdetailsnew:
+                  //   item.stockmaterialarray.length > 0
+                  //     ? productdetailsNew.join(",")
+                  //     : "",
+                  productdetailsnew:
+                    // productdetailsNew.join(",")
+                    productdetailsNew.filter((item) => item.trim() !== '').join(','),
+                };
+              } else {
+                return {
+                  ...item,
+                  serialNumber: (page - 1) * pageSize + index + 1,
+                };
+              }
+            })
           : []
       );
 
@@ -5381,12 +4678,7 @@ function Stockpurchaserequest() {
       setProjectCheck(false);
     } catch (err) {
       setProjectCheck(false);
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -5396,8 +4688,8 @@ function Stockpurchaserequest() {
   //team multiselect
 
   const requestModeOptions = [
-    { label: "Asset Material", value: "Asset Material" },
-    { label: "Stock Material", value: "Stock Material" },
+    { label: 'Asset Material', value: 'Asset Material' },
+    { label: 'Stock Material', value: 'Stock Material' },
   ];
 
   const [selectedRequestMode, setSelectedOptionsRequestMode] = useState([]);
@@ -5413,9 +4705,7 @@ function Stockpurchaserequest() {
   };
 
   const customValueRendererRequest = (valueRequestMode, _categoryname) => {
-    return valueRequestMode?.length
-      ? valueRequestMode.map(({ label }) => label)?.join(", ")
-      : "Please Select Request Mode";
+    return valueRequestMode?.length ? valueRequestMode.map(({ label }) => label)?.join(', ') : 'Please Select Request Mode';
   };
 
   const [selectedOptionsCompany, setSelectedOptionsCompany] = useState([]);
@@ -5435,9 +4725,7 @@ function Stockpurchaserequest() {
   };
 
   const customValueRendererCompany = (valueCompanyCat, _categoryname) => {
-    return valueCompanyCat?.length
-      ? valueCompanyCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Company";
+    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(', ') : 'Please Select Company';
   };
 
   //branch multiselect
@@ -5456,9 +4744,7 @@ function Stockpurchaserequest() {
   };
 
   const customValueRendererBranch = (valueBranchCat, _categoryname) => {
-    return valueBranchCat?.length
-      ? valueBranchCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Branch";
+    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(', ') : 'Please Select Branch';
   };
 
   //unit multiselect
@@ -5475,9 +4761,7 @@ function Stockpurchaserequest() {
   };
 
   const customValueRendererUnit = (valueUnitCat, _categoryname) => {
-    return valueUnitCat?.length
-      ? valueUnitCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Unit";
+    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(', ') : 'Please Select Unit';
   };
 
   //auto select all dropdowns
@@ -5490,30 +4774,15 @@ function Stockpurchaserequest() {
           branch: data.branch,
           unit: data.unit,
         }))
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        );
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit));
       let selectedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         .map((a, index) => {
           return a.company;
         });
 
       let mappedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         ?.map((data) => ({
           label: data?.company,
           value: data?.company,
@@ -5523,25 +4792,13 @@ function Stockpurchaserequest() {
       setSelectedOptionsCompany(mappedCompany);
 
       let selectedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         .map((a, index) => {
           return a.branch;
         });
 
       let mappedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         ?.map((data) => ({
           label: data?.branch,
           value: data?.branch,
@@ -5551,31 +4808,13 @@ function Stockpurchaserequest() {
       setSelectedOptionsBranch(mappedBranch);
 
       let selectedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         .map((a, index) => {
           return a.unit;
         });
 
       let mappedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         ?.map((data) => ({
           label: data?.unit,
           value: data?.unit,
@@ -5584,12 +4823,7 @@ function Stockpurchaserequest() {
       setValueUnitCat(selectedUnit);
       setSelectedOptionsUnit(mappedUnit);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -5599,17 +4833,12 @@ function Stockpurchaserequest() {
 
   const handleSubmitFilter = (e) => {
     e.preventDefault();
-    if (
-      selectedOptionsCompany?.length === 0 &&
-      selectedOptionsBranch?.length === 0 &&
-      selectedOptionsUnit?.length === 0 &&
-      selectedRequestMode?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Any One");
-      setPopupSeverityMalert("info");
+    if (selectedOptionsCompany?.length === 0 && selectedOptionsBranch?.length === 0 && selectedOptionsUnit?.length === 0 && selectedRequestMode?.length === 0) {
+      setPopupContentMalert('Please Select Any One');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
-      fetchStock("Filtered");
+      fetchStock('Filtered');
     }
   };
 
@@ -5627,19 +4856,19 @@ function Stockpurchaserequest() {
     setValueCompanyCat([]);
     setValueBranchCat([]);
     setValueUnitCat([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
 
   return (
     <>
       <Box>
-        <Headtitle title={"Manage Stock"} />
+        <Headtitle title={'Manage Stock'} />
         {/* ****** Header Content ****** */}
 
         {/* ****** Table Start ****** */}
-        {isUserRoleCompare?.includes("lstockpurchaserequest") && (
+        {isUserRoleCompare?.includes('lstockpurchaserequest') && (
           <>
             <Box sx={userStyle.container}>
               {/* ******************************************************EXPORT Buttons****************************************************** */}
@@ -5647,14 +4876,7 @@ function Stockpurchaserequest() {
                 {/* <Typography sx={userStyle.importheadtext}>
                 List Stock Request To Purchase
               </Typography> */}
-                <PageHeading
-                  title=" List Stock Request To Purchase"
-                  modulename="Asset"
-                  submodulename="Stock"
-                  mainpagename="Stock Purchase Request"
-                  subpagename=""
-                  subsubpagename=""
-                />
+                <PageHeading title=" List Stock Request To Purchase" modulename="Asset" submodulename="Stock" mainpagename="Stock Purchase Request" subpagename="" subsubpagename="" />
               </Grid>
               <Box>
                 <Grid container spacing={2}>
@@ -5669,13 +4891,7 @@ function Stockpurchaserequest() {
                               value: data.company,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           value={selectedOptionsCompany}
                           onChange={(e) => {
@@ -5691,21 +4907,13 @@ function Stockpurchaserequest() {
                         <Typography> Branch</Typography>
                         <MultiSelect
                           options={accessbranch
-                            ?.filter((comp) =>
-                              valueCompanyCat?.includes(comp.company)
-                            )
+                            ?.filter((comp) => valueCompanyCat?.includes(comp.company))
                             ?.map((data) => ({
                               label: data.branch,
                               value: data.branch,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           value={selectedOptionsBranch}
                           onChange={(e) => {
@@ -5721,23 +4929,13 @@ function Stockpurchaserequest() {
                         <Typography> Unit</Typography>
                         <MultiSelect
                           options={accessbranch
-                            ?.filter(
-                              (comp) =>
-                                valueCompanyCat?.includes(comp.company) &&
-                                valueBranchCat?.includes(comp.branch)
-                            )
+                            ?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch))
                             ?.map((data) => ({
                               label: data.unit,
                               value: data.unit,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           value={selectedOptionsUnit}
                           onChange={(e) => {
@@ -5765,7 +4963,7 @@ function Stockpurchaserequest() {
                   </>
 
                   <Grid item md={2} sm={12} xs={12} marginTop={3}>
-                    <Grid sx={{ display: "flex", gap: "15px" }}>
+                    <Grid sx={{ display: 'flex', gap: '15px' }}>
                       <Button
                         variant="contained"
                         sx={buttonStyles.buttonsubmit}
@@ -5773,7 +4971,7 @@ function Stockpurchaserequest() {
                           handleSubmitFilter(e);
                         }}
                       >
-                        {" "}
+                        {' '}
                         Filter
                       </Button>
                       <Button
@@ -5782,7 +4980,7 @@ function Stockpurchaserequest() {
                           handleClearFilter();
                         }}
                       >
-                        {" "}
+                        {' '}
                         CLEAR
                       </Button>
                     </Grid>
@@ -5806,7 +5004,7 @@ function Stockpurchaserequest() {
                           },
                         }}
                         onChange={handlePageSizeChange}
-                        sx={{ width: "77px" }}
+                        sx={{ width: '77px' }}
                       >
                         <MenuItem value={1}>1</MenuItem>
                         <MenuItem value={5}>5</MenuItem>
@@ -5825,87 +5023,70 @@ function Stockpurchaserequest() {
                     xs={12}
                     sm={12}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Box>
-                      {isUserRoleCompare?.includes(
-                        "excelstockpurchaserequest"
-                      ) && (
-                          <>
-                            <Button
-                              onClick={(e) => {
-                                setIsFilterOpen(true);
-                                setFormat("xl");
-                              }}
-                              sx={userStyle.buttongrp}
-                            >
-                              <FaFileExcel />
-                              &ensp;Export to Excel&ensp;
-                            </Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes(
-                        "csvstockpurchaserequest"
-                      ) && (
-                          <>
-                            <Button
-                              onClick={(e) => {
-                                setIsFilterOpen(true);
-                                setFormat("csv");
-                              }}
-                              sx={userStyle.buttongrp}
-                            >
-                              <FaFileCsv />
-                              &ensp;Export to CSV&ensp;
-                            </Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes(
-                        "printstockpurchaserequest"
-                      ) && (
-                          <>
-                            <Button
-                              sx={userStyle.buttongrp}
-                              onClick={handleprint}
-                            >
-                              &ensp;
-                              <FaPrint />
-                              &ensp;Print&ensp;
-                            </Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes(
-                        "pdfstockpurchaserequest"
-                      ) && (
-                          <>
-                            <Button
-                              sx={userStyle.buttongrp}
-                              onClick={() => {
-                                setIsPdfFilterOpen(true);
-                              }}
-                            >
-                              <FaFilePdf />
-                              &ensp;Export to PDF&ensp;
-                            </Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes(
-                        "imagestockpurchaserequest"
-                      ) && (
-                          <>
-                            <Button
-                              sx={userStyle.buttongrp}
-                              onClick={handleCaptureImage}
-                            >
-                              {" "}
-                              <ImageIcon sx={{ fontSize: "15px" }} />{" "}
-                              &ensp;Image&ensp;{" "}
-                            </Button>
-                          </>
-                        )}
+                      {isUserRoleCompare?.includes('excelstockpurchaserequest') && (
+                        <>
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpen(true);
+                              setFormat('xl');
+                            }}
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileExcel />
+                            &ensp;Export to Excel&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('csvstockpurchaserequest') && (
+                        <>
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpen(true);
+                              setFormat('csv');
+                            }}
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileCsv />
+                            &ensp;Export to CSV&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('printstockpurchaserequest') && (
+                        <>
+                          <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                            &ensp;
+                            <FaPrint />
+                            &ensp;Print&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('pdfstockpurchaserequest') && (
+                        <>
+                          <Button
+                            sx={userStyle.buttongrp}
+                            onClick={() => {
+                              setIsPdfFilterOpen(true);
+                            }}
+                          >
+                            <FaFilePdf />
+                            &ensp;Export to PDF&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('imagestockpurchaserequest') && (
+                        <>
+                          <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                            {' '}
+                            <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                          </Button>
+                        </>
+                      )}
                     </Box>
                   </Grid>
                   <Grid item md={2} xs={12} sm={12}>
@@ -5927,16 +5108,13 @@ function Stockpurchaserequest() {
                             )}
                             <Tooltip title="Show search options">
                               <span>
-                                <IoMdOptions
-                                  style={{ cursor: "pointer" }}
-                                  onClick={handleClickSearch}
-                                />
+                                <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
                               </span>
                             </Tooltip>
                           </InputAdornment>
                         }
                         aria-describedby="outlined-weight-helper-text"
-                        inputProps={{ "aria-label": "weight" }}
+                        inputProps={{ 'aria-label': 'weight' }}
                         type="text"
                         value={getSearchDisplay()}
                         onChange={handleSearchChange}
@@ -5951,42 +5129,26 @@ function Stockpurchaserequest() {
                   <Grid item md={6} xs={12} sm={12}>
                     <Box
                       sx={{
-                        display: "flex",
-                        justifyContent: "left",
-                        flexWrap: "wrap",
-                        gap: "10px",
+                        display: 'flex',
+                        justifyContent: 'left',
+                        flexWrap: 'wrap',
+                        gap: '10px',
                       }}
                     >
-                      <Button
-                        sx={userStyle.buttongrp}
-                        onClick={handleShowAllColumns}
-                      >
+                      <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
                         Show All Columns
                       </Button>
-                      <Button
-                        sx={userStyle.buttongrp}
-                        onClick={handleOpenManageColumns}
-                      >
+                      <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
                         Manage Columns
                       </Button>
-                      {isUserRoleCompare?.includes(
-                        "bdstockpurchaserequest"
-                      ) && (
-                          <Button
-                            variant="contained"
-                            sx={buttonStyles.buttonbulkdelete}
-                            onClick={handleClickOpenalert}
-                          >
-                            Bulk Delete
-                          </Button>
-                        )}
+                      {isUserRoleCompare?.includes('bdstockpurchaserequest') && (
+                        <Button variant="contained" sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
+                          Bulk Delete
+                        </Button>
+                      )}
                       &ensp;
-                      <Button
-                        onClick={handleClickOpenstockupdate}
-                        color="primary"
-                        variant="contained"
-                      >
-                        {" "}
+                      <Button onClick={handleClickOpenstockupdate} color="primary" variant="contained">
+                        {' '}
                         Bulk Update
                       </Button>
                     </Box>
@@ -5996,26 +5158,17 @@ function Stockpurchaserequest() {
                 {projectCheck ? (
                   <Box
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      minHeight: "350px",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      minHeight: '350px',
                     }}
                   >
-                    <ThreeDots
-                      height="80"
-                      width="80"
-                      radius="9"
-                      color="#1976d2"
-                      ariaLabel="three-dots-loading"
-                      wrapperStyle={{}}
-                      wrapperClassName=""
-                      visible={true}
-                    />
+                    <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                     {/* <FacebookCircularProgress /> */}
                   </Box>
                 ) : (
                   <>
-                    <Box style={{ width: "100%", overflowY: "hidden" }}>
+                    <Box style={{ width: '100%', overflowY: 'hidden' }}>
                       <>
                         <AggridTableForPaginationTable
                           rowDataTable={rowDataTable}
@@ -6028,16 +5181,12 @@ function Stockpurchaserequest() {
                           setColumnVisibility={setColumnVisibility}
                           selectedRows={selectedRows}
                           setSelectedRows={setSelectedRows}
-                          selectedRowsRequestPurchase={
-                            selectedRowsRequestPurchase
-                          }
-                          setSelectedRowsRequestPurchase={
-                            setSelectedRowsRequestPurchase
-                          }
+                          selectedRowsRequestPurchase={selectedRowsRequestPurchase}
+                          setSelectedRowsRequestPurchase={setSelectedRowsRequestPurchase}
                           gridRefTable={gridRefTable}
                           totalDatas={totalProjects}
                           setFilteredRowData={setFilteredRowData}
-                          pagenamecheck={"Stock Request Purchase"}
+                          pagenamecheck={'Stock Request Purchase'}
                           filteredRowData={filteredRowData}
                           gridRefTableImg={gridRefTableImg}
                           itemsList={overallFilterdata}
@@ -6053,30 +5202,17 @@ function Stockpurchaserequest() {
         )}
         {/* Manage Column */}
 
-        <Popover
-          id={id}
-          open={isManageColumnsOpen}
-          anchorEl={anchorEl}
-          onClose={handleCloseManageColumns}
-          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-          transformOrigin={{ vertical: "center", horizontal: "right" }}
-        >
+        <Popover id={id} open={isManageColumnsOpen} anchorEl={anchorEl} onClose={handleCloseManageColumns} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} transformOrigin={{ vertical: 'center', horizontal: 'right' }}>
           {manageColumnsContent}
         </Popover>
-        <Popover
-          id={idSearch}
-          open={openSearch}
-          anchorEl={anchorElSearch}
-          onClose={handleCloseSearch}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
-          <Box style={{ padding: "10px", maxWidth: "450px" }}>
+        <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+          <Box style={{ padding: '10px', maxWidth: '450px' }}>
             <Typography variant="h6">Advance Search</Typography>
             <IconButton
               aria-label="close"
               onClick={handleCloseSearch}
               sx={{
-                position: "absolute",
+                position: 'absolute',
                 right: 8,
                 top: 8,
                 color: (theme) => theme.palette.grey[500],
@@ -6084,19 +5220,19 @@ function Stockpurchaserequest() {
             >
               <CloseIcon />
             </IconButton>
-            <DialogContent sx={{ width: "100%" }}>
+            <DialogContent sx={{ width: '100%' }}>
               <Box
                 sx={{
-                  width: "350px",
-                  maxHeight: "400px",
-                  overflow: "hidden",
-                  position: "relative",
+                  width: '350px',
+                  maxHeight: '400px',
+                  overflow: 'hidden',
+                  position: 'relative',
                 }}
               >
                 <Box
                   sx={{
-                    maxHeight: "300px",
-                    overflowY: "auto",
+                    maxHeight: '300px',
+                    overflowY: 'auto',
                     // paddingRight: '5px'
                   }}
                 >
@@ -6110,7 +5246,7 @@ function Stockpurchaserequest() {
                           PaperProps: {
                             style: {
                               maxHeight: 200,
-                              width: "auto",
+                              width: 'auto',
                             },
                           },
                         }}
@@ -6138,7 +5274,7 @@ function Stockpurchaserequest() {
                           PaperProps: {
                             style: {
                               maxHeight: 200,
-                              width: "auto",
+                              width: 'auto',
                             },
                           },
                         }}
@@ -6159,26 +5295,16 @@ function Stockpurchaserequest() {
                       <TextField
                         fullWidth
                         size="small"
-                        value={
-                          ["Blank", "Not Blank"].includes(selectedCondition)
-                            ? ""
-                            : filterValue
-                        }
+                        value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
                         onChange={(e) => setFilterValue(e.target.value)}
-                        disabled={["Blank", "Not Blank"].includes(
-                          selectedCondition
-                        )}
-                        placeholder={
-                          ["Blank", "Not Blank"].includes(selectedCondition)
-                            ? "Disabled"
-                            : "Enter value"
-                        }
+                        disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                        placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-disabled": {
-                            backgroundColor: "rgb(0 0 0 / 26%)",
+                          '& .MuiOutlinedInput-root.Mui-disabled': {
+                            backgroundColor: 'rgb(0 0 0 / 26%)',
                           },
-                          "& .MuiOutlinedInput-input.Mui-disabled": {
-                            cursor: "not-allowed",
+                          '& .MuiOutlinedInput-input.Mui-disabled': {
+                            cursor: 'not-allowed',
                           },
                         }}
                       />
@@ -6186,37 +5312,16 @@ function Stockpurchaserequest() {
                     {additionalFilters.length > 0 && (
                       <>
                         <Grid item md={12} sm={12} xs={12}>
-                          <RadioGroup
-                            row
-                            value={logicOperator}
-                            onChange={(e) => setLogicOperator(e.target.value)}
-                          >
-                            <FormControlLabel
-                              value="AND"
-                              control={<Radio />}
-                              label="AND"
-                            />
-                            <FormControlLabel
-                              value="OR"
-                              control={<Radio />}
-                              label="OR"
-                            />
+                          <RadioGroup row value={logicOperator} onChange={(e) => setLogicOperator(e.target.value)}>
+                            <FormControlLabel value="AND" control={<Radio />} label="AND" />
+                            <FormControlLabel value="OR" control={<Radio />} label="OR" />
                           </RadioGroup>
                         </Grid>
                       </>
                     )}
                     {additionalFilters.length === 0 && (
                       <Grid item md={4} sm={12} xs={12}>
-                        <Button
-                          variant="contained"
-                          onClick={handleAddFilter}
-                          sx={{ textTransform: "capitalize" }}
-                          disabled={
-                            ["Blank", "Not Blank"].includes(selectedCondition)
-                              ? false
-                              : !filterValue || selectedColumn.length === 0
-                          }
-                        >
+                        <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
                           Add Filter
                         </Button>
                       </Grid>
@@ -6226,7 +5331,7 @@ function Stockpurchaserequest() {
                       <Button
                         variant="contained"
                         onClick={() => {
-                          fetchStock("Filtered");
+                          fetchStock('Filtered');
                           setIsSearchActive(true);
                           setAdvancedFilter([
                             ...additionalFilters,
@@ -6237,12 +5342,8 @@ function Stockpurchaserequest() {
                             },
                           ]);
                         }}
-                        sx={{ textTransform: "capitalize" }}
-                        disabled={
-                          ["Blank", "Not Blank"].includes(selectedCondition)
-                            ? false
-                            : !filterValue || selectedColumn.length === 0
-                        }
+                        sx={{ textTransform: 'capitalize' }}
+                        disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
                       >
                         Search
                       </Button>
@@ -6259,22 +5360,10 @@ function Stockpurchaserequest() {
         {/* Delete Modal */}
         <Box>
           {/* ALERT DIALOG */}
-          <Dialog
-            open={isDeleteOpen}
-            onClose={handleCloseMod}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogContent
-              sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-            >
-              <ErrorOutlineOutlinedIcon
-                sx={{ fontSize: "80px", color: "orange" }}
-              />
-              <Typography
-                variant="h5"
-                sx={{ color: "red", textAlign: "center" }}
-              >
+          <Dialog open={isDeleteOpen} onClose={handleCloseMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+            <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+              <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+              <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
                 Are you sure?
               </Typography>
             </DialogContent>
@@ -6282,40 +5371,30 @@ function Stockpurchaserequest() {
               <Button
                 onClick={handleCloseMod}
                 style={{
-                  backgroundColor: "#f4f4f4",
-                  color: "#444",
-                  boxShadow: "none",
-                  borderRadius: "3px",
-                  border: "1px solid #0000006b",
-                  "&:hover": {
-                    "& .css-bluauu-MuiButtonBase-root-MuiButton-root": {
-                      backgroundColor: "#f4f4f4",
+                  backgroundColor: '#f4f4f4',
+                  color: '#444',
+                  boxShadow: 'none',
+                  borderRadius: '3px',
+                  border: '1px solid #0000006b',
+                  '&:hover': {
+                    '& .css-bluauu-MuiButtonBase-root-MuiButton-root': {
+                      backgroundColor: '#f4f4f4',
                     },
                   },
                 }}
               >
                 Cancel
               </Button>
-              <Button
-                autoFocus
-                variant="contained"
-                color="error"
-                onClick={(e) => delProject(projectid)}
-              >
-                {" "}
-                OK{" "}
+              <Button autoFocus variant="contained" color="error" onClick={(e) => delProject(projectid)}>
+                {' '}
+                OK{' '}
               </Button>
             </DialogActions>
           </Dialog>
 
           {/* this is info view details */}
-          <Dialog
-            open={openInfo}
-            onClose={handleCloseinfo}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <Box sx={{ width: "550px", padding: "20px 50px" }}>
+          <Dialog open={openInfo} onClose={handleCloseinfo} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+            <Box sx={{ width: '550px', padding: '20px 50px' }}>
               <>
                 <Typography sx={userStyle.HeaderText}>Stock Info</Typography>
                 <br />
@@ -6327,46 +5406,16 @@ function Stockpurchaserequest() {
                       <br />
                       <Table>
                         <TableHead>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {"SNO"}.
-                          </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {" "}
-                            {"UserName"}
-                          </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {" "}
-                            {"Date"}
-                          </StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'SNO'}.</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'UserName'}</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'Date'}</StyledTableCell>
                         </TableHead>
                         <TableBody>
                           {addedby?.map((item, i) => (
                             <StyledTableRow>
-                              <StyledTableCell
-                                sx={{ padding: "5px 10px !important" }}
-                              >
-                                {i + 1}.
-                              </StyledTableCell>
-                              <StyledTableCell
-                                sx={{ padding: "5px 10px !important" }}
-                              >
-                                {" "}
-                                {item.name}
-                              </StyledTableCell>
-                              <StyledTableCell
-                                sx={{ padding: "5px 10px !important" }}
-                              >
-                                {" "}
-                                {moment(item.date).format(
-                                  "DD-MM-YYYY hh:mm:ss a"
-                                )}
-                              </StyledTableCell>
+                              <StyledTableCell sx={{ padding: '5px 10px !important' }}>{i + 1}.</StyledTableCell>
+                              <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.name}</StyledTableCell>
+                              <StyledTableCell sx={{ padding: '5px 10px !important' }}> {moment(item.date).format('DD-MM-YYYY hh:mm:ss a')}</StyledTableCell>
                             </StyledTableRow>
                           ))}
                         </TableBody>
@@ -6379,46 +5428,16 @@ function Stockpurchaserequest() {
                       <br />
                       <Table>
                         <TableHead>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {"SNO"}.
-                          </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {" "}
-                            {"UserName"}
-                          </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ padding: "5px 10px !important" }}
-                          >
-                            {" "}
-                            {"Date"}
-                          </StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'SNO'}.</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'UserName'}</StyledTableCell>
+                          <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'Date'}</StyledTableCell>
                         </TableHead>
                         <TableBody>
                           {updateby?.map((item, i) => (
                             <StyledTableRow>
-                              <StyledTableCell
-                                sx={{ padding: "5px 10px !important" }}
-                              >
-                                {i + 1}.
-                              </StyledTableCell>
-                              <StyledTableCell
-                                sx={{ padding: "5px 10px !important" }}
-                              >
-                                {" "}
-                                {item.name}
-                              </StyledTableCell>
-                              <StyledTableCell
-                                sx={{ padding: "5px 10px !important" }}
-                              >
-                                {" "}
-                                {moment(item.date).format(
-                                  "DD-MM-YYYY hh:mm:ss a"
-                                )}
-                              </StyledTableCell>
+                              <StyledTableCell sx={{ padding: '5px 10px !important' }}>{i + 1}.</StyledTableCell>
+                              <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.name}</StyledTableCell>
+                              <StyledTableCell sx={{ padding: '5px 10px !important' }}> {moment(item.date).format('DD-MM-YYYY hh:mm:ss a')}</StyledTableCell>
                             </StyledTableRow>
                           ))}
                         </TableBody>
@@ -6430,8 +5449,8 @@ function Stockpurchaserequest() {
                 <br />
                 <Grid container spacing={2}>
                   <Button variant="contained" onClick={handleCloseinfo}>
-                    {" "}
-                    Back{" "}
+                    {' '}
+                    Back{' '}
                   </Button>
                 </Grid>
               </>
@@ -6441,12 +5460,7 @@ function Stockpurchaserequest() {
           {/* print layout */}
 
           <TableContainer component={Paper} sx={userStyle.printcls}>
-            <Table
-              sx={{ minWidth: 700 }}
-              aria-label="customized table"
-              id="usertable"
-              ref={componentRef}
-            >
+            <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable" ref={componentRef}>
               <TableHead>
                 <TableRow>
                   <TableCell> SI.No</TableCell>
@@ -6515,24 +5529,14 @@ function Stockpurchaserequest() {
         </Box>
 
         {/* stock model */}
-        <Dialog
-          open={openstock}
-          onClose={handleClickOpenstock}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="lg"
-          fullWidth={true}
-          sx={{ marginTop: "95px" }}
-        >
-          <Box sx={{ padding: "20px 50px" }}>
+        <Dialog open={openstock} onClose={handleClickOpenstock} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" fullWidth={true} sx={{ marginTop: '95px' }}>
+          <Box sx={{ padding: '20px 50px' }}>
             <>
               <Box>
                 <>
                   <Grid container spacing={2}>
                     <Grid item xs={8}>
-                      <Typography sx={userStyle.importheadtext}>
-                        Manage Purchase Details
-                      </Typography>
+                      <Typography sx={userStyle.importheadtext}>Manage Purchase Details</Typography>
                     </Grid>
                   </Grid>
                   <br />
@@ -6544,7 +5548,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Company<b style={{ color: "red" }}>*</b>
+                          Company<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           // options={companysEdit}
@@ -6554,13 +5558,7 @@ function Stockpurchaserequest() {
                               value: data.company,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           styles={colourStyles}
                           value={{
@@ -6571,19 +5569,19 @@ function Stockpurchaserequest() {
                             setStockmaster({
                               ...stockmaster,
                               company: e.value,
-                              branch: "Please Select Branch",
-                              unit: "Please Select Unit",
-                              floor: "Please Select Floor",
-                              area: "Please Select Area",
-                              location: "Please Select Location",
+                              branch: 'Please Select Branch',
+                              unit: 'Please Select Unit',
+                              floor: 'Please Select Floor',
+                              area: 'Please Select Area',
+                              location: 'Please Select Location',
                             });
                             setBranches([]);
                             setFilteredUnit([]);
-                            setSelectedBranch("Please Select Branch");
-                            setSelectedUnit("Please Select Unit");
+                            setSelectedBranch('Please Select Branch');
+                            setSelectedUnit('Please Select Unit');
                             setAreasEdit([]);
                             setFloorEdit([]);
-                            setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                            setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                             fetchBranchDropdownsEdit(e.value);
                             fetchbranches(e.value);
                           }}
@@ -6592,27 +5590,19 @@ function Stockpurchaserequest() {
                     </Grid>
                     <Grid item md={3} sm={12} xs={12}>
                       <Typography>
-                        Branch <b style={{ color: "red" }}>*</b>
+                        Branch <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <FormControl size="small" fullWidth>
                         <Selects
                           // options={branches}
                           options={accessbranch
-                            ?.filter(
-                              (comp) => stockmaster.company === comp.company
-                            )
+                            ?.filter((comp) => stockmaster.company === comp.company)
                             ?.map((data) => ({
                               label: data.branch,
                               value: data.branch,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           styles={colourStyles}
                           value={{
@@ -6622,16 +5612,16 @@ function Stockpurchaserequest() {
                           onChange={(e) => {
                             setStockmaster({
                               ...stockmaster,
-                              branch: "Please Select Branch",
-                              unit: "Please Select Unit",
-                              floor: "Please Select Floor",
-                              area: "Please Select Area",
-                              location: "Please Select Location",
+                              branch: 'Please Select Branch',
+                              unit: 'Please Select Unit',
+                              floor: 'Please Select Floor',
+                              area: 'Please Select Area',
+                              location: 'Please Select Location',
                             });
                             fetchFloorEdit(e.value);
                             handleBranchChange(e);
-                            setSelectedUnit("Please Select Unit");
-                            setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                            setSelectedUnit('Please Select Unit');
+                            setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                             setAreasEdit([]);
                           }}
                         />
@@ -6639,32 +5629,22 @@ function Stockpurchaserequest() {
                     </Grid>
                     <Grid item md={3} xs={12} sm={12}>
                       <Typography>
-                        Unit <b style={{ color: "red" }}>*</b>
+                        Unit <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <FormControl size="small" fullWidth>
                         <Selects
                           // options={filteredUnit}
                           options={accessbranch
-                            ?.filter(
-                              (comp) =>
-                                stockmaster.company === comp.company &&
-                                selectedBranch === comp.branch
-                            )
+                            ?.filter((comp) => stockmaster.company === comp.company && selectedBranch === comp.branch)
                             ?.map((data) => ({
                               label: data.unit,
                               value: data.unit,
                             }))
                             .filter((item, index, self) => {
-                              return (
-                                self.findIndex(
-                                  (i) =>
-                                    i.label === item.label &&
-                                    i.value === item.value
-                                ) === index
-                              );
+                              return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                             })}
                           styles={colourStyles}
-                          placeholder={"please select"}
+                          placeholder={'please select'}
                           value={{ label: selectedUnit, value: selectedUnit }}
                           onChange={(e) => setSelectedUnit(e.value)}
                         />
@@ -6673,7 +5653,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Floor<b style={{ color: "red" }}>*</b>
+                          Floor<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           options={floorsEdit}
@@ -6686,12 +5666,12 @@ function Stockpurchaserequest() {
                             setStockmaster({
                               ...stockmaster,
                               floor: e.value,
-                              workstation: "",
-                              area: "Please Select Area",
-                              location: "Please Select Location",
+                              workstation: '',
+                              area: 'Please Select Area',
+                              location: 'Please Select Location',
                             });
                             setAreasEdit([]);
-                            setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                            setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                             fetchAreaEdit(selectedBranch, e.value);
                           }}
                         />
@@ -6700,7 +5680,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Area<b style={{ color: "red" }}>*</b>
+                          Area<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           options={areasEdit}
@@ -6713,15 +5693,11 @@ function Stockpurchaserequest() {
                             setStockmaster({
                               ...stockmaster,
                               area: e.value,
-                              workstation: "",
-                              location: "Please Select Location",
+                              workstation: '',
+                              location: 'Please Select Location',
                             });
-                            setLocationsEdit([{ label: "ALL", value: "ALL" }]);
-                            fetchAllLocationEdit(
-                              selectedBranch,
-                              stockmaster.floor,
-                              e.value
-                            );
+                            setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
+                            fetchAllLocationEdit(selectedBranch, stockmaster.floor, e.value);
                           }}
                         />
                       </FormControl>
@@ -6729,7 +5705,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Location<b style={{ color: "red" }}>*</b>
+                          Location<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           options={locationsEdit}
@@ -6742,7 +5718,7 @@ function Stockpurchaserequest() {
                             setStockmaster({
                               ...stockmaster,
                               location: e.value,
-                              workstation: "",
+                              workstation: '',
                             });
                           }}
                         />
@@ -6751,7 +5727,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Date<b style={{ color: "red" }}>*</b>{" "}
+                          Date<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -6770,7 +5746,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Time<b style={{ color: "red" }}>*</b>{" "}
+                          Time<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -6789,7 +5765,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Warranty<b style={{ color: "red" }}>*</b>
+                          Warranty<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Select
                           fullWidth
@@ -6804,36 +5780,29 @@ function Stockpurchaserequest() {
                           }}
                         >
                           <MenuItem value="" disabled>
-                            {" "}
+                            {' '}
                             Please Select
                           </MenuItem>
-                          <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                          <MenuItem value="No"> {"No"} </MenuItem>
+                          <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                          <MenuItem value="No"> {'No'} </MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
-                    {stockmaster.warranty === "Yes" && (
+                    {stockmaster.warranty === 'Yes' && (
                       <>
                         <Grid item md={3} xs={12} sm={12}>
                           <Grid container>
                             <Grid item md={6} xs={6} sm={6}>
                               <Typography>
-                                Warranty Time<b style={{ color: "red" }}>*</b>
+                                Warranty Time<b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <FormControl fullWidth size="small">
-                                <OutlinedInput
-                                  id="component-outlined"
-                                  type="text"
-                                  size="small"
-                                  placeholder="Enter Time"
-                                  value={stockmaster.estimation}
-                                  onChange={(e) => handleChangephonenumber(e)}
-                                />
+                                <OutlinedInput id="component-outlined" type="text" size="small" placeholder="Enter Time" value={stockmaster.estimation} onChange={(e) => handleChangephonenumber(e)} />
                               </FormControl>
                             </Grid>
                             <Grid item md={6} xs={6} sm={6}>
                               <Typography>
-                                Estimation<b style={{ color: "red" }}>*</b>
+                                Estimation<b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <Select
                                 fullWidth
@@ -6847,12 +5816,12 @@ function Stockpurchaserequest() {
                                 onChange={handleEstimationChange}
                               >
                                 <MenuItem value="" disabled>
-                                  {" "}
+                                  {' '}
                                   Please Select
                                 </MenuItem>
-                                <MenuItem value="Days"> {"Days"} </MenuItem>
-                                <MenuItem value="Month"> {"Month"} </MenuItem>
-                                <MenuItem value="Year"> {"Year"} </MenuItem>
+                                <MenuItem value="Days"> {'Days'} </MenuItem>
+                                <MenuItem value="Month"> {'Month'} </MenuItem>
+                                <MenuItem value="Year"> {'Year'} </MenuItem>
                               </Select>
                             </Grid>
                           </Grid>
@@ -6862,30 +5831,21 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>Request Mode For</Typography>
-                        <OutlinedInput
-                          value={stockmaster.requestmode}
-                          readOnly={true}
-                        />
+                        <OutlinedInput value={stockmaster.requestmode} readOnly={true} />
                       </FormControl>
                     </Grid>
-                    {stockmaster.requestmode === "Asset Material" ? (
+                    {stockmaster.requestmode === 'Asset Material' ? (
                       <>
                         <Grid item md={3} xs={12} sm={12}>
                           <Typography>Asset Type </Typography>
                           <FormControl size="small" fullWidth>
-                            <OutlinedInput
-                              readOnly={true}
-                              value={selectedAssetType}
-                            />
+                            <OutlinedInput readOnly={true} value={selectedAssetType} />
                           </FormControl>
                         </Grid>
                         <Grid item md={3} xs={12} sm={12}>
                           <Typography>Product Head </Typography>
                           <FormControl size="small" fullWidth>
-                            <OutlinedInput
-                              readOnly={true}
-                              value={selectedProducthead}
-                            />
+                            <OutlinedInput readOnly={true} value={selectedProducthead} />
                           </FormControl>
                         </Grid>
 
@@ -6893,40 +5853,28 @@ function Stockpurchaserequest() {
                           <FormControl size="small" fullWidth>
                             <Typography>Product Name </Typography>
 
-                            <OutlinedInput
-                              readOnly={true}
-                              value={selectedProductname}
-                            />
+                            <OutlinedInput readOnly={true} value={selectedProductname} />
                           </FormControl>
                         </Grid>
 
                         <Grid item md={3} sm={12} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>Product Details</Typography>
-                            <OutlinedInput
-                              readOnly={true}
-                              value={stockmaster.productdetails}
-                            />
+                            <OutlinedInput readOnly={true} value={stockmaster.productdetails} />
                           </FormControl>
                         </Grid>
                         <Grid item md={3} xs={12} sm={12}>
                           <FormControl size="small" fullWidth>
                             <Typography>UOM </Typography>
 
-                            <OutlinedInput
-                              readOnly={true}
-                              value={stockmaster.uom}
-                            />
+                            <OutlinedInput readOnly={true} value={stockmaster.uom} />
                           </FormControl>
                         </Grid>
 
                         <Grid item md={3} sm={12} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>Qty</Typography>
-                            <OutlinedInput
-                              readOnly={true}
-                              value={stockmaster.quantity}
-                            />
+                            <OutlinedInput readOnly={true} value={stockmaster.quantity} />
                           </FormControl>
                         </Grid>
                       </>
@@ -6935,19 +5883,13 @@ function Stockpurchaserequest() {
                         <Grid item md={3} xs={12} sm={12}>
                           <FormControl fullWidth size="small">
                             <Typography>Stock Category</Typography>
-                            <OutlinedInput
-                              readOnly={true}
-                              value={stockmaster.stockcategory}
-                            />
+                            <OutlinedInput readOnly={true} value={stockmaster.stockcategory} />
                           </FormControl>
                         </Grid>
                         <Grid item md={3} xs={12} sm={12}>
                           <FormControl fullWidth size="small">
                             <Typography>Stock Sub-category</Typography>
-                            <OutlinedInput
-                              readOnly={true}
-                              value={stockmaster.stocksubcategory}
-                            />
+                            <OutlinedInput readOnly={true} value={stockmaster.stocksubcategory} />
                           </FormControl>
                         </Grid>
                       </>
@@ -6958,7 +5900,7 @@ function Stockpurchaserequest() {
                     {stockArray.length > 0 && (
                       <>
                         <Grid item md={3} xs={12} sm={12}>
-                          {" "}
+                          {' '}
                           <Typography variant="h6">Stock Todo List</Typography>
                         </Grid>
 
@@ -6974,38 +5916,23 @@ function Stockpurchaserequest() {
                             <Grid item md={3} xs={3} sm={3}>
                               <FormControl fullWidth size="small">
                                 <Typography>Material</Typography>
-                                <OutlinedInput
-                                  readOnly={true}
-                                  value={item.materialnew}
-                                />
+                                <OutlinedInput readOnly={true} value={item.materialnew} />
                               </FormControl>
                             </Grid>
                             <Grid item md={3} xs={3} sm={3}>
                               <FormControl fullWidth size="small">
                                 <Typography>UOM </Typography>
-                                <OutlinedInput
-                                  readOnly={true}
-                                  value={item.uomnew}
-                                />
+                                <OutlinedInput readOnly={true} value={item.uomnew} />
                               </FormControl>
                             </Grid>
                             <Grid item md={3} sm={3} xs={3}>
                               <FormControl fullWidth size="small">
                                 <Typography>Qty </Typography>
-                                <OutlinedInput
-                                  readOnly={true}
-                                  value={item.quantitynew}
-                                />
+                                <OutlinedInput readOnly={true} value={item.quantitynew} />
                               </FormControl>
                             </Grid>
 
-                            <Grid
-                              item
-                              md={3}
-                              sm={3}
-                              xs={3}
-                              sx={{ display: "flex" }}
-                            >
+                            <Grid item md={3} sm={3} xs={3} sx={{ display: 'flex' }}>
                               <FormControl fullWidth size="small">
                                 <Typography>Product Details</Typography>
 
@@ -7014,7 +5941,7 @@ function Stockpurchaserequest() {
                                   minRows={2}
                                   readOnly={true}
                                   value={item.productdetailsnew}
-                                // placeholder="Please Enter Product Details"
+                                  // placeholder="Please Enter Product Details"
                                 />
                               </FormControl>
                               &nbsp; &emsp;
@@ -7026,10 +5953,8 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          {" "}
-                          Vendor Group Name<b style={{ color: "red" }}>
-                            *
-                          </b>{" "}
+                          {' '}
+                          Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <Selects
                           options={vendorGroupOpt}
@@ -7048,7 +5973,7 @@ function Stockpurchaserequest() {
                         <Grid item md={10} xs={10} sm={10}>
                           <FormControl size="small" fullWidth>
                             <Typography>
-                              Vendor Name <b style={{ color: "red" }}>*</b>{" "}
+                              Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
                             </Typography>
                             <Selects
                               options={vendormaster}
@@ -7071,17 +5996,17 @@ function Stockpurchaserequest() {
                           <Button
                             variant="contained"
                             style={{
-                              height: "30px",
-                              minWidth: "20px",
-                              padding: "19px 13px",
-                              color: "white",
-                              background: "rgb(25, 118, 210)",
+                              height: '30px',
+                              minWidth: '20px',
+                              padding: '19px 13px',
+                              color: 'white',
+                              background: 'rgb(25, 118, 210)',
                             }}
                             onClick={() => {
                               handleClickOpenviewalertvendor();
                             }}
                           >
-                            <FaPlus style={{ fontSize: "15px" }} />
+                            <FaPlus style={{ fontSize: '15px' }} />
                           </Button>
                         </Grid>
                       </Grid>
@@ -7090,18 +6015,13 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>GST No </Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="text"
-                          value={vendorgetid?.gstnumber}
-                          readOnly
-                        />
+                        <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
                       </FormControl>
                     </Grid>
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Bill No <b style={{ color: "red" }}>*</b>{" "}
+                          Bill No <b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -7118,11 +6038,11 @@ function Stockpurchaserequest() {
                         />
                       </FormControl>
                     </Grid>
-                    {stockmaster.warranty === "Yes" && (
+                    {stockmaster.warranty === 'Yes' && (
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Warranty Details <b style={{ color: "red" }}>*</b>{" "}
+                            Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -7143,7 +6063,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Rate<b style={{ color: "red" }}>*</b>{" "}
+                          Rate<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -7160,37 +6080,27 @@ function Stockpurchaserequest() {
                         />
                       </FormControl>
                     </Grid>
-                    {stockmaster.requestmode === "Stock Material" && (
+                    {stockmaster.requestmode === 'Stock Material' && (
                       <>
                         <Grid item md={3} sm={12} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>
                               Total Bill Amounts
-                              <b style={{ color: "red" }}>*</b>{" "}
+                              <b style={{ color: 'red' }}>*</b>{' '}
                             </Typography>
-                            <OutlinedInput
-                              id="component-outlined"
-                              type="number"
-                              sx={userStyle.input}
-                              value={totalQuantityStock * stockmaster.rate}
-                            />
+                            <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={totalQuantityStock * stockmaster.rate} />
                           </FormControl>
                         </Grid>
                       </>
                     )}
-                    {stockmaster.requestmode === "Asset Material" && (
+                    {stockmaster.requestmode === 'Asset Material' && (
                       <>
                         <Grid item md={3} sm={12} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>
-                              Total Bill Amount<b style={{ color: "red" }}>*</b>{" "}
+                              Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
                             </Typography>
-                            <OutlinedInput
-                              id="component-outlined"
-                              type="number"
-                              sx={userStyle.input}
-                              value={stockmaster.quantity * stockmaster.rate}
-                            />
+                            <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={stockmaster.quantity * stockmaster.rate} />
                           </FormControl>
                         </Grid>
                       </>
@@ -7198,7 +6108,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Bill Date <b style={{ color: "red" }}>*</b>{" "}
+                          Bill Date <b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <TextField
                           size="small"
@@ -7215,27 +6125,19 @@ function Stockpurchaserequest() {
                     </Grid>
                     <Grid item md={3} xs={12} sm={12}>
                       <Typography>
-                        Bill <b style={{ color: "red" }}>*</b>{" "}
+                        Bill <b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
-                      <Box sx={{ display: "flex", justifyContent: "left" }}>
-                        <Button
-                          variant="contained"
-                          onClick={() => handleClickUploadPopupOpenedit()}
-                        >
+                      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                        <Button variant="contained" onClick={() => handleClickUploadPopupOpenedit()}>
                           Upload
                         </Button>
                       </Box>
                     </Grid>
-                    {stockmaster.warranty === "Yes" && (
+                    {stockmaster.warranty === 'Yes' && (
                       <Grid item md={3} xs={12} sm={12}>
                         <Typography>Warranty Card </Typography>
-                        <Box sx={{ display: "flex", justifyContent: "left" }}>
-                          <Button
-                            variant="contained"
-                            onClick={() =>
-                              handleClickUploadPopupOpenwarrantyedit()
-                            }
-                          >
+                        <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                          <Button variant="contained" onClick={() => handleClickUploadPopupOpenwarrantyedit()}>
                             Upload
                           </Button>
                         </Box>
@@ -7249,16 +6151,12 @@ function Stockpurchaserequest() {
                   <Grid container>
                     <Grid item md={3} xs={12} sm={6}>
                       {btnSubmit ? (
-                        <Box sx={{ display: "flex" }}>
+                        <Box sx={{ display: 'flex' }}>
                           <CircularProgress />
                         </Box>
                       ) : (
                         <>
-                          <Button
-                            variant="contained"
-                            sx={buttonStyles.buttonsubmit}
-                            onClick={handleSubmit}
-                          >
+                          <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
                             Create
                           </Button>
                         </>
@@ -7270,13 +6168,9 @@ function Stockpurchaserequest() {
                       </Button>
                     </Grid>
                     <Grid item md={3} xs={12} sm={6}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleClosestock}
-                      >
-                        {" "}
-                        Back{" "}
+                      <Button variant="contained" color="primary" onClick={handleClosestock}>
+                        {' '}
+                        Back{' '}
                       </Button>
                     </Grid>
                   </Grid>
@@ -7290,24 +6184,14 @@ function Stockpurchaserequest() {
         {/* stock update model */}
 
         {/* stock model */}
-        <Dialog
-          open={openstockupdate}
-          onClose={handleClickOpenstockupdate}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="lg"
-          fullWidth={true}
-          sx={{ marginTop: "95px" }}
-        >
-          <Box sx={{ padding: "20px 50px" }}>
+        <Dialog open={openstockupdate} onClose={handleClickOpenstockupdate} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" fullWidth={true} sx={{ marginTop: '95px' }}>
+          <Box sx={{ padding: '20px 50px' }}>
             <>
               <Box>
                 <>
                   <Grid container spacing={2}>
                     <Grid item xs={8}>
-                      <Typography sx={userStyle.importheadtext}>
-                        Manage Purchase Details
-                      </Typography>
+                      <Typography sx={userStyle.importheadtext}>Manage Purchase Details</Typography>
                     </Grid>
                   </Grid>
                   <br />
@@ -7315,7 +6199,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Date<b style={{ color: "red" }}>*</b>{" "}
+                          Date<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -7334,7 +6218,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Time<b style={{ color: "red" }}>*</b>{" "}
+                          Time<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -7353,7 +6237,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Warranty<b style={{ color: "red" }}>*</b>
+                          Warranty<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Select
                           fullWidth
@@ -7368,38 +6252,29 @@ function Stockpurchaserequest() {
                           }}
                         >
                           <MenuItem value="" disabled>
-                            {" "}
+                            {' '}
                             Please Select
                           </MenuItem>
-                          <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                          <MenuItem value="No"> {"No"} </MenuItem>
+                          <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                          <MenuItem value="No"> {'No'} </MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
-                    {stockmasterupdate.warranty === "Yes" && (
+                    {stockmasterupdate.warranty === 'Yes' && (
                       <>
                         <Grid item md={3} xs={12} sm={12}>
                           <Grid container>
                             <Grid item md={6} xs={6} sm={6}>
                               <Typography>
-                                Warranty Time<b style={{ color: "red" }}>*</b>
+                                Warranty Time<b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <FormControl fullWidth size="small">
-                                <OutlinedInput
-                                  id="component-outlined"
-                                  type="text"
-                                  size="small"
-                                  placeholder="Enter Time"
-                                  value={stockmasterupdate.estimation}
-                                  onChange={(e) =>
-                                    handleChangephonenumberupdate(e)
-                                  }
-                                />
+                                <OutlinedInput id="component-outlined" type="text" size="small" placeholder="Enter Time" value={stockmasterupdate.estimation} onChange={(e) => handleChangephonenumberupdate(e)} />
                               </FormControl>
                             </Grid>
                             <Grid item md={6} xs={6} sm={6}>
                               <Typography>
-                                Estimation<b style={{ color: "red" }}>*</b>
+                                Estimation<b style={{ color: 'red' }}>*</b>
                               </Typography>
                               <Select
                                 fullWidth
@@ -7413,12 +6288,12 @@ function Stockpurchaserequest() {
                                 onChange={handleEstimationChangeupdate}
                               >
                                 <MenuItem value="" disabled>
-                                  {" "}
+                                  {' '}
                                   Please Select
                                 </MenuItem>
-                                <MenuItem value="Days"> {"Days"} </MenuItem>
-                                <MenuItem value="Month"> {"Month"} </MenuItem>
-                                <MenuItem value="Year"> {"Year"} </MenuItem>
+                                <MenuItem value="Days"> {'Days'} </MenuItem>
+                                <MenuItem value="Month"> {'Month'} </MenuItem>
+                                <MenuItem value="Year"> {'Year'} </MenuItem>
                               </Select>
                             </Grid>
                           </Grid>
@@ -7435,10 +6310,8 @@ function Stockpurchaserequest() {
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          {" "}
-                          Vendor Group Name<b style={{ color: "red" }}>
-                            *
-                          </b>{" "}
+                          {' '}
+                          Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <Selects
                           options={vendorGroupOpt}
@@ -7455,7 +6328,7 @@ function Stockpurchaserequest() {
                     <Grid item md={2.5} xs={12} sm={12}>
                       <FormControl size="small" fullWidth>
                         <Typography>
-                          Vendor Name <b style={{ color: "red" }}>*</b>{" "}
+                          Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <Selects
                           options={vendormaster}
@@ -7478,35 +6351,30 @@ function Stockpurchaserequest() {
                       <Button
                         variant="contained"
                         style={{
-                          height: "30px",
-                          minWidth: "20px",
-                          padding: "19px 13px",
-                          color: "white",
-                          marginTop: "20px",
-                          background: "rgb(25, 118, 210)",
+                          height: '30px',
+                          minWidth: '20px',
+                          padding: '19px 13px',
+                          color: 'white',
+                          marginTop: '20px',
+                          background: 'rgb(25, 118, 210)',
                         }}
                         onClick={() => {
                           handleClickOpenviewalertvendor();
                         }}
                       >
-                        <FaPlus style={{ fontSize: "15px" }} />
+                        <FaPlus style={{ fontSize: '15px' }} />
                       </Button>
                     </Grid>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>GST No </Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="text"
-                          value={vendorgetid?.gstnumber}
-                          readOnly
-                        />
+                        <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
                       </FormControl>
                     </Grid>
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Bill No <b style={{ color: "red" }}>*</b>{" "}
+                          Bill No <b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -7523,11 +6391,11 @@ function Stockpurchaserequest() {
                         />
                       </FormControl>
                     </Grid>
-                    {stockmasterupdate.warranty === "Yes" && (
+                    {stockmasterupdate.warranty === 'Yes' && (
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Warranty Details <b style={{ color: "red" }}>*</b>{" "}
+                            Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -7548,7 +6416,7 @@ function Stockpurchaserequest() {
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Rate<b style={{ color: "red" }}>*</b>{" "}
+                          Rate<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -7568,20 +6436,15 @@ function Stockpurchaserequest() {
                     <Grid item md={3} sm={12} xs={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Total Bill Amount<b style={{ color: "red" }}>*</b>{" "}
+                          Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="number"
-                          sx={userStyle.input}
-                          value={totalQuantity * stockmasterupdate.rate}
-                        />
+                        <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={totalQuantity * stockmasterupdate.rate} />
                       </FormControl>
                     </Grid>
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Bill Date <b style={{ color: "red" }}>*</b>{" "}
+                          Bill Date <b style={{ color: 'red' }}>*</b>{' '}
                         </Typography>
                         <TextField
                           size="small"
@@ -7598,27 +6461,19 @@ function Stockpurchaserequest() {
                     </Grid>
                     <Grid item md={3} xs={12} sm={12}>
                       <Typography>
-                        Bill <b style={{ color: "red" }}>*</b>{" "}
+                        Bill <b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
-                      <Box sx={{ display: "flex", justifyContent: "left" }}>
-                        <Button
-                          variant="contained"
-                          onClick={() => handleClickUploadPopupOpenedit()}
-                        >
+                      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                        <Button variant="contained" onClick={() => handleClickUploadPopupOpenedit()}>
                           Upload
                         </Button>
                       </Box>
                     </Grid>
-                    {stockmasterupdate.warranty === "Yes" && (
+                    {stockmasterupdate.warranty === 'Yes' && (
                       <Grid item md={3} xs={12} sm={12}>
                         <Typography>Warranty Card </Typography>
-                        <Box sx={{ display: "flex", justifyContent: "left" }}>
-                          <Button
-                            variant="contained"
-                            onClick={() =>
-                              handleClickUploadPopupOpenwarrantyedit()
-                            }
-                          >
+                        <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                          <Button variant="contained" onClick={() => handleClickUploadPopupOpenwarrantyedit()}>
                             Upload
                           </Button>
                         </Box>
@@ -7631,16 +6486,12 @@ function Stockpurchaserequest() {
                   <Grid container>
                     <Grid item md={3} xs={12} sm={6}>
                       {btnSubmit ? (
-                        <Box sx={{ display: "flex" }}>
+                        <Box sx={{ display: 'flex' }}>
                           <CircularProgress />
                         </Box>
                       ) : (
                         <>
-                          <Button
-                            variant="contained"
-                            sx={buttonStyles.buttonsubmit}
-                            onClick={handleSubmitUpdate}
-                          >
+                          <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmitUpdate}>
                             Create
                           </Button>
                         </>
@@ -7652,13 +6503,9 @@ function Stockpurchaserequest() {
                       </Button>
                     </Grid>
                     <Grid item md={3} xs={12} sm={6}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleClosestockupdate}
-                      >
-                        {" "}
-                        Back{" "}
+                      <Button variant="contained" color="primary" onClick={handleClosestockupdate}>
+                        {' '}
+                        Back{' '}
                       </Button>
                     </Grid>
                   </Grid>
@@ -7670,65 +6517,35 @@ function Stockpurchaserequest() {
         </Dialog>
 
         {/* ALERT DIALOG */}
-        <Dialog
-          open={isCheckOpen}
-          onClose={handleCloseCheck}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
-            <ErrorOutlineOutlinedIcon
-              sx={{ fontSize: "80px", color: "orange" }}
-            />
-            <Typography
-              variant="h6"
-              sx={{ color: "black", textAlign: "center" }}
-            >
-              {checkvendor?.length > 0 &&
-                checkcategory?.length > 0 &&
-                checksubcategory?.length > 0 &&
-                checktimepoints?.length > 0 ? (
+        <Dialog open={isCheckOpen} onClose={handleCloseCheck} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+            <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
+              {checkvendor?.length > 0 && checkcategory?.length > 0 && checksubcategory?.length > 0 && checktimepoints?.length > 0 ? (
                 <>
-                  <span style={{ fontWeight: "700", color: "#777" }}>
-                    {`${deleteproject.name} `}
-                  </span>
-                  was linked in{" "}
-                  <span style={{ fontWeight: "700" }}>
-                    Vendor, Category, Subcategory & Time and points{" "}
-                  </span>
+                  <span style={{ fontWeight: '700', color: '#777' }}>{`${deleteproject.name} `}</span>
+                  was linked in <span style={{ fontWeight: '700' }}>Vendor, Category, Subcategory & Time and points </span>
                 </>
-              ) : checkvendor?.length > 0 ||
-                checkcategory?.length > 0 ||
-                checksubcategory?.length > 0 ||
-                checktimepoints?.length > 0 ? (
+              ) : checkvendor?.length > 0 || checkcategory?.length > 0 || checksubcategory?.length > 0 || checktimepoints?.length > 0 ? (
                 <>
-                  <span style={{ fontWeight: "700", color: "#777" }}>
-                    {`${deleteproject.name} `}
-                  </span>
-                  was linked in{" "}
-                  <span style={{ fontWeight: "700" }}>
-                    {checkvendor?.length ? " Vendor" : ""}
-                    {checkcategory?.length ? " Category" : ""}
-                    {checksubcategory?.length ? " Subcategory" : ""}
-                    {checktimepoints?.length ? " Time and points" : ""}
+                  <span style={{ fontWeight: '700', color: '#777' }}>{`${deleteproject.name} `}</span>
+                  was linked in{' '}
+                  <span style={{ fontWeight: '700' }}>
+                    {checkvendor?.length ? ' Vendor' : ''}
+                    {checkcategory?.length ? ' Category' : ''}
+                    {checksubcategory?.length ? ' Subcategory' : ''}
+                    {checktimepoints?.length ? ' Time and points' : ''}
                   </span>
                 </>
               ) : (
-                ""
+                ''
               )}
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={handleCloseCheck}
-              autoFocus
-              variant="contained"
-              color="error"
-            >
-              {" "}
-              OK{" "}
+            <Button onClick={handleCloseCheck} autoFocus variant="contained" color="error">
+              {' '}
+              OK{' '}
             </Button>
           </DialogActions>
         </Dialog>
@@ -7746,19 +6563,17 @@ function Stockpurchaserequest() {
             // "& .MuiPaper-root": {
             //   overflow: "visible",
             // },
-            marginTop: "95px",
+            marginTop: '95px',
           }}
           fullWidth={true}
         >
-          {isUserRoleCompare?.includes("avendormaster") && (
+          {isUserRoleCompare?.includes('avendormaster') && (
             <Box sx={userStyle.dialogbox}>
               <>
                 <Grid container spacing={2}>
                   <Grid item xs={8}>
-                    {" "}
-                    <Typography sx={{ fontWeight: "bold" }}>
-                      Add Vendor
-                    </Typography>{" "}
+                    {' '}
+                    <Typography sx={{ fontWeight: 'bold' }}>Add Vendor</Typography>{' '}
                   </Grid>
                 </Grid>
                 <br />
@@ -7767,17 +6582,13 @@ function Stockpurchaserequest() {
                     <FormControl fullWidth size="small">
                       {cateCode &&
                         cateCode.map(() => {
-                          let strings = "VEN";
+                          let strings = 'VEN';
                           let refNo = cateCode[cateCode?.length - 1]?.vendorid;
                           let digits = (cateCode?.length + 1).toString();
                           const stringLength = refNo?.length;
                           let lastChar = refNo?.charAt(stringLength - 1);
-                          let getlastBeforeChar = refNo?.charAt(
-                            stringLength - 2
-                          );
-                          let getlastThreeChar = refNo?.charAt(
-                            stringLength - 3
-                          );
+                          let getlastBeforeChar = refNo?.charAt(stringLength - 2);
+                          let getlastThreeChar = refNo?.charAt(stringLength - 3);
                           let lastBeforeChar = refNo?.slice(-2);
                           let lastThreeChar = refNo?.slice(-3);
                           let lastDigit = refNo?.slice(-4);
@@ -7785,42 +6596,27 @@ function Stockpurchaserequest() {
                           let refLstTwo = parseInt(lastBeforeChar) + 1;
                           let refLstThree = parseInt(lastThreeChar) + 1;
                           let refLstDigit = parseInt(lastDigit) + 1;
-                          if (
-                            digits.length < 4 &&
-                            getlastBeforeChar == 0 &&
-                            getlastThreeChar == 0
-                          ) {
-                            refNOINC = ("000" + refNOINC)?.substr(-4);
+                          if (digits.length < 4 && getlastBeforeChar == 0 && getlastThreeChar == 0) {
+                            refNOINC = ('000' + refNOINC)?.substr(-4);
                             newval = strings + refNOINC;
-                          } else if (
-                            digits.length < 4 &&
-                            getlastBeforeChar > 0 &&
-                            getlastThreeChar == 0
-                          ) {
-                            refNOINC = ("00" + refLstTwo)?.substr(-4);
+                          } else if (digits.length < 4 && getlastBeforeChar > 0 && getlastThreeChar == 0) {
+                            refNOINC = ('00' + refLstTwo)?.substr(-4);
                             newval = strings + refNOINC;
-                          } else if (
-                            digits.length < 4 &&
-                            getlastThreeChar > 0
-                          ) {
-                            refNOINC = ("0" + refLstThree)?.substr(-4);
+                          } else if (digits.length < 4 && getlastThreeChar > 0) {
+                            refNOINC = ('0' + refLstThree)?.substr(-4);
                             newval = strings + refNOINC;
                           }
                         })}
                       <Typography>
-                        Vendor ID <b style={{ color: "red" }}>*</b>{" "}
+                        Vendor ID <b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        placeholder="Please Enter Vendor Id"
-                        value={newval}
-                      />
+                      <OutlinedInput id="component-outlined" placeholder="Please Enter Vendor Id" value={newval} />
                     </FormControl>
                   </Grid>
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Vendor Name <b style={{ color: "red" }}>*</b>
+                        Vendor Name <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -7877,14 +6673,11 @@ function Stockpurchaserequest() {
                       </FormGroup>
                     </Grid>
                   </Grid>
-                  <Grid item md={12} xs={12} sm={12} sx={{ display: "flex" }}>
+                  <Grid item md={12} xs={12} sm={12} sx={{ display: 'flex' }}>
                     <Grid item md={3} sm={12} xs={12}>
                       <Typography>Photograph</Typography>
-                      <Box sx={{ display: "flex", justifyContent: "left" }}>
-                        <Button
-                          sx={buttonStyles.buttonsubmit}
-                          onClick={handleClickUploadPopupOpen}
-                        >
+                      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                        <Button sx={buttonStyles.buttonsubmit} onClick={handleClickUploadPopupOpen}>
                           Upload
                         </Button>
                       </Box>
@@ -7899,15 +6692,12 @@ function Stockpurchaserequest() {
                                 src={file.preview}
                                 alt={file.name}
                                 style={{
-                                  maxWidth: "70px",
-                                  maxHeight: "70px",
-                                  marginTop: "10px",
+                                  maxWidth: '70px',
+                                  maxHeight: '70px',
+                                  marginTop: '10px',
                                 }}
                               />
-                              <Button
-                                onClick={() => handleRemoveFile(index)}
-                                style={{ marginTop: "0px", color: "red" }}
-                              >
+                              <Button onClick={() => handleRemoveFile(index)} style={{ marginTop: '0px', color: 'red' }}>
                                 X
                               </Button>
                             </>
@@ -7922,18 +6712,13 @@ function Stockpurchaserequest() {
                             <Grid item md={2} sm={2} xs={12}>
                               <Box
                                 style={{
-                                  isplay: "flex",
-                                  justifyContent: "center",
-                                  alignItems: "center",
-                                  marginLeft: "37px",
+                                  isplay: 'flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  marginLeft: '37px',
                                 }}
                               >
-                                <img
-                                  src={image.preview}
-                                  alt={image.name}
-                                  height={50}
-                                  style={{ maxWidth: "-webkit-fill-available" }}
-                                />
+                                <img src={image.preview} alt={image.name} height={50} style={{ maxWidth: '-webkit-fill-available' }} />
                               </Box>
                             </Grid>
                             <Grid
@@ -7942,55 +6727,52 @@ function Stockpurchaserequest() {
                               sm={7}
                               xs={12}
                               sx={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
                               }}
                             >
-                              <Typography variant="subtitle2">
-                                {" "}
-                                {image.name}{" "}
-                              </Typography>
+                              <Typography variant="subtitle2"> {image.name} </Typography>
                             </Grid>
                             <Grid item md={1} sm={1} xs={12}>
-                              <Grid sx={{ display: "flex" }}>
+                              <Grid sx={{ display: 'flex' }}>
                                 <Button
                                   sx={{
-                                    marginTop: "15px !important",
-                                    padding: "14px 14px",
-                                    minWidth: "40px !important",
-                                    borderRadius: "50% !important",
-                                    ":hover": {
-                                      backgroundColor: "#80808036", // theme.palette.primary.main
+                                    marginTop: '15px !important',
+                                    padding: '14px 14px',
+                                    minWidth: '40px !important',
+                                    borderRadius: '50% !important',
+                                    ':hover': {
+                                      backgroundColor: '#80808036', // theme.palette.primary.main
                                     },
                                   }}
                                   onClick={() => renderFilePreview(image)}
                                 >
                                   <VisibilityOutlinedIcon
                                     style={{
-                                      fontsize: "12px",
-                                      color: "#357AE8",
-                                      marginTop: "35px !important",
+                                      fontsize: '12px',
+                                      color: '#357AE8',
+                                      marginTop: '35px !important',
                                     }}
                                   />
                                 </Button>
                                 <Button
                                   sx={{
-                                    marginTop: "15px !important",
-                                    padding: "14px 14px",
-                                    minWidth: "40px !important",
-                                    borderRadius: "50% !important",
-                                    ":hover": {
-                                      backgroundColor: "#80808036",
+                                    marginTop: '15px !important',
+                                    padding: '14px 14px',
+                                    minWidth: '40px !important',
+                                    borderRadius: '50% !important',
+                                    ':hover': {
+                                      backgroundColor: '#80808036',
                                     },
                                   }}
                                   onClick={() => removeCapturedImage(index)}
                                 >
                                   <FaTrash
                                     style={{
-                                      color: "#a73131",
-                                      fontSize: "12px",
-                                      marginTop: "35px !important",
+                                      color: '#a73131',
+                                      fontSize: '12px',
+                                      marginTop: '35px !important',
                                     }}
                                   />
                                 </Button>
@@ -8005,27 +6787,22 @@ function Stockpurchaserequest() {
                           <Grid item md={2} sm={2} xs={2}>
                             <Box
                               style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
                               }}
                             >
-                              {file?.type?.includes("image/") ? (
+                              {file?.type?.includes('image/') ? (
                                 <img
                                   src={file.preview}
                                   alt={file.name}
                                   height={50}
                                   style={{
-                                    maxWidth: "-webkit-fill-available",
+                                    maxWidth: '-webkit-fill-available',
                                   }}
                                 />
                               ) : (
-                                <img
-                                  className={classes.preview}
-                                  src={getFileIcon(file.name)}
-                                  height="10"
-                                  alt="file icon"
-                                />
+                                <img className={classes.preview} src={getFileIcon(file.name)} height="10" alt="file icon" />
                               )}
                             </Box>
                           </Grid>
@@ -8035,47 +6812,40 @@ function Stockpurchaserequest() {
                             sm={7}
                             xs={7}
                             sx={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
                             }}
                           >
-                            <Typography variant="subtitle2">
-                              {" "}
-                              {file.name}{" "}
-                            </Typography>
+                            <Typography variant="subtitle2"> {file.name} </Typography>
                           </Grid>
                           <Grid item md={1} sm={1} xs={1}>
-                            <Grid sx={{ display: "flex" }}>
+                            <Grid sx={{ display: 'flex' }}>
                               <Button
                                 sx={{
-                                  padding: "14px 14px",
-                                  minWidth: "40px !important",
-                                  borderRadius: "50% !important",
-                                  ":hover": {
-                                    backgroundColor: "#80808036", // theme.palette.primary.main
+                                  padding: '14px 14px',
+                                  minWidth: '40px !important',
+                                  borderRadius: '50% !important',
+                                  ':hover': {
+                                    backgroundColor: '#80808036', // theme.palette.primary.main
                                   },
                                 }}
                                 onClick={() => renderFilePreview(file)}
                               >
-                                <VisibilityOutlinedIcon
-                                  style={{ fontsize: "12px", color: "#357AE8" }}
-                                />
+                                <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                               </Button>
                               <Button
                                 sx={{
-                                  padding: "14px 14px",
-                                  minWidth: "40px !important",
-                                  borderRadius: "50% !important",
-                                  ":hover": {
-                                    backgroundColor: "#80808036", // theme.palette.primary.main
+                                  padding: '14px 14px',
+                                  minWidth: '40px !important',
+                                  borderRadius: '50% !important',
+                                  ':hover': {
+                                    backgroundColor: '#80808036', // theme.palette.primary.main
                                   },
                                 }}
                                 onClick={() => handleDeleteFile(index)}
                               >
-                                <FaTrash
-                                  style={{ color: "#a73131", fontSize: "12px" }}
-                                />
+                                <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                               </Button>
                             </Grid>
                           </Grid>
@@ -8084,9 +6854,7 @@ function Stockpurchaserequest() {
                     </Grid>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography sx={{ fontWeight: "bold" }}>
-                      Alternate Phone Number
-                    </Typography>
+                    <Typography sx={{ fontWeight: 'bold' }}>Alternate Phone Number</Typography>
                   </Grid>
                   <br />
                   <Grid item md={3} xs={12} sm={12}>
@@ -8178,7 +6946,7 @@ function Stockpurchaserequest() {
                   <Grid item lg={3} md={4} xs={12} sm={6}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Address <b style={{ color: "red" }}>*</b>
+                        Address <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <TextareaAutosize
                         aria-label="minimum height"
@@ -8197,20 +6965,20 @@ function Stockpurchaserequest() {
                       <Selects
                         options={Country.getAllCountries()}
                         getOptionLabel={(options) => {
-                          return options["name"];
+                          return options['name'];
                         }}
                         getOptionValue={(options) => {
-                          return options["name"];
+                          return options['name'];
                         }}
                         value={selectedCountryp}
                         onChange={(item) => {
                           setSelectedCountryp(item);
                           setVendor((prevSupplier) => ({
                             ...prevSupplier,
-                            country: item?.name || "",
+                            country: item?.name || '',
                           }));
-                          setSelectedStatep("");
-                          setSelectedCityp("");
+                          setSelectedStatep('');
+                          setSelectedCityp('');
                         }}
                       />
                     </FormControl>
@@ -8219,23 +6987,21 @@ function Stockpurchaserequest() {
                     <FormControl fullWidth size="small">
                       <Typography>State</Typography>
                       <Selects
-                        options={State?.getStatesOfCountry(
-                          selectedCountryp?.isoCode
-                        )}
+                        options={State?.getStatesOfCountry(selectedCountryp?.isoCode)}
                         getOptionLabel={(options) => {
-                          return options["name"];
+                          return options['name'];
                         }}
                         getOptionValue={(options) => {
-                          return options["name"];
+                          return options['name'];
                         }}
                         value={selectedStatep}
                         onChange={(item) => {
                           setSelectedStatep(item);
                           setVendor((prevSupplier) => ({
                             ...prevSupplier,
-                            state: item?.name || "",
+                            state: item?.name || '',
                           }));
-                          setSelectedCityp("");
+                          setSelectedCityp('');
                         }}
                       />
                     </FormControl>
@@ -8244,22 +7010,19 @@ function Stockpurchaserequest() {
                     <FormControl fullWidth size="small">
                       <Typography>City</Typography>
                       <Selects
-                        options={City.getCitiesOfState(
-                          selectedStatep?.countryCode,
-                          selectedStatep?.isoCode
-                        )}
+                        options={City.getCitiesOfState(selectedStatep?.countryCode, selectedStatep?.isoCode)}
                         getOptionLabel={(options) => {
-                          return options["name"];
+                          return options['name'];
                         }}
                         getOptionValue={(options) => {
-                          return options["name"];
+                          return options['name'];
                         }}
                         value={selectedCityp}
                         onChange={(item) => {
                           setSelectedCityp(item);
                           setVendor((prevSupplier) => ({
                             ...prevSupplier,
-                            city: item?.name || "",
+                            city: item?.name || '',
                           }));
                         }}
                       />
@@ -8366,19 +7129,15 @@ function Stockpurchaserequest() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Status<b style={{ color: "red" }}>*</b>
+                        Status<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         maxMenuHeight={250}
                         options={vendorstatusopt}
                         placeholder="Please Choose Status"
                         value={{
-                          label: !vendor.vendorstatus
-                            ? "Please Select Status"
-                            : vendor.vendorstatus,
-                          value: !vendor.vendorstatus
-                            ? "Please Select Status"
-                            : vendor.vendorstatus,
+                          label: !vendor.vendorstatus ? 'Please Select Status' : vendor.vendorstatus,
+                          value: !vendor.vendorstatus ? 'Please Select Status' : vendor.vendorstatus,
                         }}
                         onChange={(e) => {
                           setVendor({ ...vendor, vendorstatus: e.value });
@@ -8390,7 +7149,7 @@ function Stockpurchaserequest() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Payment Frequency<b style={{ color: "red" }}>*</b>
+                        Payment Frequency<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         maxMenuHeight={250}
@@ -8406,23 +7165,19 @@ function Stockpurchaserequest() {
                       />
                     </FormControl>
                   </Grid>
-                  {vendor.paymentfrequency === "Monthly" && (
+                  {vendor.paymentfrequency === 'Monthly' && (
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Monthly Date<b style={{ color: "red" }}>*</b>
+                          Monthly Date<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           maxMenuHeight={250}
                           options={dateOption}
                           placeholder="Please Choose Monthly Date"
                           value={{
-                            label: !vendor.monthlyfrequency
-                              ? "Please Select Monthly Frequency"
-                              : vendor.monthlyfrequency,
-                            value: !vendor.monthlyfrequency
-                              ? "Please Select Monthly Frequency"
-                              : vendor.monthlyfrequency,
+                            label: !vendor.monthlyfrequency ? 'Please Select Monthly Frequency' : vendor.monthlyfrequency,
+                            value: !vendor.monthlyfrequency ? 'Please Select Monthly Frequency' : vendor.monthlyfrequency,
                           }}
                           onChange={(e) => {
                             setVendor({
@@ -8434,23 +7189,19 @@ function Stockpurchaserequest() {
                       </FormControl>
                     </Grid>
                   )}
-                  {vendor.paymentfrequency === "Weekly" && (
+                  {vendor.paymentfrequency === 'Weekly' && (
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Weekly Days<b style={{ color: "red" }}>*</b>
+                          Weekly Days<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           maxMenuHeight={250}
                           options={dayOptions}
                           placeholder="Please Choose Monthly Date"
                           value={{
-                            label: !vendor.weeklyfrequency
-                              ? "Please Select Weekly Frequency"
-                              : vendor.weeklyfrequency,
-                            value: !vendor.weeklyfrequency
-                              ? "Please Select Weekly Frequency"
-                              : vendor.weeklyfrequency,
+                            label: !vendor.weeklyfrequency ? 'Please Select Weekly Frequency' : vendor.weeklyfrequency,
+                            value: !vendor.weeklyfrequency ? 'Please Select Weekly Frequency' : vendor.weeklyfrequency,
                           }}
                           onChange={(e) => {
                             setVendor({
@@ -8462,10 +7213,10 @@ function Stockpurchaserequest() {
                       </FormControl>
                     </Grid>
                   )}
-                  <Grid item md={3} xs={12} sm={12} sx={{ display: "flex" }}>
+                  <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Mode of Payments<b style={{ color: "red" }}>*</b>
+                        Mode of Payments<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         maxMenuHeight={250}
@@ -8487,10 +7238,10 @@ function Stockpurchaserequest() {
                       onClick={handlemodeofpay}
                       type="button"
                       sx={{
-                        height: "30px",
-                        minWidth: "30px",
-                        marginTop: "28px",
-                        padding: "6px 10px",
+                        height: '30px',
+                        minWidth: '30px',
+                        marginTop: '28px',
+                        padding: '6px 10px',
                       }}
                     >
                       <FaPlus />
@@ -8499,40 +7250,28 @@ function Stockpurchaserequest() {
                   </Grid>
                 </Grid>
                 <br />
-                {modeofpay.includes("Cash") && (
+                {modeofpay.includes('Cash') && (
                   <>
                     <br />
                     <Grid container spacing={2}>
-                      <Grid
-                        item
-                        md={3}
-                        xs={12}
-                        sm={12}
-                        sx={{ display: "flex" }}
-                      >
+                      <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                         <FormControl fullWidth size="small">
-                          <Typography sx={{ fontWeight: "bold" }}>
-                            Cash <b style={{ color: "red" }}>*</b>
+                          <Typography sx={{ fontWeight: 'bold' }}>
+                            Cash <b style={{ color: 'red' }}>*</b>
                           </Typography>
-                          <OutlinedInput
-                            id="component-outlined"
-                            type="text"
-                            readOnly={true}
-                            value={"Cash"}
-                            onChange={(e) => { }}
-                          />
+                          <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => {}} />
                         </FormControl>
                         &nbsp; &emsp;
                         <Button
                           variant="contained"
                           color="error"
                           type="button"
-                          onClick={(e) => deleteTodo("Cash")}
+                          onClick={(e) => deleteTodo('Cash')}
                           sx={{
-                            height: "30px",
-                            minWidth: "30px",
-                            marginTop: "28px",
-                            padding: "6px 10px",
+                            height: '30px',
+                            minWidth: '30px',
+                            marginTop: '28px',
+                            padding: '6px 10px',
                           }}
                         >
                           <AiOutlineClose />
@@ -8543,13 +7282,11 @@ function Stockpurchaserequest() {
                 )}
                 <br />
                 <br />
-                {modeofpay.includes("Bank Transfer") && (
+                {modeofpay.includes('Bank Transfer') && (
                   <>
                     <Grid container spacing={2}>
                       <Grid item xs={8}>
-                        <Typography sx={{ fontWeight: "bold" }}>
-                          Bank Details
-                        </Typography>
+                        <Typography sx={{ fontWeight: 'bold' }}>Bank Details</Typography>
                       </Grid>
                     </Grid>
                     <br />
@@ -8557,7 +7294,7 @@ function Stockpurchaserequest() {
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Bank Name<b style={{ color: "red" }}>*</b>
+                            Bank Name<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <Selects
                             maxMenuHeight={250}
@@ -8576,7 +7313,7 @@ function Stockpurchaserequest() {
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Bank Branch Name<b style={{ color: "red" }}>*</b>
+                            Bank Branch Name<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8598,7 +7335,7 @@ function Stockpurchaserequest() {
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Account Holder Name<b style={{ color: "red" }}>*</b>
+                            Account Holder Name<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8620,7 +7357,7 @@ function Stockpurchaserequest() {
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Account Number<b style={{ color: "red" }}>*</b>
+                            Account Number<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8640,16 +7377,10 @@ function Stockpurchaserequest() {
                           />
                         </FormControl>
                       </Grid>
-                      <Grid
-                        item
-                        md={3}
-                        xs={12}
-                        sm={12}
-                        sx={{ display: "flex" }}
-                      >
+                      <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            IFSC Code<b style={{ color: "red" }}>*</b>
+                            IFSC Code<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8669,12 +7400,12 @@ function Stockpurchaserequest() {
                           variant="contained"
                           color="error"
                           type="button"
-                          onClick={(e) => deleteTodo("Bank Transfer")}
+                          onClick={(e) => deleteTodo('Bank Transfer')}
                           sx={{
-                            height: "30px",
-                            minWidth: "30px",
-                            marginTop: "28px",
-                            padding: "6px 10px",
+                            height: '30px',
+                            minWidth: '30px',
+                            marginTop: '28px',
+                            padding: '6px 10px',
                           }}
                         >
                           <AiOutlineClose />
@@ -8684,27 +7415,19 @@ function Stockpurchaserequest() {
                   </>
                 )}
                 <br /> <br />
-                {modeofpay.includes("UPI") && (
+                {modeofpay.includes('UPI') && (
                   <>
                     <Grid container spacing={2}>
                       <Grid item xs={8}>
-                        <Typography sx={{ fontWeight: "bold" }}>
-                          UPI Details
-                        </Typography>
+                        <Typography sx={{ fontWeight: 'bold' }}>UPI Details</Typography>
                       </Grid>
                     </Grid>
                     <br />
                     <Grid container spacing={2}>
-                      <Grid
-                        item
-                        md={3}
-                        xs={12}
-                        sm={12}
-                        sx={{ display: "flex" }}
-                      >
+                      <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            UPI Number<b style={{ color: "red" }}>*</b>
+                            UPI Number<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8725,12 +7448,12 @@ function Stockpurchaserequest() {
                           variant="contained"
                           color="error"
                           type="button"
-                          onClick={(e) => deleteTodo("UPI")}
+                          onClick={(e) => deleteTodo('UPI')}
                           sx={{
-                            height: "30px",
-                            minWidth: "30px",
-                            marginTop: "28px",
-                            padding: "6px 10px",
+                            height: '30px',
+                            minWidth: '30px',
+                            marginTop: '28px',
+                            padding: '6px 10px',
                           }}
                         >
                           <AiOutlineClose />
@@ -8740,13 +7463,11 @@ function Stockpurchaserequest() {
                   </>
                 )}
                 <br /> <br />
-                {modeofpay.includes("Card") && (
+                {modeofpay.includes('Card') && (
                   <>
                     <Grid container spacing={2}>
                       <Grid item xs={8}>
-                        <Typography sx={{ fontWeight: "bold" }}>
-                          Card Details
-                        </Typography>
+                        <Typography sx={{ fontWeight: 'bold' }}>Card Details</Typography>
                       </Grid>
                     </Grid>
                     <br />
@@ -8754,7 +7475,7 @@ function Stockpurchaserequest() {
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Card Number<b style={{ color: "red" }}>*</b>
+                            Card Number<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8777,7 +7498,7 @@ function Stockpurchaserequest() {
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Card Holder Name<b style={{ color: "red" }}>*</b>
+                            Card Holder Name<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8800,7 +7521,7 @@ function Stockpurchaserequest() {
                         <FormControl fullWidth size="small">
                           <Typography>
                             Card Transaction Number
-                            <b style={{ color: "red" }}>*</b>
+                            <b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8822,7 +7543,7 @@ function Stockpurchaserequest() {
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Card Type<b style={{ color: "red" }}>*</b>
+                            Card Type<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <Selects
                             maxMenuHeight={250}
@@ -8840,7 +7561,7 @@ function Stockpurchaserequest() {
                       </Grid>
                       <Grid item md={3} xs={12} sm={6}>
                         <Typography>
-                          Expire At<b style={{ color: "red" }}>*</b>
+                          Expire At<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Grid container spacing={1}>
                           <Grid item md={6} xs={12} sm={6}>
@@ -8879,16 +7600,10 @@ function Stockpurchaserequest() {
                           </Grid>
                         </Grid>
                       </Grid>
-                      <Grid
-                        item
-                        md={3}
-                        xs={12}
-                        sm={12}
-                        sx={{ display: "flex" }}
-                      >
+                      <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Security Code<b style={{ color: "red" }}>*</b>
+                            Security Code<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8909,12 +7624,12 @@ function Stockpurchaserequest() {
                           variant="contained"
                           color="error"
                           type="button"
-                          onClick={(e) => deleteTodo("Card")}
+                          onClick={(e) => deleteTodo('Card')}
                           sx={{
-                            height: "30px",
-                            minWidth: "30px",
-                            marginTop: "28px",
-                            padding: "6px 10px",
+                            height: '30px',
+                            minWidth: '30px',
+                            marginTop: '28px',
+                            padding: '6px 10px',
                           }}
                         >
                           <AiOutlineClose />
@@ -8924,27 +7639,19 @@ function Stockpurchaserequest() {
                   </>
                 )}
                 <br />
-                {modeofpay.includes("Cheque") && (
+                {modeofpay.includes('Cheque') && (
                   <>
                     <Grid container spacing={2}>
                       <Grid item xs={8}>
-                        <Typography sx={{ fontWeight: "bold" }}>
-                          Cheque Details
-                        </Typography>
+                        <Typography sx={{ fontWeight: 'bold' }}>Cheque Details</Typography>
                       </Grid>
                     </Grid>
                     <br />
                     <Grid container spacing={2}>
-                      <Grid
-                        item
-                        md={3}
-                        xs={12}
-                        sm={12}
-                        sx={{ display: "flex" }}
-                      >
+                      <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
                         <FormControl fullWidth size="small">
                           <Typography>
-                            Cheque Number<b style={{ color: "red" }}>*</b>
+                            Cheque Number<b style={{ color: 'red' }}>*</b>
                           </Typography>
                           <OutlinedInput
                             id="component-outlined"
@@ -8968,12 +7675,12 @@ function Stockpurchaserequest() {
                           variant="contained"
                           color="error"
                           type="button"
-                          onClick={(e) => deleteTodo("Cheque")}
+                          onClick={(e) => deleteTodo('Cheque')}
                           sx={{
-                            height: "30px",
-                            minWidth: "30px",
-                            marginTop: "28px",
-                            padding: "6px 10px",
+                            height: '30px',
+                            minWidth: '30px',
+                            marginTop: '28px',
+                            padding: '6px 10px',
                           }}
                         >
                           <AiOutlineClose />
@@ -8983,19 +7690,9 @@ function Stockpurchaserequest() {
                   </>
                 )}
                 <br />
-                <Grid
-                  container
-                  spacing={2}
-                  sx={{ display: "flex", justifyContent: "center" }}
-                >
+                <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                   <Grid item lg={1} md={2} sm={2} xs={12}>
-                    <Button
-                      onClick={handleSubmitvendor}
-                      disabled={isBtn}
-                      sx={buttonStyles.buttonsubmit}
-                      loadingPosition="end"
-                      variant="contained"
-                    >
+                    <Button onClick={handleSubmitvendor} disabled={isBtn} sx={buttonStyles.buttonsubmit} loadingPosition="end" variant="contained">
                       Submit
                     </Button>
                   </Grid>
@@ -9005,10 +7702,7 @@ function Stockpurchaserequest() {
                     </Button>
                   </Grid>
                   <Grid item lg={1} md={2} sm={2} xs={12}>
-                    <Button
-                      sx={buttonStyles.btncancel}
-                      onClick={handleCloseviewalertvendor}
-                    >
+                    <Button sx={buttonStyles.btncancel} onClick={handleCloseviewalertvendor}>
                       Cancel
                     </Button>
                   </Grid>
@@ -9026,9 +7720,9 @@ function Stockpurchaserequest() {
           aria-describedby="alert-dialog-description"
           maxWidth="md"
           sx={{
-            overflow: "visible",
-            "& .MuiPaper-root": {
-              overflow: "visible",
+            overflow: 'visible',
+            '& .MuiPaper-root': {
+              overflow: 'visible',
             },
           }}
           fullWidth={true}
@@ -9037,9 +7731,7 @@ function Stockpurchaserequest() {
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Manage UOM
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Manage UOM</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -9047,7 +7739,7 @@ function Stockpurchaserequest() {
                 <Grid item md={4} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Name<b style={{ color: "red" }}>*</b>
+                      Name<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -9066,12 +7758,8 @@ function Stockpurchaserequest() {
 
               <Grid container>
                 <Grid item md={3} xs={12} sm={6}>
-                  {isUserRoleCompare?.includes("bdstockpurchaserequest") && (
-                    <Button
-                      variant="contained"
-                      sx={buttonStyles.buttonsubmit}
-                      onClick={handleSubmituom}
-                    >
+                  {isUserRoleCompare?.includes('bdstockpurchaserequest') && (
+                    <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmituom}>
                       Submit
                     </Button>
                   )}
@@ -9082,10 +7770,7 @@ function Stockpurchaserequest() {
                   </Button>
                 </Grid>
                 <Grid item md={3} xs={12} sm={6}>
-                  <Button
-                    sx={buttonStyles.btncancel}
-                    onClick={handleCloseviewalertUom}
-                  >
+                  <Button sx={buttonStyles.btncancel} onClick={handleCloseviewalertUom}>
                     Cancel
                   </Button>
                 </Grid>
@@ -9101,9 +7786,9 @@ function Stockpurchaserequest() {
           aria-describedby="alert-dialog-description"
           maxWidth="md"
           sx={{
-            overflow: "visible",
-            "& .MuiPaper-root": {
-              overflow: "visible",
+            overflow: 'visible',
+            '& .MuiPaper-root': {
+              overflow: 'visible',
             },
           }}
           fullWidth={true}
@@ -9112,9 +7797,7 @@ function Stockpurchaserequest() {
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Manage Asset Material
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Manage Asset Material</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -9122,7 +7805,7 @@ function Stockpurchaserequest() {
                 <Grid item md={4} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <Typography>
-                      Asset Head <b style={{ color: "red" }}>*</b>{" "}
+                      Asset Head <b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={account}
@@ -9141,7 +7824,7 @@ function Stockpurchaserequest() {
                 <Grid item md={4} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Material Code <b style={{ color: "red" }}>*</b>
+                      Material Code <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -9157,7 +7840,7 @@ function Stockpurchaserequest() {
                 <Grid item md={3.5} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Material Name <b style={{ color: "red" }}>*</b>
+                      Material Name <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -9174,31 +7857,21 @@ function Stockpurchaserequest() {
               <br /> <br />
               <Grid container spacing={2}>
                 <Grid item md={2.5} xs={12} sm={6}>
-                  {isUserRoleCompare?.includes("bdstockpurchaserequest") && (
-                    <Button
-                      variant="contained"
-                      sx={buttonStyles.buttonsubmit}
-                      onClick={handleSubmitasset}
-                    >
+                  {isUserRoleCompare?.includes('bdstockpurchaserequest') && (
+                    <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmitasset}>
                       Submit
                     </Button>
                   )}
                 </Grid>
                 <Grid item md={2.5} xs={12} sm={6}>
-                  {isUserRoleCompare?.includes("bdstockpurchaserequest") && (
-                    <Button
-                      sx={buttonStyles.btncancel}
-                      onClick={handleClearasset}
-                    >
+                  {isUserRoleCompare?.includes('bdstockpurchaserequest') && (
+                    <Button sx={buttonStyles.btncancel} onClick={handleClearasset}>
                       Clear
                     </Button>
                   )}
                 </Grid>
                 <Grid item md={2.5} xs={12} sm={6}>
-                  <Button
-                    sx={buttonStyles.btncancel}
-                    onClick={handleCloseviewalertAsset}
-                  >
+                  <Button sx={buttonStyles.btncancel} onClick={handleCloseviewalertAsset}>
                     Cancel
                   </Button>
                 </Grid>
@@ -9343,40 +8016,19 @@ function Stockpurchaserequest() {
       </Dialog> */}
 
         {/* UPLOAD BILL IMAGE DIALOG EDIT*/}
-        <Dialog
-          open={uploadPopupOpenedit}
-          onClose={handleUploadPopupCloseedit}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="md"
-          sx={{ marginTop: "95px" }}
-        >
-          <DialogTitle
-            id="customized-dialog-title1"
-            sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
-          >
+        <Dialog open={uploadPopupOpenedit} onClose={handleUploadPopupCloseedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+          <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
             Upload Image Bill
           </DialogTitle>
-          <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+          <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
             <Grid container spacing={2}>
               <Grid item lg={12} md={12} sm={12} xs={12}>
                 <br />
                 <FormControl size="small" fullWidth>
-                  <Grid sx={{ display: "flex" }}>
-                    <Button
-                      variant="contained"
-                      component="label"
-                      sx={userStyle.uploadbtn}
-                    >
+                  <Grid sx={{ display: 'flex' }}>
+                    <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                       Upload
-                      <input
-                        type="file"
-                        multiple
-                        id="productimagbille"
-                        accept="image/*"
-                        hidden
-                        onChange={handleInputChangeedit}
-                      />
+                      <input type="file" multiple id="productimagbille" accept="image/*" hidden onChange={handleInputChangeedit} />
                     </Button>
                     &ensp;
                   </Grid>
@@ -9390,18 +8042,18 @@ function Stockpurchaserequest() {
                       <Grid item md={2} sm={2} xs={2}>
                         <Box
                           style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                           }}
                         >
-                          {file.type.includes("image/") ? (
+                          {file.type.includes('image/') ? (
                             <img
                               src={file.preview}
                               alt={file.name}
                               height={50}
                               style={{
-                                maxWidth: "-webkit-fill-available",
+                                maxWidth: '-webkit-fill-available',
                               }}
                             />
                           ) : (
@@ -9420,47 +8072,40 @@ function Stockpurchaserequest() {
                         sm={7}
                         xs={7}
                         sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
                         }}
                       >
-                        <Typography variant="subtitle2">
-                          {" "}
-                          {file.name}{" "}
-                        </Typography>
+                        <Typography variant="subtitle2"> {file.name} </Typography>
                       </Grid>
                       <Grid item md={2} sm={1} xs={1}>
-                        <Grid sx={{ display: "flex" }}>
+                        <Grid sx={{ display: 'flex' }}>
                           <Button
                             sx={{
-                              padding: "14px 14px",
-                              minWidth: "40px !important",
-                              borderRadius: "50% !important",
-                              ":hover": {
-                                backgroundColor: "#80808036", // theme.palette.primary.main
+                              padding: '14px 14px',
+                              minWidth: '40px !important',
+                              borderRadius: '50% !important',
+                              ':hover': {
+                                backgroundColor: '#80808036', // theme.palette.primary.main
                               },
                             }}
                             onClick={(e) => renderFilePreviewedit(file)}
                           >
-                            <VisibilityOutlinedIcon
-                              style={{ fontsize: "12px", color: "#357AE8" }}
-                            />
+                            <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                           </Button>
                           <Button
                             sx={{
-                              padding: "14px 14px",
-                              minWidth: "40px !important",
-                              borderRadius: "50% !important",
-                              ":hover": {
-                                backgroundColor: "#80808036", // theme.palette.primary.main
+                              padding: '14px 14px',
+                              minWidth: '40px !important',
+                              borderRadius: '50% !important',
+                              ':hover': {
+                                backgroundColor: '#80808036', // theme.palette.primary.main
                               },
                             }}
                             onClick={() => handleDeleteFileedit(index)}
                           >
-                            <FaTrash
-                              style={{ color: "#a73131", fontSize: "12px" }}
-                            />
+                            <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                           </Button>
                         </Grid>
                       </Grid>
@@ -9476,10 +8121,7 @@ function Stockpurchaserequest() {
             <Button onClick={resetImageedit} sx={userStyle.btncancel}>
               Reset
             </Button>
-            <Button
-              onClick={handleUploadPopupCloseedit}
-              sx={userStyle.btncancel}
-            >
+            <Button onClick={handleUploadPopupCloseedit} sx={userStyle.btncancel}>
               Cancel
             </Button>
           </DialogActions>
@@ -9624,40 +8266,19 @@ function Stockpurchaserequest() {
       </Dialog> */}
 
         {/* UPLOAD WARRANTY IMAGE DIALOG EDIT*/}
-        <Dialog
-          open={uploadPopupOpenwarrantyedit}
-          onClose={handleUploadPopupClosewarrantyedit}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="md"
-          sx={{ marginTop: "95px" }}
-        >
-          <DialogTitle
-            id="customized-dialog-title1"
-            sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
-          >
+        <Dialog open={uploadPopupOpenwarrantyedit} onClose={handleUploadPopupClosewarrantyedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+          <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
             Upload Image
           </DialogTitle>
-          <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+          <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
             <Grid container spacing={2}>
               <Grid item lg={12} md={12} sm={12} xs={12}>
                 <br />
                 <FormControl size="small" fullWidth>
-                  <Grid sx={{ display: "flex" }}>
-                    <Button
-                      variant="contained"
-                      component="label"
-                      sx={userStyle.uploadbtn}
-                    >
+                  <Grid sx={{ display: 'flex' }}>
+                    <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                       Upload
-                      <input
-                        type="file"
-                        multiple
-                        id="productimage"
-                        accept="image/*"
-                        hidden
-                        onChange={handleInputChangewarrantyedit}
-                      />
+                      <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangewarrantyedit} />
                     </Button>
                     &ensp;
                   </Grid>
@@ -9669,27 +8290,22 @@ function Stockpurchaserequest() {
                     <Grid item md={2} sm={2} xs={2}>
                       <Box
                         style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
                         }}
                       >
-                        {file.type.includes("image/") ? (
+                        {file.type.includes('image/') ? (
                           <img
                             src={file.preview}
                             alt={file.name}
                             height={50}
                             style={{
-                              maxWidth: "-webkit-fill-available",
+                              maxWidth: '-webkit-fill-available',
                             }}
                           />
                         ) : (
-                          <img
-                            className={classes.preview}
-                            src={getFileIconwarrantyedit(file.name)}
-                            height="10"
-                            alt="file icon"
-                          />
+                          <img className={classes.preview} src={getFileIconwarrantyedit(file.name)} height="10" alt="file icon" />
                         )}
                       </Box>
                     </Grid>
@@ -9699,44 +8315,40 @@ function Stockpurchaserequest() {
                       sm={7}
                       xs={7}
                       sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
                       <Typography variant="subtitle2"> {file.name} </Typography>
                     </Grid>
                     <Grid item md={1} sm={1} xs={1}>
-                      <Grid sx={{ display: "flex" }}>
+                      <Grid sx={{ display: 'flex' }}>
                         <Button
                           sx={{
-                            padding: "14px 14px",
-                            minWidth: "40px !important",
-                            borderRadius: "50% !important",
-                            ":hover": {
-                              backgroundColor: "#80808036", // theme.palette.primary.main
+                            padding: '14px 14px',
+                            minWidth: '40px !important',
+                            borderRadius: '50% !important',
+                            ':hover': {
+                              backgroundColor: '#80808036', // theme.palette.primary.main
                             },
                           }}
                           onClick={() => renderFilePreviewwarrantyedit(file)}
                         >
-                          <VisibilityOutlinedIcon
-                            style={{ fontsize: "12px", color: "#357AE8" }}
-                          />
+                          <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                         </Button>
                         <Button
                           sx={{
-                            padding: "14px 14px",
-                            minWidth: "40px !important",
-                            borderRadius: "50% !important",
-                            ":hover": {
-                              backgroundColor: "#80808036", // theme.palette.primary.main
+                            padding: '14px 14px',
+                            minWidth: '40px !important',
+                            borderRadius: '50% !important',
+                            ':hover': {
+                              backgroundColor: '#80808036', // theme.palette.primary.main
                             },
                           }}
                           onClick={() => handleDeleteFilewarrantyedit(index)}
                         >
-                          <FaTrash
-                            style={{ color: "#a73131", fontSize: "12px" }}
-                          />
+                          <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                         </Button>
                       </Grid>
                     </Grid>
@@ -9746,19 +8358,13 @@ function Stockpurchaserequest() {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={handleUploadOverAllwarrantyedit}
-              variant="contained"
-            >
+            <Button onClick={handleUploadOverAllwarrantyedit} variant="contained">
               Ok
             </Button>
             <Button onClick={resetImagewarrantyedit} sx={userStyle.btncancel}>
               Reset
             </Button>
-            <Button
-              onClick={handleUploadPopupClosewarrantyedit}
-              sx={userStyle.btncancel}
-            >
+            <Button onClick={handleUploadPopupClosewarrantyedit} sx={userStyle.btncancel}>
               Cancel
             </Button>
           </DialogActions>
@@ -9774,19 +8380,16 @@ function Stockpurchaserequest() {
               fullWidth={true}
               maxWidth="md"
               sx={{
-                overflow: "auto",
-                "& .MuiPaper-root": {
-                  overflow: "auto",
+                overflow: 'auto',
+                '& .MuiPaper-root': {
+                  overflow: 'auto',
                 },
-                marginTop: "50px",
+                marginTop: '50px',
               }}
             >
-              <Box sx={{ padding: "20px 50px" }}>
+              <Box sx={{ padding: '20px 50px' }}>
                 <>
-                  <Typography sx={userStyle.HeaderText}>
-                    {" "}
-                    Add Vendor Grouping
-                  </Typography>
+                  <Typography sx={userStyle.HeaderText}> Add Vendor Grouping</Typography>
                   <br />
                   <Grid container spacing={2}>
                     <Grid item md={4} xs={12} sm={4}>
@@ -9798,14 +8401,8 @@ function Stockpurchaserequest() {
                           disabled={isExitsVendor}
                           placeholder="Please Select Name"
                           value={{
-                            label:
-                              vendorgroup.vendorgroupname === ""
-                                ? "Please Select Name"
-                                : vendorgroup.vendorgroupname,
-                            value:
-                              vendorgroup.vendorgroupname === ""
-                                ? "Please Select Name"
-                                : vendorgroup.vendorgroupname,
+                            label: vendorgroup.vendorgroupname === '' ? 'Please Select Name' : vendorgroup.vendorgroupname,
+                            value: vendorgroup.vendorgroupname === '' ? 'Please Select Name' : vendorgroup.vendorgroupname,
                           }}
                           onChange={(e) => {
                             setIsExitsVendor(false);
@@ -9840,24 +8437,20 @@ function Stockpurchaserequest() {
                   <br />
                   <br />
                   <Grid container spacing={2}>
-                    <Button
-                      variant="contained"
-                      sx={buttonStyles.btnUpload}
-                      onClick={updateVendor}
-                    >
-                      {" "}
-                      Update{" "}
+                    <Button variant="contained" sx={buttonStyles.btnUpload} onClick={updateVendor}>
+                      {' '}
+                      Update{' '}
                     </Button>
                     <Button
                       variant="contained"
                       sx={buttonStyles.btncancel}
                       onClick={(e) => {
                         setIsExitsVendor(null);
-                        setVendorgroup({ vendorgroupname: "" });
+                        setVendorgroup({ vendorgroupname: '' });
                       }}
                     >
-                      {" "}
-                      Clear{" "}
+                      {' '}
+                      Clear{' '}
                     </Button>
                   </Grid>
                 </>
@@ -9868,19 +8461,9 @@ function Stockpurchaserequest() {
 
         {/* EXTERNAL COMPONENTS -------------- START */}
         {/* VALIDATION */}
-        <MessageAlert
-          openPopup={openPopupMalert}
-          handleClosePopup={handleClosePopupMalert}
-          popupContent={popupContentMalert}
-          popupSeverity={popupSeverityMalert}
-        />
+        <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
         {/* SUCCESS */}
-        <AlertDialog
-          openPopup={openPopup}
-          handleClosePopup={handleClosePopup}
-          popupContent={popupContent}
-          popupSeverity={popupSeverity}
-        />
+        <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
         {/* PRINT PDF EXCEL CSV */}
         <ExportData
           isFilterOpen={isFilterOpen}
@@ -9890,61 +8473,25 @@ function Stockpurchaserequest() {
           isPdfFilterOpen={isPdfFilterOpen}
           setIsPdfFilterOpen={setIsPdfFilterOpen}
           handleClosePdfFilterMod={handleClosePdfFilterMod}
-          filteredDataTwo={
-            (filteredChanges !== null ? filteredRowData : rowDataTable) ?? []
-          }
+          filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
           itemsTwo={overallFilterdata ?? []}
-          filename={"StockRequestToPurchase"}
+          filename={'StockRequestToPurchase'}
           exportColumnNames={exportColumnNames}
           exportRowValues={exportRowValues}
           componentRef={componentRef}
         />
         {/* INFO */}
-        <InfoPopup
-          openInfo={openInfo}
-          handleCloseinfo={handleCloseinfo}
-          heading="Stock Request To Purchase Info"
-          addedby={addedby}
-          updateby={updateby}
-        />
+        <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Stock Request To Purchase Info" addedby={addedby} updateby={updateby} />
         {/*SINGLE DELETE ALERT DIALOG ARE YOU SURE? */}
-        <DeleteConfirmation
-          open={isDeleteOpen}
-          onClose={handleCloseMod}
-          onConfirm={delProject}
-          title="Are you sure?"
-          confirmButtonText="Yes"
-          cancelButtonText="Cancel"
-        />
+        <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delProject} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
         {/*BULK DELETE ALERT DIALOG ARE YOU SURE? */}
-        <DeleteConfirmation
-          open={isDeleteOpencheckbox}
-          onClose={handleCloseModcheckbox}
-          onConfirm={delProjectcheckbox}
-          title="Are you sure?"
-          confirmButtonText="Yes"
-          cancelButtonText="Cancel"
-        />
+        <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delProjectcheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
         {/* PLEASE SELECT ANY ROW */}
-        <PleaseSelectRow
-          open={isDeleteOpenalert}
-          onClose={handleCloseModalert}
-          message="Please Select any Row"
-          iconColor="orange"
-          buttonText="OK"
-        />
-        <Dialog
-          open={uploadPopupOpen}
-          onClose={handleUploadPopupClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="md"
-          fullWidth={true}
-          sx={{ marginTop: "80px", zIndex: openPopupMalert ? 1400 : 1300 }}
-        >
+        <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
+        <Dialog open={uploadPopupOpen} onClose={handleUploadPopupClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth={true} sx={{ marginTop: '80px', zIndex: openPopupMalert ? 1400 : 1300 }}>
           <DialogTitle
             id="customized-dialog-title1"
-            sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
+            sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}
             onClick={() => {
               console.log(refImage);
               console.log(isLightColor);
@@ -9952,19 +8499,19 @@ function Stockpurchaserequest() {
           >
             Upload Image
           </DialogTitle>
-          <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+          <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
             <Grid container spacing={2}>
               <Grid item lg={12} md={12} sm={12} xs={12}>
-                <Typography variant="body2" style={{ marginTop: "5px" }}>
+                <Typography variant="body2" style={{ marginTop: '5px' }}>
                   Max File size: 5MB
                 </Typography>
                 {isLoading && (
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      marginTop: "5px",
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      marginTop: '5px',
                     }}
                   >
                     <Skeleton
@@ -9973,10 +8520,9 @@ function Stockpurchaserequest() {
                       height={25}
                       animation="wave"
                       sx={{
-                        bgcolor: "#f5f5f5", // Background color of the skeleton
-                        "&::after": {
-                          background:
-                            "linear-gradient(90deg, transparent, #1694f5, transparent)", // Wave color
+                        bgcolor: '#f5f5f5', // Background color of the skeleton
+                        '&::after': {
+                          background: 'linear-gradient(90deg, transparent, #1694f5, transparent)', // Wave color
                         },
                       }}
                     />
@@ -9984,11 +8530,7 @@ function Stockpurchaserequest() {
                   </Box>
                 )}
                 {/* {showDragField ? ( */}
-                <div
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                  onPaste={handlePaste}
-                >
+                <div onDragOver={handleDragOver} onDrop={handleDrop} onPaste={handlePaste}>
                   {previewURL && refImageDrag.length > 0 ? (
                     <>
                       {refImageDrag.map((file, index) => (
@@ -9997,31 +8539,28 @@ function Stockpurchaserequest() {
                             src={file.preview}
                             alt={file.name}
                             style={{
-                              maxWidth: "70px",
-                              maxHeight: "70px",
-                              marginTop: "10px",
+                              maxWidth: '70px',
+                              maxHeight: '70px',
+                              marginTop: '10px',
                             }}
                           />
-                          <Button
-                            onClick={() => handleRemoveFile(index)}
-                            style={{ marginTop: "0px", color: "red" }}
-                          >
+                          <Button onClick={() => handleRemoveFile(index)} style={{ marginTop: '0px', color: 'red' }}>
                             X
                           </Button>
-                          <div style={{ display: "flex", gap: "10px" }}>
+                          <div style={{ display: 'flex', gap: '10px' }}>
                             {/* Color Picker */}
                             <div
                               style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "5px",
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
                               }}
                             >
                               <Typography
                                 variant="body1"
                                 style={{
-                                  color: "#555",
-                                  fontSize: "10px",
+                                  color: '#555',
+                                  fontSize: '10px',
                                 }}
                               >
                                 BG Color
@@ -10031,11 +8570,11 @@ function Stockpurchaserequest() {
                                 value={colorDrag}
                                 onChange={handleColorChangeDrag}
                                 style={{
-                                  width: "30px",
-                                  height: "30px",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  borderRadius: "5px",
+                                  width: '30px',
+                                  height: '30px',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  borderRadius: '5px',
                                 }}
                               />
                             </div>
@@ -10048,19 +8587,19 @@ function Stockpurchaserequest() {
                               color="primary"
                               endIcon={<FormatColorFillIcon />}
                               sx={{
-                                padding: "10px 10px",
-                                fontSize: "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                borderRadius: "5px",
-                                color: isLightColorDrag ? "black" : "white",
-                                fontWeight: "600",
+                                padding: '10px 10px',
+                                fontSize: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                borderRadius: '5px',
+                                color: isLightColorDrag ? 'black' : 'white',
+                                fontWeight: '600',
                                 backgroundColor: colorDrag, // Dynamically set the background color
-                                "&:hover": {
+                                '&:hover': {
                                   backgroundColor: `${colorDrag}90`, // Slightly transparent on hover for a nice effect
                                 },
-                                border: "1px solid  black",
+                                border: '1px solid  black',
                               }}
                             ></LoadingButton>
                           </div>
@@ -10070,20 +8609,19 @@ function Stockpurchaserequest() {
                   ) : (
                     <div
                       style={{
-                        marginTop: "10px",
-                        marginLeft: "0px",
-                        border: "1px dashed #ccc",
-                        padding: "0px",
-                        width: "100%",
-                        height: "150px",
-                        display: "flex",
-                        alignContent: "center",
-                        textAlign: "center",
+                        marginTop: '10px',
+                        marginLeft: '0px',
+                        border: '1px dashed #ccc',
+                        padding: '0px',
+                        width: '100%',
+                        height: '150px',
+                        display: 'flex',
+                        alignContent: 'center',
+                        textAlign: 'center',
                       }}
                     >
-                      <div style={{ display: "flex", margin: "50px auto" }}>
-                        <ContentCopyIcon />{" "}
-                        {"Drag and drop or Paste here (ctrl+v)"}
+                      <div style={{ display: 'flex', margin: '50px auto' }}>
+                        <ContentCopyIcon /> {'Drag and drop or Paste here (ctrl+v)'}
                       </div>
                     </div>
                   )}
@@ -10094,29 +8632,14 @@ function Stockpurchaserequest() {
               <Grid item lg={12} md={12} sm={12} xs={12}>
                 <br />
                 <FormControl size="small" fullWidth>
-                  <Grid sx={{ display: "flex" }}>
+                  <Grid sx={{ display: 'flex' }}>
                     {/* {showUploadBtn ? ( */}
-                    <Button
-                      variant="contained"
-                      component="label"
-                      sx={buttonStyles.buttonsubmit}
-                    >
+                    <Button variant="contained" component="label" sx={buttonStyles.buttonsubmit}>
                       Upload
-                      <input
-                        type="file"
-                        multiple
-                        id="productimage"
-                        accept="image/*"
-                        hidden
-                        onChange={handleChangeImage}
-                      />
+                      <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleChangeImage} />
                     </Button>
                     &ensp;
-                    <Button
-                      variant="contained"
-                      onClick={showWebcam}
-                      sx={userStyle.uploadbtn}
-                    >
+                    <Button variant="contained" onClick={showWebcam} sx={userStyle.uploadbtn}>
                       Webcam
                     </Button>
                   </Grid>
@@ -10129,18 +8652,13 @@ function Stockpurchaserequest() {
                       <Grid item md={2} sm={2} xs={12}>
                         <Box
                           style={{
-                            isplay: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            marginLeft: "37px",
+                            isplay: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginLeft: '37px',
                           }}
                         >
-                          <img
-                            src={image.preview}
-                            alt={image.name}
-                            height={50}
-                            style={{ maxWidth: "-webkit-fill-available" }}
-                          />
+                          <img src={image.preview} alt={image.name} height={50} style={{ maxWidth: '-webkit-fill-available' }} />
                         </Box>
                       </Grid>
                       <Grid
@@ -10149,78 +8667,75 @@ function Stockpurchaserequest() {
                         sm={7}
                         xs={12}
                         sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
                         }}
                       >
-                        <Typography variant="subtitle2">
-                          {" "}
-                          {image.name}{" "}
-                        </Typography>
+                        <Typography variant="subtitle2"> {image.name} </Typography>
                       </Grid>
                       <Grid item md={1} sm={1} xs={12}>
-                        <Grid sx={{ display: "flex" }}>
+                        <Grid sx={{ display: 'flex' }}>
                           <Button
                             sx={{
-                              marginTop: "15px !important",
-                              padding: "14px 14px",
-                              minWidth: "40px !important",
-                              borderRadius: "50% !important",
-                              ":hover": {
-                                backgroundColor: "#80808036", // theme.palette.primary.main
+                              marginTop: '15px !important',
+                              padding: '14px 14px',
+                              minWidth: '40px !important',
+                              borderRadius: '50% !important',
+                              ':hover': {
+                                backgroundColor: '#80808036', // theme.palette.primary.main
                               },
                             }}
                             onClick={() => renderFilePreview(image)}
                           >
                             <VisibilityOutlinedIcon
                               style={{
-                                fontsize: "12px",
-                                color: "#357AE8",
-                                marginTop: "35px !important",
+                                fontsize: '12px',
+                                color: '#357AE8',
+                                marginTop: '35px !important',
                               }}
                             />
                           </Button>
                           <Button
                             sx={{
-                              marginTop: "15px !important",
-                              padding: "14px 14px",
-                              minWidth: "40px !important",
-                              borderRadius: "50% !important",
-                              ":hover": {
-                                backgroundColor: "#80808036",
+                              marginTop: '15px !important',
+                              padding: '14px 14px',
+                              minWidth: '40px !important',
+                              borderRadius: '50% !important',
+                              ':hover': {
+                                backgroundColor: '#80808036',
                               },
                             }}
                             onClick={() => removeCapturedImage(index)}
                           >
                             <FaTrash
                               style={{
-                                color: "#a73131",
-                                fontSize: "12px",
-                                marginTop: "35px !important",
+                                color: '#a73131',
+                                fontSize: '12px',
+                                marginTop: '35px !important',
                               }}
                             />
                           </Button>
                           <div
                             style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: "10px",
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '10px',
                             }}
                           >
                             {/* Color Picker */}
                             <div
                               style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "5px",
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
                               }}
                             >
                               <Typography
                                 variant="body1"
                                 style={{
-                                  color: "#555",
-                                  fontSize: "10px",
+                                  color: '#555',
+                                  fontSize: '10px',
                                 }}
                               >
                                 BG Color
@@ -10232,11 +8747,11 @@ function Stockpurchaserequest() {
                                   handleColorChangeCaptured(e, index);
                                 }}
                                 style={{
-                                  width: "30px",
-                                  height: "30px",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  borderRadius: "5px",
+                                  width: '30px',
+                                  height: '30px',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  borderRadius: '5px',
                                 }}
                               />
                             </div>
@@ -10244,28 +8759,26 @@ function Stockpurchaserequest() {
                             {/* Submit Button */}
                             <LoadingButton
                               onClick={(e) => {
-                                handleSubmitNew(index, "captured");
+                                handleSubmitNew(index, 'captured');
                               }}
                               loading={bgbtnCaptured[index]}
                               variant="contained"
                               color="primary"
                               endIcon={<FormatColorFillIcon />}
                               sx={{
-                                padding: "10px 10px",
-                                fontSize: "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                borderRadius: "5px",
-                                color: isLightColorCaptured[index]
-                                  ? "black"
-                                  : "white",
-                                fontWeight: "600",
+                                padding: '10px 10px',
+                                fontSize: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                borderRadius: '5px',
+                                color: isLightColorCaptured[index] ? 'black' : 'white',
+                                fontWeight: '600',
                                 backgroundColor: colorCaptured[index], // Dynamically set the background color
-                                "&:hover": {
+                                '&:hover': {
                                   backgroundColor: `${colorCaptured[index]}90`, // Slightly transparent on hover for a nice effect
                                 },
-                                border: "1px solid  black",
+                                border: '1px solid  black',
                               }}
                             ></LoadingButton>
                           </div>
@@ -10278,27 +8791,22 @@ function Stockpurchaserequest() {
                     <Grid item md={2} sm={2} xs={2}>
                       <Box
                         style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
                         }}
                       >
-                        {file.type.includes("image/") ? (
+                        {file.type.includes('image/') ? (
                           <img
                             src={file.preview}
                             alt={file.name}
                             height={50}
                             style={{
-                              maxWidth: "-webkit-fill-available",
+                              maxWidth: '-webkit-fill-available',
                             }}
                           />
                         ) : (
-                          <img
-                            className={classes.preview}
-                            src={getFileIcon(file.name)}
-                            height="10"
-                            alt="file icon"
-                          />
+                          <img className={classes.preview} src={getFileIcon(file.name)} height="10" alt="file icon" />
                         )}
                       </Box>
                     </Grid>
@@ -10308,65 +8816,61 @@ function Stockpurchaserequest() {
                       sm={7}
                       xs={7}
                       sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
                       <Typography variant="subtitle2"> {file.name} </Typography>
                     </Grid>
                     <Grid item md={1} sm={1} xs={1}>
-                      <Grid sx={{ display: "flex" }}>
+                      <Grid sx={{ display: 'flex' }}>
                         <Button
                           sx={{
-                            padding: "14px 14px",
-                            minWidth: "40px !important",
-                            borderRadius: "50% !important",
-                            ":hover": {
-                              backgroundColor: "#80808036", // theme.palette.primary.main
+                            padding: '14px 14px',
+                            minWidth: '40px !important',
+                            borderRadius: '50% !important',
+                            ':hover': {
+                              backgroundColor: '#80808036', // theme.palette.primary.main
                             },
                           }}
                           onClick={() => renderFilePreview(file)}
                         >
-                          <VisibilityOutlinedIcon
-                            style={{ fontsize: "12px", color: "#357AE8" }}
-                          />
+                          <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                         </Button>
                         <Button
                           sx={{
-                            padding: "14px 14px",
-                            minWidth: "40px !important",
-                            borderRadius: "50% !important",
-                            ":hover": {
-                              backgroundColor: "#80808036", // theme.palette.primary.main
+                            padding: '14px 14px',
+                            minWidth: '40px !important',
+                            borderRadius: '50% !important',
+                            ':hover': {
+                              backgroundColor: '#80808036', // theme.palette.primary.main
                             },
                           }}
                           onClick={() => handleDeleteFile(index)}
                         >
-                          <FaTrash
-                            style={{ color: "#a73131", fontSize: "12px" }}
-                          />
+                          <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                         </Button>
                         <div
                           style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "10px",
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px',
                           }}
                         >
                           {/* Color Picker */}
                           <div
                             style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "5px",
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '5px',
                             }}
                           >
                             <Typography
                               variant="body1"
                               style={{
-                                color: "#555",
-                                fontSize: "10px",
+                                color: '#555',
+                                fontSize: '10px',
                               }}
                             >
                               BG Color
@@ -10378,11 +8882,11 @@ function Stockpurchaserequest() {
                                 handleColorChange(e, index);
                               }}
                               style={{
-                                width: "30px",
-                                height: "30px",
-                                border: "none",
-                                cursor: "pointer",
-                                borderRadius: "5px",
+                                width: '30px',
+                                height: '30px',
+                                border: 'none',
+                                cursor: 'pointer',
+                                borderRadius: '5px',
                               }}
                             />
                           </div>
@@ -10390,26 +8894,26 @@ function Stockpurchaserequest() {
                           {/* Submit Button */}
                           <LoadingButton
                             onClick={(e) => {
-                              handleSubmitNew(index, "upload");
+                              handleSubmitNew(index, 'upload');
                             }}
                             loading={bgbtn[index]}
                             variant="contained"
                             color="primary"
                             endIcon={<FormatColorFillIcon />}
                             sx={{
-                              padding: "10px 10px",
-                              fontSize: "8px",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              borderRadius: "5px",
-                              color: isLightColor[index] ? "black" : "white",
-                              fontWeight: "600",
+                              padding: '10px 10px',
+                              fontSize: '8px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              borderRadius: '5px',
+                              color: isLightColor[index] ? 'black' : 'white',
+                              fontWeight: '600',
                               backgroundColor: color[index], // Dynamically set the background color
-                              "&:hover": {
+                              '&:hover': {
                                 backgroundColor: `${color[index]}90`, // Slightly transparent on hover for a nice effect
                               },
-                              border: "1px solid  black",
+                              border: '1px solid  black',
                             }}
                           ></LoadingButton>
                         </div>
@@ -10421,59 +8925,30 @@ function Stockpurchaserequest() {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={handleUploadOverAll}
-              sx={buttonStyles.buttonsubmit}
-            >
+            <Button onClick={handleUploadOverAll} sx={buttonStyles.buttonsubmit}>
               Ok
             </Button>
             <Button onClick={resetImage} sx={buttonStyles.btncancel}>
               Reset
             </Button>
-            <Button
-              onClick={handleUploadPopupClose}
-              sx={buttonStyles.btncancel}
-            >
+            <Button onClick={handleUploadPopupClose} sx={buttonStyles.btncancel}>
               Cancel
             </Button>
           </DialogActions>
         </Dialog>
-        <Dialog
-          open={isWebcamOpen}
-          onClose={webcamClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="sm"
-          fullWidth={true}
-        >
+        <Dialog open={isWebcamOpen} onClose={webcamClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="sm" fullWidth={true}>
           <DialogContent
             sx={{
-              display: "flex",
-              justifyContent: "center",
-              textAlign: "center",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'center',
+              textAlign: 'center',
+              alignItems: 'center',
             }}
           >
-            <Webcamimage
-              name={name}
-              getImg={getImg}
-              setGetImg={setGetImg}
-              valNum={valNum}
-              setValNum={setValNum}
-              capturedImages={capturedImages}
-              setCapturedImages={setCapturedImages}
-              setRefImage={setRefImage}
-              setRefImageDrag={setRefImageDrag}
-              setVendor={setVendor}
-              vendor={vendor}
-            />
+            <Webcamimage name={name} getImg={getImg} setGetImg={setGetImg} valNum={valNum} setValNum={setValNum} capturedImages={capturedImages} setCapturedImages={setCapturedImages} setRefImage={setRefImage} setRefImageDrag={setRefImageDrag} setVendor={setVendor} vendor={vendor} />
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={webcamDataStore}
-            >
+            <Button variant="contained" color="success" onClick={webcamDataStore}>
               OK
             </Button>
             <Button variant="contained" color="error" onClick={webcamClose}>

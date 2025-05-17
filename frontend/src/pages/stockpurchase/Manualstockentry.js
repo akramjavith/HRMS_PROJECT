@@ -134,6 +134,10 @@ function Manualstockentry() {
   const [refImgWarrantyfilenamesEdit, setRefImgWarrantyfilenamesEdit] = useState([]);
   const [refImgbillfilenamesEdit, setRefImgbillfilenamesEdit] = useState([]);
 
+  const [groupedVendorNamesedit, setGroupedVendorNamesedit] = useState([]);
+
+
+
   // State to track advanced filter
   const [advancedFilter, setAdvancedFilter] = useState(null);
   const [gridApi, setGridApi] = useState(null);
@@ -199,6 +203,46 @@ function Manualstockentry() {
     expensetotal: '',
     balanceamount: '',
     paidamount: '',
+  });
+
+  const [expensecreateedit, setExpensecreateedit] = useState({
+    expansecategory: 'Please Select Expense Category',
+    expansesubcategory: 'Please Select Expense Sub Category',
+    referenceno: '',
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    vendorname: 'Please Select Vendor',
+    purpose: 'Please Select Purpose',
+    totalbillamount: '',
+    date,
+    files: '',
+    duedate: "",
+    vendorfrequency: '',
+    paidstatus: 'Not Paid',
+    duedate: '',
+    expansenote: '',
+    paidmode: 'Please Select Paid Mode',
+    expensetotal: '',
+    balanceamount: '',
+    paidamount: '',
+  });
+
+  const [vendorstockedit, setVendorNewstockedit] = useState({
+    bankname: '',
+    bankbranchname: '',
+    accountholdername: '',
+    accountnumber: '',
+    ifsccode: '',
+    upinumber: '',
+    chequenumber: '',
+    cardnumber: '',
+    cardholdername: '',
+    cardtransactionnumber: '',
+    cardtype: '',
+    cardmonth: '',
+    cardyear: '',
+    cardsecuritycode: '',
   });
 
   const [todoDetails, setTodoDetails] = useState({
@@ -1848,7 +1892,7 @@ function Manualstockentry() {
   };
 
   const handleDataFromChild = () => {
-    fetchVendor();
+    fetchVendorGrouping();
   };
 
   //alert model for Uom details
@@ -1884,36 +1928,36 @@ function Manualstockentry() {
 
   const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
+      branch: data.branch,
+      company: data.company,
+      unit: data.unit,
+    }))
+    : isAssignBranch
+      ?.filter((data) => {
+        let fetfinalurl = [];
+
+        if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.subsubpagenameurl;
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.subpagenameurl;
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.mainpagenameurl;
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+          fetfinalurl = data.submodulenameurl;
+        } else if (data?.modulenameurl?.length !== 0) {
+          fetfinalurl = data.modulenameurl;
+        } else {
+          fetfinalurl = [];
+        }
+
+        const remove = [window.location.pathname?.substring(1), window.location.pathname];
+        return fetfinalurl?.some((item) => remove?.includes(item));
+      })
+      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }))
-    : isAssignBranch
-        ?.filter((data) => {
-          let fetfinalurl = [];
-
-          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.subsubpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.subpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.mainpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.submodulenameurl;
-          } else if (data?.modulenameurl?.length !== 0) {
-            fetfinalurl = data.modulenameurl;
-          } else {
-            fetfinalurl = [];
-          }
-
-          const remove = [window.location.pathname?.substring(1), window.location.pathname];
-          return fetfinalurl?.some((item) => remove?.includes(item));
-        })
-        ?.map((data) => ({
-          branch: data.branch,
-          company: data.company,
-          unit: data.unit,
-        }));
+      }));
 
   const handleBranchChange = (e) => {
     const selectedBranch = e.value;
@@ -2181,22 +2225,22 @@ function Manualstockentry() {
     }
   };
 
-  const fetchVendor = async () => {
+  const fetchVendorGrouping = async () => {
     try {
       let res1 = await axios.get(SERVICE.ALL_VENDORGROUPING, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const allGroup = Array.from(new Set(res1?.data?.vendorgrouping.map((d) => d.name))).map((item) => {
-        return {
-          label: item,
-          value: item,
-        };
-      });
-
-      setVendorGroupopt(allGroup);
       setVendorOverall(res1?.data?.vendorgrouping);
+      let datas = [
+        ...res1?.data?.vendorgrouping?.map((t) => ({
+          ...t,
+          label: t.name,
+          value: t.name,
+        })),
+      ];
+      setVendorGroupopt(datas);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -2219,18 +2263,26 @@ function Manualstockentry() {
         ...d,
         label: d.vendorname,
         value: d.vendorname,
-        _id: d._id,
       })),
     ];
 
     let final = all.filter((data) => {
       return foundDatas.includes(data.value);
     });
-
-    setVendoropt(final);
+    setVendoropt([
+      ...res?.data?.vendordetails
+        ?.filter((item) => item.vendorstatus === 'Active')
+        ?.map((t) => ({
+          ...t,
+          label: t.vendorname,
+          value: t.vendorname,
+        })),
+    ]);
+    // setVendoropt(final);
   };
 
   const handleChangeGroupNameEdit = async (e) => {
+    console.log(e.value, "valuie")
     let foundDatas = vendorOverall
       .filter((data) => {
         return data.name == e.value;
@@ -2253,8 +2305,16 @@ function Manualstockentry() {
     let final = all.filter((data) => {
       return foundDatas.includes(data.value);
     });
+    setVendoroptEdit([
+      ...res?.data?.vendordetails
+        ?.filter((item) => item.vendorstatus === 'Active')
+        ?.map((t) => ({
+          ...t,
+          label: t.vendorname,
+          value: t.vendorname,
+        })),
+    ]);
 
-    setVendoroptEdit(final);
   };
 
   //set function to get particular row
@@ -2342,6 +2402,8 @@ function Manualstockentry() {
         area: String(stockmaster.area),
         totalbillamount: Number(stockmaster.quantity) * Number(stockmaster.rate),
         totalbillamountstock: stockmaster.totalbillamount,
+        duedate: String(expensecreate.duedate ? expensecreate.duedate : ""),
+
         // workstation: String(
         //   stockmaster.workcheck ? stockmaster.workstation : ""
         // ),
@@ -2435,36 +2497,36 @@ function Manualstockentry() {
         paymentduereminderlog:
           expensecreate.paidstatus === 'Paid'
             ? [
-                {
-                  balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmaster.totalbillamount : expensecreate.balanceamount),
-                  expensetotal: stockmaster.totalbillamount,
-                  modeofpayments: expensecreate.paidmode,
-                  payamountdate: expensecreate.date,
-                  payamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
-                  bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
-                  bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.bankbranchname : '',
-                  accountholdername: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountholdername : '',
-                  accountnumber: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountnumber : '',
-                  ifsccode: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.ifsccode : '',
+              {
+                balanceamount: Number(expensecreate.paidstatus === 'Not Paid' ? stockmaster.totalbillamount : expensecreate.balanceamount),
+                expensetotal: stockmaster.totalbillamount,
+                modeofpayments: expensecreate.paidmode,
+                payamountdate: expensecreate.date,
+                payamount: Number(expensecreate.paidstatus === 'Not Paid' ? 0 : expensecreate.paidamount),
+                bankname: expensecreate.paidmode === 'Bank Transfer' ? String(vendorstock.bankname) : '',
+                bankbranchname: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.bankbranchname : '',
+                accountholdername: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountholdername : '',
+                accountnumber: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.accountnumber : '',
+                ifsccode: expensecreate.paidmode === 'Bank Transfer' ? vendorstock.ifsccode : '',
 
-                  upinumber: expensecreate.paidmode === 'UPI' ? vendorstock.upinumber : '',
+                upinumber: expensecreate.paidmode === 'UPI' ? vendorstock.upinumber : '',
 
-                  cardnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardnumber : '',
-                  cardholdername: expensecreate.paidmode === 'Card' ? vendorstock.cardholdername : '',
-                  cardtransactionnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardtransactionnumber : '',
-                  cardtype: expensecreate.paidmode === 'Card' ? vendorstock.cardtype : '',
-                  cardmonth: expensecreate.paidmode === 'Card' ? vendorstock.cardmonth : '',
-                  cardyear: expensecreate.paidmode === 'Card' ? vendorstock.cardyear : '',
-                  cardsecuritycode: expensecreate.paidmode === 'Card' ? vendorstock.cardsecuritycode : '',
-                  chequenumber: expensecreate.paidmode === 'Cheque' ? vendorstock.chequenumber : '',
-                  addedby: [
-                    {
-                      name: String(isUserRoleAccess.companyname),
-                      date: String(new Date()),
-                    },
-                  ],
-                },
-              ]
+                cardnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardnumber : '',
+                cardholdername: expensecreate.paidmode === 'Card' ? vendorstock.cardholdername : '',
+                cardtransactionnumber: expensecreate.paidmode === 'Card' ? vendorstock.cardtransactionnumber : '',
+                cardtype: expensecreate.paidmode === 'Card' ? vendorstock.cardtype : '',
+                cardmonth: expensecreate.paidmode === 'Card' ? vendorstock.cardmonth : '',
+                cardyear: expensecreate.paidmode === 'Card' ? vendorstock.cardyear : '',
+                cardsecuritycode: expensecreate.paidmode === 'Card' ? vendorstock.cardsecuritycode : '',
+                chequenumber: expensecreate.paidmode === 'Cheque' ? vendorstock.chequenumber : '',
+                addedby: [
+                  {
+                    name: String(isUserRoleAccess.companyname),
+                    date: String(new Date()),
+                  },
+                ],
+              },
+            ]
             : [],
         addedby: [
           {
@@ -3010,7 +3072,7 @@ function Manualstockentry() {
           },
         ],
       });
-      await fetchVendor();
+      await fetchVendorGrouping();
       setVendor({
         vendorname: '',
         emailid: '',
@@ -3254,9 +3316,12 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
+      const alldata = { ...res?.data?.smanualstock, calculationbalamount: Number(res?.data?.smanualstock?.balanceamount) };
+
       setAmountEdit(res?.data?.smanualstock?.totalbillamount);
       setStockmasteredit(res?.data?.smanualstock);
       setFrequencyValueedit(res?.data?.smanualstock?.vendorfrequency === undefined ? '' : res?.data?.smanualstock?.vendorfrequency);
+      setGroupedVendorNamesedit(vendorOverall?.filter((item) => item.name === res?.data?.smanualstock?.vendorgroup)?.map((data) => data?.vendor));
 
       setSelectedBranchedit(res?.data?.smanualstock.branch);
       setVendorGroupEdit(res?.data?.smanualstock?.vendorgroup);
@@ -3438,6 +3503,8 @@ function Manualstockentry() {
         company: String(stockmasteredit.company),
         branch: String(stockmasteredit.branch),
         unit: String(stockmasteredit.unit),
+        duedate: String(expensecreateedit.duedate ? expensecreateedit.duedate : ""),
+
         floor: String(stockmasteredit.floor),
         location: String(stockmasteredit.location),
         area: String(stockmasteredit.area),
@@ -4282,12 +4349,12 @@ function Manualstockentry() {
     fetchAssetType();
     fetchteams();
     fetchEmployee();
-    fetchVendor();
+    fetchVendorGrouping();
     fetchMaterialAll();
     fetchAssetTypeDropdowns();
   }, []);
   useEffect(() => {
-    fetchVendor();
+    fetchVendorGrouping();
   }, [vendorAuto]);
 
   // useEffect(() => {
@@ -5267,14 +5334,14 @@ function Manualstockentry() {
       setOverallFilterdata(
         res_employee?.data?.totalProjectsData?.length > 0
           ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-              return {
-                ...item,
-                serialNumber: (page - 1) * pageSize + index + 1,
-                uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
-                billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
-                purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
-              };
-            })
+            return {
+              ...item,
+              serialNumber: (page - 1) * pageSize + index + 1,
+              uom: item.uom !== '' ? `${item.quantity}#${item.uom}` : item.quantity,
+              billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
+              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+            };
+          })
           : []
       );
 
@@ -5544,6 +5611,195 @@ function Manualstockentry() {
       balanceamount: '',
     });
   };
+
+  const [holidays, setHolidays] = useState([])
+  const fetchHoliday = async () => {
+    setPageName(!pageName);
+    try {
+      let res_status = await axios.post(SERVICE.ALL_HOLIDAY, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        assignbranch: accessbranch,
+      });
+
+
+
+      setHolidays(res_status?.data?.holiday);
+    } catch (err) {
+      handleApiError(
+        err,
+        setPopupContentMalert,
+        setPopupSeverityMalert,
+        handleClickOpenPopupMalert
+      );
+    }
+  };
+
+  // Helper function to find the next available date that's not a Sunday or a holiday
+  const getNextValidDate = (date, holidays) => {
+    const holidaysSet = new Set(holidays); // Store holidays for quick lookup
+    let nextDate = moment(date); // Convert the date to a Moment instance
+
+    // Increment the date until it's not a Sunday or a holiday
+    while (nextDate.day() === 0 || holidaysSet.has(nextDate.format("YYYY-MM-DD"))) {
+      nextDate.add(1, 'day'); // Move to the next day
+    }
+
+    return nextDate;
+  };
+
+
+
+  const setDueDate = (e) => {
+    let dueDate = ""; // Default value if not monthly
+    if (e.paymentfrequency === "Monthly" && e.monthlyfrequency) {
+      // Get the current month and year
+      const today = moment();
+      let proposedDate = moment(`${today.year()}-${today.month() + 1}-${e.monthlyfrequency}`, "YYYY-MM-DD");
+
+      // If proposedDate is in the past, set it to next month
+      if (proposedDate.isBefore(today, 'day')) {
+        proposedDate.add(1, 'month');
+      }
+
+      // Filter holidays specific to the selected company, branch, and unit
+      let mappedHolidays = holidays
+        ?.filter(data =>
+          data.company?.includes(stockmaster?.company) &&
+          data.applicablefor?.includes(stockmaster?.branch) &&
+          data.unit?.includes(stockmaster?.unit)
+        )
+        ?.map(item => item?.date);
+
+
+      // Get the valid due date (not Sunday or a holiday)
+      const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+      dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+    } else if (e.paymentfrequency === "Weekly" && e.weeklyfrequency) {
+      // Set today to "2024-05-17"
+      const today = moment(expensecreate?.date);
+
+      // Map days of the week to their numeric values (Sunday = 0, Monday = 1, ..., Saturday = 6)
+      const dayMapping = {
+        Sunday: 0,
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 6
+      };
+
+      // Get the numeric value of the desired day
+      const targetDay = dayMapping[e.weeklyfrequency];
+
+      // Calculate the next target day from today
+      let proposedDate = today.clone().isoWeekday(targetDay);
+
+      // If the proposed day is earlier than today, move to the next week
+      if (proposedDate.isBefore(today, 'day')) {
+        proposedDate.add(1, 'week');
+      }
+
+      // Filter holidays specific to the selected company, branch, and unit
+      let mappedHolidays = holidays
+        ?.filter(data =>
+          data.company?.includes(stockmaster?.company) &&
+          data.applicablefor?.includes(stockmaster?.branch) &&
+          data.unit?.includes(stockmaster?.unit)
+        )
+        ?.map(item => item?.date);
+
+      // Get the valid due date (not a holiday)
+      const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+      dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+    }
+
+    setExpensecreate({
+      ...expensecreate,
+      vendorname: e.value,
+      vendorfrequency: e.paymentfrequency,
+      duedate: dueDate
+    });
+  };
+
+  const setDueDateEdit = (e) => {
+    let dueDate = ""; // Default value if not monthly
+    if (e.paymentfrequency === "Monthly" && e.monthlyfrequency) {
+      // Get the current month and year
+      const today = moment();
+      let proposedDate = moment(`${today.year()}-${today.month() + 1}-${e.monthlyfrequency}`, "YYYY-MM-DD");
+
+      // If proposedDate is in the past, set it to next month
+      if (proposedDate.isBefore(today, 'day')) {
+        proposedDate.add(1, 'month');
+      }
+
+      // Filter holidays specific to the selected company, branch, and unit
+      let mappedHolidays = holidays
+        ?.filter(data =>
+          data.company?.includes(stockmasteredit?.company) &&
+          data.applicablefor?.includes(stockmasteredit?.branch) &&
+          data.unit?.includes(stockmasteredit?.unit)
+        )
+        ?.map(item => item?.date);
+
+
+      // Get the valid due date (not Sunday or a holiday)
+      const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+      dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+    } else if (e.paymentfrequency === "Weekly" && e.weeklyfrequency) {
+      // Set today to "2024-05-17"
+      const today = moment(expensecreateedit?.date);
+
+      // Map days of the week to their numeric values (Sunday = 0, Monday = 1, ..., Saturday = 6)
+      const dayMapping = {
+        Sunday: 0,
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 6
+      };
+
+      // Get the numeric value of the desired day
+      const targetDay = dayMapping[e.weeklyfrequency];
+
+      // Calculate the next target day from today
+      let proposedDate = today.clone().isoWeekday(targetDay);
+
+      // If the proposed day is earlier than today, move to the next week
+      if (proposedDate.isBefore(today, 'day')) {
+        proposedDate.add(1, 'week');
+      }
+
+      // Filter holidays specific to the selected company, branch, and unit
+      let mappedHolidays = holidays
+        ?.filter(data =>
+          data.company?.includes(stockmasteredit?.company) &&
+          data.applicablefor?.includes(stockmasteredit?.branch) &&
+          data.unit?.includes(stockmasteredit?.unit)
+        )
+        ?.map(item => item?.date);
+
+      // Get the valid due date (not a holiday)
+      const validDueDate = getNextValidDate(proposedDate, mappedHolidays);
+      dueDate = validDueDate.format("YYYY-MM-DD"); // Format as YYYY-MM-DD
+    }
+
+    setExpensecreateedit({
+      ...expensecreateedit,
+      vendorname: e.value,
+      vendorfrequency: e.paymentfrequency,
+      duedate: dueDate
+    });
+  };
+
+  useEffect(() => {
+    fetchHoliday()
+  }, []);
 
   return (
     <Box>
@@ -5835,9 +6091,9 @@ function Manualstockentry() {
                           type="text"
                           placeholder=""
                           value={stockmaster.warrantycalculation}
-                          // onChange={(e) => {
-                          //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
-                          // }}
+                        // onChange={(e) => {
+                        //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
+                        // }}
                         />
                       </FormControl>
                     </Grid>
@@ -5852,13 +6108,29 @@ function Manualstockentry() {
                       {/* <b style={{ color: "red" }}>*</b>{" "} */}
                     </Typography>
                     <Selects
-                      options={[...vendorModeOptions, ...vendorGroupOpt]}
+                      // options={[...vendorModeOptions, ...vendorGroupOpt]}
+                      options={[
+                        ...vendorModeOptions,
+                        ...vendorGroupOpt.filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        }),
+                      ]}
                       styles={colourStyles}
                       value={{ label: vendorGroup, value: vendorGroup }}
                       onChange={(e) => {
                         handleChangeGroupName(e);
+                        setExpensecreate({
+                          ...expensecreate,
+                          vendorgrouping: e.value,
+                          vendorname: 'Please Select Vendor',
+                          vendorfrequency: '',
+                          duedate: '',
+                          paidmode: 'Please Select Paid Mode',
+                        });
                         setVendorGroup(e.value);
                         setFrequencyValue('');
+                        setGroupedVendorNames(vendorGroupOpt?.filter((item) => item.name === e.value)?.map((data) => data?.vendor));
+                        setVendorModeOfPayments('');
                         setVendorNew('Choose Vendor');
                       }}
                     />
@@ -5872,13 +6144,22 @@ function Manualstockentry() {
                       {/* <b style={{ color: "red" }}>*</b>{" "} */}
                     </Typography>
                     <Selects
-                      options={[...vendorModeOptions, ...vendorOpt]}
+                      // options={[...vendorModeOptions, ...vendorOpt]}
+                      options={[
+                        ...vendorModeOptions,
+                        ...vendorOpt?.filter((data) => groupedVendorNames?.includes?.(data?.value))
+                      ]}
                       styles={colourStyles}
                       value={{ label: vendorNew, value: vendorNew }}
                       onChange={(e) => {
+                        setDueDate(e)
                         setVendorNew(e.value);
                         setFrequencyValue(e.paymentfrequency);
-                        // e.value === "Old Stock" || "Unknown" ? "" :
+                        setVendorModeOfPayments(e?.modeofpayments);
+                        setVendorNewstock((prev) => ({
+                          ...prev,
+                          ...e,
+                        }));
                         vendorid(e._id);
                       }}
                     />
@@ -5955,63 +6236,9 @@ function Manualstockentry() {
                   </Grid>
                 )}
 
-                {stockmaster.requestmode === 'Asset Material' && (
-                  <Grid item md={3} sm={12} xs={12}>
-                    <FormControl fullWidth size="small">
-                      <Typography>
-                        Rate<b style={{ color: 'red' }}>*</b>{' '}
-                      </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="number"
-                        sx={userStyle.input}
-                        placeholder="Please Enter Rate"
-                        value={stockmaster.rate}
-                        onChange={(e) => {
-                          const quantity = stockmaster.requestmode == 'Stock Material' ? Number(stockmaster.quantitynew) : Number(stockmaster.quantity);
-                          setStockmaster({
-                            ...stockmaster,
-                            rate: e.target.value,
-                          });
-                          setAmount(Number(e.target.value) * Number(quantity));
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
-                )}
 
-                {stockmaster.requestmode === 'Asset Material' && (
-                  <Grid item md={3} sm={12} xs={12}>
-                    <FormControl fullWidth size="small">
-                      <Typography>
-                        Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
-                      </Typography>
-                      <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={Number(totalAmount)} />
-                    </FormControl>
-                  </Grid>
-                )}
-                {stockmaster.requestmode === 'Stock Material' && (
-                  <Grid item md={3} sm={12} xs={12}>
-                    <FormControl fullWidth size="small">
-                      <Typography>
-                        Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
-                      </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="number"
-                        sx={userStyle.input}
-                        // value={Number(totalAmount)}
-                        value={stockmaster.totalbillamount}
-                        onChange={(e) => {
-                          setStockmaster({
-                            ...stockmaster,
-                            totalbillamount: e.target.value,
-                          });
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
-                )}
+
+
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>Bill Date</Typography>
@@ -6023,7 +6250,28 @@ function Manualstockentry() {
                         setStockmaster({
                           ...stockmaster,
                           billdate: e.target.value,
+                          duedate: ''
                         });
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item lg={2} md={4} xs={12} sm={6}>
+                  <FormControl fullWidth size="small">
+                    <Typography>Due Date</Typography>
+                    <OutlinedInput
+                      id="to-date"
+                      type="date"
+                      value={expensecreate.duedate}
+                      onChange={(e) => {
+                        setExpensecreate({
+                          ...expensecreate,
+                          duedate: e.target.value,
+                        });
+                      }}
+                      inputProps={{
+                        min: stockmaster.date,
+                        // max: today
                       }}
                     />
                   </FormControl>
@@ -6102,6 +6350,95 @@ function Manualstockentry() {
                         setSubcategoryOption([]);
                         setMaterialoptNew([]);
                       }}
+                    />
+                  </FormControl>
+                </Grid>
+                {stockmaster.requestmode === 'Asset Material' && (
+                  <Grid item md={3} sm={12} xs={12}>
+                    <FormControl fullWidth size="small">
+                      <Typography>
+                        Rate<b style={{ color: 'red' }}>*</b>{' '}
+                      </Typography>
+                      <OutlinedInput
+                        id="component-outlined"
+                        type="number"
+                        sx={userStyle.input}
+                        placeholder="Please Enter Rate"
+                        value={stockmaster.rate}
+                        onChange={(e) => {
+                          const quantity = stockmaster.requestmode == 'Stock Material' ? Number(stockmaster.quantitynew) : Number(stockmaster.quantity);
+                          setStockmaster({
+                            ...stockmaster,
+                            rate: e.target.value,
+                          });
+                          setAmount(Number(e.target.value) * Number(quantity));
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                )}
+
+                {/* {stockmaster.requestmode === 'Asset Material' && (
+                  <Grid item md={3} sm={12} xs={12}>
+                    <FormControl fullWidth size="small">
+                      <Typography>
+                        Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
+                      </Typography>
+                      <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={Number(totalAmount)} />
+                    </FormControl>
+                  </Grid>
+                )}
+                {stockmaster.requestmode === 'Stock Material' && (
+                  <Grid item md={3} sm={12} xs={12}>
+                    <FormControl fullWidth size="small">
+                      <Typography>
+                        Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
+                      </Typography>
+                      <OutlinedInput
+                        id="component-outlined"
+                        type="number"
+                        sx={userStyle.input}
+                        // value={Number(totalAmount)}
+                        value={stockmaster.totalbillamount}
+                        onChange={(e) => {
+                          setStockmaster({
+                            ...stockmaster,
+                            totalbillamount: e.target.value,
+                          });
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                )} */}
+                <Grid item md={3} sm={12} xs={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Total Bill Amount<b style={{ color: 'red' }}>*</b>{' '}
+                    </Typography>
+                    <OutlinedInput
+                      id="component-outlined"
+                      type="number"
+                      sx={userStyle.input}
+
+                      value={stockmaster.requestmode === 'Stock Material' ? stockmaster.totalbillamount : Number(totalAmount)}
+
+                      // onChange={(e) => {
+                      //   setStockmaster({
+                      //     ...stockmaster,
+                      //     totalbillamount: e.target.value,
+                      //   });
+                      // }}
+                      onChange={
+                        stockmaster.requestmode === 'Stock Material'
+                          ? (e) =>
+                            setStockmaster({
+                              ...stockmaster,
+                              totalbillamount: e.target.value,
+                            })
+                          : undefined
+                      }
+
+
                     />
                   </FormControl>
                 </Grid>
@@ -7721,7 +8058,7 @@ function Manualstockentry() {
                                                           handleChange(index, 'estimation', e.target.value);
                                                           // handleChangephonenumber(e)
                                                         }}
-                                                        // onChange={(e) => handleChangephonenumber(e)}
+                                                      // onChange={(e) => handleChangephonenumber(e)}
                                                       />
                                                     </FormControl>
                                                   </Grid>
@@ -7742,7 +8079,7 @@ function Manualstockentry() {
                                                         handleChange(index, 'estimationtime', e.target.value);
                                                         // handleEstimationChange()
                                                       }}
-                                                      // onChange={handleEstimationChange}
+                                                    // onChange={handleEstimationChange}
                                                     >
                                                       <MenuItem value="" disabled>
                                                         {' '}
@@ -7773,7 +8110,7 @@ function Manualstockentry() {
                                                         handleChange(index, 'purchasedate', e.target.value);
                                                         // handlePurchaseDateChange()
                                                       }}
-                                                      // onChange={handlePurchaseDateChange}
+                                                    // onChange={handlePurchaseDateChange}
                                                     />
                                                   </FormControl>
                                                 </Grid>
@@ -7793,9 +8130,9 @@ function Manualstockentry() {
                                                         disabled={todo.subcomponentcheck === false}
                                                         placeholder=""
                                                         value={todo.warrantycalculation}
-                                                        // onChange={(e) => {
-                                                        //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                        // }}
+                                                      // onChange={(e) => {
+                                                      //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
+                                                      // }}
                                                       />
                                                     </FormControl>
                                                   </Grid>
@@ -9446,7 +9783,7 @@ function Manualstockentry() {
                                                           handleChange(index, 'estimation', e.target.value);
                                                           handleChangephonenumber(e);
                                                         }}
-                                                        // onChange={(e) => handleChangephonenumber(e)}
+                                                      // onChange={(e) => handleChangephonenumber(e)}
                                                       />
                                                     </FormControl>
                                                   </Grid>
@@ -9466,7 +9803,7 @@ function Manualstockentry() {
                                                         handleChange(index, 'estimationtime', e.target.value);
                                                         // handleEstimationChange()
                                                       }}
-                                                      // onChange={handleEstimationChange}
+                                                    // onChange={handleEstimationChange}
                                                     >
                                                       <MenuItem value="" disabled>
                                                         {' '}
@@ -9497,7 +9834,7 @@ function Manualstockentry() {
                                                         handleChange(index, 'purchasedate', e.target.value);
                                                         // handlePurchaseDateChange()
                                                       }}
-                                                      // onChange={handlePurchaseDateChange}
+                                                    // onChange={handlePurchaseDateChange}
                                                     />
                                                   </FormControl>
                                                 </Grid>
@@ -9517,9 +9854,9 @@ function Manualstockentry() {
                                                         disabled={todo.subcomponentcheck === false}
                                                         placeholder=""
                                                         value={todo.warrantycalculation}
-                                                        // onChange={(e) => {
-                                                        //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                        // }}
+                                                      // onChange={(e) => {
+                                                      //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
+                                                      // }}
                                                       />
                                                     </FormControl>
                                                   </Grid>
@@ -9824,17 +10161,17 @@ function Manualstockentry() {
                                 options={
                                   !itemAllShow
                                     ? allStockValues
-                                        .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
-                                        .map((item) => ({
-                                          label: item.itemname,
-                                          value: item.itemname,
-                                          uom: item.uom,
-                                        }))
-                                    : allStockValues.map((item) => ({
+                                      .filter((item) => item.stockcategory === todoDetails.category && item.stocksubcategory === todoDetails.subcategory)
+                                      .map((item) => ({
                                         label: item.itemname,
                                         value: item.itemname,
                                         uom: item.uom,
                                       }))
+                                    : allStockValues.map((item) => ({
+                                      label: item.itemname,
+                                      value: item.itemname,
+                                      uom: item.uom,
+                                    }))
                                 }
                                 styles={colourStyles}
                                 value={{
@@ -10139,7 +10476,7 @@ function Manualstockentry() {
                             <Typography sx={{ fontWeight: 'bold' }}>Cash</Typography>
                             <br />
 
-                            <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => {}} />
+                            <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => { }} />
                           </FormControl>
                         </Grid>
                       </>
@@ -10631,14 +10968,30 @@ function Manualstockentry() {
                       {/* <b style={{ color: "red" }}>*</b>{" "} */}
                     </Typography>
                     <Selects
-                      options={[...vendorModeOptions, ...vendorGroupOpt]}
+                      // options={[...vendorModeOptions, ...vendorGroupOpt]}
+                      options={[
+                        ...vendorModeOptions,
+                        ...vendorGroupOpt.filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        }),
+                      ]}
                       styles={colourStyles}
                       value={{ label: vendorGroupEdit, value: vendorGroupEdit }}
                       onChange={(e) => {
                         handleChangeGroupNameEdit(e);
+                        setExpensecreateedit({
+                          ...expensecreateedit,
+                          vendorgrouping: e.value,
+                          vendorname: 'Please Select Vendor',
+                          vendorfrequency: '',
+                          duedate: '',
+                          paidmode: 'Please Select Paid Mode',
+                        });
                         setVendorGroupEdit(e.value);
+                        setGroupedVendorNamesedit(vendorGroupOpt?.filter((item) => item.name === e.value)?.map((data) => data?.vendor));
+
                         setVendorNewEdit('Choose Vendor');
-                        setFrequencyValue('');
+                        setFrequencyValueedit('');
                       }}
                     />
                   </FormControl>
@@ -10650,13 +11003,23 @@ function Manualstockentry() {
                     </Typography>
                     <Selects
                       // options={vendormaster}
-                      options={[...vendorModeOptions, ...vendorOptEdit]}
+                      // options={[...vendorModeOptions, ...vendorOptEdit]}
+                      options={[
+                        ...vendorModeOptions,
+                        ...vendorOptEdit?.filter((data) => groupedVendorNamesedit?.includes?.(data?.value))
+                      ]}
                       styles={colourStyles}
                       value={{ label: vendorNewEdit, value: vendorNewEdit }}
                       onChange={(e) => {
+                        setDueDateEdit(e)
                         setVendorNewEdit(e.value);
                         setFrequencyValueedit(e.paymentfrequency);
                         vendorid(e._id);
+                        setVendorNewstockedit((prev) => ({
+                          ...prev,
+                          ...e,
+                        }));
+
                       }}
                     />
                   </FormControl>
@@ -10732,7 +11095,28 @@ function Manualstockentry() {
                         setStockmasteredit({
                           ...stockmasteredit,
                           billdate: e.target.value,
+                          duedate: ''
                         });
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item lg={2} md={4} xs={12} sm={6}>
+                  <FormControl fullWidth size="small">
+                    <Typography>Due Date</Typography>
+                    <OutlinedInput
+                      id="to-date"
+                      type="date"
+                      value={expensecreate.duedate}
+                      onChange={(e) => {
+                        setExpensecreateedit({
+                          ...expensecreateedit,
+                          duedate: e.target.value,
+                        });
+                      }}
+                      inputProps={{
+                        min: stockmasteredit.date,
+                        // max: today
                       }}
                     />
                   </FormControl>
@@ -14060,7 +14444,7 @@ function Manualstockentry() {
                                                 handleChangeEdit(index, 'estimationtime', e.target.value);
                                                 // handleEstimationChange()
                                               }}
-                                              // onChange={handleEstimationChange}
+                                            // onChange={handleEstimationChange}
                                             >
                                               <MenuItem value="" disabled>
                                                 {' '}
@@ -14092,7 +14476,7 @@ function Manualstockentry() {
                                                 handleChangeEdit(index, 'purchasedate', e.target.value);
                                                 // handlePurchaseDateChange()
                                               }}
-                                              // onChange={handlePurchaseDateChange}
+                                            // onChange={handlePurchaseDateChange}
                                             />
                                           </FormControl>
                                         </Grid>
@@ -14113,9 +14497,9 @@ function Manualstockentry() {
                                                 placeholder=""
                                                 disabled={todo.subcomponentcheck === false}
                                                 value={todo.warrantycalculation}
-                                                // onChange={(e) => {
-                                                //   setAssetdetail({ ...assetdetail, warrantyCalculation: e.target.value });
-                                                // }}
+                                              // onChange={(e) => {
+                                              //   setAssetdetail({ ...assetdetail, warrantyCalculation: e.target.value });
+                                              // }}
                                               />
                                             </FormControl>
                                           </Grid>
@@ -15530,7 +15914,7 @@ function Manualstockentry() {
                   <Button
                     variant="contained"
                     sx={buttonStyles.buttonsubmit}
-                    //  onClick={handleSubmitCapacity}
+                  //  onClick={handleSubmitCapacity}
                   >
                     Submit
                   </Button>
@@ -15539,7 +15923,7 @@ function Manualstockentry() {
                 <Grid item md={3} xs={12} sm={6}>
                   <Button
                     sx={buttonStyles.btncancel}
-                    // onClick={handleclearCapacity}
+                  // onClick={handleclearCapacity}
                   >
                     Clear
                   </Button>

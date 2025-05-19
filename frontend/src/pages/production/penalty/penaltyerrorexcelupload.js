@@ -6,9 +6,11 @@ import {
   OutlinedInput,
   Dialog,
   TableBody,
+  Select,
   DialogContent,
   DialogActions,
   FormControl,
+  MenuItem,
   Grid,
   Table,
   TableHead,
@@ -46,6 +48,12 @@ const ExcelSheet = () => {
     { label: "DEP Audit Summary Report", value: "DEP Audit Summary Report" },
     { label: "DEP Queue Type Audit Summary Report", value: "DEP Queue Type Audit Summary Report" },
   ];
+
+        const [yeardrop, setYeardrop] = useState("yyyy");
+            const [monthdrop, setMonthdrop] = useState("MM");
+            const [datedrop, setDatedrop] = useState("dd");
+            const [symboldrop, setSymboldrop] = useState("-");
+            const [hoursdrop, setHoursdrop] = useState("NAN");
 
   const [projects, setProjects] = useState([]);
   const [excelupdate, setExcelsupdate] = useState({
@@ -226,13 +234,82 @@ const ExcelSheet = () => {
     getProject();
   }, []);
 
+    const DEP_FIELDS = [
+      "date","process", "errorfilename", "documentnumber", "documenttype",
+      "fieldname", "line", "errorvalue", "correctvalue", "link", "doclink"
+    ];
+
+    const DEP_QUEUE_FIELDS = [
+      "date","process", "errorfilename", "fieldname", "line",
+      "errorvalue", "correctvalue", "link", "doclink"
+    ];
+
+
+const hyperlinkRenderer = function (instance, td, row, col, prop, value, cellProperties) {
+  // Use default text renderer first
+  Handsontable.renderers.TextRenderer.call(this, instance, td, row, col, prop, value, cellProperties);
+
+  const meta = instance.getCellMeta(row, col);
+  const link = meta.hyperlink;
+
+  if (link) {
+    td.innerHTML = `<a href="${link}" target="_blank" style="color: blue; text-decoration: underline;">${value}</a>`;
+  }
+};
+
+
+  const isURL = (text) => {
+  try {
+    const url = new URL(text);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch (e) {
+    return false;
+  }
+};
+
+
+const convertLinksToHyperlinks = () => {
+  const hot = hotInstanceRef.current;
+  if (!hot) return;
+
+  const fieldMap = penaltyErrorUpload.type === "DEP Audit Summary Report"
+    ? DEP_FIELDS
+    : penaltyErrorUpload.type === "DEP Queue Type Audit Summary Report"
+      ? DEP_QUEUE_FIELDS
+      : [];
+
+  const targetFields = ["errorfilename", "documentnumber"];
+  const targetCols = targetFields.map(field => fieldMap.indexOf(field)).filter(index => index >= 0);;
+
+  for (let row = 0; row < hot.countRows(); row++) {
+    for (const col of targetCols) {
+      const cellValue = hot.getDataAtCell(row, col);
+      console.log(isURL(cellValue),"cellValue");
+      // typeof cellValue === "string" && 
+     if (col >= 0 && typeof cellValue === "string" && isURL(cellValue)) {
+  hot.setCellMeta(row, col, "hyperlink", cellValue);
+}
+    }
+  }
+
+  hot.render();
+};
+
+
   useEffect(() => {
     const hotElement = hotElementRef.current;
+      const columns = Array.from({ length: 17 }, (_, colIndex) => {
+    const field = DEP_FIELDS[colIndex]; // adjust based on report type if needed
+    if (field === "errorfilename" || field === "documentnumber") {
+      return { renderer: hyperlinkRenderer };
+    }
+    return { renderer: Handsontable.renderers.TextRenderer };
+  });
     const hotInstance = new Handsontable(hotElement, {
       data: [[]],
       minRows: 17,
       minCols: 17,
-      colHeaders: [],
+      colHeaders:DEP_FIELDS,
       rowHeaders: true,
       columnSorting: true,
       filters: true,
@@ -242,146 +319,249 @@ const ExcelSheet = () => {
       copyPaste: true,
       sorting: true,
       multiColumnSorting: true,
+       afterPaste: () => convertLinksToHyperlinks()
     });
+
+  //     hot.addHook('afterPaste', () => {
+  //   convertLinksToHyperlinks();
+  // });
+
     hotInstanceRef.current = hotInstance;
 
     return () => {
       hotInstance.destroy();
     };
-  }, []);
+  }, [penaltyErrorUpload.type]);
 
   const handleSubmit = async () => {
-    const updatedData = hotInstanceRef.current.getData();
-    const filteredRows = updatedData.filter((row) =>
-      row.some((cell) => cell !== null && cell !== "")
-    );
-    const filteredCols = [];
+    // const updatedData = hotInstanceRef.current.getData();
+const hotInstance = hotInstanceRef.current;
+const updatedData = [];
 
-    for (let col = 0; col < updatedData[0].length; col++) {
-      const columnData = filteredRows.map((row) => row[col]);
-      if (columnData.some((cell) => cell !== null && cell !== "")) {
-        filteredCols.push(columnData);
-      }
+  // Step 1: Extract full data with value + hyperlink from Handsontable
+  for (let row = 0; row < hotInstance.countRows(); row++) {
+    const rowData = [];
+    for (let col = 0; col < hotInstance.countCols(); col++) {
+      const value = hotInstance.getDataAtCell(row, col);
+      const link = hotInstance.getCellMeta(row, col)?.hyperlink || "";
+      rowData.push({ value, link });
     }
+    updatedData.push(rowData);
+  }
 
+  // Step 2: Filter rows with at least one non-empty value
+  const filteredRows = updatedData.filter((row) =>
+    row.some((cell) => cell?.value !== null && cell?.value !== "")
+  );
 
+  // Step 3: Filter columns with at least one non-empty value
+  const filteredCols = [];
+  for (let col = 0; col < updatedData[0].length; col++) {
+    const columnData = filteredRows.map((row) => row[col]);
+    if (columnData.some((cell) => cell?.value !== null && cell?.value !== "")) {
+      filteredCols.push(columnData);
+    }
+  }
 
-    // Proceed with saving data
-
-    // const filteredData =
-    //   filteredCols.length > 0
-    //     ? filteredCols[0].map((_, i) => filteredCols.map((row) => row[i]))
-    //     : [];
-
-    //   const filteredData =
-    // filteredCols.length > 0
-    //   ? filteredCols[0].map((_, i) =>
-    //       filteredCols.map((row) => (row[i] !== undefined ? row[i] : ""))
-    //     )
-    //   : [];
-
-    //       console.log(filteredData,"filteredData")
-    //   const newArray = filteredData.map((item, index) => {
-    //     return Object.entries(item).reduce((acc, [key, value]) => {
-
-    //       if (penaltyErrorUpload.type === "DEP Audit Summary Report") {
-
-    //         if (key === "0") {
-    //           acc.process = value;
-    //         } else if (key === "1") {
-    //           acc.errorfilename = value;
-    //         } else if (key === "2") {
-    //           acc.documentnumber = value;
-    //         } else if (key === "3") {
-    //           acc.documenttype = value;
-    //         } else if (key === "4") {
-    //           acc.fieldname = value;
-    //         } else if (key === "5") {
-    //           acc.line = value;
-    //         } else if (key === "6") {
-    //           acc.errorvalue = value;
-    //         } else if (key === "7") {
-    //           acc.correctvalue = value;
-    //         }
-    //         else if (key === "8") {
-    //           acc.link = value;
-    //         }
-    //         else if (key === "9") {
-    //           acc.doclink = value;
-    //         }
-    //         else {
-    //           acc.id = parseInt(value);
-    //         }
-    //       }
-
-
-    //       if (penaltyErrorUpload.type === "DEP Queue Type Audit Summary Report") {
-    //         //  if (key === "0") {
-    //         //       acc.date = value;
-    //         //     } else
-    //         if (key === "0") {
-    //           acc.process = value;
-    //         } else if (key === "1") {
-    //           acc.errorfilename = value;
-    //         } else if (key === "2") {
-    //           acc.fieldname = value;
-    //         } else if (key === "3") {
-    //           acc.line = value;
-    //         } else if (key === "4") {
-    //           acc.errorvalue = value;
-    //         } else if (key === "5") {
-    //           acc.correctvalue = value;
-    //         } else if (key === "6") {
-    //           acc.link = value;
-    //         } else if (key === "7") {
-    //           acc.doclink = value;
-    //         }
-    //         else {
-    //           acc.id = parseInt(value);
-    //         }
-    //       }
-
-
-    //       return acc;
-    //     }, {});
-    //   });
-    const filteredData = updatedData
-      .filter((row) => row.some((cell) => cell !== null && cell !== ""))
-      .map((row) =>
-        Array.from({ length: updatedData[0].length }, (_, i) => row[i] ?? "")
-      );
-
-    const DEP_FIELDS = [
-      "process", "errorfilename", "documentnumber", "documenttype",
-      "fieldname", "line", "errorvalue", "correctvalue", "link", "doclink"
-    ];
-
-    const DEP_QUEUE_FIELDS = [
-      "process", "errorfilename", "fieldname", "line",
-      "errorvalue", "correctvalue", "link", "doclink"
-    ];
-
+  // Step 4: Clean + standardize filtered data (ensure full structure is preserved)
+  const filteredData = filteredRows.map((row) =>
+    Array.from({ length: updatedData[0].length }, (_, i) => row[i] ?? { value: "", link: "" })
+  );
+  
     const fieldMap = penaltyErrorUpload.type === "DEP Audit Summary Report"
       ? DEP_FIELDS
       : penaltyErrorUpload.type === "DEP Queue Type Audit Summary Report"
         ? DEP_QUEUE_FIELDS
         : [];
 
-    const newArray = filteredData.map((item) => {
-      const obj = {};
-      item.forEach((value, index) => {
-        const key = fieldMap[index];
-        if (key) {
-          obj[key] = value;
-        } else {
-          obj.id = parseInt(value);
-        }
-      });
-      return obj;
-    });
+        console.log(filteredData,"filteredData")
 
-    console.log(newArray, "newArray")
+           function getDateFormat(dateValue) {
+
+                        const patterns = [
+                            //  "/" FORMAT
+                            { regex: /^\d{2}\/\d{2}\/\d{4}$/, format: "dd/MM/yyyy" },
+                            { regex: /^\d{1,2}\/\d{2}\/\d{4}$/, format: "d/MM/yyyy" },
+                            { regex: /^\d{2}\/\d{2}\/\d{4}$/, format: "MM/dd/yyyy" },
+                            { regex: /^\d{1,2}\/\d{2}\/\d{4}$/, format: "M/dd/yyyy" },
+                            { regex: /^\[A-Za-z]{3}\/\d{2}\/\d{4}$/, format: "MMM/dd/yyyy" },
+                            { regex: /^\[A-Za-z]{4,}\/\d{2}\/\d{4}$/, format: "MMMM/dd/yyyy" },
+                            { regex: /^\d{4}\/\d{2}\/\d{2}$/, format: "yyyy/MM/dd" },
+                            { regex: /^\d{2}\/\d{2}\/\d{2}$/, format: "yy/MM/dd" },
+                            //  "-" FORMAT
+
+                            { regex: /^\d{2}-\d{2}-\d{4}$/, format: "dd-MM-yyyy" },
+                            { regex: /^\d{1,2}-\d{2}-\d{4}$/, format: "d-MM-yyyy" },
+                            { regex: /^\d{2}-\d{2}-\d{4}$/, format: "MM-dd-yyyy" },
+                            { regex: /^\d{1,2}-\d{2}-\d{4}$/, format: "M-dd-yyyy" },
+                            { regex: /^[A-Za-z]{3}-\d{2}-\d{4}$/, format: "MMM-dd-yyyy" },
+                            { regex: /^[A-Za-z]{4,}-\d{2}-\d{4}$/, format: "MMMM-dd-yyyy" },
+                            { regex: /^\d{4}-\d{2}-\d{2}$/, format: "yyyy-MM-dd" },
+                            { regex: /^\d{2}-\d{2}-\d{2}$/, format: "yy-MM-dd" },
+                            //  "." FORMAT
+
+                            { regex: /^\d{2}\.\d{2}\.\d{4}$/, format: "dd.MM.yyyy" },
+                            { regex: /^\d{1,2}\.\d{2}\.\d{4}$/, format: "d.MM.yyyy" },
+                            { regex: /^\d{2}\.\d{2}\.\d{4}$/, format: "MM.dd.yyyy" },
+                            { regex: /^\d{1,2}\.\d{2}\.\d{4}$/, format: "M.dd.yyyy" },
+                            { regex: /^[A-Za-z]{3}\.\d{2}\.\d{4}$/, format: "MMM.dd.yyyy" },
+                            { regex: /^[A-Za-z]{4,}\.\d{2}\.\d{4}$/, format: "MMMM.dd.yyyy" },
+                            { regex: /^\d{4}\.\d{2}\.\d{2}$/, format: "yyyy.MM.dd" },
+                            { regex: /^\d{2}\.\d{2}\.\d{2}$/, format: "yy.MM.dd" },
+
+                        ];
+
+                        // Find the format of the input date
+                        const foundPattern = patterns.find(p => p.regex.test(dateValue));
+                        // console.log(foundPattern, "foundPattern")
+                        return foundPattern ? foundPattern.format : "Unknown format";
+                    }
+
+    // const newArray = filteredData.map((item) => {
+    //   const obj = {};
+    //   item.forEach((value, index) => {
+    //     const key = fieldMap[index];
+    //     if (key) {
+    //       obj[key] = value;
+    //     } else {
+    //       obj.id = parseInt(value);
+    //     }
+    //   });
+    //   return obj;
+
+     
+
+    //                 let datesArray = item.map(item => (item["Audit Date"]));
+    //                 let expectedFormat = `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`
+
+    // });
+
+    function getDateFormat(dateValue) {
+  const patterns = [
+    // "/" FORMAT
+    { regex: /^\d{2}\/\d{2}\/\d{4}$/, format: "dd/MM/yyyy" },
+    { regex: /^\d{1,2}\/\d{2}\/\d{4}$/, format: "d/MM/yyyy" },
+    { regex: /^\d{2}\/\d{2}\/\d{4}$/, format: "MM/dd/yyyy" },
+    { regex: /^\d{1,2}\/\d{2}\/\d{4}$/, format: "M/dd/yyyy" },
+    { regex: /^[A-Za-z]{3}\/\d{2}\/\d{4}$/, format: "MMM/dd/yyyy" },
+    { regex: /^[A-Za-z]{4,}\/\d{2}\/\d{4}$/, format: "MMMM/dd/yyyy" },
+    { regex: /^\d{4}\/\d{2}\/\d{2}$/, format: "yyyy/MM/dd" },
+    { regex: /^\d{2}\/\d{2}\/\d{2}$/, format: "yy/MM/dd" },
+
+    // "-" FORMAT
+    { regex: /^\d{2}-\d{2}-\d{4}$/, format: "dd-MM-yyyy" },
+    { regex: /^\d{1,2}-\d{2}-\d{4}$/, format: "d-MM-yyyy" },
+    { regex: /^\d{2}-\d{2}-\d{4}$/, format: "MM-dd-yyyy" },
+    { regex: /^\d{1,2}-\d{2}-\d{4}$/, format: "M-dd-yyyy" },
+    { regex: /^[A-Za-z]{3}-\d{2}-\d{4}$/, format: "MMM-dd-yyyy" },
+    { regex: /^[A-Za-z]{4,}-\d{2}-\d{4}$/, format: "MMMM-dd-yyyy" },
+    { regex: /^\d{4}-\d{2}-\d{2}$/, format: "yyyy-MM-dd" },
+    { regex: /^\d{2}-\d{2}-\d{2}$/, format: "yy-MM-dd" },
+
+    // "." FORMAT
+    { regex: /^\d{2}\.\d{2}\.\d{4}$/, format: "dd.MM.yyyy" },
+    { regex: /^\d{1,2}\.\d{2}\.\d{4}$/, format: "d.MM.yyyy" },
+    { regex: /^\d{2}\.\d{2}\.\d{4}$/, format: "MM.dd.yyyy" },
+    { regex: /^\d{1,2}\.\d{2}\.\d{4}$/, format: "M.dd.yyyy" },
+    { regex: /^[A-Za-z]{3}\.\d{2}\.\d{4}$/, format: "MMM.dd.yyyy" },
+    { regex: /^[A-Za-z]{4,}\.\d{2}\.\d{4}$/, format: "MMMM.dd.yyyy" },
+    { regex: /^\d{4}\.\d{2}\.\d{2}$/, format: "yyyy.MM.dd" },
+    { regex: /^\d{2}\.\d{2}\.\d{2}$/, format: "yy.MM.dd" },
+
+    // Extra formats can go here
+  ];
+
+  const foundPattern = patterns.find(p => p.regex.test(dateValue));
+  return foundPattern ? foundPattern.format : "Unknown format";
+}
+const ERROR_FILENAME_INDEX = fieldMap.indexOf("errorfilename");
+const DOC_NUMBER_INDEX = fieldMap.indexOf("documentnumber");
+
+const newArray = filteredData.map((row) => {
+  const obj = {};
+
+  row.forEach((cell, colIndex) => {
+    const key = fieldMap[colIndex];
+    const value = cell.value;
+    const hyperlink = cell.link;
+
+    if (key) {
+      obj[key] = value;
+    } else {
+      obj.id = parseInt(value);
+    }
+
+    // Inject actual hyperlinks into the mapped object
+    if (colIndex === ERROR_FILENAME_INDEX) {
+      obj["link"] = hyperlink || "";
+    }
+    if (colIndex === DOC_NUMBER_INDEX) {
+      obj["doclink"] = hyperlink || "";
+    }
+  });
+
+  return obj;
+});
+console.log(newArray,"newArray")
+// Main mapping logic
+// const newArray = filteredData.map((item) => {
+//   const obj = {};
+//   item.forEach((value, index) => {
+//     const key = fieldMap[index];
+//     if (key) {
+//       obj[key] = value;
+//     } else {
+//       obj.id = parseInt(value);
+//     }
+//   });
+//   return obj;
+// });
+
+// Optional: constructing an expected format string from dropdowns
+// const expectedFormat = `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`;
+const expectedFormat = `${monthdrop}${symboldrop}${datedrop}${symboldrop}${yeardrop}`;
+
+// Step 4: Extract dates and validate
+const datesArray = newArray.map(obj => obj["date"]);
+console.log("Expected Format:", expectedFormat);
+
+    console.log(datesArray, "datesArray")
+
+       function formatToDate(dateValue, format) {
+        console.log(dateValue, format,"heck")
+                    dateValue = dateValue.trim(); // Remove extra spaces
+
+                    // Create regex based on the given format
+                    const separator = format.includes("/") ? "/" : (format.includes("-") ? "-" : ".");
+                    const regexPattern = new RegExp(format.replace(/(YYYY|MM|DD)/gi, "\\d{2,4}").replace(/[-/.]/g, `\\${separator}`));
+
+                    // Check if the date matches the format
+                    if (regexPattern.test(dateValue)) {
+                        let year, month, day;
+                        const dateParts = dateValue.split(separator);
+                        const formatParts = format.split(separator);
+
+                        // Compare and map parts from format to actual date value
+                        formatParts.forEach((part, index) => {
+                            const upperPart = part.toUpperCase(); // Make it case-insensitive
+                            if (upperPart === "YYYY") year = dateParts[index];
+                            if (upperPart === "MM") month = dateParts[index];
+                            if (upperPart === "DD") day = dateParts[index];
+                        });
+
+                        // Return formatted date in "YYYY-MM-DD"
+                        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    }
+
+                    return "Invalid date format";
+                }
+
+
+
+
     let SelfDupeRemovedData = []
+
+    
     if (penaltyErrorUpload.type === "DEP Audit Summary Report") {
       SelfDupeRemovedData = newArray.map((item) => (
 
@@ -392,7 +572,7 @@ const ExcelSheet = () => {
           process: String(item.process),
           loginid: String(penaltyErrorUpload.loginid),
           // date: moment(new Date(item.date)).format("YYYY-MM-DD"),
-          date: String(penaltyErrorUpload.date),
+           date: formatToDate(item["date"], `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`),
           fromdate: String(penaltyErrorUpload.date),
           todate: String(penaltyErrorUpload.date),
           type: String(penaltyErrorUpload.type),
@@ -407,6 +587,11 @@ const ExcelSheet = () => {
           correctvalue: String(item.correctvalue),
           link: String(item.link),
           doclink: String(item.doclink),
+            yeardrop: yeardrop,
+                monthdrop: monthdrop,
+                datedrop: datedrop,
+                symboldrop: symboldrop,
+                hoursdrop: hoursdrop,
           mode: "Errorupload",
         })
       )
@@ -420,7 +605,7 @@ const ExcelSheet = () => {
           process: String(item.process),
           loginid: String(penaltyErrorUpload.loginid),
           // date: moment(new Date(item.date)).format("YYYY-MM-DD"),
-          date: String(penaltyErrorUpload.date),
+           date: formatToDate(item["date"], `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`),
              fromdate: String(penaltyErrorUpload.date),
           todate: String(penaltyErrorUpload.date),
           errorfilename: String(item.errorfilename),
@@ -434,11 +619,16 @@ const ExcelSheet = () => {
           correctvalue: String(item.correctvalue),
           link: String(item.link),
           doclink: String(item.doclink),
+            yeardrop: yeardrop,
+                monthdrop: monthdrop,
+                datedrop: datedrop,
+                symboldrop: symboldrop,
+                hoursdrop: hoursdrop,
           mode: "Errorupload",
         })
       )
     }
-
+ console.log(SelfDupeRemovedData, "SelfDupeRemovedData");
     SelfDupeRemovedData.filter((item, index, self) =>
       index ===
       self.findIndex(
@@ -455,13 +645,11 @@ const ExcelSheet = () => {
           tp.line == item.line &&
           tp.errorvalue == item.errorvalue &&
           tp.correctvalue == item.correctvalue
-        //  &&
-        // tp.link == item.link &&
-        // tp.doclink == item.doclink
+       
       )
     );
 
-    console.log(SelfDupeRemovedData, "SelfDupeRemovedData");
+   
 
 
 
@@ -476,7 +664,6 @@ const ExcelSheet = () => {
       date: String(penaltyErrorUpload.date),
     });
 
-    // const isNameMatch = targetPoints?.some((item) =>
     const isNameMatchbulkDuplicate = Respenalty.data.penaltyerroruploadpoints
 
     let DupeRemovedData = SelfDupeRemovedData.filter(item =>
@@ -493,11 +680,7 @@ const ExcelSheet = () => {
           tp.line === item.line &&
           tp.errorvalue === item.errorvalue &&
           tp.correctvalue === item.correctvalue
-        // &&
-        // tp.link === item.link &&
-        // tp.doclink === item.doclink;
-
-        //   console.log('Match:', isMatch, { tp, item });
+      
         return isMatch;
       })
     );
@@ -515,6 +698,8 @@ const ExcelSheet = () => {
     });
     let olddata = Res?.data?.penaltyerroruploadpoints;
     console.log(olddata, "olddata")
+
+
     let newdata = DupeRemovedData.filter(item =>
       !olddata.some(tp => {
         const isMatch =
@@ -529,11 +714,6 @@ const ExcelSheet = () => {
           tp.line === item.line &&
           tp.errorvalue === item.errorvalue &&
           tp.correctvalue === item.correctvalue
-        // &&
-        // tp.link === item.link &&
-        // tp.doclink === item.doclink;
-
-        //   console.log('Match:', isMatch, { tp, item });
         return isMatch;
       })
     );
@@ -551,11 +731,7 @@ const ExcelSheet = () => {
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
     }
-    // else if (penaltyErrorUpload.process === "Please Select Process") {
-    //   setPopupContentMalert("Please Select Process");
-    //   setPopupSeverityMalert("info");
-    //   handleClickOpenPopupMalert();
-    // }
+
     else if (penaltyErrorUpload.loginid === "Please Select Login ID") {
       setPopupContentMalert("Please Select Login ID");
       setPopupSeverityMalert("info");
@@ -566,33 +742,35 @@ const ExcelSheet = () => {
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
     }
-    else if (penaltyErrorUpload.date === "") {
-      setPopupContentMalert("Please Select Date");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-      // Set the flag to true
-    }
+    // else if (penaltyErrorUpload.date === "") {
+    //   setPopupContentMalert("Please Select Date");
+    //   setPopupSeverityMalert("info");
+    //   handleClickOpenPopupMalert();
+    //   // Set the flag to true
+    // }
     else if (newArray.length <= 0) {
       setPopupContentMalert("Please Fill Excel");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
 
+
     }
+  else  if (datesArray.some(d => d && getDateFormat(d) !== expectedFormat)) {
+  setPopupContentMalert("Expected Date Format Does Not Match");
+  setPopupSeverityMalert("info");
+  handleClickOpenPopupMalert();
+}
     else if (SelfDupeRemovedData.length != newdata.length && newdata.length == 0) {
       setPopupContentMalert('Duplicate Datas Removed!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     }
-    // else if (isNameMatchPeanltyDuplicate) {
-    //     setPopupContentMalert('Data Already In Penalty Error Upload!');
-    //     setPopupSeverityMalert('info');
-    //     handleClickOpenPopupMalert();
-    // } 
+  
 
     else {
       console.log("abc")
       if (SelfDupeRemovedData.length != newdata.length) {
-        ;
+       
         setPopupContent('Duplicate Datas Removed!');
         setPopupSeverity('success');
         handleClickOpenPopup();
@@ -743,8 +921,163 @@ const ExcelSheet = () => {
           </Grid>
 
 
+   <Grid item md={6} xs={12} sm={12}>
+                                <Typography>Date Format<b style={{ color: "red" }}>*</b></Typography>
+                                <Grid container spacing={0.3}>
+                                
 
-          <Grid item md={3} xs={12} sm={6}>
+                                    <Grid item md={2} xs={4} sm={2.7}>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                fullWidth
+                                                labelId="demo-select-small"
+                                                id="demo-select-small"
+                                                MenuProps={{
+                                                    PaperProps: {
+                                                        style: { maxHeight: 200, width: 80 },
+                                                    },
+                                                }}
+                                                value={monthdrop}
+                                                onChange={(e) => setMonthdrop(e.target.value)}
+                                                displayEmpty
+                                                inputProps={{ "aria-label": "Without label" }}
+                                            >
+                                                {/* <MenuItem value="Month" disabled>Month</MenuItem> */}
+                                                <MenuItem value="MM">MM</MenuItem>
+                                                <MenuItem value="M">M</MenuItem>
+                                                <MenuItem value="MMM">MMM</MenuItem>
+                                                <MenuItem value="MMMM">MMMM</MenuItem>
+                                                <MenuItem value="dd">dd</MenuItem>
+                                                <MenuItem value="yyyy">yyyy</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+
+                                    <Grid item md={2.7} xs={4} sm={2}>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                fullWidth
+                                                labelId="demo-select-small"
+                                                id="demo-select-small"
+                                                MenuProps={{
+                                                    PaperProps: {
+                                                        style: { maxHeight: 200, width: 80 },
+                                                    },
+                                                }}
+                                                value={datedrop}
+                                                onChange={(e) => setDatedrop(e.target.value)}
+                                                displayEmpty
+                                                inputProps={{ "aria-label": "Without label" }}
+                                            >
+                                                {/* <MenuItem value="Date" disabled>Date</MenuItem> */}
+                                                <MenuItem value="dd">dd</MenuItem>
+                                                <MenuItem value="d">d</MenuItem>
+                                                <MenuItem value="yyyy">yyyy</MenuItem>
+                                                <MenuItem value="yy">yy</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+
+    <Grid item md={2.5} xs={4} sm={2.5}>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                fullWidth
+                                                labelId="demo-select-small"
+                                                id="demo-select-small"
+                                                MenuProps={{
+                                                    PaperProps: {
+                                                        style: { maxHeight: 200, width: 80 },
+                                                    },
+                                                }}
+                                                value={yeardrop}
+                                                onChange={(e) => setYeardrop(e.target.value)}
+                                                displayEmpty
+                                                inputProps={{ "aria-label": "Without label" }}
+                                            >
+                                                <MenuItem value="dd">dd</MenuItem>
+                                                <MenuItem value="d">d</MenuItem>
+                                                <MenuItem value="M">M</MenuItem>
+                                                <MenuItem value="MM">MM</MenuItem>
+                                                <MenuItem value="MMM">MMM</MenuItem>
+                                                <MenuItem value="MMMM">MMMM</MenuItem>
+                                                <MenuItem value="yyyy">yyyy</MenuItem>
+                                                <MenuItem value="yy">yy</MenuItem>
+
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+
+
+
+
+                                    <Grid item md={1.8} xs={3} sm={1.8}>
+                                        <FormControl fullWidth size="small">
+                                            {/* <Typography>Excel Date Format</Typography> */}
+                                            <Select
+                                                fullWidth
+                                                labelId="demo-select-small"
+                                                id="demo-select-small"
+                                                //   disabled={fileLength > 0}
+                                                MenuProps={{
+                                                    PaperProps: {
+                                                        style: {
+                                                            maxHeight: 200,
+                                                            width: 80,
+                                                        },
+                                                    },
+                                                }}
+                                                value={symboldrop}
+                                                onChange={(e) => {
+                                                    setSymboldrop(e.target.value);
+                                                }}
+                                                displayEmpty
+                                                inputProps={{ "aria-label": "Without label" }}
+                                            >
+                                                <MenuItem value="/" disabled>
+                                                    {" "}
+                                                    {"/"}{" "}
+                                                </MenuItem>
+                                                <MenuItem value="/"> {"/"} </MenuItem>
+                                                <MenuItem value="."> {"."} </MenuItem>
+                                                <MenuItem value="-"> {"-"} </MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+
+                                    <Grid  item md={3} xs={12} sm={6}>
+                                        <FormControl fullWidth size="small">
+                                            {/* <Typography>Excel Date Format</Typography> */}
+                                            <Select
+                                                fullWidth
+                                                labelId="demo-select-small"
+                                                id="demo-select-small"
+                                                MenuProps={{
+                                                    PaperProps: {
+                                                        style: {
+                                                            maxHeight: 200,
+                                                            width: 80,
+                                                        },
+                                                    },
+                                                }}
+                                                value={hoursdrop}
+                                                onChange={(e) => {
+                                                    setHoursdrop(e.target.value);
+                                                }}
+                                                displayEmpty
+                                                inputProps={{ "aria-label": "Without label" }}
+                                            >
+                                                <MenuItem value="Hours" disabled>
+                                                    {"Hours"}{" "}
+                                                </MenuItem>
+                                                <MenuItem value="12 Hours"> {"12 Hours"} </MenuItem>
+                                                <MenuItem value="24 Hours"> {"24 Hours"} </MenuItem>
+                                                <MenuItem value="NAN"> {"NAN"} </MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+          {/* <Grid item md={3} xs={12} sm={6}>
             <FormControl fullWidth size="small">
               <Typography>Date<b style={{ color: "red" }}>*</b></Typography>
               <OutlinedInput
@@ -759,7 +1092,7 @@ const ExcelSheet = () => {
                 }}
               />
             </FormControl>
-          </Grid>
+          </Grid> */}
           <Grid item md={3} xs={12} sm={6}>
             <Typography>
               Type <b style={{ color: "red" }}>*</b>
@@ -825,61 +1158,61 @@ const ExcelSheet = () => {
           {
             (penaltyErrorUpload.type === "DEP Audit Summary Report") &&
             <>
-              {/* <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
+              <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
     <Typography>
       <strong>A: Audit Date</strong>
     </Typography>
-  </Grid> */}
+  </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>A: Process</strong>
+                  <strong>B: Process</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>B: Error File Name</strong>
+                  <strong>C: Error File Name</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>C: Document Number</strong>
+                  <strong>D: Document Number</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2} md={2} lg={2}>
                 <Typography>
-                  <strong>D: Document Type</strong>
+                  <strong>E: Document Type</strong>
                 </Typography>
               </Grid>
 
 
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>E: Field Name</strong>
+                  <strong>F: Field Name</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>F: Line</strong>
+                  <strong>G: Line</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>G: Error Value</strong>
+                  <strong>H: Error Value</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>H: Correct Value</strong>
+                  <strong>I: Correct Value</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>I: Link</strong>
+                  <strong>J: Link</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2} md={2} lg={2}>
                 <Typography>
-                  <strong>J: Doc Link</strong>
+                  <strong>K: Doc Link</strong>
                 </Typography>
               </Grid>
             </>
@@ -888,50 +1221,50 @@ const ExcelSheet = () => {
           {
             (penaltyErrorUpload.type === "DEP Queue Type Audit Summary Report") &&
             <>
-              {/* <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
+              <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
     <Typography>
       <strong>A: Audit Date</strong>
     </Typography>
-  </Grid> */}
+  </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>A: Process</strong>
+                  <strong>B: Process</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>B: Error File Name</strong>
+                  <strong>C: Error File Name</strong>
                 </Typography>
               </Grid>
 
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>C: Field Name</strong>
+                  <strong>D: Field Name</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>D: Line</strong>
+                  <strong>E: Line</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>E: Error Value</strong>
+                  <strong>F: Error Value</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>F: Correct Value</strong>
+                  <strong>G: Correct Value</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>G: Link</strong>
+                  <strong>H: Link</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2.5} md={2.5} lg={2.5}>
                 <Typography>
-                  <strong>H: Doc Link</strong>
+                  <strong>I: Doc Link</strong>
                 </Typography>
               </Grid>
             </>

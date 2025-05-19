@@ -143,10 +143,12 @@ function Stockpurchaserequest() {
   const [stockmaterialedit, setStockmaterialedit] = useState([]);
 
   const handleDataFromChildUIDeignStock = (data) => {
+    console.log(data,"data")
     // Handle the data received from the child component
-    // setDataFromChildUIDeign(data);
+  // setDataFromChildUIDeign(data);
     if (data === true) {
-      fetchStock();
+       fetchStock('Filtered');
+
     }
   };
 
@@ -3498,6 +3500,30 @@ function Stockpurchaserequest() {
   };
 
 const [itemsName,setitemsName] = useState([])
+const [Specification, setSpecification] = useState([]);
+
+
+  const fetchspecification = async (e) => {
+        try {
+            let res = await axios.get(SERVICE.ASSETWORKSTAION, {
+                headers: {
+                    Authorization: `Bearer ${auth.APIToken}`,
+                },
+            });
+
+            let result = res.data.assetworkstation.filter((d) => d.workstation === e);
+
+            const resultall = result.map((d) => ({
+                ...d,
+                label: d.categoryname,
+                value: d.categoryname,
+            }));
+
+            setSpecification(resultall);
+        } catch (err) {
+            handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+        }
+    };
   //get single row to edit....
   const getCode = async (id, data) => {
     try {
@@ -3508,11 +3534,11 @@ const [itemsName,setitemsName] = useState([])
       });
        if (data.requestmode === 'Stock Material') {
        
-          let materialNew = data.stockmaterialarray.map(data =>({label:data.materialnew,value:data.materialnew}));
+          let materialNew = data.stockmaterialarray.map(data =>({label:data.materialnew,value:data.materialnew,uom:data.uomnew}));
 
       setitemsName(materialNew)
       }
-
+await fetchspecification(res?.data?.sstockmanage.material)
       setStockmaster({
         ...res?.data?.sstockmanage,
         vendorname: 'Please Select Vendor',
@@ -5549,6 +5575,7 @@ const [itemsName,setitemsName] = useState([])
             openpop={!openviewalertvendorstock}
             stockmaterialedit={stockmaterialedit}
             itemsName={itemsName}
+            Specification={Specification}
             handleCloseviewalertvendorstock={handleCloseviewalertvendorstock}
           />
         </Dialog>

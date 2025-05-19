@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
-import { Box, Typography, OutlinedInput, Dialog, TableBody, DialogContent, DialogActions, FormControl, Grid, Table, TableHead, Button } from '@mui/material';
+import { Box, Typography, OutlinedInput, Dialog, TableBody, DialogContent, DialogActions,Select,MenuItem, FormControl, Grid, Table, TableHead, Button } from '@mui/material';
 import MessageAlert from '../../../components/MessageAlert';
 import AlertDialog from '../../../components/Alert';
 import { userStyle, colourStyles } from '../../../pageStyle';
@@ -32,6 +32,12 @@ const ExcelSheet = () => {
     { label: "DEP Queue Type Audit Summary Report", value: "DEP Queue Type Audit Summary Report" },
   ];
 
+
+       const [yeardrop, setYeardrop] = useState("MM");
+        const [monthdrop, setMonthdrop] = useState("dd");
+        const [datedrop, setDatedrop] = useState("yyyy");
+        const [symboldrop, setSymboldrop] = useState("-");
+        const [hoursdrop, setHoursdrop] = useState("NAN");
   const [projects, setProjects] = useState([]);
   const [excelupdate, setExcelsupdate] = useState({
     name: '',
@@ -245,85 +251,6 @@ const ExcelSheet = () => {
 
 
 
-    // Proceed with saving data
-
-    // const filteredData =
-    //   filteredCols.length > 0
-    //     ? filteredCols[0].map((_, i) => filteredCols.map((row) => row[i]))
-    //     : [];
-
-    //   const filteredData =
-    // filteredCols.length > 0
-    //   ? filteredCols[0].map((_, i) =>
-    //       filteredCols.map((row) => (row[i] !== undefined ? row[i] : ""))
-    //     )
-    //   : [];
-
-    //       console.log(filteredData,"filteredData")
-    //   const newArray = filteredData.map((item, index) => {
-    //     return Object.entries(item).reduce((acc, [key, value]) => {
-
-    //       if (penaltyErrorUpload.type === "DEP Audit Summary Report") {
-
-    //         if (key === "0") {
-    //           acc.process = value;
-    //         } else if (key === "1") {
-    //           acc.errorfilename = value;
-    //         } else if (key === "2") {
-    //           acc.documentnumber = value;
-    //         } else if (key === "3") {
-    //           acc.documenttype = value;
-    //         } else if (key === "4") {
-    //           acc.fieldname = value;
-    //         } else if (key === "5") {
-    //           acc.line = value;
-    //         } else if (key === "6") {
-    //           acc.errorvalue = value;
-    //         } else if (key === "7") {
-    //           acc.correctvalue = value;
-    //         }
-    //         else if (key === "8") {
-    //           acc.link = value;
-    //         }
-    //         else if (key === "9") {
-    //           acc.doclink = value;
-    //         }
-    //         else {
-    //           acc.id = parseInt(value);
-    //         }
-    //       }
-
-
-    //       if (penaltyErrorUpload.type === "DEP Queue Type Audit Summary Report") {
-    //         //  if (key === "0") {
-    //         //       acc.date = value;
-    //         //     } else
-    //         if (key === "0") {
-    //           acc.process = value;
-    //         } else if (key === "1") {
-    //           acc.errorfilename = value;
-    //         } else if (key === "2") {
-    //           acc.fieldname = value;
-    //         } else if (key === "3") {
-    //           acc.line = value;
-    //         } else if (key === "4") {
-    //           acc.errorvalue = value;
-    //         } else if (key === "5") {
-    //           acc.correctvalue = value;
-    //         } else if (key === "6") {
-    //           acc.link = value;
-    //         } else if (key === "7") {
-    //           acc.doclink = value;
-    //         }
-    //         else {
-    //           acc.id = parseInt(value);
-    //         }
-    //       }
-
-
-    //       return acc;
-    //     }, {});
-    //   });
     const filteredData = updatedData
       .filter((row) => row.some((cell) => cell !== null && cell !== ""))
       .map((row) =>
@@ -331,12 +258,12 @@ const ExcelSheet = () => {
       );
 
     const DEP_FIELDS = [
-      "process", "errorfilename", "documentnumber", "documenttype",
+    "dateformatted",  "process", "errorfilename", "documentnumber", "documenttype",
       "fieldname", "line", "errorvalue", "correctvalue", "link", "doclink"
     ];
 
     const DEP_QUEUE_FIELDS = [
-      "process", "errorfilename", "fieldname", "line",
+      "dateformatted",  "process", "errorfilename", "fieldname", "line",
       "errorvalue", "correctvalue", "link", "doclink"
     ];
 
@@ -345,6 +272,50 @@ const ExcelSheet = () => {
       : penaltyErrorUpload.type === "DEP Queue Type Audit Summary Report"
         ? DEP_QUEUE_FIELDS
         : [];
+
+   function getDateFormat(dateValue) {
+
+                        const patterns = [
+                            //  "/" FORMAT
+                            { regex: /^\d{2}\/\d{2}\/\d{4}$/, format: "dd/MM/yyyy" },
+                            { regex: /^\d{1,2}\/\d{2}\/\d{4}$/, format: "d/MM/yyyy" },
+                            { regex: /^\d{2}\/\d{2}\/\d{4}$/, format: "MM/dd/yyyy" },
+                            { regex: /^\d{1,2}\/\d{2}\/\d{4}$/, format: "M/dd/yyyy" },
+                            { regex: /^\[A-Za-z]{3}\/\d{2}\/\d{4}$/, format: "MMM/dd/yyyy" },
+                            { regex: /^\[A-Za-z]{4,}\/\d{2}\/\d{4}$/, format: "MMMM/dd/yyyy" },
+                            { regex: /^\d{4}\/\d{2}\/\d{2}$/, format: "yyyy/MM/dd" },
+                            { regex: /^\d{2}\/\d{2}\/\d{2}$/, format: "yy/MM/dd" },
+                            //  "-" FORMAT
+
+                            { regex: /^\d{2}-\d{2}-\d{4}$/, format: "dd-MM-yyyy" },
+                            { regex: /^\d{1,2}-\d{2}-\d{4}$/, format: "d-MM-yyyy" },
+                            { regex: /^\d{2}-\d{2}-\d{4}$/, format: "MM-dd-yyyy" },
+                            { regex: /^\d{1,2}-\d{2}-\d{4}$/, format: "M-dd-yyyy" },
+                            { regex: /^[A-Za-z]{3}-\d{2}-\d{4}$/, format: "MMM-dd-yyyy" },
+                            { regex: /^[A-Za-z]{4,}-\d{2}-\d{4}$/, format: "MMMM-dd-yyyy" },
+                            { regex: /^\d{4}-\d{2}-\d{2}$/, format: "yyyy-MM-dd" },
+                            { regex: /^\d{2}-\d{2}-\d{2}$/, format: "yy-MM-dd" },
+                            //  "." FORMAT
+
+                            { regex: /^\d{2}\.\d{2}\.\d{4}$/, format: "dd.MM.yyyy" },
+                            { regex: /^\d{1,2}\.\d{2}\.\d{4}$/, format: "d.MM.yyyy" },
+                            { regex: /^\d{2}\.\d{2}\.\d{4}$/, format: "MM.dd.yyyy" },
+                            { regex: /^\d{1,2}\.\d{2}\.\d{4}$/, format: "M.dd.yyyy" },
+                            { regex: /^[A-Za-z]{3}\.\d{2}\.\d{4}$/, format: "MMM.dd.yyyy" },
+                            { regex: /^[A-Za-z]{4,}\.\d{2}\.\d{4}$/, format: "MMMM.dd.yyyy" },
+                            { regex: /^\d{4}\.\d{2}\.\d{2}$/, format: "yyyy.MM.dd" },
+                            { regex: /^\d{2}\.\d{2}\.\d{2}$/, format: "yy.MM.dd" },
+
+                        ];
+
+                        // Find the format of the input date
+                        const foundPattern = patterns.find(p => p.regex.test(dateValue));
+                        // console.log(foundPattern, "foundPattern")
+                        return foundPattern ? foundPattern.format : "Unknown format";
+                    }
+
+
+
 
     const newArray = filteredData.map((item) => {
       const obj = {};
@@ -358,8 +329,43 @@ const ExcelSheet = () => {
       });
       return obj;
     });
+console.log(newArray,"newArray")
+const expectedFormat = `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`;
 
-    console.log(newArray, "newArray")
+const datesArray = newArray.map(obj => obj["dateformatted"]);
+console.log("Expected Format:", expectedFormat);
+
+    console.log(datesArray, "datesArray")
+
+       function formatToDate(dateValue, format) {
+        console.log(dateValue, format,"heck")
+                    dateValue = dateValue.trim(); // Remove extra spaces
+
+                    // Create regex based on the given format
+                    const separator = format.includes("/") ? "/" : (format.includes("-") ? "-" : ".");
+                    const regexPattern = new RegExp(format.replace(/(YYYY|MM|DD)/gi, "\\d{2,4}").replace(/[-/.]/g, `\\${separator}`));
+
+                    // Check if the date matches the format
+                    if (regexPattern.test(dateValue)) {
+                        let year, month, day;
+                        const dateParts = dateValue.split(separator);
+                        const formatParts = format.split(separator);
+
+                        // Compare and map parts from format to actual date value
+                        formatParts.forEach((part, index) => {
+                            const upperPart = part.toUpperCase(); // Make it case-insensitive
+                            if (upperPart === "YYYY") year = dateParts[index];
+                            if (upperPart === "MM") month = dateParts[index];
+                            if (upperPart === "DD") day = dateParts[index];
+                        });
+
+                        // Return formatted date in "YYYY-MM-DD"
+                        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    }
+
+                    return "Invalid date format";
+                }
+
     let SelfDupeRemovedData = []
     if (penaltyErrorUpload.type === "DEP Audit Summary Report") {
       SelfDupeRemovedData = newArray.map((item) => (
@@ -371,7 +377,7 @@ const ExcelSheet = () => {
           process: String(item.process),
           loginid: String(penaltyErrorUpload.loginid),
           // date: moment(new Date(item.date)).format("YYYY-MM-DD"),
-          dateformatted: String(penaltyErrorUpload.date),
+           dateformatted: formatToDate(item["dateformatted"], `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`),
           fromdate: String(penaltyErrorUpload.date),
           todate: String(penaltyErrorUpload.date),
                  filename:penaltyErrorUpload.projectvendor + "_" +penaltyErrorUpload.loginid + "_" + penaltyErrorUpload.date + " _" + penaltyErrorUpload.type ,
@@ -399,7 +405,7 @@ const ExcelSheet = () => {
           process: String(item.process),
           loginid: String(penaltyErrorUpload.loginid),
           // date: moment(new Date(item.date)).format("YYYY-MM-DD"),
-          dateformatted: String(penaltyErrorUpload.date),
+           dateformatted: formatToDate(item["dateformatted"], `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`),
           fromdate: String(penaltyErrorUpload.date),
           todate: String(penaltyErrorUpload.date),
           errorfilename: String(item.errorfilename),
@@ -536,16 +542,24 @@ const ExcelSheet = () => {
       setPopupContentMalert('Please Select Login ID');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (penaltyErrorUpload.date === '') {
-      setPopupContentMalert('Please Select Date');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-      // Set the flag to true
-    } else if (newArray.length <= 0) {
+    }
+    //  else if (penaltyErrorUpload.date === '') {
+    //   setPopupContentMalert('Please Select Date');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    //   // Set the flag to true
+    // }
+     else if (newArray.length <= 0) {
       setPopupContentMalert('Please Fill Excel');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (SelfDupeRemovedData.length != newdata.length && newdata.length == 0) {
+    } 
+     else  if (datesArray.some(d => d && getDateFormat(d) !== expectedFormat)) {
+  setPopupContentMalert("Expected Date Format Does Not Match");
+  setPopupSeverityMalert("info");
+  handleClickOpenPopupMalert();
+}
+    else if (SelfDupeRemovedData.length != newdata.length && newdata.length == 0) {
       setPopupContentMalert('Duplicate Datas Removed!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
@@ -703,7 +717,7 @@ const ExcelSheet = () => {
               />
             </FormControl>
           </Grid>
-          <Grid item md={3} xs={12} sm={6}>
+          {/* <Grid item md={3} xs={12} sm={6}>
             <FormControl fullWidth size="small">
               <Typography>Date</Typography>
               <OutlinedInput
@@ -718,7 +732,163 @@ const ExcelSheet = () => {
                 }}
               />
             </FormControl>
-          </Grid>
+          </Grid> */}
+            <Grid item md={6} xs={12} sm={12}>
+                                          <Typography>Date Format<b style={{ color: "red" }}>*</b></Typography>
+                                          <Grid container spacing={0.3}>
+                                              <Grid item md={2.5} xs={4} sm={2.5}>
+                                                  <FormControl fullWidth size="small">
+                                                      <Select
+                                                          fullWidth
+                                                          labelId="demo-select-small"
+                                                          id="demo-select-small"
+                                                          MenuProps={{
+                                                              PaperProps: {
+                                                                  style: { maxHeight: 200, width: 80 },
+                                                              },
+                                                          }}
+                                                          value={yeardrop}
+                                                          onChange={(e) => setYeardrop(e.target.value)}
+                                                          displayEmpty
+                                                          inputProps={{ "aria-label": "Without label" }}
+                                                      >
+                                                          <MenuItem value="dd">dd</MenuItem>
+                                                          <MenuItem value="d">d</MenuItem>
+                                                          <MenuItem value="M">M</MenuItem>
+                                                          <MenuItem value="MM">MM</MenuItem>
+                                                          <MenuItem value="MMM">MMM</MenuItem>
+                                                          <MenuItem value="MMMM">MMMM</MenuItem>
+                                                          <MenuItem value="yyyy">yyyy</MenuItem>
+                                                          <MenuItem value="yy">yy</MenuItem>
+          
+                                                      </Select>
+                                                  </FormControl>
+                                              </Grid>
+          
+                                              <Grid item md={2} xs={4} sm={2.7}>
+                                                  <FormControl fullWidth size="small">
+                                                      <Select
+                                                          fullWidth
+                                                          labelId="demo-select-small"
+                                                          id="demo-select-small"
+                                                          MenuProps={{
+                                                              PaperProps: {
+                                                                  style: { maxHeight: 200, width: 80 },
+                                                              },
+                                                          }}
+                                                          value={monthdrop}
+                                                          onChange={(e) => setMonthdrop(e.target.value)}
+                                                          displayEmpty
+                                                          inputProps={{ "aria-label": "Without label" }}
+                                                      >
+                                                          {/* <MenuItem value="Month" disabled>Month</MenuItem> */}
+                                                          <MenuItem value="MM">MM</MenuItem>
+                                                          <MenuItem value="M">M</MenuItem>
+                                                          <MenuItem value="MMM">MMM</MenuItem>
+                                                          <MenuItem value="MMMM">MMMM</MenuItem>
+                                                          <MenuItem value="dd">dd</MenuItem>
+                                                          <MenuItem value="yyyy">yyyy</MenuItem>
+                                                      </Select>
+                                                  </FormControl>
+                                              </Grid>
+          
+                                              <Grid item md={2.7} xs={4} sm={2}>
+                                                  <FormControl fullWidth size="small">
+                                                      <Select
+                                                          fullWidth
+                                                          labelId="demo-select-small"
+                                                          id="demo-select-small"
+                                                          MenuProps={{
+                                                              PaperProps: {
+                                                                  style: { maxHeight: 200, width: 80 },
+                                                              },
+                                                          }}
+                                                          value={datedrop}
+                                                          onChange={(e) => setDatedrop(e.target.value)}
+                                                          displayEmpty
+                                                          inputProps={{ "aria-label": "Without label" }}
+                                                      >
+                                                          {/* <MenuItem value="Date" disabled>Date</MenuItem> */}
+                                                          <MenuItem value="dd">dd</MenuItem>
+                                                          <MenuItem value="d">d</MenuItem>
+                                                          <MenuItem value="yyyy">yyyy</MenuItem>
+                                                          <MenuItem value="yy">yy</MenuItem>
+                                                      </Select>
+                                                  </FormControl>
+                                              </Grid>
+          
+          
+          
+          
+          
+          
+                                              <Grid item md={1.8} xs={3} sm={1.8}>
+                                                  <FormControl fullWidth size="small">
+                                                      {/* <Typography>Excel Date Format</Typography> */}
+                                                      <Select
+                                                          fullWidth
+                                                          labelId="demo-select-small"
+                                                          id="demo-select-small"
+                                                          //   disabled={fileLength > 0}
+                                                          MenuProps={{
+                                                              PaperProps: {
+                                                                  style: {
+                                                                      maxHeight: 200,
+                                                                      width: 80,
+                                                                  },
+                                                              },
+                                                          }}
+                                                          value={symboldrop}
+                                                          onChange={(e) => {
+                                                              setSymboldrop(e.target.value);
+                                                          }}
+                                                          displayEmpty
+                                                          inputProps={{ "aria-label": "Without label" }}
+                                                      >
+                                                          <MenuItem value="/" disabled>
+                                                              {" "}
+                                                              {"/"}{" "}
+                                                          </MenuItem>
+                                                          <MenuItem value="/"> {"/"} </MenuItem>
+                                                          <MenuItem value="."> {"."} </MenuItem>
+                                                          <MenuItem value="-"> {"-"} </MenuItem>
+                                                      </Select>
+                                                  </FormControl>
+                                              </Grid>
+          
+                                              <Grid  item md={3} xs={12} sm={6}>
+                                                  <FormControl fullWidth size="small">
+                                                      {/* <Typography>Excel Date Format</Typography> */}
+                                                      <Select
+                                                          fullWidth
+                                                          labelId="demo-select-small"
+                                                          id="demo-select-small"
+                                                          MenuProps={{
+                                                              PaperProps: {
+                                                                  style: {
+                                                                      maxHeight: 200,
+                                                                      width: 80,
+                                                                  },
+                                                              },
+                                                          }}
+                                                          value={hoursdrop}
+                                                          onChange={(e) => {
+                                                              setHoursdrop(e.target.value);
+                                                          }}
+                                                          displayEmpty
+                                                          inputProps={{ "aria-label": "Without label" }}
+                                                      >
+                                                          <MenuItem value="Hours" disabled>
+                                                              {"Hours"}{" "}
+                                                          </MenuItem>
+                                                          <MenuItem value="12 Hours"> {"12 Hours"} </MenuItem>
+                                                          <MenuItem value="24 Hours"> {"24 Hours"} </MenuItem>
+                                                          <MenuItem value="NAN"> {"NAN"} </MenuItem>
+                                                      </Select>
+                                                  </FormControl>
+                                              </Grid>
+                                          </Grid>
+                                      </Grid>
           <Grid item md={3} xs={12} sm={6}>
             <Typography>
               Type <b style={{ color: "red" }}>*</b>

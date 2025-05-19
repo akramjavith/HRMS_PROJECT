@@ -110,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,itemsName,handleCloseviewalertvendorstock }) {
+function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,itemsName,handleCloseviewalertvendorstock,Specification }) {
     const [assetSpecificationTypeArray, setAssetSpecificationTypeArray] = useState([]);
     const [assetSpecificationType, setAssetSpecificationType] = useState({ name: '', code: '' });
     const [assetModel, setAssetModel] = useState({ name: '', code: '' });
@@ -397,9 +397,11 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
     const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
     const handleClickOpenPopupMalert = () => {
         setOpenPopupMalert(true);
+    
     };
     const handleClosePopupMalert = () => {
         setOpenPopupMalert(false);
+          setBtnSubmit(false)
     };
     const [openPopup, setOpenPopup] = useState(false);
     const [popupContent, setPopupContent] = useState('');
@@ -409,6 +411,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
     };
     const handleClosePopup = () => {
         setOpenPopup(false);
+          setBtnSubmit(false)
     };
 
     const handleChangeGroupName = async (e) => {
@@ -1591,7 +1594,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
     const [stockCodeCount, setStockCodeCount] = useState(0);
     const [workStationOpt, setWorkStationOpt] = useState([]);
     const [filteredWorkStation, setFilteredWorkStation] = useState([]);
-    const [Specification, setSpecification] = useState([]);
+    const [Specificationcomp, setSpecification] = useState([]);
     const [Specificationedit, setSpecificationedit] = useState([]);
 
     const [materialOpt, setMaterialopt] = useState([]);
@@ -2000,7 +2003,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
                 duedate: String(expensecreate.duedate ? expensecreate.duedate : ""),
                 totalbillamountstock: stockmaster.totalbillamount,
                 area: String(stockmaster.area),
-                status: String('Transfer'),
+               
                 workstation: String(stockmaster.workcheck ? stockmaster.workstation : ''),
                 workcheck: String(stockmaster.workcheck),
 
@@ -2038,7 +2041,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
                 warrantycalculation: String(stockmaster.warrantycalculation),
                 purchasedate: selectedPurchaseDate,
 
-                requestmode: String('Stock Material'),
+                requestmode: String(stockmaster.requestmode),
                 // stockcategory: stockmaster.stockcategory === "Please Select Stock Category" ? "" : String(stockmaster.stockcategory),
                 // stocksubcategory: stockmaster.stocksubcategory === "Please Select Stock Sub Category" ? "" : String(stockmaster.stocksubcategory),
                 // stockmaterialarray: stockArray,
@@ -2127,8 +2130,8 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
             handleClickOpenPopup();
             sendDataToParentUIStock(true);
             // setStockmaster(stockcreate.data);
-            await fetchStock();
-            await fetchStockStockMaterial();
+            // await fetchStock();
+            // await fetchStockStockMaterial();
             setStockArray([]);
             setStockmaster({
                 ...stockmaster,
@@ -2259,7 +2262,7 @@ const handleSubmit = async (e) => {
     e.preventDefault();
     await fetchStock('Filtered');
 
-    if (!isStockMaterial) {
+  if (stockmaster.requestmode === "Asset Material") {
       const isNameMatch = stock.some(
         (item) =>
           item.company == stockmaster.company &&
@@ -2328,15 +2331,21 @@ const handleSubmit = async (e) => {
         setPopupContentMalert('Please Select Location!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (vendorGroup === 'Choose Vendor Group') {
+      } else if (vendorGroup === 'Please Select Vendor Group') {
         setPopupContentMalert('Please Select Vendor Group!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (vendorNew === 'Choose Vendor') {
+      } else if (vendorNew === 'Please Select Vendor') {
         setPopupContentMalert('Please Select Vendor!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
+      } 
+      else if (stockmaster.billno === '') {
+        setPopupContentMalert('Please Enter Billno!');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+      }
+      else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
         setPopupContentMalert('Please Select Request Mode For!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
@@ -2344,15 +2353,7 @@ const handleSubmit = async (e) => {
         setPopupContentMalert('Please Select Material!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.component === '' || stockmaster.component === 'Please Select Component') {
-        setPopupContentMalert('Please Select Component!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.billno === '') {
-        setPopupContentMalert('Please Enter Billno!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.productdetails === '') {
+      }   else if (stockmaster.productdetails === '') {
         setPopupContentMalert('Please Enter Product Details!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
@@ -2368,19 +2369,27 @@ const handleSubmit = async (e) => {
         setPopupContentMalert('Please Enter Quantity!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.rate === '') {
-        setPopupContentMalert('Please Enter Rate!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.billdate === '') {
+      }  else if (stockmaster.billdate === '') {
         setPopupContentMalert('Please Select Bill Date!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (refImage.length == 0) {
+      }
+       else if (stockmaster.rate === '') {
+        setPopupContentMalert('Please Enter Rate!');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+      }
+       else if (refImage.length == 0) {
         setPopupContentMalert('Please Upload Bill!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }  else if (isNameMatch) {
+      } 
+      else if (stockmaster.component === '' || stockmaster.component === 'Please Select Component') {
+        setPopupContentMalert('Please Select Component!');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+      }
+      else if (isNameMatch) {
         setPopupContentMalert('Data Already Exist!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
@@ -2391,7 +2400,9 @@ const handleSubmit = async (e) => {
       } else {
         sendRequest();
       }
-    } else {
+    } 
+    
+    else {
       const isNameMatch = stockMaterial.some(
         (item) =>
           item.company == stockmaster.company &&
@@ -4266,121 +4277,130 @@ const handleSubmit = async (e) => {
     const [todos, setTodos] = useState([]);
     const [todosEdit, setTodosEdit] = useState([]);
 
-    const handleAddInput = (e) => {
-        let specificationItem = Specification.find((item) => e === item.categoryname);
-        let filtersub = specificationItem?.subcategoryname;
-        let result;
-        if (filtersub.length > 0) {
-            result = filtersub?.map((sub, index) => ({
-                subname: sub.subcomponent,
-                sub: `${index + 1}.${sub.subcomponent}`,
-                type: sub.type ? 'Please Select Type' : '',
-                model: sub.model ? 'Please Select Model' : '',
-                size: sub.size ? 'Please Select Size' : '',
-                variant: sub.variant ? 'Please Select variant' : '',
-                brand: sub.brand ? 'Please Select Brand' : '',
-                serial: sub.serial ? '' : undefined,
-                other: sub.other ? '' : undefined,
-                capacity: sub.capacity ? 'Please Select Capacity' : '',
-                hdmiport: sub.hdmiport ? '' : undefined,
-                vgaport: sub.vgaport ? '' : undefined,
-                dpport: sub.dpport ? '' : undefined,
-                usbport: sub.usbport ? '' : undefined,
-                paneltypescreen: sub.paneltypescreen ? 'Please Select Panel Type' : '',
-                resolution: sub.resolution ? 'Please Select Screen Resolution' : '',
-                connectivity: sub.connectivity ? 'Please Select Connectivity' : '',
-                daterate: sub.daterate ? 'Please Select Data Rate' : '',
-                compatibledevice: sub.compatibledevice ? 'Please Select Compatible Device' : '',
-                outputpower: sub.outputpower ? 'Please Select Output Power' : '',
-                collingfancount: sub.collingfancount ? 'Please Select Cooling Fan Count' : '',
-                clockspeed: sub.clockspeed ? 'Please Select Clock Speed' : '',
-                core: sub.core ? 'Please Select Core' : '',
-                speed: sub.speed ? 'Please Select Speed' : '',
-                frequency: sub.frequency ? 'Please Select Frequency' : '',
-                output: sub.output ? 'Please Select Output' : '',
-                ethernetports: sub.ethernetports ? 'Please Select Ethernet Ports' : '',
-                distance: sub.distance ? 'Please Select Distance' : '',
-                lengthname: sub.lengthname ? 'Please Select Length' : '',
-                slot: sub.slot ? 'Please Select Slot' : '',
-                noofchannels: sub.noofchannels ? 'Please Select No. Of Channels' : '',
-                colours: sub.colours ? 'Please Select Colour' : '',
+  const handleAddInput = (e) => {
+    let specificationItem = Specification.find((item) => e === item.categoryname);
+    let filtersub = specificationItem?.subcategoryname;
+    let result;
+    if (filtersub.length > 0) {
+      result = filtersub?.map((sub, index) => ({
+        subname: sub.subcomponent,
+        sub: `${index + 1}.${sub.subcomponent}`,
+        subcomponentcheck: false,
+        type: sub.type ? 'Choose Type' : '',
+        model: sub.model ? 'Choose Model' : '',
+        size: sub.size ? 'Choose Size' : '',
+        variant: sub.variant ? 'Choose variant' : '',
+        brand: sub.brand ? 'Choose Brand' : '',
+        serial: sub.serial ? '' : undefined,
+        other: sub.other ? '' : undefined,
+        capacity: sub.capacity ? 'Choose Capacity' : '',
+        hdmiport: sub.hdmiport ? '' : undefined,
+        vgaport: sub.vgaport ? '' : undefined,
+        dpport: sub.dpport ? '' : undefined,
+        usbport: sub.usbport ? '' : undefined,
+        paneltypescreen: sub.paneltypescreen ? 'Choose Panel Type' : '',
+        resolution: sub.resolution ? 'Choose Screen Resolution' : '',
+        connectivity: sub.connectivity ? 'Choose Connectivity' : '',
+        daterate: sub.daterate ? 'Choose Data Rate' : '',
+        compatibledevice: sub.compatibledevice ? 'Choose Compatible Device' : '',
+        outputpower: sub.outputpower ? 'Choose Output Power' : '',
+        collingfancount: sub.collingfancount ? 'Choose Cooling Fan Count' : '',
+        clockspeed: sub.clockspeed ? 'Choose Clock Speed' : '',
+        core: sub.core ? 'Choose Core' : '',
+        speed: sub.speed ? 'Choose Speed' : '',
+        frequency: sub.frequency ? 'Choose Frequency' : '',
+        output: sub.output ? 'Choose Output' : '',
+        ethernetports: sub.ethernetports ? 'Choose Ethernet Ports' : '',
+        distance: sub.distance ? 'Choose Distance' : '',
+        lengthname: sub.lengthname ? 'Choose Length' : '',
+        slot: sub.slot ? 'Choose Slot' : '',
+        noofchannels: sub.noofchannels ? 'Choose No. Of Channels' : '',
+        colours: sub.colours ? 'Choose Colour' : '',
 
-                warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
-                estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
-                estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
-                warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
-                purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
-                vendor: stockmaster.vendorname ? stockmaster.vendorname : undefined,
-                phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
-                vendorid: vendornameid ? vendornameid : undefined,
-                address: vendorgetid.address ? vendorgetid.address : undefined,
-            }));
-        } else if (
-            filtersub.length === 0 &&
-            !(
-                !specificationItem.type &&
-                !specificationItem.model &&
-                !specificationItem.size &&
-                !specificationItem.variant &&
-                !specificationItem.brand &&
-                !specificationItem.serial &&
-                !specificationItem.other &&
-                !specificationItem.capacity &&
-                !specificationItem.hdmiport &&
-                !specificationItem.vgaport &&
-                !specificationItem.dpport &&
-                !specificationItem.usbport
-            )
-        ) {
-            result = [
-                {
-                    // sub: `${index + 1}.${sub.subcomponent}`,
-                    type: specificationItem.type ? 'Please Select Type' : '',
-                    model: specificationItem.model ? 'Please Select Model' : '',
-                    size: specificationItem.size ? 'Please Select Size' : '',
-                    variant: specificationItem.variant ? 'Please Select variant' : '',
-                    brand: specificationItem.brand ? 'Please Select Brand' : '',
-                    serial: specificationItem.serial ? '' : undefined,
-                    other: specificationItem.other ? '' : undefined,
-                    capacity: specificationItem.capacity ? 'Please Select Capacity' : '',
-                    hdmiport: specificationItem.hdmiport ? '' : undefined,
-                    vgaport: specificationItem.vgaport ? '' : undefined,
-                    dpport: specificationItem.dpport ? '' : undefined,
-                    usbport: specificationItem.usbport ? '' : undefined,
-                    paneltypescreen: specificationItem.paneltypescreen ? 'Please Select Panel Type' : '',
-                    resolution: specificationItem.resolution ? 'Please Select Screen Resolution' : '',
-                    connectivity: specificationItem.connectivity ? 'Please Select Connectivity' : '',
-                    daterate: specificationItem.daterate ? 'Please Select Data Rate' : '',
-                    compatibledevice: specificationItem.compatibledevice ? 'Please Select Compatible Device' : '',
-                    outputpower: specificationItem.outputpower ? 'Please Select Output Power' : '',
-                    collingfancount: specificationItem.collingfancount ? 'Please Select Cooling Fan Count' : '',
-                    clockspeed: specificationItem.clockspeed ? 'Please Select Clock Speed' : '',
-                    core: specificationItem.core ? 'Please Select Core' : '',
-                    speed: specificationItem.speed ? 'Please Select Speed' : '',
-                    frequency: specificationItem.frequency ? 'Please Select Frequency' : '',
-                    output: specificationItem.output ? 'Please Select Output' : '',
-                    ethernetports: specificationItem.ethernetports ? 'Please Select Ethernet Ports' : '',
-                    distance: specificationItem.distance ? 'Please Select Distance' : '',
-                    lengthname: specificationItem.lengthname ? 'Please Select Length' : '',
-                    slot: specificationItem.slot ? 'Please Select Slot' : '',
-                    noofchannels: specificationItem.noofchannels ? 'Please Select No. Of Channels' : '',
-                    colours: specificationItem.colours ? 'Please Select Colour' : '',
+        warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
+        estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
+        estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
+        warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
+        purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
 
-                    warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
-                    estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
-                    estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
-                    warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
-                    purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
-                    vendor: stockmaster.vendorname ? stockmaster.vendorname : undefined,
-                    phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
-                    vendorid: vendornameid ? vendornameid : undefined,
-                    address: vendorgetid.address ? vendorgetid.address : undefined,
-                },
-            ];
-        }
+        vendor: vendorNew ? vendorNew : undefined,
+        vendorgroup: vendorGroup ? vendorGroup : undefined,
 
-        setTodos(result);
-    };
+        phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
+        vendorid: vendornameid ? vendornameid : undefined,
+        address: vendorgetid.address ? vendorgetid.address : undefined,
+      }));
+    } else if (
+      filtersub.length === 0 &&
+      !(
+        !specificationItem.type &&
+        !specificationItem.model &&
+        !specificationItem.size &&
+        !specificationItem.variant &&
+        !specificationItem.brand &&
+        !specificationItem.serial &&
+        !specificationItem.other &&
+        !specificationItem.capacity &&
+        !specificationItem.hdmiport &&
+        !specificationItem.vgaport &&
+        !specificationItem.dpport &&
+        !specificationItem.usbport
+      )
+    ) {
+      result = [
+        {
+          // sub: `${index + 1}.${sub.subcomponent}`,
+          subcomponentcheck: false,
+          type: specificationItem.type ? 'Choose Type' : '',
+          model: specificationItem.model ? 'Choose Model' : '',
+          size: specificationItem.size ? 'Choose Size' : '',
+          variant: specificationItem.variant ? 'Choose variant' : '',
+          brand: specificationItem.brand ? 'Choose Brand' : '',
+          serial: specificationItem.serial ? '' : undefined,
+          other: specificationItem.other ? '' : undefined,
+          capacity: specificationItem.capacity ? 'Choose Capacity' : '',
+          hdmiport: specificationItem.hdmiport ? '' : undefined,
+          vgaport: specificationItem.vgaport ? '' : undefined,
+          dpport: specificationItem.dpport ? '' : undefined,
+          usbport: specificationItem.usbport ? '' : undefined,
+          paneltypescreen: specificationItem.paneltypescreen ? 'Choose Panel Type' : '',
+          resolution: specificationItem.resolution ? 'Choose Screen Resolution' : '',
+          connectivity: specificationItem.connectivity ? 'Choose Connectivity' : '',
+          daterate: specificationItem.daterate ? 'Choose Data Rate' : '',
+          compatibledevice: specificationItem.compatibledevice ? 'Choose Compatible Device' : '',
+          outputpower: specificationItem.outputpower ? 'Choose Output Power' : '',
+          collingfancount: specificationItem.collingfancount ? 'Choose Cooling Fan Count' : '',
+          clockspeed: specificationItem.clockspeed ? 'Choose Clock Speed' : '',
+          core: specificationItem.core ? 'Choose Core' : '',
+          speed: specificationItem.speed ? 'Choose Speed' : '',
+          frequency: specificationItem.frequency ? 'Choose Frequency' : '',
+          output: specificationItem.output ? 'Choose Output' : '',
+          ethernetports: specificationItem.ethernetports ? 'Choose Ethernet Ports' : '',
+          distance: specificationItem.distance ? 'Choose Distance' : '',
+          lengthname: specificationItem.lengthname ? 'Choose Length' : '',
+          slot: specificationItem.slot ? 'Choose Slot' : '',
+          noofchannels: specificationItem.noofchannels ? 'Choose No. Of Channels' : '',
+          colours: specificationItem.colours ? 'Choose Colour' : '',
+
+          warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
+          estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
+          estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
+          warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
+          purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
+
+          vendor: vendorNew ? vendorNew : undefined,
+          vendorgroup: vendorGroup ? vendorGroup : undefined,
+
+          phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
+          vendorid: vendornameid ? vendornameid : undefined,
+          address: vendorgetid.address ? vendorgetid.address : undefined,
+        },
+      ];
+    }
+
+    setTodos(result);
+    setVendoroptInd(new Array(result?.length).fill(vendorOpt));
+  };
 
     const handleChange = async (index, name, value, id) => {
         const updatedTodos = [...todos];
@@ -6999,6 +7019,7 @@ const handleSubmit = async (e) => {
                                                                                   fullWidth
                                                                                   labelId="demo-select-small"
                                                                                   id="demo-select-small"
+                                                                                  size="small"
                                                                                   value={todo.estimationtime}
                                                                                   disabled={todo.subcomponentcheck === false}
                                                                                   // onChange={(e) => {
@@ -8722,6 +8743,7 @@ const handleSubmit = async (e) => {
                                                                                   labelId="demo-select-small"
                                                                                   id="demo-select-small"
                                                                                   value={todo.estimationtime}
+                                                                                   size="small"
                                                                                   // onChange={(e) => {
                                                                                   //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
                                                                                   // }}

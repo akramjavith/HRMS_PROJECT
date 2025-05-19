@@ -5520,195 +5520,156 @@ function ManualMaster({ sendDataToParentUIManual, stockmaterialedit, handleClose
               <br />
               <Grid container spacing={2}>
                 <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Company<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      // options={companys}
-                      options={accessbranch
-                        ?.map((data) => ({
-                          label: data.company,
-                          value: data.company,
-                        }))
-                        .filter((item, index, self) => {
-                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                        })}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmaster.company,
-                        value: stockmaster.company,
-                      }}
-                      onChange={(e) => {
-                        setStockmaster({
-                          ...stockmaster,
-                          company: e.value,
-                          branch: 'Please Select Branch',
-                          unit: 'Please Select Unit',
-                          floor: 'Please Select Floor',
-                          area: 'Please Select Area',
-                          location: 'Please Select Location',
-                        });
-                        // setBranchs([]);
-                        setUnits([]);
-                        setFloors([]);
-                        setAreas([]);
-                        setLocations([{ label: 'ALL', value: 'ALL' }]);
-                        fetchBranchDropdowns(e);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Branch<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      // options={branchs}
-                      options={accessbranch
-                        ?.filter((comp) => stockmaster.company === comp.company)
-                        ?.map((data) => ({
-                          label: data.branch,
-                          value: data.branch,
-                        }))
-                        .filter((item, index, self) => {
-                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                        })}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmaster.branch,
-                        value: stockmaster.branch,
-                      }}
-                      onChange={(e) => {
-                        setNewcheckBranch(e.value);
-                        setStockmaster({
-                          ...stockmaster,
-                          branch: e.value,
-                          unit: 'Please Select Unit',
-                          floor: 'Please Select Floor',
-                          area: 'Please Select Area',
-                          location: 'Please Select Location',
-                        });
-                        // setUnits([]);
-                        // setFloors([]);
-                        setAreas([]);
-                        setLocations([{ label: 'ALL', value: 'ALL' }]);
-                        fetchUnits(e);
-                        fetchFloor(e.value);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Unit<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      // options={units}
-                      options={accessbranch
-                        ?.filter((comp) => stockmaster.company === comp.company && stockmaster.branch === comp.branch)
-                        ?.map((data) => ({
-                          label: data.unit,
-                          value: data.unit,
-                        }))
-                        .filter((item, index, self) => {
-                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                        })}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmaster.unit,
-                        value: stockmaster.unit,
-                      }}
-                      onChange={(e) => {
-                        setStockmaster({
-                          ...stockmaster,
-                          unit: e.value,
-                          floor: 'Please Select Floor',
-                          area: 'Please Select Area',
-                          location: 'Please Select Location',
-                        });
-                        // setFloors([]);
-                        setAreas([]);
-                        setLocations([{ label: 'ALL', value: 'ALL' }]);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Floor<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      options={floors}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmaster.floor,
-                        value: stockmaster.floor,
-                      }}
-                      onChange={(e) => {
-                        setStockmaster({
-                          ...stockmaster,
-                          floor: e.value,
-                          workstation: '',
-                          area: 'Please Select Area',
-                        });
-                        // setAreas([]);
-                        setLocations([{ label: 'ALL', value: 'ALL' }]);
-                        fetchArea(stockmaster.branch, e.value);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Area<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      options={areas}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmaster.area,
-                        value: stockmaster.area,
-                      }}
-                      onChange={(e) => {
-                        setStockmaster({
-                          ...stockmaster,
-                          area: e.value,
-                          workstation: '',
-                          location: 'Please Select Location',
-                        });
-                        setLocations([{ label: 'ALL', value: 'ALL' }]);
-                        fetchLocation(stockmaster.branch, stockmaster.floor, stockmaster.area, e.value);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Location<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      options={locations}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmaster.location,
-                        value: stockmaster.location,
-                      }}
-                      onChange={(e) => {
-                        setStockmaster({
-                          ...stockmaster,
-                          location: e.value,
-                          workstation: '',
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
+                                                                 <FormControl fullWidth size="small">
+                                                                     <Typography>
+                                                                         Company<b style={{ color: 'red' }}>*</b>
+                                                                     </Typography>
+                                                                     {/* <Selects
+                                                                         options={companys}
+                                                                         styles={colourStyles}
+                                                                         value={{ label: stockmaster.company, value: stockmaster.company }}
+                                                                         onChange={(e) => {
+                                                                             setStockmaster({ ...stockmaster, company: e.value, branch: 'Please Select Branch', unit: 'Please Select Unit', floor: 'Please Select Floor', area: 'Please Select Area', location: 'Please Select Location' });
+                                                                             // setBranchs([]);
+                                                                             setUnits([]);
+                                                                             setFloors([]);
+                                                                             setAreas([]);
+                                                                             setLocations([{ label: 'ALL', value: 'ALL' }]);
+                                                                             fetchBranchDropdowns(e.value);
+                                                                         }}
+                                                                     /> */}
+                                                                      <OutlinedInput
+                                                                         id="component-outlined"
+                                                                         type="text"
+                                                                         value={stockmaster.company}
+                                                                      readOnly
+                                                                       
+                                                                     />
+                                                                 </FormControl>
+                                                             </Grid>
+                                                             <Grid item md={3} xs={12} sm={12}>
+                                                                 <FormControl fullWidth size="small">
+                                                                     <Typography>
+                                                                         Branch<b style={{ color: 'red' }}>*</b>
+                                                                     </Typography>
+                                                                     {/* <Selects
+                                                                         options={branchs}
+                                                                         styles={colourStyles}
+                                                                         value={{ label: stockmaster.branch, value: stockmaster.branch }}
+                                                                         onChange={(e) => {
+                                                                             setNewcheckBranch(e.value);
+                                                                             setStockmaster({ ...stockmaster, branch: e.value, unit: 'Please Select Unit', floor: 'Please Select Floor', area: 'Please Select Area', location: 'Please Select Location' });
+                                                                             // setUnits([]);
+                                                                             // setFloors([]);
+                                                                             // setAreas([]);
+                                                                             setLocations([{ label: 'ALL', value: 'ALL' }]);
+                                                                             fetchUnits(e.value);
+                                                                             fetchFloor(e.value);
+                                                                         }}
+                                                                     /> */}
+                                                                      <OutlinedInput
+                                                                         id="component-outlined"
+                                                                         type="text"
+                                                                         value={stockmaster.branch}
+                                                                      readOnly
+                                                                       
+                                                                     />
+                                                                 </FormControl>
+                                                             </Grid>
+                                                             <Grid item md={3} xs={12} sm={12}>
+                                                                 <FormControl fullWidth size="small">
+                                                                     <Typography>
+                                                                         Unit<b style={{ color: 'red' }}>*</b>
+                                                                     </Typography>
+                                                                     {/* <Selects
+                                                                         options={units}
+                                                                         styles={colourStyles}
+                                                                         value={{ label: stockmaster.unit, value: stockmaster.unit }}
+                                                                         onChange={(e) => {
+                                                                             setStockmaster({ ...stockmaster, unit: e.value, workstation: '' });
+                                                                         }}
+                                                                     /> */}
+                                                                      <OutlinedInput
+                                                                         id="component-outlined"
+                                                                         type="text"
+                                                                         value={stockmaster.unit}
+                                                                      readOnly
+                                                                       
+                                                                     />
+                                                                 </FormControl>
+                                                             </Grid>
+                                                             <Grid item md={3} xs={12} sm={12}>
+                                                                 <FormControl fullWidth size="small">
+                                                                     <Typography>
+                                                                         Floor<b style={{ color: 'red' }}>*</b>
+                                                                     </Typography>
+                                                                     {/* <Selects
+                                                                         options={floors}
+                                                                         styles={colourStyles}
+                                                                         value={{ label: stockmaster.floor, value: stockmaster.floor }}
+                                                                         onChange={(e) => {
+                                                                             setStockmaster({ ...stockmaster, floor: e.value, workstation: '', area: 'Please Select Area' });
+                                                                             // setAreas([]);
+                                                                             setLocations([{ label: 'ALL', value: 'ALL' }]);
+                                                                             fetchArea(stockmaster.branch, e.value);
+                                                                         }}
+                                                                     /> */}
+                                                                      <OutlinedInput
+                                                                         id="component-outlined"
+                                                                        type="text"
+                                                                         value={stockmaster.floor}
+                                                                      readOnly
+                                                                       
+                                                                     />
+                                                                 </FormControl>
+                                                             </Grid>
+                                                             <Grid item md={3} xs={12} sm={12}>
+                                                                 <FormControl fullWidth size="small">
+                                                                     <Typography>
+                                                                         Area<b style={{ color: 'red' }}>*</b>
+                                                                     </Typography>
+                                                                     {/* <Selects
+                                                                         options={areas}
+                                                                         styles={colourStyles}
+                                                                         value={{ label: stockmaster.area, value: stockmaster.area }}
+                                                                         onChange={(e) => {
+                                                                             setStockmaster({ ...stockmaster, area: e.value, workstation: '', location: 'Please Select Location' });
+                                                                             setLocations([{ label: 'ALL', value: 'ALL' }]);
+                                                                             fetchLocation(stockmaster.branch, stockmaster.floor, stockmaster.area, e.value);
+                                                                         }}
+                                                                     /> */}
+                                                                      <OutlinedInput
+                                                                         id="component-outlined"
+                                                                         type="text"
+                                                                         value={stockmaster.area}
+                                                                      readOnly
+                                                                       
+                                                                     />
+                                                                 </FormControl>
+                                                             </Grid>
+                                                             <Grid item md={3} xs={12} sm={12}>
+                                                                 <FormControl fullWidth size="small">
+                                                                     <Typography>
+                                                                         Location<b style={{ color: 'red' }}>*</b>
+                                                                     </Typography>
+                                                                     {/* <Selects
+                                                                         options={locations}
+                                                                         styles={colourStyles}
+                                                                         value={{ label: stockmaster.location, value: stockmaster.location }}
+                                                                         onChange={(e) => {
+                                                                             setStockmaster({ ...stockmaster, location: e.value, workstation: '' });
+                                                                         }}
+                                                                     /> */}
+                                                                      <OutlinedInput
+                                                                         id="component-outlined"
+                                                                         type="text"
+                                                                         value={stockmaster.location}
+                                                                      readOnly
+                                                                       
+                                                                     />
+                                                                 </FormControl>
+                                                             </Grid>
+              
 
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">

@@ -793,14 +793,20 @@ exports.getAllStockPurchaseLimited = catchAsyncErrors(async (req, res, next) => 
             status: { $ne: "Transfer" }
           }
         },
-        {
-          $project: {
-            requestmode: 1, company: 1, branch: 1, unit: 1,
-            floor: 1, area: 1, location: 1, productname: 1,
-            quantity: 1, stockmaterialarray: 1,tododetails:1,
-            status: { $literal: "Stock" } // Adding status directly
-          }
-        }
+          {
+    $addFields: {
+      status: "Stock"
+    }
+  },
+        // {
+        //   $project: {
+        //     requestmode: 1, company: 1, branch: 1, unit: 1,
+        //     floor: 1, area: 1, location: 1, productname: 1,
+        //     quantity: 1, stockmaterialarray: 1,tododetails:1,vendor:1,vendorgroup:1,frequency:1,gstno:1,
+        //     phonenumber:1,tododetails:1,billno:1,filenames:1,filenamesbill:1,
+        //     status: { $literal: "Stock" } // Adding status directly
+        //   }
+        // }
       ]),
       Manualstock.aggregate([
         {
@@ -813,14 +819,19 @@ exports.getAllStockPurchaseLimited = catchAsyncErrors(async (req, res, next) => 
             status: { $ne: "Transfer" }
           }
         },
-        {
-          $project: {
-            requestmode: 1, company: 1, branch: 1, unit: 1,
-            floor: 1, area: 1, location: 1, productname: 1,
-            quantity: 1, stockmaterialarray: 1,tododetails:1,
-            status: { $literal: "Manual" }
-          }
-        }
+         {
+    $addFields: {
+      status: "Manual"
+    }
+  },
+        // {
+        //   $project: {
+        //     requestmode: 1, company: 1, branch: 1, unit: 1,
+        //     floor: 1, area: 1, location: 1, productname: 1,
+        //     quantity: 1, stockmaterialarray: 1,tododetails:1,
+        //     status: { $literal: "Manual" }
+        //   }
+        // }
   ])
     ]);
 

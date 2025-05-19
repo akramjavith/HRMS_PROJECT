@@ -167,8 +167,9 @@ function StockManagement() {
         assignbranch: accessbranchtable
 
       });
-
-      setUsageCountAll(res_usagecount.data?.stock.filter(d =>
+console.log(res_usagecount.data?.stock,handover,"stock")
+      setUsageCountAll(res_usagecount.data?.stock
+        .filter(d =>
          d.company === handover.company &&
          d.branch === handover.branch &&
          d.unit === handover.unit &&
@@ -184,6 +185,14 @@ function StockManagement() {
         addedbyname: item.addedby[0].name,
 
       })))
+      //     setUsageCountAll(res_usagecount.data?.stock?.map((item, index) => ({
+      //   ...item,
+      //   id: item._id,
+      //   serialNumber: index + 1,
+      //   usagedate: moment(item?.usagedate).format("DD/MM/YYYY"),
+      //   addedbyname: item.addedby[0].name,
+
+      // })))
       setUsageCountAllcheck(false)
     } catch (err) {
       setUsageCountAllcheck(false)
@@ -553,7 +562,7 @@ function StockManagement() {
     setusedcountusage(Number(data.handovercount) - Number(data.returncount))
     setviewusagecount(data.productname)
     setHandover({
-      ...handover,
+      // ...handover,
       status: data.status,
       company: company,
       branch: branch,
@@ -1759,7 +1768,10 @@ function StockManagement() {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
+  const [vendorNew, setVendorNew] = useState('Please Select Vendor');
+    const [vendorGroup, setVendorGroup] = useState('Please Select Vendor Group');
+    const [frequencyValue, setFrequencyValue] = useState('');
+  
   const getCodeStock = async (
     company,
     branch,
@@ -1769,7 +1781,9 @@ function StockManagement() {
     location,
     productname,
     balancedcount,
-    status
+    status,
+    requestmode,
+    data
     // , assettype, producthead, component
   ) => {
     try {
@@ -1778,6 +1792,7 @@ function StockManagement() {
       //         Authorization: `Bearer ${auth.APIToken}`,
       //     },
       // });
+      console.log(data,"Data")
       setStockmaterialedit({
         ...stockmaterialedit,
         company: company,
@@ -1788,10 +1803,19 @@ function StockManagement() {
         location: location,
         productname: productname,
         balancedcount: balancedcount,
-        status: status
+        status: status,
+        billdate:data.billdate,
+        billdate:data.billdate,
+        totalbillamountstock:data.totalbillamountstock,
+        duedate:data.duedate,
+        warrantydetails:data.warrantydetails,
+        tododetails:data.tododetails,
         // ,
         // assettype: assettype, producthead: producthead, component: component,
       });
+      setVendorGroup(data.vendorgroup)
+      setVendorNew(data.vendor)
+      setFrequencyValue(data.vendorfrequency)
       if (status == "Stock") {
         handleClickOpenviewalertvendorstock();
       } else {
@@ -2882,6 +2906,7 @@ function StockManagement() {
                   params.data.balancedcount,
                   params.data.status,
                   params.data.requestmode,
+                  params.data
 
                   // ,
                   // params.data.assettype, params.data.producthead, params.data.component
@@ -3676,6 +3701,20 @@ function StockManagement() {
             branch: item.branch,
             unit: item.unit,
             floor: item.floor,
+
+
+              vendor: item.vendor,
+            vendorgroup: item.vendorgroup,
+            totalbillamount: item.totalbillamount,
+            vendorid: item.vendorid,
+    filenames: item.filenames,
+            filenamesbill: item.filenamesbill,
+            billno: item.billno,
+            duedate: item.duedate,
+            billdate: item.billdate,
+vendorfrequency:item.vendorfrequency,
+totalbillamountstock:item.totalbillamountstock,
+warrantydetails:item.warrantydetails,
             status: item.status,
             area: item.area,
             location: item.location,
@@ -3722,6 +3761,18 @@ function StockManagement() {
               status: current.status,
               area: current.area,
               location: current.location,
+               vendor: current.vendor,
+            vendorgroup: current.vendorgroup,
+            totalbillamount: current.totalbillamount,
+            vendorid: current.vendorid,
+    filenames: current.filenames,
+            filenamesbill: current.filenamesbill,
+               billno: current.billno,
+            duedate: current.duedate,
+            billdate: current.billdate,
+vendorfrequency:current.vendorfrequency,
+totalbillamountstock:current.totalbillamountstock,
+warrantydetails:current.warrantydetails,
               productname: current.materialnew,
               materialnew: current.materialnew,
               requestmode: current.requestmode,
@@ -3835,7 +3886,7 @@ function StockManagement() {
           }
         });
 
-        // console.log(merge, "mergestock")
+    console.log(merge, "mergestock")
         let quantityAndUom = merge.map((data, newindex) => ({
           ...data,
           uomnew: `${data.purchasecountstock}#${data.uomcodenew}`,
@@ -6765,6 +6816,9 @@ function StockManagement() {
           sendDataToParentUIStock={handleDataFromChildUIDeignStock}
           openpop={!openviewalertvendorstock}
           stockmaterialedit={stockmaterialedit}
+          vendorNew={vendorNew}
+          vendorGroup={vendorGroup}
+          frequencyValue={frequencyValue}
           handleCloseviewalertvendorstock={handleCloseviewalertvendorstock}
         />
       </Dialog>

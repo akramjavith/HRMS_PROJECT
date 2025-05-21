@@ -51,7 +51,7 @@ exports.getAllPenaltyerroruploadpointsduplicatewithbulkerroruploadFile = catchAs
 
 
     const getKey = (item) =>
-      `${item.projectvendor}-${item.process}-${item.loginid}-${item.date}-${item.errorfilename}-${item.documentnumber}-${item.documenttype}-${item.fieldname}-${item.line}-${item.errorvalue}-${item.correctvalue}`;
+      `${item.projectvendor}$${item.process}$${item.loginid}$${item.date}$${item.errorfilename}$${item.documentnumber}$${item.documenttype}$${item.fieldname}$${item.line}$${item.errorvalue}-${item.correctvalue}`;
 
     // 2. Create Set of keys from DB results
     const existingKeys = new Set(penaltyerroruploadpointsall.map(getKey));
@@ -441,10 +441,10 @@ exports.getAllPenaltyErrorUploadPointsByDate = catchAsyncErrors(async (req, res,
 
 
     let query = {
-      projectvendor: projectvendor,
+      projectvendor: {$in:projectvendor},
     process: {$in:process},
-      loginid: loginid,
-   date: date,
+      loginid: {$in:loginid},
+  date: {$in:date},
     }
 
     penaltyerroruploadpoints = await PenaltyErrorUploadpoints.find(query);
@@ -468,7 +468,7 @@ exports.getAllBulkErroruploadbydate = catchAsyncErrors(async (req, res, next) =>
         projectvendor: projectvendor,
     process: {$in:process},
       loginid: loginid,
-   dateformatted: date,
+   dateformatted: {$in:date},
     }
     penaltyerroruploadpoints = await BulkErrorUploadpoints.find(query);
   } catch (err) {
@@ -494,7 +494,7 @@ exports.getAllPenaltyErrorUploadPointsByDateNew = catchAsyncErrors(async (req, r
       projectvendor: projectvendor,
       process: {$in:process},
       loginid: loginid,
-      date: date,
+      date: {$in:date},
     }
 
     penaltyerroruploadpoints = await PenaltyErrorUploadpoints.find(query);
@@ -518,8 +518,10 @@ exports.getAllBulkErroruploadbydateNew = catchAsyncErrors(async (req, res, next)
       projectvendor: projectvendor,
        process: {$in:process},
       loginid: loginid,
-      dateformatted: date,
+      dateformatted: {$in:date},
     }
+    console.log(query,"querybulk")
+
     penaltyerroruploadpoints = await BulkErrorUploadpoints.find(query);
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
@@ -531,5 +533,25 @@ exports.getAllBulkErroruploadbydateNew = catchAsyncErrors(async (req, res, next)
   });
 });
 
+
+exports.getAllPenaltyErrorUploadEditExcel = catchAsyncErrors(async (req, res, next) => {
+
+ const {body} = req.body;
+console.log(body,req.query,"body")
+  // Convert array to bulkWrite operations
+  const bulkOps = body.map(item => ({
+    updateOne: {
+      filter: { _id: item.id }, // Make sure `item.id` is ObjectId if needed
+      update: { $set: { link: item.link,doclink: item.doclink  } }
+    }
+  }));
+
+  try {
+    const result = await PenaltyErrorUploadpoints.bulkWrite(bulkOps);
+    res.status(200).json({ message: 'Bulk update successful', result });
+  } catch (error) {
+    res.status(500).json({ message: 'Bulk update failed', error });
+  }
+});
 
 

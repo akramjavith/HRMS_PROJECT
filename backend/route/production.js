@@ -658,7 +658,7 @@ productionRoute.route("/categorydatechange/:id").get(getSingleCategorydatechange
 
 //Penaltyerroruploadpoints Route
 const { getAllPenaltyerroruploadpoints, getAllPenaltyerroruploadpointsduplicatewithbulkerrorupload,getAllPenaltyerroruploadpointsClientUserId,
-  getAllBulkErroruploadbydate,getAllPenaltyErrorUploadPointsByDateNew,getAllBulkErroruploadbydateNew,
+  getAllBulkErroruploadbydate,getAllPenaltyErrorUploadPointsByDateNew,getAllBulkErroruploadbydateNew,getAllPenaltyErrorUploadEditExcel,
   getAllBulkerroruploadpointsduplicatewithbulkerrorupload, getAllBulkerroruploadpointsduplicatewithbulkerroruploadFile,getAllPenaltyErrorUploadPointsByDate,
   getAllPenaltyerroruploadpointsduplicatewithbulkerroruploadFile, PenaltyErrorUploadSort, updatePenaltyerroruploadpoints, getAllPenaltyerroruploadpointsProjectBasedFilter, getAllPenaltyerroruploadpointsDateFilter, deletePenaltyerroruploadpoints, deleteMultiplePenaltyErrorUpload, getSinglePenaltyerroruploadpoints, addPenaltyerroruploadpoints } = require("../controller/modules/penalty/penaltyerrorupload");
 productionRoute.route("/penaltyerroruploadsclientuseridlimited").post(getAllPenaltyerroruploadpointsClientUserId);
@@ -683,15 +683,18 @@ productionRoute.route("/bulkerroruploadfetchbydate").post(getAllBulkErroruploadb
 
 productionRoute.route("/penaltyerroruploadsbydatenew").post(getAllPenaltyErrorUploadPointsByDateNew);
 productionRoute.route("/bulkerroruploadfetchbydatenew").post(getAllBulkErroruploadbydateNew);
+productionRoute.route("/penaltyerroruploadedtiexcel").post(getAllPenaltyErrorUploadEditExcel);
+
 
 
 
 //Bulkerroruploadpoints Route
-const { getAllBulkErrorUploadpoints, PenaltyDayCreateBulkDelete, getAllBulkErrorUploadpointsFilename, getAllBulkErrorUploadListFilter, getAllBulkErrorIploadUniqid, updateBulkErrorUploadpoints, deleteBulkErrorUploadpoints, getAllBulkErrorUploadpointsFilter, getSingleBulkErrorUploadpoints, addBulkErrorUploadpoints, deleteMultipleBulkErrorUpload } = require("../controller/modules/penalty/bulkerrorupload");
+const { getAllBulkErrorUploadpoints, PenaltyDayCreateBulkDelete, getAllBulkErrorUploadpointsFilename, getAllBulkErrorUploadListFilter, getAllBulkErrorIploadUniqid, updateBulkErrorUploadpoints, deleteBulkErrorUploadpoints, getAllBulkErrorUploadpointsFilter, getSingleBulkErrorUploadpoints, addBulkErrorUploadpoints,addBulkErrorUploadpointsExcel, deleteMultipleBulkErrorUpload } = require("../controller/modules/penalty/bulkerrorupload");
 productionRoute.route("/bulkerroruploads").get(getAllBulkErrorUploadpoints);
 productionRoute.route("/bulkerroruploadsbulkdelete").post(PenaltyDayCreateBulkDelete);
 productionRoute.route("/bulkerroruploadsfilterlist").post(getAllBulkErrorUploadListFilter);
 productionRoute.route("/bulkerroruploads/new").post(addBulkErrorUploadpoints);
+productionRoute.route("/bulkerroruploadsexcel").post(addBulkErrorUploadpointsExcel);
 productionRoute.route("/bulkerroruploadsunique").get(getAllBulkErrorIploadUniqid);
 productionRoute.route("/bulkerroruploadsfilename").post(getAllBulkErrorUploadpointsFilename);
 productionRoute.route("/multiplebulkerroruploads").post(deleteMultipleBulkErrorUpload);

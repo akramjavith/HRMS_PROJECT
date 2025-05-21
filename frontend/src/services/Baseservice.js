@@ -5783,6 +5783,11 @@ export const SERVICE = {
     STOCK_MANAGEMENT_STATUS: `${BASE_URL}/api/stockmanagementstatus`,
     STOCK_MANAGEMENT__MANUAL_STATUS: `${BASE_URL}/api/stockmanagementstatusmanual`,
 
+    PENALTY_ERROR_UPLOAD_BULK_UPDATE: `${BASE_URL}/api/penaltyerroruploadedtiexcel`,
+    BULK_ERROR_UPLOAD_EXCEL: `${BASE_URL}/api/bulkerroruploadsexcel`,
 
+
+
+    
     
 };

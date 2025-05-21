@@ -74,6 +74,33 @@ exports.addBulkErrorUploadpoints = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
+exports.addBulkErrorUploadpointsExcel = catchAsyncErrors(async (req, res, next) => {
+  const payload = req.body;
+
+  if (!Array.isArray(payload) || payload.length === 0) {
+    return res.status(400).json({
+      message: "Invalid data: Expected a non-empty array.",
+    });
+  }
+
+  try {
+    await BulkErrorUploadpoints.insertMany(payload, {
+      ordered: false, // continue inserting even if some docs fail
+    });
+
+    return res.status(200).json({
+      message: "Successfully added!",
+      count: payload.length,
+    });
+  } catch (error) {
+    console.error("Bulk insert error:", error);
+    return res.status(500).json({
+      message: "Bulk insert failed.",
+      error: error.message,
+    });
+  }
+});
+
 // get Signle bulkerroruploadpoints => /api/bulkerroruploadpoints/:id
 exports.getSingleBulkErrorUploadpoints = catchAsyncErrors(async (req, res, next) => {
     const id = req.params.id;

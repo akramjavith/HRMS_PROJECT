@@ -802,6 +802,7 @@ const ExcelSheet = () => {
         ? DEP_QUEUE_FIELDS
         : [];
 
+
     function getDateFormat(dateValue) {
       console.log(dateValue, "dateValue")
       const patterns = [
@@ -814,6 +815,7 @@ const ExcelSheet = () => {
         { regex: /^\[A-Za-z]{4,}\/\d{2}\/\d{4}$/, format: "MMMM/dd/yyyy" },
         { regex: /^\d{4}\/\d{2}\/\d{2}$/, format: "yyyy/MM/dd" },
         { regex: /^\d{2}\/\d{2}\/\d{2}$/, format: "yy/MM/dd" },
+          { regex: /^\d{2}\/\d{2}\/\d{2}$/, format: "MM/dd/yy" },
         //  "-" FORMAT
 
         { regex: /^\d{2}-\d{2}-\d{4}$/, format: "dd-MM-yyyy" },
@@ -824,6 +826,7 @@ const ExcelSheet = () => {
         { regex: /^[A-Za-z]{4,}-\d{2}-\d{4}$/, format: "MMMM-dd-yyyy" },
         { regex: /^\d{4}-\d{2}-\d{2}$/, format: "yyyy-MM-dd" },
         { regex: /^\d{2}-\d{2}-\d{2}$/, format: "yy-MM-dd" },
+        { regex: /^\d{2}-\d{2}-\d{2}$/, format: "MM-dd-yy" },
         //  "." FORMAT
 
         { regex: /^\d{2}\.\d{2}\.\d{4}$/, format: "dd.MM.yyyy" },
@@ -834,7 +837,7 @@ const ExcelSheet = () => {
         { regex: /^[A-Za-z]{4,}\.\d{2}\.\d{4}$/, format: "MMMM.dd.yyyy" },
         { regex: /^\d{4}\.\d{2}\.\d{2}$/, format: "yyyy.MM.dd" },
         { regex: /^\d{2}\.\d{2}\.\d{2}$/, format: "yy.MM.dd" },
-
+       { regex: /^\d{2}\.\d{2}\.\d{2}$/, format: "MM.dd.yy" },
       ];
 
       // Find the format of the input date
@@ -866,34 +869,82 @@ const ExcelSheet = () => {
 
 
 
-    function formatToDate(dateValue, format) {
-      console.log(dateValue, format, "heck")
-      dateValue = dateValue.trim(); // Remove extra spaces
+    // function formatToDate(dateValue, format) {
+    //   console.log(dateValue, format, "heck")
+    //   dateValue = dateValue.trim(); // Remove extra spaces
 
-      // Create regex based on the given format
-      const separator = format.includes("/") ? "/" : (format.includes("-") ? "-" : ".");
-      const regexPattern = new RegExp(format.replace(/(YYYY|MM|DD)/gi, "\\d{2,4}").replace(/[-/.]/g, `\\${separator}`));
+    //   // Create regex based on the given format
+    //   const separator = format.includes("/") ? "/" : (format.includes("-") ? "-" : ".");
+    //   const regexPattern = new RegExp(format.replace(/(YYYY|MM|DD)/gi, "\\d{2,4}").replace(/[-/.]/g, `\\${separator}`));
 
-      // Check if the date matches the format
-      if (regexPattern.test(dateValue)) {
-        let year, month, day;
-        const dateParts = dateValue.split(separator);
-        const formatParts = format.split(separator);
+    //   // Check if the date matches the format
+    //   if (regexPattern.test(dateValue)) {
+    //     let year, month, day;
+    //     const dateParts = dateValue.split(separator);
+    //     const formatParts = format.split(separator);
 
-        // Compare and map parts from format to actual date value
-        formatParts.forEach((part, index) => {
-          const upperPart = part.toUpperCase(); // Make it case-insensitive
-          if (upperPart === "YYYY") year = dateParts[index];
-          if (upperPart === "MM") month = dateParts[index];
-          if (upperPart === "DD") day = dateParts[index];
-        });
+    //     // Compare and map parts from format to actual date value
+    //     formatParts.forEach((part, index) => {
+    //       const upperPart = part.toUpperCase(); // Make it case-insensitive
+    //       if (upperPart === "YYYY") year = dateParts[index];
+    //       if (upperPart === "MM") month = dateParts[index];
+    //       if (upperPart === "DD") day = dateParts[index];
+    //     });
 
-        // Return formatted date in "YYYY-MM-DD"
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      }
+    //     // Return formatted date in "YYYY-MM-DD"
+    //     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    //   }
 
-      return "Invalid date format";
+    //   return "Invalid date format";
+    // }
+
+
+        function formatToDate(dateValue, format) {
+  console.log(dateValue, format, "check");
+
+  if (!dateValue || !format) return "Invalid input";
+
+  dateValue = dateValue.trim();
+  const separator = format.includes("/") ? "/" : format.includes("-") ? "-" : ".";
+
+  const dateParts = dateValue.split(separator);
+  const formatParts = format.split(separator);
+
+  if (dateParts.length !== formatParts.length) {
+    return "Invalid date format";
+  }
+
+  let year = "", month = "", day = "";
+
+  formatParts.forEach((part, index) => {
+    const value = dateParts[index];
+    switch (part.toUpperCase()) {
+      case "YYYY":
+        year = value;
+        break;
+      case "YY":
+        year = parseInt(value) < 50 ? `20${value}` : `19${value}`;
+        break;
+      case "MM":
+      case "M":
+        month = value.padStart(2, "0");
+        break;
+      case "DD":
+      case "D":
+        day = value.padStart(2, "0");
+        break;
     }
+  });
+
+  if (!year || !month || !day) {
+    return "Invalid date format";
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
+
+
     const datesArray = newArray.map(obj => obj["date"]);
     console.log(datesArray, "datesArray")
 

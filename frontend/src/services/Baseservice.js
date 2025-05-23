@@ -5785,6 +5785,9 @@ export const SERVICE = {
 
     PENALTY_ERROR_UPLOAD_BULK_UPDATE: `${BASE_URL}/api/penaltyerroruploadedtiexcel`,
     BULK_ERROR_UPLOAD_EXCEL: `${BASE_URL}/api/bulkerroruploadsexcel`,
+    STOCK_PURCHASE_LIMITED_ASSIGN: `${BASE_URL}/api/stockpurchaselimitedassign`,
+
+    
 
 
 

@@ -126,6 +126,15 @@ function ManuaStockTable({ vendorAuto }) {
   const [isusercompleted, setisusercompleted] = useState([]);
   const [isAttandance, setIsAttandance] = useState(false);
 
+  const [openViewstatus, setOpenViewstatus] = useState(false);
+
+    const handleViewOpenstatus = () => {
+    setOpenViewstatus(true);
+  };
+  const handlViewClosestatus = () => {
+    setOpenViewstatus(false);
+  };
+
 
   const [stockmanagemasteredit, setStockmanagemasteredit] = useState({
     company: 'Please Select Company',
@@ -2596,13 +2605,15 @@ function ManuaStockTable({ vendorAuto }) {
           ...item,
           id: item._id,
           serialNumber: index + 1,
-          date: item.handover === "handover" ? moment(item.allotdate).format("DD/MM/YYYY") :
-            item.handover === "return" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
-              moment(item.usagedate).format("DD/MM/YYYY"),
-
-          time: item.handover === "handover" ? item.allottime :
-            item.handover === "return" ? moment(item.addedby[0]?.date).format("hh:mm") :
-              item.usagetime,
+              date: item.handover === "handover" ? moment(item.allotdate).format("DD/MM/YYYY") :
+                    item.handover === "return" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
+                    item.status === "Transfer" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
+                      moment(item.usagedate).format("DD/MM/YYYY"),
+        
+                  time: item.handover === "handover" ? item.allottime :
+                    item.handover === "return" ? moment(item.addedby[0]?.date).format("hh:mm") :
+                     item.status === "Transfer" ? moment(item.addedby[0]?.date).format("hh:mm") :
+                      item.usagetime,
         }
       }));
       setIsAttandance(false)
@@ -3930,11 +3941,14 @@ function ManuaStockTable({ vendorAuto }) {
       cellRenderer: (params) => {
         let buttonStyles = {};
 
-        if (params.data.handover === "handover") {
+         if (params.data.handover === "handover") {
           buttonStyles = { backgroundColor: "#DFF6DD", color: "#2E7D32", borderColor: "#2E7D32" };
         } else if (params.data.handover === "return") {
           buttonStyles = { backgroundColor: "#FFEBEE", color: "#D32F2F", borderColor: "#D32F2F" };
-        } else {
+        } else if (params.data.hansover === "usagecount") {
+          buttonStyles = { backgroundColor: "#E3F2FD", color: "#1565C0", borderColor: "#1565C0" };
+        }
+        else {
           buttonStyles = { backgroundColor: "#E3F2FD", color: "#1565C0", borderColor: "#1565C0" };
         }
 
@@ -4099,7 +4113,7 @@ function ManuaStockTable({ vendorAuto }) {
       hide: !columnVisibilitycom.actions,
       cellRenderer: (params) => (
         <Grid sx={{ display: 'flex' }}>
-          {isUserRoleCompare?.includes('dstockpurchase') && (
+        
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
@@ -4109,7 +4123,18 @@ function ManuaStockTable({ vendorAuto }) {
             >
               <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
             </Button>
-          )}
+          
+           
+                      <Button
+                        sx={userStyle.buttonedit}
+                        onClick={(e) => {
+                          getviewCode(params.data.id);
+                          handleViewOpenstatus();
+                        }}
+                      >
+                        <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
+                      </Button>
+                 
         </Grid>
       ),
     },
@@ -6677,6 +6702,115 @@ function ManuaStockTable({ vendorAuto }) {
         exportRowValues={exportRowValuescom}
         componentRef={componentRefcom}
       />
+
+
+           <Dialog open={openViewstatus} onClose={handlViewClosestatus} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '95px' }}>
+              <Box sx={{ padding: '20px 50px' }}>
+                <>
+                  <Typography sx={userStyle.HeaderText}>Status View Stock Purchase</Typography>
+                  <br /> <br />
+                  <Grid container spacing={2}>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6"> Material</Typography>
+                        <Typography>{stockmanagemasteredit.productname}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6"> Company</Typography>
+                        <Typography>{stockmanagemasteredit.company}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6"> Branch</Typography>
+                        <Typography>{stockmanagemasteredit.branch}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">Unit</Typography>
+                        <Typography>{stockmanagemasteredit.unit}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">Floor</Typography>
+                        <Typography>{stockmanagemasteredit.floor}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">Area</Typography>
+                        <Typography>{stockmanagemasteredit.area}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">Location</Typography>
+                        <Typography>{stockmanagemasteredit.location}</Typography>
+                      </FormControl>
+                    </Grid>
+      
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">Employee Name</Typography>
+                        <Typography>{stockmanagemasteredit.employeenameto}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">User Company</Typography>
+                        <Typography>{stockmanagemasteredit?.usercompany}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">User Branch</Typography>
+                        <Typography>{stockmanagemasteredit?.userbranch}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">User Unit</Typography>
+                        <Typography>{stockmanagemasteredit.userunit}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">Quantity</Typography>
+                        <Typography>{stockmanagemasteredit.countquantity}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">Date</Typography>
+                        <Typography>{moment(stockmanagemasteredit.date).format('DD/MM/YYYY')}</Typography>
+                      </FormControl>
+                    </Grid>
+                    <Grid item md={4} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography variant="h6">Time</Typography>
+                        <Typography>{stockmanagemasteredit.handover === "handover" ? stockmanagemasteredit.allottime :
+                  stockmanagemasteredit.handover === "return" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
+                   stockmanagemasteredit.status === "Transfer" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
+                    stockmanagemasteredit.usagetime}</Typography>
+                      </FormControl>
+                    </Grid>
+                   
+                  </Grid>
+                  <br /> <br /> <br />
+                  <Grid container spacing={2}>
+                    <Button variant="contained" color="primary" onClick={handlViewClosestatus}>
+                      Back
+                    </Button>
+                  </Grid>
+                </>
+              </Box>
+            </Dialog>
+
+
     </Box>
   );
 }

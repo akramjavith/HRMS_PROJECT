@@ -1,5 +1,6 @@
 const Stock = require("../../../model/modules/stockpurchase/stock");
 const User = require("../../../model/login/auth");
+const Assetdetail = require('../../../model/modules/account/assetdetails');
 const Managestockitems = require("../../../model/modules/stockpurchase/managestockitems");
 const Manualstock = require("../../../model/modules/stockpurchase/manualstockentry");
 const ErrorHandler = require("../../../utils/errorhandler");
@@ -56,12 +57,17 @@ exports.getAllStockManagementStatus = catchAsyncErrors(async (req, res, next) =>
   
   query = {
     $or: branchFilter,
-   handover:{$in:["handover","return","usagecount"]}
+  $or:[
+  { handover:{$in:["handover","return","usagecount"]}},
+  { status:"Transfer"}
+   ]
   }
-
-    stock = await Stock.find(query,{employeenameto:1,handover:1,company:1,branch:1,unit:1,floor:1,
-      usagedate:1,usagetime:1,      allotdate:1,allottime:1,
-      area:1,location:1,countquantity:1,productname:1,usercompany:1,userbranch:1,userunit:1,userteam:1,addedby:1,createdAt:1});
+console.log(query,"querys")
+    // stock = await Stock.find(query,{employeenameto:1,handover:1,company:1,branch:1,unit:1,floor:1,
+    //   usagedate:1,usagetime:1,      allotdate:1,allottime:1,tododetails:1,
+    //   area:1,location:1,countquantity:1,productname:1,usercompany:1,userbranch:1,userunit:1,userteam:1,addedby:1,createdAt:1});
+       stock = await Stock.find(query);
+       console.log(stock.length,"stockshlk")
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
   }
@@ -86,17 +92,21 @@ exports.getAllStockManagementStatusManual = catchAsyncErrors(async (req, res, ne
   }));
 
   
-  query = {
+   query = {
     $or: branchFilter,
-   handover:{$in:["handover","return","usagecount"]}
+  $or:[
+  { handover:{$in:["handover","return","usagecount"]}},
+  { status:"Transfer"}
+   ]
   }
 
 
     // query.handover={$in:["handover","return","usagecount"]}
 
-    stock = await Manualstock.find(query,{employeenameto:1,handover:1,company:1,branch:1,unit:1,floor:1,
-      usagedate:1,usagetime:1,allotdate:1,allottime:1,
-      area:1,location:1,countquantity:1,productname:1,usercompany:1,userbranch:1,userunit:1,userteam:1,addedby:1,createdAt:1});
+    // stock = await Manualstock.find(query,{employeenameto:1,handover:1,company:1,branch:1,unit:1,floor:1,
+    //   usagedate:1,usagetime:1,allotdate:1,allottime:1,
+    //   area:1,location:1,countquantity:1,productname:1,usercompany:1,userbranch:1,userunit:1,userteam:1,addedby:1,createdAt:1});
+        stock = await Manualstock.find(query);
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
   }
@@ -687,7 +697,7 @@ exports.getAllStockPurchaseLimitedTransfer = catchAsyncErrors(async (req, res, n
   try {
 
     stock = await Stock.find({ status: "Transfer" },
-      { requestmode: 1, company: 1, status: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, stockmaterialarray: 1,tododetails:1, quantity: 1 });
+      { requestmode: 1, company: 1, status: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, tododetails:1, quantity: 1 });
 
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
@@ -1185,41 +1195,70 @@ exports.getAllStockPurchaseLimitedUsageCount = catchAsyncErrors(async (req, res,
     unit: branchObj.unit,
   }));
 
-    const [stocklimited, manuallimited] = await Promise.all([
+    const [stocklimited, manuallimited,assetdetails] = await Promise.all([
       Stock.aggregate([
         {
           $match: { 
           $or:branchFilter,
           handover: "usagecount" }
         },
-        {
-          $project: {
-            company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,addedby:1,
-            employeenameto: 1, usagedate: 1, usagetime: 1, usercompany: 1, userbranch: 1, userunit: 1,
-            userfloor: 1, userarea: 1, userlocation: 1, useremployee: 1, userteam: 1, description: 1,
-            filesusagecount: 1, requestmode: 1,
-            status: { $literal: "Stock" } // Adding status field
-          }
-        }
+         {
+    $addFields: {
+      status: "Stock"
+    }
+  },
+        // {
+        //   $project: {
+        //     company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,addedby:1,
+        //     employeenameto: 1, usagedate: 1, usagetime: 1, usercompany: 1, userbranch: 1, userunit: 1,
+        //     userfloor: 1, userarea: 1, userlocation: 1, useremployee: 1, userteam: 1, description: 1,
+        //     filesusagecount: 1, requestmode: 1,
+        //     status: { $literal: "Stock" } // Adding status field
+        //   }
+        // }
       ]),
       Manualstock.aggregate([
         {
           $match: { handover: "usagecount" }
         },
+         {
+    $addFields: {
+      status: "Manual"
+    }
+  },
+        // {
+        //   $project: {
+        //     company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,addedby:1,
+        //     employeenameto: 1, usagedate: 1, usagetime: 1, usercompany: 1, userbranch: 1, userunit: 1,
+        //     userfloor: 1, userarea: 1, userlocation: 1, useremployee: 1, userteam: 1, description: 1,
+        //     filesusagecount: 1, requestmode: 1,
+        //     status: { $literal: "Manual" } // Adding status field
+        //   }
+        // }
+      ]),
+         Assetdetail.aggregate([
         {
-          $project: {
-            company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,addedby:1,
-            employeenameto: 1, usagedate: 1, usagetime: 1, usercompany: 1, userbranch: 1, userunit: 1,
-            userfloor: 1, userarea: 1, userlocation: 1, useremployee: 1, userteam: 1, description: 1,
-            filesusagecount: 1, requestmode: 1,
-            status: { $literal: "Manual" } // Adding status field
-          }
-        }
+          $match: { status: "Assign" }
+        },
+  //        {
+  //   // $addFields: {
+  //   //   status: "Assign"
+  //   // }
+  // },
+        // {
+        //   $project: {
+        //     company: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, countquantity: 1,addedby:1,
+        //     employeenameto: 1, usagedate: 1, usagetime: 1, usercompany: 1, userbranch: 1, userunit: 1,
+        //     userfloor: 1, userarea: 1, userlocation: 1, useremployee: 1, userteam: 1, description: 1,
+        //     filesusagecount: 1, requestmode: 1,
+        //     status: { $literal: "Manual" } // Adding status field
+        //   }
+        // }
       ])
     ]);
 
-    stock = [...stocklimited, ...manuallimited];
-// console.log(stock,"stockusagecoutn")
+    stock = [...stocklimited, ...manuallimited,...assetdetails];
+console.log(stock,"stockusagecoutn")
 
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
@@ -2943,4 +2982,19 @@ const {id} = req.body
 
 
 
+exports.getAllStockPurchaseLimitedAssign= catchAsyncErrors(async (req, res, next) => {
+  let stock;
+  try {
 
+    stock = await Assetdetail.find({ status: "Assign" }, { });
+
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+  if (!stock) {
+    return next(new ErrorHandler("Stock not found!", 404));
+  }
+  return res.status(200).json({
+    stock,
+  });
+});

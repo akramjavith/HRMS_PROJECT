@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
@@ -14,6 +15,7 @@ import pdfIcon from "../../components/Assets/pdf-icon.png";
 import wordIcon from "../../components/Assets/word-icon.png";
 import Webcamimage from "../asset/Webcameimageasset.js";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   Box, InputAdornment,
@@ -46,7 +48,7 @@ import { saveAs } from "file-saver";
 import html2canvas from "html2canvas";
 import "jspdf-autotable";
 import moment from "moment-timezone";
-import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from "react";
+
 import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch, FaPlus, FaEdit } from "react-icons/fa";
 import { ThreeDots } from "react-loader-spinner";
 import { MultiSelect } from "react-multi-select-component";
@@ -101,12 +103,16 @@ function StockManagement() {
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
   const [searchedString, setSearchedString] = useState("");
-
+  console.log(stock, "stock")
 
 
   const [filteredRowDataviewasset, setFilteredRowDataviewasset] = useState([]);
   const [filteredChangesviewasset, setFilteredChangesviewasset] = useState(null);
   const [searchedStringviewasset, setSearchedStringviewasset] = useState("");
+
+
+  const [stockCategoryOptions, setStockCategoryOptions] = useState([]);
+  const [allStockCategory, setAllStockCategory] = useState([]);
 
 
 
@@ -139,7 +145,7 @@ function StockManagement() {
   };
 
 
-
+  const [isEditOpenused, setIsEditOpenused] = useState(false);
   const [usageCountAllcheck, setUsageCountAllcheck] = useState(false)
 
   const [handover, setHandover] = useState({
@@ -150,12 +156,17 @@ function StockManagement() {
     area: "",
     location: "",
     productname: "",
+    usagecount: "",
+    requestmode: "",
+    status: "",
+    balancedcount: "",
+    quantitynew: ""
   });
 
 
   const [usageCountAll, setUsageCountAll] = useState([])
 
-  // console.log(usageCountAll, "usageCountAll")
+  console.log(usageCountAll, "usageCountAll")
 
   const fetchUsageAll = async () => {
     setUsageCountAllcheck(true)
@@ -167,24 +178,47 @@ function StockManagement() {
         assignbranch: accessbranchtable
 
       });
-console.log(res_usagecount.data?.stock,handover,"stock")
-      setUsageCountAll(res_usagecount.data?.stock
-        .filter(d =>
-         d.company === handover.company &&
-         d.branch === handover.branch &&
-         d.unit === handover.unit &&
-         d.floor === handover.floor &&
-         d.area === handover.area &&
-         d.location === handover.location  &&
-         d.productname === handover.productname 
-         )?.map((item, index) => ({
+      console.log(handover, "handover")
+
+      const stock = res_usagecount?.data?.stock || [];
+
+      const filteredData = stock.filter(d =>
+        d.company === handover.company &&
+        d.branch === handover.branch &&
+        d.unit === handover.unit &&
+        d.floor === handover.floor &&
+        d.area === handover.area &&
+        d.location === handover.location &&
+        d.productname === handover.productname
+      );
+
+      console.log(filteredData, "Filtered stock");
+
+      const finalData = filteredData.map((item, index) => ({
         ...item,
         id: item._id,
         serialNumber: index + 1,
-        usagedate: moment(item?.usagedate).format("DD/MM/YYYY"),
-        addedbyname: item.addedby[0].name,
+        usercompany: item.status === "Assign" ? item.company : item.usercompany,
+        userbranch: item.status === "Assign" ? item.branch : item.userbranch,
+        userunit: item.status === "Assign" ? item.unit : item.userunit,
+        userfloor: item.status === "Assign" ? item.floor : item.userfloor,
+        userarea: item.status === "Assign" ? item.area : item.userarea,
+        requestmode: item.status === "Assign" ? "Asset Material" : item.requestmode,
+        userlocation: item.status === "Assign" ? item.location : item.userlocation,
+        usagedate: item.usagedate ? moment(item.usagedate).format("DD/MM/YYYY") : "",
+        addedbyname: item?.addedby?.[0]?.name || "",
+        usagedate: item.status === "Assign" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") : item.usagedate,
+        usagetime: item.status === "Assign" ? moment(item.addedby[0]?.date).format("hh:mm") : item.usagetime
 
-      })))
+        //  addedby:""
+      }));
+
+      console.log(finalData, "Final transformed stock");
+
+      setUsageCountAll(finalData)
+
+
+
       //     setUsageCountAll(res_usagecount.data?.stock?.map((item, index) => ({
       //   ...item,
       //   id: item._id,
@@ -202,7 +236,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
 
   useEffect(() => {
     fetchUsageAll();
-  }, [handover])
+  }, [isEditOpenused])
 
   const [isHandleChange, setIsHandleChange] = useState(false);
 
@@ -345,6 +379,12 @@ console.log(res_usagecount.data?.stock,handover,"stock")
     }
   };
 
+  const [refImgWarranty, setRefImgWarranty] = useState([]);
+  const [refImgWarrantyBill, setRefImgWarrantyBill] = useState([]);
+
+  const [refImgWarrantyfilenames, setRefImgWarrantyfilenames] = useState([]);
+  const [refImgbillfilenames, setRefImgbillfilenames] = useState([]);
+
   //reference images
   const handleInputChange = (event) => {
     const files = event.target.files;
@@ -364,6 +404,9 @@ console.log(res_usagecount.data?.stock,handover,"stock")
           base64: reader.result.split(",")[1],
         });
         setRefImage(newSelectedFiles);
+        setRefImgbillfilenames(newSelectedFiles.map((d) => d.name));
+
+        setRefImgWarrantyBill((existingFiles) => [...existingFiles, file]);
       };
       reader.readAsDataURL(file);
       // } else {
@@ -526,7 +569,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
     "usagedate",
     "usagetime",
     "description",
-    "addedby"
+    "addedbyname"
   ];
 
   const statusOpt = [
@@ -543,7 +586,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
   const [viewusagecount, setviewusagecount] = useState("")
 
   // console.log(viewusagecount, "pro")
-  const [isEditOpenused, setIsEditOpenused] = useState(false);
+
   //Edit model...
   const handleClickOpenEditused = (data,
     company,
@@ -562,7 +605,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
     setusedcountusage(Number(data.handovercount) - Number(data.returncount))
     setviewusagecount(data.productname)
     setHandover({
-      // ...handover,
+      ...handover,
       status: data.status,
       company: company,
       branch: branch,
@@ -575,6 +618,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
       requestmode: requestmode,
 
     });
+    fetchUsageAll()
 
     setStockManagehand({
       company: "Please Select Company",
@@ -795,9 +839,10 @@ console.log(res_usagecount.data?.stock,handover,"stock")
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
     if (regex.test(inputValue) || inputValue === "") {
-      // Update the state with the valid numeric value
-
       setQuantityedit(inputValue);
+    } else if (inputValue === "0" || /^0[0-9]+$/.test(inputValue)) {
+      // If the value is just "0" or starts with "0", clear the input
+      setQuantityedit("");
     }
   };
 
@@ -1244,7 +1289,9 @@ console.log(res_usagecount.data?.stock,handover,"stock")
     description: true,
     employeenameto: true,
     productname: true,
-    addedbyname:true,
+    status: true,
+    addedbyname: true,
+    actions: true,
   };
   const [columnVisibilityviewusage, setColumnVisibilityviewusage] = useState(
     initialColumnVisibilityviewusage
@@ -1327,7 +1374,34 @@ console.log(res_usagecount.data?.stock,handover,"stock")
       hide: !columnVisibilityviewusage.serialNumber,
       headerClassName: "bold-header",
     },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 0,
+      width: 180,
+      minHeight: "40px !important",
+      sortable: false,
+      hide: !columnVisibilityviewusage.status,
+      headerClassName: "bold-header",
 
+      cellRenderer: (params) => {
+        let buttonStyles = {};
+
+        if (params.data.status === "Assign") {
+          buttonStyles = { backgroundColor: "#DFF6DD", color: "#2E7D32", borderColor: "#2E7D32" };
+        }
+        return (
+          <Button
+            variant="outlined"
+            size="small"
+            sx={buttonStyles}
+          >
+            {params.data.status === "Assign" ? "Assign" : "Usage Count"}
+
+          </Button>
+        );
+      }
+    },
     {
       field: "requestmode",
       headerName: "Mode",
@@ -1445,7 +1519,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
       hide: !columnVisibilityviewusage.description,
       headerClassName: "bold-header",
     },
-   {
+    {
       field: "addedbyname",
       headerName: "Added By",
       flex: 0,
@@ -1454,13 +1528,13 @@ console.log(res_usagecount.data?.stock,handover,"stock")
       headerClassName: "bold-header",
     },
     {
-      field: "filesusagecount",
+      field: "actions",
       headerName: "Attachment",
       flex: 0,
       width: 100,
       minHeight: "40px !important",
       sortable: false,
-      hide: !columnVisibilityviewusage.filesusagecount,
+      hide: !columnVisibilityviewusage.actions,
       headerClassName: "bold-header",
       cellRenderer: (params) => (
         <>
@@ -1494,23 +1568,23 @@ console.log(res_usagecount.data?.stock,handover,"stock")
   const rowDataTableviewusage = filteredDataviewusage.map((item, index) => {
     return {
       ...item,
-      id: item._id,
-      serialNumber: item.serialNumber,
-      usercompany: item.usercompany,
-      filesusagecount: item.filesusagecount,
-      countquantity: item.countquantity,
-      userbranch: item.userbranch,
-      userunit: item.userunit,
-      requestmode: item.requestmode,
-      userfloor: item.userfloor,
-      userarea: item.userarea,
-      userlocation: item.userlocation,
-      userteam: item.userteam,
-      useremployee: item.useremployee,
-      usagedate: item.usagedate,
-      usagetime: item.usagetime,
-      description: item.description,
-      productname: item.productname
+      // id: item._id,
+      // serialNumber: item.serialNumber,
+      // usercompany: item.usercompany,
+      // filesusagecount: item.filesusagecount,
+      // countquantity: item.countquantity,
+      // userbranch: item.userbranch,
+      // userunit: item.userunit,
+      // requestmode: item.requestmode,
+      // userfloor: item.userfloor,
+      // userarea: item.userarea,
+      // userlocation: item.userlocation,
+      // userteam: item.userteam,
+      // useremployee: item.useremployee,
+      // usagedate: item.usagedate,
+      // usagetime: item.usagetime,
+      // description: item.description,
+      // productname: item.productname
     };
   });
 
@@ -1734,6 +1808,12 @@ console.log(res_usagecount.data?.stock,handover,"stock")
   const [assetlog, setAssetLog] = useState([]);
   const [assetreturnlog, setAssetReturnLog] = useState([]);
 
+
+  const [vendorNewasset, setVendorNewasset] = useState('Please Select Vendor');
+  const [vendorGroupasset, setVendorGroupasset] = useState('Please Select Vendor Group');
+  const [frequencyValueasset, setFrequencyValueasset] = useState('');
+
+
   //set function to get particular row
   const getCode = async (
     company,
@@ -1749,6 +1829,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
     data
   ) => {
     try {
+      console.log(data, "daataaset")
       setStockedit({
         ...stockedit,
         company: company,
@@ -1761,17 +1842,39 @@ console.log(res_usagecount.data?.stock,handover,"stock")
         assettype: assettype,
         asset: asset,
         component: component,
-        workstation: data.workstation
+        workstation: data.workstation,
+        purchasedate: data.purchasedate,
+        warrantycalculation: data.warrantycalculation,
+        estimationtime: data.estimationtime,
+        estimation: data.estimation,
+        gstno: data.gstno,
+        producthead: data.producthead,
+        warranty: data.warranty,
+        // rate:data.rate
       });
+      setHandover({
+        ...handover,
+
+        balancedcount: data.balancedcount,
+        productname: data.productname,
+        quantity: data.quantity
+
+      });
+      setVendorGroupasset(data.vendorgroup)
+      setVendorNewasset(data.status === "Stock" ? data.vendor : data.vendorname)
+      setFrequencyValueasset(data.vendorfrequency)
       handleClickOpenviewalertvendor();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
   const [vendorNew, setVendorNew] = useState('Please Select Vendor');
-    const [vendorGroup, setVendorGroup] = useState('Please Select Vendor Group');
-    const [frequencyValue, setFrequencyValue] = useState('');
-  
+  const [vendorGroup, setVendorGroup] = useState('Please Select Vendor Group');
+  const [frequencyValue, setFrequencyValue] = useState('');
+
+
+
+
   const getCodeStock = async (
     company,
     branch,
@@ -1792,7 +1895,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
       //         Authorization: `Bearer ${auth.APIToken}`,
       //     },
       // });
-      console.log(data,"Data")
+      console.log(data, "Data")
       setStockmaterialedit({
         ...stockmaterialedit,
         company: company,
@@ -1804,17 +1907,70 @@ console.log(res_usagecount.data?.stock,handover,"stock")
         productname: productname,
         balancedcount: balancedcount,
         status: status,
-        billdate:data.billdate,
-        billdate:data.billdate,
-        totalbillamountstock:data.totalbillamountstock,
-        duedate:data.duedate,
-        warrantydetails:data.warrantydetails,
-        tododetails:data.tododetails,
+        billdate: data.billdate,
+        billdate: data.billdate,
+        totalbillamountstock: data.totalbillamountstock,
+        duedate: data.duedate,
+        warrantydetails: data.warrantydetails,
+        tododetails: data.tododetails,
+        warranty: data.warranty,
+        purchasedate: data.purchasedate,
+        warrantycalculation: data.warrantycalculation,
+        estimationtime: data.estimationtime,
+        estimation: data.estimation,
+        gstno: data.gstno,
+        billno: data.billno,
+        category: data.category,
+        subcategory: data.subcategory,
+        materialnew: data.materialnew,
+        productdetailsnew: data.productdetailsnew,
+        rate: data.rate,
+        amount: data.amount,
+        uomnew: data.uomnew,
+        quantitynew: data.quantitynew,
+        vendorid: data.vendorid,
+        // filenames:data.filenames,
+        // filenamesbill:data.filenamesbill,
+
+
+        paidstatus: data.paidstatus,
+        paidmode: data.paidmode,
+        paidamount: data.paidamount,
+        paidmode: data.paidmode,
+        balanceamount: data.balanceamount,
+        bankname: data.bankname,
+        bankbranchname: data.bankbranchname,
+        accountholdername: data.accountholdername,
+        accountnumber: data.accountnumber,
+        ifsccode: data.ifsccode,
+        upinumber: data.upinumber,
+        cardnumber: data.cardnumber,
+        cardholdername: data.cardholdername,
+        cardtransactionnumber: data.cardtransactionnumber,
+        cardtype: data.cardtype,
+        cardmonth: data.cardmonth,
+        cardyear: data.cardyear,
+        cardsecuritycode: data.cardsecuritycode,
+        chequenumber: data.chequenumber,
+
         // ,
         // assettype: assettype, producthead: producthead, component: component,
       });
+      setHandover({
+        ...handover,
+
+        balancedcount: data.balancedcount,
+        productname: data.productname,
+        quantitynew: data.quantitynew
+
+      });
+      setStockManagehand({
+
+        countquantity: data.quantitynew,
+      });
+
       setVendorGroup(data.vendorgroup)
-      setVendorNew(data.vendor)
+      setVendorNew(status === "Stock" ? data.vendor : data.vendorname)
       setFrequencyValue(data.vendorfrequency)
       if (status == "Stock") {
         handleClickOpenviewalertvendorstock();
@@ -2241,12 +2397,22 @@ console.log(res_usagecount.data?.stock,handover,"stock")
 
   //image
   const handleCaptureImage = () => {
-    if (gridRef.current) {
-      html2canvas(gridRef.current).then((canvas) => {
-        canvas.toBlob((blob) => {
+    // if (gridRef.current) {
+    //   html2canvas(gridRef.current).then((canvas) => {
+    //     canvas.toBlob((blob) => {
+    //       saveAs(blob, "StockManagement.png");
+    //     });
+    //   });
+    // }
+
+    if (gridRefTableImg.current) {
+      domtoimage.toBlob(gridRefTableImg.current)
+        .then((blob) => {
           saveAs(blob, "StockManagement.png");
+        })
+        .catch((error) => {
+          console.error("dom-to-image error: ", error);
         });
-      });
     }
   };
 
@@ -2260,13 +2426,13 @@ console.log(res_usagecount.data?.stock,handover,"stock")
     pageStyle: "print",
   });
 
-  //print...
-  const componentRefviewusage = useRef();
-  const handleprintviewusage = useReactToPrint({
-    content: () => componentRefviewusage.current,
-    documentTitle: "Usage Count",
-    pageStyle: "print",
-  });
+  // //print...
+  // const componentRefviewusage = useRef();
+  // const handleprintviewusage = useReactToPrint({
+  //   content: () => componentRefviewusage.current,
+  //   documentTitle: "Usage Count",
+  //   pageStyle: "print",
+  // });
 
   //serial no for listing items
   const addSerialNumber = (datas) => {
@@ -2485,32 +2651,44 @@ console.log(res_usagecount.data?.stock,handover,"stock")
       cellRenderer: (params) => (
         <Grid sx={{ display: "flex" }}>
           {params.data.requestmode === "Asset Material" && (
-            <Button
-              variant="contained"
-              // color="#008000"
-              sx={{
-                background: "#008000", textTransform: "capitalize", "&:hover": {
-                  backgroundColor: "#086108",
-                },
-              }}
-              onClick={() => {
-                getCode(
-                  params.data.company,
-                  params.data.branch,
-                  params.data.unit,
-                  params.data.floor,
-                  params.data.area,
-                  params.data.location,
-                  params.data.productname,
-                  params.data.assettype,
-                  params.data.asset,
-                  params.data.component,
-                  params.data
-                );
-              }}
-            >
-              Assign
-            </Button>
+            <Grid sx={{ display: "flex", gap: "2px" }}>
+              <Typography
+                sx={{
+                  backgroundColor: "#00800094",
+                  borderRadius: "50%",
+                  padding: "4px",
+                }}
+              >
+                {" "}
+                {params.data.assigncount}
+              </Typography>
+              <Button
+                variant="contained"
+                // color="#008000"
+                sx={{
+                  background: "#008000", textTransform: "capitalize", "&:hover": {
+                    backgroundColor: "#086108",
+                  },
+                }}
+                onClick={() => {
+                  getCode(
+                    params.data.company,
+                    params.data.branch,
+                    params.data.unit,
+                    params.data.floor,
+                    params.data.area,
+                    params.data.location,
+                    params.data.productname,
+                    params.data.assettype,
+                    params.data.asset,
+                    params.data.component,
+                    params.data
+                  );
+                }}
+              >
+                Assign
+              </Button>
+            </Grid>
           )}
         </Grid>
       ),
@@ -2891,30 +3069,42 @@ console.log(res_usagecount.data?.stock,handover,"stock")
       cellRenderer: (params) => (
         <Grid sx={{ display: "flex" }}>
           {params.data.requestmode === "Stock Material" && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                getCodeStock(
-                  params.data.company,
-                  params.data.branch,
-                  params.data.unit,
-                  params.data.floor,
-                  params.data.area,
-                  params.data.location,
-                  params.data.productname,
-                  params.data.balancedcount,
-                  params.data.status,
-                  params.data.requestmode,
-                  params.data
+            <Grid sx={{ display: "flex", gap: "2px" }}>
+              <Typography
+                sx={{
+                  backgroundColor: "#1976d2a8",
+                  borderRadius: "50%",
+                  padding: "4px",
+                }}
+              >
+                {" "}
+                {params.data.transfercount}
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  getCodeStock(
+                    params.data.company,
+                    params.data.branch,
+                    params.data.unit,
+                    params.data.floor,
+                    params.data.area,
+                    params.data.location,
+                    params.data.productname,
+                    params.data.balancedcount,
+                    params.data.status,
+                    params.data.requestmode,
+                    params.data
 
-                  // ,
-                  // params.data.assettype, params.data.producthead, params.data.component
-                );
-              }}
-            >
-              Transfer
-            </Button>
+                    // ,
+                    // params.data.assettype, params.data.producthead, params.data.component
+                  );
+                }}
+              >
+                Transfer
+              </Button>
+            </Grid>
           )}
         </Grid>
       ),
@@ -3182,7 +3372,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
       setColumnVisibility(initialColumnVisibility)
 
       if (stockManagefilter.requestmode === "Asset Material") {
-         setColumnVisibility(initialColumnVisibility)
+        setColumnVisibility(initialColumnVisibility)
         let res_project = await axios.post(SERVICE.STOCKPURCHASELIMITED, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
@@ -3215,10 +3405,18 @@ console.log(res_usagecount.data?.stock,handover,"stock")
           assignbranch: accessbranchtable
         });
 
+        let res_assign = await axios.get(SERVICE.STOCK_PURCHASE_LIMITED_ASSIGN, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
 
 
 
         let single = res_project?.data?.stock;
+        let singleassign = res_assign?.data?.stock;
+
+        console.log(singleassign, "singleassign")
 
         // console.log(single, "single")
         let singlehand = res_hand.data?.stock;
@@ -3335,6 +3533,44 @@ console.log(res_usagecount.data?.stock,handover,"stock")
 
 
 
+        let singleassigntotal = singleassign.reduce((acc, current) => {
+          const existingItemIndex = acc.findIndex(
+            (item) =>
+              item.company === current.company &&
+              item.branch === current.branch &&
+              item.unit === current.unit &&
+              item.floor === current.floor &&
+              item.area === current.area &&
+              item.location === current.location &&
+              item.productname === current.productname
+          );
+
+          if (existingItemIndex !== -1) {
+            // Update existing item
+            const existingItem = acc[existingItemIndex];
+
+            existingItem.countquantity += Number(current.countquantity);
+            existingItem._id = current._id;
+          } else {
+            // Add new item
+            acc.push({
+              company: current.company,
+              _id: current._id,
+              branch: current.branch,
+              unit: current.unit,
+              status: current.status,
+              floor: current.floor,
+              area: current.area,
+              location: current.location,
+              productname: current.productname,
+              countquantity: Number(current.countquantity),
+            });
+          }
+          return acc;
+        }, []);
+
+
+        console.log(singleassigntotal, "singleassigntotal")
 
 
         let res = await axios.get(SERVICE.ASSETDETAIL_STOCK_LIMITED, {
@@ -3424,6 +3660,20 @@ console.log(res_usagecount.data?.stock,handover,"stock")
               productname: current.productname,
               requestmode: current.requestmode,
               purchasecount: Number(current.quantity),
+
+              vendor: current.vendor,
+              vendorname: current.vendorname,
+              vendorgroup: current.vendorgroup,
+              vendorid: current.vendorid,
+              vendorfrequency: current.vendorfrequency,
+              purchasedate: current.purchasedate,
+              warrantycalculation: current.warrantycalculation,
+              warranty: current.warranty,
+              gstno: current.gstno,
+              estimationtime: current.estimationtime,
+              estimation: current.estimation,
+              producthead: current.producthead,
+              quantity: current.quantity
             });
           }
           return acc;
@@ -3476,6 +3726,21 @@ console.log(res_usagecount.data?.stock,handover,"stock")
               item.productname === d.productname
           );
 
+
+          let findassigncount = singleassigntotal.find(
+            (d) =>
+              item.company === d.company &&
+              item.branch === d.branch &&
+              item.unit === d.unit &&
+              item.floor === d.floor &&
+              item.area === d.area &&
+              item.location === d.location &&
+              item.productname === d.productname
+          );
+
+          console.log(findassigncount, "findassigncount")
+
+
           let matchHandItems =
             singlehandtotal.length > 0
               ? findquantity
@@ -3496,9 +3761,18 @@ console.log(res_usagecount.data?.stock,handover,"stock")
                 : 0
               : 0;
 
-          if (matchItems || matchHandItems || matchReturnItems || matchUsageCountItems) {
+
+          let matchAssignCountItems =
+            singleassigntotal.length > 0
+              ? findassigncount
+                ? findassigncount.countquantity
+                : 0
+              : 0;
+
+          console.log(matchAssignCountItems, "matchAssignCountItems")
+          if (matchItems || matchHandItems || matchReturnItems || matchUsageCountItems || matchAssignCountItems) {
             let matchqty = matchHandItems ? Number(matchHandItems) : 0;
-            let allused = Number(matchHandItems) - Number(matchReturnItems)
+            let allused = (Number(matchHandItems) + Number(matchAssignCountItems)) - Number(matchReturnItems);
             // let allused = Number(matchHandItems) + Number(matchUsageCountItems)
             return {
               ...item,
@@ -3520,6 +3794,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
               handovercount: Number(matchHandItems),
               returncount: Number(matchReturnItems),
               usagecount: Number(matchUsageCountItems),
+              assigncount: Number(matchAssignCountItems),
 
             };
           } else {
@@ -3529,6 +3804,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
               handovercount: 0,
               returncount: 0,
               usagecount: 0,
+              assigncount: 0,
               balancedcount: Number(item.purchasecount) - 0,
             };
           }
@@ -3539,7 +3815,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
       }
 
       else if (stockManagefilter.requestmode === "Stock Material") {
-         setColumnVisibility(initialColumnVisibility)
+        setColumnVisibility(initialColumnVisibility)
         let res_project = await axios.post(SERVICE.STOCKPURCHASELIMITED, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
@@ -3564,6 +3840,7 @@ console.log(res_usagecount.data?.stock,handover,"stock")
         });
 
 
+
         let res_usagecount = await axios.post(SERVICE.STOCKPURCHASELIMITED_USAGE_COUNT, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
@@ -3571,8 +3848,23 @@ console.log(res_usagecount.data?.stock,handover,"stock")
           assignbranch: accessbranchtable
         });
 
+        let res_transfer = await axios.get(SERVICE.STOCKPURCHASE_TRANSFER_LIMITED, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+
+        });
+
 
         let single = res_project?.data?.stock;
+
+        let singletransfer = res_transfer?.data?.stock.filter(d => d.status === "Transfer").flatMap(item =>
+          item.tododetails.map(todoItem => ({
+            ...item,
+            productname: todoItem.materialnew,
+            countquantity: todoItem.quantitynew,
+          }))
+        );
 
         let singlehand = res_hand.data?.stock;
         let singlereturn = res_return.data?.stock;
@@ -3688,9 +3980,44 @@ console.log(res_usagecount.data?.stock,handover,"stock")
           return acc;
         }, []);
 
+        console.log(singletransfer, "singletransfer")
+        let singletransfertotal = singletransfer.reduce((acc, current) => {
+          const existingItemIndex = acc.findIndex(
+            (item) =>
+              item.company === current.company &&
+              item.branch === current.branch &&
+              item.unit === current.unit &&
+              item.floor === current.floor &&
+              item.area === current.area &&
+              item.location === current.location &&
+              item.productname === current.productname
+          );
 
+          if (existingItemIndex !== -1) {
+            // Update existing item
+            const existingItem = acc[existingItemIndex];
 
+            existingItem.countquantity += Number(current.countquantity);
+            existingItem._id = current._id;
+          } else {
+            // Add new item
+            acc.push({
+              company: current.company,
+              _id: current._id,
+              branch: current.branch,
+              unit: current.unit,
+              floor: current.floor,
+              status: current.status,
+              area: current.area,
+              location: current.location,
+              productname: current.productname,
+              countquantity: Number(current.countquantity),
+            });
+          }
+          return acc;
+        }, []);
 
+        console.log(singletransfertotal, "singletransfertotal")
 
         let result = single.flatMap((item) => {
 
@@ -3702,27 +4029,63 @@ console.log(res_usagecount.data?.stock,handover,"stock")
             unit: item.unit,
             floor: item.floor,
 
-
-              vendor: item.vendor,
+            requestmode: item.requestmode,
+            vendor: item.vendor,
+            vendorname: item.vendorname,
             vendorgroup: item.vendorgroup,
             totalbillamount: item.totalbillamount,
             vendorid: item.vendorid,
-    filenames: item.filenames,
+            filenames: item.filenames,
             filenamesbill: item.filenamesbill,
             billno: item.billno,
             duedate: item.duedate,
             billdate: item.billdate,
-vendorfrequency:item.vendorfrequency,
-totalbillamountstock:item.totalbillamountstock,
-warrantydetails:item.warrantydetails,
+            vendorfrequency: item.vendorfrequency,
+            totalbillamountstock: item.totalbillamountstock,
+            warrantydetails: item.warrantydetails,
+            warranty: item.warranty,
+            purchasedate: item.purchasedate,
+            warrantycalculation: item.warrantycalculation,
+            gstno: item.gstno,
+            estimationtime: item.estimationtime,
+            estimation: item.estimation,
+            paidstatus: item.paidstatus,
+            paidmode: item.paidmode,
+            paidamount: item.paidamount,
+            paidmode: item.paidmode,
+            balanceamount: item.balanceamount,
+            bankname: item.bankname,
+            bankbranchname: item.bankbranchname,
+            accountholdername: item.accountholdername,
+            accountnumber: item.accountnumber,
+            ifsccode: item.ifsccode,
+            upinumber: item.upinumber,
+            cardnumber: item.cardnumber,
+            cardholdername: item.cardholdername,
+            cardtransactionnumber: item.cardtransactionnumber,
+            cardtype: item.cardtype,
+            cardmonth: item.cardmonth,
+            cardyear: item.cardyear,
+            cardsecuritycode: item.cardsecuritycode,
+            chequenumber: item.chequenumber,
+            vendorid: item.vendorid,
+            filenames: item.filenames,
+            filenamesbill: item.filenamesbill,
+
+
             status: item.status,
             area: item.area,
             location: item.location,
             requestmode: item.requestmode,
+            category: subItem.category,
+            subcategory: subItem.subcategory,
             materialnew: subItem.materialnew,
             quantitynew: subItem.quantitynew,
 
-            uomcodenew: subItem.uomcodenew,
+            uomnew: subItem.uomnew,
+            productdetailsnew: subItem.productdetailsnew,
+            rate: subItem.rate,
+            amount: subItem.amount,
           }));
         });
 
@@ -3747,7 +4110,7 @@ warrantydetails:item.warrantydetails,
             existingItem.requestmode = current.requestmode;
             existingItem.productname = current.materialnew;
             existingItem.materialnew = current.materialnew;
-            existingItem.uomcodenew = current.uomcodenew;
+            existingItem.uomnew = current.uomnew;
             existingItem.status = current.status;
 
           } else {
@@ -3761,23 +4124,62 @@ warrantydetails:item.warrantydetails,
               status: current.status,
               area: current.area,
               location: current.location,
-               vendor: current.vendor,
-            vendorgroup: current.vendorgroup,
-            totalbillamount: current.totalbillamount,
-            vendorid: current.vendorid,
-    filenames: current.filenames,
-            filenamesbill: current.filenamesbill,
-               billno: current.billno,
-            duedate: current.duedate,
-            billdate: current.billdate,
-vendorfrequency:current.vendorfrequency,
-totalbillamountstock:current.totalbillamountstock,
-warrantydetails:current.warrantydetails,
+              vendor: current.vendor,
+              requestmode: current.requestmode,
+              vendorname: current.vendorname,
+              vendorgroup: current.vendorgroup,
+              totalbillamount: current.totalbillamount,
+              vendorid: current.vendorid,
+              filenames: current.filenames,
+              filenamesbill: current.filenamesbill,
+              billno: current.billno,
+              duedate: current.duedate,
+              billdate: current.billdate,
+              vendorfrequency: current.vendorfrequency,
+              totalbillamountstock: current.totalbillamountstock,
+              warrantydetails: current.warrantydetails,
+              warranty: current.warranty,
+              purchasedate: current.purchasedate,
+              warrantycalculation: current.warrantycalculation,
+              gstno: current.gstno,
+              estimationtime: current.estimationtime,
+              estimation: current.estimation,
+              filenamesbill: current.filenamesbill,
+              filenames: current.filenames,
+
+              paidstatus: current.paidstatus,
+              paidmode: current.paidmode,
+              paidamount: current.paidamount,
+              paidmode: current.paidmode,
+              balanceamount: current.balanceamount,
+              bankname: current.bankname,
+              bankbranchname: current.bankbranchname,
+              accountholdername: current.accountholdername,
+              accountnumber: current.accountnumber,
+              ifsccode: current.ifsccode,
+              upinumber: current.upinumber,
+              cardnumber: current.cardnumber,
+              cardholdername: current.cardholdername,
+              cardtransactionnumber: current.cardtransactionnumber,
+              cardtype: current.cardtype,
+              cardmonth: current.cardmonth,
+              cardyear: current.cardyear,
+              cardsecuritycode: current.cardsecuritycode,
+              chequenumber: current.chequenumber,
+              vendorid: current.vendorid,
+
               productname: current.materialnew,
               materialnew: current.materialnew,
+              category: current.category,
+              subcategory: current.subcategory,
+              uomnew: current.uomnew,
+              productdetailsnew: current.productdetailsnew,
+              quantitynew: current.quantitynew,
+              rate: current.rate,
+              amount: current.amount,
               requestmode: current.requestmode,
               status: current.status,
-              uomcodenew: current.uomcodenew,
+              uomnew: current.uomnew,
               purchasecount: Number(current.quantitynew),
               purchasecountstock: Number(current.quantitynew),
             });
@@ -3786,19 +4188,6 @@ warrantydetails:current.warrantydetails,
         }, []);
 
         let merge = getfilter.map((item) => {
-
-          // console.log(item, "iem")
-          // let matchItems = getstocktotal.find(
-          //   (d) =>
-
-          //     item.company === d.company &&
-          //     item.branch === d.branch &&
-          //     item.unit === d.unit &&
-          //     item.floor === d.floor &&
-          //     item.area === d.area &&
-          //     item.location === d.location &&
-          //     item.materialnew === d.materialnew
-          // );
 
           let findquantity = singlehandtotal.find(
             (d) =>
@@ -3833,6 +4222,19 @@ warrantydetails:current.warrantydetails,
               item.productname === d.productname
           );
 
+          let findtransfercount = singletransfertotal.find(
+            (d) =>
+              item.company === d.company &&
+              item.branch === d.branch &&
+              item.unit === d.unit &&
+              item.floor === d.floor &&
+              item.area === d.area &&
+              item.location === d.location &&
+              item.productname === d.productname
+          );
+
+          console.log(findtransfercount, "findtransfercount")
+
           let matchHandItems =
             singlehandtotal.length > 0
               ? findquantity
@@ -3846,7 +4248,7 @@ warrantydetails:current.warrantydetails,
                 : 0
               : 0;
 
-          // console.log(matchReturnItems, "return")
+
 
           let matchUsageCountItems =
             singleusagecounttotal.length > 0
@@ -3854,14 +4256,19 @@ warrantydetails:current.warrantydetails,
                 ? findusagecount.countquantity
                 : 0
               : 0;
-          // console.log(matchItems, "matchItems")
 
-          if (matchHandItems || matchReturnItems || matchUsageCountItems) {
+          let matchTransferCountItems =
+            singletransfertotal.length > 0
+              ? findtransfercount
+                ? findtransfercount.countquantity
+                : 0
+              : 0;
+
+          console.log(matchTransferCountItems, "matchTransferCountItems")
+          if (matchHandItems || matchReturnItems || matchUsageCountItems || matchTransferCountItems) {
             let matchqty = matchHandItems ? Number(matchHandItems) : 0;
-            let allused = Number(matchHandItems) - Number(matchReturnItems)
-
-            // let allused = usedcountqty + Number(matchUsageCountItems)
-            // console.log(matchqty, "matchqty")
+            let allused = (Number(matchHandItems) + Number(matchTransferCountItems)) - Number(matchReturnItems)
+            // const balancedcount =  ( Number(item.purchasecountstock) -  Number(allused))
             return {
               ...item,
               purchasecountstock: Number(item.purchasecountstock),
@@ -3873,6 +4280,7 @@ warrantydetails:current.warrantydetails,
               handovercount: Number(matchHandItems),
               returncount: Number(matchReturnItems),
               usagecount: Number(matchUsageCountItems),
+              transfercount: Number(matchTransferCountItems),
             };
           } else {
             return {
@@ -3880,16 +4288,17 @@ warrantydetails:current.warrantydetails,
               usedcount: 0,
               handovercount: 0,
               returncount: 0,
+              transfercount: 0,
               usagecount: 0,
               balancedcount: Number(item.purchasecountstock) - 0,
             };
           }
         });
 
-    console.log(merge, "mergestock")
+        console.log(merge, "mergestock")
         let quantityAndUom = merge.map((data, newindex) => ({
           ...data,
-          uomnew: `${data.purchasecountstock}#${data.uomcodenew}`,
+          uomnew: `${data.purchasecountstock}#${data.uomnew}`,
         }));
 
 
@@ -4147,6 +4556,7 @@ warrantydetails:current.warrantydetails,
 
 
   const sendRequestStockUsageCount = async () => {
+    const uniqueId = uuidv4();
     try {
 
       if (handover.status === "Stock") {
@@ -4174,12 +4584,15 @@ warrantydetails:current.warrantydetails,
           employeenameto: String(stockManagehand.employeenameto === "Please Select Employee" ? "" : stockManagehand.employeenameto),
 
           countquantity: String(stockManagehand.countquantity),
-
+          uniqueId: uniqueId,
           usagedate: String(stockManagehand.usagedate),
           usagetime: String(stockManagehand.usagetime),
           description: String(stockManagehand.description),
 
-          filesusagecount: allUploadedFiles.concat(refImage, refImageDrag, capturedImages),
+          // filesusagecount: allUploadedFiles.concat(refImage, refImageDrag, capturedImages),
+          filesusagecount: allUploadedFiles.concat(refImage, refImageDrag, capturedImages).map(item => ({ name: item.name, remarks: item.remarks })),
+
+
           handover: String("usagecount"),
           addedby: [
             {
@@ -4196,7 +4609,7 @@ warrantydetails:current.warrantydetails,
           },
 
           company: String(handover.company),
-
+          uniqueId: uniqueId,
           branch: String(handover.branch),
           unit: String(handover.unit),
           productname: String(handover.productname),
@@ -4207,6 +4620,7 @@ warrantydetails:current.warrantydetails,
           usercompany: String(stockManagehand.company),
           userbranch: String(stockManagehand.branch),
           userunit: String(stockManagehand.unit),
+          uniqueId: stockManagehand.uniqueId,
           userfloor: String(stockManagehand.floor),
           userarea: String(stockManagehand.area),
           userlocation: String(stockManagehand.location),
@@ -4219,7 +4633,7 @@ warrantydetails:current.warrantydetails,
           usagetime: String(stockManagehand.usagetime),
           description: String(stockManagehand.description),
 
-          filesusagecount: allUploadedFiles.concat(refImage, refImageDrag, capturedImages),
+          filesusagecount: allUploadedFiles.concat(refImage, refImageDrag, capturedImages).map(item => ({ name: item.name, remarks: item.remarks })),
           handover: String("usagecount"),
           addedby: [
             {
@@ -4229,6 +4643,8 @@ warrantydetails:current.warrantydetails,
           ],
         });
       }
+
+      await handleFileUpload(refImgWarrantyBill, 'bill', uniqueId);
       setStockManagehand({
         company: "Please Select Company",
         branch: "Please Select Branch",
@@ -4257,6 +4673,97 @@ warrantydetails:current.warrantydetails,
       await fetchUsageAll();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
+
+
+  function base64ToFile(base64String, filename, mimeType) {
+    const byteString = atob(base64String.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new File([ab], filename, { type: mimeType });
+  }
+
+  const handleFileUpload = async (selectedFilesall, type, uniqueId) => {
+    try {
+      // console.log(selectedFilesall, "selectedFilesall");
+      const selectedFiles = selectedFilesall.map(file =>
+        base64ToFile(file.preview, file.name, file.type)
+      );
+      // .flatMap(t => [{ ...t.files, uniqueId: t.uniqueId }])
+      // let uniqueId = selectedFilesall[0].uniqueId
+      // let selectedFiles = selectedFilesall.flatMap(t =>
+      //   Array.from(t.files).map(file => ({ ...file, uniqueId: t.uniqueId }))
+      // );
+
+      const uploadFiles = async () => {
+        for (const selectedFile of selectedFiles) {
+          // console.log(selectedFile, "selectedFile");
+          const chunkSize = 5 * 1024 * 1024; // 5MB (adjust based on your requirements)
+          const totalChunks = Math.ceil(selectedFile.size / chunkSize);
+          const chunkProgress = 100 / totalChunks;
+          let chunkNumber = 0;
+          let start = 0;
+          let end = 0;
+
+          const uploadNextChunk = async () => {
+            try {
+              if (end < selectedFile.size) {
+                end = start + chunkSize;
+                if (end > selectedFile.size) {
+                  end = selectedFile.size;
+                }
+
+                const chunk = selectedFile.slice(start, end, selectedFile.type);
+                // console.log(chunk, "chunk");
+
+                const formData = new FormData();
+                formData.append('file', chunk);
+                formData.append('chunkNumber', chunkNumber);
+                formData.append('totalChunks', totalChunks);
+                formData.append('filesize', selectedFile.size);
+                formData.append('originalname', `${uniqueId}$${type}$${selectedFile.name}`);
+
+                // console.log(formData, "formData");
+
+                try {
+                  const response = await axios.post(SERVICE.UPLOAD_CHUNK_STOCK, formData, {
+                    headers: {
+                      'Content-Type': 'multipart/form-data',
+                    },
+                  });
+                  // console.log(response, "response");
+                  const temp = `Chunk ${chunkNumber + 1}/${totalChunks} uploaded successfully for ${selectedFile.name}`;
+
+                  start = end;
+                  chunkNumber++;
+
+                  uploadNextChunk();
+                } catch (err) {
+                  console.log(err, 'ERrer');
+                  handleApiError(err, setShowAlert, handleClickOpenerr);
+                }
+              } else {
+                // setProgress(100);
+                console.log(`File upload completed for ${selectedFile.name}`);
+              }
+            } catch (err) {
+              console.log(err, 'asdfse');
+            }
+          };
+
+          await uploadNextChunk();
+        }
+        // setSelectedFiles([]);
+        // console.log("All file uploads completed");
+      };
+
+      uploadFiles();
+    } catch (err) {
+      console.log(err, 'errfile');
     }
   };
 
@@ -4311,6 +4818,8 @@ warrantydetails:current.warrantydetails,
     }
   };
 
+  console.log(stockManagehand.allotdate, "time")
+
   const handlesubmitstock = (e) => {
     e.preventDefault();
     if (selectedCompanyFrom.length === 0) {
@@ -4339,11 +4848,11 @@ warrantydetails:current.warrantydetails,
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
     }
-    else if (stockManagehand.allotdate === "") {
+    else if (stockManagehand.allotdate === "" || stockManagehand.allotdate === undefined || stockManagehand.allotdate === "undefined") {
       setPopupContentMalert("Please Select Date!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
-    } else if (stockManagehand.allottime === "") {
+    } else if (stockManagehand.allottime === "" || stockManagehand.allottime === undefined || stockManagehand.allottime === "undefined") {
       setPopupContentMalert("Please Select Time!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
@@ -5387,7 +5896,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Company",
       flex: 0,
       width: 100,
-      hide: !columnVisibility.company,
+      hide: !columnVisibilityViewassetreturn.company,
       headerClassName: "bold-header",
     },
     {
@@ -5395,7 +5904,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Branch",
       flex: 0,
       width: 180,
-      hide: !columnVisibility.branch,
+      hide: !columnVisibilityViewassetreturn.branch,
       headerClassName: "bold-header",
     },
     {
@@ -5403,7 +5912,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Unit",
       flex: 0,
       width: 140,
-      hide: !columnVisibility.unit,
+      hide: !columnVisibilityViewassetreturn.unit,
       headerClassName: "bold-header",
     },
     {
@@ -5411,7 +5920,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Floor",
       flex: 0,
       width: 140,
-      hide: !columnVisibility.floor,
+      hide: !columnVisibilityViewassetreturn.floor,
       headerClassName: "bold-header",
     },
     {
@@ -5419,7 +5928,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Area",
       flex: 0,
       width: 140,
-      hide: !columnVisibility.area,
+      hide: !columnVisibilityViewassetreturn.area,
       headerClassName: "bold-header",
     },
     {
@@ -5427,7 +5936,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Location",
       flex: 0,
       width: 140,
-      hide: !columnVisibility.location,
+      hide: !columnVisibilityViewassetreturn.location,
       headerClassName: "bold-header",
     },
     {
@@ -5435,7 +5944,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Material",
       flex: 0,
       width: 200,
-      hide: !columnVisibility.productname,
+      hide: !columnVisibilityViewassetreturn.productname,
       headerClassName: "bold-header",
     },
     {
@@ -5443,7 +5952,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Quantity",
       flex: 0,
       width: 200,
-      hide: !columnVisibility.countquantity,
+      hide: !columnVisibilityViewassetreturn.countquantity,
       headerClassName: "bold-header",
     },
     {
@@ -5451,7 +5960,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Employee",
       flex: 0,
       width: 200,
-      hide: !columnVisibility.employeenameto,
+      hide: !columnVisibilityViewassetreturn.employeenameto,
       headerClassName: "bold-header",
     },
     {
@@ -5459,7 +5968,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Status",
       flex: 0,
       width: 200,
-      hide: !columnVisibility.handover,
+      hide: !columnVisibilityViewassetreturn.handover,
       headerClassName: "bold-header",
     },
     {
@@ -5467,7 +5976,7 @@ warrantydetails:current.warrantydetails,
       headerName: "Date & Time",
       flex: 0,
       width: 200,
-      hide: !columnVisibility.addedby,
+      hide: !columnVisibilityViewassetreturn.addedby,
       headerClassName: "bold-header",
     },
   ];
@@ -5906,7 +6415,10 @@ warrantydetails:current.warrantydetails,
                   )}
                   {isUserRoleCompare?.includes("printstockmanagement") && (
                     <>
-                      <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                      <Button
+                        sx={userStyle.buttongrp}
+                        onClick={handleprint}
+                      >
                         &ensp;
                         <FaPrint />
                         &ensp;Print&ensp;
@@ -6347,10 +6859,11 @@ warrantydetails:current.warrantydetails,
                       placeholder="Please Enter Quantity"
                       value={stockManagehand.countquantity}
                       onChange={(e) => {
+                        const value = Number(e.target.value);
                         setStockManagehand({
                           ...stockManagehand,
                           countquantity:
-                            e.target.value > 0 ? e.target.value : 0,
+                            e.target.value > 0 ? e.target.value : "",
                         });
                       }}
                     />
@@ -6796,6 +7309,10 @@ warrantydetails:current.warrantydetails,
         <AssetDetails
           sendDataToParentUI={handleDataFromChildUIDeign}
           stockedit={stockedit}
+          vendorasset={vendorNewasset}
+          handover={handover}
+          vendorGroupasset={vendorGroupasset}
+          frequencyValue={frequencyValueasset}
           handleCloseviewalertvendor={handleCloseviewalertvendor}
         />
       </Dialog>
@@ -6818,6 +7335,10 @@ warrantydetails:current.warrantydetails,
           stockmaterialedit={stockmaterialedit}
           vendorNew={vendorNew}
           vendorGroup={vendorGroup}
+          stockManagehand={stockManagehand}
+          handover={handover}
+          stockCategoryOptions={stockCategoryOptions}
+          allStockCategory={allStockCategory}
           frequencyValue={frequencyValue}
           handleCloseviewalertvendorstock={handleCloseviewalertvendorstock}
         />
@@ -6836,6 +7357,11 @@ warrantydetails:current.warrantydetails,
         <ManualEntry
           sendDataToParentUIManual={handleDataFromChildUIDeignManual}
           openpop={!openviewalertvendormanual}
+          vendorNew={vendorNew}
+          vendorGroup={vendorGroup}
+          frequencyValue={frequencyValue}
+          stockManagehand={stockManagehand}
+          handover={handover}
           stockmaterialedit={stockmaterialedit}
           handleCloseviewalertvendormanual={handleCloseviewalertvendormanual}
         />
@@ -7686,10 +8212,10 @@ warrantydetails:current.warrantydetails,
                       value={stockManagehand.countquantity}
                       onChange={(e) => {
                         // handleOnchangeQty(e)
+                        const value = Number(e.target.value);
                         setStockManagehand({
                           ...stockManagehand,
-                          countquantity:
-                            e.target.value > 0 ? e.target.value : 0,
+                          countquantity: value > 0 ? value : "",
                         });
                       }}
 
@@ -8394,7 +8920,7 @@ warrantydetails:current.warrantydetails,
       />
 
 
-      <ExportData
+      {/* <ExportData
         isFilterOpen={isPdfFilterOpenviewusage}
         handleCloseFilterMod={handleCloseFilterModviewusage}
         fileFormat={fileFormat}
@@ -8407,8 +8933,8 @@ warrantydetails:current.warrantydetails,
         filename={"Usage Count"}
         exportColumnNames={exportColumnViewUsage}
         exportRowValues={exportRowValuesViewusage}
-        componentRef={componentRef}
-      />
+        componentRef={componentRefviewusage}
+      /> */}
       {/* PLEASE SELECT ANY ROW */}
       <PleaseSelectRow
         open={isDeleteOpenalert}

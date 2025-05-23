@@ -5,6 +5,14 @@ const assetdetailSchema = new Schema({
     type: Boolean,
     required: false,
   },
+    productname: {
+    type: String,
+    required: false,
+  },
+    countquantity: {
+    type: String,
+    required: false,
+  },
   distributed: {
     type: Boolean,
     required: false,

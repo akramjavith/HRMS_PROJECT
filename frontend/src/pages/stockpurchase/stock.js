@@ -534,6 +534,7 @@ function Stockmaster() {
   const handleClosePopupMalert = () => {
     setOpenPopupMalert(false);
     setBtnSubmit(false);
+    
   };
   const [openPopup, setOpenPopup] = useState(false);
   const [popupContent, setPopupContent] = useState('');

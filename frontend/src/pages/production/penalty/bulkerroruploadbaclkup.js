@@ -31,7 +31,8 @@ import CircularProgress, {
 } from "@mui/material/CircularProgress";
 import Switch from "@mui/material/Switch";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import axios from '../../../axiosInstance';
+
+import axios from "axios";
 import { saveAs } from "file-saver";
 import { CsvBuilder } from "filefy";
 import html2canvas from "html2canvas";
@@ -115,19 +116,6 @@ function BulkErrorUpload() {
   const [alertMsg, setAlertMsg] = useState("");
   const [loaderList, setLoaderList] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-
-
-       // Error Popup model
-      const [isErrorOpenpop, setIsErrorOpenpop] = useState(false);
-      const [showAlertpop, setShowAlertpop] = useState();
-      const handleClickOpenerrpop = (e,reason) => {
-          if (reason && reason === "backdropClick") return;
-        setIsErrorOpenpop(true);
-      };
-      const handleCloseerrpop = () => {
-
-        setIsErrorOpenpop(false);
-      };
 
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
@@ -3566,19 +3554,12 @@ function formatDate(date, format) {
    console.log(expectedFormat,"expectedFormat")
             // Format date values from serial numbers to human-readable strings
             const formattedData = sheetData.map((row) => {
-            let auditDate = row["Audit Date"];
-  
-  if (typeof auditDate === "number") {
-    // Excel serial number
-    const jsDate = excelDateToJSDate(auditDate);
-    row["Audit Date"] = formatDate(jsDate, expectedFormat);
-  } else if (typeof auditDate === "string" && auditDate.includes("-")) {
-    // Already a string like "06-05-2025"
-    // Try parsing based on expected input format (assume dd-mm-yyyy)
-    const [dd, mm, yyyy] = auditDate.split("-");
-    const jsDate = new Date(`${yyyy}-${mm}-${dd}`); // Construct in yyyy-mm-dd to avoid locale issues
-    row["Audit Date"] = formatDate(jsDate, expectedFormat);
-  }
+             const auditDate = row["Audit Date"];
+            if (typeof auditDate === "number") {
+              const jsDate = excelDateToJSDate(auditDate); // Step 1: Convert Excel serial to JS Date
+              const formatted = formatDate(jsDate, expectedFormat); // Step 2: Format date to expected format
+              row["Audit Date"] = formatted;
+            }
             return row;
             });
             // console.log(formattedData, "formattedData")
@@ -3746,16 +3727,15 @@ function formatDate(date, format) {
             let datesArray = d.map((item) => item["Audit Date"]);
             let expectedFormat = `${datedrop}${symboldrop}${monthdrop}${symboldrop}${yeardrop}`;
 
+            console.log(expectedFormat,d, "formats");
             let Respenaltyupdate = await axios.post(
               SERVICE.PENALTYERRORUPLOADS_BY_DATE,
               {
                 headers: {
                   Authorization: `Bearer ${auth.APIToken}`,
                 },
-                projectvendor:[ ...new Set(d.map((item) => item["Project Vendor"]))],
-                process:[ ...new Set(d.map((item) => String(item["Process"])))],
-              // process: [...new Set(d.map(item => String(item["Process"]).trim()).filter(Boolean))].sort(),
-
+                projectvendor: d.map((item) => item["Project Vendor"]),
+                process: d.map((item) => item["Process"]),
                 loginid: d.map((item) => item["Login Id"]),
                 date: d.map((item) =>
                   formatToDate(item["Audit Date"], expectedFormat)
@@ -3774,7 +3754,23 @@ function formatDate(date, format) {
 
             let newdataMatcheddata = isNameMatchbulkDuplicate.map((tp) => {
               const Match = d.find((item) => {
-              
+                console.log(
+                  tp.projectvendor == item["Project Vendor"],
+                  tp.process == item["Process"],
+                  tp.loginid == item["Login Id"],
+                  tp.date ==
+                    formatToDate(
+                      item["Audit Date"],
+                      `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`
+                    ),
+                  tp.errorfilename == item["File Name"],
+                  tp.documentnumber == item["Document Number"],
+                  tp.documenttype == item["Document Type"],
+                  tp.fieldname == item["Field Name"],
+                  tp.line == item["Line"],
+                  tp.errorvalue == item["Error Value"],
+                  tp.correctvalue == item["Correct Value"]
+                );
                 return (
                   tp.projectvendor == item["Project Vendor"] &&
                   tp.process == item["Process"] &&
@@ -3805,52 +3801,27 @@ function formatDate(date, format) {
             });
             setPenaltyEditUpdate(newdataMatcheddata);
             console.log(newdataMatcheddata, "newdataMatcheddata");
-
-uniqueArrayfinal = d.filter((item, index, self) =>
-  index ===
-  self.findIndex((tp) =>
-    tp["Project Vendor"] === item["Project Vendor"] &&
-    tp["Process"] === item["Process"] &&
-    tp["Login Id"] === item["Login Id"] && // corrected to match "Login Id" key
-    tp["Audit Date"] ===  item["Audit Date"] &&
-    tp["File Name"] === item["File Name"] &&
-    tp["Document Number"] === item["Document Number"] &&
-    tp["Document Type"] === item["Document Type"] &&
-    tp["Field Name"] === item["Field Name"] &&
-    tp["Line"] === item["Line"] &&
-    tp["Error Value"] === item["Error Value"] &&
-    tp["Correct Value"] === item["Correct Value"]
-    //  &&
-    // tp["HyperLink"] === item["HyperLink"] &&
-    // tp["HyperLink Doc"] === item["HyperLink Doc"]
-  )
-);
-
-            // .filter((item) => {
-            //   return !targetPoints.some(
-            //     (tp) =>
-            //       tp.projectvendor == item["Project Vendor"] &&
-            //       tp.process == item["Process"] &&
-            //       tp.loginid == item["Login Id"] &&
-            //       tp.date ==   formatToDate(
-            //           item["Audit Date"],
-            //           `${datedrop}${symboldrop}${monthdrop}${symboldrop}${yeardrop}`
-            //         ) &&
-            //       tp.errorfilename == item["File Name"] &&
-            //       tp.documentnumber == item["Document Number"] &&
-            //       tp.documenttype == item["Document Type"] &&
-            //       tp.fieldname == item["Field Name"] &&
-            //       tp.line == item["Line"] &&
-            //       tp.errorvalue == item["Error Value"] &&
-            //       tp.correctvalue == item["Correct Value"] &&
-            //       tp.link == item["HyperLink"] &&
-            //       tp.doclink == item["HyperLink Doc"]
-            //   );
-            // });
+            uniqueArrayfinal = d.filter((item) => {
+              return !targetPoints.some(
+                (tp) =>
+                  tp.projectvendor == item["Project Vendor"] &&
+                  tp.process == item["Process"] &&
+                  tp.loginid == item["Login Id"] &&
+                  tp.date == item["Audit Date"] &&
+                  tp.errorfilename == item["File Name"] &&
+                  tp.documentnumber == item["Document Number"] &&
+                  tp.documenttype == item["Document Type"] &&
+                  tp.fieldname == item["Field Name"] &&
+                  tp.line == item["Line"] &&
+                  tp.errorvalue == item["Error Value"] &&
+                  tp.correctvalue == item["Correct Value"] &&
+                  tp.link == item["HyperLink"] &&
+                  tp.doclink == item["HyperLink Doc"]
+              );
+            });
 
             // console.log(d, "do")
             console.log(newdataMatcheddata, "newdataMatcheddata");
-            console.log(uniqueArrayfinal, "uniqueArrayfinal");
 
             let Respenalty = await axios.post(
               SERVICE.PENALTYERRORUPLOADS_DUPLICATE_CHECK_WITH_BULKERRORUPLOAD_FILE,
@@ -3886,17 +3857,8 @@ uniqueArrayfinal = d.filter((item, index, self) =>
             );
 
             console.log(existingKeysbulk, existingKeys, "fdata");
-            console.log(uniqueToUpload.length, d.length, "fdata");
-if(uniqueToUpload.length === 0 && newdataMatcheddata.length > 0){
- setShowAlertpop(
-            <>
-              <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
-              <p style={{ fontSize: '20px', fontWeight: 900 }}>{}</p>
-            </>
-          );
-          handleClickOpenerrpop();
-}
-           else if (uniqueToUpload.length !== d.length) {
+
+            if (uniqueToUpload.length !== d.length) {
               setPopupContentMalert(
                 uniqueToUpload.length != d.length
                   ? ` Duplicate data and Points field Not a number data's are Removed`
@@ -3959,9 +3921,6 @@ if(uniqueToUpload.length === 0 && newdataMatcheddata.length > 0){
               setPopupSeverityMalert("info");
               handleClickOpenPopupMalert();
             } else {
-
-
-
               const dataArray = uniqueArrayfinal.map((item) => {
                 return {
                   fromdate: penaltyErrorUpload.fromdate,
@@ -4133,66 +4092,6 @@ if(uniqueToUpload.length === 0 && newdataMatcheddata.length > 0){
     }
   };
 
-
-   const sendJSONPenatlyUpdate = async () => {
-
-      console.log(penaltyEditUpdate, "newdataMatcheddata");
-      const chunkSizepenalty = 10000; // send 10,000 records per batch
-
-      let batchRequestBodyPeantly = penaltyEditUpdate.map((d) => ({
-        id: d._id,
-        link: d.link,
-        doclink: d.doclink,
-      }));
-
- 
-      setPageName(!pageName);
-      try {
-        setLoading(true); // Set loading to true when starting the upload
-      
-        for (
-          let i = 0;
-          i < batchRequestBodyPeantly.length;
-          i += chunkSizepenalty
-        ) {
-          const chunk = batchRequestBodyPeantly.slice(i, i + chunkSizepenalty);
-
-          try {
-            const res = await axios.post(
-              SERVICE.PENALTY_ERROR_UPLOAD_BULK_UPDATE,
-              {
-                headers: { "Content-Type": "application/json" },
-                body: chunk,
-              }
-            );
-            console.log(`Batch ${i + 1} success`, res.data);
-          } catch (err) {
-            console.error(`Batch ${i / chunkSizepenalty + 1} failed`, err);
-            // Optional: handle retries or break the loop
-          }
-        }
-
-        setLoading(false);
-        setPopupContent("Updated Successfully");
-        setPopupSeverity("success");
-        setSelectedSheet("Please Select Sheet");
-        setUpdatesheet((prev) => [...prev, selectedSheetindex]);
-        handleClickOpenPopup();
-        handleCloseerrpop()
-        await fetchTargetPointsData1();
-      } catch (err) {
-      } finally {
-        setPopupContent("Updated Successfully");
-        setPopupSeverity("success");
-        setSelectedSheet("Please Select Sheet");
-        handleCloseerrpop()
-        setUpdatesheet((prev) => [...prev, selectedSheetindex]);
-        handleClickOpenPopup();
-        await fetchTargetPointsData1();
-      }
-    }
-
-
   const clearFileSelection = () => {
     setUpdatesheet([]);
     setFileUploadName("");
@@ -4208,100 +4107,45 @@ if(uniqueToUpload.length === 0 && newdataMatcheddata.length > 0){
   var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
   var yyyy = today.getFullYear();
   today = dd + "-" + mm + "-" + yyyy;
-  // const ExportsHead = () => {
-  //   let fileDownloadName = "bulkerrorupload_" + "_" + today;
-  //   if (
-  //     penaltyErrorUpload.fromdate === "" ||
-  //     penaltyErrorUpload.todate === ""
-  //   ) {
-  //     let alertMsg =
-  //       penaltyErrorUpload.fromdate === "" && penaltyErrorUpload.fromdate === ""
-  //         ? "Please Choose From Date & To Date"
-  //         : penaltyErrorUpload.fromdate === ""
-  //         ? "Please Choose From Date"
-  //         : "Please Choose To Date";
-  //     setPopupContentMalert(alertMsg);
-  //     setPopupSeverityMalert("info");
-  //     handleClickOpenPopupMalert();
-  //   } else {
-  //     new CsvBuilder(fileDownloadName)
-  //       .setColumns(
-  //         [
-  //           "Audit Date",
-  //           "Process",
-  //           "File Name",
-  //           "Document Number",
-  //           "Document Type",
-  //           "Field Name",
-  //           "Line",
-  //           "Error Value",
-  //           "Correct Value",
-  //           "Project Vendor",
-  //           "Login Id",
-  //           "HyperLink",
-  //           "HyperLink Doc",
-  //         ],
+  const ExportsHead = () => {
+    let fileDownloadName = "bulkerrorupload_" + "_" + today;
+    if (
+      penaltyErrorUpload.fromdate === "" ||
+      penaltyErrorUpload.todate === ""
+    ) {
+      let alertMsg =
+        penaltyErrorUpload.fromdate === "" && penaltyErrorUpload.fromdate === ""
+          ? "Please Choose From Date & To Date"
+          : penaltyErrorUpload.fromdate === ""
+          ? "Please Choose From Date"
+          : "Please Choose To Date";
+      setPopupContentMalert(alertMsg);
+      setPopupSeverityMalert("info");
+      handleClickOpenPopupMalert();
+    } else {
+      new CsvBuilder(fileDownloadName)
+        .setColumns(
+          [
+            "Audit Date",
+            "Process",
+            "File Name",
+            "Document Number",
+            "Document Type",
+            "Field Name",
+            "Line",
+            "Error Value",
+            "Correct Value",
+            "Project Vendor",
+            "Login Id",
+            "HyperLink",
+            "HyperLink Doc",
+          ],
 
-  //         []
-  //       )
-  //       .exportFile();
-  //   }
-  // };
-
-const ExportsHead = () => {
-  let fileDownloadName = "bulkerrorupload_" + today;
-
-  if (penaltyErrorUpload.fromdate === "" || penaltyErrorUpload.todate === "") {
-    let alertMsg =
-      penaltyErrorUpload.fromdate === "" && penaltyErrorUpload.todate === ""
-        ? "Please Choose From Date & To Date"
-        : penaltyErrorUpload.fromdate === ""
-        ? "Please Choose From Date"
-        : "Please Choose To Date";
-
-    setPopupContentMalert(alertMsg);
-    setPopupSeverityMalert("info");
-    handleClickOpenPopupMalert();
-  } else {
-    const headers = [
-      "Audit Date",
-      "Process",
-      "File Name",
-      "Document Number",
-      "Document Type",
-      "Field Name",
-      "Line",
-      "Error Value",
-      "Correct Value",
-      "Project Vendor",
-      "Login Id",
-      "HyperLink",
-      "HyperLink Doc",
-    ];
-
-    const data = []; // <-- replace this with your actual data array
-
-    // Add header as first row, then spread your data
-    const worksheetData = [headers, ...data];
-
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Errors");
-
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    const blob = new Blob([excelBuffer], {
-      type:
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-
-    saveAs(blob, `${fileDownloadName}.xlsx`);
-  }
-};
-
+          []
+        )
+        .exportFile();
+    }
+  };
   let dateselect = new Date();
   dateselect.setDate(dateselect.getDate() - 4);
   var ddt = String(dateselect.getDate()).padStart(2, "0");
@@ -7131,35 +6975,6 @@ const ExportsHead = () => {
         iconColor="orange"
         buttonText="OK"
       />
-
-
-         <Box>
-                              <Dialog open={isErrorOpenpop} onClose={handleCloseerrpop} aria-labelledby="alert-dialog-title" maxWidth={"sm"} aria-describedby="alert-dialog-description">
-                                {/* <DialogContent sx={{  textAlign: 'center', alignItems: 'center' }}>
-                                  <Typography variant="h6">{showAlertpop}</Typography>
-                                </DialogContent> */}
-                                    <DialogContent sx={{  textAlign: 'center', alignItems: 'center' }}>
-                      <Typography sx={userStyle.HeaderText}>No Data To Upload in Bulk Upload,link and doclink updated in penalty error upload</Typography>
-                   
-                    </DialogContent>
-            
-            
-            
-                                <DialogActions>
-                                  <Button
-                                  
-                                   variant="contained"
-                                   color="primary"
-                                    onClick={sendJSONPenatlyUpdate}
-                                  >
-                                    Ok
-                                  </Button>
-                                </DialogActions>
-                              </Dialog>
-                            </Box>
-
-
-
     </Box>
   );
 }

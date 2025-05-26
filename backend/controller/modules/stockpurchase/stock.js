@@ -15,7 +15,8 @@ const fs = require("fs");
 const path = require("path");
 const mime = require('mime-types');
 
-
+const fastCsv = require("fast-csv");
+const PdfPrinter = require("pdfmake");
 
 function createFilterCondition(column, condition, value) {
   switch (condition) {
@@ -491,6 +492,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
       "rate",
       "vendorgroup",
       "vendor",
+      "paidstatus",
     ];
 
     const orConditions = regexTerms.map((regex) => {
@@ -560,6 +562,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
         area: 1,
         location: 1,
         requestmode: 1,
+        paidstatus:1,
         stockcategory: 1,
           vendorfrequency:1,
         stocksubcategory: 1,
@@ -621,7 +624,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
 
     // Now, totalProjects, totalProjectsData, and result are available for use.
 
-    console.log(result.length, 'resultstock')
+    console.log(result, 'resultstock')
     res.status(200).json({
       totalProjects,
       totalProjectsData: [],
@@ -696,8 +699,14 @@ exports.getAllStockPurchaseLimitedTransfer = catchAsyncErrors(async (req, res, n
   let stock;
   try {
 
-    stock = await Stock.find({ status: "Transfer" },
+   let  stocks = await Stock.find({ status: "Transfer" },
       { requestmode: 1, company: 1, status: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, tododetails:1, quantity: 1 });
+
+      
+    let manual = await Manual.find({ status: "Transfer" },
+      { requestmode: 1, company: 1, status: 1, branch: 1, unit: 1, floor: 1, area: 1, location: 1, productname: 1, tododetails:1, quantity: 1 });
+
+        stock = [...stocks,...manual]
 
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
@@ -2359,14 +2368,13 @@ exports.getAllStockExcelDownloadStock = catchAsyncErrors(async (req, res, next) 
       vendor: 1,
       stockmaterialarray: 1,
       tododetails:1,
-      quantitynew: 1
+      quantitynew: 1,
+      paidstatus:1
     });
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
   }
-  if (!stock) {
-    return next(new ErrorHandler("Stock not found!", 404));
-  }
+ 
   return res.status(200).json({
     stock,
   });
@@ -2671,7 +2679,7 @@ exports.getAllStockExcelDownloadAsset = async (req, res, next) => {
 
 
 
-exports.getAllStockPdfDownloadAssetPDF = async (req, res, next) => {
+exports.getAllStockPdfDownloadAssetPDFold = async (req, res, next) => {
   try {
     // Create a new PDF document
     const doc = new PDFDocument();
@@ -2715,7 +2723,7 @@ exports.getAllStockPdfDownloadAssetPDF = async (req, res, next) => {
     ]).cursor();
 
     // Add title or header to the PDF document
-    doc.fontSize(18).text('Stock Data Report', { align: 'center' });
+    doc.fontSize(18).text('Stock Purchase Asset List', { align: 'center' });
     doc.moveDown();
 
     // Add table headers
@@ -2738,7 +2746,7 @@ exports.getAllStockPdfDownloadAssetPDF = async (req, res, next) => {
         docData.productname, docData.warranty, docData.purchasedate, docData.productdetails,
         docData.warrantydetails, docData.quantity, docData.uom, docData.rate, docData.billdate
       ];
-      doc.text(row.join(' | '), { align: 'center' });
+      doc.text(row.join(' | '));
     }
 
     // Finalize the PDF document
@@ -2748,6 +2756,124 @@ exports.getAllStockPdfDownloadAssetPDF = async (req, res, next) => {
     return next(new ErrorHandler("Error exporting data", 500));
   }
 };
+
+exports.getAllStockPdfDownloadAssetPDF = catchAsyncErrors(async (req, res, next) => {
+
+  try {
+   const cursor = Stock.aggregate([
+      { $match: { requestmode: req.body.mode } },
+      {
+        $project: {
+          company: 1,
+          branch: 1,
+          unit: 1,
+          floor: 1,
+          area: 1,
+          location: 1,
+          requestmode: 1,
+          vendorgroup: 1,
+          vendor: 1,
+          gstno: 1,
+          billno: 1,
+          assettype: 1,
+          producthead: 1,
+          productname: 1,
+          warranty: 1,
+          purchasedate: 1,
+          productdetails: 1,
+          warrantydetails: 1,
+          quantity: 1,
+          uom: 1,
+          rate: 1,
+          billdate: 1
+        }
+      }
+    ]).cursor();
+
+    // ✅ Define pdfmake with Basic Fonts (Helvetica)
+    const fonts = {
+      Helvetica: {
+        normal: "Helvetica",
+        bold: "Helvetica-Bold",
+        italics: "Helvetica-Oblique",
+        bolditalics: "Helvetica-BoldOblique",
+      },
+    };
+
+    const printer = new PdfPrinter(fonts);
+
+    let content = [];
+
+    // ✅ Table Headers (No Bold)
+    const headers = [
+      'Company', 'Branch', 'Unit', 'Floor', 'Area', 'Location', 'Request Mode',
+      'Vendor Group', 'Vendor', 'GST No', 'Bill No', 'Asset Type', 'Product Head',
+      'Product Name', 'Warranty', 'Purchase Date', 'Product Details', 'Warranty Details',
+      'Quantity', 'UOM', 'Rate', 'Bill Date'
+    ];
+    
+    content.push({ text: "Production Report", font: "Helvetica", alignment: "center" });
+    content.push({ text: `Generated on: ${new Date().toLocaleString()}`, font: "Helvetica", alignment: "right" });
+    content.push("\n");
+
+    let tableData = [headers];
+
+    const fields = [
+  "company", "branch", "unit", "floor", "area", "location", "requestmode",
+  "vendorgroup", "vendor", "gstno", "billno", "assettype", "producthead",
+  "productname", "warranty", "purchasedate", "productdetails", "warrantydetails",
+  "quantity", "uom", "rate", "billdate"
+];
+
+    for await (const doc of cursor) {
+      // tableData.push([
+      //   doc.company ?? "-", doc.branch ??
+      //    "-", doc.unit ?? "-", doc.floor ??
+      //     "-", doc.area ?? "-", doc.location ?? "-", doc.requestmode ?? 
+      //     "-", doc.vendorgroup, doc.vendor ?? "-",, doc.gstno ?? "-",
+      //     , doc.billno ?? "-",, doc.assettype ?? "-",, doc.producthead ?? "-",
+
+      //     , doc.productname ?? "-", doc.warranty ?? "-", doc.purchasedate ?? "-", doc.productdetails ?? "-",
+      //      doc.warrantydetails ?? "-",
+      //        doc.quantity ?? "-",, doc.uom ?? "-",, doc.rate ?? "-",
+      //     , doc.billdate ?? "-"
+        
+      //   ]
+      //   );
+     tableData.push(fields.map(f => doc[f] ?? "-"));
+    }
+
+    // ✅ Add table to PDF content
+    content.push({ table: {headerRows: 1, body: tableData, widths: [
+    20, 20, 20, 20, 20, 20, 25,
+      25, 25, 20, 20, 20, 20,
+      25, 20, 20, 25, 25,
+      15, 20, 15, 20
+], }, layout: "lightHorizontalLines" });
+
+    // ✅ Define PDF Document (Using Helvetica)
+    const docDefinition = {
+      pageSize: "A4", // ✅ Standard A4 size
+      pageOrientation: "landscape", // ✅ Change to landscape mode
+      content,
+      defaultStyle: {
+        font: "Helvetica",
+        fontSize: 6, // ✅ Reduce font size (default is 12)
+      },
+    };
+
+    // ✅ Send PDF as Response
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=Production_Report.pdf");
+
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
+    pdfDoc.pipe(res); // ✅ Stream PDF directly to client
+    pdfDoc.end();
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 
 //reorder
 exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, next) => {

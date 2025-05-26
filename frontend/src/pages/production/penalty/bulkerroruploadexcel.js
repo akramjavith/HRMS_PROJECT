@@ -191,38 +191,38 @@ const ExcelSheet = () => {
   //get all client user id.
   const fetchClientUserID = async (proj) => {
     try {
-      // let res_freq = await axios.get(SERVICE.ALL_CLIENTUSERIDDATA, {
-      //   headers: {
-      //     Authorization: `Bearer ${auth.APIToken}`,
-      //   },
-      // });
-      // const filterProjBased = res_freq?.data?.clientuserid.filter((item) => item.projectvendor === proj);
-      // const loginIdOpt = [
-      //   ...filterProjBased.map((d) => ({
-      //     ...d,
-      //     label: d.userid,
-      //     value: d.userid,
-      //   })),
-      // ];
-
-      let res_vendor = await axios.post(SERVICE.CLIENT_USER_ID_VALIDATION_ERROR_ENTRY, {
+      let res_freq = await axios.get(SERVICE.ALL_CLIENTUSERIDDATA, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
-        role: isUserRoleAccess.role,
-        project: proj,
-        companyname: isUserRoleAccess.companyname,
-        date: new Date().toISOString().split('T')[0],
       });
+      const filterProjBased = res_freq?.data?.clientuserid.filter((item) => item.projectvendor === proj);
+      const loginIdOpt = [
+        ...filterProjBased.map((d) => ({
+          ...d,
+          label: d.userid,
+          value: d.userid,
+        })),
+      ];
 
-      // let alluseridNames = res_vendor?.data?.clientuserid;
-      let alluseridNamesadmin = res_vendor?.data?.clientuserid.map((d) => ({
-        ...d,
-        label: d.userid,
-        value: d.userid,
-      }));
+      // let res_vendor = await axios.post(SERVICE.CLIENT_USER_ID_VALIDATION_ERROR_ENTRY, {
+      //   headers: {
+      //     Authorization: `Bearer ${auth.APIToken}`,
+      //   },
+      //   role: isUserRoleAccess.role,
+      //   project: proj,
+      //   companyname: isUserRoleAccess.companyname,
+      //   date: new Date().toISOString().split('T')[0],
+      // });
 
-      setClientLoginIDOpt(alluseridNamesadmin);
+      // // let alluseridNames = res_vendor?.data?.clientuserid;
+      // let alluseridNamesadmin = res_vendor?.data?.clientuserid.map((d) => ({
+      //   ...d,
+      //   label: d.userid,
+      //   value: d.userid,
+      // }));
+
+      setClientLoginIDOpt(loginIdOpt);
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
     }
@@ -280,12 +280,12 @@ const ExcelSheet = () => {
 
     const DEP_FIELDS = [
       "dateformatted", "process", "errorfilename", "documentnumber", "documenttype",
-      "fieldname", "line", "errorvalue", "correctvalue", "link", "doclink"
+      "fieldname", "line", "errorvalue", "correctvalue","projectvendor","loginid", "link", "doclink"
     ];
 
     const DEP_QUEUE_FIELDS = [
       "dateformatted", "process", "errorfilename", "fieldname", "line",
-      "errorvalue", "correctvalue", "link", "doclink"
+      "errorvalue", "correctvalue","projectvendor","loginid", "link", "doclink"
     ];
 
     const fieldMap = penaltyErrorUpload.type === "DEP Audit Summary Report"
@@ -442,14 +442,14 @@ const ExcelSheet = () => {
         {
           ...item,
 
-          projectvendor: String(penaltyErrorUpload.projectvendor),
+          projectvendor: String(item.projectvendor),
           process: String(item.process),
-          loginid: String(penaltyErrorUpload.loginid),
+          loginid: String(item.loginid),
           // date: moment(new Date(item.date)).format("YYYY-MM-DD"),
           dateformatted: formatToDate(item["dateformatted"], `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`),
           fromdate: String(penaltyErrorUpload.date),
           todate: String(penaltyErrorUpload.date),
-          filename: penaltyErrorUpload.projectvendor + "_" + penaltyErrorUpload.loginid + "_" + penaltyErrorUpload.date + " _" + penaltyErrorUpload.type,
+          filename: item.projectvendor + "_" + item.loginid + "_" + item.dateformatted + " _" + penaltyErrorUpload.type,
 
           type: String(penaltyErrorUpload.type),
           errorfilename: String(item.errorfilename),
@@ -470,16 +470,16 @@ const ExcelSheet = () => {
         {
           ...item,
 
-          projectvendor: String(penaltyErrorUpload.projectvendor),
+          projectvendor: String(item.projectvendor),
           process: String(item.process),
-          loginid: String(penaltyErrorUpload.loginid),
+          loginid: String(item.loginid),
           // date: moment(new Date(item.date)).format("YYYY-MM-DD"),
           dateformatted: formatToDate(item["dateformatted"], `${yeardrop}${symboldrop}${monthdrop}${symboldrop}${datedrop}`),
           fromdate: String(penaltyErrorUpload.date),
           todate: String(penaltyErrorUpload.date),
           errorfilename: String(item.errorfilename),
           type: String(penaltyErrorUpload.type),
-          filename: penaltyErrorUpload.projectvendor + "_" + penaltyErrorUpload.loginid + "_" + penaltyErrorUpload.date + " _" + penaltyErrorUpload.type,
+          filename: item.projectvendor + "_" + item.loginid + "_" + item.dateformatted + " _" + penaltyErrorUpload.type,
 
           // documentnumber: String(item.documentnumber),
           // documenttype: String(item.documenttype),
@@ -523,10 +523,10 @@ const ExcelSheet = () => {
       headers: {
         Authorization: `Bearer ${auth.APIToken}`,
       },
-      projectvendor: [penaltyErrorUpload.projectvendor],
+      projectvendor:SelfDupeRemovedData.map(item => item.projectvendor),
       // process: String(penaltyErrorUpload.process),
       process: SelfDupeRemovedData.map(item => item.process),
-      loginid: [penaltyErrorUpload.loginid],
+      loginid: SelfDupeRemovedData.map(item => item.loginid),
       date: SelfDupeRemovedData.map(item => item.dateformatted),
     });
 
@@ -561,10 +561,10 @@ const ExcelSheet = () => {
       headers: {
         Authorization: `Bearer ${auth.APIToken}`,
       },
-      projectvendor: String(penaltyErrorUpload.projectvendor),
+      projectvendor: SelfDupeRemovedData.map(item => item.projectvendor),
       // process: String(penaltyErrorUpload.process),
       process: SelfDupeRemovedData.map(item => item.process),
-      loginid: String(penaltyErrorUpload.loginid),
+      loginid:  SelfDupeRemovedData.map(item => item.loginid),
       date: SelfDupeRemovedData.map(item => item.dateformatted),
     });
     let olddata = Res?.data?.penaltyerroruploadpoints;
@@ -631,28 +631,28 @@ setInvalidDates(invalidDates)
 
     console.log(newdata, SelfDupeRemovedData, 'newdata');
 
-    if (penaltyErrorUpload.projectvendor === 'Please Select Project Vendor') {
-      setPopupContentMalert('Please Select Project Vendor');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    }
+    // if (penaltyErrorUpload.projectvendor === 'Please Select Project Vendor') {
+    //   setPopupContentMalert('Please Select Project Vendor');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    // }
     // else if (penaltyErrorUpload.process === 'Please Select Process') {
     //   setPopupContentMalert('Please Select Process');
     //   setPopupSeverityMalert('info');
     //   handleClickOpenPopupMalert();
     // } 
-    else if (penaltyErrorUpload.loginid === 'Please Select Login ID') {
-      setPopupContentMalert('Please Select Login ID');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    }
+    // else if (penaltyErrorUpload.loginid === 'Please Select Login ID') {
+    //   setPopupContentMalert('Please Select Login ID');
+    //   setPopupSeverityMalert('info');
+    //   handleClickOpenPopupMalert();
+    // }
     //  else if (penaltyErrorUpload.date === '') {
     //   setPopupContentMalert('Please Select Date');
     //   setPopupSeverityMalert('info');
     //   handleClickOpenPopupMalert();
     //   // Set the flag to true
     // }
-    else if (newArray.length <= 0) {
+     if (newArray.length <= 0) {
       setPopupContentMalert('Please Fill Excel');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
@@ -921,7 +921,7 @@ setInvalidDates(invalidDates)
               />
             </FormControl>
           </Grid>
-          <Grid item md={3} xs={12} sm={6}>
+          {/* <Grid item md={3} xs={12} sm={6}>
             <Typography>
               Project <b style={{ color: 'red' }}>*</b>
             </Typography>
@@ -945,7 +945,7 @@ setInvalidDates(invalidDates)
                 }}
               />
             </FormControl>
-          </Grid>
+          </Grid> */}
 
           {/* <Grid item md={3} xs={12} sm={6}>
             <Typography>
@@ -969,7 +969,7 @@ setInvalidDates(invalidDates)
               />
             </FormControl>
           </Grid> */}
-          <Grid item md={2} xs={12} sm={6}>
+          {/* <Grid item md={2} xs={12} sm={6}>
             <Typography>
               Login Id <b style={{ color: 'red' }}>*</b>
             </Typography>
@@ -989,7 +989,7 @@ setInvalidDates(invalidDates)
                 }}
               />
             </FormControl>
-          </Grid>
+          </Grid> */}
           {/* <Grid item md={3} xs={12} sm={6}>
             <FormControl fullWidth size="small">
               <Typography>Date</Typography>
@@ -1006,7 +1006,7 @@ setInvalidDates(invalidDates)
               />
             </FormControl>
           </Grid> */}
-          <Grid item md={4} xs={12} sm={12}>
+          <Grid item md={6} xs={12} sm={12}>
             <Typography>Date Format<b style={{ color: "red" }}>*</b></Typography>
             <Grid container spacing={0.3}>
               <Grid item md={2.5} xs={4} sm={2.5}>
@@ -1295,12 +1295,22 @@ setInvalidDates(invalidDates)
               </Grid>
               <Grid item xs={12} sm={1} md={1} lg={1}>
                 <Typography>
-                  <strong>J: Link</strong>
+                  <strong>J: Project Vendor</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={1} md={1} lg={1}>
                 <Typography>
-                  <strong>K: Doc Link</strong>
+                  <strong>K: Login ID</strong>
+                </Typography>
+              </Grid>
+               <Grid item xs={12} sm={1} md={1} lg={1}>
+                <Typography>
+                  <strong>L: Link</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={1} md={1} lg={1}>
+                <Typography>
+                  <strong>M: Doc Link</strong>
                 </Typography>
               </Grid>
             </>
@@ -1347,12 +1357,22 @@ setInvalidDates(invalidDates)
               </Grid>
               <Grid item xs={12} sm={1} md={1} lg={1}>
                 <Typography>
-                  <strong>H: Link</strong>
+                  <strong>H: Project Vendor</strong>
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={1} md={1} lg={1}>
                 <Typography>
-                  <strong>I: Doc Link</strong>
+                  <strong>I: Login Id</strong>
+                </Typography>
+              </Grid>
+               <Grid item xs={12} sm={1} md={1} lg={1}>
+                <Typography>
+                  <strong>J: Link</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={1} md={1} lg={1}>
+                <Typography>
+                  <strong>K: Doc Link</strong>
                 </Typography>
               </Grid>
             </>

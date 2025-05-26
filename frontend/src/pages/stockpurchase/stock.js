@@ -130,6 +130,9 @@ function Stockmaster() {
   const [isLoading, setIsLoading] = useState(false);
   const [vendorOverall, setVendorOverall] = useState([]);
 
+    const [loadingdeloverall, setloadingdeloverall] = useState(false);
+  
+
   let Expensetotal = 0;
 
   const particularModeOptions = [
@@ -2641,6 +2644,8 @@ function Stockmaster() {
       });
       await handleFileUpload(refImgWarranty, 'todo', uniqueId);
       await handleFileUpload(refImgWarrantyBill, 'bill', uniqueId);
+
+      setloadingdeloverall(false);
       // await fetchStock("Filtered");
       // await fetchEbSort()
       setBtnSubmit(false);
@@ -2772,6 +2777,7 @@ function Stockmaster() {
   const handleSubmit = async (e) => {
     let vendorEmpty = todos.some((item) => item.vendor == 'Choose Vendor');
     setBtnSubmit(true);
+      setloadingdeloverall(true);
     e.preventDefault();
     await fetchStock('Filtered');
     await fetchEbSort();
@@ -2852,7 +2858,28 @@ function Stockmaster() {
         setPopupContentMalert('Please Select Vendor!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
+      }
+       else if (stockmaster.billno === '') {
+        setPopupContentMalert('Please Enter Billno!');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+      } 
+      else if (stockmaster.warranty === 'Yes' && stockmaster.warrantydetails === '') {
+        setPopupContentMalert('Please Enter Warranty Details!');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+      }
+       else if (stockmaster.billdate === '') {
+        setPopupContentMalert('Please Select Bill Date!');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+      }
+       else if (refImage.length == 0) {
+        setPopupContentMalert('Please Upload Bill!');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+      }
+       else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
         setPopupContentMalert('Please Select Request Mode For!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
@@ -2864,19 +2891,11 @@ function Stockmaster() {
         setPopupContentMalert('Please Select Component!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.billno === '') {
-        setPopupContentMalert('Please Enter Billno!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.productdetails === '') {
+      }else if (stockmaster.productdetails === '') {
         setPopupContentMalert('Please Enter Product Details!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (stockmaster.warranty === 'Yes' && stockmaster.warrantydetails === '') {
-        setPopupContentMalert('Please Enter Warranty Details!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
+      }  else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
         setPopupContentMalert('Please Select Uom!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
@@ -2886,14 +2905,6 @@ function Stockmaster() {
         handleClickOpenPopupMalert();
       } else if (stockmaster.rate === '') {
         setPopupContentMalert('Please Enter Rate!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.billdate === '') {
-        setPopupContentMalert('Please Select Bill Date!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (refImage.length == 0) {
-        setPopupContentMalert('Please Upload Bill!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else if (vendorEmpty) {
@@ -5331,7 +5342,7 @@ function Stockmaster() {
         } else {
           console.error('Error: No data returned from server');
         }
-
+ setIsFilterOpen(false);
         setLoader(false);
       }
     } catch (err) {
@@ -5401,7 +5412,9 @@ function Stockmaster() {
         }
 
         setLoader(false);
+         setIsPdfFilterOpen(false);
       }
+      
     } catch (err) {
       setLoader(false);
       console.log('Error downloading Excel file: ', err);
@@ -10853,7 +10866,7 @@ function Stockmaster() {
 
               <Grid container spacing={2}>
                 <Grid item md={3} xs={12} sm={6} marginTop={3}>
-                  {btnSubmit ? (
+                  {/* {btnSubmit ? (
                     <Box sx={{ display: 'flex' }}>
                       <CircularProgress />
                     </Box>
@@ -10863,7 +10876,16 @@ function Stockmaster() {
                         Create
                       </Button>
                     </>
-                  )}
+                  )} */}
+                   <LoadingButton
+                                      onClick={handleSubmit}
+                                      loading={loadingdeloverall}
+                                      sx={buttonStyles.buttonsubmit}
+                                      loadingPosition="end"
+                                      variant="contained"
+                                    >
+                                      Submit
+                                    </LoadingButton>
                 </Grid>
                 <Grid item md={3} xs={12} sm={6} marginTop={3}>
                   <Button sx={buttonStyles.btncancel} onClick={handleclear}>

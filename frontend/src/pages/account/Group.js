@@ -50,6 +50,7 @@ function Group() {
   };
   const handleClosePopupMalert = () => {
     setOpenPopupMalert(false);
+    setloadingdeloverall(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
   const [popupContent, setPopupContent] = useState("");

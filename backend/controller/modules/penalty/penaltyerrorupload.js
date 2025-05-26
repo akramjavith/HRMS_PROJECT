@@ -51,7 +51,7 @@ exports.getAllPenaltyerroruploadpointsduplicatewithbulkerroruploadFile = catchAs
 
 
     const getKey = (item) =>
-      `${item.projectvendor}$${item.process}$${item.loginid}$${item.date}$${item.errorfilename}$${item.documentnumber}$${item.documenttype}$${item.fieldname}$${item.line}$${item.errorvalue}-${item.correctvalue}`;
+      `${item.projectvendor}$${item.process}$${item.loginid}$${item.date}$${item.errorfilename}$${item.documentnumber}$${item.documenttype}$${item.fieldname}$${item.line}$${item.errorvalue}$${item.correctvalue}`;
 
     // 2. Create Set of keys from DB results
     const existingKeys = new Set(penaltyerroruploadpointsall.map(getKey));
@@ -446,7 +446,7 @@ exports.getAllPenaltyErrorUploadPointsByDate = catchAsyncErrors(async (req, res,
       loginid: {$in:loginid},
   date: {$in:date},
     }
-
+console.log(query,"query")
     penaltyerroruploadpoints = await PenaltyErrorUploadpoints.find(query);
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));

@@ -77,6 +77,8 @@ import { SERVICE } from '../../services/Baseservice';
 import AlertDialog from '../../components/Alert';
 import { DeleteConfirmation, PleaseSelectRow } from '../../components/DeleteConfirmation.js';
 import ExportData from '../../components/ExportData';
+import ExportDatacom from '../../components/ExportData';
+
 import InfoPopup from '../../components/InfoPopup.js';
 import MessageAlert from '../../components/MessageAlert';
 
@@ -1082,6 +1084,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     'Rate',
     'Vendor Group',
     'Vendor Name',
+    'Paid Status',
   ];
   let exportRowValues = [
     'company',
@@ -1106,6 +1109,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     'rate',
     'vendorgroup',
     'vendor',
+    'paidstatus',
   ];
 
   //Access Module
@@ -1206,6 +1210,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     checkbox: true,
     serialNumber: true,
     company: true,
+    paidstatus:true,
     branch: true,
     unit: true,
     floor: true,
@@ -2128,8 +2133,12 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         materialnew: 'Please Select Material',
         totalbillamount: res?.data?.sstock?.totalbillamountstock,
       });
+const paidmode = vendorOpt?.find((data) => vendorOverall?.filter((item) => item.name === res?.data?.sstock?.vendorgroup)?.map((data) => data?.vendor)?.includes?.(res?.data?.sstock?.vendor))?.modeofpayments
+setVendorModeOfPayments(paidmode)
+// .find(d => d.value === res?.data?.sstock?.vendor)
+     console.log(paidmode,"paidmode")
 
-      // const fileswarranty = await getMultipleFilesAsObjects(res?.data?.sstock?.filenames, "todo", res?.data?.sstock?.uniqueId);
+// const fileswarranty = await getMultipleFilesAsObjects(res?.data?.sstock?.filenames, "todo", res?.data?.sstock?.uniqueId);
 
       // handleFetchWarranty(fileswarranty);
 
@@ -2174,8 +2183,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
       // await fetchBranchDropdownsEdit(res?.data?.sstock?.company);
       // await fetchUnitsEdit(res?.data?.sstock?.branch);
-      // await fetchFloorEdit(res?.data?.sstock?.branch);
-      // await fetchAreaEdit(res?.data?.sstock?.branch, res?.data?.sstock?.floor);
+      await fetchFloorEdit(res?.data?.sstock?.branch);
+      await fetchAreaEdit(res?.data?.sstock?.branch, res?.data?.sstock?.floor);
+      await fetchAllLocationEdit(res?.data?.sstock?.branch, res?.data?.sstock?.floor, res?.data?.sstock?.area);
 
       // if (res?.data?.sstock.vendorid) {
       //   let resv = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.sstock.vendorid}`, {
@@ -3234,6 +3244,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
             rate: item.rate,
             vendor: item.vendor,
             vendorgroup: item.vendorgroup,
+            paidstatus: item.paidstatus,
           };
         });
 
@@ -3795,6 +3806,14 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       minHeight: '40px',
       hide: !columnVisibility.billdate,
     },
+     {
+      field: 'paidstatus',
+      headerName: 'Paid Status',
+      flex: 0,
+      width: 180,
+      minHeight: '40px',
+      hide: !columnVisibility.paidstatus,
+    },
     {
       field: 'actions',
       headerName: 'Action',
@@ -3860,6 +3879,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     // let documentArray = item.document.length === 0 ? item.documentstext : item.document;
 
     return {
+      ...item,
       id: item.id,
       serialNumber: item.serialNumber,
       company: item.company,
@@ -3984,6 +4004,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
 
   const handleCloseFilterOpen = async () => {
+
+    try{
     let res_employee = await axios.get(SERVICE.EXCEL_DOWNLOAD_STOCK, {
       headers: {
         Authorization: `Bearer ${auth.APIToken}`,
@@ -4040,7 +4062,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         })
         : []
     );
-    setIsFilterOpen(false);
+    setIsFilterOpen(true);
+  }catch(err){
+    console.log(err,"Errorexcel")
+  }
   };
 
   // page refersh reload
@@ -4105,7 +4130,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         })
         : []
     );
-    setIsPdfFilterOpen(false);
+    setIsPdfFilterOpen(true);
   };
 
   const handleClosePdfFilterMod = () => {
@@ -4729,8 +4754,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                     <>
                       <Button
                         onClick={(e) => {
-                          handleCloseFilterOpen();
-
+                          // handleCloseFilterOpen();
+  setIsFilterOpen(true);
                           setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
@@ -4744,7 +4769,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                     <>
                       <Button
                         onClick={(e) => {
-                          handleCloseFilterOpen();
+                          // handleCloseFilterOpen();
+                            setIsFilterOpen(true);
                           setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
@@ -4768,8 +4794,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                       <Button
                         sx={userStyle.buttongrp}
                         onClick={() => {
-                          // setIsPdfFilterOpen(true);
-                          handleCloseFilterOpenPdf();
+                          setIsPdfFilterOpen(true);
+                          // handleCloseFilterOpenPdf();
                         }}
                       >
                         <FaFilePdf />
@@ -5365,7 +5391,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
 
 
       {/* this is info view details */}
-      <Dialog open={openInfo} onClose={handleCloseinfo} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+      {/* <Dialog open={openInfo} onClose={handleCloseinfo} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <Box sx={{ width: '550px', padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}>Stock Purchase Info</Typography>
@@ -5427,7 +5453,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
             </Grid>
           </>
         </Box>
-      </Dialog>
+      </Dialog> */}
       <Box>
         {/* Edit DIALOG */}
         <Dialog
@@ -6723,6 +6749,12 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
                   <Typography>{moment(stockmanagemasteredit.billdate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
+                  <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6"> Paid Status</Typography>
+                  <Typography>{stockmanagemasteredit.paidstatus}</Typography>
+                </FormControl>
+              </Grid>
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
@@ -7105,7 +7137,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         setIsPdfFilterOpen={setIsPdfFilterOpen}
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
-        itemsTwo={overallFilterdata ?? []}
+        
+         itemsTwo={stockmanages ?? []}
+        // itemsTwo={overallFilterdata ?? []}
         filename={'StockPurchase'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
@@ -7178,7 +7212,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         </Dialog>
       </Box>
 
-      <ExportData
+      <ExportDatacom
         isFilterOpen={isFilterOpencom}
         handleCloseFilterMod={handleCloseFilterModcom}
         fileFormat={fileFormat}

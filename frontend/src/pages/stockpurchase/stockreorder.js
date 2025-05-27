@@ -343,15 +343,20 @@ function StockReorder() {
     //get single row to edit....
 
     //image
+
+
     const handleCaptureImage = () => {
-        if (gridRef.current) {
-            html2canvas(gridRef.current).then((canvas) => {
-                canvas.toBlob((blob) => {
-                    saveAs(blob, "StockManagement.png");
-                });
+        if (gridRefTableImg.current) {
+          domtoimage.toBlob(gridRefTableImg.current)
+            .then((blob) => {
+              saveAs(blob, "Stock Reorder.png");
+            })
+            .catch((error) => {
+              console.error("dom-to-image error: ", error);
             });
         }
-    };
+      };
+    
 
     // get particular columns for export excel
 

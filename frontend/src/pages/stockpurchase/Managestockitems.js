@@ -1321,7 +1321,7 @@ function Managestockitems() {
     }
 
     setPageName(!pageName)
-
+setColumnVisibility(initialColumnVisibility)
     try {
       let res_employee = await axios.post(SERVICE.MANAGE_STOCK_ITEMS_PAGINATION, queryParams, {
         headers: {

@@ -8,14 +8,15 @@ const catchAsyncErrors = require("../../../middleware/catchAsyncError");
 const ExcelJS = require("exceljs");
 const { PassThrough } = require("stream");
 const PDFDocument = require('pdfkit');
-const PdfPrinter = require("pdfmake");
+
 const multer = require("multer");
 const upload = multer();
 const fs = require("fs");
 const path = require("path");
 const mime = require('mime-types');
 
-
+const fastCsv = require("fast-csv");
+const PdfPrinter = require("pdfmake");
 
 function createFilterCondition(column, condition, value) {
   switch (condition) {
@@ -491,6 +492,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
       "rate",
       "vendorgroup",
       "vendor",
+      "paidstatus",
     ];
 
     const orConditions = regexTerms.map((regex) => {
@@ -560,6 +562,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
         area: 1,
         location: 1,
         requestmode: 1,
+        paidstatus:1,
         stockcategory: 1,
           vendorfrequency:1,
         stocksubcategory: 1,
@@ -621,7 +624,7 @@ exports.getAllStockAccessStock = catchAsyncErrors(async (req, res, next) => {
 
     // Now, totalProjects, totalProjectsData, and result are available for use.
 
-    console.log(result.length, 'resultstock')
+    console.log(result, 'resultstock')
     res.status(200).json({
       totalProjects,
       totalProjectsData: [],
@@ -715,7 +718,6 @@ exports.getAllStockPurchaseLimitedTransfer = catchAsyncErrors(async (req, res, n
     stock,
   });
 });
-
 
 exports.getAllStockPurchaseLimitedTransferLog = catchAsyncErrors(async (req, res, next) => {
   let stock;
@@ -1265,7 +1267,7 @@ exports.getAllStockPurchaseLimitedUsageCount = catchAsyncErrors(async (req, res,
     ]);
 
     stock = [...stocklimited, ...manuallimited,...assetdetails];
-console.log(stock,"stockusagecoutn")
+// console.log(stock,"stockusagecoutn")
 
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
@@ -2366,14 +2368,13 @@ exports.getAllStockExcelDownloadStock = catchAsyncErrors(async (req, res, next) 
       vendor: 1,
       stockmaterialarray: 1,
       tododetails:1,
-      quantitynew: 1
+      quantitynew: 1,
+      paidstatus:1
     });
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
   }
-  if (!stock) {
-    return next(new ErrorHandler("Stock not found!", 404));
-  }
+ 
   return res.status(200).json({
     stock,
   });
@@ -2677,6 +2678,84 @@ exports.getAllStockExcelDownloadAsset = async (req, res, next) => {
 
 
 
+
+exports.getAllStockPdfDownloadAssetPDFold = async (req, res, next) => {
+  try {
+    // Create a new PDF document
+    const doc = new PDFDocument();
+
+    // Set response headers to stream the PDF file
+    res.setHeader("Content-Disposition", "attachment; filename=stock_data.pdf");
+    res.setHeader("Content-Type", "application/pdf");
+
+    // Pipe the document to the response object
+    doc.pipe(res);
+
+    // Fetch data from MongoDB
+    const dataStream = Stock.aggregate([
+      { $match: { requestmode: req.body.mode } },
+      {
+        $project: {
+          company: 1,
+          branch: 1,
+          unit: 1,
+          floor: 1,
+          area: 1,
+          location: 1,
+          requestmode: 1,
+          vendorgroup: 1,
+          vendor: 1,
+          gstno: 1,
+          billno: 1,
+          assettype: 1,
+          producthead: 1,
+          productname: 1,
+          warranty: 1,
+          purchasedate: 1,
+          productdetails: 1,
+          warrantydetails: 1,
+          quantity: 1,
+          uom: 1,
+          rate: 1,
+          billdate: 1
+        }
+      }
+    ]).cursor();
+
+    // Add title or header to the PDF document
+    doc.fontSize(18).text('Stock Purchase Asset List', { align: 'center' });
+    doc.moveDown();
+
+    // Add table headers
+    const headers = [
+      'Company', 'Branch', 'Unit', 'Floor', 'Area', 'Location', 'Request Mode',
+      'Vendor Group', 'Vendor', 'GST No', 'Bill No', 'Asset Type', 'Product Head',
+      'Product Name', 'Warranty', 'Purchase Date', 'Product Details', 'Warranty Details',
+      'Quantity', 'UOM', 'Rate', 'Bill Date'
+    ];
+
+    doc.fontSize(12).text(headers.join(' | '), { align: 'center' });
+    doc.moveDown();
+
+    // Add data rows to the PDF
+    for await (let docData of dataStream) {
+      const row = [
+        docData.company, docData.branch, docData.unit, docData.floor, docData.area,
+        docData.location, docData.requestmode, docData.vendorgroup, docData.vendor,
+        docData.gstno, docData.billno, docData.assettype, docData.producthead,
+        docData.productname, docData.warranty, docData.purchasedate, docData.productdetails,
+        docData.warrantydetails, docData.quantity, docData.uom, docData.rate, docData.billdate
+      ];
+      doc.text(row.join(' | '));
+    }
+
+    // Finalize the PDF document
+    doc.end();
+  } catch (err) {
+    console.error("Export error:", err);
+    return next(new ErrorHandler("Error exporting data", 500));
+  }
+};
 
 exports.getAllStockPdfDownloadAssetPDF = catchAsyncErrors(async (req, res, next) => {
 

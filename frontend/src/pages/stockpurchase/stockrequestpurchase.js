@@ -983,7 +983,7 @@ function Stockpurchaserequest() {
   const [vendorGroup, setVendorGroup] = useState('Please Select Vendor Group');
 
   let exportColumnNames = ['Company', 'Branch', 'Unit', 'Floor', 'Area', 'Location', 'Date', 'Time', 'Expected Date', 'Expected Time', 'Request Mode For', 'Product Details', 'Quantity', 'Quantity & UOM'];
-  let exportRowValues = ['company', 'branch', 'unit', 'floor', 'area', 'location', 'requestdate', 'requesttime', 'expecttdate', 'expecttime', 'requestmode', 'productdetailsnew', 'quantitynew', 'uomnew'];
+  let exportRowValues = ['company', 'branch', 'unit', 'floor', 'area', 'location', 'requestdate', 'requesttime', 'duedate', 'expecttime', 'requestmode', 'productdetailsnew', 'quantitynew', 'uomnew'];
 
   //Access Module
   const pathname = window.location.pathname;
@@ -2677,6 +2677,7 @@ function Stockpurchaserequest() {
       setGetImgwarranty(null);
       setFilewarrantyedit('');
       setGetImgwarrantyedit(null);
+      handleClosestockupdate()
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -3815,7 +3816,7 @@ await fetchspecification(res?.data?.sstockmanage.material)
               company: item.company,
               requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
               requesttime: item.requesttime,
-              expecttdate: moment(item.expecttdate).format('DD/MM/YYYY'),
+             duedate: moment(item.duedate).format('DD/MM/YYYY'),
               expecttime: item.expecttime,
               branch: item.branch,
               unit: item.unit,
@@ -3854,6 +3855,7 @@ await fetchspecification(res?.data?.sstockmanage.material)
               // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
               // expecttime: item.expecttime,
               requesttime: item.requesttime,
+              duedate:moment(item.duedate).format('DD/MM/YYYY'),
               productdetailsnew: item.productdetails,
               uomnew: `${item.quantity}#${item.uomcode}`,
               quantitynew: item.quantity,
@@ -3892,7 +3894,7 @@ await fetchspecification(res?.data?.sstockmanage.material)
                   branch: item.branch,
                   unit: item.unit,
                   requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
-                  expecttdate: moment(item.expecttdate).format('DD/MM/YYYY'),
+                  duedate: moment(item.duedate).format('DD/MM/YYYY'),
                   expecttime: item.expecttime,
                   requesttime: item.requesttime,
                   floor: item.floor,
@@ -4531,180 +4533,201 @@ await fetchspecification(res?.data?.sstockmanage.material)
 
     setPageName(!pageName);
 
-    try {
-      // let res_project = await axios.get(SERVICE.STOCKMANAGE, {
-      let res_employee = await axios.post(SERVICE.STOCK_MANAGE_FILTER, queryParams, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-      });
+      try {
+    
+        let res_employee = await axios.post(SERVICE.STOCK_MANAGE_FILTER, queryParams, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
 
-      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
+        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
 
-      // let filteredData = ans.filter((data) => {
-      //   return data.requestmode === "Asset Material";
-      // });
+        // let filteredData = ans.filter((data) => {
+        //   return data.requestmode === "Asset Material";
+        // });
 
-      let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-      });
+        let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
 
-      let codeValues = res_project_1?.data?.vommaster.map((data) => ({
-        name: data.name,
-        code: data?.code,
-      }));
-      // setuomcodes(codeValues);
+        let codeValues = res_project_1?.data?.vommaster.map((data) => ({
+          name: data.name,
+          code: data?.code,
+        }));
+        // setuomcodes(codeValues);
 
-      let setData = ans.map((item) => {
-        const matchingItem = codeValues.find((item1) => item.uom === item1.name);
+        let setData = ans.map((item) => {
+          const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
-        const matchingItem1 = codeValues.find((item1) => item.uomnew === item1.name);
+          const matchingItem1 = codeValues.find((item1) => item.uomnew === item1.name);
 
-        if (matchingItem) {
-          return { ...item, uomcode: matchingItem.code };
-        } else if (matchingItem1) {
-          return { ...item, uomcode: matchingItem1.code };
-        } else {
-          return { ...item };
-        }
-      });
+          if (matchingItem) {
+            return { ...item, uomcode: matchingItem.code };
+          } else if (matchingItem1) {
+            return { ...item, uomcode: matchingItem1.code };
+          } else {
+            return { ...item };
+          }
+        });
 
-      // const itemsWithSerialNumber = setData?.map((item, index) => ({
-      //   ...item,
-      //   serialNumber: (page - 1) * pageSize + index + 1,
-      // }));
+        // const itemsWithSerialNumber = setData?.map((item, index) => ({
+        //   ...item,
+        //   serialNumber: (page - 1) * pageSize + index + 1,
+        // }));
 
-      const itemsWithSerialNumber = setData?.map((item, index) => {
-        if (item.requestmode === 'Stock Material') {
-          let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
+        const itemsWithSerialNumber = setData?.map((item, index) => {
+          if (item.requestmode === 'Stock Material') {
+            let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
-          let materialNew = item.stockmaterialarray.map((data, newindex) => {
-            return ` ${data.materialnew}`;
-          });
+            let materialNew = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.materialnew}`;
+            });
 
-          let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
-            return ` ${data.productdetailsnew}`;
-          });
+            let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.productdetailsnew}`;
+            });
 
-          let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
-            return ` ${data.quantitynew}#${data.uomcodenew}`;
-          });
+            let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.quantitynew}#${data.uomcodenew}`;
+            });
 
-          const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
-          const result = nonEmptyParts.join(',');
+            const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+            const result = nonEmptyParts.join(',');
 
-          return {
-            id: item._id,
-            serialNumber: (page - 1) * pageSize + index + 1,
-            company: item.company,
-            branch: item.branch,
-            unit: item.unit,
-            floor: item.floor,
-            area: item.area,
-            location: item.location,
-            requestmode: item.requestmode,
+            return {
+              ...item,
+              id: item._id,
+              serialNumber: (page - 1) * pageSize + index + 1,
+              company: item.company,
+              requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+              requesttime: item.requesttime,
+             duedate: moment(item.duedate).format('DD/MM/YYYY'),
+              expecttime: item.expecttime,
+              branch: item.branch,
+              unit: item.unit,
+              floor: item.floor,
+              area: item.area,
+              location: item.location,
+              requestmode: item.requestmode,
 
-            // uomnew: quantityAndUom.join(","),
-            uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
-            // quantitynew: quantityNew.join(","),
-            quantitynew: quantityNew,
+              // uomnew: quantityAndUom.join(","),
+              uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
+              // quantitynew: quantityNew.join(","),
+              quantitynew: quantityNew,
 
-            // materialnew: materialNew.join(',').toString(),
-            // productdetailsnew:
-            //   item.stockmaterialarray.length > 0
-            //     ? productdetailsNew.join(",")
-            //     : "",
-            productdetailsnew:
-              // productdetailsNew.join(",")
-              productdetailsNew.filter((item) => item.trim() !== '').join(','),
-          };
-        } else {
-          return {
-            id: item._id,
-            serialNumber: (page - 1) * pageSize + index + 1,
-            company: item.company,
-            branch: item.branch,
-            unit: item.unit,
-            floor: item.floor,
-            area: item.area,
-            location: item.location,
-            requestmode: item.requestmode,
+              // materialnew: materialNew.join(',').toString(),
+              // productdetailsnew:
+              //   item.stockmaterialarray.length > 0
+              //     ? productdetailsNew.join(",")
+              //     : "",
+              productdetailsnew:
+                // productdetailsNew.join(",")
+                productdetailsNew.filter((item) => item.trim() !== '').join(','),
+            };
+          } else {
+            return {
+              ...item,
+              id: item._id,
+              serialNumber: (page - 1) * pageSize + index + 1,
+              company: item.company,
+              branch: item.branch,
+              unit: item.unit,
+              floor: item.floor,
+              area: item.area,
+              location: item.location,
+              requestmode: item.requestmode,
+              requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+              // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
+              // expecttime: item.expecttime,
+              requesttime: item.requesttime,
+              duedate:moment(item.duedate).format('DD/MM/YYYY'),
+              productdetailsnew: item.productdetails,
+              uomnew: `${item.quantity}#${item.uomcode}`,
+              quantitynew: item.quantity,
+             
+            };
+          }
+        });
+        setStockmanage(itemsWithSerialNumber);
 
-            productdetailsnew: item.productdetails,
-            uomnew: `${item.quantity}#${item.uomcode}`,
-            quantitynew: item.quantity,
-          };
-        }
-      });
-      setStockmanage(itemsWithSerialNumber);
+        setOverallFilterdata(
+          res_employee?.data?.totalProjectsData?.length > 0
+            ? res_employee?.data?.totalProjectsData?.map((item, index) => {
+              if (item.requestmode === 'Stock Material') {
+                let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
-      setOverallFilterdata(
-        res_employee?.data?.totalProjectsData?.length > 0
-          ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-            if (item.requestmode === 'Stock Material') {
-              let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
+                let materialNew = item.stockmaterialarray.map((data, newindex) => {
+                  return ` ${data.materialnew}`;
+                });
 
-              let materialNew = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.materialnew}`;
-              });
+                let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+                  return ` ${data.productdetailsnew}`;
+                });
 
-              let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.productdetailsnew}`;
-              });
+                let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+                  return ` ${data.quantitynew}#${data.uomcodenew}`;
+                });
 
-              let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.quantitynew}#${data.uomcodenew}`;
-              });
+                const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+                const result = nonEmptyParts.join(',');
 
-              const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
-              const result = nonEmptyParts.join(',');
+                return {
+                  ...item,
+                  id: item._id,
+                  serialNumber: (page - 1) * pageSize + index + 1,
+                  company: item.company,
+                  branch: item.branch,
+                  unit: item.unit,
+                  requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+                  duedate: moment(item.duedate).format('DD/MM/YYYY'),
+                  expecttime: item.expecttime,
+                  requesttime: item.requesttime,
+                  floor: item.floor,
+                  area: item.area,
+                  location: item.location,
+                  requestmode: item.requestmode,
 
-              return {
-                id: item._id,
-                serialNumber: (page - 1) * pageSize + index + 1,
-                company: item.company,
-                branch: item.branch,
-                unit: item.unit,
-                floor: item.floor,
-                area: item.area,
-                location: item.location,
-                requestmode: item.requestmode,
+                  // uomnew: quantityAndUom.join(","),
+                  uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
+                  // quantitynew: quantityNew.join(","),
+                  quantitynew: quantityNew,
 
-                // uomnew: quantityAndUom.join(","),
-                uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
-                // quantitynew: quantityNew.join(","),
-                quantitynew: quantityNew,
+                  // materialnew: materialNew.join(',').toString(),
+                  // productdetailsnew:
+                  //   item.stockmaterialarray.length > 0
+                  //     ? productdetailsNew.join(",")
+                  //     : "",
+                  productdetailsnew:
+                    // productdetailsNew.join(",")
+                    productdetailsNew.filter((item) => item.trim() !== '').join(','),
+                };
+              } else {
+                return {
+                  ...item,
+                  serialNumber: (page - 1) * pageSize + index + 1,
+                  requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+                  requesttime: item.requesttime,
+                  // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
+                  // expecttime: item.expecttime,
+                };
+              }
+            })
+            : []
+        );
 
-                // materialnew: materialNew.join(',').toString(),
-                // productdetailsnew:
-                //   item.stockmaterialarray.length > 0
-                //     ? productdetailsNew.join(",")
-                //     : "",
-                productdetailsnew:
-                  // productdetailsNew.join(",")
-                  productdetailsNew.filter((item) => item.trim() !== '').join(','),
-              };
-            } else {
-              return {
-                ...item,
-                serialNumber: (page - 1) * pageSize + index + 1,
-              };
-            }
-          })
-          : []
-      );
-
-      setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
-      setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-      setPageSize((data) => {
-        return ans?.length > 0 ? data : 10;
-      });
-      setPage((data) => {
-        return ans?.length > 0 ? data : 1;
-      });
-      setProjectCheck(false);
+        setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
+        setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
+        setPageSize((data) => {
+          return ans?.length > 0 ? data : 10;
+        });
+        setPage((data) => {
+          return ans?.length > 0 ? data : 1;
+        });
+        setProjectCheck(false);
+      
     } catch (err) {
       setProjectCheck(false);
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -4889,6 +4912,8 @@ await fetchspecification(res?.data?.sstockmanage.material)
     setPopupSeverity('success');
     handleClickOpenPopup();
   };
+
+  
 
   return (
     <>
@@ -5860,6 +5885,26 @@ await fetchspecification(res?.data?.sstockmanage.material)
                         />
                       </FormControl>
                     </Grid>
+                     {/* <Grid item lg={2} md={4} xs={12} sm={6}>
+                                      <FormControl fullWidth size="small">
+                                        <Typography>Due Date</Typography>
+                                        <OutlinedInput
+                                          id="to-date"
+                                          type="date"
+                                          value={stockmasterupdate.duedate}
+                                          onChange={(e) => {
+                                            setStockmasterupdate({
+                                              ...stockmasterupdate,
+                                              duedate: e.target.value,
+                                            });
+                                          }}
+                                          inputProps={{
+                                            min: stockmasterupdate.billdate,
+                                            // max: today
+                                          }}
+                                        />
+                                      </FormControl>
+                                    </Grid> */}
                     <Grid item md={3} xs={12} sm={12}>
                       <Typography>
                         Bill <b style={{ color: 'red' }}>*</b>{' '}

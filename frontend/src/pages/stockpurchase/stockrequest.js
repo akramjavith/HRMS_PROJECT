@@ -2071,7 +2071,7 @@ function Stockmanagerequest() {
       setPopupContent("Deleted Successfully");
       setPopupSeverity("success");
       handleClickOpenPopup();
-      await fetchStock("Filtered");
+      await fetchStock();
 
       setSelectedRows([]);
       setPage(1);
@@ -2096,7 +2096,7 @@ function Stockmanagerequest() {
       await Promise.all(deletePromises);
       setIsHandleChange(false)
 
-      await fetchStock("Filtered");
+      await fetchStock();
       // await fetchStockStockMaterial();
       setPopupContent("Deleted Successfully");
       setPopupSeverity("success");
@@ -2915,7 +2915,7 @@ function Stockmanagerequest() {
       setPopupContent("Updated Successfully");
       setPopupSeverity("success");
       handleClickOpenPopup();
-      await fetchStock("Filtered");
+      await fetchStock();
       handleCloseModEdit();
 
     } catch (err) {
@@ -3169,8 +3169,11 @@ function Stockmanagerequest() {
 
     }
   };
+
+  
+
   //get all project.
-  const fetchStock = async (e) => {
+  const fetchStockold = async (e) => {
     setPageName(!pageName)
     setProjectCheck(true);
     const queryParams = {
@@ -3253,6 +3256,80 @@ function Stockmanagerequest() {
       } else {
         setProjectCheck(false)
       }
+    }
+
+    catch (err) {
+      setProjectCheck(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+
+    }
+
+  }
+
+
+
+    const fetchStock = async (e) => {
+    setPageName(!pageName)
+    setProjectCheck(true);
+    const queryParams = {
+    
+      assignbranch: accessbranch,
+      company: valueCompanyCat,
+      branch: valueBranchCat,
+      unit: valueUnitCat,
+    };
+
+
+    try {
+     
+        let res_employee = await axios.post(SERVICE.STOCK_MANAGE_ACCESS, queryParams, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
+
+        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+        console.log(ans, "ansss")
+        // let filteredData = ans.filter((data) => {
+        //   return data.requestmode === "Asset Material";
+        // });
+
+        let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
+
+        let codeValues = res_project_1?.data?.vommaster.map((data) => ({
+          name: data.name,
+          code: data?.code,
+        }));
+        // setuomcodes(codeValues);
+
+        let setData = ans.map((item) => {
+          // Find the corresponding item in codeValues array
+          const matchingItem = codeValues.find(
+            (item1) => item.uom === item1.name
+          );
+
+          // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
+          return matchingItem
+            ? { ...item, uomcode: matchingItem?.code }
+            : { ...item, uomcode: "" };
+        });
+        const itemsWithSerialNumber = setData?.map((item, index) => ({
+          ...item,
+          serialNumber:index + 1,
+          requestdate: moment(item.requestdate).format("DD/MM/YYYY"),
+          duedate: moment(item.duedate).format("DD/MM/YYYY"),
+        }));
+
+        setStockmanage(itemsWithSerialNumber);
+        console.log(itemsWithSerialNumber, "itemsWithSerialNumber")
+
+
+        setProjectCheck(false);
+    
     }
 
     catch (err) {
@@ -3368,11 +3445,11 @@ function Stockmanagerequest() {
     fetchAssetType();
   }, []);
 
-  useEffect(() => {
-    if (items?.length > 0) {
-      fetchStock("Filtered");
-    }
-  }, [page, pageSize, searchQuery]);
+  // useEffect(() => {
+
+  //     fetchStock();
+ 
+  // }, []);
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
@@ -3713,7 +3790,7 @@ function Stockmanagerequest() {
   const filteredSelectedColumn = columnDataTable.filter(data => data.field !== 'checkbox' && data.field !== "actions" && data.field !== "serialNumber");
 
 
-  const rowDataTable = items.map((item, index) => {
+  const rowDataTable = filteredData.map((item, index) => {
     return {
       ...item,
       id: item._id,
@@ -4336,7 +4413,7 @@ function Stockmanagerequest() {
       handleClickOpenPopupMalert();
     }
     else {
-      fetchStock("Filtered");
+      fetchStock();
     }
   };
 
@@ -5803,7 +5880,7 @@ function Stockmanagerequest() {
                       )}
                   </Box>
                 </Grid>
-                <Grid item md={2} xs={12} sm={12}>
+                {/* <Grid item md={2} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <OutlinedInput size="small"
                       id="outlined-adornment-weight"
@@ -5834,7 +5911,23 @@ function Stockmanagerequest() {
                       disabled={!!advancedFilter}
                     />
                   </FormControl>
-                </Grid>
+                </Grid> */}
+                 <Grid item md={2} xs={6} sm={6}>
+                                <Box>
+                                  <AggregatedSearchBar
+                                    columnDataTable={columnDataTable}
+                                    setItems={setItems}
+                                    addSerialNumber={addSerialNumber}
+                                    setPage={setPage}
+                                    maindatas={stockmanages}
+                                    setSearchedString={setSearchedString}
+                                    searchQuery={searchQuery}
+                                    setSearchQuery={setSearchQuery}
+                                    paginated={false}
+                                    totalDatas={stockmanages}
+                                  />
+                                </Box>
+                              </Grid>
               </Grid>
               <br />
               <Grid container spacing={1}>
@@ -5900,7 +5993,7 @@ function Stockmanagerequest() {
                 <>
                   <Box style={{ width: "100%", overflowY: "hidden" }}>
                     <>
-                      <AggridTableForPaginationTable
+                      {/* <AggridTableForPaginationTable
                         rowDataTable={rowDataTable}
                         columnDataTable={columnDataTable}
                         columnVisibility={columnVisibility}
@@ -5917,7 +6010,34 @@ function Stockmanagerequest() {
                         filteredRowData={filteredRowData}
                         gridRefTableImg={gridRefTableImg}
                         itemsList={overallFilterdata}
-                      />
+                      /> */}
+                      <AggridTable
+                                        rowDataTable={rowDataTable}
+                                        columnDataTable={columnDataTable}
+                                        columnVisibility={columnVisibility}
+                                        page={page}
+                                        setPage={setPage}
+                                        pageSize={pageSize}
+                                        totalPages={totalPages}
+                                        setColumnVisibility={setColumnVisibility}
+                                        isHandleChange={isHandleChange}
+                                        items={items}
+                                        selectedRows={selectedRows}
+                                        setSelectedRows={setSelectedRows}
+                                        gridRefTable={gridRefTable}
+                                      
+                                        paginated={false}
+                                        filteredDatas={filteredDatas}
+                                        // totalDatas={totalDatas}
+                                        searchQuery={searchedString}
+                                        handleShowAllColumns={handleShowAllColumns}
+                                        setFilteredRowData={setFilteredRowData}
+                                        filteredRowData={filteredRowData}
+                                        setFilteredChanges={setFilteredChanges}
+                                        filteredChanges={filteredChanges}
+                                        gridRefTableImg={gridRefTableImg}
+                                        itemsList={stockmanages}
+                                      />
                     </>
                   </Box>
                 </>
@@ -6160,7 +6280,7 @@ function Stockmanagerequest() {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Due Date</Typography>
-                  <Typography>{stockmanagemasteredit.duedate}</Typography>
+                  <Typography>{moment(stockmanagemasteredit.duedate).format("DD/MM/YYYY")}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={4} xs={12} sm={12}>

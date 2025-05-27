@@ -128,7 +128,7 @@ function ManuaStockTable({ vendorAuto }) {
 
   const [openViewstatus, setOpenViewstatus] = useState(false);
 
-    const handleViewOpenstatus = () => {
+  const handleViewOpenstatus = () => {
     setOpenViewstatus(true);
   };
   const handlViewClosestatus = () => {
@@ -1320,6 +1320,7 @@ function ManuaStockTable({ vendorAuto }) {
       setGroupedVendorNames(vendorOverall?.filter((item) => item.name === res?.data?.smanualstock?.vendorgroup)?.map((data) => data?.vendor));
 
       setExpensecreate(alldata);
+      setVendorNewstock(res?.data?.smanualstock);
       setEducationtodo(res?.data?.smanualstock?.tododetails);
       setVendorGroupEdit(res?.data?.smanualstock?.vendorgroup);
       setVendorNewEdit(res?.data?.smanualstock?.vendorname);
@@ -1334,6 +1335,9 @@ function ManuaStockTable({ vendorAuto }) {
       });
       console.log(res?.data?.smanualstock?.tododetails.totalbillamount, 'tato');
       setAmountEdit(res?.data?.smanualstock?.tododetails.totalbillamount);
+
+      const paidmode = vendorOptEdit?.find((data) => vendorOverall?.filter((item) => item.name === res?.data?.smanualstock?.vendorgroup)?.map((data) => data?.vendor)?.includes?.(res?.data?.smanualstock?.vendorname))?.modeofpayments
+      setVendorModeOfPayments(paidmode)
       // setRefImageedit(res?.data?.smanualstock?.files);
       // setRefImagewarrantyedit(
       //   res?.data?.smanualstock?.warrantyfiles
@@ -1423,6 +1427,48 @@ function ManuaStockTable({ vendorAuto }) {
         },
       });
       handleViewOpen();
+      setStockmanagemasteredit(res?.data?.smanualstock);
+      let stockcategoryNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return data.category === 'Please Select Category' ? '' : `${data.category}`;
+      });
+      setstockcategoryNeww(stockcategoryNew.toString());
+
+      let stocksubcategoryNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return data.subcategory === 'Please Select Sub Category' ? '' : `${data.subcategory}`;
+      });
+      setMSubcategoryNeww(stocksubcategoryNew.toString());
+      let quantityNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return ` ${data.quantitynew}`;
+      });
+      setQuantityNeww(quantityNew.toString());
+
+      let materialNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return ` ${data.materialnew}`;
+      });
+      setMaterialNeww(materialNew.toString());
+
+      let productdetailsNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return ` ${data.productdetailsnew}`;
+      });
+      setProductdetailsNeww(productdetailsNew.toString());
+
+      let quantityAndUom = res?.data?.smanualstock.tododetails.map((data, newindex) => {
+        return ` ${data.quantitynew}#${data.uomnew}`;
+      });
+      setQuantityAndUom(quantityAndUom.toString());
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
+
+  const getviewCodestatus = async (e) => {
+    try {
+      let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${e}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+      handleViewOpenstatus();
       setStockmanagemasteredit(res?.data?.smanualstock);
       let stockcategoryNew = res?.data?.smanualstock.tododetails.map((data, newindex) => {
         return data.category === 'Please Select Category' ? '' : `${data.category}`;
@@ -2605,15 +2651,15 @@ function ManuaStockTable({ vendorAuto }) {
           ...item,
           id: item._id,
           serialNumber: index + 1,
-              date: item.handover === "handover" ? moment(item.allotdate).format("DD/MM/YYYY") :
-                    item.handover === "return" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
-                    item.status === "Transfer" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
-                      moment(item.usagedate).format("DD/MM/YYYY"),
-        
-                  time: item.handover === "handover" ? item.allottime :
-                    item.handover === "return" ? moment(item.addedby[0]?.date).format("hh:mm") :
-                     item.status === "Transfer" ? moment(item.addedby[0]?.date).format("hh:mm") :
-                      item.usagetime,
+          date: item.handover === "handover" ? moment(item.allotdate).format("DD/MM/YYYY") :
+            item.handover === "return" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
+              item.status === "Transfer" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
+                moment(item.usagedate).format("DD/MM/YYYY"),
+
+          time: item.handover === "handover" ? item.allottime :
+            item.handover === "return" ? moment(item.addedby[0]?.date).format("hh:mm") :
+              item.status === "Transfer" ? moment(item.addedby[0]?.date).format("hh:mm") :
+                item.usagetime,
         }
       }));
       setIsAttandance(false)
@@ -3102,7 +3148,7 @@ function ManuaStockTable({ vendorAuto }) {
             <Button
               sx={userStyle.buttonedit}
               onClick={(e) => {
-                getviewCode(params.data.id);
+                getviewCodestatus(params.data.id);
                 // handleViewOpen();
               }}
             >
@@ -3941,13 +3987,14 @@ function ManuaStockTable({ vendorAuto }) {
       cellRenderer: (params) => {
         let buttonStyles = {};
 
-         if (params.data.handover === "handover") {
+        if (params.data.handover === "handover") {
           buttonStyles = { backgroundColor: "#DFF6DD", color: "#2E7D32", borderColor: "#2E7D32" };
         } else if (params.data.handover === "return") {
           buttonStyles = { backgroundColor: "#FFEBEE", color: "#D32F2F", borderColor: "#D32F2F" };
-        } else if (params.data.hansover === "usagecount") {
+        } else if (params.data.handover === "usagecount") {
           buttonStyles = { backgroundColor: "#E3F2FD", color: "#1565C0", borderColor: "#1565C0" };
         }
+
         else {
           buttonStyles = { backgroundColor: "#E3F2FD", color: "#1565C0", borderColor: "#1565C0" };
         }
@@ -3959,7 +4006,7 @@ function ManuaStockTable({ vendorAuto }) {
             sx={buttonStyles}
           >
             {params.data.handover === "handover" ? "Allot" :
-              params.data.handover === "return" ? "Return" : "Usage Count"}
+              params.data.handover === "return" ? "Return" : params.data.status === "Transfer" ? "Transfer" : "Usage Count"}
           </Button>
         );
       }
@@ -4113,28 +4160,28 @@ function ManuaStockTable({ vendorAuto }) {
       hide: !columnVisibilitycom.actions,
       cellRenderer: (params) => (
         <Grid sx={{ display: 'flex' }}>
-        
-            <Button
-              sx={userStyle.buttondelete}
-              onClick={(e) => {
-                getinfoCode(params.data.id);
-                handleClickOpen();
-              }}
-            >
-              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
-            </Button>
-          
-           
-                      <Button
-                        sx={userStyle.buttonedit}
-                        onClick={(e) => {
-                          getviewCode(params.data.id);
-                          handleViewOpenstatus();
-                        }}
-                      >
-                        <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
-                      </Button>
-                 
+
+          <Button
+            sx={userStyle.buttondelete}
+            onClick={(e) => {
+              getinfoCode(params.data.id);
+              handleClickOpen();
+            }}
+          >
+            <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
+          </Button>
+
+
+          <Button
+            sx={userStyle.buttonedit}
+            onClick={(e) => {
+              getviewCode(params.data.id);
+              handleViewOpenstatus();
+            }}
+          >
+            <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
+          </Button>
+
         </Grid>
       ),
     },
@@ -5446,7 +5493,7 @@ function ManuaStockTable({ vendorAuto }) {
                     <Selects
                       // options={vendorGroupOpt}
                       // options={[...vendorModeOptions, ...vendorGroupOpt]}
-                        options={[
+                      options={[
                         ...vendorModeOptions,
                         ...vendorGroupOpt.filter((item, index, self) => {
                           return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
@@ -5456,7 +5503,7 @@ function ManuaStockTable({ vendorAuto }) {
                       value={{ label: vendorGroupEdit, value: vendorGroupEdit }}
                       onChange={(e) => {
                         handleChangeGroupNameEdit(e);
-                         setExpensecreate({
+                        setExpensecreate({
                           ...expensecreate,
                           vendorgrouping: e.value,
                           vendorname: 'Please Select Vendor',
@@ -5464,7 +5511,7 @@ function ManuaStockTable({ vendorAuto }) {
                           duedate: '',
                           paidmode: 'Please Select Paid Mode',
                         });
-                          setGroupedVendorNames(vendorGroupOpt?.filter((item) => item.name === e.value)?.map((data) => data?.vendor));
+                        setGroupedVendorNames(vendorGroupOpt?.filter((item) => item.name === e.value)?.map((data) => data?.vendor));
                         setVendorGroupEdit(e.value);
                         setVendorNewEdit('Choose Vendor');
                         setFrequencyValue('');
@@ -5479,7 +5526,7 @@ function ManuaStockTable({ vendorAuto }) {
                     </Typography>
                     <Selects
                       // options={[...vendorModeOptions, ...vendorOptEdit]}
-                       options={[
+                      options={[
                         ...vendorModeOptions,
                         ...vendorOptEdit?.filter((data) => groupedVendorNames?.includes?.(data?.value))
                       ]}
@@ -5489,7 +5536,8 @@ function ManuaStockTable({ vendorAuto }) {
                         setDueDate(e)
                         setVendorNewEdit(e.value);
                         setFrequencyValue(e?.paymentfrequency);
-                         setVendorNewstock((prev) => ({
+                        setVendorModeOfPayments(e?.modeofpayments);
+                        setVendorNewstock((prev) => ({
                           ...prev,
                           ...e,
                         }));
@@ -6704,111 +6752,117 @@ function ManuaStockTable({ vendorAuto }) {
       />
 
 
-           <Dialog open={openViewstatus} onClose={handlViewClosestatus} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '95px' }}>
-              <Box sx={{ padding: '20px 50px' }}>
-                <>
-                  <Typography sx={userStyle.HeaderText}>Status View Stock Purchase</Typography>
-                  <br /> <br />
-                  <Grid container spacing={2}>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6"> Material</Typography>
-                        <Typography>{stockmanagemasteredit.productname}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6"> Company</Typography>
-                        <Typography>{stockmanagemasteredit.company}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6"> Branch</Typography>
-                        <Typography>{stockmanagemasteredit.branch}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">Unit</Typography>
-                        <Typography>{stockmanagemasteredit.unit}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">Floor</Typography>
-                        <Typography>{stockmanagemasteredit.floor}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">Area</Typography>
-                        <Typography>{stockmanagemasteredit.area}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">Location</Typography>
-                        <Typography>{stockmanagemasteredit.location}</Typography>
-                      </FormControl>
-                    </Grid>
-      
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">Employee Name</Typography>
-                        <Typography>{stockmanagemasteredit.employeenameto}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">User Company</Typography>
-                        <Typography>{stockmanagemasteredit?.usercompany}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">User Branch</Typography>
-                        <Typography>{stockmanagemasteredit?.userbranch}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">User Unit</Typography>
-                        <Typography>{stockmanagemasteredit.userunit}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">Quantity</Typography>
-                        <Typography>{stockmanagemasteredit.countquantity}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">Date</Typography>
-                        <Typography>{moment(stockmanagemasteredit.date).format('DD/MM/YYYY')}</Typography>
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography variant="h6">Time</Typography>
-                        <Typography>{stockmanagemasteredit.handover === "handover" ? stockmanagemasteredit.allottime :
-                  stockmanagemasteredit.handover === "return" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
-                   stockmanagemasteredit.status === "Transfer" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
-                    stockmanagemasteredit.usagetime}</Typography>
-                      </FormControl>
-                    </Grid>
-                   
-                  </Grid>
-                  <br /> <br /> <br />
-                  <Grid container spacing={2}>
-                    <Button variant="contained" color="primary" onClick={handlViewClosestatus}>
-                      Back
-                    </Button>
-                  </Grid>
-                </>
-              </Box>
-            </Dialog>
+      <Dialog open={openViewstatus} onClose={handlViewClosestatus} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '95px' }}>
+        <Box sx={{ padding: '20px 50px' }}>
+          <>
+            <Typography sx={userStyle.HeaderText}>Status View Stock Purchase</Typography>
+            <br /> <br />
+            <Grid container spacing={2}>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6"> Material</Typography>
+                  <Typography>{stockmanagemasteredit.productname}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6"> Company</Typography>
+                  <Typography>{stockmanagemasteredit.company}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6"> Branch</Typography>
+                  <Typography>{stockmanagemasteredit.branch}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Unit</Typography>
+                  <Typography>{stockmanagemasteredit.unit}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Floor</Typography>
+                  <Typography>{stockmanagemasteredit.floor}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Area</Typography>
+                  <Typography>{stockmanagemasteredit.area}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Location</Typography>
+                  <Typography>{stockmanagemasteredit.location}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Team</Typography>
+                  <Typography>{stockmanagemasteredit.team}</Typography>
+                </FormControl>
+              </Grid>
+
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Employee Name</Typography>
+                  <Typography>{stockmanagemasteredit.employeenameto}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">User Company</Typography>
+                  <Typography>{stockmanagemasteredit?.usercompany}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">User Branch</Typography>
+                  <Typography>{stockmanagemasteredit?.userbranch}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">User Unit</Typography>
+                  <Typography>{stockmanagemasteredit.userunit}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Quantity</Typography>
+                  <Typography>{stockmanagemasteredit.countquantity}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Date</Typography>
+                  <Typography>{moment(stockmanagemasteredit.date).format('DD/MM/YYYY')}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Time</Typography>
+                  <Typography>{stockmanagemasteredit.handover === "handover" ? stockmanagemasteredit.allottime :
+                    stockmanagemasteredit.handover === "return" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
+                      stockmanagemasteredit.status === "Transfer" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
+                        stockmanagemasteredit.usagetime}</Typography>
+                </FormControl>
+              </Grid>
+
+            </Grid>
+            <br /> <br /> <br />
+            <Grid container spacing={2}>
+              <Button variant="contained" color="primary" onClick={handlViewClosestatus}>
+                Back
+              </Button>
+            </Grid>
+          </>
+        </Box>
+      </Dialog>
 
 
     </Box>

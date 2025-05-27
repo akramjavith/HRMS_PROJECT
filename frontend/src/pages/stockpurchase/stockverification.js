@@ -2932,7 +2932,7 @@ function Stockverification() {
         if (gridRefTableImg.current) {
             domtoimage.toBlob(gridRefTableImg.current)
                 .then((blob) => {
-                    saveAs(blob, "StockRequest_Purchase.png");
+                    saveAs(blob, "Stock_Verification.png");
                 })
                 .catch((error) => {
                     console.error("dom-to-image error: ", error);
@@ -4835,7 +4835,7 @@ function Stockverification() {
 
     const fetchStockExcel = async (e, searchQuery) => {
         setPageName(!pageName)
-        setProjectCheck(true);
+        // setProjectCheck(true);
         const queryParams = {
             page: Number(page),
             pageSize: Number(pageSize),
@@ -5003,12 +5003,12 @@ function Stockverification() {
             setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
             setPageSize((data) => { return ans?.length > 0 ? data : 10 });
             setPage((data) => { return ans?.length > 0 ? data : 1 });
-            setProjectCheck(false);
+            // setProjectCheck(false);
         }
 
 
         catch (err) {
-            setProjectCheck(false);
+            // setProjectCheck(false);
             handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
 
         }
@@ -5018,7 +5018,7 @@ function Stockverification() {
 
     useEffect(() => {
         if (items?.length > 0) {
-            fetchStock("Filtered", searchQuery);
+            fetchStock("Filtered",searchQuery);
         }
     }, [page, pageSize, searchQuery]);
 
@@ -5133,7 +5133,7 @@ function Stockverification() {
         setSearchQuery(event.target.value);
         setFilterValue(event.target.value);
         setPage(1);
-        fetchStock("Filtered", event.target.value)
+        // fetchStock("Filtered", event.target.value)
     };
 
     // Split the search query into individual terms

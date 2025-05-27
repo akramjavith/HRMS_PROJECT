@@ -2219,7 +2219,14 @@ function Manualstockentry() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setOverallFilterdata(res1.data.manualstock);
+      setOverallFilterdata(res1.data.manualstock?.map((item, index) => {
+            return {
+              ...item,
+             
+              billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
+              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+            };
+          }));
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -2995,7 +3002,7 @@ function Manualstockentry() {
     });
     setExpensecreate({
       totalbillamount: '',
-
+duedate:'',
       paidstatus: 'Not Paid',
 
       paidmode: 'Please Select Paid Mode',
@@ -6270,7 +6277,7 @@ function Manualstockentry() {
                         });
                       }}
                       inputProps={{
-                        min: stockmaster.date,
+                        min: stockmaster.billdate,
                         // max: today
                       }}
                     />
@@ -10522,7 +10529,7 @@ function Manualstockentry() {
                         <Grid item md={4} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>IFSC Code</Typography>
-                            <OutlinedInput readOnly={true} value={vendor.ifsccode} />
+                            <OutlinedInput readOnly={true} value={vendorstock.ifsccode} />
                           </FormControl>
                         </Grid>
                       </>
@@ -11115,7 +11122,7 @@ function Manualstockentry() {
                         });
                       }}
                       inputProps={{
-                        min: stockmasteredit.date,
+                        min: stockmasteredit.billdate,
                         // max: today
                       }}
                     />

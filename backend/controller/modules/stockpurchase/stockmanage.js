@@ -107,7 +107,7 @@ exports.getAllStockmanageAlertCount = catchAsyncErrors(async (req, res, next) =>
 
 
 
-exports.getAllStockmanageAccess = catchAsyncErrors(async (req, res, next) => {
+exports.getAllStockmanageAccessold = catchAsyncErrors(async (req, res, next) => {
   const { page, pageSize, assignbranch, allFilters, logicOperator, searchQuery, company, branch, unit } = req.body;
 
   let query = {};
@@ -327,8 +327,74 @@ exports.getAllStockmanageAccess = catchAsyncErrors(async (req, res, next) => {
 });
 
 
+exports.getAllStockmanageAccess = catchAsyncErrors(async (req, res, next) => {
+  const {  assignbranch, company, branch, unit } = req.body;
+  try {
+  let query = {};
+  // Construct the filter query based on the assignbranch array
+  const branchFilter = assignbranch.map((branchObj) => ({
+    branch: branchObj.branch,
+    company: branchObj.company,
+    unit: branchObj.unit,
+  }));
 
-exports.getAllStockmanageAccessStock = catchAsyncErrors(async (req, res, next) => {
+  query = {
+    $or: branchFilter,
+    requestmode: "Asset Material"
+
+  };
+  if (company && company?.length > 0) {
+    query.company = { $in: company }
+  }
+  if (branch && branch?.length > 0) {
+    query.branch = { $in: branch }
+  }
+  if (unit && unit?.length > 0) {
+    query.unit = { $in: unit }
+  }
+
+ 
+    const result = await Stockmanage.find(query, {
+      company: 1,
+      branch: 1,
+      unit: 1,
+      requesttime: 1,
+      requestdate: 1,
+      material: 1,
+      duedate: 1,
+      expectdays: 1,
+      floor: 1,
+      area: 1,
+      location: 1,
+      workstation: 1,
+      requestmode: 1,
+      asset: 1,
+      assettype: 1,
+      material: 1,
+      component: 1,
+      subcomponent: 1,
+      productdetails: 1,
+      stockmaterialarray: 1,
+      uom: 1,
+      quantity: 1
+    }).lean()
+     
+    console.log(result.length, 'resultstock')
+    res.status(200).json({
+      result,
+     
+    });
+  
+  
+  } catch (err) {
+    console.log(err, "stock")
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+});
+
+
+
+exports.getAllStockmanageAccessStockold = catchAsyncErrors(async (req, res, next) => {
   const { page, pageSize, assignbranch, allFilters, logicOperator, searchQuery, company, branch, unit } = req.body;
 
   let query = {};
@@ -597,7 +663,73 @@ exports.getAllStockmanageAccessStock = catchAsyncErrors(async (req, res, next) =
 
 
 
+exports.getAllStockmanageAccessStock = catchAsyncErrors(async (req, res, next) => {
+  const { assignbranch ,company, branch, unit } = req.body;
+try{
+  let query = {};
+  // Construct the filter query based on the assignbranch array
+  const branchFilter = assignbranch.map((branchObj) => ({
+    branch: branchObj.branch,
+    company: branchObj.company,
+    unit: branchObj.unit,
+  }));
 
+  query = {
+    $or: branchFilter,
+    requestmode: "Stock Material"
+
+  };
+
+  if (company && company?.length > 0) {
+    query.company = { $in: company }
+  }
+  if (branch && branch?.length > 0) {
+    query.branch = { $in: branch }
+  }
+  if (unit && unit?.length > 0) {
+    query.unit = { $in: unit }
+  }
+
+
+  
+    const result = await Stockmanage.find(query, {
+      company: 1,
+      branch: 1,
+      unit: 1,
+      requesttime: 1,
+      requestdate: 1,
+      duedate: 1,
+      expectdays: 1,
+      floor: 1,
+      area: 1,
+      location: 1,
+      workstation: 1,
+      requestmode: 1,
+      asset: 1,
+      assettype: 1,
+      material: 1,
+      component: 1,
+      subcomponent: 1,
+      productdetails: 1,
+      stockmaterialarray: 1,
+      stockcategory: 1,
+      stocksubcategory: 1,
+      duedate:1,
+      uom: 1,
+      quantity: 1
+    }).lean()
+     
+    console.log(result, 'resultasset')
+    res.status(200).json({
+    
+      result,
+     
+    });
+  } catch (err) {
+    console.log(err, "stock")
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+});
 
 
 
@@ -927,6 +1059,7 @@ exports.getAllStockmanageFilteredAccess = catchAsyncErrors(async (req, res, next
       quantity: 1,
       uomnew: 1,
       quantitynew: 1,
+      duedate:1,
       productdetailsnew: 1,
       stockmaterialarray: 1
     })

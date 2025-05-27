@@ -500,6 +500,7 @@ function OverallAssetReport() {
     setPageName(!pageName)
     try {
       setBankdetail(true);
+      setColumnVisibility(initialColumnVisibility)
       setFiltertable("Location");
       if (datasToAllot.requestmode === "Location") {
         // let res_hand = await axios.get(SERVICE.ASSETDETAIL, {

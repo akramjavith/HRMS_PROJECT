@@ -360,10 +360,22 @@ function StockCategory() {
     setPageName(!pageName)
     setLoading(true);
     try {
+          setColumnVisibility(initialColumnVisibility);
+
       let response = await axios.get(`${SERVICE.STOCKCATEGORY}`, {
         headers: { Authorization: `Bearer ${auth.APIToken}` },
       });
-      setCategoryList(response.data.stockcategory);
+      setCategoryList(response.data.stockcategory.map((item, index) => {
+    return {
+      id: item._id,
+      serialNumber: index + 1,
+      categoryname: item.categoryname,
+      categorycode: item.categorycode,
+      subcategoryname: item.subcategoryname
+        ?.map((t, i) => `${i + 1 + ". "}` + t)
+        .toString(),
+    };
+  }));
       setSubDuplicate(
         response.data.stockcategory.filter(
           (data) => data._id !== singleCategory._id
@@ -912,13 +924,14 @@ function StockCategory() {
   ];
   const rowDataTable = filteredData.map((item, index) => {
     return {
-      id: item._id,
-      serialNumber: item.serialNumber,
-      categoryname: item.categoryname,
-      categorycode: item.categorycode,
-      subcategoryname: item.subcategoryname
-        ?.map((t, i) => `${i + 1 + ". "}` + t)
-        .toString(),
+      ...item,
+      id: item.id,
+      // serialNumber: item.serialNumber,
+      // categoryname: item.categoryname,
+      // categorycode: item.categorycode,
+      // subcategoryname: item.subcategoryname
+      //   ?.map((t, i) => `${i + 1 + ". "}` + t)
+      //   .toString(),
     };
   });
   const rowsWithCheckboxes = rowDataTable.map((row) => ({
@@ -1035,7 +1048,7 @@ function StockCategory() {
     if (gridRef.current) {
       html2canvas(gridRef.current).then((canvas) => {
         canvas.toBlob((blob) => {
-          saveAs(blob, "Stock Category List.png");
+          saveAs(blob, "Stock Category.png");
         });
       });
     }
@@ -1480,6 +1493,7 @@ function StockCategory() {
           onClose={handlViewClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
+          sx={{marginTop:"95px"}}
         >
           <DialogContent>
             <Grid container spacing={2}>

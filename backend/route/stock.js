@@ -61,7 +61,7 @@ stockRoute.route("/stockpurchaselimitedassign").get(getAllStockPurchaseLimitedAs
 
 
 //reorder
-stockRoute.route("/stockpurchaselimitedreorder").get(getAllStockPurchaseLimitedReorder)
+stockRoute.route("/stockpurchaselimitedreorder").post(getAllStockPurchaseLimitedReorder)
 
 
 

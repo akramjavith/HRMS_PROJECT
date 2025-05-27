@@ -5148,6 +5148,7 @@ const handleSubmit = async (e) => {
                                             onChange={(e) => {
                                                 setDueDate(e)
                                                 setVendorNew(e.value);
+                                                 setVendorModeOfPayments(e?.modeofpayments);
                                                 setFrequencyValue(e?.paymentfrequency);
 
                                                 vendorid(e._id);
@@ -5194,7 +5195,7 @@ const handleSubmit = async (e) => {
                                 <Grid item lg={3} md={3} xs={12} sm={6}>
                                     <FormControl size="small" fullWidth>
                                         <Typography>Frequency</Typography>
-                                        <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValue} readOnly />
+                                        <OutlinedInput id="component-outlined" type="text" sx={userStyle.input}  value={frequencyValue} readOnly />
                                     </FormControl>
                                 </Grid>
                                 <Grid item md={3} xs={12} sm={12}>

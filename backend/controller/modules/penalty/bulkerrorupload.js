@@ -170,10 +170,10 @@ exports.getAllBulkErrorUploadpointsFilter = catchAsyncErrors(async (req, res, ne
     try {
         bulkerroruploadpoints = await BulkErrorUploadpoints.find({
             fromdate: { $gte: req.body.fromdate, $lte: req.body.todate }
-        }, { fromdate: 1, todate: 1, projectvendor: 1, process: 1, filename: 1, addedby: 1 }).lean();
+        }, { fromdate: 1, todate: 1, projectvendor: 1, process: 1, filename: 1, addedby: 1,createdAt:1 }).lean();
     } catch (err) {
         return next(new ErrorHandler("Records not found!", 404));
-    }
+    }bulk
     if (!bulkerroruploadpoints) {
         return next(new ErrorHandler("Data not found!", 404));
     }

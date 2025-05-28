@@ -231,7 +231,7 @@ exports.getAllPenaltyerroruploadpointsDateFilter = catchAsyncErrors(async (req, 
   const { fromdate, todate } = req.body;
   let penaltyerroruploadpoints;
   try {
-    penaltyerroruploadpoints = await PenaltyErrorUploadpoints.find({ date: { $gte: fromdate, $lte: todate } }, { fromdate: 1, todate: 1, projectvendor: 1, process: 1, filename: 1, addedby: 1, mode: 1 });
+    penaltyerroruploadpoints = await PenaltyErrorUploadpoints.find({ date: { $gte: fromdate, $lte: todate } }, { fromdate: 1, todate: 1, projectvendor: 1, process: 1, filename: 1, addedby: 1, mode: 1,createdAt:1 });
   } catch (err) {
     return next(new ErrorHandler("Records not found!", 404));
   }

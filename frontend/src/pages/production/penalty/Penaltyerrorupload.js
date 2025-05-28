@@ -1173,7 +1173,11 @@ function PenaltyErrorUpload() {
       const itemsWithSerialNumber = uniqueArray?.map((item, index) => ({
         ...item,
         serialNumber: index + 1,
-        createddate: moment(item.addedby[0].date).format('DD-MM-YYYY hh:mm:ss a'),
+        // createddate: moment(item.addedby[0].date).format('DD-MM-YYYY hh:mm:ss a'),
+         createddate: moment(item.createdAt).format(
+                "DD-MM-YYYY hh:mm:ss a"
+              ),
+              
         fromdate: moment(item.fromdate).format('DD-MM-YYYY'),
         todate: moment(item.todate).format('DD-MM-YYYY'),
         oldfromdate: item.fromdate,

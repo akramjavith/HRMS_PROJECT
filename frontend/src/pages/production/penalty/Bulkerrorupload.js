@@ -236,7 +236,7 @@ function BulkErrorUpload() {
     link: "",
     doclink: "",
   });
-
+console.log(targetPointsFilename,"targetPointsFilename")
   const [penaltyErrorUploadFilter, setPenaltyErrorUploadFilter] = useState({
     projectvendor: "Please Select ProjectVendor",
     process: "Please Select Process",
@@ -3111,12 +3111,7 @@ function BulkErrorUpload() {
   });
   //serial no for listing itemsFilename
   const addSerialNumberFilename = (datas) => {
-    const itemsWithSerialNumber = datas?.map((item, index) => ({
-      ...item,
-      serialNumber: index + 1,
-      oldfromdate: item.fromdate,
-      oldtodate: item.todate,
-    }));
+    const itemsWithSerialNumber = datas
     setItemsFilename(itemsWithSerialNumber);
     setOverallItemsFilename(itemsWithSerialNumber);
   };
@@ -3331,14 +3326,18 @@ function BulkErrorUpload() {
       projectvendor: item.projectvendor,
       process: item.process,
       filename: item.filename,
-      createdby: item.addedby[0]?.name,
-      createddate: moment(item.addedby[0]?.date).format(
-        "DD-MM-YYYY hh:mm:ss a"
-      ),
-      fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
-      todate: moment(item.todate).format("DD-MM-YYYY"),
-      oldfromdate: item.fromdate,
-      oldtodate: item.todate,
+      // createdby: item.addedby[0]?.name,
+      // // createddate: moment(item.addedby[0]?.date).format(
+      // //   "DD-MM-YYYY hh:mm:ss a"
+      // // ),
+      //  createddate: moment(item.createdAt).format(
+      //   "DD-MM-YYYY hh:mm:ss a"
+      // ),
+      
+      // fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
+      // // todate: moment(item.todate).format("DD-MM-YYYY"),
+      // oldfromdate: item.fromdate,
+      // oldtodate: item.todate,
     };
   });
   const rowsWithCheckboxesFilename = rowDataTableFilename.map((row) => ({
@@ -4436,8 +4435,24 @@ const ExportsHead = () => {
       ).map((filename) => {
         return getFilenames.find((obj) => obj.filename === filename);
       });
+      console.log(uniqueArray,"uniqueArray")
       // const uniqueArray = Array.from(new Set(getFilenames));
-      setTargetPointsFilename(uniqueArray);
+      setTargetPointsFilename(uniqueArray?.map((item, index) => ({
+      ...item,
+      serialNumber: index + 1,
+      oldfromdate: item.fromdate,
+      oldtodate: item.todate,
+       createdby: item.addedby[0]?.name,
+      // createddate: moment(item.addedby[0]?.date).format(
+      //   "DD-MM-YYYY hh:mm:ss a"
+      // ),
+       createddate: moment(item.createdAt).format(
+        "DD-MM-YYYY hh:mm:ss a"
+      ),
+      
+      fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
+      todate: moment(item.todate).format("DD-MM-YYYY"),
+    })));
       setLoader(false);
     } catch (err) {
       setLoader(false);

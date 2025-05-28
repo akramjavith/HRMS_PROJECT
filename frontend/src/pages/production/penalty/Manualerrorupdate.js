@@ -372,7 +372,7 @@ function ManulErrorUpdate() {
 
 
 
-    const sendEditRequest = async (id, manualvalue, olddate) => {
+    const sendEditRequest = async (id, manualvalue,data, olddate) => {
 
         setManualerroredit(id)
         // setLoader(true)
@@ -399,7 +399,13 @@ function ManulErrorUpdate() {
                     setPopupContent("Please Enter Value");
                     setPopupSeverity("warning");
                     handleClickOpenPopup();
-                } else {
+                } 
+                  else if ((Number(data.uploadcount) > Number(manualvalue))) {
+          setPopupContentMalert('Please Enter Equal or More than Upload Count');
+          setPopupSeverityMalert('warning');
+          handleClickOpenPopupMalert();
+        }
+                else {
 
 
                     let res = await axios.put(`${SERVICE.PENALTYTOTALFIELDUPLOAD_SINGLE}/${editid}`, {
@@ -569,17 +575,38 @@ function ManulErrorUpdate() {
 
 
 
-        {
-            headerName: "Manual Error (Editable)",
-            field: "manualerror",
-            editable: true,
-            suppressClickEdit: true,
-            sortable: true,
-            filter: true,
-            resizable: true,
-            cellEditor: "agTextCellEditor",
-            suppressDestroy: true,
-        },
+        // {
+        //     headerName: "Manual Error (Editable)",
+        //     field: "manualerror",
+        //     editable: true,
+        //     suppressClickEdit: true,
+        //     sortable: true,
+        //     filter: true,
+        //     resizable: true,
+        //     cellEditor: "agTextCellEditor",
+        //     suppressDestroy: true,
+        // },
+         {
+      field: 'manualerror',
+      headerName: 'User Manual Error (DoubleClick Editable)',
+      flex: 0,
+      width: 250,
+      minHeight: '40px !important',
+      sortable: false,
+       editable: (params) => {
+    return (
+    Number(params.data.totalfields) === 0 &&
+      Number(params.data.errorcount) > 0
+    );
+  },
+      suppressClickEdit: true,
+      filter: true,
+      resizable: true,
+       cellEditor: 'agTextCellEditor',
+      hide: !columnVisibility.manualerror,
+      headerClassName: 'bold-header',
+    
+    },
         {
             field: "uploadcount",
             headerName: "Upload Count",
@@ -605,10 +632,10 @@ function ManulErrorUpdate() {
                             <Button
                                 variant="outlined"
                                 color="primary"
-                                disabled={updatedids.includes(params.data.id)}
+                                disabled={(updatedids.includes(params.data.id || Number(params.data.totalfields) !== 0)  )}
                                 size="small"
                                 onClick={() => {
-                                    sendEditRequest(params.data.id, params.data.manualerror, params.data.olddate);
+                                    sendEditRequest(params.data.id, params.data.manualerror,params.data, params.data.olddate);
                                 }}
                             >
                                 UPDATE

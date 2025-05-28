@@ -232,25 +232,63 @@ const ExcelSheet = () => {
     getProject();
   }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const hotElement = hotElementRef.current;
+  //   const hotInstance = new Handsontable(hotElement, {
+  //     data: [[]],
+  //     minRows: 17,
+  //     minCols: 17,
+  //     colHeaders: [],
+  //     rowHeaders: true,
+  //     columnSorting: true,
+  //     filters: true,
+  //     formulas: true,
+  //     dropdownMenu: true,
+  //     contextMenu: true,
+  //     copyPaste: true,
+  //     sorting: true,
+  //     multiColumnSorting: true,
+  //   });
+  //   hotInstanceRef.current = hotInstance;
+
+  //   return () => {
+  //     hotInstance.destroy();
+  //   };
+  // }, []);
+
+    useEffect(() => {
     const hotElement = hotElementRef.current;
+  
     const hotInstance = new Handsontable(hotElement, {
-      data: [[]],
-      minRows: 17,
-      minCols: 17,
-      colHeaders: [],
+      data: Array.from({ length: 17 }, () => Array(17).fill(null)),
       rowHeaders: true,
-      columnSorting: true,
+      colHeaders: true,
       filters: true,
-      formulas: true,
+       minRows: 17,
+        minCols: 17,
       dropdownMenu: true,
       contextMenu: true,
-      copyPaste: true,
-      sorting: true,
+      columnSorting: true,
       multiColumnSorting: true,
+      copyPaste: true,
+  
+      afterPaste() {
+        const totalRows = hotInstance.countRows();
+  
+        for (let row = totalRows - 1; row >= 0; row--) {
+          const isEmpty = hotInstance
+            .getDataAtRow(row)
+            .every(cell => cell === null || cell === '');
+  
+          if (isEmpty) {
+            hotInstance.alter('remove_row', row);
+          }
+        }
+      },
     });
+  
     hotInstanceRef.current = hotInstance;
-
+  
     return () => {
       hotInstance.destroy();
     };
@@ -388,6 +426,8 @@ const ExcelSheet = () => {
 
     //   return "Invalid date format";
     // }
+
+
     function formatToDate(dateValue, format) {
   console.log(dateValue, format, "check");
 
@@ -462,6 +502,12 @@ const ExcelSheet = () => {
           link: String(item.link),
           doclink: String(item.doclink),
           mode: "Bulkupload",
+             addedby: [
+        {
+          name: String(isUserRoleAccess?.username),
+          date: String(new Date()),
+        },
+      ],
         })
       )
     } else {
@@ -490,6 +536,12 @@ const ExcelSheet = () => {
           link: String(item.link),
           doclink: String(item.doclink),
           mode: "Bulkupload",
+           addedby: [
+        {
+          name: String(isUserRoleAccess?.username),
+          date: String(new Date()),
+        },
+      ],
         })
       )
     }

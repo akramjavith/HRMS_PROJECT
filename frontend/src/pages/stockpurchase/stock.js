@@ -10763,7 +10763,7 @@ function Stockmaster() {
                         <Grid item md={4} xs={12} sm={12} sx={{ display: 'flex' }}>
                           <FormControl fullWidth size="small">
                             <Typography>IFSC Code</Typography>
-                            <OutlinedInput readOnly={true} value={vendor.ifsccode} />
+                            <OutlinedInput readOnly={true} value={vendorstock.ifsccode} />
                           </FormControl>
                         </Grid>
                       </>

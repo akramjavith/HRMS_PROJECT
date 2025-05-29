@@ -1071,1079 +1071,261 @@ exports.getProductionUploadDatasByIdManualTemp = catchAsyncErrors(async (req, re
 
 
 //overallreport
-//opverallreport
 exports.getAllproductiontempFilter = catchAsyncErrors(async (req, res, next) => {
-  let productionupload = [], producionIndividual = [], mergedData = [], mergedDataall, finaluser = [], allData = [];
-  let userDates = req.body.userDates;
-  const { batchNumber, batchSize } = req.body;
-
-  try {
-    const getDatesBetween = (startDate, endDate) => {
-      const dates = [];
-      let currentDate = new Date(startDate);
-      let currentEndDate = new Date(endDate);
-
-      // Loop through the dates between start and end date
-      while (currentDate <= currentEndDate) {
-        dates.push(currentDate.toISOString().split('T')[0]); // Format: YYYY-MM-DD
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-
-      // if (req.body.shift === "Shift Based") {
-      const nextDate = new Date(currentEndDate);
-      nextDate.setDate(currentEndDate.getDate() + 1);
-      dates.push(nextDate.toISOString().split('T')[0]); // Format: YYYY-MM-DD
-      // }
-
-      return dates;
-    };
-
-    let dates = getDatesBetween(req.body.fromdate, req.body.todate);
-    let finalDates = [...new Set(dates)]
-
-    const skip = (batchNumber - 1) * batchSize;
-    const limit = batchSize;
-
-    let queryManual = {}
-    if (req.body.user.length > 0) { queryManual.user = { $in: req.body.user } }
-    if (req.body.projectvendor.length > 0) { queryManual.vendor = { $in: req.body.projectvendor } }
-    if (req.body.category.length > 0) { queryManual.filename = { $in: req.body.category } }
-    if (finalDates.length > 0) { queryManual.fromdate = { $in: finalDates } }
-
-    let query = {}
-    if (req.body.selecteddupe === "Without Duplicate") { query.dupe = "No" }
-    if (req.body.user.length > 0) { query.user = { $in: req.body.user } }
-    if (req.body.projectvendor.length > 0) { query.vendor = { $in: req.body.projectvendor } }
-    if (req.body.category.length > 0) { query.filenameupdated = { $in: req.body.category } }
-    if (finalDates.length > 0) { query.formatteddate = { $in: finalDates } }
-
-    let userQuery = {
-      $or: [
-
-        { reasondate: { $exists: false } || "" },
-        {
-          reasonablestatus: { $ne: "" }, // When reasonablestatus is not empty
-          reasondate: { $lte: req.body.todate } // Check reasondate
-        }
-      ]
-    }
-
-
-    let attendenceControlCriteria = await AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec();
-
-    let dayShiftBeforeHrs = attendenceControlCriteria && attendenceControlCriteria.dayactive && attendenceControlCriteria.dayactive == true ? Number(attendenceControlCriteria.calcshifthourday) : 4;
-    let dayShiftBeforeMin = attendenceControlCriteria && attendenceControlCriteria.dayactive && attendenceControlCriteria.dayactive == true ? Number(attendenceControlCriteria.calcshiftminday) : 0;
-    let nightShiftBeforeHrs = attendenceControlCriteria && attendenceControlCriteria.nightactive && attendenceControlCriteria.nightactive == true ? Number(attendenceControlCriteria.calcshifthournight) : 4;
-    let nightShiftBeforeMin = attendenceControlCriteria && attendenceControlCriteria.nightactive && attendenceControlCriteria.nightactive == true ? Number(attendenceControlCriteria.calcshiftminnight) : 0;
-
-
-    let [usersAll, shift, loginids, depMonthSet] = await Promise.all([
-      Users.find(userQuery, {}),
-      Shift.find({}, { name: 1, fromhour: 1, tohour: 1, frommin: 1, tomin: 1, fromtime: 1, totime: 1, isallowance: 1 }).lean(),
-      ClientUserid.find({ loginallotlog: { $exists: true, $ne: [] } }, { empname: 1, userid: 1, loginallotlog: 1 }).lean(),
-      DepartmentMonth.find({
-        $and: [
-          { todate: { $gte: req.body.fromdate } },  // Find records where 'todate' is greater than or equal to 'fromdate'
-          { fromdate: { $lte: req.body.todate } }   // Find records where 'fromdate' is less than or equal to 'todate'
-        ]
-      }, { department: 1, year: 1, month: 1, monthname: 1, fromdate: 1, todate: 1, totaldays: 1 }).lean()
-    ]);
-    console.log(usersAll.length, shift.length, loginids.length, depMonthSet.length, 'leg')
-    if (req.body.mode.includes("Manual Production")) {
-      producionIndividual = await ProducionIndividual.find(queryManual, {}).skip(skip).limit(limit).lean();
-    }
-    if (req.body.mode.includes("Production")) {
-      productionupload = await ProductionTempUploadAll.find(query,
-        { user: 1, formatteddate: 1, formattedtime: 1, dupe: 1, filenameupdated: 1, vendor: 1, category: 1, section: 1, flagcount: 1, unitid: 1, unitrate: 1, updatedunitrate: 1, updatedflag: 1, updatedsection: 1 }
-      ).lean().skip(skip).limit(limit);
-
-    }
-    allData = req.body.mode.includes("Production") && req.body.mode.includes("Manual Production") ?
-      [...producionIndividual, ...productionupload] :
-      req.body.mode.includes("Production") ? productionupload : producionIndividual;
-    console.log(allData.length, 'sd')
-    const fromDateSet = [...new Set(depMonthSet.map(d => d.fromdate))];
-
-    let users = usersAll.map(item => {
-      let findUserDeprtment = item.department;
-      if (item.departmentlog && item.departmentlog.length > 1) {
-        const sortedDepartmentLog = item.departmentlog.sort((a, b) => new Date(b.startdate) - new Date(a.startdate));
-        const findDept = sortedDepartmentLog.find(dept =>
-          fromDateSet.includes(dept.startdate) ||
-          fromDateSet.some(fromDate => new Date(fromDate) > new Date(dept.startdate))
-        );
-        findUserDeprtment = findDept ? findDept.department : "";
-      } else {
-        findUserDeprtment = new Date(item.doj) >= new Date(item.departmentlog[0].startdate) ? item.departmentlog[0].department : ""
-      }
-      return {
-        ...item._doc,
-        department: findUserDeprtment,
-      };
-    }).filter(item => item !== null);
-
-
-    if (req.body.shift == "Shift Based") {
-      try {
-        let mergedDataallfirst = allData.map(upload => {
-          const loginInfo = loginids.find((login) => login.userid === upload.user);
-          let loginallot = loginInfo && loginInfo.loginallotlog ? loginInfo.loginallotlog : [];
-
-          let filteredDataDateTime = null;
-          if (loginallot.length > 0) {
-            const groupedByDateTime = {};
-            // Group items by date and time
-            loginallot.forEach((item) => {
-              const dateTime = item.date + " " + item.time; // Assuming item.updatetime contains time in HH:mm format
-              if (!groupedByDateTime[dateTime]) {
-                groupedByDateTime[dateTime] = [];
-              }
-              groupedByDateTime[dateTime].push(item);
-            });
-
-            // Extract the last item of each group
-            const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
-
-            // Sort the last items by date and time
-            lastItemsForEachDateTime.sort((a, b) => {
-              return new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time);
-            });
-
-            // Find the first item in the sorted array that meets the criteria
-
-            for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
-              const dateTime = lastItemsForEachDateTime[i].date + " " + lastItemsForEachDateTime[i].time;
-              // let datevalsplit = upload.mode == "Manual" ? upload.fromdate : upload.dateval.split(" ");
-              let datevalsplitfinal = upload.mode == "Manual" ? upload.fromdate + " " + upload.time + ":00" : upload.formatteddate + " " + upload.formattedtime;
-              // console.log(datevalsplitfinal, datevalsplit, "datevalsplitfinal")
-              if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
-                filteredDataDateTime = lastItemsForEachDateTime[i];
-              } else {
-                break; // Break the loop if we encounter an item with date and time greater than or equal to selectedDateTime
-              }
-            }
-          }
-
-          let logininfoname = loginallot.length > 0 && filteredDataDateTime ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : "";
-
-          const userInfo = users.find((user) => user.companyname == logininfoname);
-          const userArray = users.filter((user) => user.companyname == logininfoname);
-          const filenamelist = upload.mode === "Manual" ? upload.filename : upload.filenameupdated;
-
-
-          const comparedate = upload.mode == "Manual" ? upload.fromdate : upload.formatteddate;
-          const comparetime = upload.mode == "Manual" ? upload.time + ":00" : upload.formattedtime;
-
-          let shiftEndTime = `${req.body.todate}T23:59:59.000Z`;
-          let shiftFromTime = `${req.body.fromdate}T00:00:00.000Z`;
-
-          let userShiftTimings = {}
-          if (userArray && userArray.length > 0) {
-            finaluser = userArray && userArray.length > 0 &&
-              userArray?.flatMap((item, index) => {
-                const findShiftTiming = (shiftName) => {
-                  const foundShift = shift?.find((d) => d.name === shiftName);
-                  return foundShift ? `${foundShift.fromhour}:${foundShift.frommin}${foundShift.fromtime}to${foundShift.tohour}:${foundShift.tomin}${foundShift.totime} ` : "";
-                };
-                const findShiftTimingsts = (shiftName) => {
-                  const foundShift = shift?.find((d) => d.name === shiftName);
-                  return foundShift ? `${foundShift.isallowance} ` : "";
-                };
-
-                const filteredMatchingDoubleShiftItem = item.shiftallot?.filter((val) => val && val.empcode === item.empcode && val.adjstatus === "Approved");
-
-                // Filter out the dates that have matching 'Shift Adjustment' todates
-                let removedUserDates = userDates.filter((date) => {
-                  // Check if there is no matching 'Shift Adjustment' for the current user and formattedDate
-                  const matchingShiftAdjustmentToDate = filteredMatchingDoubleShiftItem?.find((item) => item && item.todate === date.formattedDate && item.adjustmenttype === "Shift Adjustment");
-
-                  // If there is no matching 'Shift Adjustment', keep the date
-                  return !matchingShiftAdjustmentToDate;
-                });
-
-                // Create a Set to store unique entries based on formattedDate, dayName, dayCount, and shiftMode
-                let uniqueEntries = new Set();
-
-                // Iterate over removedUserDates and add unique entries to the Set
-                removedUserDates.forEach((date) => {
-                  uniqueEntries.add(
-                    JSON.stringify({
-                      formattedDate: date.formattedDate,
-                      dayName: date.dayName,
-                      dayCount: date.dayCount,
-                      shiftMode: "Main Shift",
-                      weekNumberInMonth: date.weekNumberInMonth,
-                    })
-                  );
-                });
-
-                // Iterate over filteredMatchingDoubleShiftItem and add unique entries to the Set
-                filteredMatchingDoubleShiftItem && filteredMatchingDoubleShiftItem?.forEach((item) => {
-                  const [day, month, year] = item.adjdate?.split("/");
-                  let newFormattedDate = new Date(`${year} -${month} -${day} `);
-
-                  if (item.adjustmenttype === "Shift Adjustment" || item.adjustmenttype === "Add On Shift" || item.adjustmenttype === "Shift Weekoff Swap") {
-                    uniqueEntries.add(
-                      JSON.stringify({
-                        formattedDate: item.adjdate,
-                        dayName: moment(item.adjdate, "DD/MM/YYYY").format("dddd"),
-                        dayCount: parseInt(moment(item.adjdate, "DD/MM/YYYY").format("DD")),
-                        shiftMode: "Second Shift",
-                        weekNumberInMonth:
-                          getWeekNumberInMonth(newFormattedDate) === 1
-                            ? `${getWeekNumberInMonth(newFormattedDate)}st Week`
-                            : getWeekNumberInMonth(newFormattedDate) === 2
-                              ? `${getWeekNumberInMonth(newFormattedDate)}nd Week`
-                              : getWeekNumberInMonth(newFormattedDate) === 3
-                                ? `${getWeekNumberInMonth(newFormattedDate)}rd Week`
-                                : getWeekNumberInMonth(newFormattedDate) > 3
-                                  ? `${getWeekNumberInMonth(newFormattedDate)}th Week`
-                                  : "",
-                      })
-                    );
-                  }
-                });
-
-                // Convert Set back to an array of objects
-                let createdUserDatesUnique = Array.from(uniqueEntries).map((entry) => JSON.parse(entry));
-
-                function sortUserDates(dates) {
-                  return dates.sort((a, b) => {
-                    if (a.formattedDate === b.formattedDate) {
-                      // If dates are the same, sort by shift mode
-                      if (a.shiftMode < b.shiftMode) return -1;
-                      if (a.shiftMode > b.shiftMode) return 1;
-                      return 0;
-                    } else {
-                      // Otherwise, sort by date
-                      const dateA = new Date(a.formattedDate.split("/").reverse().join("/"));
-                      const dateB = new Date(b.formattedDate.split("/").reverse().join("/"));
-                      return dateA - dateB;
-                    }
-                  });
-                }
-
-                // Sort the array
-                const sortedCreatedUserDates = sortUserDates(createdUserDatesUnique);
-                const createdUserDates = sortedCreatedUserDates?.filter((d) => {
-                  const filterData = userDates.some((val) => val.formattedDate === d.formattedDate);
-                  if (filterData) {
-                    return d;
-                  }
-                });
-                // console.log(createdUserDates, 'createdUserDates')
-                // Map each user date to a row
-                const userRows = createdUserDates?.map((date) => {
-                  let filteredRowData = item.shiftallot?.filter((val) => val.empcode == item.empcode);
-                  const matchingItem = filteredRowData?.find((item) => item && item.adjdate == date.formattedDate);
-                  const matchingItemAllot = filteredRowData?.find((item) => item && formatDate(item.date) == date.formattedDate);
-                  const matchingDoubleShiftItem = filteredRowData?.find((item) => item && item.todate === date.formattedDate);
-                  const filterBoardingLog = item.boardingLog && item.boardingLog?.filter((item) => {
-                    // return item.logcreation === "user" || item.logcreation === "shift";
-                    return item;
-                  });
-                  const depMonthSetFiltered = depMonthSet.filter(d => d.department === item.department)
-
-                  // Check if the dayName is Sunday or Monday
-                  // const isWeekOff = item.weekoff?.includes(date.dayName);
-                  const isWeekOff = getWeekOffDay(date, filterBoardingLog, item.department, depMonthSet) === "Week Off" ? true : false;
-                  const isWeekOffWithAdjustment = isWeekOff && matchingItem;
-                  const isWeekOffWithManual = isWeekOff && matchingItemAllot;
-
-                  const actualShiftTiming = findShiftTiming(item.shifttiming);
-
-                  const row = {
-                    company: item.company,
-                    branch: item.branch,
-                    unit: item.unit,
-                    team: item.team,
-                    companyname: item.companyname,
-                    empcode: item.empcode,
-                    username: item.username,
-                    shifttiming: getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered),
-                    date: date.formattedDate,
-                    shiftmode: date.shiftMode,
-                    plusshift: date.plusshift,
-                    shiftsts: findShiftTimingsts(getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered)),
-                  };
-
-                  return row;
-                });
-                return userRows;
-              });
-
-
-            // console.log(finaluser, 'finaluser')
-            function filterData(data) {
-              const firstEntry = data[0];
-              const secondEntry = data[1];
-              if (!firstEntry) return [];
-              const isFirstShiftWeekoff = firstEntry.shifttiming && firstEntry.shifttiming !== "" && firstEntry.shifttiming == "Week Off";
-              const isFirstShiftPM = firstEntry.shifttiming && firstEntry.shifttiming !== "" && firstEntry.shifttiming != "Week Off" ? firstEntry.shifttiming.split("to")[0].includes("PM") : "";
-              const isMainShift = firstEntry.shiftmode === "Main Shift";
-              const isPlusShift = firstEntry.plusshift && firstEntry.plusshift != "";
-              if (isFirstShiftWeekoff) {
-                data = [
-                  { date: firstEntry.date, shifttiming: secondEntry.shifttiming, shiftsts: firstEntry.shiftsts, },
-                  { date: secondEntry.date, shifttiming: secondEntry.shifttiming, shiftsts: secondEntry.shiftsts, }
-                ]
-              }
-              else if (isFirstShiftPM && isMainShift && isPlusShift) {
-                // Keep the first entry and the entries that are not "Second Shift"
-                return data.filter((entry, index) => index != 0);
-                // } else if (!isFirstShiftPM && isMainShift) {
-              } else {
-                // Keep the first entry and the entries that are "Main Shift"
-                return data.filter(entry => entry.shiftmode === "Main Shift");
-              }
-
-              return data; // Return the original data if conditions are not met
-            }
-
-            userShiftTimings = filterData(finaluser).map(item => ({ date: item.date, shifttiming: item.shifttiming, shiftsts: item.shiftsts, plusshift: item.plusshift }));
-            // console.log(userShiftTimings, 'userShiftTimings')
-            // finaluser ? null : (finaluser, upload.companyname);
-            let userShiftTimingsFromTwo = { date: userShiftTimings[userShiftTimings.length - 1].date, shifttiming: userShiftTimings[0].shifttiming, shiftsts: userShiftTimings[userShiftTimings.length - 1].shiftsts }
-            let userShiftTimingsBefore = { date: userShiftTimings[userShiftTimings.length - 1].date, shifttiming: userShiftTimings[userShiftTimings.length - 1].shifttiming, shiftsts: "Disable" }
-            // console.log(userShiftTimings, "userShiftTimings")
-
-            function convertToISODateTime(currentShift, nextShift) {
-              // console.log(nextShift, 'nextShift')
-              function padTime(time) {
-                let [hours, minutes] = time.split(':');
-                if (hours.length === 1) {
-                  hours = '0' + hours;
-                }
-                return `${hours}:${minutes}`;
-              }
-              // Helper function to parse date and time from shift objects
-              function parseDateTime(shift) {
-                // console.log(shift)
-                const [day, month, year] = shift.date.split('/');
-                // const timeString = shift.shifttiming.split('to')[0].trim();
-                let timeString = shift.shifttiming && shift.shifttiming != "" && shift.shifttiming == "Week Off" ? ("00:00AMto00:00AM").split('to')[0].trim() : ((shift.shifttiming && shift.shifttiming != "" && shift.shifttiming != "Week Off") ? shift.shifttiming.split('to')[0].trim() : ("00:00AMto11:59PM").split('to')[0].trim());
-
-                // Normalize time separators (replace dots with colons)
-                timeString = timeString.replace('.', ':');
-
-                // Handle missing leading zeros in hour values
-                timeString = padTime(timeString);
-
-
-                let [hours, minutes] = timeString.slice(0, -2).split(':');
-                const period = timeString.slice(-2);
-
-                if (period === 'PM' && hours !== '12') {
-                  hours = parseInt(hours, 10) + 12;
-                } else if (period === 'AM' && hours === '12') {
-                  hours = '00';
-                }
-
-                const dateTimeString = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00.000Z`);
-                // let newTime = new Date(dateTimeString.getTime() - 4 * 60 * 60 * 1000);
-                let finalHrs = period === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
-                let finalMin = period === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
-                let newTime = new Date(dateTimeString.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin * 60 * 1000)));
-
-
-                // console.log(newTime.toISOString());
-                return (newTime.toISOString());
-              }
-
-              // Parse initial date and time from current shift
-              const initialDateTime = currentShift.shifttiming === "Week Off" ? parseDateTime(nextShiftBefor) : parseDateTime(currentShift);
-              // console.log(initialDateTime, currentShift.shifttiming, "initialDateTime")
-
-              const initialEndDateTime = new Date(initialDateTime);
-              initialEndDateTime.setHours(initialEndDateTime.getHours() + 23);
-              initialEndDateTime.setMinutes(initialEndDateTime.getMinutes() + 59);
-
-
-              // console.log(nextShift.shifttiming, upload.companyname, "asd", "jjj")
-              // Parse start time of the next shift
-
-              const nextShiftStartTime = nextShift.shifttiming === "Week Off" ? parseDateTime(currentShiftTwo) : parseDateTime(nextShift);
-              // console.log(nextShiftStartTime, 'nextShiftStartTime')
-
-              if (new Date(initialEndDateTime) >= new Date(nextShiftStartTime)) {
-                initialEndDateTime.setTime(new Date(nextShiftStartTime).getTime() - 60000); // Set to 1 minute before next shift
-              }
-
-              // Convert to ISO 8601 format with 'Z' to indicate UTC
-              const isoString = initialEndDateTime.toISOString();
-              return isoString;
-            }
-
-            const currentShift = userShiftTimings[userShiftTimings.length - 2];
-            const nextShift = userShiftTimings[userShiftTimings.length - 1];
-            const currentShiftTwo = userShiftTimingsFromTwo;
-            const nextShiftBefor = userShiftTimingsBefore;
-
-
-            shiftEndTime = convertToISODateTime(currentShift, nextShift);
-            // console.log(shiftEndTime, "shiftEndTime")
-            function padTime(time) {
-              let [hours, minutes] = time.split(':');
-              if (hours.length === 1) {
-                hours = '0' + hours;
-              }
-              return `${hours}:${minutes}`;
-            }
-
-            function parseFromDateTime(shift) {
-
-              const [day, month, year] = shift.date.split('/');
-
-              let timeString = shift.shifttiming && shift.shifttiming != "" && shift.shifttiming == "Week Off" ? ("00:00AMto00:00AM").split('to')[0].trim() : ((shift.shifttiming && shift.shifttiming != "" && shift.shifttiming != "Week Off") ? shift.shifttiming.split('to')[0].trim() : ("00:00AMto11:59PM").split('to')[0].trim());
-
-              timeString = timeString.replace('.', ':');
-
-              // Handle missing leading zeros in hour values
-              timeString = padTime(timeString);
-
-
-              let [hours, minutes] = timeString.slice(0, -2).split(':');
-              const period = timeString.slice(-2);
-
-              if (period === 'PM' && hours !== '12') {
-                hours = parseInt(hours, 10) + 12;
-              } else if (period === 'AM' && hours === '12') {
-
-                hours = '00';
-              }
-
-              const dateTimeString = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00Z`);
-              // let newTime = new Date(dateTimeString.getTime() - 4 * 60 * 60 * 1000);
-              let finalHrs = period === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
-              let finalMin = period === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
-              // console.log(finalHrs, finalMin)
-              let newTime = shift.shifttiming ? new Date(dateTimeString.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin * 60 * 1000))) : new Date(dateTimeString);
-
-              return (newTime.toISOString());
-            }
-            // console.log(userShiftTimings[0])
-            // Parse initial date and time from current shift
-            shiftFromTime = parseFromDateTime(userShiftTimings[0]);
-          }
-          const dateTime = new Date(`${comparedate}T${comparetime}Z`);
-
-          if ((req.body.empname.length > 0 ? req.body.empname.includes(logininfoname) : true) &&
-            (req.body.company.length > 0 ? req.body.company.includes(userInfo ? userInfo.company : "") : true) &&
-            (req.body.branch.length > 0 ? req.body.branch.includes(userInfo ? userInfo.branch : "") : true) &&
-            (req.body.unit.length > 0 ? req.body.unit.includes(userInfo ? userInfo.unit : "") : true) &&
-            (req.body.team.length > 0 ? req.body.team.includes(userInfo ? userInfo.team : "") : true) &&
-            (new Date(dateTime) >= new Date(shiftFromTime) && new Date(dateTime) <= new Date(shiftEndTime)) && (req.body.empname.length > 0 ? req.body.empname.includes(loginInfo ? loginInfo.empname : "") : true) &&
-            (req.body.subsmanual && req.body.subsmanual.length > 0 ? req.body.subsmanual.some(sub => sub.category === filenamelist && sub.subcategory === upload.category) : true)) {
-
-            return {
-              user: upload.user,
-              vendor: upload.vendor,
-              category: upload.category,
-              dateval: upload.mode === "Manual" ? `${upload.fromdate} ${upload.time}:00` : `${upload.formatteddate} ${upload.formattedtime}`,
-              olddateval: upload.mode === "Manual" ? `${upload.fromdate}T${upload.time}:00` : `${upload.formatteddate}T${upload.formattedtime}`,
-              filename: filenamelist,
-              mode: upload.mode == "Manual" ? "Manual" : "Production",
-              empname: logininfoname,
-              empcode: userInfo && userInfo.empcode,
-              company: userInfo && userInfo.company,
-              unit: userInfo && userInfo.unit,
-              branch: userInfo && userInfo.branch,
-              team: userInfo && userInfo.team,
-              username: userInfo && userInfo.username,
-              empcode: userInfo && userInfo.empcode,
-              shifttiming: userShiftTimings && userShiftTimings[0].shifttiming,
-              _id: upload._id,
-              section: upload.section,
-              csection: upload.updatedsection ? upload.updatedsection : "",
-              flagcount: upload.flagcount,
-              cflagcount: upload.updatedflag ? upload.updatedflag : "",
-              unitid: upload.unitid,
-              dupe: upload.mode == "Manual" ? "No" : upload.dupe,
-              points: Number(upload.unitrate) * 8.333333333333333,
-              cpoints: upload.updatedunitrate ? Number(upload.updatedunitrate) * 8.333333333333333 : "",
-              unitrate: Number(upload.unitrate),
-              cunitrate: upload.updatedunitrate ? Number(upload.updatedunitrate) : "",
-            };
-          }
-          return null;
-        });
-        console.log(mergedDataallfirst.length, "123")
-        mergedData = mergedDataallfirst.filter((item) => item !== null);
-      } catch (err) {
-        err;
-      }
-    }
-
-    else if (req.body.shift == "Date Based") {
-      let mergedDataallfirst = allData.map(upload => {
-
-        const loginInfo = loginids.find((login) => login.userid === upload.user);
-        let loginallot = loginInfo && loginInfo.loginallotlog ? loginInfo.loginallotlog : [];
-
-        let filteredDataDateTime = null;
-        if (loginallot.length > 0) {
-          const groupedByDateTime = {};
-
-          // Group items by date and time
-          loginallot.forEach((item) => {
-            const dateTime = item.date + " " + item.time; // Assuming item.updatetime contains time in HH:mm format
-            if (!groupedByDateTime[dateTime]) {
-              groupedByDateTime[dateTime] = [];
-            }
-            groupedByDateTime[dateTime].push(item);
-          });
-
-          // Extract the last item of each group
-          const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
-          // Sort the last items by date and time
-          lastItemsForEachDateTime.sort((a, b) => {
-            return new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time);
-          });
-
-          // Find the first item in the sorted array that meets the criteria
-          if (lastItemsForEachDateTime.length > 0) {
-            for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
-              const dateTime = lastItemsForEachDateTime[i].date + " " + lastItemsForEachDateTime[i].time;
-              // let datevalsplit = upload.mode === "Manual" ? "" : upload.dateval.split(" ")[0];
-              let datevalsplitfinal = upload.mode === "Manual" ? upload.fromdate + " " + upload.time : upload.formatteddate + " " + upload.formattedtime;
-              // console.log(datevalsplitfinal)
-              if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
-                filteredDataDateTime = lastItemsForEachDateTime[i];
-              } else {
-                break;
-              }
-
-            }
-          }
-        }
-
-        let logininfoname = loginallot.length > 0 && filteredDataDateTime ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : "";
-
-        const userInfo = loginInfo ? users.find((user) => user.companyname == logininfoname) : "";
-        const userArray = loginInfo ? users.filter((user) => user.companyname == logininfoname) : [];
-
-        const filenamelist = upload.mode === "Manual" ? upload.filename : upload.filenameupdated;
-
-        const comparedate = upload.mode == "Manual" ? upload.fromdate : upload.formatteddate;
-        const comparetime = upload.mode == "Manual" ? `${upload.time}:00` : upload.formattedtime;
-
-
-        let shiftEndTime = `${req.body.todate}T23:59:59.000Z`;
-        let shiftFromTime = `${req.body.fromdate}T00:00:00.000Z`;
-
-        let userShiftTimings = {}
-        if (userArray && userArray.length > 0) {
-          finaluser = userArray && userArray.length > 0 &&
-            userArray?.flatMap((item, index) => {
-              const findShiftTiming = (shiftName) => {
-                const foundShift = shift?.find((d) => d.name === shiftName);
-                return foundShift ? `${foundShift.fromhour}:${foundShift.frommin}${foundShift.fromtime}to${foundShift.tohour}:${foundShift.tomin}${foundShift.totime} ` : "";
-              };
-              const findShiftTimingsts = (shiftName) => {
-                const foundShift = shift?.find((d) => d.name === shiftName);
-                return foundShift ? `${foundShift.isallowance} ` : "";
-              };
-
-              const filteredMatchingDoubleShiftItem = item.shiftallot?.filter((val) => val && val.empcode === item.empcode && val.adjstatus === "Approved");
-
-              // Filter out the dates that have matching 'Shift Adjustment' todates
-              let removedUserDates = userDates.filter((date) => {
-                // Check if there is no matching 'Shift Adjustment' for the current user and formattedDate
-                const matchingShiftAdjustmentToDate = filteredMatchingDoubleShiftItem?.find((item) => item && item.todate === date.formattedDate && item.adjustmenttype === "Shift Adjustment");
-
-                // If there is no matching 'Shift Adjustment', keep the date
-                return !matchingShiftAdjustmentToDate;
-              });
-
-              // Create a Set to store unique entries based on formattedDate, dayName, dayCount, and shiftMode
-              let uniqueEntries = new Set();
-
-              // Iterate over removedUserDates and add unique entries to the Set
-              removedUserDates.forEach((date) => {
-                uniqueEntries.add(
-                  JSON.stringify({
-                    formattedDate: date.formattedDate,
-                    dayName: date.dayName,
-                    dayCount: date.dayCount,
-                    shiftMode: "Main Shift",
-                    weekNumberInMonth: date.weekNumberInMonth,
-                  })
-                );
-              });
-
-              // Iterate over filteredMatchingDoubleShiftItem and add unique entries to the Set
-              filteredMatchingDoubleShiftItem && filteredMatchingDoubleShiftItem?.forEach((item) => {
-                const [day, month, year] = item.adjdate?.split("/");
-                let newFormattedDate = new Date(`${year} -${month} -${day} `);
-
-                if (item.adjustmenttype === "Shift Adjustment" || item.adjustmenttype === "Add On Shift" || item.adjustmenttype === "Shift Weekoff Swap") {
-                  uniqueEntries.add(
-                    JSON.stringify({
-                      formattedDate: item.adjdate,
-                      dayName: moment(item.adjdate, "DD/MM/YYYY").format("dddd"),
-                      dayCount: parseInt(moment(item.adjdate, "DD/MM/YYYY").format("DD")),
-                      shiftMode: "Second Shift",
-                      weekNumberInMonth:
-                        getWeekNumberInMonth(newFormattedDate) === 1
-                          ? `${getWeekNumberInMonth(newFormattedDate)}st Week`
-                          : getWeekNumberInMonth(newFormattedDate) === 2
-                            ? `${getWeekNumberInMonth(newFormattedDate)}nd Week`
-                            : getWeekNumberInMonth(newFormattedDate) === 3
-                              ? `${getWeekNumberInMonth(newFormattedDate)}rd Week`
-                              : getWeekNumberInMonth(newFormattedDate) > 3
-                                ? `${getWeekNumberInMonth(newFormattedDate)}th Week`
-                                : "",
-                    })
-                  );
-                }
-              });
-
-              // Convert Set back to an array of objects
-              let createdUserDatesUnique = Array.from(uniqueEntries).map((entry) => JSON.parse(entry));
-
-              function sortUserDates(dates) {
-                return dates.sort((a, b) => {
-                  if (a.formattedDate === b.formattedDate) {
-                    // If dates are the same, sort by shift mode
-                    if (a.shiftMode < b.shiftMode) return -1;
-                    if (a.shiftMode > b.shiftMode) return 1;
-                    return 0;
-                  } else {
-                    // Otherwise, sort by date
-                    const dateA = new Date(a.formattedDate.split("/").reverse().join("/"));
-                    const dateB = new Date(b.formattedDate.split("/").reverse().join("/"));
-                    return dateA - dateB;
-                  }
-                });
-              }
-
-              // Sort the array
-              const sortedCreatedUserDates = sortUserDates(createdUserDatesUnique);
-              const createdUserDates = sortedCreatedUserDates?.filter((d) => {
-                const filterData = userDates.some((val) => val.formattedDate === d.formattedDate);
-                if (filterData) {
-                  return d;
-                }
-              });
-              // console.log(createdUserDates, 'createdUserDates')
-              // Map each user date to a row
-              const userRows = createdUserDates?.map((date) => {
-                let filteredRowData = item.shiftallot?.filter((val) => val.empcode == item.empcode);
-                const matchingItem = filteredRowData?.find((item) => item && item.adjdate == date.formattedDate);
-                const matchingItemAllot = filteredRowData?.find((item) => item && formatDate(item.date) == date.formattedDate);
-                const matchingDoubleShiftItem = filteredRowData?.find((item) => item && item.todate === date.formattedDate);
-                const filterBoardingLog = item.boardingLog && item.boardingLog?.filter((item) => {
-                  // return item.logcreation === "user" || item.logcreation === "shift";
-                  return item;
-                });
-                const depMonthSetFiltered = depMonthSet.filter(d => d.department === item.department)
-
-                // Check if the dayName is Sunday or Monday
-                // const isWeekOff = item.weekoff?.includes(date.dayName);
-                const isWeekOff = getWeekOffDay(date, filterBoardingLog, item.department, depMonthSet) === "Week Off" ? true : false;
-                const isWeekOffWithAdjustment = isWeekOff && matchingItem;
-                const isWeekOffWithManual = isWeekOff && matchingItemAllot;
-
-                const actualShiftTiming = findShiftTiming(item.shifttiming);
-
-                const row = {
-                  company: item.company,
-                  branch: item.branch,
-                  unit: item.unit,
-                  team: item.team,
-                  companyname: item.companyname,
-                  empcode: item.empcode,
-                  username: item.username,
-                  shifttiming: getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered),
-                  date: date.formattedDate,
-                  shiftmode: date.shiftMode,
-                  plusshift: date.plusshift,
-                  shiftsts: findShiftTimingsts(getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered)),
-                };
-
-                return row;
-              });
-              return userRows;
-            });
-
-
-          // console.log(finaluser, 'finaluser')
-          function filterData(data) {
-            const firstEntry = data[0];
-            const secondEntry = data[1];
-            if (!firstEntry) return [];
-            const isFirstShiftWeekoff = firstEntry.shifttiming && firstEntry.shifttiming !== "" && firstEntry.shifttiming == "Week Off";
-            const isFirstShiftPM = firstEntry.shifttiming && firstEntry.shifttiming !== "" && firstEntry.shifttiming != "Week Off" ? firstEntry.shifttiming.split("to")[0].includes("PM") : "";
-            const isMainShift = firstEntry.shiftmode === "Main Shift";
-            const isPlusShift = firstEntry.plusshift && firstEntry.plusshift != "";
-            if (isFirstShiftWeekoff) {
-              data = [
-                { date: firstEntry.date, shifttiming: secondEntry.shifttiming, shiftsts: firstEntry.shiftsts, },
-                { date: secondEntry.date, shifttiming: secondEntry.shifttiming, shiftsts: secondEntry.shiftsts, }
-              ]
-            }
-            else if (isFirstShiftPM && isMainShift && isPlusShift) {
-              // Keep the first entry and the entries that are not "Second Shift"
-              return data.filter((entry, index) => index != 0);
-              // } else if (!isFirstShiftPM && isMainShift) {
-            } else {
-              // Keep the first entry and the entries that are "Main Shift"
-              return data.filter(entry => entry.shiftmode === "Main Shift");
-            }
-
-            return data; // Return the original data if conditions are not met
-          }
-
-          userShiftTimings = filterData(finaluser).map(item => ({ date: item.date, shifttiming: item.shifttiming, shiftsts: item.shiftsts, plusshift: item.plusshift }));
-          // console.log(userShiftTimings, 'userShiftTimings')
-          // finaluser ? null : (finaluser, upload.companyname);
-          let userShiftTimingsFromTwo = { date: userShiftTimings[userShiftTimings.length - 1].date, shifttiming: userShiftTimings[0].shifttiming, shiftsts: userShiftTimings[userShiftTimings.length - 1].shiftsts }
-          let userShiftTimingsBefore = { date: userShiftTimings[userShiftTimings.length - 1].date, shifttiming: userShiftTimings[userShiftTimings.length - 1].shifttiming, shiftsts: "Disable" }
-          // console.log(userShiftTimings, "userShiftTimings")
-
-          function convertToISODateTime(currentShift, nextShift) {
-            // console.log(nextShift, 'nextShift')
-            function padTime(time) {
-              let [hours, minutes] = time.split(':');
-              if (hours.length === 1) {
-                hours = '0' + hours;
-              }
-              return `${hours}:${minutes}`;
-            }
-            // Helper function to parse date and time from shift objects
-            function parseDateTime(shift) {
-              // console.log(shift)
-              const [day, month, year] = shift.date.split('/');
-              // const timeString = shift.shifttiming.split('to')[0].trim();
-              let timeString = shift.shifttiming && shift.shifttiming != "" && shift.shifttiming == "Week Off" ? ("00:00AMto00:00AM").split('to')[0].trim() : ((shift.shifttiming && shift.shifttiming != "" && shift.shifttiming != "Week Off") ? shift.shifttiming.split('to')[0].trim() : ("00:00AMto11:59PM").split('to')[0].trim());
-
-              // Normalize time separators (replace dots with colons)
-              timeString = timeString.replace('.', ':');
-
-              // Handle missing leading zeros in hour values
-              timeString = padTime(timeString);
-
-
-              let [hours, minutes] = timeString.slice(0, -2).split(':');
-              const period = timeString.slice(-2);
-
-              if (period === 'PM' && hours !== '12') {
-                hours = parseInt(hours, 10) + 12;
-              } else if (period === 'AM' && hours === '12') {
-                hours = '00';
-              }
-
-              const dateTimeString = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00.000Z`);
-              // let newTime = new Date(dateTimeString.getTime() - 4 * 60 * 60 * 1000);
-              let finalHrs = period === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
-              let finalMin = period === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
-              let newTime = new Date(dateTimeString.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin * 60 * 1000)));
-
-
-              // console.log(newTime.toISOString());
-              return (newTime.toISOString());
-            }
-
-            // Parse initial date and time from current shift
-            const initialDateTime = currentShift.shifttiming === "Week Off" ? parseDateTime(nextShiftBefor) : parseDateTime(currentShift);
-            // console.log(initialDateTime, currentShift.shifttiming, "initialDateTime")
-
-            const initialEndDateTime = new Date(initialDateTime);
-            initialEndDateTime.setHours(initialEndDateTime.getHours() + 23);
-            initialEndDateTime.setMinutes(initialEndDateTime.getMinutes() + 59);
-
-
-            // console.log(nextShift.shifttiming, upload.companyname, "asd", "jjj")
-            // Parse start time of the next shift
-
-            const nextShiftStartTime = nextShift.shifttiming === "Week Off" ? parseDateTime(currentShiftTwo) : parseDateTime(nextShift);
-            // console.log(nextShiftStartTime, 'nextShiftStartTime')
-
-            if (new Date(initialEndDateTime) >= new Date(nextShiftStartTime)) {
-              initialEndDateTime.setTime(new Date(nextShiftStartTime).getTime() - 60000); // Set to 1 minute before next shift
-            }
-
-            // Convert to ISO 8601 format with 'Z' to indicate UTC
-            const isoString = initialEndDateTime.toISOString();
-            return isoString;
-          }
-
-          const currentShift = userShiftTimings[userShiftTimings.length - 2];
-          const nextShift = userShiftTimings[userShiftTimings.length - 1];
-          const currentShiftTwo = userShiftTimingsFromTwo;
-          const nextShiftBefor = userShiftTimingsBefore;
-
-
-          shiftEndTime = convertToISODateTime(currentShift, nextShift);
-          // console.log(shiftEndTime, "shiftEndTime")
-          function padTime(time) {
-            let [hours, minutes] = time.split(':');
-            if (hours.length === 1) {
-              hours = '0' + hours;
-            }
-            return `${hours}:${minutes}`;
-          }
-
-          function parseFromDateTime(shift) {
-
-            const [day, month, year] = shift.date.split('/');
-
-            let timeString = shift.shifttiming && shift.shifttiming != "" && shift.shifttiming == "Week Off" ? ("00:00AMto00:00AM").split('to')[0].trim() : ((shift.shifttiming && shift.shifttiming != "" && shift.shifttiming != "Week Off") ? shift.shifttiming.split('to')[0].trim() : ("00:00AMto11:59PM").split('to')[0].trim());
-
-            timeString = timeString.replace('.', ':');
-
-            // Handle missing leading zeros in hour values
-            timeString = padTime(timeString);
-
-
-            let [hours, minutes] = timeString.slice(0, -2).split(':');
-            const period = timeString.slice(-2);
-
-            if (period === 'PM' && hours !== '12') {
-              hours = parseInt(hours, 10) + 12;
-            } else if (period === 'AM' && hours === '12') {
-
-              hours = '00';
-            }
-
-            const dateTimeString = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00Z`);
-            // let newTime = new Date(dateTimeString.getTime() - 4 * 60 * 60 * 1000);
-            let finalHrs = period === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
-            let finalMin = period === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
-            // console.log(finalHrs, finalMin)
-            let newTime = shift.shifttiming ? new Date(dateTimeString.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin * 60 * 1000))) : new Date(dateTimeString);
-
-            return (newTime.toISOString());
-          }
-          // console.log(userShiftTimings[0])
-          // Parse initial date and time from current shift
-          shiftFromTime = parseFromDateTime(userShiftTimings[0]);
-        }
-
-        // console.log(userShiftTimings, "userShiftTimings")
-        const fromDateselected = new Date(`${req.body.fromdate}T${req.body.fromtime}Z`);
-        const toDateselected = new Date(`${req.body.todate}T${req.body.totime}Z`);
-
-        const dateTime = new Date(`${comparedate}T${comparetime}Z`);
-
-        if ((req.body.empname.length > 0 ? req.body.empname.includes(logininfoname) : true) &&
-          (req.body.company.length > 0 ? req.body.company.includes(userInfo ? userInfo.company : "") : true) &&
-          (req.body.branch.length > 0 ? req.body.branch.includes(userInfo ? userInfo.branch : "") : true) &&
-          (req.body.unit.length > 0 ? req.body.unit.includes(userInfo ? userInfo.unit : "") : true) &&
-          (req.body.team.length > 0 ? req.body.team.includes(userInfo ? userInfo.team : "") : true) &&
-          (dateTime >= fromDateselected && dateTime <= toDateselected) &&
-          (req.body.subsmanual && req.body.subsmanual.length > 0 ? req.body.subsmanual.some(sub => sub.category === filenamelist && sub.subcategory === upload.category)
-            : true)) {
-
-          return {
-            user: upload.user,
-            // fromdate: upload.fromdate,
-            // todate: upload.todate,
-            vendor: upload.vendor,
-            category: upload.category,
-            dateval: upload.mode === "Manual" ? `${upload.fromdate} ${upload.time}:00` : `${upload.formatteddate} ${upload.formattedtime}`,
-            olddateval: upload.mode === "Manual" ? `${upload.fromdate}T${upload.time}:00` : `${upload.formatteddate}T${upload.formattedtime} `,
-
-            // time: upload.time,
-            filename: filenamelist,
-            mode: upload.mode == "Manual" ? "Manual" : "Production",
-            empname: logininfoname,
-            empcode: userInfo && userInfo.empcode,
-            company: userInfo && userInfo.company,
-            unit: userInfo && userInfo.unit,
-            branch: userInfo && userInfo.branch,
-            team: userInfo && userInfo.team,
-            shifttiming: userShiftTimings && userShiftTimings[0].shifttiming,
-            username: userInfo && userInfo.username,
-            empcode: userInfo && userInfo.empcode,
-            _id: upload._id,
-
-            unitid: upload.unitid,
-            section: upload.section,
-            csection: upload.updatedsection ? upload.updatedsection : "",
-
-            flagcount: upload.flagcount,
-            cflagcount: upload.updatedflag ? upload.updatedflag : "",
-            dupe: upload.mode == "Manual" ? "No" : upload.dupe,
-            unitid: upload.unitid,
-            points: Number(upload.unitrate) * 8.333333333333333,
-            cpoints: upload.updatedunitrate ? Number(upload.updatedunitrate) * 8.333333333333333 : "",
-            unitrate: Number(upload.unitrate),
-            cunitrate: upload.updatedunitrate ? Number(upload.updatedunitrate) : "",
-          };
-        }
-        return null
-      });
-
-
-      mergedData = mergedDataallfirst.filter((item) => item !== null)
-      console.log(mergedData.length, 'sdkfh')
-    }
-
-  } catch (err) {
-    console.log(err)
-    return next(new ErrorHandler("Records not found!", 404));
-  }
-  return res.status(200).json({
+  let productionupload = [],
     mergedData,
-    count: allData.length
-  });
-});
-
-//individual
-exports.getAllProductionTempReportFilter = catchAsyncErrors(async (req, res, next) => {
-  let productionupload, attendances, mergedData, producionIndividual;
+    producionIndividual;
   let finaluser = [];
   let mergedDataall = [];
-  let sortedProductionUpload = []
-  let userDates = req.body.userDates;
   try {
-
+    const { empname, username, user, projectvendor, category, subcategory, mode, fromtime, totime, selecteddupe, company, branch, unit, team, users } = req.body;
     const dateObj = new Date(req.body.fromdate);
-    console.log(req.body.fromdate)
+    const date = req.body.fromdate;
+
     // Extract day, month, and year components
-    const day = String(dateObj.getDate()).padStart(2, "0");
-    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const year = dateObj.getFullYear();
 
     // Format the date components into the desired format
     const formattedDate = `${day}-${month}-${year}`;
 
-    let currentDateTodate = new Date(req.body.fromdate);
-    let nextDaytodate = new Date(currentDateTodate);
-    nextDaytodate.setDate(currentDateTodate.getDate() + 1);
-    let nextDateFormatted = nextDaytodate.toISOString().split("T")[0];
-
-
     let dateoneafter = new Date(req.body.fromdate);
     dateoneafter.setDate(dateoneafter.getDate() + 1);
-    let newDateOnePlus = dateoneafter.toISOString().split("T")[0];
+    let newDateOnePlus = dateoneafter.toISOString().split('T')[0];
 
     let datebefore = new Date(req.body.fromdate);
     datebefore.setDate(datebefore.getDate() - 1);
-    let newDateOneMinus = datebefore.toISOString().split("T")[0];
+    let newDateOneMinus = datebefore.toISOString().split('T')[0];
 
-    // producionIndividual = await ProducionIndividual.find({}, {});
-    let loginids = await ClientUserid.find({ loginallotlog: { $exists: true, $ne: [] } }, { empname: 1, userid: 1, loginallotlog: 1 }).lean();
-
-
-
-    attendances = await Attendances.find({ date: { $eq: formattedDate } }, { clockintime: 1, date: 1, username: 1 });
-    let users = await Users.find({}, { companyname: 1, empcode: 1, company: 1, unit: 1, branch: 1, team: 1, username: 1, processlog: 1, shifttiming: 1, department: 1, doj: 1, assignExpLog: 1, shiftallot: 1, boardingLog: 1 });
-    let shift = await Shift.find({}, { name: 1, fromhour: 1, tohour: 1, frommin: 1, tomin: 1, fromtime: 1, totime: 1, isallowance: 1 });
-
-    let depMonthSet = await DepartmentMonth.find({
-
-      $and: [
-        { todate: { $gte: req.body.fromdate } },  // Find records where 'todate' is greater than or equal to 'fromdate'
-        { fromdate: { $lte: req.body.fromdate } }   // Find records where 'fromdate' is less than or equal to 'todate'
-      ]
-    }, { department: 1, year: 1, month: 1, monthname: 1, fromdate: 1, todate: 1, totaldays: 1 });
-
-
-    // let depMonthSet = await DepartmentMonth.find({}, { department: 1, year: 1, month: 1, monthname: 1, fromdate: 1, todate: 1, totaldays: 1 });
-
-    let query = {}
-    let finalDates = [req.body.fromdate, newDateOnePlus]
-
-    if (req.body.allloginids.length > 0) {
-      query.user = { $in: req.body.allloginids }
+    const useridsall = users.flatMap((item) => item.userids);
+    let logidQuery = {
+      loginallotlog: { $exists: true, $ne: [] },
+      // allotted: 'allotted',
+      'loginallotlog.empname': { $in: users.map((item) => item.companyname) },
+      userid: { $in: useridsall },
+    };
+    if (user.length > 0) {
+      logidQuery.userid = { $in: user };
     }
-    if (req.body.projectvendor.length > 0) {
-      query.vendor = { $in: req.body.projectvendor }
+    let userQuery = {
+      enquirystatus: {
+        $nin: ['Enquiry Purpose'],
+      },
+      companyname: { $in: users.map((item) => item.companyname) },
+
+      $or: [{ reasondate: { $exists: false } }, { reasondate: { $eq: '' } }, { reasondate: { $gte: date } }],
+    };
+
+    if (empname.length > 0) {
+      userQuery.companyname = { $in: empname };
     }
 
-    if (finalDates.length > 0) {
-      query.formatteddate = { $in: finalDates }
+    let query = {};
+    let queryManual = {};
+
+    if (user.length > 0) {
+      query.user = { $in: user };
+      queryManual.user = { $in: user };
     }
-    // if (req.body.subs.length > 0) {
-    //   query.$or = req.body.subs.map(sub => ({
-    //     filename: sub.category,
-    //     category: sub.subcategory
-    //   }))
-    // }
-
-
-    console.log(query, "query");
-
-    let queryManual = {}
-
-    // if (req.body.subsmanual.length > 0) {
-    //   queryManual.$or = req.body.subsmanual.map(sub => ({
-    //     filename: sub.category,
-    //     category: sub.subcategory
-    //   }))
-    // }
-
-    if (req.body.allloginids.length > 0) {
-      queryManual.user = { $in: req.body.allloginids }
+    if (user.length === 0) {
+      query.user = { $in: useridsall };
+      queryManual.user = { $in: useridsall };
     }
-    if (req.body.projectvendor.length > 0) {
-      queryManual.vendor = { $in: req.body.projectvendor }
-    }
-    queryManual.status = "Approved"
-
-    queryManual.$or = [
-      { fromdate: { $eq: req.body.fromdate } },
-      { fromdate: { $eq: newDateOnePlus } },
-      // { fromdate: { $eq: newDateOneMinus } }
-    ]
-    // console.log(queryManual, "queryManual")
-
-    if (req.body.mode.map((item) => item.value).includes("Manual Production")) {
-      producionIndividual = await ProducionIndividual.find(queryManual, {});
+    if (projectvendor.length > 0) {
+      query.vendor = { $in: projectvendor };
+      queryManual.vendor = { $in: projectvendor };
     }
 
-    if (req.body.mode.map((item) => item.value).includes("Production")) {
-      sortedProductionUpload = await ProductionTempUploadAll.find(
-        query,
-        { user: 1, fromdate: 1, dateval: 1, formatteddatetime: 1, todate: 1, vendor: 1, category: 1, filename: 1, section: 1, flagcount: 1, unitid: 1, unitrate: 1, updatedunitrate: 1, updatedflag: 1, updatedsection: 1 }
+    if (selecteddupe === 'Without Duplicate') {
+      query.dupe = 'No';
+    }
+
+    queryManual.status = 'Approved';
+
+    if (req.body.shift == 'Shift Based') {
+      queryManual.$or = [{ fromdate: { $eq: req.body.fromdate } }, { fromdate: { $eq: newDateOnePlus } }];
+    } else {
+      queryManual.fromdate = { $eq: date };
+    }
+    console.log(users.length, 'USERLENGTHuplosadFILTER');
+
+    const { minStart, maxEnd } = users
+      .filter((d) => d.userShiftTimings.shiftFromTime && d.userShiftTimings.shiftFromTime !== '')
+      .reduce(
+        (acc, obj) => {
+          const startTime = new Date(obj.userShiftTimings.shiftFromTime);
+          const endTime = new Date(obj.userShiftTimings.shiftEndTime);
+
+          // console.log('Comparing:', startTime, endTime);
+
+          // Update minimum start time
+          if (!acc.minStart || startTime < acc.minStart) {
+            acc.minStart = startTime;
+          }
+
+          // Update maximum end time
+          if (!acc.maxEnd || endTime > acc.maxEnd) {
+            acc.maxEnd = endTime;
+          }
+
+          return acc;
+        },
+        { minStart: null, maxEnd: null } // Proper initialization
       );
-      console.log(sortedProductionUpload.length, "prod");
 
-      productionupload = sortedProductionUpload.sort((a, b) => {
-        const [dateA, timeA] = a.formatteddatetime.split(" ");
-        const [dateB, timeB] = b.formatteddatetime.split(" ");
+    query.dateobjformatdate = { $gte: minStart, $lte: maxEnd };
+    console.log(query.dateobjformatdate, 'query');
 
-        const dateTimeA = new Date(`${dateA}T${timeA}`);
-        const dateTimeB = new Date(`${dateB}T${timeB}`);
+    const [loginids, producionIndividual, productionupload, attendances] = await Promise.all([
+      ClientUserid.find(logidQuery, { empname: 1, userid: 1, projectvendor: 1, loginallotlog: 1 }).lean(),
+      mode.includes('Manual Production')
+        ? ProducionIndividual.find(queryManual, {
+            user: 1,
+            fromdate: 1,
+            time: 1,
+            filename: 1,
+            vendor: 1,
+            mode: 1,
+            category: 1,
+            section: 1,
+            unitid: 1,
+            lateentrystatus: 1,
+            updatedunitrate: 1,
+            updatedflag: 1,
+            updatedsection: 1,
+            unallotcategory: 1,
+            unallotsubcategory: 1,
+          })
+        : Promise.resolve([]),
+      mode.includes('Production')
+        ? ProductionTempUploadAll.find(query, {
+            unitid: 1,
+            user: 1,
+            formatteddate: 1,
+            formattedtime: 1,
+            filenameupdated: 1,
+            category: 1,
+            flagcount: 1,
+            vendor: 1,
+            unitrate: 1,
+            updatedunitrate: 1,
+            updatedflag: 1,
+            unallotcategory: 1,
+            unallotsubcategory: 1,
+          })
+        : Promise.resolve([]),
+      Attendances.find({ date: formattedDate, username: { $in: username } }, { clockintime: 1, date: 1, username: 1 }),
+    ]);
 
-        return dateTimeA - dateTimeB; // Sort in ascending order
-      });
+    let allData = [...producionIndividual, ...productionupload];
+
+    console.log(allData.length, 'aalldata');
+
+    // Function to subtract hours and minutes from a date
+    function subtractTime(date, hours, minutes) {
+      // Subtract hours
+      date.setHours(date.getHours() - hours);
+      // Subtract minutes
+      date.setMinutes(date.getMinutes() - minutes);
+      return date;
     }
-    // console.log(query, "query")
 
-    let attendenceControlCriteria = await AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec();
+    // Format the result to "YYYY-MM-DD HH:MM:SS"
+    function formatDateCst(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
 
-    let dayShiftBeforeHrs = attendenceControlCriteria && attendenceControlCriteria.dayactive && attendenceControlCriteria.dayactive == true ? Number(attendenceControlCriteria.calcshifthourday) : 4;
-    let dayShiftBeforeMin = attendenceControlCriteria && attendenceControlCriteria.dayactive && attendenceControlCriteria.dayactive == true ? Number(attendenceControlCriteria.calcshiftminday) : 0;
-    let nightShiftBeforeHrs = attendenceControlCriteria && attendenceControlCriteria.nightactive && attendenceControlCriteria.nightactive == true ? Number(attendenceControlCriteria.calcshifthournight) : 4;
-    let nightShiftBeforeMin = attendenceControlCriteria && attendenceControlCriteria.nightactive && attendenceControlCriteria.nightactive == true ? Number(attendenceControlCriteria.calcshiftminnight) : 0;
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
 
+    function compareDateTimes(dateT, shiftFrom, shiftEnd) {
+      // Parse the datetime strings into Date objects
+      const dateTimeObj = new Date(dateT);
+      const shiftFromTimeObj = new Date(shiftFrom);
+      const shiftEndTimeObj = new Date(shiftEnd);
+      // Perform the comparisons
+      const isWithinShift = dateTimeObj >= shiftFromTimeObj && dateTimeObj <= shiftEndTimeObj;
 
+      return isWithinShift;
+    }
 
-    let allData = req.body.mode.map((item) => item.value).includes("Production") && req.body.mode.map((item) => item.value).includes("Manual Production") ?
-      [...producionIndividual, ...productionupload] :
-      req.body.mode.map((item) => item.value).includes("Production") ?
-        productionupload :
-        producionIndividual;
-    console.log(allData.length, "allData")
+    // Step 1: Flatten the loginallotlog array and include user info
+    let logs = loginids.flatMap((user) =>
+      user.loginallotlog.map((log) => ({
+        userid: user.userid,
+        projectvendor: user.projectvendor,
+        date: log.date,
+        time: log.time,
+        empname: log.empname,
+        empcode: log.empcode,
+        enddate: log.enddate ? log.enddate : null,
+      }))
+    );
 
-    if (req.body.shift == "Shift Based") {
+    // Step 2: Sort logs by date and time (ascending order)
+    logs.sort((a, b) => {
+      if (a.date === b.date) {
+        return a.time.localeCompare(b.time);
+      }
+      return new Date(a.date) - new Date(b.date);
+    });
 
+    // Step 3: Calculate the enddate for each log (except the last log for each userid)
+    const userLogsMap = {};
+
+    logs.forEach((log) => {
+      if (!userLogsMap[log.userid]) {
+        userLogsMap[log.userid] = {};
+      }
+
+      if (!userLogsMap[log.userid][log.projectvendor]) {
+        userLogsMap[log.userid][log.projectvendor] = [];
+      }
+
+      userLogsMap[log.userid][log.projectvendor].push(log);
+    });
+
+    Object.values(userLogsMap).forEach((userLogs) => {
+      Object.values(userLogs).forEach((logsArray) => {
+        logsArray.forEach((log, idx) => {
+          if (idx < logsArray.length - 1) {
+            log.enddate = logsArray[idx + 1].date;
+          }
+        });
+      });
+    });
+
+    // Step 4: Filter logs based on input date
+    const filteredLogs = logs.filter((log) => {
+      return new Date(log.date) <= new Date(req.body.date) && (!log.enddate || new Date(log.enddate) >= new Date(req.body.date));
+    });
+
+    // Step 5: Sort the filtered logs by date and time (descending order)
+    filteredLogs.sort((a, b) => {
+      if (a.date === b.date) {
+        return b.time.localeCompare(a.time);
+      }
+      return new Date(b.date) - new Date(a.date);
+    });
+
+    if (req.body.shift == 'Shift Based') {
       try {
-        let mergedDataallfirst = allData.map((upload) => {
-          const loginInfo = loginids.find((login) => req.body.allloginids.includes(login.userid));
+        let mergedDataallfirst = allData.map((upload, index) => {
+          const loginInfo = filteredLogs.find((login) => login.userid === upload.user && login.projectvendor === upload.vendor);
 
-          let loginallot = loginInfo && loginInfo.loginallotlog ? loginInfo.loginallotlog : [];
-
+          let loginallot = loginInfo ? loginInfo : [];
           let filteredDataDateTime = null;
+
           if (loginallot.length > 0) {
             const groupedByDateTime = {};
 
-            // Group items by date and time
             loginallot.forEach((item) => {
-              const dateTime = item.date + " " + item.time;
+              const dateTime = item.date + ' ' + item.time;
               if (!groupedByDateTime[dateTime]) {
                 groupedByDateTime[dateTime] = [];
               }
@@ -2155,18 +1337,14 @@ exports.getAllProductionTempReportFilter = catchAsyncErrors(async (req, res, nex
 
             // Sort the last items by date and time
             lastItemsForEachDateTime.sort((a, b) => {
-              return new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time);
+              return new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time);
             });
 
             // Find the first item in the sorted array that meets the criteria
-
             for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
-              const dateTime = lastItemsForEachDateTime[i].date + " " + lastItemsForEachDateTime[i].time;
-              // let datevalsplit = upload.mode === "Manual" ? "" : upload.formatteddatetime.split(" ");
-              // let datevalsplitfinal = upload.mode === "Manual" ? upload.fromdate + " " + upload.time + ":00" : upload.formatteddatetime;
-              let datevalsplit = upload.mode == "Manual" ? upload.fromdate : upload.formatteddatetime.split(" ");
-              let datevalsplitfinal = upload.mode == "Manual" ? upload.fromdate + " " + upload.time + ":00" : datevalsplit[0] + " " + datevalsplit[1];
-              // console.log(datevalsplitfinal, "datevalsplitfinal")
+              const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
+              // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
+              let datevalsplitfinal = upload.mode == 'Manual' ? `${upload.fromdate}T${uploadtime}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`;
               if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
                 filteredDataDateTime = lastItemsForEachDateTime[i];
               } else {
@@ -2175,418 +1353,106 @@ exports.getAllProductionTempReportFilter = catchAsyncErrors(async (req, res, nex
             }
           }
 
-          let logininfoname = loginallot.length > 0 ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : "";
+          let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : '';
+          // const filenamelistviewAll = upload.filename && upload.filename?.split(".x");
+          const comparedate = upload.mode == 'Manual' ? upload.fromdate : upload.formatteddate;
+          const comparetime = upload.mode == 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime;
+          // console.log(logininfoname,'logininfoname')
 
-          const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : "";
-          // console.log(logininfoname)
-          const userArray = loginInfo ? users.filter((user) => user.companyname === logininfoname) : "";
+          const dateTime = `${comparedate}T${comparetime}Z`;
 
-          const filenamelistviewAll = upload.filename && upload.filename?.split(".x");
-          const filenamelist = filenamelistviewAll && filenamelistviewAll[0];
-
-          // const FindProjectvendor = upload.vendor && upload.vendor?.split("-");
-          // const getproject = FindProjectvendor && FindProjectvendor[0];
-          // const getvendor = FindProjectvendor && FindProjectvendor[1];
-
-
-
-          const finddatevalue = upload.formatteddatetime && upload.formatteddatetime?.split(" ");
-
-          const finddate = upload.mode === "Manual" ? upload.fromdate : finddatevalue && finddatevalue[0];
-          const findtime = upload.mode === "Manual" ? upload.time : finddatevalue && finddatevalue[1];
-
-          const comparedate = upload.mode == "Manual" ? upload.fromdate : finddate;
-          const comparetime = upload.mode == "Manual" ? upload.time : findtime;
-
+          // const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : '';
+          const userInfo = users.find((user) => logininfoname === user.companyname && new Date(dateTime) >= new Date(user.userShiftTimings.shiftFromTime) && new Date(dateTime) <= new Date(user.userShiftTimings.shiftEndTime));
+          //  console.log(userInfo,'userInfo')
           let shiftEndTime = `${req.body.fromdate}T00:00:00.000Z`;
           let shiftFromTime = `${req.body.fromdate}T00:00:00.000Z`;
 
-          let userShiftTimings = {}
-          if (userArray && userArray.length > 0) {
-            finaluser = userArray && userArray.length > 0 &&
-              userArray?.flatMap((item, index) => {
-                const findShiftTiming = (shiftName) => {
-                  const foundShift = shift?.find((d) => d.name === shiftName);
-                  return foundShift ? `${foundShift.fromhour}:${foundShift.frommin}${foundShift.fromtime}to${foundShift.tohour}:${foundShift.tomin}${foundShift.totime} ` : "";
-                };
-                const findShiftTimingsts = (shiftName) => {
-                  const foundShift = shift?.find((d) => d.name === shiftName);
-                  return foundShift ? `${foundShift.isallowance}` : "";
-                };
-
-                const filteredMatchingDoubleShiftItem = item?._doc?.shiftallot?.filter((val) => val && val?._doc?.empcode === item?._doc?.empcode && val?._doc?.adjstatus === "Approved");
-
-                // Filter out the dates that have matching 'Shift Adjustment' todates
-                let removedUserDates = userDates.filter((date) => {
-                  // Check if there is no matching 'Shift Adjustment' for the current user and formattedDate
-                  const matchingShiftAdjustmentToDate = filteredMatchingDoubleShiftItem?.find((item) => item && item?._doc?.todate === date.formattedDate && item?._doc?.adjustmenttype === "Shift Adjustment");
-
-                  // If there is no matching 'Shift Adjustment', keep the date
-                  return !matchingShiftAdjustmentToDate;
-                });
-
-                // Create a Set to store unique entries based on formattedDate, dayName, dayCount, and shiftMode
-                let uniqueEntries = new Set();
-
-                // Iterate over removedUserDates and add unique entries to the Set
-                removedUserDates.forEach((date) => {
-                  uniqueEntries.add(
-                    JSON.stringify({
-                      formattedDate: date.formattedDate,
-                      dayName: date.dayName,
-                      dayCount: date.dayCount,
-                      shiftMode: "Main Shift",
-                      weekNumberInMonth: date.weekNumberInMonth,
-                    })
-                  );
-                });
-
-                // Iterate over filteredMatchingDoubleShiftItem and add unique entries to the Set
-                filteredMatchingDoubleShiftItem && filteredMatchingDoubleShiftItem?.forEach((item) => {
-                  const [day, month, year] = item._doc.adjdate?.split("/");
-                  let newFormattedDate = new Date(`${year}-${month}-${day}`);
-
-                  if (item._doc.adjustmenttype === "Shift Adjustment" || item._doc.adjustmenttype === "Add On Shift" || item._doc.adjustmenttype === "Shift Weekoff Swap") {
-                    uniqueEntries.add(
-                      JSON.stringify({
-                        formattedDate: item._doc.adjdate,
-                        dayName: moment(item._doc.adjdate, "DD/MM/YYYY").format("dddd"),
-                        dayCount: parseInt(moment(item._doc.adjdate, "DD/MM/YYYY").format("DD")),
-                        shiftMode: "Second Shift",
-                        weekNumberInMonth:
-                          getWeekNumberInMonth(newFormattedDate) === 1
-                            ? `${getWeekNumberInMonth(newFormattedDate)}st Week`
-                            : getWeekNumberInMonth(newFormattedDate) === 2
-                              ? `${getWeekNumberInMonth(newFormattedDate)}nd Week`
-                              : getWeekNumberInMonth(newFormattedDate) === 3
-                                ? `${getWeekNumberInMonth(newFormattedDate)}rd Week`
-                                : getWeekNumberInMonth(newFormattedDate) > 3
-                                  ? `${getWeekNumberInMonth(newFormattedDate)}th Week`
-                                  : "",
-                      })
-                    );
-                  }
-                });
-
-                // Convert Set back to an array of objects
-                let createdUserDatesUnique = Array.from(uniqueEntries).map((entry) => JSON.parse(entry));
-
-                function sortUserDates(dates) {
-                  return dates.sort((a, b) => {
-                    if (a.formattedDate === b.formattedDate) {
-                      // If dates are the same, sort by shift mode
-                      if (a.shiftMode < b.shiftMode) return -1;
-                      if (a.shiftMode > b.shiftMode) return 1;
-                      return 0;
-                    } else {
-                      // Otherwise, sort by date
-                      const dateA = new Date(a.formattedDate.split("/").reverse().join("/"));
-                      const dateB = new Date(b.formattedDate.split("/").reverse().join("/"));
-                      return dateA - dateB;
-                    }
-                  });
-                }
-
-                // Sort the array
-                const sortedCreatedUserDates = sortUserDates(createdUserDatesUnique);
-                const createdUserDates = sortedCreatedUserDates?.filter((d) => {
-                  const filterData = userDates.some((val) => val.formattedDate === d.formattedDate);
-                  if (filterData) {
-                    return d;
-                  }
-                });
-
-                // Map each user date to a row
-                const userRows = createdUserDates?.map((date) => {
-                  let filteredRowData = item?._doc?.shiftallot?.filter((val) => val?._doc?.empcode == item?._doc?.empcode);
-                  const matchingItem = filteredRowData?.find((item) => item && item?._doc?.adjdate == date.formattedDate);
-                  const matchingItemAllot = filteredRowData?.find((item) => item && formatDate(item?._doc?.date) == date.formattedDate);
-                  const matchingDoubleShiftItem = filteredRowData?.find((item) => item && item?._doc?.todate === date.formattedDate);
-                  const filterBoardingLog = item?._doc?.boardingLog && item?._doc?.boardingLog?.filter((item) => {
-                    // return item.logcreation === "user" || item.logcreation === "shift";
-                    return item;
-                  });
-
-                  // Check if the dayName is Sunday or Monday
-                  // const isWeekOff = item?._doc?.weekoff?.includes(date.dayName);
-                  const isWeekOff = getWeekOffDay(date, filterBoardingLog, item?._doc?.department, depMonthSet) === "Week Off" ? true : false;
-                  const isWeekOffWithAdjustment = isWeekOff && matchingItem;
-                  const isWeekOffWithManual = isWeekOff && matchingItemAllot;
-
-                  const actualShiftTiming = findShiftTiming(item?._doc?.shifttiming);
-
-                  const row = {
-                    company: item?._doc?.company,
-                    branch: item?._doc?.branch,
-                    unit: item?._doc?.unit,
-                    team: item?._doc?.team,
-                    companyname: item?._doc?.companyname,
-                    empcode: item?._doc?.empcode,
-                    username: item?._doc?.username,
-                    shifttiming: getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?._doc?.department, depMonthSet),
-                    date: date.formattedDate,
-                    shiftmode: date.shiftMode,
-                    shiftsts: findShiftTimingsts(getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?._doc?.department, depMonthSet)),
-                  };
-
-                  return row;
-                });
-                return userRows;
-              });
-
-
-            function filterData(data) {
-              const firstEntry = data[0];
-              const secondEntry = data[1];
-              if (!firstEntry) return [];
-              const isFirstShiftWeekoff = firstEntry.shifttiming && firstEntry.shifttiming !== "" && firstEntry.shifttiming == "Week Off";
-              const isFirstShiftPM = firstEntry.shifttiming && firstEntry.shifttiming !== "" && firstEntry.shifttiming != "Week Off" ? firstEntry.shifttiming.split("to")[0].includes("PM") : "";
-              const isMainShift = firstEntry.shiftmode === "Main Shift";
-              const isPlusShift = firstEntry.plusshift && firstEntry.plusshift != "";
-              if (isFirstShiftWeekoff) {
-                data = [
-                  { date: firstEntry.date, shifttiming: secondEntry.shifttiming, shiftsts: firstEntry.shiftsts, },
-                  { date: secondEntry.date, shifttiming: secondEntry.shifttiming, shiftsts: secondEntry.shiftsts, }
-                ]
-              }
-              else if (isFirstShiftPM && isMainShift && isPlusShift) {
-                // Keep the first entry and the entries that are not "Second Shift"
-                return data.filter((entry, index) => index != 0);
-                // } else if (!isFirstShiftPM && isMainShift) {
-              } else {
-                // Keep the first entry and the entries that are "Main Shift"
-                return data.filter(entry => entry.shiftmode === "Main Shift");
-              }
-
-              return data; // Return the original data if conditions are not met
-            }
-            // console.log(finaluser, 'hgf')
-            userShiftTimings = filterData(finaluser).map(item => ({ date: item.date, shifttiming: item.shifttiming, shiftsts: item.shiftsts, plusshift: item.plusshift }));
-            // finaluser ? null : (finaluser, upload.companyname);
-            let userShiftTimingsFromTwo = { date: userShiftTimings[1].date, shifttiming: userShiftTimings[0].shifttiming, shiftsts: userShiftTimings[1].shiftsts }
-            let userShiftTimingsBefore = { date: userShiftTimings[0].date, shifttiming: userShiftTimings[1].shifttiming, shiftsts: userShiftTimings[0].shiftsts }
-
-
-            function convertToISODateTime(currentShift, nextShift) {
-              // console.log(nextShift, 'nextShift')
-              function padTime(time) {
-                let [hours, minutes] = time.split(':');
-                if (hours.length === 1) {
-                  hours = '0' + hours;
-                }
-                return `${hours}:${minutes}`;
-              }
-              // Helper function to parse date and time from shift objects
-              function parseDateTime(shift) {
-                // console.log(shift)
-                const [day, month, year] = shift.date.split('/');
-                // const timeString = shift.shifttiming.split('to')[0].trim();
-                let timeString = shift.shifttiming && shift.shifttiming != "" && shift.shifttiming == "Week Off" ? ("00:00AMto00:00AM").split('to')[0].trim() : ((shift.shifttiming && shift.shifttiming != "" && shift.shifttiming != "Week Off") ? shift.shifttiming.split('to')[0].trim() : ("00:00AMto11:59PM").split('to')[0].trim());
-
-                // Normalize time separators (replace dots with colons)
-                timeString = timeString.replace('.', ':');
-
-                // Handle missing leading zeros in hour values
-                timeString = padTime(timeString);
-
-
-                let [hours, minutes] = timeString.slice(0, -2).split(':');
-                const period = timeString.slice(-2);
-
-                if (period === 'PM' && hours !== '12') {
-                  hours = parseInt(hours, 10) + 12;
-                } else if (period === 'AM' && hours === '12') {
-                  hours = '00';
-                }
-
-                const dateTimeString = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00.000Z`);
-                // let newTime = new Date(dateTimeString.getTime() - 4 * 60 * 60 * 1000);
-                let finalHrs = period === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
-                let finalMin = period === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
-                let newTime = new Date(dateTimeString.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin * 60 * 1000)));
-
-
-                // console.log(newTime.toISOString());
-                return (newTime.toISOString());
-              }
-
-              // Parse initial date and time from current shift
-              const initialDateTime = currentShift.shifttiming === "Week Off" ? parseDateTime(nextShiftBefor) : parseDateTime(currentShift);
-              // console.log(initialDateTime, currentShift.shifttiming, "initialDateTime")
-
-              const initialEndDateTime = new Date(initialDateTime);
-              initialEndDateTime.setHours(initialEndDateTime.getHours() + 23);
-              initialEndDateTime.setMinutes(initialEndDateTime.getMinutes() + 59);
-
-
-              // console.log(nextShift.shifttiming, upload.companyname, "asd", "jjj")
-              // Parse start time of the next shift
-
-              const nextShiftStartTime = nextShift.shifttiming === "Week Off" ? parseDateTime(currentShiftTwo) : parseDateTime(nextShift);
-              // console.log(nextShiftStartTime, 'nextShiftStartTime')
-
-              if (new Date(initialEndDateTime) >= new Date(nextShiftStartTime)) {
-                initialEndDateTime.setTime(new Date(nextShiftStartTime).getTime() - 60000); // Set to 1 minute before next shift
-              }
-
-              // Convert to ISO 8601 format with 'Z' to indicate UTC
-              const isoString = initialEndDateTime.toISOString();
-              return isoString;
-            }
-
-            const currentShift = userShiftTimings[0];
-            const nextShift = userShiftTimings[1];
-            const currentShiftTwo = userShiftTimingsFromTwo;
-            const nextShiftBefor = userShiftTimingsBefore;
-
-
-            shiftEndTime = convertToISODateTime(currentShift, nextShift);
-
-            function padTime(time) {
-              let [hours, minutes] = time.split(':');
-              if (hours.length === 1) {
-                hours = '0' + hours;
-              }
-              return `${hours}:${minutes}`;
-            }
-
-            function parseFromDateTime(shift) {
-
-              const [day, month, year] = shift.date.split('/');
-
-              let timeString = shift.shifttiming && shift.shifttiming != "" && shift.shifttiming == "Week Off" ? ("00:00AMto00:00AM").split('to')[0].trim() : ((shift.shifttiming && shift.shifttiming != "" && shift.shifttiming != "Week Off") ? shift.shifttiming.split('to')[0].trim() : ("00:00AMto11:59PM").split('to')[0].trim());
-
-              timeString = timeString.replace('.', ':');
-
-              // Handle missing leading zeros in hour values
-              timeString = padTime(timeString);
-
-
-              let [hours, minutes] = timeString.slice(0, -2).split(':');
-              const period = timeString.slice(-2);
-
-              if (period === 'PM' && hours !== '12') {
-                hours = parseInt(hours, 10) + 12;
-              } else if (period === 'AM' && hours === '12') {
-
-                hours = '00';
-              }
-
-              const dateTimeString = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00Z`);
-              // let newTime = new Date(dateTimeString.getTime() - 4 * 60 * 60 * 1000);
-              let finalHrs = period === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
-              let finalMin = period === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
-              // console.log(finalHrs, finalMin)
-              let newTime = shift.shifttiming ? new Date(dateTimeString.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin * 60 * 1000))) : new Date(dateTimeString);
-
-              return (newTime.toISOString());
-            }
-            // console.log(userShiftTimings[0])
-            // Parse initial date and time from current shift
-            shiftFromTime = parseFromDateTime(userShiftTimings[0]);
-
-
+          // console.log(dateSelectedFormat, dateSelectedFormatOnePlus, dateSelectedFormatOneMinus, 'sdfd')
+          if (userInfo) {
+            userShiftTimings = userInfo.userShiftTimings;
+          } else {
+            userShiftTimings = { shiftFromTime: shiftFromTime, shiftEndTime: shiftEndTime, shiftsts: '' };
           }
 
-          const dateTime = new Date(`${comparedate}T${comparetime}Z`);
+          let getprocessCode = userInfo ? userInfo.process : '';
 
-          let filteredItem = null;
+          const finalcategory = upload.unallotcategory ? upload.unallotcategory : upload.mode == 'Manual' ? upload.filename : upload.filenameupdated;
 
-          if (userInfo && userInfo.processlog) {
-            const groupedByMonthProcs = {};
+          const finalsubcategory = upload.unallotsubcategory ? upload.unallotsubcategory : upload.category;
 
-            // Group items by month
-            // userInfo.processlog &&
-            userInfo.processlog.forEach((d) => {
-              const monthYear = d.date?.split("-").slice(0, 2).join("-");
-              if (!groupedByMonthProcs[monthYear]) {
-                groupedByMonthProcs[monthYear] = [];
-              }
-              groupedByMonthProcs[monthYear].push(d);
-            });
+          let finalunitrate = upload.updatedunitrate ? Number(upload.updatedunitrate) : Number(upload.unitrate);
+          let finalflag = upload.updatedflag ? Number(upload.updatedflag) : Number(upload.flagcount);
 
-            // Extract the last item of each group
-            const lastItemsForEachMonthPros = Object.values(groupedByMonthProcs).map((group) => group[group.length - 1]);
+          let unitrateold = Number(upload.unitrate);
+          let flagold = Number(upload.flagcount);
 
-            // Filter the data array based on the month and year
-            lastItemsForEachMonthPros.sort((a, b) => {
-              return new Date(a.date) - new Date(b.date);
-            });
-            // Find the first item in the sorted array that meets the criteria
+          let LateEntryPointsDeduct = upload.mode == 'Manual' && upload.lateentrystatus === 'Late Entry';
 
-            for (let i = 0; i < lastItemsForEachMonthPros.length; i++) {
-              const date = lastItemsForEachMonthPros[i].date;
+          const istDate = new Date(`${comparedate}T${comparetime}Z`);
+          // Subtract 10 hours and 30 minutes
+          const resultDate = addTimeBasedOnDST(`${comparedate} ${comparetime}`);
+          // const formattedResult = formatDateCst(resultDate);
 
-              if (req.body.date >= date) {
-                filteredItem = lastItemsForEachMonthPros[i];
-              } else {
-                break;
-              }
-            }
-          }
-
-
-          function compareDateTimes(dateT, shiftFrom, shiftEnd) {
-            // Parse the datetime strings into Date objects
-            const dateTimeObj = new Date(dateT);
-            const shiftFromTimeObj = new Date(shiftFrom);
-            const shiftEndTimeObj = new Date(shiftEnd);
-            // Perform the comparisons
-            const isWithinShift = dateTimeObj >= shiftFromTimeObj && dateTimeObj <= shiftEndTimeObj;
-
-            return isWithinShift;
-          }
-          // console.log(dateTime, shiftFromTime, shiftEndTime, "dfs")
-          if (compareDateTimes(dateTime, shiftFromTime, shiftEndTime)
-            &&
-            (req.body.subsmanual && req.body.subsmanual.length > 0
-              ? req.body.subsmanual.some(sub => sub.category === upload.filename && sub.subcategory === upload.category)
-              : true)
+          if (
+            compareDateTimes(dateTime, userShiftTimings.shiftFromTime, userShiftTimings.shiftEndTime) &&
+            (category.length === 0 || category.includes(finalcategory)) &&
+            (subcategory.length === 0 || subcategory.includes(finalsubcategory)) &&
+            (company.length === 0 || company.includes(userInfo?.company)) &&
+            (branch.length === 0 || branch.includes(userInfo?.branch)) &&
+            (unit.length === 0 || unit.includes(userInfo?.unit)) &&
+            (team.length === 0 || team.includes(userInfo?.team)) &&
+            (empname.length === 0 || empname.includes(userInfo?.companyname))
           ) {
             return {
               user: upload.user,
               fromdate: upload.fromdate,
               todate: upload.todate,
               vendor: upload.vendor,
-              category: upload.category,
-              dateval: upload.mode === "Manual" ? `${upload.fromdate} ${upload.time}:00` : upload.formatteddatetime,
-              olddateval: upload.mode === "Manual" ? `${upload.fromdate}T${upload.time}:00` : `${upload.formatteddatetime.split(" ")[0]}T${upload.formatteddatetime.split(" ")[1]}`,
-              time: upload.time,
-              filename: upload.filename,
-              mode: upload.mode === "Manual" ? "Manual" : "Production",
-              empname: loginInfo && loginInfo.empname,
+              category: finalsubcategory,
+              dateval: upload.mode === 'Manual' ? `${upload.fromdate} ${convertTo24HourFormat(upload.time)}` : `${upload.formatteddate} ${upload.formattedtime}`,
+              olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
+              // time: upload.mode === 'Manual' ?convertTo24HourFormat(upload.time) : upload.formattedtime,
+              filename: finalcategory,
+              mode: upload.mode === 'Manual' ? 'Manual' : 'Production',
+              empname: userInfo && userInfo.companyname,
               empcode: userInfo && userInfo.empcode,
               company: userInfo && userInfo.company,
               unit: userInfo && userInfo.unit,
               branch: userInfo && userInfo.branch,
               team: userInfo && userInfo.team,
-              shifttiming: finaluser && finaluser[0].shifttiming,
+              shifttiming: userShiftTimings ? userShiftTimings.shifttiming : '',
               username: userInfo && userInfo.username,
               empcode: userInfo && userInfo.empcode,
               _id: upload._id,
-              section: upload.updatedsection ? upload.updatedsection : upload.section,
-              flagcount: upload.updatedflag ? upload.updatedflag : upload.flagcount,
+              section: upload.section,
+              flagcount: upload.flagcount,
+              unitrate: upload.unitrate,
+
+              csection: upload.updatedsection ? upload.updatedsection : '',
+              cflagcount: upload.updatedflag ? upload.updatedflag : '',
+              cunitrate: upload.updatedunitrate ? upload.updatedunitrate : '',
+
               unitid: upload.unitid,
-              filename: upload.filename,
               worktook: upload.worktook,
-              points: upload.updatedunitrate ? Number(upload.updatedunitrate) * 8.333333333333333 : Number(upload.unitrate) * 8.333333333333333,
+              lateentry: LateEntryPointsDeduct,
+              points: LateEntryPointsDeduct ? 0 : (unitrateold * 8.333333333333333).toFixed(5),
+              cpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * 8.333333333333333).toFixed(5),
+              totalpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * finalflag * 8.333333333333333).toFixed(5),
+              cstist: String(resultDate),
+              // points: upload.updatedunitrate ? Number(upload.updatedunitrate) * 8.333333333333333 : Number(upload.unitrate) * 8.333333333333333,
             };
           }
-
-
         });
 
-
         function getTimeDifference(start, end) {
-          // console.log(start, end, "srt")
+          // console.log(start, end, "startend");
           if (start && end) {
             const startDate = new Date(start);
             const endDate = new Date(end);
 
             if (startDate > endDate) {
-              return "00:00:00";
+              return '00:00:00';
             } else {
-
               const diff = new Date(endDate - startDate);
               return diff.toISOString().substr(11, 8);
             }
@@ -2595,97 +1461,1536 @@ exports.getAllProductionTempReportFilter = catchAsyncErrors(async (req, res, nex
 
         let lastTimes = {};
 
-        const productionResult = [];
+        mergedDataallfirst = mergedDataallfirst.filter((d) => d !== null && d !== undefined);
 
+        mergedDataall = mergedDataallfirst.sort((a, b) => {
+          // First sort by empname
+          if (a.empname < b.empname) return -1;
+          if (a.empname > b.empname) return 1;
+          // If empnames are equal, sort by dateval
+          //  return a.dateval.localeCompare(b.dateval);
+          return new Date(a.olddateval) - new Date(b.olddateval);
+        });
 
-        // mergedDataallfirst = mergedDataallfirst.filter(d => d !== null && d !== undefined &&
-        //   item.mode && item.mode === "Production" && item.formatteddatetime
+             const empFirstLastIndex = {};
+mergedDataall.forEach((item, idx) => {
+  if (!empFirstLastIndex[item.empname]) {
+    empFirstLastIndex[item.empname] = { first: idx, last: idx };
+  } else {
+    empFirstLastIndex[item.empname].last = idx;
+  }
+});
 
-        // )
-
-        console.log(mergedDataallfirst.length, "mergedDataallfirst")
-
-        // mergedDataall = mergedDataallfirst.sort((a, b) => {
-        //   // First sort by empname
-        //   if (a.empname < b.empname) return -1;
-        //   if (a.empname > b.empname) return 1;
-        //   // If empnames are equal, sort by dateval
-        //   //  return a.dateval.localeCompare(b.dateval);
-        //   return new Date(a.olddateval) - new Date(b.olddateval)
-        // });
-
-        mergedDataall = mergedDataallfirst
-          .filter((item) => item !== undefined
-            && item.dateval && item.empname).sort((a, b) => {
-              if (a.mode !== b.mode) {
-                return a.mode === "Production" ? -1 : 1;
-              }
-
-
-              if (a.empname < b.empname) return -1;
-              if (a.empname > b.empname) return 1;
-
-              if (a.mode === "Production") {
-                if (a.dateval < b.dateval) return -1;
-                if (a.dateval > b.dateval) return 1;
-              } else if (a.mode === "Manual") {
-                const dateA = new Date(`${a.fromdate}T${a.time}`);
-                const dateB = new Date(`${b.fromdate}T${b.time}`);
-
-                if (dateA < dateB) return -1;
-                if (dateA > dateB) return 1;
-              }
-
-
-              return 0;
-            });
-
-        console.log(mergedDataall.length, "mergedDataall")
         mergedDataall.forEach((item, index) => {
-          // const originalDatetime = new Date(item.olddateval);
+           const {first,last} = empFirstLastIndex[item.empname]
+          const originalDatetime = item.dateval;
           // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
-          const finddatevalue = item.dateval && item.dateval?.split(" ");
+          const finddatevalue = originalDatetime && originalDatetime?.split(' ');
           const findtime = finddatevalue && finddatevalue[1];
           const finddate = finddatevalue && finddatevalue[0];
 
-          const loginInfo = loginids.find(login => login.userid === item.user);
+          const formattedTimeshift = findtime;
 
-          const userInfo = loginInfo ? users.find(user => user.companyname === loginInfo.empname) : "";
+          const clockindate = attendances.find((d) => {
+            const [day, month, year] = d.date.split('-'); // Split the date string from the attendance record
+            const dateObject = new Date(year, month - 1, day); // Create a new Date object
+            const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')}`; // Format the date
+            //  console.log(formattedDateString, date , item.username == d.username)
+            return formattedDateString === date && item.username == d.username;
+          });
 
+          // const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
+          // const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
+          // let formattedHours = hours;
+          // if (ampm === 'PM' && hours < 12) {
+          //   formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
+          // } else if (ampm === 'AM' && hours === 12) {
+          //   formattedHours = 0; // Convert 12 AM to 0 hours
+          // }
+          const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : '';
+          //  `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          // return formattedTime;
 
-          const findshifttime = userInfo && userInfo.shifttiming && userInfo.shifttiming.split("to")
+          if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+            if (item) {
+              if (!lastTimes.hasOwnProperty(item.empname)) {
+                lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+              }
+item.claimstatus ="first";
+              item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`);
+            }
+          } else if (item.empname == mergedDataall[index - 1].empname) {
+            // item.empname = loginInfo.empname;
+            item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
+            // lastTimes[loginInfo.empname] = findtime;
+            //  productionResult.push(item);
+              item.claimstatus = "";
+                         if (index === last) {
+                  item.claimstatus = "last";
+                }
+          }
+        });
+      } catch (err) {
+        console.log(err, 'err');
+        // return next(new ErrorHandler("Records not found", 404));
+      }
+    } else if (req.body.shift == 'Date Based') {
+      try {
+        let mergedDataallfirst = allData.map((upload) => {
+          const loginInfo = filteredLogs.find((login) => login.userid === upload.user && login.projectvendor === upload.vendor);
 
-          const getshift = findshifttime && findshifttime[0];
+          let loginallot = loginInfo ? loginInfo : [];
+          let filteredDataDateTime = null;
+          if (loginallot.length > 0) {
+            const groupedByDateTime = {};
 
+            loginallot.forEach((item) => {
+              const dateTime = item.date + ' ' + item.time;
+              if (!groupedByDateTime[dateTime]) {
+                groupedByDateTime[dateTime] = [];
+              }
+              groupedByDateTime[dateTime].push(item);
+            });
 
-          const [time, period] = getshift.includes("AM") ? getshift.split("AM") : getshift.split("PM");
-          const [hoursshift, minutesshift] = time.split(":");
+            // Extract the last item of each group
+            const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
 
-          // Converting hours to 24-hour format if the period is "PM" and not "12"
-          let hours24 = parseInt(hoursshift, 10);
-          if (getshift.includes("PM") && hoursshift !== "12") {
-            hours24 += 12;
+            // Sort the last items by date and time
+            lastItemsForEachDateTime.sort((a, b) => {
+              return new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time);
+            });
+
+            // Find the first item in the sorted array that meets the criteria
+            for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
+              const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
+              // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
+              let datevalsplitfinal = upload.mode == 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`;
+              if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
+                filteredDataDateTime = lastItemsForEachDateTime[i];
+              } else {
+                break;
+              }
+            }
           }
 
-          // Creating a new Date object with the updated hours
-          const date = new Date(finddate);
-          date.setHours(hours24);
-          date.setMinutes(parseInt(minutesshift, 10));
-          date.setSeconds(0);
+          let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : '';
 
-          // Formatting the date to "hh:mm:ss" format
-          const formattedTimeshift = date.toTimeString().split(" ")[0];
-          const clockindate = attendances.find(d => {
+          const comparedate = upload.mode == 'Manual' ? upload.fromdate : upload.formatteddate;
+          const comparetime = upload.mode == 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime;
+
+          const fromdatetime = `${date}T${fromtime}Z`;
+          const todatetime = `${date}T${totime}Z`;
+
+          const dateTime = `${comparedate}T${comparetime}Z`;
+          // console.log(users[0].userShiftTimings.shiftFromTime,'user.userShiftTimings.shiftFromTime')
+          // const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : '';
+          const userInfo = users.find((user) => logininfoname === user.companyname);
+
+          // let userShiftTimings = {};
+
+          if (userInfo) {
+            userShiftTimings = userInfo.userShiftTimings;
+          } else {
+            userShiftTimings = { shiftFromTime: new Date(shiftFromTime), shiftEndTime: new Date(shiftEndTime), shiftOnlyFromTime, shiftOnlyEndTime, shiftsts: '' };
+          }
+
+          let getprocessCode = userInfo ? userInfo.process : '';
+
+          const finalcategory = upload.unallotcategory ? upload.unallotcategory : upload.mode == 'Manual' ? upload.filename : upload.filenameupdated;
+
+          const finalsubcategory = upload.unallotsubcategory ? upload.unallotsubcategory : upload.category;
+
+          let finalunitrate = upload.updatedunitrate ? Number(upload.updatedunitrate) : Number(upload.unitrate);
+          let finalflag = upload.updatedflag ? Number(upload.updatedflag) : Number(upload.flagcount);
+
+          let LateEntryPointsDeduct = upload.mode == 'Manual' && upload.lateentrystatus === 'Late Entry';
+
+          let unitrateold = Number(upload.unitrate);
+          let flagold = Number(upload.flagcount);
+
+          const istDate = new Date(`${comparedate}T${comparetime}Z`);
+          // Subtract 10 hours and 30 minutes
+          // const resultDate = subtractTime(istDate, 10, 30);
+          const resultDate = addTimeBasedOnDST(`${comparedate} ${comparetime}`);
+
+          // const formattedResult = formatDateCst(resultDate);
+          // console.log(todatetime,'todatetime')
+          if (
+            compareDateTimes(dateTime, fromdatetime, todatetime) &&
+            (category.length === 0 || category.includes(finalcategory)) &&
+            (subcategory.length === 0 || subcategory.includes(finalsubcategory)) &&
+            (company.length === 0 || company.includes(userInfo?.company)) &&
+            (branch.length === 0 || branch.includes(userInfo?.branch)) &&
+            (unit.length === 0 || unit.includes(userInfo?.unit)) &&
+            (team.length === 0 || team.includes(userInfo?.team)) &&
+            (empname.length === 0 || empname.includes(userInfo?.companyname))
+          ) {
+            return {
+              user: upload.user,
+              fromdate: upload.fromdate,
+              todate: upload.todate,
+              vendor: upload.vendor,
+              category: finalsubcategory,
+              dateval: upload.mode === 'Manual' ? `${upload.fromdate} ${convertTo24HourFormat(upload.time)}` : `${upload.formatteddate} ${upload.formattedtime}`,
+              olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
+              filename: finalcategory,
+              // time: upload.mode === 'Manual' ?convertTo24HourFormat(upload.time) : upload.formattedtime,
+              mode: upload.mode === 'Manual' ? 'Manual' : 'Production',
+              empname: userInfo && userInfo.companyname,
+              empcode: userInfo && userInfo.empcode,
+              company: userInfo && userInfo.company,
+              unit: userInfo && userInfo.unit,
+              branch: userInfo && userInfo.branch,
+              team: userInfo && userInfo.team,
+              shifttiming: userShiftTimings && userShiftTimings?.shifttiming ? userShiftTimings?.shifttiming : '',
+
+              username: userInfo && userInfo.username,
+              empcode: userInfo && userInfo.empcode,
+              _id: upload._id,
+              section: upload.section,
+              flagcount: upload.flagcount,
+              unitrate: upload.unitrate,
+
+              csection: upload.updatedsection ? upload.updatedsection : '',
+              cflagcount: upload.updatedflag ? upload.updatedflag : '',
+              cunitrate: upload.updatedflag ? upload.updatedflag : '',
+
+              unitid: upload.unitid,
+              worktook: upload.worktook,
+              lateentry: LateEntryPointsDeduct,
+              points: LateEntryPointsDeduct ? 0 : (unitrateold * 8.333333333333333).toFixed(3),
+              cpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * 8.333333333333333).toFixed(3),
+              totalpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * finalflag * 8.333333333333333).toFixed(3),
+              cstist: String(resultDate),
+            };
+          }
+        });
+
+        function getTimeDifference(start, end, id) {
+          if (start && end) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+
+            if (startDate > endDate) {
+              return '00:00:00';
+            } else {
+              const diff = new Date(endDate - startDate);
+              return diff.toISOString().substr(11, 8);
+            }
+          }
+        }
+
+        let lastTimes = {};
+
+        mergedDataallfirst = mergedDataallfirst.filter((d) => d !== null && d !== undefined);
+
+        mergedDataall = mergedDataallfirst.sort((a, b) => {
+          // First sort by empname
+          if (a.empname < b.empname) return -1;
+          if (a.empname > b.empname) return 1;
+          // If empnames are equal, sort by dateval
+          //  return a.dateval.localeCompare(b.dateval);
+          return new Date(a.olddateval) - new Date(b.olddateval);
+        });
+
+         const empFirstLastIndex = {};
+mergedDataall.forEach((item, idx) => {
+  if (!empFirstLastIndex[item.empname]) {
+    empFirstLastIndex[item.empname] = { first: idx, last: idx };
+  } else {
+    empFirstLastIndex[item.empname].last = idx;
+  }
+});
+
+        mergedDataall.forEach((item, index) => {
+             const {first,last} = empFirstLastIndex[item.empname]
+          const originalDatetime = item.dateval;
+
+          // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+          const finddatevalue = originalDatetime && originalDatetime?.split(' ');
+          const findtime = finddatevalue && finddatevalue[1];
+          const finddate = finddatevalue && finddatevalue[0];
+
+          // const loginInfo = loginids.find((login) => login.userid === item.user && login.projectvendor == item.vendor);
+
+          // const userInfo = loginInfo ? users.find((user) => user.companyname === loginInfo.empname) : '';
+
+          // const findshifttime = userInfo && userInfo.shifttiming && userInfo.shifttiming.split('to');
+
+          const formattedTimeshift = findtime;
+
+          const clockindate = attendances.find((d) => {
             const [day, month, year] = d.date.split('-'); // Split the date string from the attendance record
             const dateObject = new Date(year, month - 1, day); // Create a new Date object
             const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')}`; // Format the date
 
-            return formattedDateString === finddate && userInfo.username == d.username
+            return formattedDateString === finddate && item.username == d.username;
+          });
+
+          // const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
+          // const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
+          // let formattedHours = hours;
+          // if (ampm === 'PM' && hours < 12) {
+          //   formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
+          // } else if (ampm === 'AM' && hours === 12) {
+          //   formattedHours = 0; // Convert 12 AM to 0 hours
+          // }
+          // const formattedTime = `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          // return formattedTime;
+          const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : '';
+          if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+            if (item) {
+              if (!lastTimes.hasOwnProperty(item.empname)) {
+                // console.log(clockindate,formattedTime,formattedTimeshift, 'formattedTimeshift'  )
+                lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+              }
+item.claimstatus ="first";
+              item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`, '1');
+            }
+          } else if (item.empname == mergedDataall[index - 1].empname) {
+            // item.empname = loginInfo.empname;
+            item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval, '2');
+            // lastTimes[loginInfo.empname] = findtime;
+            //  productionResult.push(item);
+             item.claimstatus = "";
+             if (index === last) {
+      item.claimstatus = "last";
+    }
+          }
+        });
+      } catch (err) {
+        console.log(err, 'err');
+        return next(new ErrorHandler('Records not found', 404));
+      }
+    }
+
+    mergedData = mergedDataall.filter((item) => item != null);
+  } catch (err) {
+    console.log(err, 'err');
+    return next(new ErrorHandler('Records not found!', 404));
+  }
+
+  return res.status(200).json({
+    mergedData,
+  });
+});
+
+//individual report
+exports.getAllProductionTempReportFilter = catchAsyncErrors(async (req, res, next) => {
+  let productionupload = [],
+    mergedData,
+    producionIndividual;
+  let finaluser = [];
+  let mergedDataall = [];
+  try {
+    const { companyname, username, user, projectvendor, category, filename, mode, fromtime, totime } = req.body;
+    const dateObj = new Date(req.body.fromdate);
+
+    const date = req.body.fromdate;
+
+    // Extract day, month, and year components
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const year = dateObj.getFullYear();
+
+    // Format the date components into the desired format
+    const formattedDate = `${day}-${month}-${year}`;
+
+    let dateoneafter = new Date(req.body.fromdate);
+    dateoneafter.setDate(dateoneafter.getDate() + 1);
+    let newDateOnePlus = dateoneafter.toISOString().split('T')[0];
+
+    let datebefore = new Date(req.body.fromdate);
+    datebefore.setDate(datebefore.getDate() - 1);
+    let newDateOneMinus = datebefore.toISOString().split('T')[0];
+
+    let dateNow = new Date(date);
+    let datevalue = dateNow.toISOString().split('T')[0];
+
+    let deptMonthQuery = {
+      fromdate: { $lte: datevalue },
+      todate: { $gte: datevalue },
+    };
+    let logidQuery = {
+      loginallotlog: { $exists: true, $ne: [] },
+      // allotted: 'allotted',
+      userid: { $in: user },
+    };
+
+    let userQuery = {
+      enquirystatus: {
+        $nin: ['Enquiry Purpose'],
+      },
+      companyname: companyname,
+      $or: [{ reasondate: { $exists: false } }, { reasondate: { $eq: '' } }, { reasondate: { $gte: date } }],
+    };
+    let startMonthDateMinus = new Date(date);
+    let startdate = startMonthDateMinus.setDate(startMonthDateMinus.getDate() - 1);
+    let startMonthDate = new Date(startdate);
+
+    let firstDate = new Date(date);
+    let enddate = firstDate.setDate(firstDate.getDate() + 2);
+    let endMonthDate = new Date(enddate);
+
+    let query = {};
+    let queryManual = {};
+
+    if (filename.length > 0) {
+      query.filenameupdated = { $in: filename };
+      queryManual.filename = { $in: filename.map((item) => `${item}`) };
+    }
+    if (category.length > 0) {
+      query.category = { $in: category };
+      queryManual.category = { $in: category };
+    }
+    if (user.length > 0) {
+      query.user = { $in: user };
+      queryManual.user = { $in: user };
+    }
+    if (projectvendor.length > 0) {
+      query.vendor = { $in: projectvendor };
+      queryManual.vendor = { $in: projectvendor };
+    }
+
+    // query.dateobjformatdate = { $gte: new Date(`${date}T00:00:00Z`), $lte: new Date(`${newDateOnePlus}T18:00:00Z`) };
+    query.dupe = 'No';
+
+    queryManual.status = 'Approved';
+
+    if (req.body.shift == 'Shift Based') {
+      queryManual.$or = [{ fromdate: { $eq: req.body.fromdate } }, { fromdate: { $eq: newDateOnePlus } }];
+    } else {
+      queryManual.fromdate = { $eq: date };
+    }
+
+    const daysArray = [];
+    while (startMonthDate <= endMonthDate) {
+      const formattedDate = `${String(startMonthDate.getDate()).padStart(2, '0')}/${String(startMonthDate.getMonth() + 1).padStart(2, '0')}/${startMonthDate.getFullYear()}`;
+      const dayName = startMonthDate.toLocaleDateString('en-US', {
+        weekday: 'long',
+      });
+      const dayCount = startMonthDate.getDate();
+      const shiftMode = 'Main Shift';
+      const weekNumberInMonth =
+        getWeekNumberInMonth(startMonthDate) === 1
+          ? `${getWeekNumberInMonth(startMonthDate)}st Week`
+          : getWeekNumberInMonth(startMonthDate) === 2
+          ? `${getWeekNumberInMonth(startMonthDate)}nd Week`
+          : getWeekNumberInMonth(startMonthDate) === 3
+          ? `${getWeekNumberInMonth(startMonthDate)}rd Week`
+          : getWeekNumberInMonth(startMonthDate) > 3
+          ? `${getWeekNumberInMonth(startMonthDate)}th Week`
+          : '';
+
+      daysArray.push({
+        formattedDate,
+        dayName,
+        dayCount,
+        shiftMode,
+        weekNumberInMonth,
+      });
+
+      // Move to the next day
+      startMonthDate.setDate(startMonthDate.getDate() + 1);
+    }
+    const userDates = daysArray;
+
+    const [attendenceControlCriteria, depMonthSet, usersAll, shift, loginids, producionIndividual, attendances] = await Promise.all([
+      AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec(),
+      DepartmentMonth.find(deptMonthQuery, { department: 1, year: 1, month: 1, monthname: 1, fromdate: 1, todate: 1, totaldays: 1 }),
+      Users.find(userQuery, {
+        companyname: 1,
+        empcode: 1,
+        company: 1,
+        departmentlog: 1,
+        unit: 1,
+        branch: 1,
+        team: 1,
+        username: 1,
+        processlog: 1,
+        shifttiming: 1,
+        department: 1,
+        doj: 1,
+        assignExpLog: 1,
+        shiftallot: 1,
+        boardingLog: 1,
+        intStartDate: 1,
+      }),
+      Shift.find({}, { name: 1, fromhour: 1, tohour: 1, frommin: 1, tomin: 1, fromtime: 1, totime: 1, isallowance: 1 }).lean(),
+      ClientUserid.find(logidQuery, { empname: 1, userid: 1, projectvendor: 1, loginallotlog: 1 }).lean(),
+      mode.includes('Manual Production')
+        ? ProducionIndividual.find(queryManual, {
+            user: 1,
+            fromdate: 1,
+            time: 1,
+            filename: 1,
+            vendor: 1,
+            mode: 1,
+            category: 1,
+            section: 1,
+            unitid: 1,
+            lateentrystatus: 1,
+            updatedunitrate: 1,
+            updatedflag: 1,
+            updatedsection: 1,
+            unallotcategory: 1,
+            unallotsubcategory: 1,
           })
+        : Promise.resolve([]),
+      Attendances.find({ date: formattedDate, username: username }, { clockintime: 1, date: 1, username: 1 }),
+    ]);
+    let dayShiftBeforeHrs = attendenceControlCriteria && attendenceControlCriteria.dayactive && attendenceControlCriteria.dayactive == true ? Number(attendenceControlCriteria.calcshifthourday) : 4;
+    let dayShiftBeforeMin = attendenceControlCriteria && attendenceControlCriteria.dayactive && attendenceControlCriteria.dayactive == true ? Number(attendenceControlCriteria.calcshiftminday) : 0;
+    let nightShiftBeforeHrs = attendenceControlCriteria && attendenceControlCriteria.nightactive && attendenceControlCriteria.nightactive == true ? Number(attendenceControlCriteria.calcshifthournight) : 4;
+    let nightShiftBeforeMin = attendenceControlCriteria && attendenceControlCriteria.nightactive && attendenceControlCriteria.nightactive == true ? Number(attendenceControlCriteria.calcshiftminnight) : 0;
 
+    let users1 = usersAll.map((item) => {
+      let findUserDepartment = item.department;
+      let findUserTeam = item.team;
+      let findUserProcess = item.process;
+      let findexpval = item.experience;
+      let userids = [];
 
-          const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ""; // Split the time and AM/PM
-          const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ""; // Split hours, minutes, and seconds
+      const loginallot = loginids.filter((login) => login.loginallotlog.some((d) => d.empname === item.companyname)).map((data) => data.userid);
+
+      const dojDate = item.boardingLog.length > 0 ? item.boardingLog[0].startdate : item.doj;
+
+      // Handling team change with boardingLog
+      if (item.boardingLog && item.boardingLog.length > 0) {
+        // Check if there's any team change
+        const teamChangeLog = item.boardingLog.filter((log) => log.logcreation !== 'shift' && log.ischangeteam === true);
+
+        if (teamChangeLog.length > 0) {
+          // Sort by startdate descending
+          const sortedTeamLog = teamChangeLog.sort((a, b) => {
+            // First, compare startdate
+            const startDateComparison = new Date(b.startdate) - new Date(a.startdate);
+            if (startDateComparison !== 0) {
+              return startDateComparison;
+            }
+
+            // If startdate is the same, compare createdat
+            return b.updateddatetime - a.updateddatetime;
+          });
+
+          // Find the relevant team change based on the 'date'
+          const findTeam = sortedTeamLog.find((log) => new Date(date) >= new Date(log.startdate));
+          findUserTeam = findTeam ? findTeam.team : item.team;
+        }
+      }
+
+      // Handling department change with departmentlog
+      if (item.departmentlog && item.departmentlog.length > 0) {
+        if (item.departmentlog.length > 1) {
+          // Sort department logs by startdate descending
+          const sortedDepartmentLog = item.departmentlog.sort((a, b) => {
+            // First, compare startdate
+            const startDateComparison = new Date(b.startdate) - new Date(a.startdate);
+            if (startDateComparison !== 0) {
+              return startDateComparison;
+            }
+
+            // If startdate is the same, compare createdat
+            return b.updateddatetime - a.updateddatetime;
+          });
+
+          // Find the relevant department change based on the 'date'
+          const findDept =
+            sortedDepartmentLog.length > 1 && sortedDepartmentLog.map((item) => item.department).includes('Internship')
+              ? sortedDepartmentLog.filter((item) => item.department != 'Internship').find((dept) => new Date(date) >= new Date(dept.startdate))
+              : sortedDepartmentLog.find((dept) => new Date(date) >= new Date(dept.startdate));
+          findUserDepartment = findDept ? findDept.department : item.department;
+        } else if (item.departmentlog.length === 1) {
+          findUserDepartment = new Date(date) >= new Date(item.departmentlog[0].startdate) ? item.departmentlog[0].department : item.department;
+        } else {
+          findUserDepartment = item.department;
+        }
+      }
+
+      if (item && item.processlog) {
+        const groupedByMonthProcs = {};
+
+        // Group items by month
+        item.processlog &&
+          item.processlog
+            ?.sort((a, b) => {
+              return new Date(a.date) - new Date(b.date);
+            })
+            ?.forEach((d) => {
+              const monthYear = d.date?.split('-').slice(0, 2).join('-');
+              if (!groupedByMonthProcs[monthYear]) {
+                groupedByMonthProcs[monthYear] = [];
+              }
+              groupedByMonthProcs[monthYear].push(d);
+            });
+
+        // Extract the last item of each group
+        const lastItemsForEachMonthPros = Object.values(groupedByMonthProcs).map((group) => group[group.length - 1]);
+
+        // Filter the data array based on the month and year
+        lastItemsForEachMonthPros.sort((a, b) => {
+          return new Date(a.date) - new Date(b.date);
+        });
+        // Find the first item in the sorted array that meets the criteria
+
+        for (let i = 0; i < lastItemsForEachMonthPros.length; i++) {
+          const date = lastItemsForEachMonthPros[i].date;
+
+          if (new Date(req.body.date) >= new Date(date)) {
+            findUserProcess = lastItemsForEachMonthPros[i];
+          } else {
+            break;
+          }
+        }
+      }
+      const groupedByMonth = {};
+      if (item.assignExpLog && item.assignExpLog.length > 0) {
+        const findMonthStartDate = depMonthSet.find((data) => new Date(date) >= new Date(data.fromdate) && new Date(date) <= new Date(data.todate) && data.department == findUserDepartment);
+        let findDate = findMonthStartDate ? findMonthStartDate.fromdate : date;
+        item.assignExpLog &&
+          item.assignExpLog.length > 0 &&
+          item.assignExpLog
+            .filter((d) => d.expmode != 'Auto' && d.expmode != 'Manual')
+            .sort((a, b) => {
+              return new Date(a.updatedate) - new Date(b.updatedate);
+            })
+            .forEach((item) => {
+              const monthYear = item.updatedate?.split('-').slice(0, 2).join('-');
+              if (!groupedByMonth[monthYear]) {
+                groupedByMonth[monthYear] = [];
+              }
+              groupedByMonth[monthYear].push(item);
+            });
+
+        // Extract the last item of each group
+        const lastItemsForEachMonth = Object.values(groupedByMonth).map((group) => group[group.length - 1]);
+
+        // Find the first item in the sorted array that meets the criteria
+
+        // Find the first item in the sorted array that meets the criteria
+        let filteredItem = null;
+
+        for (let i = 0; i < lastItemsForEachMonth.length; i++) {
+          const date1 = lastItemsForEachMonth[i].updatedate;
+
+          if (date >= date1) {
+            filteredItem = lastItemsForEachMonth[i];
+          } else {
+            break;
+          }
+        }
+
+        let modevalue = filteredItem;
+
+        const calculateMonthsBetweenDates = (startDate, endDate) => {
+          if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            let years = end.getFullYear() - start.getFullYear();
+            let months = end.getMonth() - start.getMonth();
+            let days = end.getDate() - start.getDate();
+
+            // Convert years to months
+            months += years * 12;
+
+            // Adjust for negative days
+            if (days < 0) {
+              months -= 1; // Subtract a month
+              days += new Date(end.getFullYear(), end.getMonth(), 0).getDate(); // Add days of the previous month
+            }
+
+            // Adjust for days 15 and above
+            if (days >= 15) {
+              months += 1; // Count the month if 15 or more days have passed
+            }
+
+            return months <= 0 ? 0 : months;
+          }
+
+          return 0; // Return 0 if either date is missing
+        };
+
+        // Calculate difference in months between findDate and item.doj
+        let differenceInMonths, differenceInMonthsexp, differenceInMonthstar;
+        if (modevalue) {
+          //findexp end difference yes/no
+          if (modevalue.endexp === 'Yes') {
+            differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, modevalue.endexpdate);
+            //  Math.floor((new Date(modevalue.endexpdate) - new Date(item.doj)) / (30 * 24 * 60 * 60 * 1000));
+            if (modevalue.expmode === 'Add') {
+              differenceInMonthsexp += parseInt(modevalue.expval);
+            } else if (modevalue.expmode === 'Minus') {
+              differenceInMonthsexp -= parseInt(modevalue.expval);
+            } else if (modevalue.expmode === 'Fix') {
+              differenceInMonthsexp = parseInt(modevalue.expval);
+            }
+          } else {
+            differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, findDate);
+            // Math.floor((new Date(findDate) - new Date(item.doj)) / (30 * 24 * 60 * 60 * 1000));
+            if (modevalue.expmode === 'Add') {
+              differenceInMonthsexp += parseInt(modevalue.expval);
+            } else if (modevalue.expmode === 'Minus') {
+              differenceInMonthsexp -= parseInt(modevalue.expval);
+            } else if (modevalue.expmode === 'Fix') {
+              differenceInMonthsexp = parseInt(modevalue.expval);
+            } else {
+              // differenceInMonths = parseInt(modevalue.expval);
+              differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, findDate);
+            }
+          }
+
+          //findtar end difference yes/no
+          if (modevalue.endtar === 'Yes') {
+            differenceInMonthstar = calculateMonthsBetweenDates(item.doj, modevalue.endtardate);
+            //  Math.floor((new Date(modevalue.endtardate) - new Date(item.doj)) / (30 * 24 * 60 * 60 * 1000));
+            if (modevalue.expmode === 'Add') {
+              differenceInMonthstar += parseInt(modevalue.expval);
+            } else if (modevalue.expmode === 'Minus') {
+              differenceInMonthstar -= parseInt(modevalue.expval);
+            } else if (modevalue.expmode === 'Fix') {
+              differenceInMonthstar = parseInt(modevalue.expval);
+            }
+          } else {
+            differenceInMonthstar = calculateMonthsBetweenDates(item.doj, findDate);
+            if (modevalue.expmode === 'Add') {
+              differenceInMonthstar += parseInt(modevalue.expval);
+            } else if (modevalue.expmode === 'Minus') {
+              differenceInMonthstar -= parseInt(modevalue.expval);
+            } else if (modevalue.expmode === 'Fix') {
+              differenceInMonthstar = parseInt(modevalue.expval);
+            } else {
+              // differenceInMonths = parseInt(modevalue.expval);
+              differenceInMonthstar = calculateMonthsBetweenDates(item.doj, findDate);
+            }
+          }
+
+          differenceInMonths = calculateMonthsBetweenDates(item.doj, findDate);
+          if (modevalue.expmode === 'Add') {
+            differenceInMonths += parseInt(modevalue.expval);
+          } else if (modevalue.expmode === 'Minus') {
+            differenceInMonths -= parseInt(modevalue.expval);
+          } else if (modevalue.expmode === 'Fix') {
+            differenceInMonths = parseInt(modevalue.expval);
+          } else {
+            // differenceInMonths = parseInt(modevalue.expval);
+            differenceInMonths = calculateMonthsBetweenDates(item.doj, findDate);
+          }
+        } else {
+          differenceInMonthsexp = calculateMonthsBetweenDates(item.doj, findDate);
+          differenceInMonthstar = calculateMonthsBetweenDates(item.doj, findDate);
+          differenceInMonths = calculateMonthsBetweenDates(item.doj, findDate);
+        }
+        // console.log(differenceInMonthstar, modevalue, 'differenceInMonthstar');
+        findexpval = differenceInMonthstar < 1 ? '00' : differenceInMonthstar <= 9 ? '0' + differenceInMonthstar : differenceInMonthstar;
+      }
+      let findUserProcessFinal = findUserProcess ? findUserProcess.process : item.process;
+
+      return {
+        ...item._doc,
+        department: findUserDepartment,
+        team: findUserTeam,
+        process: findUserProcessFinal,
+        exp: findexpval,
+        dojDate: dojDate,
+        userids: loginallot,
+      };
+    });
+
+    let userShifts = users1;
+    finaluser =
+      userShifts &&
+      userShifts.length > 0 &&
+      userShifts?.flatMap((item, index) => {
+        const findShiftTiming = (shiftName) => {
+          const foundShift = shift?.find((d) => d.name === shiftName);
+          return foundShift ? `${foundShift.fromhour}:${foundShift.frommin}${foundShift.fromtime}to${foundShift.tohour}:${foundShift.tomin}${foundShift.totime} ` : '';
+        };
+        const findShiftTimingsts = (shiftName) => {
+          const foundShift = shift?.find((d) => d.name === shiftName);
+          return foundShift ? `${foundShift.isallowance}` : '';
+        };
+
+        const filteredMatchingDoubleShiftItem = item.shiftallot?.filter((val) => val && val.empcode === item.empcode && val.adjstatus === 'Approved');
+
+        // Filter out the dates that have matching 'Shift Adjustment' todates
+        let removedUserDates = userDates.filter((date) => {
+          // Check if there is no matching 'Shift Adjustment' for the current user and formattedDate
+          const matchingShiftAdjustmentToDate = filteredMatchingDoubleShiftItem?.find((item) => item && item.todate === date.formattedDate && item.adjustmenttype === 'Shift Adjustment');
+
+          // If there is no matching 'Shift Adjustment', keep the date
+          return !matchingShiftAdjustmentToDate;
+        });
+
+        // Create a Set to store unique entries based on formattedDate, dayName, dayCount, and shiftMode
+        let uniqueEntries = new Set();
+
+        // Iterate over removedUserDates and add unique entries to the Set
+        userDates.forEach((date) => {
+          uniqueEntries.add(
+            JSON.stringify({
+              formattedDate: date.formattedDate,
+              dayName: date.dayName,
+              dayCount: date.dayCount,
+              shiftMode: 'Main Shift',
+              weekNumberInMonth: date.weekNumberInMonth,
+            })
+          );
+        });
+
+        // Iterate over filteredMatchingDoubleShiftItem and add unique entries to the Set
+        filteredMatchingDoubleShiftItem &&
+          filteredMatchingDoubleShiftItem?.forEach((item) => {
+            const [day, month, year] = item.adjdate?.split('/');
+            let newFormattedDate = new Date(`${year}-${month}-${day}`);
+
+            if (item.adjustmenttype === 'Shift Adjustment' || item.adjustmenttype === 'Add On Shift' || item.adjustmenttype === 'Shift Weekoff Swap') {
+              uniqueEntries.add(
+                JSON.stringify({
+                  formattedDate: item.adjdate,
+                  dayName: moment(item.adjdate, 'DD/MM/YYYY').format('dddd'),
+                  dayCount: parseInt(moment(item.adjdate, 'DD/MM/YYYY').format('DD')),
+                  shiftMode: 'Second Shift',
+                  weekNumberInMonth:
+                    getWeekNumberInMonth(newFormattedDate) === 1
+                      ? `${getWeekNumberInMonth(newFormattedDate)}st Week`
+                      : getWeekNumberInMonth(newFormattedDate) === 2
+                      ? `${getWeekNumberInMonth(newFormattedDate)}nd Week`
+                      : getWeekNumberInMonth(newFormattedDate) === 3
+                      ? `${getWeekNumberInMonth(newFormattedDate)}rd Week`
+                      : getWeekNumberInMonth(newFormattedDate) > 3
+                      ? `${getWeekNumberInMonth(newFormattedDate)}th Week`
+                      : '',
+                })
+              );
+            }
+          });
+
+        // Convert Set back to an array of objects
+        let createdUserDatesUnique = Array.from(uniqueEntries).map((entry) => JSON.parse(entry));
+
+        function sortUserDates(dates) {
+          return dates.sort((a, b) => {
+            if (a.formattedDate === b.formattedDate) {
+              // If dates are the same, sort by shift mode
+              if (a.shiftMode < b.shiftMode) return -1;
+              if (a.shiftMode > b.shiftMode) return 1;
+              return 0;
+            } else {
+              // Otherwise, sort by date
+              const dateA = new Date(a.formattedDate.split('/').reverse().join('/'));
+              const dateB = new Date(b.formattedDate.split('/').reverse().join('/'));
+              return dateA - dateB;
+            }
+          });
+        }
+
+        // Sort the array
+        const sortedCreatedUserDates = sortUserDates(createdUserDatesUnique);
+        const createdUserDates = sortedCreatedUserDates?.filter((d) => {
+          const filterData = userDates.some((val) => val.formattedDate === d.formattedDate);
+          if (filterData) {
+            return d;
+          }
+        });
+
+        // Map each user date to a row
+        const userRows = createdUserDates?.map((date) => {
+          let filteredRowData = item.shiftallot?.filter((val) => val.empcode == item.empcode);
+          const matchingItem = filteredRowData.find((item) => item && item.adjdate == date.formattedDate);
+          const matchingItemAllot = filteredRowData?.find((item) => item && formatDate(item.date) == date.formattedDate);
+          const matchingDoubleShiftItem = filteredRowData?.find((item) => item && item.todate === date.formattedDate);
+          const matchingRemovedItem = filteredRowData.find((item) => item.removedshiftdate === date.formattedDate);
+          const matchingAssignShiftItem = filteredRowData?.find((item) => item?._doc?.adjdate === date.formattedDate && item?._doc?.adjstatus === 'Approved' && item?._doc?.adjustmenttype === 'Assign Shift');
+
+          const filterBoardingLog =
+            item.boardingLog &&
+            item.boardingLog?.filter((item) => {
+              return item.logcreation === 'user' || item.logcreation === 'shift';
+            });
+
+          // Check if the dayName is Sunday or Monday
+          // const isWeekOff = item.weekoff?.includes(date.dayName);
+
+          const isWeekOff = getWeekOffDay(date, filterBoardingLog, item.department, depMonthSet) === 'Week Off' ? true : false;
+          const isWeekOffWithAdjustment = isWeekOff && matchingItem;
+          const isWeekOffWithManual = isWeekOff && matchingItemAllot;
+
+          const actualShiftTiming = findShiftTiming(item.shifttiming);
+          const row = {
+            company: item.company,
+            branch: item.branch,
+            unit: item.unit,
+            team: item.team,
+            companyname: item.companyname,
+            empcode: item.empcode,
+            username: item.username,
+            shifttiming: getShiftForDateProdDay(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem),
+            date: date.formattedDate,
+            shiftmode: date.shiftMode,
+            shiftsts: findShiftTimingsts(getShiftForDateProdDay(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem)),
+          };
+
+          return row;
+        });
+        return userRows;
+      });
+
+    let dateSelectedFormat = moment(date).format('DD/MM/YYYY');
+    let dateSelectedFormatOnePlus = moment(newDateOnePlus).format('DD/MM/YYYY');
+    let dateSelectedFormatOneMinus = moment(newDateOneMinus).format('DD/MM/YYYY');
+    // let dateSelectedFormatTwoPlus = moment(newDateTwoPlus).format('DD/MM/YYYY');
+
+    let shiftEndTime = `${date}T00:00:00.000Z`;
+    let shiftFromTime = `${date}T00:00:00.000Z`;
+    let shiftOnlyFromTime = `${date}T00:00:00.000Z`;
+    let shiftOnlyEndTime = `${date}T00:00:00.000Z`;
+
+    let users = users1
+      .flatMap((item) => {
+        let finaluserFiltered = finaluser.filter((d) => d.shifttiming != undefined && d.companyname === item.companyname);
+        // console.log(finaluserFiltered,'finaluserFiltered')
+        function filterData(data) {
+          // console.log(data, dateSelectedFormatOneMinus, dateSelectedFormat, dateSelectedFormatOnePlus, 'data')
+          const previousEntry = data.find((d) => d.date === dateSelectedFormatOneMinus);
+          const firstEntry = data.find((d) => d.date === dateSelectedFormat);
+          const secondEntry = data.find((d) => d.date === dateSelectedFormatOnePlus);
+          const firstEntryDoubleShift = data.find((d) => d.date === dateSelectedFormat && d.shiftmode === 'Second Shift' && d.shifttiming != undefined);
+          const firstEntryDoubleShiftPM = data.find((d) => d.date === dateSelectedFormat && d.shiftmode === 'Second Shift' && d.shifttiming != undefined && d.shifttiming.split('to')[0].includes('PM'));
+          // const thirdEntry = data.find((d) => d.date === dateSelectedFormatTwoPlus);
+          // console.log(firstEntry, firstEntryDoubleShift, 'firstEntryDoubleShift');
+          const isBeforeDayDoubleShift = data.find((d) => d.date === dateSelectedFormatOneMinus && d.shiftmode === 'Second Shift' && d.shifttiming != undefined);
+          const isBeforeDayDoubleShiftPM = isBeforeDayDoubleShift && isBeforeDayDoubleShift.shifttiming.split('to')[0].includes('PM');
+
+          // if (!firstEntry) return [];
+          const ispreviousShiftWeekoff = previousEntry && previousEntry.shifttiming !== '' && previousEntry.shifttiming == 'Week Off';
+          const isFirstShiftWeekoff = firstEntry && firstEntry.shifttiming !== '' && firstEntry.shifttiming == 'Week Off';
+          const isSecondShiftWeekoff = secondEntry && secondEntry.shifttiming !== '' && secondEntry.shifttiming == 'Week Off';
+          const isFirstShiftPM = firstEntry && firstEntry.shifttiming !== '' && firstEntry.shifttiming != 'Week Off' ? firstEntry.shifttiming.split('to')[0].includes('PM') : '';
+          const isPreviousShiftPM = previousEntry && previousEntry.shifttiming !== '' && previousEntry.shifttiming != 'Week Off' ? previousEntry.shifttiming.split('to')[0].includes('PM') : '';
+          const isSecondShiftPM = secondEntry && secondEntry.shifttiming !== '' && secondEntry.shifttiming != 'Week Off' ? secondEntry.shifttiming.split('to')[0].includes('PM') : '';
+          // console.log(firstEntry,secondEntry, 'firstEntry');
+          const isMainShift = firstEntry && firstEntry.shiftmode === 'Main Shift';
+          const isPlusShift = firstEntry && firstEntry.plusshift && firstEntry.plusshift != '';
+
+          function convertTo24Hour(time) {
+            // Remove any extra spaces or unexpected characters
+            time = time.trim();
+
+            // Use regular expression to capture time and AM/PM
+            const match = time.match(/^(\d{1,2}):(\d{2})(AM|PM)$/);
+            if (!match) return null; // Return null if the format is incorrect
+
+            let hours = parseInt(match[1], 10);
+            const minutes = match[2];
+            const period = match[3];
+
+            // Convert to 24-hour format
+            if (period === 'PM' && hours < 12) {
+              hours += 12;
+            }
+            if (period === 'AM' && hours === 12) {
+              hours = 0;
+            }
+
+            // Format the time as 'HH:MM'
+            return `${hours.toString().padStart(2, '0')}:${minutes}`;
+          }
+          if (isFirstShiftWeekoff && isSecondShiftWeekoff) {
+            let newFromTime = isPreviousShiftPM ? new Date(`${date}T10:00:00Z`) : new Date(`${date}T01:00:00Z`);
+            let newEndTime = isPreviousShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(previousEntry.shifttiming.split('to')[0])}Z`) : new Date(`${newDateOnePlus}T${convertTo24Hour(previousEntry.shifttiming.split('to')[0])}Z`);
+
+            shiftOnlyFromTime = new Date(`${date}T00:00:00Z`);
+            shiftOnlyEndTime = new Date(`${date}T00:00:00Z`);
+
+            let finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            let finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            shiftEndTime = new Date(newEndTime.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin + 1) * 60 * 1000));
+            shiftFromTime = new Date(newFromTime.getTime() + 60 * 1000);
+
+            shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() + 59));
+
+            data = { shiftFromTime, shiftEndTime, shiftsts: 'Disable', shifttiming: firstEntry.shifttiming, shiftOnlyFromTime, shiftOnlyEndTime };
+            // console.log(shiftFromTime, shiftEndTime, newFromTime, newEndTime, 'shiftFromTime111')
+          } else if (isFirstShiftWeekoff && ispreviousShiftWeekoff) {
+            let newFromTime = isPreviousShiftPM ? new Date(`${date}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`);
+            let newEndTime = isPreviousShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`) : new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`);
+
+            shiftOnlyFromTime = new Date(`${date}T00:00:00Z`);
+            shiftOnlyEndTime = new Date(`${date}T00:00:00Z`);
+
+            let finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            let finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            shiftEndTime = new Date(newEndTime.getTime() - (finalHrs * 60 * 60 * 1000 + finalMin * 60 * 1000));
+            shiftFromTime = new Date(newFromTime.getTime() - (finalHrs * 60 * 60 * 1000 + finalMin * 60 * 1000));
+
+            shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() - 1));
+
+            data = { shiftFromTime, shiftEndTime, shiftsts: 'Disable', shifttiming: firstEntry.shifttiming, shiftOnlyFromTime, shiftOnlyEndTime };
+            // console.log(shiftFromTime, shiftEndTime, newFromTime, newEndTime, 'shiftFromTime111')
+          } else if (isFirstShiftWeekoff) {
+            let newFromTime = isPreviousShiftPM ? new Date(`${date}T10:00:00Z`) : new Date(`${date}T01:00:00Z`);
+            let newEndTime = isPreviousShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`) : new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`);
+
+            shiftOnlyFromTime = new Date(`${date}T00:00:00Z`);
+            shiftOnlyEndTime = new Date(`${date}T00:00:00Z`);
+
+            let finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            let finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            shiftEndTime = new Date(newEndTime.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin + 1) * 60 * 1000));
+            shiftFromTime = new Date(newFromTime.getTime() + 60 * 1000);
+
+            shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() + 59));
+
+            data = { shiftFromTime, shiftEndTime, shiftsts: 'Disable', shifttiming: firstEntry.shifttiming, shiftOnlyFromTime, shiftOnlyEndTime };
+            // console.log(shiftFromTime, shiftEndTime, newFromTime, newEndTime, 'shiftFromTime')
+          } else if (isSecondShiftWeekoff) {
+            let newFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            let newEndTime = isFirstShiftPM ? new Date(`${newDateOnePlus}T10:00:00Z`) : new Date(`${newDateOnePlus}T01:00:00Z`);
+
+            shiftOnlyFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            shiftOnlyEndTime = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`);
+
+            let finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            let finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            shiftEndTime = new Date(newEndTime);
+            shiftFromTime = new Date(newFromTime.getTime() - (finalHrs * 60 * 60 * 1000 + finalMin * 60 * 1000));
+            shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() + 59));
+
+            data = { shiftFromTime, shiftEndTime, shiftsts: firstEntry.shiftsts, shifttiming: firstEntry.shifttiming, shiftOnlyFromTime, shiftOnlyEndTime };
+            // console.log(shiftFromTime, shiftEndTime, newFromTime, newEndTime, 'shiftFromTimesec')
+          } else if (firstEntryDoubleShift && secondEntry.shifttiming === 'Not Allotted') {
+            // return data.filter(entry => [dateSelectedFormat, dateSelectedFormatOnePlus].includes(entry.date) && entry.shiftmode === "Main Shift");
+            let newFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            let newEndTime = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`);
+
+            let newFromTimeSecondShift = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`);
+            let newEndTimeSecondShift = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[1])}Z`) : new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[1])}Z`);
+
+            shiftOnlyFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            shiftOnlyEndTime = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`);
+
+            const shiftOnlyFromTimeSecondShift = firstEntryDoubleShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`);
+            const shiftOnlyEndTimeSecondShift = firstEntryDoubleShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[1])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[1])}Z`);
+
+            const finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            const finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            shiftFromTime = new Date(newFromTime.getTime() - (finalHrs * 60 * 60 * 1000 + finalMin * 60 * 1000));
+
+            shiftEndTime = new Date(newEndTime.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin + 1) * 60 * 1000));
+            shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() + 59));
+
+            let shiftEndTimeFirstShift = newEndTime;
+
+            const shiftFromTimeSecondShift = new Date(newFromTimeSecondShift.setSeconds(newFromTimeSecondShift.getSeconds() + 1));
+            let shiftEndTimeSecondShift = new Date(newEndTimeSecondShift);
+            // shiftEndTimeSecondShift = new Date(shiftEndTimeSecondShift.setSeconds(shiftEndTimeSecondShift.getSeconds() + 59));
+
+            // console.log(shiftFromTime, shiftEndTime, shiftOnlyFromTime, shiftOnlyEndTime, firstEntry.shifttiming.split("to")[1], 'shiftFromTimesec')
+            data = [
+              { shiftFromTime, shiftEndTime: shiftEndTimeFirstShift, shiftsts: 'Disable', shifttiming: firstEntry.shifttiming, shiftOnlyFromTime, shiftOnlyEndTime },
+              { shiftFromTime: shiftFromTimeSecondShift, shiftEndTime: shiftEndTimeSecondShift, shiftsts: 'Disable', shifttiming: firstEntryDoubleShift.shifttiming, shiftOnlyFromTime: shiftOnlyFromTimeSecondShift, shiftOnlyEndTime: shiftOnlyEndTimeSecondShift },
+            ];
+          } else if (firstEntryDoubleShift && secondEntry.shifttiming != 'Not Allotted') {
+            // return data.filter(entry => [dateSelectedFormat, dateSelectedFormatOnePlus].includes(entry.date) && entry.shiftmode === "Main Shift");
+            let newFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            let newEndTime = firstEntryDoubleShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`) : new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`);
+
+            let newFromTimeSecondShift = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`);
+            let newEndTimeSecondShift = isSecondShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`) : new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`);
+
+            shiftOnlyFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            shiftOnlyEndTime = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`);
+
+            const shiftOnlyFromTimeSecondShift = firstEntryDoubleShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[0])}Z`);
+            const shiftOnlyEndTimeSecondShift = firstEntryDoubleShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[1])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntryDoubleShift.shifttiming.split('to')[1])}Z`);
+
+            const finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            const finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            shiftFromTime = new Date(newFromTime.getTime() - (finalHrs * 60 * 60 * 1000 + finalMin * 60 * 1000));
+
+            shiftEndTime = new Date(newEndTime.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin + 1) * 60 * 1000));
+            shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() + 59));
+
+            let shiftEndTimeSecondShift = new Date(newEndTimeSecondShift.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin + 1) * 60 * 1000));
+            shiftEndTimeSecondShift = new Date(shiftEndTimeSecondShift.setSeconds(shiftEndTimeSecondShift.getSeconds() + 59));
+
+            let shiftEndTimeFirstShift = newEndTime;
+
+            const shiftFromTimeSecondShift = new Date(newFromTimeSecondShift.setSeconds(newFromTimeSecondShift.getSeconds() + 1));
+            //  let shiftEndTimeFirstShift = newEndTime;
+
+            //   const shiftFromTimeSecondShift = new Date(newFromTimeSecondShift.setSeconds(newFromTimeSecondShift.getSeconds() + 1));
+            //   let shiftEndTimeSecondShift = new Date(newEndTimeSecondShift);
+            // shiftEndTimeSecondShift = new Date(shiftEndTimeSecondShift.setSeconds(shiftEndTimeSecondShift.getSeconds() + 59));
+
+            // console.log(shiftFromTime, shiftEndTime, shiftOnlyFromTime, shiftOnlyEndTime, firstEntry.shifttiming.split("to")[1], 'shiftFromTimesec')
+            data = [
+              { shiftFromTime, shiftEndTime: shiftEndTimeFirstShift, shiftsts: 'Disable', shifttiming: firstEntry.shifttiming, shiftOnlyFromTime, shiftOnlyEndTime },
+              { shiftFromTime: shiftFromTimeSecondShift, shiftEndTime: shiftEndTimeSecondShift, shiftsts: 'Disable', shifttiming: firstEntryDoubleShift.shifttiming, shiftOnlyFromTime: shiftOnlyFromTimeSecondShift, shiftOnlyEndTime: shiftOnlyEndTimeSecondShift },
+            ];
+          } else if (isBeforeDayDoubleShift && firstEntry.shifttiming === 'Not Allotted' && secondEntry) {
+            // return data.filter(entry => [dateSelectedFormat, dateSelectedFormatOnePlus].includes(entry.date) && entry.shiftmode === "Main Shift");
+            let newFromTime = isBeforeDayDoubleShiftPM ? new Date(`${date}T${convertTo24Hour(isBeforeDayDoubleShift.shifttiming.split('to')[1])}Z`) : new Date(`${date}T${convertTo24Hour(isBeforeDayDoubleShift.shifttiming.split('to')[1])}Z`);
+            let newEndTime = isBeforeDayDoubleShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`) : new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`);
+
+            shiftOnlyFromTime = isFirstShiftPM ? new Date(`${date}T${'00:00:00'}Z`) : new Date(`${date}T${'00:00:00'}Z`);
+            shiftOnlyEndTime = isFirstShiftPM ? new Date(`${date}T${'00:00:00'}Z`) : new Date(`${date}T${'00:00:00'}Z`);
+
+            let finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            let finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            shiftEndTime = new Date(newEndTime.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin + 1) * 60 * 1000));
+            // shiftFromTime = new Date(newFromTime.getTime() - (finalHrs * 60 * 60 * 1000 + finalMin * 60 * 1000));
+            shiftFromTime = new Date(newFromTime.getTime() + 60 * 1000);
+            shiftFromTime = new Date(shiftFromTime.setSeconds(shiftFromTime.getSeconds() - 59));
+
+            shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() + 59));
+
+            // console.log(shiftFromTime, shiftEndTime, shiftOnlyFromTime, shiftOnlyEndTime, firstEntry.shifttiming.split("to")[1], 'shiftFromTimesec')
+            data = { shiftFromTime, shiftEndTime, shiftsts: 'Disable', shifttiming: 'Not Allot', shiftOnlyFromTime, shiftOnlyEndTime };
+          } else if (firstEntry.shifttiming === 'Not Allotted' && secondEntry && previousEntry) {
+            // return data.filter(entry => [dateSelectedFormat, dateSelectedFormatOnePlus].includes(entry.date) && entry.shiftmode === "Main Shift");
+            let newFromTime = isPreviousShiftPM ? new Date(`${date}T${convertTo24Hour(previousEntry.shifttiming.split('to')[1])}Z`) : new Date(`${newDateOneMinus}T${convertTo24Hour(previousEntry.shifttiming.split('to')[1])}Z`);
+            let newEndTime = isSecondShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`) : new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`);
+
+            shiftOnlyFromTime = isFirstShiftPM ? new Date(`${date}T${'00:00:00'}Z`) : new Date(`${date}T${'00:00:00'}Z`);
+            shiftOnlyEndTime = isFirstShiftPM ? new Date(`${date}T${'00:00:00'}Z`) : new Date(`${date}T${'00:00:00'}Z`);
+
+            let finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            let finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            shiftEndTime = new Date(newEndTime.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin + 1) * 60 * 1000));
+            // shiftFromTime = new Date(newFromTime.getTime() - (finalHrs * 60 * 60 * 1000 + finalMin * 60 * 1000));
+            shiftFromTime = new Date(newFromTime.getTime() + 60 * 1000);
+            shiftFromTime = new Date(shiftFromTime.setSeconds(shiftFromTime.getSeconds() - 59));
+
+            shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() + 59));
+
+            // console.log(shiftFromTime, shiftEndTime, shiftOnlyFromTime, shiftOnlyEndTime, firstEntry.shifttiming.split("to")[1], 'shiftFromTimesec')
+            data = { shiftFromTime, shiftEndTime, shiftsts: 'Disable', shifttiming: 'Not Allot', shiftOnlyFromTime, shiftOnlyEndTime };
+          } else if (firstEntry && secondEntry.shifttiming === 'Not Allotted') {
+            // console.log("secondshiftnotallot")
+            // return data.filter(entry => [dateSelectedFormat, dateSelectedFormatOnePlus].includes(entry.date) && entry.shiftmode === "Main Shift");
+            let newFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            let newEndTime = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`);
+
+            shiftOnlyFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            shiftOnlyEndTime = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`);
+
+            let finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            let finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            // shiftEndTime = new Date(newEndTime.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin + 1) * 60 * 1000));
+            shiftFromTime = new Date(newFromTime.getTime() - (finalHrs * 60 * 60 * 1000 + finalMin * 60 * 1000));
+
+            // shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() + 59));
+            shiftEndTime = newEndTime;
+
+            // console.log(shiftFromTime, shiftEndTime, shiftOnlyFromTime, shiftOnlyEndTime, firstEntry.shifttiming.split("to")[1], 'shiftFromTimesec')
+            data = { shiftFromTime, shiftEndTime, shiftsts: firstEntry.shiftsts, shifttiming: firstEntry.shifttiming, shiftOnlyFromTime, shiftOnlyEndTime };
+          } else if (firstEntry && secondEntry) {
+            // console.log("thislastelseif")
+            // return data.filter(entry => [dateSelectedFormat, dateSelectedFormatOnePlus].includes(entry.date) && entry.shiftmode === "Main Shift");
+            let newFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            let newEndTime = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`) : new Date(`${newDateOnePlus}T${convertTo24Hour(secondEntry.shifttiming.split('to')[0])}Z`);
+
+            shiftOnlyFromTime = isFirstShiftPM ? new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[0])}Z`);
+            shiftOnlyEndTime = isFirstShiftPM ? new Date(`${newDateOnePlus}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`) : new Date(`${date}T${convertTo24Hour(firstEntry.shifttiming.split('to')[1])}Z`);
+
+            let finalHrs = isPreviousShiftPM === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
+            let finalMin = isPreviousShiftPM === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
+            shiftEndTime = new Date(newEndTime.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin + 1) * 60 * 1000));
+            shiftFromTime = new Date(newFromTime.getTime() - (finalHrs * 60 * 60 * 1000 + finalMin * 60 * 1000));
+
+            shiftEndTime = new Date(shiftEndTime.setSeconds(shiftEndTime.getSeconds() + 59));
+
+            // console.log(shiftFromTime, shiftEndTime, shiftOnlyFromTime, shiftOnlyEndTime, firstEntry.shifttiming.split("to")[1], 'shiftFromTimesec')
+            data = { shiftFromTime, shiftEndTime, shiftsts: firstEntry.shiftsts, shifttiming: firstEntry.shifttiming, shiftOnlyFromTime, shiftOnlyEndTime };
+          } else {
+            data = { shiftFromTime: new Date(shiftFromTime), shiftEndTime: new Date(shiftEndTime), shiftOnlyFromTime, shiftOnlyEndTime, shiftsts: 'Disable' };
+          }
+
+          return data; // Return the original data if conditions are not met
+        }
+
+        userShiftTimings = finaluserFiltered.length >= 3 ? filterData(finaluserFiltered) : { shiftFromTime: new Date(shiftFromTime), shiftEndTime: new Date(shiftEndTime), shiftOnlyFromTime, shiftOnlyEndTime, shiftsts: 'Disable' };
+
+        if (finaluserFiltered.find((d) => d.date === dateSelectedFormat && d.shiftmode === 'Second Shift' && d.shifttiming != undefined)) {
+          return [
+            {
+              companyname: item.companyname,
+              empcode: item.empcode,
+              company: item.company,
+              unit: item.unit,
+              branch: item.branch,
+              team: item.team,
+              username: item.username,
+              department: item.department,
+              doj: item.doj,
+              exp: item.exp,
+              process: item.process,
+              dojDate: item.dojDate,
+              userids: item.userids,
+              userShiftTimings: userShiftTimings[0],
+            },
+            {
+              companyname: item.companyname,
+              empcode: item.empcode,
+              company: item.company,
+              unit: item.unit,
+              branch: item.branch,
+              team: item.team,
+              username: item.username,
+              department: item.department,
+              doj: item.doj,
+              exp: item.exp,
+              process: item.process,
+              dojDate: item.dojDate,
+              userids: item.userids,
+              userShiftTimings: userShiftTimings[1],
+            },
+          ];
+        } else {
+          return {
+            companyname: item.companyname,
+            empcode: item.empcode,
+            company: item.company,
+            unit: item.unit,
+            branch: item.branch,
+            team: item.team,
+            username: item.username,
+            department: item.department,
+            doj: item.doj,
+            exp: item.exp,
+            process: item.process,
+            dojDate: item.dojDate,
+            userids: item.userids,
+            //  assignExpLog: item.assignExpLog.filter((d) => d.expmode != 'Auto' && d.expmode != 'Manual').sort((a, b) => new Date(a.updatedate) - new Date(b.updatedate)),
+            userShiftTimings: userShiftTimings,
+          };
+        }
+      })
+      .sort((a, b) => new Date(a.userShiftTimings.shiftFromTime) - new Date(b.userShiftTimings.shiftFromTime));
+
+    const { minStart, maxEnd } = users
+      .filter((d) => d.userShiftTimings.shiftFromTime && d.userShiftTimings.shiftFromTime !== '')
+      .reduce(
+        (acc, obj) => {
+          const startTime = new Date(obj.userShiftTimings.shiftFromTime);
+          const endTime = new Date(obj.userShiftTimings.shiftEndTime);
+
+          // console.log('Comparing:', startTime, endTime);
+
+          // Update minimum start time
+          if (!acc.minStart || startTime < acc.minStart) {
+            acc.minStart = startTime;
+          }
+
+          // Update maximum end time
+          if (!acc.maxEnd || endTime > acc.maxEnd) {
+            acc.maxEnd = endTime;
+          }
+
+          return acc;
+        },
+        { minStart: null, maxEnd: null } // Proper initialization
+      );
+    if (req.body.shift == 'Shift Based') {
+      query.dateobjformatdate = { $gte: minStart, $lte: maxEnd };
+    } else {
+      query.dateobjformatdate = { $gte: new Date(`${date}T${fromtime}Z`), $lte: new Date(`${date}T${totime}Z`) };
+    }
+
+    console.log(query, 'query');
+
+    if (mode.includes('Production')) {
+      // console.log("123")
+      productionupload = await ProductionTempUploadAll.find(query, {
+        user: 1,
+        formatteddate: 1,
+        formattedtime: 1,
+        dupe: 1,
+        filenameupdated: 1,
+        vendor: 1,
+        category: 1,
+        section: 1,
+        flagcount: 1,
+        unitid: 1,
+        unitrate: 1,
+        updatedunitrate: 1,
+        updatedflag: 1,
+        updatedsection: 1,
+        unallotcategory: 1,
+        unallotsubcategory: 1,
+      });
+    }
+
+    console.log(users.length, shift.length, loginids.length, productionupload.length, 'individialreport');
+
+    let allData = mode.includes('Production') && mode.includes('Manual Production') ? [...producionIndividual, ...productionupload] : mode.includes('Production') ? productionupload : producionIndividual;
+
+    function compareDateTimes(dateT, shiftFrom, shiftEnd) {
+      // Parse the datetime strings into Date objects
+      const dateTimeObj = dateT;
+      const shiftFromTimeObj = shiftFrom;
+      const shiftEndTimeObj = shiftEnd;
+      // Perform the comparisons
+      const isWithinShift = dateTimeObj >= shiftFromTimeObj && dateTimeObj <= shiftEndTimeObj;
+
+      return isWithinShift;
+    }
+
+    // Step 1: Flatten the loginallotlog array and include user info
+    let logs = loginids.flatMap((user) =>
+      user.loginallotlog.map((log) => ({
+        userid: user.userid,
+        projectvendor: user.projectvendor,
+        date: log.date,
+        time: log.time,
+        empname: log.empname,
+        empcode: log.empcode,
+        enddate: log.enddate ? log.enddate : null,
+      }))
+    );
+
+    // Step 2: Sort logs by date and time (ascending order)
+    logs.sort((a, b) => {
+      if (a.date === b.date) {
+        return a.time.localeCompare(b.time);
+      }
+      return new Date(a.date) - new Date(b.date);
+    });
+
+    // Step 3: Calculate the enddate for each log (except the last log for each userid)
+    const userLogsMap = {};
+
+    logs.forEach((log) => {
+      if (!userLogsMap[log.userid]) {
+        userLogsMap[log.userid] = {};
+      }
+
+      if (!userLogsMap[log.userid][log.projectvendor]) {
+        userLogsMap[log.userid][log.projectvendor] = [];
+      }
+
+      userLogsMap[log.userid][log.projectvendor].push(log);
+    });
+
+    Object.values(userLogsMap).forEach((userLogs) => {
+      Object.values(userLogs).forEach((logsArray) => {
+        logsArray.forEach((log, idx) => {
+          if (idx < logsArray.length - 1) {
+            log.enddate = logsArray[idx + 1].date;
+          }
+        });
+      });
+    });
+
+    // Step 4: Filter logs based on input date
+    const filteredLogs = logs.filter((log) => {
+      return new Date(log.date) <= new Date(req.body.date) && (!log.enddate || new Date(log.enddate) >= new Date(req.body.date));
+    });
+
+    // Step 5: Sort the filtered logs by date and time (descending order)
+    filteredLogs.sort((a, b) => {
+      if (a.date === b.date) {
+        return b.time.localeCompare(a.time);
+      }
+      return new Date(b.date) - new Date(a.date);
+    });
+
+    if (req.body.shift == 'Shift Based') {
+      try {
+        let mergedDataallfirst = allData.map((upload) => {
+          const loginInfo = filteredLogs.find((login) => login.userid === upload.user && login.projectvendor === upload.vendor);
+
+          let loginallot = loginInfo ? loginInfo : [];
+          let filteredDataDateTime = null;
+
+          if (loginallot.length > 0) {
+            const groupedByDateTime = {};
+
+            loginallot.forEach((item) => {
+              const dateTime = item.date + ' ' + item.time;
+              if (!groupedByDateTime[dateTime]) {
+                groupedByDateTime[dateTime] = [];
+              }
+              groupedByDateTime[dateTime].push(item);
+            });
+
+            // Extract the last item of each group
+            const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
+
+            // Sort the last items by date and time
+            lastItemsForEachDateTime.sort((a, b) => {
+              return new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time);
+            });
+
+            // Find the first item in the sorted array that meets the criteria
+            for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
+              const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
+              // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
+              let datevalsplitfinal = upload.mode == 'Manual' ? `${upload.fromdate}T${uploadtime}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`;
+              if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
+                filteredDataDateTime = lastItemsForEachDateTime[i];
+              } else {
+                break;
+              }
+            }
+          }
+
+          let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : '';
+          // const filenamelistviewAll = upload.filename && upload.filename?.split(".x");
+          const comparedate = upload.mode == 'Manual' ? upload.fromdate : upload.formatteddate;
+          const comparetime = upload.mode == 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime;
+
+          const dateTime = new Date(`${comparedate}T${comparetime}Z`);
+
+          // const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : '';
+          const userInfo = users.find((user) => logininfoname === user.companyname && dateTime >= user.userShiftTimings.shiftFromTime && dateTime <= user.userShiftTimings.shiftEndTime);
+
+          // console.log(dateSelectedFormat, dateSelectedFormatOnePlus, dateSelectedFormatOneMinus, 'sdfd')
+          if (userInfo) {
+            userShiftTimings = userInfo.userShiftTimings;
+          } else {
+            userShiftTimings = { shiftFromTime: shiftFromTime, shiftEndTime: shiftEndTime, shiftOnlyFromTime, shiftOnlyEndTime, shiftsts: '' };
+          }
+
+          let getprocessCode = userInfo ? userInfo.process : '';
+
+          const finalcategory = upload.unallotcategory ? upload.unallotcategory : upload.mode == 'Manual' ? upload.filename : upload.filenameupdated;
+
+          const filenamespiliteed = finalcategory;
+          const finalsubcategory = upload.unallotsubcategory ? upload.unallotsubcategory : upload.category;
+
+          // const datesplited = upload.mode == "Manual" ? upload.fromdate + " " + uploadtime + ":00" : upload.dateval?.split(" IST")[0]
+
+          let finalunitrate = upload.updatedunitrate ? Number(upload.updatedunitrate) : Number(upload.unitrate);
+          let finalflag = upload.updatedflag ? Number(upload.updatedflag) : Number(upload.flagcount);
+
+          let LateEntryPointsDeduct = upload.mode == 'Manual' && upload.lateentrystatus === 'Late Entry';
+
+          //  console.log(dateTime, userShiftTimings.shiftFromTime, userShiftTimings.shiftEndTime,'check')
+
+          if (compareDateTimes(dateTime, userShiftTimings.shiftFromTime, userShiftTimings.shiftEndTime)) {
+            return {
+              user: upload.user,
+              fromdate: upload.fromdate,
+              todate: upload.todate,
+              vendor: upload.vendor,
+              category: finalsubcategory,
+              dateval: upload.mode === 'Manual' ? `${upload.fromdate} ${convertTo24HourFormat(upload.time)}` : `${upload.formatteddate} ${upload.formattedtime}`,
+              olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
+              time: upload.mode === 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime,
+              filename: finalcategory,
+              mode: upload.mode === 'Manual' ? 'Manual' : 'Production',
+              empname: userInfo && userInfo.companyname,
+              empcode: userInfo && userInfo.empcode,
+              company: userInfo && userInfo.company,
+              unit: userInfo && userInfo.unit,
+              branch: userInfo && userInfo.branch,
+              team: userInfo && userInfo.team,
+              shifttiming: userShiftTimings ? userShiftTimings.shifttiming : '',
+              username: userInfo && userInfo.username,
+              empcode: userInfo && userInfo.empcode,
+              _id: upload._id,
+              section: upload.updatedsection ? upload.updatedsection : upload.section,
+              flagcount: upload.updatedflag ? upload.updatedflag : upload.flagcount,
+              unitid: upload.unitid,
+              worktook: upload.worktook,
+              lateentry: LateEntryPointsDeduct,
+              points: LateEntryPointsDeduct ? 0 : (finalunitrate * 8.333333333333333).toFixed(3),
+              totalpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * finalflag * 8.333333333333333).toFixed(3),
+
+              // points: upload.updatedunitrate ? Number(upload.updatedunitrate) * 8.333333333333333 : Number(upload.unitrate) * 8.333333333333333,
+            };
+          }
+        });
+
+        function getTimeDifference(start, end) {
+          // console.log(start, end, "startend");
+          if (start && end) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+
+            if (startDate > endDate) {
+              return '00:00:00';
+            } else {
+              const diff = new Date(endDate - startDate);
+              return diff.toISOString().substr(11, 8);
+            }
+          }
+        }
+
+        let lastTimes = {};
+
+        mergedDataallfirst = mergedDataallfirst.filter((d) => d !== null && d !== undefined);
+
+        mergedDataall = mergedDataallfirst.sort((a, b) => {
+          // First sort by empname
+          if (a.empname < b.empname) return -1;
+          if (a.empname > b.empname) return 1;
+          // If empnames are equal, sort by dateval
+          //  return a.dateval.localeCompare(b.dateval);
+          return new Date(a.olddateval) - new Date(b.olddateval);
+        });
+
+           const empFirstLastIndex = {};
+mergedDataall.forEach((item, idx) => {
+  if (!empFirstLastIndex[item.empname]) {
+    empFirstLastIndex[item.empname] = { first: idx, last: idx };
+  } else {
+    empFirstLastIndex[item.empname].last = idx;
+  }
+});
+
+        mergedDataall.forEach((item, index) => {
+            const {first,last} = empFirstLastIndex[item.empname]
+          const originalDatetime = item.dateval;
+          // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+          const finddatevalue = originalDatetime && originalDatetime?.split(' ');
+          const findtime = finddatevalue && finddatevalue[1];
+          const finddate = finddatevalue && finddatevalue[0];
+
+          // const loginInfo = loginids.find((login) => login.userid === item.user && login.projectvendor == item.vendor);
+
+          // const userInfo = loginInfo ? users.find((user) => user.companyname === loginInfo.empname) : '';
+
+          // const findshifttime = userInfo && userInfo.shifttiming && userInfo.shifttiming.split('to');
+
+          // const getshift = item.shifttiming == 'Week Off' || item.shifttiming == 'Not Allotted' ? findtime : item.shifttiming  && item.shifttiming.split('to')[0];
+          // let hours24 = '';
+          // const [time, period] = getshift?.includes('AM') ? getshift.split('AM') : getshift.split('PM');
+          // let [hoursshift, minutesshift] = time.split(':');
+
+          // if (item.shifttiming != 'Week Off' &&  item.shifttiming !== 'Not Allotted' ) {
+          //   // Converting hours to 24-hour format if the period is "PM" and not "12"
+          //   hours24 = parseInt(hoursshift, 10);
+          //   if (getshift.includes('PM') && hoursshift !== '12') {
+          //     hours24 += 12;
+          //   }
+          // } else {
+          //   hours24 = parseInt(getshift.split(':')[0], 10);
+          //   minutesshift = getshift.split(':')[1];
+          // }
+          // let secondssets = item.shifttiming == 'Week Off' || item.shifttiming == 'Not Allotted' ? 0 : getshift.split(':')[0];
+          // // Creating a new Date object with the updated hours
+          // const date1 = new Date(finddate);
+          // date1.setHours(hours24);
+          // date1.setMinutes(parseInt(minutesshift, 10));
+          // date1.setSeconds(secondssets);
+
+          // Formatting the date to "hh:mm:ss" format
+          const formattedTimeshift = findtime;
+
+          const clockindate = attendances.find((d) => {
+            const [day, month, year] = d.date.split('-'); // Split the date string from the attendance record
+            const dateObject = new Date(year, month - 1, day); // Create a new Date object
+            const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')}`; // Format the date
+
+            return formattedDateString === finddate && item.username == d.username;
+          });
+
+          const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
+          const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
           let formattedHours = hours;
           if (ampm === 'PM' && hours < 12) {
             formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
@@ -2696,44 +3001,40 @@ exports.getAllProductionTempReportFilter = catchAsyncErrors(async (req, res, nex
           // return formattedTime;
 
           if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
-            if (loginInfo) {
-              if (!lastTimes.hasOwnProperty(loginInfo.empname)) {
-                lastTimes[loginInfo.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+            if (item) {
+              if (!lastTimes.hasOwnProperty(item.empname)) {
+                lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
               }
-
-
-              item.worktook = getTimeDifference(new Date(`${finddate}T${lastTimes[loginInfo.empname]}`), new Date(`${finddate}T${findtime}`));
+item.claimstatus ="first";
+              item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`);
             }
           } else if (item.empname == mergedDataall[index - 1].empname) {
-
-
             // item.empname = loginInfo.empname;
-            item.worktook = getTimeDifference(mergedDataall[index - 1].dateval, item.dateval);
+            item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
             // lastTimes[loginInfo.empname] = findtime;
             //  productionResult.push(item);
+             item.claimstatus = "";
+                         if (index === last) {
+                  item.claimstatus = "last";
+                }
           }
         });
       } catch (err) {
-        console.log(err, "error")
-        return next(new ErrorHandler("Records not found", 404));
+        console.log(err, 'err');
+        // return next(new ErrorHandler("Records not found", 404));
       }
-    }
-
-    else if (req.body.shift == "Date Based") {
-
-
+    } else if (req.body.shift == 'Date Based') {
       try {
         let mergedDataallfirst = allData.map((upload) => {
-          const loginInfo = loginids.find((login) => req.body.allloginids.includes(login.userid));
-          let loginallot = loginInfo && loginInfo.loginallotlog ? loginInfo.loginallotlog : [];
+          const loginInfo = filteredLogs.find((login) => login.userid === upload.user && login.projectvendor === upload.vendor);
 
+          let loginallot = loginInfo ? loginInfo : [];
           let filteredDataDateTime = null;
           if (loginallot.length > 0) {
             const groupedByDateTime = {};
 
-            // Group items by date and time
             loginallot.forEach((item) => {
-              const dateTime = item.date + " " + item.time;
+              const dateTime = item.date + ' ' + item.time;
               if (!groupedByDateTime[dateTime]) {
                 groupedByDateTime[dateTime] = [];
               }
@@ -2745,15 +3046,14 @@ exports.getAllProductionTempReportFilter = catchAsyncErrors(async (req, res, nex
 
             // Sort the last items by date and time
             lastItemsForEachDateTime.sort((a, b) => {
-              return new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time);
+              return new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time);
             });
 
             // Find the first item in the sorted array that meets the criteria
-
             for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
-              const dateTime = lastItemsForEachDateTime[i].date + " " + lastItemsForEachDateTime[i].time;
-              let datevalsplit = upload.mode === "Manual" ? "" : upload.formatteddatetime.split(" ");
-              let datevalsplitfinal = upload.mode === "Manual" ? upload.fromdate + " " + upload.time : datevalsplit[0] + " " + datevalsplit[1];
+              const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
+              // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
+              let datevalsplitfinal = upload.mode == 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`;
               if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
                 filteredDataDateTime = lastItemsForEachDateTime[i];
               } else {
@@ -2762,504 +3062,178 @@ exports.getAllProductionTempReportFilter = catchAsyncErrors(async (req, res, nex
             }
           }
 
-          let logininfoname = loginallot.length > 0 ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : "";
+          let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : '';
 
-          const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : "";
-          const userArray = loginInfo ? users.filter((user) => user.companyname === logininfoname) : "";
+          const comparedate = upload.mode == 'Manual' ? upload.fromdate : upload.formatteddate;
+          const comparetime = upload.mode == 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime;
 
-          const filenamelistviewAll = upload.filename && upload.filename?.split(".x");
-          const filenamelist = filenamelistviewAll && filenamelistviewAll[0];
-
-
-          const FindProjectvendor = upload.vendor && upload.vendor?.split("-");
-
-          const finddatevalue = upload.formatteddatetime && upload.formatteddatetime?.split(" ");
-
-          const finddate = upload.mode === "Manual" ? upload.fromdate : finddatevalue && finddatevalue[0];
-          const findtime = upload.mode === "Manual" ? upload.time : finddatevalue && finddatevalue[1];
-
-          const comparedate = upload.mode == "Manual" ? upload.fromdate : finddate;
-          const comparetime = upload.mode == "Manual" ? upload.time : findtime;
-
-          // userArray ? null : console.log(userArray)
-          let shiftEndTime = `${req.body.fromdate}T${req.body.totime}.000Z`;
-          let shiftFromTime = `${req.body.fromdate}T${req.body.fromtime}.000Z`;
-
-
-
-          let userShiftTimings = {}
-          if (userArray && userArray.length > 0) {
-            finaluser = userArray && userArray.length > 0 &&
-              userArray?.flatMap((item, index) => {
-                const findShiftTiming = (shiftName) => {
-                  const foundShift = shift?.find((d) => d.name === shiftName);
-                  return foundShift ? `${foundShift.fromhour}:${foundShift.frommin}${foundShift.fromtime}to${foundShift.tohour}:${foundShift.tomin}${foundShift.totime} ` : "";
-                };
-                const findShiftTimingsts = (shiftName) => {
-                  const foundShift = shift?.find((d) => d.name === shiftName);
-                  return foundShift ? `${foundShift.isallowance}` : "";
-                };
-
-                const filteredMatchingDoubleShiftItem = item?._doc?.shiftallot?.filter((val) => val && val?._doc?.empcode === item?._doc?.empcode && val?._doc?.adjstatus === "Approved");
-
-                // Filter out the dates that have matching 'Shift Adjustment' todates
-                let removedUserDates = userDates.filter((date) => {
-                  // Check if there is no matching 'Shift Adjustment' for the current user and formattedDate
-                  const matchingShiftAdjustmentToDate = filteredMatchingDoubleShiftItem?.find((item) => item && item?._doc?.todate === date.formattedDate && item?._doc?.adjustmenttype === "Shift Adjustment");
-
-                  // If there is no matching 'Shift Adjustment', keep the date
-                  return !matchingShiftAdjustmentToDate;
-                });
-
-                // Create a Set to store unique entries based on formattedDate, dayName, dayCount, and shiftMode
-                let uniqueEntries = new Set();
-
-                // Iterate over removedUserDates and add unique entries to the Set
-                removedUserDates.forEach((date) => {
-                  uniqueEntries.add(
-                    JSON.stringify({
-                      formattedDate: date.formattedDate,
-                      dayName: date.dayName,
-                      dayCount: date.dayCount,
-                      shiftMode: "Main Shift",
-                      weekNumberInMonth: date.weekNumberInMonth,
-                    })
-                  );
-                });
-
-                // Iterate over filteredMatchingDoubleShiftItem and add unique entries to the Set
-                filteredMatchingDoubleShiftItem && filteredMatchingDoubleShiftItem?.forEach((item) => {
-                  const [day, month, year] = item._doc.adjdate?.split("/");
-                  let newFormattedDate = new Date(`${year}-${month}-${day}`);
-
-                  if (item._doc.adjustmenttype === "Shift Adjustment" || item._doc.adjustmenttype === "Add On Shift" || item._doc.adjustmenttype === "Shift Weekoff Swap") {
-                    uniqueEntries.add(
-                      JSON.stringify({
-                        formattedDate: item._doc.adjdate,
-                        dayName: moment(item._doc.adjdate, "DD/MM/YYYY").format("dddd"),
-                        dayCount: parseInt(moment(item._doc.adjdate, "DD/MM/YYYY").format("DD")),
-                        shiftMode: "Second Shift",
-                        weekNumberInMonth:
-                          getWeekNumberInMonth(newFormattedDate) === 1
-                            ? `${getWeekNumberInMonth(newFormattedDate)}st Week`
-                            : getWeekNumberInMonth(newFormattedDate) === 2
-                              ? `${getWeekNumberInMonth(newFormattedDate)}nd Week`
-                              : getWeekNumberInMonth(newFormattedDate) === 3
-                                ? `${getWeekNumberInMonth(newFormattedDate)}rd Week`
-                                : getWeekNumberInMonth(newFormattedDate) > 3
-                                  ? `${getWeekNumberInMonth(newFormattedDate)}th Week`
-                                  : "",
-                      })
-                    );
-                  }
-                });
-
-                // Convert Set back to an array of objects
-                let createdUserDatesUnique = Array.from(uniqueEntries).map((entry) => JSON.parse(entry));
-
-                function sortUserDates(dates) {
-                  return dates.sort((a, b) => {
-                    if (a.formattedDate === b.formattedDate) {
-                      // If dates are the same, sort by shift mode
-                      if (a.shiftMode < b.shiftMode) return -1;
-                      if (a.shiftMode > b.shiftMode) return 1;
-                      return 0;
-                    } else {
-                      // Otherwise, sort by date
-                      const dateA = new Date(a.formattedDate.split("/").reverse().join("/"));
-                      const dateB = new Date(b.formattedDate.split("/").reverse().join("/"));
-                      return dateA - dateB;
-                    }
-                  });
-                }
-
-                // Sort the array
-                const sortedCreatedUserDates = sortUserDates(createdUserDatesUnique);
-                const createdUserDates = sortedCreatedUserDates?.filter((d) => {
-                  const filterData = userDates.some((val) => val.formattedDate === d.formattedDate);
-                  if (filterData) {
-                    return d;
-                  }
-                });
-
-                // Map each user date to a row
-                const userRows = createdUserDates?.map((date) => {
-                  let filteredRowData = item?._doc?.shiftallot?.filter((val) => val?._doc?.empcode == item?._doc?.empcode);
-                  const matchingItem = filteredRowData?.find((item) => item && item?._doc?.adjdate == date.formattedDate);
-                  const matchingItemAllot = filteredRowData?.find((item) => item && formatDate(item?._doc?.date) == date.formattedDate);
-                  const matchingDoubleShiftItem = filteredRowData?.find((item) => item && item?._doc?.todate === date.formattedDate);
-                  const filterBoardingLog = item?._doc?.boardingLog && item?._doc?.boardingLog?.filter((item) => {
-                    // return item.logcreation === "user" || item.logcreation === "shift";
-                    return item;
-                  });
-
-                  // Check if the dayName is Sunday or Monday
-                  // const isWeekOff = item?._doc?.weekoff?.includes(date.dayName);
-                  const isWeekOff = getWeekOffDay(date, filterBoardingLog, item?._doc?.department, depMonthSet) === "Week Off" ? true : false;
-                  const isWeekOffWithAdjustment = isWeekOff && matchingItem;
-                  const isWeekOffWithManual = isWeekOff && matchingItemAllot;
-
-                  const actualShiftTiming = findShiftTiming(item?._doc?.shifttiming);
-
-                  const row = {
-                    company: item?._doc?.company,
-                    branch: item?._doc?.branch,
-                    unit: item?._doc?.unit,
-                    team: item?._doc?.team,
-                    companyname: item?._doc?.companyname,
-                    empcode: item?._doc?.empcode,
-                    username: item?._doc?.username,
-                    shifttiming: getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?._doc?.department, depMonthSet),
-                    date: date.formattedDate,
-                    shiftmode: date.shiftMode,
-                    shiftsts: findShiftTimingsts(getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?._doc?.department, depMonthSet)),
-                  };
-
-                  return row;
-                });
-                return userRows;
-              });
-
-
-            function filterData(data) {
-              const firstEntry = data[0];
-              const secondEntry = data[1];
-              if (!firstEntry) return [];
-              const isFirstShiftWeekoff = firstEntry.shifttiming && firstEntry.shifttiming !== "" && firstEntry.shifttiming == "Week Off";
-              const isFirstShiftPM = firstEntry.shifttiming && firstEntry.shifttiming !== "" && firstEntry.shifttiming != "Week Off" ? firstEntry.shifttiming.split("to")[0].includes("PM") : "";
-              const isMainShift = firstEntry.shiftmode === "Main Shift";
-              const isPlusShift = firstEntry.plusshift && firstEntry.plusshift != "";
-              if (isFirstShiftWeekoff) {
-                data = [
-                  { date: firstEntry.date, shifttiming: secondEntry.shifttiming, shiftsts: firstEntry.shiftsts, },
-                  { date: secondEntry.date, shifttiming: secondEntry.shifttiming, shiftsts: secondEntry.shiftsts, }
-                ]
-              }
-              else if (isFirstShiftPM && isMainShift && isPlusShift) {
-                // Keep the first entry and the entries that are not "Second Shift"
-                return data.filter((entry, index) => index != 0);
-                // } else if (!isFirstShiftPM && isMainShift) {
-              } else {
-                // Keep the first entry and the entries that are "Main Shift"
-                return data.filter(entry => entry.shiftmode === "Main Shift");
-              }
-
-              return data; // Return the original data if conditions are not met
-            }
-            // console.log(finaluser, 'hgf')
-            userShiftTimings = filterData(finaluser).map(item => ({ date: item.date, shifttiming: item.shifttiming, shiftsts: item.shiftsts, plusshift: item.plusshift }));
-            // finaluser ? null : (finaluser, upload.companyname);
-            let userShiftTimingsFromTwo = { date: userShiftTimings[1].date, shifttiming: userShiftTimings[0].shifttiming, shiftsts: userShiftTimings[1].shiftsts }
-            let userShiftTimingsBefore = { date: userShiftTimings[0].date, shifttiming: userShiftTimings[1].shifttiming, shiftsts: userShiftTimings[0].shiftsts }
-
-
-            function convertToISODateTime(currentShift, nextShift) {
-              // console.log(nextShift, 'nextShift')
-              function padTime(time) {
-                let [hours, minutes] = time.split(':');
-                if (hours.length === 1) {
-                  hours = '0' + hours;
-                }
-                return `${hours}:${minutes}`;
-              }
-              // Helper function to parse date and time from shift objects
-              function parseDateTime(shift) {
-                // console.log(shift)
-                const [day, month, year] = shift.date.split('/');
-                // const timeString = shift.shifttiming.split('to')[0].trim();
-                let timeString = shift.shifttiming && shift.shifttiming != "" && shift.shifttiming == "Week Off" ? ("00:00AMto00:00AM").split('to')[0].trim() : ((shift.shifttiming && shift.shifttiming != "" && shift.shifttiming != "Week Off") ? shift.shifttiming.split('to')[0].trim() : ("00:00AMto11:59PM").split('to')[0].trim());
-
-                // Normalize time separators (replace dots with colons)
-                timeString = timeString.replace('.', ':');
-
-                // Handle missing leading zeros in hour values
-                timeString = padTime(timeString);
-
-
-                let [hours, minutes] = timeString.slice(0, -2).split(':');
-                const period = timeString.slice(-2);
-
-                if (period === 'PM' && hours !== '12') {
-                  hours = parseInt(hours, 10) + 12;
-                } else if (period === 'AM' && hours === '12') {
-                  hours = '00';
-                }
-
-                const dateTimeString = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00.000Z`);
-                // let newTime = new Date(dateTimeString.getTime() - 4 * 60 * 60 * 1000);
-                let finalHrs = period === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
-                let finalMin = period === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
-                let newTime = new Date(dateTimeString.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin * 60 * 1000)));
-
-
-                // console.log(newTime.toISOString());
-                return (newTime.toISOString());
-              }
-
-              // Parse initial date and time from current shift
-              const initialDateTime = currentShift.shifttiming === "Week Off" ? parseDateTime(nextShiftBefor) : parseDateTime(currentShift);
-              // console.log(initialDateTime, currentShift.shifttiming, "initialDateTime")
-
-              const initialEndDateTime = new Date(initialDateTime);
-              initialEndDateTime.setHours(initialEndDateTime.getHours() + 23);
-              initialEndDateTime.setMinutes(initialEndDateTime.getMinutes() + 59);
-
-
-              // console.log(nextShift.shifttiming, upload.companyname, "asd", "jjj")
-              // Parse start time of the next shift
-
-              const nextShiftStartTime = nextShift.shifttiming === "Week Off" ? parseDateTime(currentShiftTwo) : parseDateTime(nextShift);
-              // console.log(nextShiftStartTime, 'nextShiftStartTime')
-
-              if (new Date(initialEndDateTime) >= new Date(nextShiftStartTime)) {
-                initialEndDateTime.setTime(new Date(nextShiftStartTime).getTime() - 60000); // Set to 1 minute before next shift
-              }
-
-              // Convert to ISO 8601 format with 'Z' to indicate UTC
-              const isoString = initialEndDateTime.toISOString();
-              return isoString;
-            }
-
-            const currentShift = userShiftTimings[0];
-            const nextShift = userShiftTimings[1];
-            const currentShiftTwo = userShiftTimingsFromTwo;
-            const nextShiftBefor = userShiftTimingsBefore;
-
-
-            shiftEndTime = convertToISODateTime(currentShift, nextShift);
-
-            function padTime(time) {
-              let [hours, minutes] = time.split(':');
-              if (hours.length === 1) {
-                hours = '0' + hours;
-              }
-              return `${hours}:${minutes}`;
-            }
-
-            function parseFromDateTime(shift) {
-
-              const [day, month, year] = shift.date.split('/');
-
-              let timeString = shift.shifttiming && shift.shifttiming != "" && shift.shifttiming == "Week Off" ? ("00:00AMto00:00AM").split('to')[0].trim() : ((shift.shifttiming && shift.shifttiming != "" && shift.shifttiming != "Week Off") ? shift.shifttiming.split('to')[0].trim() : ("00:00AMto11:59PM").split('to')[0].trim());
-
-              timeString = timeString.replace('.', ':');
-
-              // Handle missing leading zeros in hour values
-              timeString = padTime(timeString);
-
-
-              let [hours, minutes] = timeString.slice(0, -2).split(':');
-              const period = timeString.slice(-2);
-
-              if (period === 'PM' && hours !== '12') {
-                hours = parseInt(hours, 10) + 12;
-              } else if (period === 'AM' && hours === '12') {
-
-                hours = '00';
-              }
-
-              const dateTimeString = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00Z`);
-              // let newTime = new Date(dateTimeString.getTime() - 4 * 60 * 60 * 1000);
-              let finalHrs = period === 'PM' ? nightShiftBeforeHrs : dayShiftBeforeHrs;
-              let finalMin = period === 'PM' ? nightShiftBeforeMin : dayShiftBeforeMin;
-              // console.log(finalHrs, finalMin)
-              let newTime = shift.shifttiming ? new Date(dateTimeString.getTime() - (finalHrs * 60 * 60 * 1000 + (finalMin * 60 * 1000))) : new Date(dateTimeString);
-
-              return (newTime.toISOString());
-            }
-            // console.log(userShiftTimings[0])
-            // Parse initial date and time from current shift
-            shiftFromTime = parseFromDateTime(userShiftTimings[0]);
-
-
-          }
-
-
-          const fromDateselected = new Date(`${req.body.fromdate}T${req.body.fromtime}Z`);
-          const toDateselected = new Date(`${req.body.fromdate}T${req.body.totime}Z`);
-
+          const fromdatetime = new Date(`${date}T${fromtime}Z`);
+          const todatetime = new Date(`${date}T${totime}Z`);
 
           const dateTime = new Date(`${comparedate}T${comparetime}Z`);
+          // console.log(users[0].userShiftTimings.shiftFromTime,'user.userShiftTimings.shiftFromTime')
+          // const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : '';
+          const userInfo = users.find((user) => logininfoname === user.companyname);
 
+          // let userShiftTimings = {};
 
-          if (userInfo && userInfo.processlog) {
-            const groupedByMonthProcs = {};
-
-            // Group items by month
-            // userInfo.processlog &&
-            userInfo.processlog.forEach((d) => {
-              const monthYear = d.date?.split("-").slice(0, 2).join("-");
-              if (!groupedByMonthProcs[monthYear]) {
-                groupedByMonthProcs[monthYear] = [];
-              }
-              groupedByMonthProcs[monthYear].push(d);
-            });
-
-            // Extract the last item of each group
-            const lastItemsForEachMonthPros = Object.values(groupedByMonthProcs).map((group) => group[group.length - 1]);
-
-            // Filter the data array based on the month and year
-            lastItemsForEachMonthPros.sort((a, b) => {
-              return new Date(a.date) - new Date(b.date);
-            });
-            // Find the first item in the sorted array that meets the criteria
-
-            for (let i = 0; i < lastItemsForEachMonthPros.length; i++) {
-              const date = lastItemsForEachMonthPros[i].date;
-
-              if (req.body.date >= date) {
-                filteredItem = lastItemsForEachMonthPros[i];
-              } else {
-                break;
-              }
-            }
+          if (userInfo) {
+            userShiftTimings = userInfo.userShiftTimings;
+          } else {
+            userShiftTimings = { shiftFromTime: new Date(shiftFromTime), shiftEndTime: new Date(shiftEndTime), shiftOnlyFromTime, shiftOnlyEndTime, shiftsts: '' };
           }
 
-          function compareDateTimes(dateT, shiftFrom, shiftEnd) {
-            // Parse the datetime strings into Date objects
-            const dateTimeObj = new Date(dateT);
-            const shiftFromTimeObj = new Date(shiftFrom);
-            const shiftEndTimeObj = new Date(shiftEnd);
-            // Perform the comparisons
-            const isWithinShift = dateTimeObj >= shiftFromTimeObj && dateTimeObj <= shiftEndTimeObj;
+          let getprocessCode = userInfo ? userInfo.process : '';
 
-            return isWithinShift;
-          }
-          // console.log(fromDateselected, toDateselected, 'uyg')
-          if (compareDateTimes(dateTime, fromDateselected, toDateselected) &&
-            (req.body.subsmanual && req.body.subsmanual.length > 0
-              ? req.body.subsmanual.some(sub => sub.category === filenamelist && sub.subcategory === upload.category)
-              : true)
+          const finalcategory = upload.unallotcategory ? upload.unallotcategory : upload.mode == 'Manual' ? upload.filename : upload.filenameupdated;
 
-          ) {
+          const finalsubcategory = upload.unallotsubcategory ? upload.unallotsubcategory : upload.category;
+
+          let finalunitrate = upload.updatedunitrate ? Number(upload.updatedunitrate) : Number(upload.unitrate);
+          let finalflag = upload.updatedflag ? Number(upload.updatedflag) : Number(upload.flagcount);
+
+          let LateEntryPointsDeduct = upload.mode == 'Manual' && upload.lateentrystatus === 'Late Entry';
+          // console.log(todatetime,'todatetime')
+          if (compareDateTimes(dateTime, fromdatetime, todatetime)) {
             return {
               user: upload.user,
               fromdate: upload.fromdate,
               todate: upload.todate,
               vendor: upload.vendor,
-              category: upload.category,
-              dateval: upload.mode === "Manual" ? `${upload.fromdate} ${upload.time}:00` : upload.formatteddatetime,
-              olddateval: upload.mode === "Manual" ? `${upload.fromdate} ${upload.time}:00` : upload.formatteddatetime,
-              time: upload.time,
-              filename: upload.filename,
-              mode: upload.mode === "Manual" ? "Manual" : "Production",
-              empname: loginInfo && loginInfo.empname,
+              category: finalsubcategory,
+              dateval: upload.mode === 'Manual' ? `${upload.fromdate} ${convertTo24HourFormat(upload.time)}` : `${upload.formatteddate} ${upload.formattedtime}`,
+              olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
+
+              time: upload.mode === 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime,
+              mode: upload.mode === 'Manual' ? 'Manual' : 'Production',
+              empname: userInfo && userInfo.companyname,
               empcode: userInfo && userInfo.empcode,
               company: userInfo && userInfo.company,
               unit: userInfo && userInfo.unit,
               branch: userInfo && userInfo.branch,
               team: userInfo && userInfo.team,
-              shifttiming: finaluser && finaluser[0].shifttiming,
+              shifttiming: userShiftTimings && userShiftTimings?.shifttiming ? userShiftTimings?.shifttiming : '',
+
               username: userInfo && userInfo.username,
               empcode: userInfo && userInfo.empcode,
               _id: upload._id,
               section: upload.updatedsection ? upload.updatedsection : upload.section,
               flagcount: upload.updatedflag ? upload.updatedflag : upload.flagcount,
               unitid: upload.unitid,
-              filename: upload.filename,
+              filename: finalcategory,
               worktook: upload.worktook,
-              points: upload.updatedunitrate ? Number(upload.updatedunitrate) * 8.333333333333333 : Number(upload.unitrate) * 8.333333333333333,
+              // points: upload.updatedunitrate ? Number(upload.updatedunitrate) * 8.333333333333333 : Number(upload.unitrate) * 8.333333333333333,
+              points: LateEntryPointsDeduct ? 0 : (finalunitrate * 8.333333333333333).toFixed(3),
+              totalpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * finalflag * 8.333333333333333).toFixed(3),
             };
           }
-
-
         });
 
-        // Function to calculate time difference in HH:mm:ss format
-        function getTimeDifference(start, end) {
-          const startDate = new Date("1970-01-01T" + start);
-          const endDate = new Date("1970-01-01T" + end);
-          const diff = new Date(endDate - startDate);
-          return diff.toISOString().substr(11, 8);
+        function getTimeDifference(start, end, id) {
+          if (start && end) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+
+            if (startDate > endDate) {
+              return '00:00:00';
+            } else {
+              const diff = new Date(endDate - startDate);
+              return diff.toISOString().substr(11, 8);
+            }
+          }
         }
 
         let lastTimes = {};
 
-        const productionResult = [];
+        mergedDataallfirst = mergedDataallfirst.filter((d) => d !== null && d !== undefined);
 
-        mergedDataall = mergedDataallfirst
-          .filter((item) => item !== undefined && item.dateval && item.empname)
-          .sort((a, b) => {
-            if (a.dateval < b.dateval) return -1;
-            if (a.dateval > b.dateval) return 1;
-            if (a.empname < b.empname) return -1;
-            if (a.empname > b.empname) return 1;
-            return 0;
-          });
+        mergedDataall = mergedDataallfirst.sort((a, b) => {
+          // First sort by empname
+          if (a.empname < b.empname) return -1;
+          if (a.empname > b.empname) return 1;
+          // If empnames are equal, sort by dateval
+          //  return a.dateval.localeCompare(b.dateval);
+          return new Date(a.olddateval) - new Date(b.olddateval);
+        });
+
+          const empFirstLastIndex = {};
+mergedDataall.forEach((item, idx) => {
+  if (!empFirstLastIndex[item.empname]) {
+    empFirstLastIndex[item.empname] = { first: idx, last: idx };
+  } else {
+    empFirstLastIndex[item.empname].last = idx;
+  }
+});
+
         mergedDataall.forEach((item, index) => {
-          const finddatevalue = item.olddateval && item.olddateval?.split(" ");
-          const finddate = finddatevalue && finddatevalue[0];
+            const {first,last} = empFirstLastIndex[item.empname]
+          const originalDatetime = item.dateval;
+
+          // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+          const finddatevalue = originalDatetime && originalDatetime?.split(' ');
           const findtime = finddatevalue && finddatevalue[1];
+          const finddate = finddatevalue && finddatevalue[0];
 
+          // const loginInfo = loginids.find((login) => login.userid === item.user && login.projectvendor == item.vendor);
 
+          // const userInfo = loginInfo ? users.find((user) => user.companyname === loginInfo.empname) : '';
 
-          const findshifttime = item.shifttiming ? item.shifttiming.split("to") : "00:00AMto23:59PM";
+          // const findshifttime = userInfo && userInfo.shifttiming && userInfo.shifttiming.split('to');
 
-          const getshift = findshifttime && findshifttime[0];
-
-          const [time, period] = getshift.includes("AM") ? getshift.split("AM") : getshift.split("PM");
-          const [hoursshift, minutesshift] = time.split(":");
-
-          // Converting hours to 24-hour format if the period is "PM" and not "12"
-          let hours24 = parseInt(hoursshift, 10);
-          if (getshift.includes("PM") && hoursshift !== "12") {
-            hours24 += 12;
-          }
-          // Creating a new Date object with the updated hours
-          const date = new Date(finddate);
-          date.setHours(hours24);
-          date.setMinutes(parseInt(minutesshift, 10));
-          date.setSeconds(0);
-
-          // Formatting the date to "hh:mm:ss" format
-          const formattedTimeshift = date.toTimeString().split(" ")[0];
+          const formattedTimeshift = findtime;
 
           const clockindate = attendances.find((d) => {
-            const [day, month, year] = d.date.split("-"); // Split the date string from the attendance record
+            const [day, month, year] = d.date.split('-'); // Split the date string from the attendance record
             const dateObject = new Date(year, month - 1, day); // Create a new Date object
-            const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`; // Format the date
+            const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')}`; // Format the date
 
             return formattedDateString === finddate && item.username == d.username;
           });
 
-          const [timePart, ampm] = clockindate ? clockindate.clockintime.split(" ") : ""; // Split the time and AM/PM
-          const [hours, minutes, seconds] = timePart ? timePart.split(":").map(Number) : ""; // Split hours, minutes, and seconds
+          const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
+          const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
           let formattedHours = hours;
-          if (ampm === "PM" && hours < 12) {
+          if (ampm === 'PM' && hours < 12) {
             formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
-          } else if (ampm === "AM" && hours === 12) {
+          } else if (ampm === 'AM' && hours === 12) {
             formattedHours = 0; // Convert 12 AM to 0 hours
           }
-          const formattedTime = `${String(formattedHours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+          const formattedTime = `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
           // return formattedTime;
-          if (item.empname) {
-            if (!lastTimes.hasOwnProperty(item.empname)) {
-              lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
-            }
 
-            item.empname = item.empname;
-            item.worktook = getTimeDifference(lastTimes[item.empname], findtime);
-            lastTimes[item.empname] = findtime;
-            productionResult.push(item);
+          if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+            if (item) {
+              if (!lastTimes.hasOwnProperty(item.empname)) {
+                // console.log(clockindate,formattedTime,formattedTimeshift, 'formattedTimeshift'  )
+                lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+              }
+item.claimstatus ="first";
+              item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`, '1');
+            }
+          } else if (item.empname == mergedDataall[index - 1].empname) {
+            // item.empname = loginInfo.empname;
+            item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval, '2');
+            // lastTimes[loginInfo.empname] = findtime;
+            //  productionResult.push(item);
+             item.claimstatus = "";
+                         if (index === last) {
+                  item.claimstatus = "last";
+                }
           }
         });
       } catch (err) {
-        console.log(err, "error")
-        return next(new ErrorHandler("Records not found", 404));
+        console.log(err, 'err');
+        return next(new ErrorHandler('Records not found', 404));
       }
     }
 
     mergedData = mergedDataall.filter((item) => item != null);
   } catch (err) {
-    console.log(err)
-    return next(new ErrorHandler("Records not found!", 404));
+    console.log(err, 'err');
+    return next(new ErrorHandler('Records not found!', 404));
   }
-  // if (!productionupload) {
 
-  //   return next(new ErrorHandler("Data not found!", 404));
-  // }
   return res.status(200).json({
-    // count: products.length,
     mergedData,
   });
 });

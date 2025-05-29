@@ -1333,10 +1333,7 @@ exports.getAllStockmanageFilteredAccessVerification = catchAsyncErrors(async (re
   filterQuery = { $or: branchFilter };
 
   query = {
-    // $or: [
-    //   { updating: "" },
-    //   { updating: { $exists: false } }
-    // ],
+  
     mode: { $ne: "Rejected" },
     updating: "",
     ...filterQuery,
@@ -1367,10 +1364,6 @@ exports.getAllStockmanageFilteredAccessVerification = catchAsyncErrors(async (re
   let filterQueryoverall = { $or: branchFilterOverall };
 
   queryoverall = {
-    // $or: [
-    //   { updating: "" },
-    //   { updating: { $exists: false } }
-    // ],
     mode: { $ne: "Rejected" },
     updating: "",
     ...filterQueryoverall,
@@ -1390,72 +1383,6 @@ exports.getAllStockmanageFilteredAccessVerification = catchAsyncErrors(async (re
   }
   let conditions = [];
 
-
-
-  // Advanced search filter
-  // if (allFilters && allFilters.length > 0) {
-  //   allFilters.forEach(filter => {
-  //     // console.log(filter, "filterstock");
-
-  //     if (filter.column && filter.condition && (filter.value || ["Blank", "Not Blank"].includes(filter.condition))) {
-
-  //       // Handle special case for `stockmaterialarray`
-  //       if (["uomnew", "quantitynew", "materialnew", "productdetailsnew", "uomcodenew"].includes(filter.column)) {
-  //         const condition = {};
-
-  //         // Convert numeric filter values to string if required (e.g., for quantitynew)
-  //         const filterValue = typeof filter.value === "number" ? filter.value.toString() : filter.value;
-
-  //         condition["stockmaterialarray"] = {
-  //           $elemMatch: createFilterCondition(filter.column, filter.condition, filterValue),
-  //         };
-
-  //         conditions.push(condition);
-  //       } else {
-  //         // Handle regular fields
-  //         conditions.push(createFilterCondition(filter.column, filter.condition, filter.value));
-  //       }
-  //     }
-  //   });
-  // }
-
-  // if (allFilters && allFilters.length > 0) {
-  //   allFilters.forEach(filter => {
-  //     if (filter.column && filter.condition && (filter.value || ["Blank", "Not Blank"].includes(filter.condition))) {
-
-  //       let filterValue = filter.value;
-
-  //       // Check if the filter is for a date field
-  //       const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-  //       if (filter.column === "requestdate" || filter.column === "duedate" && dateRegex.test(filter.value)) {
-  //         // Convert DD/MM/YYYY to YYYY-MM-DD
-  //         const [day, month, year] = filter.value.split("/");
-  //         filterValue = `${year}-${month}-${day}`;
-  //       }
-  //       console.log(filter.column, "cl")
-  //       if (filter.column === "materialmode") {
-  //         conditions.push({
-  //           $or: [
-  //             createFilterCondition("material", filter.condition, filterValue),
-  //             createFilterCondition("materialnew", filter.condition, filterValue)
-  //           ]
-  //         });
-  //       }
-
-  //       // Handle special case for `stockmaterialarray`
-  //       if (["uomnew", "quantitynew", "materialnew", "productdetailsnew", "uomcodenew"].includes(filter.column)) {
-  //         const condition = {};
-  //         condition["stockmaterialarray"] = {
-  //           $elemMatch: createFilterCondition(filter.column, filter.condition, filterValue),
-  //         };
-  //         conditions.push(condition);
-  //       } else {
-  //         // Handle regular fields
-  //         conditions.push(createFilterCondition(filter.column, filter.condition, filterValue));
-  //       }
-  //     }
-  //   });
-  // }
 
   if (allFilters && allFilters.length > 0) {
 
@@ -1583,21 +1510,9 @@ exports.getAllStockmanageFilteredAccessVerification = catchAsyncErrors(async (re
       }
     });
 
-    query = {
-      $and: [
-        { updating: "" },
-        {
-          $or: assignbranch.map((branchObj) => ({
-            branch: branchObj.branch,
-            company: branchObj.company,
-            unit: branchObj.unit,
-          })),
-        },
-        ...orConditions,
-      ],
-    };
+
+  query.push(...orConditions);
   }
-  console.log(searchQuery, "searchQuery")
 
   // Apply logicOperator to combine conditions
   if (conditions.length > 0) {

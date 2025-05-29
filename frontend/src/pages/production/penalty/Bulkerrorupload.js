@@ -3805,6 +3805,8 @@ function formatDate(date, format) {
             setPenaltyEditUpdate(newdataMatcheddata);
             console.log(newdataMatcheddata, "newdataMatcheddata");
 
+            
+
 uniqueArrayfinal = d.filter((item, index, self) =>
   index ===
   self.findIndex((tp) =>

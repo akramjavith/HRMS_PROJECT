@@ -2661,8 +2661,22 @@ exports.getAllStockExcelDownloadAsset = async (req, res, next) => {
 
     // Stream data to Excel row by row
     for await (let doc of dataStream) {
-      // console.log(doc, "doc")
-      worksheet.addRow(doc); // Add each document as a row in Excel
+      const formatDate = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const formattedDoc = {
+    ...doc,
+    billdate: formatDate(doc.billdate),
+    purchasedate: formatDate(doc.purchasedate)
+  };
+
+  worksheet.addRow(formattedDoc);
     }
 
     // Once all data is streamed, write the workbook to the response
@@ -2747,20 +2761,7 @@ exports.getAllStockPdfDownloadAssetPDF = catchAsyncErrors(async (req, res, next)
 ];
 
     for await (const doc of cursor) {
-      // tableData.push([
-      //   doc.company ?? "-", doc.branch ??
-      //    "-", doc.unit ?? "-", doc.floor ??
-      //     "-", doc.area ?? "-", doc.location ?? "-", doc.requestmode ?? 
-      //     "-", doc.vendorgroup, doc.vendor ?? "-",, doc.gstno ?? "-",
-      //     , doc.billno ?? "-",, doc.assettype ?? "-",, doc.producthead ?? "-",
-
-      //     , doc.productname ?? "-", doc.warranty ?? "-", doc.purchasedate ?? "-", doc.productdetails ?? "-",
-      //      doc.warrantydetails ?? "-",
-      //        doc.quantity ?? "-",, doc.uom ?? "-",, doc.rate ?? "-",
-      //     , doc.billdate ?? "-"
-        
-      //   ]
-      //   );
+   
      tableData.push(fields.map(f => doc[f] ?? "-"));
     }
 
@@ -2798,27 +2799,32 @@ exports.getAllStockPdfDownloadAssetPDF = catchAsyncErrors(async (req, res, next)
 
 //reorder
 exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, next) => {
-
   try {
-   const {assignbranch,assetmat} = req.body;
+    const { assignbranch, assetmat } = req.body;
 
-    let query ={ }
-      const branchFilter = assignbranch.map((branchObj) => ({
-    branch: branchObj.branch,
-    company: branchObj.company,
-    unit: branchObj.unit,
-  }));
+    // Create branch filter for $or
+    const branchFilter = assignbranch.map((branchObj) => ({
+      branch: branchObj.branch,
+      company: branchObj.company,
+      unit: branchObj.unit,
+    }));
+
     const [stock, stockData, managestockitems] = await Promise.all([
+      // 1. Aggregation for stock
       Stock.aggregate([
         {
           $match: {
-             $or: branchFilter,
-              $or:[
-           { requestmode: assetmat},
-           { handover: { $exists: false }},
-            {status: { $ne: "Transfer" }},
-              ]
-          },
+            $and: [
+              { $or: branchFilter },
+              {
+                $or: [
+                  { requestmode: assetmat },
+                  { handover: { $exists: false } },
+                  { status: { $ne: "Transfer" } },
+                ]
+              }
+            ]
+          }
         },
         {
           $project: {
@@ -2832,13 +2838,20 @@ exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, ne
             productname: 1,
             quantity: 1,
             stockmaterialarray: 1,
-            tododetails:1,
+            tododetails: 1,
           },
         },
       ]),
 
+      // 2. Find stock data for return/handover/usagecount
       Stock.find(
-        { handover: { $in: ["return", "handover", "usagecount"] }, requestmode: assetmat },
+        {
+          $and: [
+            { $or: branchFilter },
+            { handover: { $in: ["return", "handover", "usagecount"] } },
+            { requestmode: assetmat },
+          ]
+        },
         {
           company: 1,
           branch: 1,
@@ -2862,18 +2875,23 @@ exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, ne
           description: 1,
           filesusagecount: 1,
           requestmode: 1,
-          handover: 1, // Needed for filtering
+          handover: 1,
         }
       ),
-      Managestockitems.find({}, { itemname: 1, minimumquantity: 1 }),
 
+      // 3. Find minimum quantity details
+      Managestockitems.find(
+        {  },
+        { itemname: 1, minimumquantity: 1 }
+      ),
     ]);
 
-    // Split the data into separate arrays
+    // Separate the stockData by handover type
     const stockreturn = stockData.filter((s) => s.handover === "return");
     const stockhand = stockData.filter((s) => s.handover === "handover");
     const stockusage = stockData.filter((s) => s.handover === "usagecount");
 
+    // Respond with structured data
     return res.json({
       managestockitems,
       stock,
@@ -2881,17 +2899,13 @@ exports.getAllStockPurchaseLimitedReorder = catchAsyncErrors(async (req, res, ne
       stockhand,
       stockusage,
     });
-  } catch (err) {
-    console.log(err, "err"
 
-    )
+  } catch (err) {
+    console.log(err, "err");
     return next(new ErrorHandler("Records not found!", 404));
   }
-
-  // return res.status(200).json({
-  //   stock,
-  // });
 });
+
 
 
 const mergeChunksStock = async (fileName, totalChunks) => {

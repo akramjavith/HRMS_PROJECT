@@ -5,8 +5,7 @@ import { userStyle } from '../../../pageStyle';
 // import { ExportXL, ExportCSV } from "../../components/Export";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-// import axios from '../../../axiosInstance';
-import axios from "axios";
+import axios from '../../../axiosInstance';
 import { SERVICE } from '../../../services/Baseservice';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { useReactToPrint } from 'react-to-print';
@@ -305,31 +304,31 @@ function OverallReport() {
   const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? []
     : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
+        ?.filter((data) => {
+          let fetfinalurl = [];
 
-        if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
 
-        const remove = [window.location.pathname?.substring(1), window.location.pathname];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
-        // branch: data.branch,
-        name: data.company,
-        // unit: data.unit,
-      }));
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          // branch: data.branch,
+          name: data.company,
+          // unit: data.unit,
+        }));
 
   //   try {
   //     let res = await axios.post(SERVICE.COMPANY_LIMITED_BY_ACCESS, {
@@ -627,31 +626,31 @@ function OverallReport() {
     const accessbranch = isUserRoleAccess?.role?.includes('Manager')
       ? []
       : isAssignBranch
-        ?.filter((data) => {
-          let fetfinalurl = [];
+          ?.filter((data) => {
+            let fetfinalurl = [];
 
-          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.subsubpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.subpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.mainpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.submodulenameurl;
-          } else if (data?.modulenameurl?.length !== 0) {
-            fetfinalurl = data.modulenameurl;
-          } else {
-            fetfinalurl = [];
-          }
+            if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+              fetfinalurl = data.subsubpagenameurl;
+            } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+              fetfinalurl = data.subpagenameurl;
+            } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+              fetfinalurl = data.mainpagenameurl;
+            } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+              fetfinalurl = data.submodulenameurl;
+            } else if (data?.modulenameurl?.length !== 0) {
+              fetfinalurl = data.modulenameurl;
+            } else {
+              fetfinalurl = [];
+            }
 
-          const remove = [window.location.pathname?.substring(1), window.location.pathname];
-          return fetfinalurl?.some((item) => remove?.includes(item));
-        })
-        ?.map((data) => ({
-          name: data.branch,
-          company: data.company,
-          unit: data.unit,
-        }));
+            const remove = [window.location.pathname?.substring(1), window.location.pathname];
+            return fetfinalurl?.some((item) => remove?.includes(item));
+          })
+          ?.map((data) => ({
+            name: data.branch,
+            company: data.company,
+            unit: data.unit,
+          }));
     try {
       const [RES_COMPANY, RES_BRANCH, RES_UNIT, RES_TEAM, RES_PROJECT, RES_VENDOR, RES_CATEGORY, RES_SUBCATEGORY] = await Promise.all([
         axios.post(SERVICE.COMPANY_LIMITED_BY_ACCESS, {
@@ -858,41 +857,41 @@ function OverallReport() {
             apiUrl,
             batchNumber === 0
               ? {
-                date: overallState.fromdate,
-                empname: selectedEmployeeFrom.map((item) => item.value),
-                user: selectedOptionsLoginid.map((item) => item.value),
-                batchNumber: batchNumber,
-                batchSize: 0,
-              }
+                  date: overallState.fromdate,
+                  empname: selectedEmployeeFrom.map((item) => item.value),
+                  user: selectedOptionsLoginid.map((item) => item.value),
+                  batchNumber: batchNumber,
+                  batchSize: 0,
+                }
               : {
-                date: overallState.fromdate,
-                users: allusers.slice(beforeBatch, currentBatch),
-                batchNumber: batchNumber,
-                company: selectedOptionsCompany.map((item) => item.value),
-                branch: selectedOptionsBranch.map((item) => item.value),
-                unit: selectedOptionsUnit.map((item) => item.value),
+                  date: overallState.fromdate,
+                  users: allusers.slice(beforeBatch, currentBatch),
+                  batchNumber: batchNumber,
+                  company: selectedOptionsCompany.map((item) => item.value),
+                  branch: selectedOptionsBranch.map((item) => item.value),
+                  unit: selectedOptionsUnit.map((item) => item.value),
 
-                // newcategory: valueSubCat,
-                team: selectedOptionsTeam.map((item) => item.value),
-                projectvendor: projvendor,
-                // subs: result,
-                // subsmanual: resultmanual,
-                empname: selectedEmployeeFrom.map((item) => item.value),
-                user: selectedOptionsLoginid.map((item) => item.value),
-                category: selectedOptionsCategory.map((item) => item.value),
-                subcategory: selectedOptionsSubCategory.map((item) => item.value),
-                // vendor: selectedVendor.map(item => item.value),
-                // project: selectedProject.map(item => item.value),
-                username: selectedEmployeeUsername,
+                  // newcategory: valueSubCat,
+                  team: selectedOptionsTeam.map((item) => item.value),
+                  projectvendor: projvendor,
+                  // subs: result,
+                  // subsmanual: resultmanual,
+                  empname: selectedEmployeeFrom.map((item) => item.value),
+                  user: selectedOptionsLoginid.map((item) => item.value),
+                  category: selectedOptionsCategory.map((item) => item.value),
+                  subcategory: selectedOptionsSubCategory.map((item) => item.value),
+                  // vendor: selectedVendor.map(item => item.value),
+                  // project: selectedProject.map(item => item.value),
+                  username: selectedEmployeeUsername,
 
-                selecteddupe: selectedDupe,
-                fromdate: overallState.fromdate,
-                fromtime: overallState.fromtime24Hrs,
-                totime: overallState.totime24Hrs,
-                todate: overallState.todate,
-                shift: overallState.shift,
-                mode: selectedOptionsMode.map((item) => item.value),
-              },
+                  selecteddupe: selectedDupe,
+                  fromdate: overallState.fromdate,
+                  fromtime: overallState.fromtime24Hrs,
+                  totime: overallState.totime24Hrs,
+                  todate: overallState.todate,
+                  shift: overallState.shift,
+                  mode: selectedOptionsMode.map((item) => item.value),
+                },
             {
               headers: {
                 Authorization: `Bearer ${auth.APIToken}`,

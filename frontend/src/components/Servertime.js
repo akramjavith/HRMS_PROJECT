@@ -94,25 +94,25 @@ function ServerTime() {
     const [serverTime, setServerTime] = useState(moment());
 
     // Fetch server time initially
-    const getCurrentServerTime = async () => {
-        try {
-            const response = await axios.get(SERVICE.GET_CURRENT_SERVER_TIME);
-            setServerTime(moment(response.data.currentNewDate));
-        } catch (err) {
-            console.log("Error fetching server time:", err);
-        }
-    };
+    // const getCurrentServerTime = async () => {
+    //     try {
+    //         const response = await axios.get(SERVICE.GET_CURRENT_SERVER_TIME);
+    //         setServerTime(moment(response.data.currentNewDate));
+    //     } catch (err) {
+    //         console.log("Error fetching server time:", err);
+    //     }
+    // };
 
 
-    useEffect(() => {
-        getCurrentServerTime();
+    // useEffect(() => {
+    //     getCurrentServerTime();
 
-        const interval = setInterval(() => {
-            setServerTime((prevTime) => moment(prevTime).add(1, "second"));
-        }, 1000);
+    //     const interval = setInterval(() => {
+    //         setServerTime((prevTime) => moment(prevTime).add(1, "second"));
+    //     }, 1000);
 
-        return () => clearInterval(interval);
-    }, []);
+    //     return () => clearInterval(interval);
+    // }, []);
 
     if (!isUserRoleAccess?.role?.includes("Manager")) return null;
 

@@ -239,7 +239,7 @@ function Erroruploadconfirm() {
   const [isusercompleted, setisusercompleted] = useState([]);
   const [isAttandance, setIsAttandance] = useState(false);
 
-  const { isUserRoleAccess, isUserRoleCompare, listPageAccessMode, pageName, setPageName, buttonStyles, isServerCurrentdatetime } = useContext(UserRoleAccessContext);
+  const { isUserRoleAccess, isUserRoleCompare, listPageAccessMode, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
   let listpageaccessby = listPageAccessMode?.find((data) => data.modulename === 'Quality' && data.submodulename === 'Penalty' && data.mainpagename === 'Penalty Setup' && data.subpagename === 'Penalty Calculation' && data.subsubpagename === 'Error Upload Confirm')?.listpageaccessmode || 'Overall';
 
   const [selectedRows, setSelectedRows] = useState([]);
@@ -612,8 +612,8 @@ function Erroruploadconfirm() {
     {
       headerName: 'Supervisor Manual Total (DoubleClick Editable)',
       field: 'manualtotal',
-         editable:  isUserRoleCompare?.includes('eerroruploadconfirmsupervisoredit'),
- 
+      editable: isUserRoleCompare?.includes('eerroruploadconfirmsupervisoredit'),
+
       suppressClickEdit: true,
       sortable: true,
       filter: true,
@@ -677,26 +677,23 @@ function Erroruploadconfirm() {
     //   cellEditor: 'agTextCellEditor',
     //   suppressDestroy: true,
     // },
-        {
+    {
       field: 'manualerror',
       headerName: 'User Manual Error (DoubleClick Editable)',
       flex: 0,
       width: 250,
       minHeight: '40px !important',
       sortable: false,
-       editable: (params) => {
-    return (
-    Number(params.data.totalfields) === 0 &&
-      Number(params.data.errorcount) > 0
-    );
-  },
+      editable: (params) => {
+        // return ( Number(params.data.totalfields) === 0 && Number(params.data.errorcount) > 0 );
+        return Number(params.data.manualerror) != Number(params.data.uploadcount);
+      },
       suppressClickEdit: true,
       filter: true,
       resizable: true,
-       cellEditor: 'agTextCellEditor',
+      cellEditor: 'agTextCellEditor',
       hide: !columnVisibility.manualerror,
       headerClassName: 'bold-header',
-    
     },
     {
       field: 'actions1',
@@ -714,9 +711,10 @@ function Erroruploadconfirm() {
               <Button
                 variant="outlined"
                 color="primary"
- disabled={  Number(params.data.totalfields) !== 0  }                size="small"
+                // disabled={Number(params.data.totalfields) !== 0}
+                size="small"
                 onClick={() => {
-                  sendEditRequest(params.data.id, params.data.manualerror,params.data, 'manualerror');
+                  sendEditRequest(params.data.id, params.data.manualerror, params.data, 'manualerror');
                 }}
               >
                 UPDATE
@@ -1105,26 +1103,23 @@ function Erroruploadconfirm() {
     //   cellEditor: 'agTextCellEditor',
     //   suppressDestroy: true,
     // },
-      {
+    {
       field: 'manualerror',
       headerName: 'User Manual Error (DoubleClick Editable)',
       flex: 0,
       width: 250,
       minHeight: '40px !important',
       sortable: false,
-       editable: (params) => {
-    return (
-      Number(params.data.totalfields) === 0 &&
-      Number(params.data.errorcount) > 0
-    );
-  },
+      editable: (params) => {
+        // return ( Number(params.data.totalfields) === 0 && Number(params.data.errorcount) > 0 );
+        return Number(params.data.manualerror) != Number(params.data.uploadcount);
+      },
       suppressClickEdit: true,
       filter: true,
       resizable: true,
-       cellEditor: 'agTextCellEditor',
+      cellEditor: 'agTextCellEditor',
       hide: !columnVisibilitynot.manualerror,
       headerClassName: 'bold-header',
-    
     },
     {
       field: 'actions1',
@@ -1137,17 +1132,15 @@ function Erroruploadconfirm() {
       headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <>
-          {
-         
-          isUserRoleCompare?.includes('emanualerrorupdate') && (
+          {isUserRoleCompare?.includes('emanualerrorupdate') && (
             <Grid sx={{ display: 'flex' }}>
               <Button
                 variant="outlined"
                 color="primary"
-               disabled={  Number(params.data.totalfields) !== 0  }
+                // disabled={Number(params.data.totalfields) !== 0}
                 size="small"
                 onClick={() => {
-                  sendEditRequestNotCompleted(params.data.id, params.data.manualerror,params.data, 'manualerror');
+                  sendEditRequestNotCompleted(params.data.id, params.data.manualerror, params.data, 'manualerror');
                 }}
               >
                 UPDATE
@@ -1156,8 +1149,6 @@ function Erroruploadconfirm() {
           )}
         </>
       ),
-
-
     },
     {
       field: 'uploadcount',
@@ -1865,12 +1856,12 @@ function Erroruploadconfirm() {
       companyname: String(isUserRoleAccess?.companyname),
       pagename: String('Error Upload Confirm'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(isServerCurrentdatetime?.currentNewDate),
+      date: String(new Date()),
 
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(isServerCurrentdatetime?.currentNewDate),
+          date: String(new Date()),
         },
       ],
     });
@@ -1991,7 +1982,7 @@ function Erroruploadconfirm() {
 
   const [maualerroredit, setManualerroredit] = useState('');
 
-  const sendEditRequest = async (id, manualvalue,data, type, manualerror) => {
+  const sendEditRequest = async (id, manualvalue, data, type, manualerror) => {
     // console.log(manualvalue, "manualvalue")
     // setLoader(true)
     let editid = id;
@@ -2002,13 +1993,11 @@ function Erroruploadconfirm() {
           setPopupContentMalert('Please Enter Value');
           setPopupSeverityMalert('warning');
           handleClickOpenPopupMalert();
-        } 
-         else if ((Number(data.uploadcount) > Number(manualvalue))) {
+        } else if (Number(data.uploadcount) > Number(manualvalue)) {
           setPopupContentMalert('Please Enter Equal or More than Upload Count');
           setPopupSeverityMalert('warning');
           handleClickOpenPopupMalert();
-        }
-        else {
+        } else {
           setManualerroredit(id);
           let res = await axios.put(`${SERVICE.PENALTYTOTALFIELDUPLOAD_SINGLE}/${editid}`, {
             headers: {
@@ -2063,8 +2052,8 @@ function Erroruploadconfirm() {
     }
   };
 
-  const sendEditRequestNotCompleted = async (id, manualvalue,data, type) => {
- console.log(data.uploadcount,manualvalue, "manualvalue")
+  const sendEditRequestNotCompleted = async (id, manualvalue, data, type) => {
+    console.log(data.uploadcount, manualvalue, 'manualvalue');
     // setLoader(true)
     let editid = id;
     setPageName(!pageName);
@@ -2074,13 +2063,11 @@ function Erroruploadconfirm() {
           setPopupContent('Please Enter Value');
           setPopupSeverity('warning');
           handleClickOpenPopup();
-        }
-        else if ((Number(data.uploadcount) > Number(manualvalue))) {
+        } else if (Number(data.uploadcount) > Number(manualvalue)) {
           setPopupContentMalert('Please Enter Equal or More than Upload Count');
           setPopupSeverityMalert('warning');
           handleClickOpenPopupMalert();
-        }
-         else {
+        } else {
           setManualerroredit(id);
           let res = await axios.put(`${SERVICE.PENALTYTOTALFIELDUPLOAD_SINGLE}/${editid}`, {
             headers: {

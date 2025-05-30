@@ -43,8 +43,8 @@ authRoute.route("/individualusersloginstatus").post(getIndividualUserLoginStatus
 authRoute.route("/authenticate").post(authenticateUser);
 authRoute.route("/userwithstatushomecount").post(getUserWithStatusHomeCount);
 authRoute.route("/userhomecountrelieve").post(getAllUserHomeCountReleive);
-authRoute.route("/userhomecountnotclockin").get(getAllUserHomeCountNotClockIn);
-authRoute.route("/userhomecountnotclockinlist").get(getAllUserHomeCountNotClockInList);
+authRoute.route("/userhomecountnotclockin").post(getAllUserHomeCountNotClockIn);
+authRoute.route("/userhomecountnotclockinlist").post(getAllUserHomeCountNotClockInList);
 authRoute.route("/hierarchybasedemployeeworkstationhira").post(getHierarchyBasedEmployeeWorkstationhira);
 authRoute.route("/hierarchybasedemployeeworkstation").post(getHierarchyBasedEmployeeWorkstation);
 authRoute.route("/duplicatefacecheck").post(duplicateFaceDetector);

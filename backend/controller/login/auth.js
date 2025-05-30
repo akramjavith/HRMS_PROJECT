@@ -24209,162 +24209,309 @@ exports.getHierarchyBasedEmployeeWorkstation = catchAsyncErrors(async (req, res,
     });
 });
 
+// exports.getUserWithStatusHomeCount = catchAsyncErrors(async (req, res, next) => {
+//     let allusers;
+//     try {
+//         const { pageName, assignbranch } = req.body;
+
+//         const branchFilter = assignbranch.map((branchObj) => ({
+//             branch: branchObj.branch,
+//             company: branchObj.company,
+//             unit: branchObj.unit
+//         }));
+// console.log(branchFilter,"branchFilter")
+//         let Query = { $or: branchFilter };
+
+//         // Define the past 3 days range
+//         const today = moment();
+//         const pastThreeAttendaysDays = [
+//             today.clone().subtract(1, "days").format("DD-MM-YYYY"),
+//             today.clone().subtract(2, "days").format("DD-MM-YYYY"),
+//             today.clone().subtract(3, "days").format("DD-MM-YYYY"),
+//         ];
+//         const pastThreeLeaveDays = [
+//             today.clone().subtract(1, "days").format("DD/MM/YYYY"),
+//             today.clone().subtract(2, "days").format("DD/MM/YYYY"),
+//             today.clone().subtract(3, "days").format("DD/MM/YYYY"),
+//         ];
+//         const pastThreeDaysISO = [
+//             today.clone().subtract(1, "days").format("YYYY-MM-DD"),
+//             today.clone().subtract(2, "days").format("YYYY-MM-DD"),
+//             today.clone().subtract(3, "days").format("YYYY-MM-DD"),
+//         ];
+//         // Fetch relevant attendance records for the past 3 days
+//         let attendance = await Attendance.find(
+//             {
+//                 date: {
+//                     $in: pastThreeAttendaysDays,
+//                 },
+//             },
+//             { date: 1, userid: 1 }
+//         ).lean();
+//         // Fetch relevant leave records
+//         let allLeaveStatus = await ApplyLeave.find(
+//             {
+//                 date: { $in: pastThreeLeaveDays },
+//             },
+//             { employeename: 1, employeeid: 1, date: 1 }
+//         ).lean();
+
+//         let holidays = await Holiday.find(
+//             {
+//                 date: { $in: pastThreeDaysISO },
+//             },
+//             { date: 1, employee: 1 }
+//         ).lean();
+
+//         let noticeperiodstatus = await Noticeperiod.find(
+//             {},
+//             {
+//                 empname: 1,
+//                 empcode: 1,
+//                 status: 1,
+//                 rejectStatus: 1,
+//                 cancelstatus: 1,
+//                 approvedStatus: 1,
+//                 continuestatus: 1,
+//                 recheckStatus: 1,
+//             }
+//         ).lean();
+
+//         // Create a map for fast lookup of attendance records
+//         const attendanceMap = attendance.reduce((acc, item) => {
+//             const userId = item.userid.toString();
+//             const date = moment(item.date, "DD-MM-YYYY").format("DD/MM/YYYY");
+//             if (!acc[userId]) {
+//                 acc[userId] = [];
+//             }
+//             acc[userId].push(date);
+//             return acc;
+//         }, {});
+
+//         // Create a map for fast lookup of leave records
+//         const leaveMap = allLeaveStatus.reduce((acc, item) => {
+//             const userKey = `${item.employeeid}_${item.employeename}`;
+//             const leaveDates = item.date.map((date) =>
+//                 moment(date, "DD/MM/YYYY").format("DD/MM/YYYY")
+//             );
+//             if (!acc[userKey]) {
+//                 acc[userKey] = [];
+//             }
+//             acc[userKey].push(...leaveDates);
+//             return acc;
+//         }, {});
+
+//         // Create a map for fast lookup of holiday records
+//         const holidayMap = holidays.reduce((acc, item) => {
+//             const date = moment(item.date).format("DD/MM/YYYY");
+//             item.employee.forEach((employee) => {
+//                 if (!acc[employee]) {
+//                     acc[employee] = [];
+//                 }
+//                 acc[employee].push(date);
+//             });
+//             return acc;
+//         }, {});
+
+
+
+//         let filterQuery = {
+//             enquirystatus: {
+//                 $nin: ["Enquiry Purpose"],
+//             },
+//             resonablestatus: {
+//                 $nin: [
+//                     "Not Joined",
+//                     "Postponed",
+//                     "Rejected",
+//                     "Closed",
+//                     "Releave Employee",
+//                     "Absconded",
+//                     "Hold",
+//                     "Terminate",
+//                 ],
+//             },
+//             ...Query,
+//         };
+
+//         if (pageName === "Employee") {
+//             filterQuery.workmode = {
+//                 $ne: "Internship",
+//             };
+//         } else if (pageName === "Internship") {
+//             filterQuery.workmode = {
+//                 $eq: "Internship",
+//             };
+//         }
+//         // Use $or to filter incomes that match any of the branch, company, and unit combinations
+//         filterQuery = {
+//             $and: [
+//                 filterQuery, // Retain previous conditions
+//                 { $or: branchFilter } // Apply branch filtering
+//             ]
+//         };
+//         allusers = await User.countDocuments(filterQuery);
+//     } catch (err) {
+//         console.log(err, "err")
+//         return next(new ErrorHandler("Records not found!", 404));
+//     }
+
+//     // if (!finalArray) {
+//     //     return next(new ErrorHandler("Users not found", 400));
+//     // }
+
+//     return res.status(200).json({
+//         // count: finalArray.length,
+//         // allusers: finalArray,
+//         allusers
+//     });
+// });
+
+
 exports.getUserWithStatusHomeCount = catchAsyncErrors(async (req, res, next) => {
-    let allusers;
-    try {
-        const { pageName, assignbranch } = req.body;
+  let allusers;
+  try {
+    const { pageName, assignbranch } = req.body;
 
-        // const branchFilter = assignbranch.map((branchObj) => ({
-        //     branch: branchObj.branch,
-        //     company: branchObj.company,
-        //     unit: branchObj.unit
-        // }));
+    const branchFilter = assignbranch.map((branchObj) => ({
+      branch: branchObj.branch,
+      company: branchObj.company,
+      unit: branchObj.unit,
+    }));
+    let Query = { $or: branchFilter };
+    // Define the past 3 days range
+    const today = moment();
+    const pastThreeAttendaysDays = [today.clone().subtract(1, 'days').format('DD-MM-YYYY'), today.clone().subtract(2, 'days').format('DD-MM-YYYY'), today.clone().subtract(3, 'days').format('DD-MM-YYYY')];
+    const pastThreeLeaveDays = [today.clone().subtract(1, 'days').format('DD/MM/YYYY'), today.clone().subtract(2, 'days').format('DD/MM/YYYY'), today.clone().subtract(3, 'days').format('DD/MM/YYYY')];
+    const pastThreeDaysISO = [today.clone().subtract(1, 'days').format('YYYY-MM-DD'), today.clone().subtract(2, 'days').format('YYYY-MM-DD'), today.clone().subtract(3, 'days').format('YYYY-MM-DD')];
+    // Fetch relevant attendance records for the past 3 days
+    let attendance = await Attendance.find(
+      {
+        date: {
+          $in: pastThreeAttendaysDays,
+        },
+      },
+      { date: 1, userid: 1 }
+    ).lean();
+    // Fetch relevant leave records
+    let allLeaveStatus = await ApplyLeave.find(
+      {
+        date: { $in: pastThreeLeaveDays },
+        status: { $nin: ['Rejected'] },
+      },
+      { employeename: 1, employeeid: 1, date: 1 }
+    ).lean();
 
-        // let Query = { $or: branchFilter };
+    let holidays = await Holiday.find(
+      {
+        date: { $in: pastThreeDaysISO },
+      },
+      { date: 1, employee: 1 }
+    ).lean();
 
-        // Define the past 3 days range
-        const today = moment();
-        const pastThreeAttendaysDays = [
-            today.clone().subtract(1, "days").format("DD-MM-YYYY"),
-            today.clone().subtract(2, "days").format("DD-MM-YYYY"),
-            today.clone().subtract(3, "days").format("DD-MM-YYYY"),
-        ];
-        const pastThreeLeaveDays = [
-            today.clone().subtract(1, "days").format("DD/MM/YYYY"),
-            today.clone().subtract(2, "days").format("DD/MM/YYYY"),
-            today.clone().subtract(3, "days").format("DD/MM/YYYY"),
-        ];
-        const pastThreeDaysISO = [
-            today.clone().subtract(1, "days").format("YYYY-MM-DD"),
-            today.clone().subtract(2, "days").format("YYYY-MM-DD"),
-            today.clone().subtract(3, "days").format("YYYY-MM-DD"),
-        ];
-        // Fetch relevant attendance records for the past 3 days
-        let attendance = await Attendance.find(
-            {
-                date: {
-                    $in: pastThreeAttendaysDays,
-                },
-            },
-            { date: 1, userid: 1 }
-        ).lean();
-        // Fetch relevant leave records
-        let allLeaveStatus = await ApplyLeave.find(
-            {
-                date: { $in: pastThreeLeaveDays },
-            },
-            { employeename: 1, employeeid: 1, date: 1 }
-        ).lean();
+    let noticeperiodstatus = await Noticeperiod.find(
+      {},
+      {
+        empname: 1,
+        empcode: 1,
+        status: 1,
+        rejectStatus: 1,
+        cancelstatus: 1,
+        approvedStatus: 1,
+        continuestatus: 1,
+        recheckStatus: 1,
+      }
+    ).lean();
 
-        let holidays = await Holiday.find(
-            {
-                date: { $in: pastThreeDaysISO },
-            },
-            { date: 1, employee: 1 }
-        ).lean();
+    // Create a map for fast lookup of attendance records
+    const attendanceMap = attendance.reduce((acc, item) => {
+      const userId = item.userid.toString();
+      const date = moment(item.date, 'DD-MM-YYYY').format('DD/MM/YYYY');
+      if (!acc[userId]) {
+        acc[userId] = [];
+      }
+      acc[userId].push(date);
+      return acc;
+    }, {});
 
-        let noticeperiodstatus = await Noticeperiod.find(
-            {},
-            {
-                empname: 1,
-                empcode: 1,
-                status: 1,
-                rejectStatus: 1,
-                cancelstatus: 1,
-                approvedStatus: 1,
-                continuestatus: 1,
-                recheckStatus: 1,
-            }
-        ).lean();
+    // Create a map for fast lookup of leave records
+    const myCheckList = await MyCheckList.find({}).lean();
+    let leaveWithCheckList = allLeaveStatus
+      .map((item) => {
+        let foundData = myCheckList?.find((dataNew) => dataNew.commonid == item._id);
+        let areAllGroupsCompleted = foundData?.groups?.every((itemNew) => (itemNew.data !== undefined && itemNew.data !== '') || itemNew.files !== undefined);
 
-        // Create a map for fast lookup of attendance records
-        const attendanceMap = attendance.reduce((acc, item) => {
-            const userId = item.userid.toString();
-            const date = moment(item.date, "DD-MM-YYYY").format("DD/MM/YYYY");
-            if (!acc[userId]) {
-                acc[userId] = [];
-            }
-            acc[userId].push(date);
-            return acc;
-        }, {});
-
-        // Create a map for fast lookup of leave records
-        const leaveMap = allLeaveStatus.reduce((acc, item) => {
-            const userKey = `${item.employeeid}_${item.employeename}`;
-            const leaveDates = item.date.map((date) =>
-                moment(date, "DD/MM/YYYY").format("DD/MM/YYYY")
-            );
-            if (!acc[userKey]) {
-                acc[userKey] = [];
-            }
-            acc[userKey].push(...leaveDates);
-            return acc;
-        }, {});
-
-        // Create a map for fast lookup of holiday records
-        const holidayMap = holidays.reduce((acc, item) => {
-            const date = moment(item.date).format("DD/MM/YYYY");
-            item.employee.forEach((employee) => {
-                if (!acc[employee]) {
-                    acc[employee] = [];
-                }
-                acc[employee].push(date);
-            });
-            return acc;
-        }, {});
-
-
-
-        let filterQuery = {
-            enquirystatus: {
-                $nin: ["Enquiry Purpose"],
-            },
-            resonablestatus: {
-                $nin: [
-                    "Not Joined",
-                    "Postponed",
-                    "Rejected",
-                    "Closed",
-                    "Releave Employee",
-                    "Absconded",
-                    "Hold",
-                    "Terminate",
-                ],
-            },
-            // ...Query,
-        };
-
-        if (pageName === "Employee") {
-            filterQuery.workmode = {
-                $ne: "Internship",
-            };
-        } else if (pageName === "Internship") {
-            filterQuery.workmode = {
-                $eq: "Internship",
-            };
+        if (areAllGroupsCompleted) {
+          return {
+            ...item,
+            updatestatus: 'Completed',
+          };
         }
-        // Use $or to filter incomes that match any of the branch, company, and unit combinations
-        // filterQuery = {
-        //     $and: [
-        //         filterQuery, // Retain previous conditions
-        //         { $or: branchFilter } // Apply branch filtering
-        //     ]
-        // };
-        allusers = await User.countDocuments(filterQuery);
-    } catch (err) {
-        console.log(err, "err")
-        return next(new ErrorHandler("Records not found!", 404));
-    }
+        return null;
+      })
+      .filter((item) => item);
 
-    // if (!finalArray) {
-    //     return next(new ErrorHandler("Users not found", 400));
+    // Create a map for fast lookup of leave records
+    const leaveMap = leaveWithCheckList.reduce((acc, item) => {
+      const userKey = `${item.employeeid}_${item.employeename}`;
+      const leaveDates = item.date.map((date) => moment(date, 'DD/MM/YYYY').format('DD/MM/YYYY'));
+      if (!acc[userKey]) {
+        acc[userKey] = [];
+      }
+      acc[userKey].push(...leaveDates);
+      return acc;
+    }, {});
+
+    // Create a map for fast lookup of holiday records
+    const holidayMap = holidays.reduce((acc, item) => {
+      const date = moment(item.date).format('DD/MM/YYYY');
+      item.employee.forEach((employee) => {
+        if (!acc[employee]) {
+          acc[employee] = [];
+        }
+        acc[employee].push(date);
+      });
+      return acc;
+    }, {});
+
+    let filterQuery = {
+      enquirystatus: {
+        $nin: ['Enquiry Purpose'],
+      },
+      resonablestatus: {
+        $nin: ['Not Joined', 'Postponed', 'Rejected', 'Closed', 'Releave Employee', 'Absconded', 'Hold', 'Terminate'],
+      },
+      ...Query,
+    };
+
+    // if (pageName === "Employee") {
+    filterQuery.workmode = {
+      $ne: 'Internship',
+    };
+    // } else if (pageName === "Internship") {
+    //     filterQuery.workmode = {
+    //         $eq: "Internship",
+    //     };
     // }
+    if (branchFilter.length > 0) {
+      allusers = await User.countDocuments(filterQuery).lean();
+    } else {
+      allusers = [];
+    }
+  } catch (err) {
+    console.log(err,"err")
+    return next(new ErrorHandler('Records not found!', 404));
+  }
 
-    return res.status(200).json({
-        // count: finalArray.length,
-        // allusers: finalArray,
-        allusers
-    });
+  // if (!finalArray) {
+  //     return next(new ErrorHandler("Users not found", 400));
+  // }
+
+  return res.status(200).json({
+    // count: finalArray.length,
+    // allusers: finalArray,
+    allusers,
+  });
 });
 
 exports.getAllUserHomeCountReleive = catchAsyncErrors(async (req, res, next) => {
@@ -24386,6 +24533,7 @@ exports.getAllUserHomeCountReleive = catchAsyncErrors(async (req, res, next) => 
         }
         user = await User.countDocuments(filterQuery);
     } catch (err) {
+        console.log(err,"errr")
         return next(new ErrorHandler("Records not found!", 404));
     }
 
@@ -24397,85 +24545,94 @@ exports.getAllUserHomeCountReleive = catchAsyncErrors(async (req, res, next) => 
 });
 
 exports.getAllUserHomeCountNotClockIn = catchAsyncErrors(async (req, res, next) => {
-    let user;
+  let user;
 
-    try {
-        const currentDate = new Date();
-        const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`;
-        user = await Attendance.countDocuments({ date: formattedDate }, {});
-    } catch (err) {
-        return next(new ErrorHandler("Records not found!", 404));
+  try {
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`;
+
+    const branchFilter = req.body.assignbranch.map((branchObj) => ({
+      branch: branchObj.branch,
+      company: branchObj.company,
+      unit: branchObj.unit,
+    }));
+    let Query = { $or: branchFilter };
+
+    let filterquery = {
+      date: formattedDate,
+      ...Query,
+    };
+
+    if (branchFilter.length > 0) {
+      user = await Attendance.countDocuments(filterquery).lean();
+    } else {
+      user = [];
     }
+  } catch (err) {
+    return next(new ErrorHandler('Records not found!', 404));
+  }
 
-    // if (!usersstatus) {
-    //     return next(new ErrorHandler("Users not found", 400));
-    // }
+  // if (!usersstatus) {
+  //     return next(new ErrorHandler("Users not found", 400));
+  // }
 
-    return res.status(200).json({ user });
+  return res.status(200).json({ user });
 });
 
 exports.getAllUserHomeCountNotClockInList = catchAsyncErrors(async (req, res, next) => {
-    let user, attendance, applyleaves, filtered;
+  let user, attendance, applyleaves, filtered;
 
-    try {
-        const currentDate = new Date();
-        const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`;
-        const formattedDateApply = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
-        console.log(formattedDateApply)
-        attendance = await Attendance.find({ date: formattedDate }, { username: 1, userid: 1 });
+  try {
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`;
+    const formattedDateApply = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+    attendance = await Attendance.find({ date: formattedDate }, { username: 1, userid: 1 });
 
-        applyleaves = await ApplyLeave.find({ status: "Approved", date: { $in: formattedDateApply } }, { employeename: 1 })
-        let filterQuery = {
-            enquirystatus: {
-                $nin: ["Enquiry Purpose"],
-            },
-            resonablestatus: {
-                $nin: [
-                    "Not Joined",
-                    "Postponed",
-                    "Rejected",
-                    "Closed",
-                    "Releave Employee",
-                    "Absconded",
-                    "Hold",
-                    "Terminate",
-                ],
-            },
-        };
+    applyleaves = await ApplyLeave.find({ status: 'Approved', date: { $in: formattedDateApply } }, { employeename: 1 }).lean();
 
-        filterQuery.workmode = {
-            $ne: "Internship",
-        };
+    const branchFilter = req.body.assignbranch.map((branchObj) => ({
+      branch: branchObj.branch,
+      company: branchObj.company,
+      unit: branchObj.unit,
+    }));
+    let Query = { $or: branchFilter };
 
+    let filterQuery = {
+      enquirystatus: {
+        $nin: ['Enquiry Purpose'],
+      },
+      resonablestatus: {
+        $nin: ['Not Joined', 'Postponed', 'Rejected', 'Closed', 'Releave Employee', 'Absconded', 'Hold', 'Terminate'],
+      },
+      ...Query,
+    };
 
+    filterQuery.workmode = {
+      $ne: 'Internship',
+    };
 
-        let alluser = await User.find(filterQuery, { company: 1, branch: 1, unit: 1, team: 1, department: 1, username: 1, companyname: 1, empcode: 1, shifttiming: 1 });
+    let alluser = await User.find(filterQuery, { company: 1, branch: 1, unit: 1, team: 1, department: 1, username: 1, companyname: 1, empcode: 1, shifttiming: 1 });
 
-
-        // console.log(alluser.length, "allusercount")
-
-
-
-        let finalfiltered = alluser.filter(
-            (ur) =>
-                !attendance.some((oldItem) => {
-                    return ur.username === oldItem.username && ur._id == oldItem.userid
-                })
-        );
-        console.log(applyleaves, "finalfiltered")
-
-        filtered = finalfiltered.filter(
-            (ur) =>
-                !applyleaves.some((oldItem) => {
-                    return ur.companyname === oldItem.employeename
-                })
-        );
-
-    } catch (err) {
-        console.log(err, "eroror")
-        return next(new ErrorHandler("Records not found!", 404));
+    let finalfiltered = alluser.filter(
+      (ur) =>
+        !attendance.some((oldItem) => {
+          return ur.username === oldItem.username && ur._id == oldItem.userid;
+        })
+    );
+    if (branchFilter.length > 0) {
+      filtered = finalfiltered.filter(
+        (ur) =>
+          !applyleaves.some((oldItem) => {
+            return ur.companyname === oldItem.employeename;
+          })
+      );
+    } else {
+      filtered = [];
     }
-    return res.status(200).json({ filtered });
+  } catch (err) {
+    return next(new ErrorHandler('Records not found!', 404));
+  }
+  return res.status(200).json({ filtered });
 });
 
 

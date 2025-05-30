@@ -63,7 +63,7 @@ const {
   getAllHierarchyPrimaryworkorderallDefault, getAllCandidateCountHome, getAllCandidateUpcomingInterview
 } = require("../controller/modules/excel/excel");
 
-excelRoute.route("/allcandidatescounthome").get(getAllCandidateCountHome);
+excelRoute.route("/allcandidatescounthome").post(getAllCandidateCountHome);
 excelRoute.route("/allcandidatesupcominginterview").post(getAllCandidateUpcomingInterview);
 
 excelRoute.route("/excels").get(getAllExcel);

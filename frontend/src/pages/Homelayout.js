@@ -141,7 +141,7 @@ const Homelayout = () => {
                         headers: {
                             Authorization: `Bearer ${auth.APIToken}`,
                         },
-                        pageName: "Employee",
+                        // pageName: "Employee",
                         assignbranch: accessbranch,
                     })
                     : Promise.resolve([]),
@@ -218,14 +218,15 @@ const Homelayout = () => {
             );
             console.log(res_relieve, "resrelevie")
             setNoticeCount(ans);
-            setReleiveEmp(res_relieve ? res_relieve?.data?.users : 0);
+            setReleiveEmp(res_relieve ? res_relieve?.data?.user : 0);
             setLeaveCount(res_leave?.data?.applyleaves);
             setEmployees(res_Employee?.data?.allusers);
+            console.log(res_Employee?.data?.allusers,"odffd")
             setNotClockIn(res_Employee?.data?.allusers - res_notcheckin?.data?.user - res_leave?.data?.applyleaves);
             setNewsEvents(res_News?.data?.scheduleevent.filter((item, index) => index <= 5))
             setCandidate(res_candidate?.data?.candidates)
             setUpcomingInterview(res_upcoming?.data?.candidates ? res_upcoming?.data?.candidates : [])
-        } catch (err) { handleApiError(err, setShowAlert, handleClickOpenerr); }
+        } catch (err) { console.log(err,"errhome");handleApiError(err, setShowAlert, handleClickOpenerr); }
     };
 
     console.log(releiveEmp, "releiveEmp")

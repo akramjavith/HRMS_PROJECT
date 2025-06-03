@@ -3170,7 +3170,7 @@ function Stockmanagerequest() {
     }
   };
 
-  
+
 
   //get all project.
   const fetchStockold = async (e) => {
@@ -3268,11 +3268,11 @@ function Stockmanagerequest() {
 
 
 
-    const fetchStock = async (e) => {
+  const fetchStock = async (e) => {
     setPageName(!pageName)
     setProjectCheck(true);
     const queryParams = {
-    
+
       assignbranch: accessbranch,
       company: valueCompanyCat,
       branch: valueBranchCat,
@@ -3281,55 +3281,55 @@ function Stockmanagerequest() {
 
 
     try {
-     
-        let res_employee = await axios.post(SERVICE.STOCK_MANAGE_ACCESS, queryParams, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        });
 
-        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
-        console.log(ans, "ansss")
-        // let filteredData = ans.filter((data) => {
-        //   return data.requestmode === "Asset Material";
-        // });
+      let res_employee = await axios.post(SERVICE.STOCK_MANAGE_ACCESS, queryParams, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
 
-        let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        });
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+      console.log(ans, "ansss")
+      // let filteredData = ans.filter((data) => {
+      //   return data.requestmode === "Asset Material";
+      // });
 
-        let codeValues = res_project_1?.data?.vommaster.map((data) => ({
-          name: data.name,
-          code: data?.code,
-        }));
-        // setuomcodes(codeValues);
+      let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
 
-        let setData = ans.map((item) => {
-          // Find the corresponding item in codeValues array
-          const matchingItem = codeValues.find(
-            (item1) => item.uom === item1.name
-          );
+      let codeValues = res_project_1?.data?.vommaster.map((data) => ({
+        name: data.name,
+        code: data?.code,
+      }));
+      // setuomcodes(codeValues);
 
-          // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-          return matchingItem
-            ? { ...item, uomcode: matchingItem?.code }
-            : { ...item, uomcode: "" };
-        });
-        const itemsWithSerialNumber = setData?.map((item, index) => ({
-          ...item,
-          serialNumber:index + 1,
-          requestdate: moment(item.requestdate).format("DD/MM/YYYY"),
-          duedate: moment(item.duedate).format("DD/MM/YYYY"),
-        }));
+      let setData = ans.map((item) => {
+        // Find the corresponding item in codeValues array
+        const matchingItem = codeValues.find(
+          (item1) => item.uom === item1.name
+        );
 
-        setStockmanage(itemsWithSerialNumber);
-        console.log(itemsWithSerialNumber, "itemsWithSerialNumber")
+        // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
+        return matchingItem
+          ? { ...item, uomcode: matchingItem?.code }
+          : { ...item, uomcode: "" };
+      });
+      const itemsWithSerialNumber = setData?.map((item, index) => ({
+        ...item,
+        serialNumber: index + 1,
+        requestdate: moment(item.requestdate).format("DD/MM/YYYY"),
+        duedate: moment(item.duedate).format("DD/MM/YYYY"),
+      }));
+
+      setStockmanage(itemsWithSerialNumber);
+      console.log(itemsWithSerialNumber, "itemsWithSerialNumber")
 
 
-        setProjectCheck(false);
-    
+      setProjectCheck(false);
+
     }
 
     catch (err) {
@@ -3448,7 +3448,7 @@ function Stockmanagerequest() {
   // useEffect(() => {
 
   //     fetchStock();
- 
+
   // }, []);
 
   useEffect(() => {
@@ -5912,22 +5912,22 @@ function Stockmanagerequest() {
                     />
                   </FormControl>
                 </Grid> */}
-                 <Grid item md={2} xs={6} sm={6}>
-                                <Box>
-                                  <AggregatedSearchBar
-                                    columnDataTable={columnDataTable}
-                                    setItems={setItems}
-                                    addSerialNumber={addSerialNumber}
-                                    setPage={setPage}
-                                    maindatas={stockmanages}
-                                    setSearchedString={setSearchedString}
-                                    searchQuery={searchQuery}
-                                    setSearchQuery={setSearchQuery}
-                                    paginated={false}
-                                    totalDatas={stockmanages}
-                                  />
-                                </Box>
-                              </Grid>
+                <Grid item md={2} xs={6} sm={6}>
+                  <Box>
+                    <AggregatedSearchBar
+                      columnDataTable={columnDataTable}
+                      setItems={setItems}
+                      addSerialNumber={addSerialNumber}
+                      setPage={setPage}
+                      maindatas={stockmanages}
+                      setSearchedString={setSearchedString}
+                      searchQuery={searchQuery}
+                      setSearchQuery={setSearchQuery}
+                      paginated={false}
+                      totalDatas={stockmanages}
+                    />
+                  </Box>
+                </Grid>
               </Grid>
               <br />
               <Grid container spacing={1}>
@@ -6012,32 +6012,32 @@ function Stockmanagerequest() {
                         itemsList={overallFilterdata}
                       /> */}
                       <AggridTable
-                                        rowDataTable={rowDataTable}
-                                        columnDataTable={columnDataTable}
-                                        columnVisibility={columnVisibility}
-                                        page={page}
-                                        setPage={setPage}
-                                        pageSize={pageSize}
-                                        totalPages={totalPages}
-                                        setColumnVisibility={setColumnVisibility}
-                                        isHandleChange={isHandleChange}
-                                        items={items}
-                                        selectedRows={selectedRows}
-                                        setSelectedRows={setSelectedRows}
-                                        gridRefTable={gridRefTable}
-                                      
-                                        paginated={false}
-                                        filteredDatas={filteredDatas}
-                                        // totalDatas={totalDatas}
-                                        searchQuery={searchedString}
-                                        handleShowAllColumns={handleShowAllColumns}
-                                        setFilteredRowData={setFilteredRowData}
-                                        filteredRowData={filteredRowData}
-                                        setFilteredChanges={setFilteredChanges}
-                                        filteredChanges={filteredChanges}
-                                        gridRefTableImg={gridRefTableImg}
-                                        itemsList={stockmanages}
-                                      />
+                        rowDataTable={rowDataTable}
+                        columnDataTable={columnDataTable}
+                        columnVisibility={columnVisibility}
+                        page={page}
+                        setPage={setPage}
+                        pageSize={pageSize}
+                        totalPages={totalPages}
+                        setColumnVisibility={setColumnVisibility}
+                        isHandleChange={isHandleChange}
+                        items={items}
+                        selectedRows={selectedRows}
+                        setSelectedRows={setSelectedRows}
+                        gridRefTable={gridRefTable}
+
+                        paginated={false}
+                        filteredDatas={filteredDatas}
+                        // totalDatas={totalDatas}
+                        searchQuery={searchedString}
+                        handleShowAllColumns={handleShowAllColumns}
+                        setFilteredRowData={setFilteredRowData}
+                        filteredRowData={filteredRowData}
+                        setFilteredChanges={setFilteredChanges}
+                        filteredChanges={filteredChanges}
+                        gridRefTableImg={gridRefTableImg}
+                        itemsList={stockmanages}
+                      />
                     </>
                   </Box>
                 </>

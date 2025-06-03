@@ -130,8 +130,8 @@ function Stockmaster() {
   const [isLoading, setIsLoading] = useState(false);
   const [vendorOverall, setVendorOverall] = useState([]);
 
-    const [loadingdeloverall, setloadingdeloverall] = useState(false);
-  
+  const [loadingdeloverall, setloadingdeloverall] = useState(false);
+
 
   let Expensetotal = 0;
 
@@ -533,11 +533,13 @@ function Stockmaster() {
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
     setBtnSubmit(false);
+
   };
   const handleClosePopupMalert = () => {
     setOpenPopupMalert(false);
     setBtnSubmit(false);
-    
+    setloadingdeloverall(false)
+
   };
   const [openPopup, setOpenPopup] = useState(false);
   const [popupContent, setPopupContent] = useState('');
@@ -549,6 +551,7 @@ function Stockmaster() {
   const handleClosePopup = () => {
     setOpenPopup(false);
     setBtnSubmit(false);
+    setloadingdeloverall(false)
   };
 
   let exportColumnNames = [
@@ -2777,7 +2780,7 @@ function Stockmaster() {
   const handleSubmit = async (e) => {
     let vendorEmpty = todos.some((item) => item.vendor == 'Choose Vendor');
     setBtnSubmit(true);
-      setloadingdeloverall(true);
+    setloadingdeloverall(true);
     e.preventDefault();
     await fetchStock('Filtered');
     await fetchEbSort();
@@ -2859,27 +2862,27 @@ function Stockmaster() {
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
-       else if (stockmaster.billno === '') {
+      else if (stockmaster.billno === '') {
         setPopupContentMalert('Please Enter Billno!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } 
+      }
       else if (stockmaster.warranty === 'Yes' && stockmaster.warrantydetails === '') {
         setPopupContentMalert('Please Enter Warranty Details!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
-       else if (stockmaster.billdate === '') {
+      else if (stockmaster.billdate === '') {
         setPopupContentMalert('Please Select Bill Date!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
-       else if (refImage.length == 0) {
+      else if (refImage.length == 0) {
         setPopupContentMalert('Please Upload Bill!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
-       else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
+      else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
         setPopupContentMalert('Please Select Request Mode For!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
@@ -2891,11 +2894,11 @@ function Stockmaster() {
         setPopupContentMalert('Please Select Component!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }else if (stockmaster.productdetails === '') {
+      } else if (stockmaster.productdetails === '') {
         setPopupContentMalert('Please Enter Product Details!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      }  else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
+      } else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
         setPopupContentMalert('Please Select Uom!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
@@ -3631,6 +3634,7 @@ function Stockmaster() {
           },
         ],
       });
+      setloadingdeloverall(false);
       await handleFileDeleteOld(oldfileNamesWar);
       await handleFileDeleteOld(oldfileNamesBill);
       await handleFileUpload(refImgWarrantyEdit, 'todo', stockmasteredit.uniqueId);
@@ -3661,6 +3665,7 @@ function Stockmaster() {
 
   const editSubmit = (e) => {
     setBtnSubmit(true);
+    setloadingdeloverall(true);
     e.preventDefault();
     let vendorEmpty = todosEdit.some((item) => item.vendor == 'Choose Vendor');
     const isNameMatch = stockEdit.some(
@@ -4284,6 +4289,18 @@ function Stockmaster() {
         });
 
         setStock(itemsWithSerialNumber);
+        setOverallFilterdata(
+          res_employee?.data?.totalProjectsData?.length > 0
+            ? res_employee?.data?.totalProjectsData?.map((item, index) => {
+              return {
+                ...item,
+                serialNumber: (page - 1) * pageSize + index + 1,
+                billdate: moment(item.billdate).format('DD/MM/YYYY'),
+                purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+              };
+            })
+            : []
+        );
 
         setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
         setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
@@ -5332,7 +5349,7 @@ function Stockmaster() {
             const url = window.URL.createObjectURL(blob); // Create a URL for the blob
             const link = document.createElement('a'); // Create a temporary link element
             link.href = url; // Set the href to the created blob URL
-            link.setAttribute('download', 'Stock_Purchase_Asset.xlsx'); // Specify the filename
+            link.setAttribute('download', 'Stock_Purchase.xlsx'); // Specify the filename
             document.body.appendChild(link); // Append the link to the document body
             link.click(); // Programmatically click the link to trigger the download
             document.body.removeChild(link); // Remove the link after download is triggered
@@ -5342,7 +5359,7 @@ function Stockmaster() {
         } else {
           console.error('Error: No data returned from server');
         }
- setIsFilterOpen(false);
+        setIsFilterOpen(false);
         setLoader(false);
       }
     } catch (err) {
@@ -5374,7 +5391,7 @@ function Stockmaster() {
           styles: { fontSize: 4 },
         });
 
-        doc.save(`${'Stock Purchase Asset'}.pdf`);
+        doc.save(`${'Stock Purchase'}.pdf`);
         setIsPdfFilterOpen(false);
       } else {
         setLoader(true);
@@ -5402,7 +5419,7 @@ function Stockmaster() {
             const url = window.URL.createObjectURL(blob); // Create a URL for the blob
             const link = document.createElement('a'); // Create a temporary link element
             link.href = url; // Set the href to the created blob URL
-            link.setAttribute('download', 'Stock_Purchase_Asset.pdf'); // Specify the filename
+            link.setAttribute('download', 'Stock_Purchase.pdf'); // Specify the filename
             document.body.appendChild(link); // Append the link to the document body
             link.click(); // Programmatically click the link to trigger the download
             document.body.removeChild(link); // Remove the link after download is triggered
@@ -5412,9 +5429,9 @@ function Stockmaster() {
         }
 
         setLoader(false);
-         setIsPdfFilterOpen(false);
+        setIsPdfFilterOpen(false);
       }
-      
+
     } catch (err) {
       setLoader(false);
       console.log('Error downloading Excel file: ', err);
@@ -5675,6 +5692,8 @@ function Stockmaster() {
             return {
               ...item,
               serialNumber: (page - 1) * pageSize + index + 1,
+              billdate: moment(item.billdate).format('DD/MM/YYYY'),
+              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
             };
           })
           : []
@@ -10877,15 +10896,15 @@ function Stockmaster() {
                       </Button>
                     </>
                   )} */}
-                   <LoadingButton
-                                      onClick={handleSubmit}
-                                      loading={loadingdeloverall}
-                                      sx={buttonStyles.buttonsubmit}
-                                      loadingPosition="end"
-                                      variant="contained"
-                                    >
-                                      Submit
-                                    </LoadingButton>
+                  <LoadingButton
+                    onClick={handleSubmit}
+                    loading={loadingdeloverall}
+                    sx={buttonStyles.buttonsubmit}
+                    loadingPosition="end"
+                    variant="contained"
+                  >
+                    Submit
+                  </LoadingButton>
                 </Grid>
                 <Grid item md={3} xs={12} sm={6} marginTop={3}>
                   <Button sx={buttonStyles.btncancel} onClick={handleclear}>
@@ -15012,7 +15031,7 @@ function Stockmaster() {
               <br /> <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
-                  {btnSubmit ? (
+                  {/* {btnSubmit ? (
                     <Box sx={{ display: 'flex' }}>
                       <CircularProgress />
                     </Box>
@@ -15022,8 +15041,17 @@ function Stockmaster() {
                         {' '}
                         Update
                       </Button>
-                    </>
-                  )}
+                    </> */}
+                  {/* )} */}
+                  <LoadingButton
+                    onClick={editSubmit}
+                    loading={loadingdeloverall}
+                    sx={buttonStyles.buttonsubmit}
+                    loadingPosition="end"
+                    variant="contained"
+                  >
+                    Update
+                  </LoadingButton>
                 </Grid>
                 <br />
                 <Grid item md={6} xs={12} sm={12}>

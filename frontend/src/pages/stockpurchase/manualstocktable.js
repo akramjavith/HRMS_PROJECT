@@ -10,7 +10,7 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { MultiSelect } from 'react-multi-select-component';
-
+import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Box,
   InputAdornment,
@@ -686,8 +686,30 @@ function ManuaStockTable({ vendorAuto }) {
       return foundDatas.includes(data.value);
     });
 
-    setVendoroptEdit(final);
+    // setVendoroptEdit(final);
   };
+
+  const fetchVendor = async (e) => {
+    let res1 = await axios.get(SERVICE.ALL_VENDORDETAILS, {
+      headers: {
+        Authorization: `Bearer ${auth.APIToken}`,
+      },
+    });
+    let datas = [
+      ...res1?.data?.vendordetails?.map((t) => ({
+        ...t,
+        label: t.vendorname,
+        value: t.vendorname,
+      })),
+    ];
+
+    // setVendoropt(final);
+    setVendoroptEdit(datas);
+  };
+
+  useEffect(() => {
+    fetchVendor();
+  }, [vendorAuto, groupedVendorNames]);
 
   const [getImg, setGetImg] = useState(null);
   const [refImage, setRefImage] = useState([]);
@@ -1319,8 +1341,7 @@ function ManuaStockTable({ vendorAuto }) {
       setFrequencyValue(res?.data?.smanualstock?.vendorfrequency === undefined ? '' : res?.data?.smanualstock?.vendorfrequency);
       setGroupedVendorNames(vendorOverall?.filter((item) => item.name === res?.data?.smanualstock?.vendorgroup)?.map((data) => data?.vendor));
 
-      setExpensecreate(alldata);
-      setVendorNewstock(res?.data?.smanualstock);
+      setExpensecreate(alldata)
       setEducationtodo(res?.data?.smanualstock?.tododetails);
       setVendorGroupEdit(res?.data?.smanualstock?.vendorgroup);
       setVendorNewEdit(res?.data?.smanualstock?.vendorname);
@@ -1335,9 +1356,14 @@ function ManuaStockTable({ vendorAuto }) {
       });
       console.log(res?.data?.smanualstock?.tododetails.totalbillamount, 'tato');
       setAmountEdit(res?.data?.smanualstock?.tododetails.totalbillamount);
-
-      const paidmode = vendorOptEdit?.find((data) => vendorOverall?.filter((item) => item.name === res?.data?.smanualstock?.vendorgroup)?.map((data) => data?.vendor)?.includes?.(res?.data?.smanualstock?.vendorname))?.modeofpayments
+      const allvendor = vendorOptEdit?.find((data) => vendorOverall?.filter((item) => item.name === res?.data?.smanualstock?.vendorgroup)?.map((data) => data?.vendor)?.includes?.(res?.data?.smanualstock?.vendorname))
+      const paidmode = allvendor?.modeofpayments
       setVendorModeOfPayments(paidmode)
+
+      setVendorNewstock((prev) => ({
+        ...prev,
+        ...allvendor,
+      }));
       // setRefImageedit(res?.data?.smanualstock?.files);
       // setRefImagewarrantyedit(
       //   res?.data?.smanualstock?.warrantyfiles
@@ -2676,7 +2702,7 @@ function ManuaStockTable({ vendorAuto }) {
   // Error Popup model
   const handleClickOpenerr = () => {
     setIsErrorOpen(true);
-    setBtnSubmit(false);
+
   };
   const handleCloseerr = () => {
     setIsErrorOpen(false);
@@ -3148,7 +3174,7 @@ function ManuaStockTable({ vendorAuto }) {
             <Button
               sx={userStyle.buttonedit}
               onClick={(e) => {
-                getviewCodestatus(params.data.id);
+                getviewCode(params.data.id);
                 // handleViewOpen();
               }}
             >
@@ -4175,7 +4201,7 @@ function ManuaStockTable({ vendorAuto }) {
           <Button
             sx={userStyle.buttonedit}
             onClick={(e) => {
-              getviewCode(params.data.id);
+              getviewCodestatus(params.data.id);
               handleViewOpenstatus();
             }}
           >
@@ -4970,7 +4996,8 @@ function ManuaStockTable({ vendorAuto }) {
           </Popover>
         </>
       )}
-
+      <br />
+      <br />
       <Box sx={userStyle.dialogbox}>
         <>
           <Grid item xs={8}>
@@ -6295,7 +6322,7 @@ function ManuaStockTable({ vendorAuto }) {
               <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
-                  {btnSubmit ? (
+                  {/* {btnSubmit ? (
                     <Box sx={{ display: 'flex' }}>
                       <CircularProgress />
                     </Box>
@@ -6304,9 +6331,12 @@ function ManuaStockTable({ vendorAuto }) {
                       <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
                         {' '}
                         Update
-                      </Button>
-                    </>
-                  )}
+                      </Button> */}
+                  <LoadingButton loading={btnSubmit} variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
+                    Update
+                  </LoadingButton>
+                  {/* </>
+                  )} */}
                 </Grid>
                 <br />
                 <Grid item md={6} xs={12} sm={12}>

@@ -1,84 +1,57 @@
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import LoadingButton from "@mui/lab/LoadingButton";
-import PageHeading from "../../components/PageHeading";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Dialog,
-  FormGroup,
-  DialogActions,
-  DialogContent,
-  FormControl,
-  Grid, Radio, InputAdornment, FormControlLabel, RadioGroup, Tooltip,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Popover,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import "jspdf-autotable";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import { handleApiError } from "../../components/Errorhandling";
-import Headtitle from "../../components/Headtitle";
-import StyledDataGrid from "../../components/TableStyle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { colourStyles, userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import LoadingButton from '@mui/lab/LoadingButton';
+import PageHeading from '../../components/PageHeading';
+import { Box, Button, Checkbox, Dialog, FormGroup, DialogActions, DialogContent, FormControl, Grid, Radio, InputAdornment, FormControlLabel, RadioGroup, Tooltip, IconButton, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, TextField, Typography } from '@mui/material';
+import Switch from '@mui/material/Switch';
+import axios from '../../axiosInstance';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import 'jspdf-autotable';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import { handleApiError } from '../../components/Errorhandling';
+import Headtitle from '../../components/Headtitle';
+import StyledDataGrid from '../../components/TableStyle';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { colourStyles, userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
 
-import AlertDialog from "../../components/Alert";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../components/DeleteConfirmation.js";
-import ExportData from "../../components/ExportData";
-import InfoPopup from "../../components/InfoPopup.js";
-import MessageAlert from "../../components/MessageAlert";
-import AggregatedSearchBar from "../../components/AggregatedSearchBar";
-import AggridTable from "../../components/AggridTable";
-import AggridTableForPaginationTable from "../../components/AggridTableForPaginationTable.js";
+import AlertDialog from '../../components/Alert';
+import { DeleteConfirmation, PleaseSelectRow } from '../../components/DeleteConfirmation.js';
+import ExportData from '../../components/ExportData';
+import InfoPopup from '../../components/InfoPopup.js';
+import MessageAlert from '../../components/MessageAlert';
+import AggregatedSearchBar from '../../components/AggregatedSearchBar';
+import AggridTable from '../../components/AggridTable';
+import AggridTableForPaginationTable from '../../components/AggridTableForPaginationTable.js';
 import domtoimage from 'dom-to-image';
-import { MdClose } from "react-icons/md";
-import { IoMdOptions } from "react-icons/io"
-import ManageColumnsContent from "../../components/ManageColumn";
-
+import { MdClose } from 'react-icons/md';
+import { IoMdOptions } from 'react-icons/io';
+import ManageColumnsContent from '../../components/ManageColumn';
 
 function Managestockitems() {
-
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
-  const [searchedString, setSearchedString] = useState("");
+  const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTableImg = useRef(null);
   const gridRefTable = useRef(null);
 
-
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
 
   // State to track advanced filter
   const [advancedFilter, setAdvancedFilter] = useState(null);
@@ -86,19 +59,18 @@ function Managestockitems() {
   const [columnApi, setColumnApi] = useState(null);
   const [filteredDataItems, setFilteredDataItems] = useState([]);
   //  const [filteredRowData, setFilteredRowData] = useState([]);
-  const [logicOperator, setLogicOperator] = useState("AND");
+  const [logicOperator, setLogicOperator] = useState('AND');
 
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [filterValue, setFilterValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [filterValue, setFilterValue] = useState('');
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = ["Contains", "Does Not Contain", "Equals", "Does Not Equal", "Begins With", "Ends With", "Blank", "Not Blank"]; // AgGrid-like conditions
-
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
     setloadingdeloverall(false);
@@ -107,8 +79,8 @@ function Managestockitems() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
     setloadingdeloverall(false);
@@ -118,59 +90,57 @@ function Managestockitems() {
   };
 
   let exportColumnNames = [
-    "Stock Category",
-    "Stock Sub Category",
-    "Itemname",
-    "Uom",
+    'Stock Category',
+    'Stock Sub Category',
+    'Itemname',
+    'Uom',
     // "Minimum Stock",
-    "Minimum Quantity",
-    "Maximum Quantity",
+    'Minimum Quantity',
+    'Maximum Quantity',
   ];
   let exportRowValues = [
-    "stockcategory",
-    "stocksubcategory",
-    "itemname",
-    "uom",
+    'stockcategory',
+    'stocksubcategory',
+    'itemname',
+    'uom',
     // "minimumstockswitch",
-    "minimumquantity",
-    "maximumquantity",
+    'minimumquantity',
+    'maximumquantity',
   ];
 
   const [loadingdeloverall, setloadingdeloverall] = useState(false);
   const gridRef = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
   const [subcategoryOpt, setSubcategoryOption] = useState([]);
   const [categoryOptionEdit, setCategoryOptionEdit] = useState([]);
   const [uomOpt, setUomOpt] = useState([]);
   const [uomOptEdit, setUomOptEdit] = useState([]);
   const [stocksubcategoryOptEdit, setStocksubcategoryOptEdit] = useState([]);
-  const [userId, setUserID] = useState("");
-  const [copiedData, setCopiedData] = useState("");
+  const [userId, setUserID] = useState('');
+  const [copiedData, setCopiedData] = useState('');
 
   //state to handle holiday values
   const [managestockitemState, setManagestockitemState] = useState({
-    stockcategory: "Please Select Stock category",
-    stocksubcategory: "Please Select Stock Sub-category",
-    itemname: "",
-    uom: "Please Select UOM",
-    minimumquantity: "",
-    maximumquantity: "",
+    stockcategory: 'Please Select Stock category',
+    stocksubcategory: 'Please Select Stock Sub-category',
+    itemname: '',
+    uom: 'Please Select UOM',
+    minimumquantity: '',
+    maximumquantity: '',
   });
   const [managestockitemEdit, setManagestockitemEdit] = useState({
-    stockcategory: "Please Select Stock category",
-    stocksubcategory: "Please Select Stock Sub-category",
-    itemname: "",
-    uom: "Please Select UOM",
-    minimumquantity: "",
-    maximumquantity: "",
+    stockcategory: 'Please Select Stock category',
+    stocksubcategory: 'Please Select Stock Sub-category',
+    itemname: '',
+    uom: 'Please Select UOM',
+    minimumquantity: '',
+    maximumquantity: '',
   });
 
   const [categoryOption, setCategoryOption] = useState([]);
   const [powerstationArray, setPowerstationArray] = useState([]);
-  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, buttonStyles } = useContext(
-    UserRoleAccessContext
-  );
+  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
   const [statusCheck, setStatusCheck] = useState(true);
 
@@ -185,7 +155,7 @@ function Managestockitems() {
   const [deleteHoliday, setDeleteHoliday] = useState({});
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [items, setItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [allStatusEdit, setAllStatusEdit] = useState([]);
 
   // Manage Columns
@@ -208,8 +178,8 @@ function Managestockitems() {
     setManagestockitemEdit((prevState) => ({
       ...prevState,
       minimumstockswitch: isChecked,
-      minimumquantity: isChecked ? prevState.minimumquantity : "",
-      maximumquantity: isChecked ? prevState.maximumquantity : "",
+      minimumquantity: isChecked ? prevState.minimumquantity : '',
+      maximumquantity: isChecked ? prevState.maximumquantity : '',
     }));
   };
 
@@ -221,14 +191,12 @@ function Managestockitems() {
     stocksubcategory: true,
     itemname: true,
     uom: true,
-    minimumstockswitch: true,
+    // minimumstockswitch: true,
     minimumquantity: true,
     maximumquantity: true,
     actions: true,
   };
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
 
   //useEffect
@@ -257,7 +225,6 @@ function Managestockitems() {
       ]);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
 
@@ -283,7 +250,6 @@ function Managestockitems() {
       );
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
 
@@ -313,7 +279,6 @@ function Managestockitems() {
       setStocksubcategoryOptEdit(subcatOpt);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
 
@@ -378,7 +343,7 @@ function Managestockitems() {
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
   const username = isUserRoleAccess.username;
   const handleOpenManageColumns = (event) => {
@@ -387,20 +352,20 @@ function Managestockitems() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.data.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   //set function to get particular row
   const rowData = async (id, name) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.MANAGESTOCKITEMS_SINGLE}/${id}`, {
         headers: {
@@ -411,7 +376,6 @@ function Managestockitems() {
       handleClickOpen();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
 
@@ -428,17 +392,16 @@ function Managestockitems() {
       handleCloseMod();
       setSelectedRows([]);
       setPage(1);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
   //add function
   const sendRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let statusCreate = await axios.post(SERVICE.MANAGESTOCKITEMS_CREATE, {
         headers: {
@@ -449,8 +412,8 @@ function Managestockitems() {
         itemname: String(managestockitemState.itemname),
         uom: String(managestockitemState.uom),
         minimumstockswitch: stockSwitch,
-        minimumquantity: stockSwitch ? String(managestockitemState.minimumquantity) : "",
-        maximumquantity: stockSwitch ? Number(managestockitemState.maximumquantity) : "",
+        minimumquantity: stockSwitch ? String(managestockitemState.minimumquantity) : '',
+        maximumquantity: stockSwitch ? Number(managestockitemState.maximumquantity) : '',
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
@@ -459,17 +422,16 @@ function Managestockitems() {
         ],
       });
       await fetchHoliday();
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
   //submit option for saving
   const handleSubmit = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     setloadingdeloverall(true);
     e.preventDefault();
     let res = await axios.get(SERVICE.MANAGESTOCKITEMS, {
@@ -482,70 +444,59 @@ function Managestockitems() {
       (item) =>
         // item.stockcategory?.toLowerCase() === managestockitemState.stockcategory?.toLowerCase() &&
         // item.stocksubcategory?.toLowerCase() === managestockitemState.stocksubcategory?.toLowerCase() &&
-        item.itemname?.toLowerCase() ===
-        managestockitemState.itemname?.toLowerCase()
+        item.itemname?.toLowerCase() === managestockitemState.itemname?.toLowerCase()
       //  &&
       // item.uom?.toLowerCase() === managestockitemState.uom?.toLowerCase()
     );
-    if (managestockitemState.stockcategory === "Please Select Stock category") {
-      setPopupContentMalert("Please Select Stock category!");
-      setPopupSeverityMalert("info");
+    if (managestockitemState.stockcategory === 'Please Select Stock category') {
+      setPopupContentMalert('Please Select Stock category!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (managestockitemState.stocksubcategory === 'Please Select Stock Sub-category') {
+      setPopupContentMalert('Please Select Stock Sub-category!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (managestockitemState.itemname === '') {
+      setPopupContentMalert('Please Enter Item Name!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (managestockitemState.uom === 'Please Select UOM') {
+      setPopupContentMalert('Please Select UOM!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (
-      managestockitemState.stocksubcategory ===
-      "Please Select Stock Sub-category"
-    ) {
-      setPopupContentMalert("Please Select Stock Sub-category!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    } else if (managestockitemState.itemname === "") {
-      setPopupContentMalert("Please Enter Item Name!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    } else if (managestockitemState.uom === "Please Select UOM") {
-      setPopupContentMalert("Please Select UOM!");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
-    else if (
       stockSwitch && // Only check these fields if stockSwitch is ON
       (!managestockitemState.minimumquantity || !managestockitemState.maximumquantity)
     ) {
-      setPopupContentMalert("Please Enter Minimum and Maximum Quantity!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Enter Minimum and Maximum Quantity!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      stockSwitch &&
-      parseInt(managestockitemState.minimumquantity, 10) >= parseInt(managestockitemState.maximumquantity, 10)
-    ) {
-      setPopupContentMalert("Minimum Quantity must be less than Maximum Quantity!");
-      setPopupSeverityMalert("error");
+    } else if (stockSwitch && parseInt(managestockitemState.minimumquantity, 10) >= parseInt(managestockitemState.maximumquantity, 10)) {
+      setPopupContentMalert('Minimum Quantity must be less than Maximum Quantity!');
+      setPopupSeverityMalert('error');
       handleClickOpenPopupMalert();
-    }
-    else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exist!!");
-      setPopupSeverityMalert("info");
+    } else if (isNameMatch) {
+      setPopupContentMalert('Data Already Exist!!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else {
+    } else {
       sendRequest();
     }
   };
   const handleclear = (e) => {
     e.preventDefault();
     setManagestockitemState({
-      stockcategory: "Please Select Stock category",
-      stocksubcategory: "Please Select Stock Sub-category",
-      itemname: "",
-      uom: "Please Select UOM",
-      minimumquantity: "",
-      maximumquantity: "",
+      stockcategory: 'Please Select Stock category',
+      stocksubcategory: 'Please Select Stock Sub-category',
+      itemname: '',
+      uom: 'Please Select UOM',
+      minimumquantity: '',
+      maximumquantity: '',
     });
     setStockSwitch(false);
     setSubcategoryOption([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
   //Edit model...
@@ -553,12 +504,12 @@ function Managestockitems() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
   };
   //get single row to edit....
   const getCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     setUserID(e);
     try {
       let res = await axios.get(`${SERVICE.MANAGESTOCKITEMS_SINGLE}/${e}`, {
@@ -574,13 +525,12 @@ function Managestockitems() {
       handleClickOpenEdit();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
 
   // get single row to view....
   const getviewCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.MANAGESTOCKITEMS_SINGLE}/${e}`, {
         headers: {
@@ -592,13 +542,12 @@ function Managestockitems() {
       handleClickOpenview();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
 
   // get single row to view....
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.MANAGESTOCKITEMS_SINGLE}/${e}`, {
         headers: {
@@ -609,7 +558,6 @@ function Managestockitems() {
       handleClickOpeninfo();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
 
@@ -620,44 +568,40 @@ function Managestockitems() {
   let holidayId = managestockitemEdit?._id;
   //editing the single data...
   const sendEditRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      let res = await axios.put(
-        `${SERVICE.MANAGESTOCKITEMS_SINGLE}/${holidayId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
+      let res = await axios.put(`${SERVICE.MANAGESTOCKITEMS_SINGLE}/${holidayId}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        stockcategory: String(managestockitemEdit.stockcategory),
+        stocksubcategory: String(managestockitemEdit.stocksubcategory),
+        itemname: String(managestockitemEdit.itemname),
+        uom: String(managestockitemEdit.uom),
+        minimumstockswitch: Boolean(stockSwitchEdit), // Ensures true/false value
+        minimumquantity: stockSwitchEdit ? String(managestockitemEdit.minimumquantity) : '',
+        maximumquantity: stockSwitchEdit ? String(managestockitemEdit.maximumquantity) : '',
+        updatedby: [
+          ...updateby,
+          {
+            name: String(isUserRoleAccess.companyname),
+            date: String(new Date()),
           },
-          stockcategory: String(managestockitemEdit.stockcategory),
-          stocksubcategory: String(managestockitemEdit.stocksubcategory),
-          itemname: String(managestockitemEdit.itemname),
-          uom: String(managestockitemEdit.uom),
-          minimumstockswitch: Boolean(stockSwitchEdit), // Ensures true/false value
-          minimumquantity: stockSwitchEdit ? String(managestockitemEdit.minimumquantity) : "",
-          maximumquantity: stockSwitchEdit ? String(managestockitemEdit.maximumquantity) : "",
-          updatedby: [
-            ...updateby,
-            {
-              name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
-            },
-          ],
-        }
-      );
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+        ],
+      });
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       await fetchHoliday();
       await fetchHolidayAll();
       handleCloseModEdit();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
 
   const editSubmit = (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     e.preventDefault();
     fetchHolidayAll();
     const isNameMatch = allStatusEdit?.some(
@@ -665,47 +609,37 @@ function Managestockitems() {
         // item.stockcategory?.toLowerCase() == managestockitemEdit.stockcategory?.toLowerCase() &&
         // item.stocksubcategory?.toLowerCase() == managestockitemEdit.stocksubcategory?.toLowerCase()
         //  &&
-        item.itemname?.toLowerCase() ==
-        managestockitemEdit.itemname?.toLowerCase()
+        item.itemname?.toLowerCase() == managestockitemEdit.itemname?.toLowerCase()
       // &&
       // item.uom?.toLowerCase() == managestockitemEdit.uom?.toLowerCase()
     );
-    if (managestockitemEdit.stockcategory === "Please Select Stockcategory") {
-      setPopupContentMalert("Please Select Stock category!");
-      setPopupSeverityMalert("info");
+    if (managestockitemEdit.stockcategory === 'Please Select Stockcategory') {
+      setPopupContentMalert('Please Select Stock category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      managestockitemEdit.stocksubcategory ===
-      "Please Select Stock Sub-category"
-    ) {
-      setPopupContentMalert("Please Select Stock Sub-category!");
-      setPopupSeverityMalert("info");
+    } else if (managestockitemEdit.stocksubcategory === 'Please Select Stock Sub-category') {
+      setPopupContentMalert('Please Select Stock Sub-category!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (managestockitemEdit.itemname === "") {
-      setPopupContentMalert("Please Enter Item Name!");
-      setPopupSeverityMalert("info");
+    } else if (managestockitemEdit.itemname === '') {
+      setPopupContentMalert('Please Enter Item Name!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (managestockitemEdit.uom === "Please Select UOM") {
-      setPopupContentMalert("Please Select UOM!");
-      setPopupSeverityMalert("info");
+    } else if (managestockitemEdit.uom === 'Please Select UOM') {
+      setPopupContentMalert('Please Select UOM!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (stockSwitchEdit && (!managestockitemEdit.minimumquantity || !managestockitemEdit.maximumquantity)) {
-      setPopupContentMalert("Please Enter Minimum and Maximum Quantity!");
-      setPopupSeverityMalert("info");
+    } else if (stockSwitchEdit && (!managestockitemEdit.minimumquantity || !managestockitemEdit.maximumquantity)) {
+      setPopupContentMalert('Please Enter Minimum and Maximum Quantity!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      stockSwitchEdit &&
-      parseInt(managestockitemEdit.minimumquantity, 10) >= parseInt(managestockitemEdit.maximumquantity, 10)
-    ) {
-      setPopupContentMalert("Minimum Quantity must be less than Maximum Quantity!");
-      setPopupSeverityMalert("error");
+    } else if (stockSwitchEdit && parseInt(managestockitemEdit.minimumquantity, 10) >= parseInt(managestockitemEdit.maximumquantity, 10)) {
+      setPopupContentMalert('Minimum Quantity must be less than Maximum Quantity!');
+      setPopupSeverityMalert('error');
       handleClickOpenPopupMalert();
-    }
-    else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exist!!");
-      setPopupSeverityMalert("info");
+    } else if (isNameMatch) {
+      setPopupContentMalert('Data Already Exist!!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequest();
@@ -713,70 +647,66 @@ function Managestockitems() {
   };
   //get all data.
   const fetchHoliday = async () => {
-    setPageName(!pageName)
-    setStatusCheck(true)
+    setPageName(!pageName);
+    setStatusCheck(true);
+    setColumnVisibility(initialColumnVisibility);
     const queryParams = {
       page: Number(page),
       pageSize: Number(pageSize),
     };
 
-    const allFilters = [
-      ...additionalFilters,
-      { column: selectedColumn, condition: selectedCondition, value: filterValue }
-    ];
+    const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
       queryParams.searchQuery = searchQuery;
     }
     try {
+
       let res_employee = await axios.post(SERVICE.MANAGE_STOCK_ITEMS_PAGINATION, queryParams, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
       const itemsWithSerialNumber = ans?.map((item, index) => {
-
         return {
           ...item,
           serialNumber: (page - 1) * pageSize + index + 1,
-
-
-        }
+        };
       });
-
 
       setPowerstationArray(itemsWithSerialNumber);
       setItems(itemsWithSerialNumber);
-      setOverallFilterdata(res_employee?.data?.totalProjectsData?.length > 0 ?
-        res_employee?.data?.totalProjectsData?.map((item, index) => {
-          return {
-            ...item,
-            serialNumber: (page - 1) * pageSize + index + 1,
-
-          }
-        }
-
-        ) : []
+      setOverallFilterdata(
+        res_employee?.data?.totalProjectsData?.length > 0
+          ? res_employee?.data?.totalProjectsData?.map((item, index) => {
+            return {
+              ...item,
+              serialNumber: (page - 1) * pageSize + index + 1,
+            };
+          })
+          : []
       );
       setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
       setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-      setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-      setPage((data) => { return ans?.length > 0 ? data : 1 });
-      setStatusCheck(false)
-    }
-    catch (err) {
-      setStatusCheck(false)
+      setPageSize((data) => {
+        return ans?.length > 0 ? data : 10;
+      });
+      setPage((data) => {
+        return ans?.length > 0 ? data : 1;
+      });
+      setStatusCheck(false);
+    } catch (err) {
+      setStatusCheck(false);
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
   //get all data.
   const fetchHolidayAll = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_status = await axios.get(SERVICE.MANAGESTOCKITEMS, {
         headers: {
@@ -784,25 +714,22 @@ function Managestockitems() {
         },
       });
 
-      setAllStatusEdit(
-        res_status?.data?.managestockitems.filter((item) => item._id !== userId)
-      );
+      setAllStatusEdit(res_status?.data?.managestockitems.filter((item) => item._id !== userId));
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
   //image
 
-
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Managestockitems.png");
+          saveAs(blob, 'Managestockitems.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -811,8 +738,8 @@ function Managestockitems() {
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Managestockitems",
-    pageStyle: "print",
+    documentTitle: 'Managestockitems',
+    pageStyle: 'print',
   });
   //serial no for listing items
   const addSerialNumber = (datas) => {
@@ -822,8 +749,6 @@ function Managestockitems() {
   useEffect(() => {
     addSerialNumber(powerstationArray);
   }, [powerstationArray]);
-
-
 
   //Datatable
   const handlePageChange = (newPage) => {
@@ -844,24 +769,16 @@ function Managestockitems() {
     setPage(1);
   };
   // Split the search query into individual terms
-  const searchOverAllTerms = searchQuery.toLowerCase().split(" ");
+  const searchOverAllTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchOverAllTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchOverAllTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
-  const filteredData = filteredDatas?.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas?.slice((page - 1) * pageSize, page * pageSize);
   // const totalPages = Math.ceil(filteredDatas?.length / pageSize);
   const visiblePages = Math.min(totalPages, 3);
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
   const pageNumbers = [];
   for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
     pageNumbers.push(i);
@@ -873,10 +790,10 @@ function Managestockitems() {
   );
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -885,55 +802,55 @@ function Managestockitems() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 100,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "stockcategory",
-      headerName: "Stock Category",
+      field: 'stockcategory',
+      headerName: 'Stock Category',
       flex: 0,
       width: 150,
       hide: !columnVisibility.stockcategory,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "stocksubcategory",
-      headerName: "Stock Sub-Category",
+      field: 'stocksubcategory',
+      headerName: 'Stock Sub-Category',
       flex: 0,
       width: 170,
       hide: !columnVisibility.stocksubcategory,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "itemname",
-      headerName: "Item Name",
+      field: 'itemname',
+      headerName: 'Item Name',
       flex: 0,
       width: 150,
       hide: !columnVisibility.itemname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "uom",
-      headerName: "Uom",
+      field: 'uom',
+      headerName: 'Uom',
       flex: 0,
       width: 100,
       hide: !columnVisibility.uom,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     // {
     //   field: "minimumstockswitch",
@@ -944,33 +861,33 @@ function Managestockitems() {
     //   headerClassName: "bold-header",
     // },
     {
-      field: "minimumquantity",
-      headerName: "Minimum Quantity",
+      field: 'minimumquantity',
+      headerName: 'Minimum Quantity',
       flex: 0,
       width: 100,
       hide: !columnVisibility.minimumquantity,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "maximumquantity",
-      headerName: "Maximum Quantity",
+      field: 'maximumquantity',
+      headerName: 'Maximum Quantity',
       flex: 0,
       width: 100,
       hide: !columnVisibility.maximumquantity,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("emanagestockitems") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('emanagestockitems') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -981,7 +898,7 @@ function Managestockitems() {
               <EditOutlinedIcon sx={buttonStyles.buttonedit} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("dmanagestockitems") && (
+          {isUserRoleCompare?.includes('dmanagestockitems') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
@@ -991,7 +908,7 @@ function Managestockitems() {
               <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("vmanagestockitems") && (
+          {isUserRoleCompare?.includes('vmanagestockitems') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -1001,7 +918,7 @@ function Managestockitems() {
               <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("imanagestockitems") && (
+          {isUserRoleCompare?.includes('imanagestockitems') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -1017,10 +934,10 @@ function Managestockitems() {
     },
   ];
 
-  const filteredSelectedColumn = columnDataTable.filter(data => data.field !== 'checkbox' && data.field !== "actions" && data.field !== "serialNumber");
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = items.map((item, index) => {
-    const formattedDate = new Date(item.date).toLocaleDateString("en-GB");
+    const formattedDate = new Date(item.date).toLocaleDateString('en-GB');
 
     return {
       id: item._id,
@@ -1049,9 +966,7 @@ function Managestockitems() {
     setColumnVisibility(updatedVisibility);
   };
   // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
     setColumnVisibility((prevVisibility) => ({
@@ -1063,9 +978,9 @@ function Managestockitems() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1073,7 +988,7 @@ function Managestockitems() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1081,38 +996,16 @@ function Managestockitems() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -1120,11 +1013,7 @@ function Managestockitems() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -1132,7 +1021,7 @@ function Managestockitems() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -1141,7 +1030,7 @@ function Managestockitems() {
                 setColumnVisibility(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -1160,27 +1049,26 @@ function Managestockitems() {
     fetchHoliday();
   }, [page, pageSize, searchQuery]);
 
-
   useEffect(() => {
     fetchHolidayAll();
   }, [isEditOpen]);
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
   useEffect(() => {
     // Retrieve column visibility from localStorage (if available)
-    const savedVisibility = localStorage.getItem("columnVisibility");
+    const savedVisibility = localStorage.getItem('columnVisibility');
     if (savedVisibility) {
       setColumnVisibility(JSON.parse(savedVisibility));
     }
   }, []);
   useEffect(() => {
     // Save column visibility to localStorage whenever it changes
-    localStorage.setItem("columnVisibility", JSON.stringify(columnVisibility));
+    localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
   }, [columnVisibility]);
 
   const delAccountcheckbox = async () => {
@@ -1199,14 +1087,13 @@ function Managestockitems() {
       handleCloseModcheckbox();
       setSelectAllChecked(false);
       setPage(1);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
 
       await fetchHoliday();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
 
@@ -1222,7 +1109,7 @@ function Managestockitems() {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("");
+  const [fileFormat, setFormat] = useState('');
 
   const pathname = window.location.pathname;
   const getapi = async () => {
@@ -1232,7 +1119,7 @@ function Managestockitems() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Manage Stock Items"),
+      pagename: String('Manage Stock Items'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -1243,48 +1130,44 @@ function Managestockitems() {
         },
       ],
     });
-
-  }
+  };
 
   useEffect(() => {
     getapi();
   }, []);
 
-
-
   // Search bar
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
   const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if (selectedColumn && filterValue || ["Blank", "Not Blank"].includes(selectedCondition)) {
-      setAdditionalFilters([
-        ...additionalFilters,
-        { column: selectedColumn, condition: selectedCondition, value: filterValue }
-      ]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
+      setAdditionalFilters([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
   // Show filtered combination in the search bar
   const getSearchDisplay = () => {
     if (advancedFilter && advancedFilter.length > 0) {
-      return advancedFilter.map((filter, index) => {
-        let showname = columnDataTable.find(col => col.field === filter.column)?.headerName;
-        return `${showname} ${filter.condition} "${filter.value}"`;
-      }).join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
+      return advancedFilter
+        .map((filter, index) => {
+          let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
+          return `${showname} ${filter.condition} "${filter.value}"`;
+        })
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
@@ -1298,12 +1181,12 @@ function Managestockitems() {
     // Reset all filters and pagination state
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
@@ -1313,79 +1196,70 @@ function Managestockitems() {
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
-      queryParams.searchQuery = searchQuery;  // Use searchQuery for regular search
+      queryParams.searchQuery = searchQuery; // Use searchQuery for regular search
     }
 
-    setPageName(!pageName)
-setColumnVisibility(initialColumnVisibility)
+    setPageName(!pageName);
+    setColumnVisibility(initialColumnVisibility);
     try {
       let res_employee = await axios.post(SERVICE.MANAGE_STOCK_ITEMS_PAGINATION, queryParams, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
       const itemsWithSerialNumber = ans?.map((item, index) => {
-
         return {
           ...item,
           serialNumber: (page - 1) * pageSize + index + 1,
-
-
-        }
+        };
       });
-
 
       setPowerstationArray(itemsWithSerialNumber);
       setItems(itemsWithSerialNumber);
-      setOverallFilterdata(res_employee?.data?.totalProjectsData?.length > 0 ?
-        res_employee?.data?.totalProjectsData?.map((item, index) => {
-          return {
-            ...item,
-            serialNumber: (page - 1) * pageSize + index + 1,
-
-          }
-        }
-
-        ) : []
+      setOverallFilterdata(
+        res_employee?.data?.totalProjectsData?.length > 0
+          ? res_employee?.data?.totalProjectsData?.map((item, index) => {
+            return {
+              ...item,
+              serialNumber: (page - 1) * pageSize + index + 1,
+            };
+          })
+          : []
       );
       setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
       setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-      setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-      setPage((data) => { return ans?.length > 0 ? data : 1 });
-      setStatusCheck(false)
-    } catch (err) { setStatusCheck(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setPageSize((data) => {
+        return ans?.length > 0 ? data : 10;
+      });
+      setPage((data) => {
+        return ans?.length > 0 ? data : 1;
+      });
+      setStatusCheck(false);
+    } catch (err) {
+      setStatusCheck(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
-
-
 
   return (
     <Box>
-      <Headtitle title={"Manage Stock Items"} />
+      <Headtitle title={'Manage Stock Items'} />
       {/* ****** Header Content ****** */}
       {/* <Typography sx={userStyle.HeaderText}>Manage Stock Items</Typography> */}
-      <PageHeading
-        title="Manage Stock Items"
-        modulename="Asset"
-        submodulename="Stock"
-        mainpagename="Manage Stock Items"
-        subpagename=""
-        subsubpagename=""
-      />
+      <PageHeading title="Manage Stock Items" modulename="Asset" submodulename="Stock" mainpagename="Manage Stock Items" subpagename="" subsubpagename="" />
 
       <>
-        {isUserRoleCompare?.includes("amanagestockitems") && (
+        {isUserRoleCompare?.includes('amanagestockitems') && (
           <Box sx={userStyle.selectcontainer}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Add Stock Items
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Add Stock Items</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -1393,7 +1267,7 @@ setColumnVisibility(initialColumnVisibility)
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Stock Category<b style={{ color: "red" }}>*</b>{" "}
+                      Stock Category<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={categoryOption}
@@ -1406,8 +1280,7 @@ setColumnVisibility(initialColumnVisibility)
                         setManagestockitemState({
                           ...managestockitemState,
                           stockcategory: e.value,
-                          stocksubcategory:
-                            "Please Select Stock Sub-category",
+                          stocksubcategory: 'Please Select Stock Sub-category',
                         });
                         fetchSubcategoryBased(e);
                       }}
@@ -1417,7 +1290,7 @@ setColumnVisibility(initialColumnVisibility)
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Stock Sub-category<b style={{ color: "red" }}>*</b>{" "}
+                      Stock Sub-category<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={subcategoryOpt}
@@ -1438,7 +1311,7 @@ setColumnVisibility(initialColumnVisibility)
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Item Name <b style={{ color: "red" }}>*</b>
+                      Item Name <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -1458,7 +1331,7 @@ setColumnVisibility(initialColumnVisibility)
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      UOM<b style={{ color: "red" }}>*</b>{" "}
+                      UOM<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={uomOpt}
@@ -1480,15 +1353,7 @@ setColumnVisibility(initialColumnVisibility)
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <FormGroup>
-                      <FormControlLabel
-                        label="Minimum Stock"
-                        control={
-                          <Switch
-                            checked={stockSwitch}
-                            onChange={handleStockSwitchChange}
-                          />
-                        }
-                      />
+                      <FormControlLabel label="Minimum Stock" control={<Switch checked={stockSwitch} onChange={handleStockSwitchChange} />} />
                     </FormGroup>
                   </FormControl>
                 </Grid>
@@ -1498,7 +1363,7 @@ setColumnVisibility(initialColumnVisibility)
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Minimum Quantity <b style={{ color: "red" }}>*</b>
+                          Minimum Quantity <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -1507,11 +1372,11 @@ setColumnVisibility(initialColumnVisibility)
                           placeholder="Please Enter Minimum Quantity"
                           value={managestockitemState.minimumquantity}
                           onChange={(e) => {
-                            const newValue = e.target.value.replace(/\./g, "");
+                            const newValue = e.target.value.replace(/\./g, '');
                             setManagestockitemState({ ...managestockitemState, minimumquantity: newValue });
                           }}
                           onKeyDown={(e) => {
-                            if (e.key === ".") {
+                            if (e.key === '.') {
                               e.preventDefault();
                             }
                           }}
@@ -1521,7 +1386,7 @@ setColumnVisibility(initialColumnVisibility)
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Maximum Quantity <b style={{ color: "red" }}>*</b>
+                          Maximum Quantity <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -1530,11 +1395,11 @@ setColumnVisibility(initialColumnVisibility)
                           placeholder="Please Enter Maximum Quantity"
                           value={managestockitemState.maximumquantity}
                           onChange={(e) => {
-                            const newValue = e.target.value.replace(/\./g, "");
+                            const newValue = e.target.value.replace(/\./g, '');
                             setManagestockitemState({ ...managestockitemState, maximumquantity: newValue });
                           }}
                           onKeyDown={(e) => {
-                            if (e.key === ".") {
+                            if (e.key === '.') {
                               e.preventDefault();
                             }
                           }}
@@ -1543,8 +1408,6 @@ setColumnVisibility(initialColumnVisibility)
                     </Grid>
                   </>
                 )}
-
-
               </Grid>
 
               <br />
@@ -1554,18 +1417,12 @@ setColumnVisibility(initialColumnVisibility)
                 <br />
                 <Grid
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "15px",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '15px',
                   }}
                 >
-                  <LoadingButton
-                    onClick={handleSubmit}
-                    loading={loadingdeloverall}
-                    sx={buttonStyles.buttonsubmit}
-                    loadingPosition="end"
-                    variant="contained"
-                  >
+                  <LoadingButton onClick={handleSubmit} loading={loadingdeloverall} sx={buttonStyles.buttonsubmit} loadingPosition="end" variant="contained">
                     Submit
                   </LoadingButton>
                   <Button sx={buttonStyles.btncancel} onClick={handleclear}>
@@ -1590,22 +1447,16 @@ setColumnVisibility(initialColumnVisibility)
             </>
           </Box>
         )}
-
-
-
       </>
 
       <br />
 
-
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lmanagestockitems") && (
+      {isUserRoleCompare?.includes('lmanagestockitems') && (
         <>
           <Box sx={userStyle.container}>
             <Grid item xs={8}>
-              <Typography sx={userStyle.importheadtext}>
-                Manage Stock Items List
-              </Typography>
+              <Typography sx={userStyle.importheadtext}>Manage Stock Items List</Typography>
             </Grid>
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
               <Grid item md={2} xs={12} sm={12}>
@@ -1623,7 +1474,7 @@ setColumnVisibility(initialColumnVisibility)
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -1641,18 +1492,18 @@ setColumnVisibility(initialColumnVisibility)
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelmanagestockitems") && (
+                  {isUserRoleCompare?.includes('excelmanagestockitems') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
-                          setFormat("xl");
+                          setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -1661,12 +1512,12 @@ setColumnVisibility(initialColumnVisibility)
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvmanagestockitems") && (
+                  {isUserRoleCompare?.includes('csvmanagestockitems') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
-                          setFormat("csv");
+                          setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -1675,7 +1526,7 @@ setColumnVisibility(initialColumnVisibility)
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printmanagestockitems") && (
+                  {isUserRoleCompare?.includes('printmanagestockitems') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
@@ -1684,7 +1535,7 @@ setColumnVisibility(initialColumnVisibility)
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfmanagestockitems") && (
+                  {isUserRoleCompare?.includes('pdfmanagestockitems') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
@@ -1698,22 +1549,18 @@ setColumnVisibility(initialColumnVisibility)
                     </>
                   )}
 
-                  {isUserRoleCompare?.includes("imagemanagestockitems") && (
-                    <Button
-                      sx={userStyle.buttongrp}
-                      onClick={handleCaptureImage}
-                    >
-                      {" "}
-                      <ImageIcon
-                        sx={{ fontSize: "15px" }}
-                      /> &ensp;Image&ensp;{" "}
+                  {isUserRoleCompare?.includes('imagemanagestockitems') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
               </Grid>
               <Grid item md={2} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
-                  <OutlinedInput size="small"
+                  <OutlinedInput
+                    size="small"
                     id="outlined-adornment-weight"
                     startAdornment={
                       <InputAdornment position="start">
@@ -1729,12 +1576,13 @@ setColumnVisibility(initialColumnVisibility)
                         )}
                         <Tooltip title="Show search options">
                           <span>
-                            <IoMdOptions style={{ cursor: 'pointer', }} onClick={handleClickSearch} />
+                            <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
                           </span>
                         </Tooltip>
-                      </InputAdornment>}
+                      </InputAdornment>
+                    }
                     aria-describedby="outlined-weight-helper-text"
-                    inputProps={{ 'aria-label': 'weight', }}
+                    inputProps={{ 'aria-label': 'weight' }}
                     type="text"
                     value={getSearchDisplay()}
                     onChange={handleSearchChange}
@@ -1753,42 +1601,28 @@ setColumnVisibility(initialColumnVisibility)
               Manage Columns
             </Button>
             &ensp;
-            {isUserRoleCompare?.includes("bdmanagestockitems") && (
-              <Button
-                variant="contained"
-                sx={buttonStyles.buttonbulkdelete}
-                onClick={handleClickOpenalert}
-              >
+            {isUserRoleCompare?.includes('bdmanagestockitems') && (
+              <Button variant="contained" sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
                 Bulk Delete
               </Button>
             )}
             <br />
             <br />
-
             {statusCheck ? (
               <Box>
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    minHeight: "350px",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    minHeight: '350px',
                   }}
                 >
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </Box>
             ) : (
               <>
-                <Box style={{ width: "100%", overflowY: "hidden" }}>
+                <Box style={{ width: '100%', overflowY: 'hidden' }}>
                   <>
                     {/* <AggridTable
                       rowDataTable={rowDataTable}
@@ -1836,7 +1670,6 @@ setColumnVisibility(initialColumnVisibility)
                     />
                   </>
                 </Box>
-
               </>
             )}
           </Box>
@@ -1845,15 +1678,7 @@ setColumnVisibility(initialColumnVisibility)
       {/* ****** Table End ****** */}
       {/* Manage Column */}
 
-
-
-      <Popover
-        id={id}
-        open={isManageColumnsOpen}
-        anchorEl={anchorEl}
-        onClose={handleCloseManageColumns}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left", }}
-      >
+      <Popover id={id} open={isManageColumnsOpen} anchorEl={anchorEl} onClose={handleCloseManageColumns} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
         <ManageColumnsContent
           handleClose={handleCloseManageColumns}
           searchQuery={searchQueryManage}
@@ -1867,25 +1692,14 @@ setColumnVisibility(initialColumnVisibility)
         />
       </Popover>
 
-
-
-
-
-
-      <Popover
-        id={idSearch}
-        open={openSearch}
-        anchorEl={anchorElSearch}
-        onClose={handleCloseSearch}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
-      >
-        <Box style={{ padding: "10px", maxWidth: '450px' }}>
+      <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <Box style={{ padding: '10px', maxWidth: '450px' }}>
           <Typography variant="h6">Advance Search</Typography>
           <IconButton
             aria-label="close"
             onClick={handleCloseSearch}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -1893,27 +1707,33 @@ setColumnVisibility(initialColumnVisibility)
           >
             <CloseIcon />
           </IconButton>
-          <DialogContent sx={{ width: "100%" }}>
-            <Box sx={{
-              width: '350px',
-              maxHeight: '400px',
-              overflow: 'hidden',
-              position: 'relative'
-            }}>
-              <Box sx={{
-                maxHeight: '300px',
-                overflowY: 'auto',
-                // paddingRight: '5px'
-              }}>
+          <DialogContent sx={{ width: '100%' }}>
+            <Box
+              sx={{
+                width: '350px',
+                maxHeight: '400px',
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
+              <Box
+                sx={{
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  // paddingRight: '5px'
+                }}
+              >
                 <Grid container spacing={1}>
                   <Grid item md={12} sm={12} xs={12}>
                     <Typography>Columns</Typography>
-                    <Select fullWidth size="small"
+                    <Select
+                      fullWidth
+                      size="small"
                       MenuProps={{
                         PaperProps: {
                           style: {
                             maxHeight: 200,
-                            width: "auto",
+                            width: 'auto',
                           },
                         },
                       }}
@@ -1922,7 +1742,9 @@ setColumnVisibility(initialColumnVisibility)
                       onChange={(e) => setSelectedColumn(e.target.value)}
                       displayEmpty
                     >
-                      <MenuItem value="" disabled>Select Column</MenuItem>
+                      <MenuItem value="" disabled>
+                        Select Column
+                      </MenuItem>
                       {filteredSelectedColumn.map((col) => (
                         <MenuItem key={col.field} value={col.field}>
                           {col.headerName}
@@ -1932,12 +1754,14 @@ setColumnVisibility(initialColumnVisibility)
                   </Grid>
                   <Grid item md={12} sm={12} xs={12}>
                     <Typography>Operator</Typography>
-                    <Select fullWidth size="small"
+                    <Select
+                      fullWidth
+                      size="small"
                       MenuProps={{
                         PaperProps: {
                           style: {
                             maxHeight: 200,
-                            width: "auto",
+                            width: 'auto',
                           },
                         },
                       }}
@@ -1955,11 +1779,13 @@ setColumnVisibility(initialColumnVisibility)
                   </Grid>
                   <Grid item md={12} sm={12} xs={12}>
                     <Typography>Value</Typography>
-                    <TextField fullWidth size="small"
-                      value={["Blank", "Not Blank"].includes(selectedCondition) ? "" : filterValue}
+                    <TextField
+                      fullWidth
+                      size="small"
+                      value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
                       onChange={(e) => setFilterValue(e.target.value)}
-                      disabled={["Blank", "Not Blank"].includes(selectedCondition)}
-                      placeholder={["Blank", "Not Blank"].includes(selectedCondition) ? "Disabled" : "Enter value"}
+                      disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                      placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
                       sx={{
                         '& .MuiOutlinedInput-root.Mui-disabled': {
                           backgroundColor: 'rgb(0 0 0 / 26%)',
@@ -1973,11 +1799,7 @@ setColumnVisibility(initialColumnVisibility)
                   {additionalFilters.length > 0 && (
                     <>
                       <Grid item md={12} sm={12} xs={12}>
-                        <RadioGroup
-                          row
-                          value={logicOperator}
-                          onChange={(e) => setLogicOperator(e.target.value)}
-                        >
+                        <RadioGroup row value={logicOperator} onChange={(e) => setLogicOperator(e.target.value)}>
                           <FormControlLabel value="AND" control={<Radio />} label="AND" />
                           <FormControlLabel value="OR" control={<Radio />} label="OR" />
                         </RadioGroup>
@@ -1985,22 +1807,24 @@ setColumnVisibility(initialColumnVisibility)
                     </>
                   )}
                   {additionalFilters.length === 0 && (
-                    <Grid item md={4} sm={12} xs={12} >
-                      <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                    <Grid item md={4} sm={12} xs={12}>
+                      <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
                         Add Filter
                       </Button>
                     </Grid>
                   )}
 
                   <Grid item md={2} sm={12} xs={12}>
-                    <Button variant="contained" onClick={() => {
-                      fetchHoliday();
-                      setIsSearchActive(true);
-                      setAdvancedFilter([
-                        ...additionalFilters,
-                        { column: selectedColumn, condition: selectedCondition, value: filterValue }
-                      ])
-                    }} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        fetchHoliday();
+                        setIsSearchActive(true);
+                        setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+                      }}
+                      sx={{ textTransform: 'capitalize' }}
+                      disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
+                    >
                       Search
                     </Button>
                   </Grid>
@@ -2012,19 +1836,10 @@ setColumnVisibility(initialColumnVisibility)
       </Popover>
 
       {/* view model */}
-      <Dialog
-        open={openview}
-        onClose={handleClickOpenview}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-      >
-        <Box sx={{ padding: "30px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md">
+        <Box sx={{ padding: '30px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              View Manage Stock Items
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> View Manage Stock Items</Typography>
             <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={6} xs={12} sm={12}>
@@ -2036,9 +1851,7 @@ setColumnVisibility(initialColumnVisibility)
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Stock Sub-category</Typography>
-                  <Typography>
-                    {managestockitemEdit.stocksubcategory}
-                  </Typography>
+                  <Typography>{managestockitemEdit.stocksubcategory}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={6} xs={12} sm={12}>
@@ -2056,14 +1869,7 @@ setColumnVisibility(initialColumnVisibility)
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl size="small" fullWidth>
                   <FormGroup>
-                    <FormControlLabel
-                      label="Minimum Stock"
-                      control={
-                        <Switch
-                          checked={stockSwitchEdit}
-                        />
-                      }
-                    />
+                    <FormControlLabel label="Minimum Stock" control={<Switch checked={stockSwitchEdit} />} />
                   </FormGroup>
                 </FormControl>
               </Grid>
@@ -2073,14 +1879,12 @@ setColumnVisibility(initialColumnVisibility)
                     <FormControl fullWidth size="small">
                       <Typography variant="h6">Minimum Quantity</Typography>
                       <Typography>{managestockitemEdit.minimumquantity}</Typography>
-
                     </FormControl>
                   </Grid>
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography variant="h6"> Maximum Quantity </Typography>
                       <Typography>{managestockitemEdit.maximumquantity}</Typography>
-
                     </FormControl>
                   </Grid>
                 </>
@@ -2088,11 +1892,7 @@ setColumnVisibility(initialColumnVisibility)
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
-              <Button
-                variant="contained"
-                sx={buttonStyles.buttonsubmit}
-                onClick={handleCloseview}
-              >
+              <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleCloseview}>
                 Back
               </Button>
             </Grid>
@@ -2103,9 +1903,9 @@ setColumnVisibility(initialColumnVisibility)
       <Box>
         <Dialog
           sx={{
-            overflow: "visible",
-            "& .MuiPaper-root": {
-              overflow: "visible",
+            overflow: 'visible',
+            '& .MuiPaper-root': {
+              overflow: 'visible',
             },
           }}
           open={isEditOpen}
@@ -2115,19 +1915,17 @@ setColumnVisibility(initialColumnVisibility)
           maxWidth="md"
           fullWidth={true}
         >
-          <Box sx={{ padding: "30px 50px" }}>
+          <Box sx={{ padding: '30px 50px' }}>
             <>
               <Grid container spacing={2}>
-                <Typography sx={userStyle.HeaderText}>
-                  Edit Manage Stock Items{" "}
-                </Typography>
+                <Typography sx={userStyle.HeaderText}>Edit Manage Stock Items </Typography>
               </Grid>
               <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Stock Category<b style={{ color: "red" }}>*</b>{" "}
+                      Stock Category<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={categoryOptionEdit}
@@ -2141,7 +1939,7 @@ setColumnVisibility(initialColumnVisibility)
                           ...managestockitemEdit,
                           stockcategory: e.value,
 
-                          stocksubcategory: "Please Select Stock Sub-category",
+                          stocksubcategory: 'Please Select Stock Sub-category',
                         });
                         fetchSubcategoryBased(e);
                       }}
@@ -2152,7 +1950,7 @@ setColumnVisibility(initialColumnVisibility)
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Stock Sub-category<b style={{ color: "red" }}>*</b>{" "}
+                      Stock Sub-category<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={stocksubcategoryOptEdit}
@@ -2173,7 +1971,7 @@ setColumnVisibility(initialColumnVisibility)
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Item Name <b style={{ color: "red" }}>*</b>
+                      Item Name <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -2192,7 +1990,7 @@ setColumnVisibility(initialColumnVisibility)
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      UOM<b style={{ color: "red" }}>*</b>{" "}
+                      UOM<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <Selects
                       options={uomOptEdit}
@@ -2213,15 +2011,7 @@ setColumnVisibility(initialColumnVisibility)
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl size="small" fullWidth>
                     <FormGroup>
-                      <FormControlLabel
-                        label="Minimum Stock"
-                        control={
-                          <Switch
-                            checked={stockSwitchEdit}
-                            onChange={handleStockSwitchChangeEdit}
-                          />
-                        }
-                      />
+                      <FormControlLabel label="Minimum Stock" control={<Switch checked={stockSwitchEdit} onChange={handleStockSwitchChangeEdit} />} />
                     </FormGroup>
                   </FormControl>
                 </Grid>
@@ -2231,7 +2021,7 @@ setColumnVisibility(initialColumnVisibility)
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Minimum Quantity <b style={{ color: "red" }}>*</b>
+                          Minimum Quantity <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -2240,11 +2030,11 @@ setColumnVisibility(initialColumnVisibility)
                           placeholder="Please Enter Minimum Quantity"
                           value={managestockitemEdit.minimumquantity}
                           onChange={(e) => {
-                            const newValue = e.target.value.replace(/\./g, "");
+                            const newValue = e.target.value.replace(/\./g, '');
                             setManagestockitemEdit({ ...managestockitemEdit, minimumquantity: newValue });
                           }}
                           onKeyDown={(e) => {
-                            if (e.key === ".") {
+                            if (e.key === '.') {
                               e.preventDefault();
                             }
                           }}
@@ -2254,7 +2044,7 @@ setColumnVisibility(initialColumnVisibility)
                     <Grid item md={3} xs={12} sm={12}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Maximum Quantity <b style={{ color: "red" }}>*</b>
+                          Maximum Quantity <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput
                           id="component-outlined"
@@ -2263,11 +2053,11 @@ setColumnVisibility(initialColumnVisibility)
                           placeholder="Please Enter Maximum Quantity"
                           value={managestockitemEdit.maximumquantity}
                           onChange={(e) => {
-                            const newValue = e.target.value.replace(/\./g, "");
+                            const newValue = e.target.value.replace(/\./g, '');
                             setManagestockitemEdit({ ...managestockitemEdit, maximumquantity: newValue });
                           }}
                           onKeyDown={(e) => {
-                            if (e.key === ".") {
+                            if (e.key === '.') {
                               e.preventDefault();
                             }
                           }}
@@ -2276,21 +2066,20 @@ setColumnVisibility(initialColumnVisibility)
                     </Grid>
                   </>
                 )}
-
               </Grid>
               <br /> <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
                   <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
-                    {" "}
+                    {' '}
                     Update
                   </Button>
                 </Grid>
                 <br />
                 <Grid item md={6} xs={12} sm={12}>
                   <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
-                    {" "}
-                    Cancel{" "}
+                    {' '}
+                    Cancel{' '}
                   </Button>
                 </Grid>
               </Grid>
@@ -2301,19 +2090,9 @@ setColumnVisibility(initialColumnVisibility)
 
       {/* EXTERNAL COMPONENTS -------------- START */}
       {/* VALIDATION */}
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
         isFilterOpen={isFilterOpen}
@@ -2325,64 +2104,31 @@ setColumnVisibility(initialColumnVisibility)
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={overallFilterdata ?? []}
-        filename={"ManageStockItems"}
+        filename={'ManageStockItems'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
       {/* INFO */}
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Manage Stock Items Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Manage Stock Items Info" addedby={addedby} updateby={updateby} />
       {/*SINGLE DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={delHoliday}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delHoliday} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/*BULK DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={delAccountcheckbox}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delAccountcheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/* PLEASE SELECT ANY ROW */}
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
       <Box>
-        <Dialog
-          open={isErrorOpen}
-          onClose={handleCloseerr}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
+        <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={handleCloseerr}
             >

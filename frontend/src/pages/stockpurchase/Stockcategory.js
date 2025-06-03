@@ -271,13 +271,15 @@ function StockCategory() {
 
   const sendRequest = async () => {
     setPageName(!pageName)
+    let autoIds = await fetchAutoId();
     const subcategoryName =
       subCategoryTodo.length === 0 ? subcategory : [...subCategoryTodo];
     try {
       let res_doc = await axios.post(SERVICE.STOCKCATEGORY_CREATE, {
         headers: { Authorization: `Bearer ${auth.APIToken}` },
         categoryname: String(category.categoryname),
-        categorycode: String(newval),
+        // categorycode: String(newval),
+        categorycode: String(autoIds),
         subcategoryname: subcategoryName,
         addedby: [
           {
@@ -286,6 +288,7 @@ function StockCategory() {
           },
         ],
       });
+      await fetchAutoId();
       setSubcategoryTodo([]);
       setSubcategory("");
       setCategory({ ...category, categoryname: "" });
@@ -359,23 +362,24 @@ function StockCategory() {
   const getCategoryList = async () => {
     setPageName(!pageName)
     setLoading(true);
+    setColumnVisibility(initialColumnVisibility);
     try {
-          setColumnVisibility(initialColumnVisibility);
+
 
       let response = await axios.get(`${SERVICE.STOCKCATEGORY}`, {
         headers: { Authorization: `Bearer ${auth.APIToken}` },
       });
       setCategoryList(response.data.stockcategory.map((item, index) => {
-    return {
-      id: item._id,
-      serialNumber: index + 1,
-      categoryname: item.categoryname,
-      categorycode: item.categorycode,
-      subcategoryname: item.subcategoryname
-        ?.map((t, i) => `${i + 1 + ". "}` + t)
-        .toString(),
-    };
-  }));
+        return {
+          id: item._id,
+          serialNumber: index + 1,
+          categoryname: item.categoryname,
+          categorycode: item.categorycode,
+          subcategoryname: item.subcategoryname
+            ?.map((t, i) => `${i + 1 + ". "}` + t)
+            .toString(),
+        };
+      }));
       setSubDuplicate(
         response.data.stockcategory.filter(
           (data) => data._id !== singleCategory._id
@@ -1094,6 +1098,29 @@ function StockCategory() {
     getapi();
   }, []);
 
+  const [autoId, setAutoId] = useState('');
+  const fetchAutoId = async () => {
+    setPageName(!pageName);
+    try {
+      let res_vendor = await axios.get(SERVICE.STOCKCATEGORY_AUTOID, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+      let refNo = res_vendor?.data?.autoid;
+
+      setAutoId(refNo);
+
+      return refNo;
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
+
+  useEffect(() => {
+    fetchAutoId()
+  }, [])
+
 
   return (
     <Box>
@@ -1138,7 +1165,7 @@ function StockCategory() {
                 />
               </FormControl>
             </Grid>
-            <Grid item md={4} sm={12} xs={12}>
+            {/* <Grid item md={4} sm={12} xs={12}>
               <FormControl fullWidth size="small">
                 {cateCode &&
                   cateCode.map(() => {
@@ -1187,6 +1214,14 @@ function StockCategory() {
                   placeholder="Please Enter Category  Code"
                   value={newval}
                 />
+              </FormControl>
+            </Grid> */}
+            <Grid item lg={3} md={4} xs={12} sm={6}>
+              <FormControl fullWidth size="small">
+                <Typography>
+                  Category Code<b style={{ color: 'red' }}>*</b>
+                </Typography>
+                <OutlinedInput id="component-outlined" type="text" value={autoId} />
               </FormControl>
             </Grid>
             <Grid item md={2}></Grid>
@@ -1323,9 +1358,10 @@ function StockCategory() {
 
       <Box>
         <Dialog
-          maxWidth="sm"
+          maxWidth="md"
           open={editOpen}
           onClose={handleEditClose}
+          sx={{ marginTop: "40x" }}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
@@ -1493,7 +1529,7 @@ function StockCategory() {
           onClose={handlViewClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
-          sx={{marginTop:"95px"}}
+          sx={{ marginTop: "95px" }}
         >
           <DialogContent>
             <Grid container spacing={2}>
@@ -1725,7 +1761,7 @@ function StockCategory() {
             <br />
             {/* ****** Table start ****** */}
             {loading ? (
-              <Box sx={userStyle.container}>
+              <Box>
                 <Box
                   sx={{
                     display: "flex",

@@ -2220,13 +2220,13 @@ function Manualstockentry() {
         },
       });
       setOverallFilterdata(res1.data.manualstock?.map((item, index) => {
-            return {
-              ...item,
-             
-              billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
-              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
-            };
-          }));
+        return {
+          ...item,
+
+          billdate: item.billdate === '' ? '' : moment(item.billdate).format('DD/MM/YYYY'),
+          purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+        };
+      }));
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -3002,7 +3002,7 @@ function Manualstockentry() {
     });
     setExpensecreate({
       totalbillamount: '',
-duedate:'',
+      duedate: '',
       paidstatus: 'Not Paid',
 
       paidmode: 'Please Select Paid Mode',
@@ -11114,7 +11114,7 @@ duedate:'',
                     <OutlinedInput
                       id="to-date"
                       type="date"
-                      value={expensecreate.duedate}
+                      value={expensecreateedit.duedate}
                       onChange={(e) => {
                         setExpensecreateedit({
                           ...expensecreateedit,
@@ -14735,7 +14735,7 @@ duedate:'',
               <br /> <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
-                  {btnSubmit ? (
+                  {/* {btnSubmit ? (
                     <Box sx={{ display: 'flex' }}>
                       <CircularProgress />
                     </Box>
@@ -14744,9 +14744,12 @@ duedate:'',
                       <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
                         {' '}
                         Update
-                      </Button>
-                    </>
-                  )}
+                      </Button> */}
+                  <LoadingButton loading={btnSubmit} variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
+                    Update
+                  </LoadingButton>
+                  {/* </>
+                  )} */}
                 </Grid>
                 <br />
                 <Grid item md={6} xs={12} sm={12}>

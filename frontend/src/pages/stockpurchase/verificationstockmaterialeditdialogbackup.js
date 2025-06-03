@@ -10,6 +10,8 @@ import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { MultiSelect } from 'react-multi-select-component';
+
 import {
   Box,
   InputAdornment,
@@ -44,7 +46,7 @@ import {
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Switch from '@mui/material/Switch';
-import axios from '../../../axiosInstance';
+import axios from '../../axiosInstance';
 import * as FileSaver from 'file-saver';
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
@@ -102,7 +104,25 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-function ListReferenceCategoryDoc({ vendorAuto }) {
+function Stockmaterialeditdialog({
+  vendorAuto,
+  openpop,
+  vendorGroup,
+  requestquantity,
+  availqty,
+  vendorNew,
+  stockmanagemasteredit1,
+  refImageedit,
+  refImagewarrantyedit,
+  handleChangeGroupName,
+  stockArray,
+  subcategoryOpt,
+  materialOptNew,
+  floorsEdit,
+  vendorgetid,
+  selectedPurchaseDateEdit,
+  handleCloseviewalertvendorstock,
+}) {
   const [stockmanages, setStockmanage] = useState([]);
 
   // State to track advanced filter
@@ -322,10 +342,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     vendorname: true,
   };
 
-  const [vendorGroup, setVendorGroup] = useState('Choose Vendor Group');
+  const [setVendorGroup] = useState('Choose Vendor Group');
   const [vendorGroupOpt, setVendorGroupopt] = useState([]);
   const [vendorOverall, setVendorOverall] = useState([]);
-  const [vendorNew, setVendorNew] = useState('Choose Vendor');
+  const [setVendorNew] = useState('Choose Vendor');
   const [vendorNewEdit, setVendorNewEdit] = useState('Choose Vendor');
 
   const [vendorOpt, setVendoropt] = useState([]);
@@ -424,32 +444,32 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setVendoroptEdit(final);
   };
 
-  const handleChangeGroupName = async (e) => {
-    let foundDatas = vendorOverall
-      .filter((data) => {
-        return data.name == e.value;
-      })
-      .map((item) => item.vendor);
+  // const handleChangeGroupName = async (e) => {
+  //     let foundDatas = vendorOverall
+  //         .filter((data) => {
+  //             return data.name == e.value;
+  //         })
+  //         .map((item) => item.vendor);
 
-    let res = await axios.get(SERVICE.ALL_VENDORDETAILS, {
-      headers: {
-        Authorization: `Bearer ${auth.APIToken}`,
-      },
-    });
-    const all = [
-      ...res?.data?.vendordetails.map((d) => ({
-        ...d,
-        label: d.vendorname,
-        value: d.vendorname,
-      })),
-    ];
+  //     let res = await axios.get(SERVICE.ALL_VENDORDETAILS, {
+  //         headers: {
+  //             Authorization: `Bearer ${auth.APIToken}`,
+  //         },
+  //     });
+  //     const all = [
+  //         ...res?.data?.vendordetails.map((d) => ({
+  //             ...d,
+  //             label: d.vendorname,
+  //             value: d.vendorname,
+  //         })),
+  //     ];
 
-    let final = all.filter((data) => {
-      return foundDatas.includes(data.value);
-    });
+  //     let final = all.filter((data) => {
+  //         return foundDatas.includes(data.value);
+  //     });
 
-    setVendoropt(final);
-  };
+  //     setVendoropt(final);
+  // };
 
   //reference images
   // const handleInputChangeedit = (event) => {
@@ -659,8 +679,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
   const [categoryOption, setCategoryOption] = useState([]);
-  const [subcategoryOpt, setSubcategoryOption] = useState([]);
-  const [materialOptNew, setMaterialoptNew] = useState([]);
+  const [setSubcategoryOption] = useState([]);
+  const [setMaterialoptNew] = useState([]);
   const [companys, setCompanys] = useState([]);
 
   const handleChangephonenumberEdit = (e) => {
@@ -686,7 +706,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     // calculateExpiryDate(value, stockmanagemasteredit.purchasedate);
   };
 
-  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState('');
+  const [setSelectedPurchaseDateEdit] = useState('');
 
   const handlePurchaseDateChangeEdit = (e) => {
     const { value } = e.target;
@@ -727,14 +747,20 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     }
   };
 
-  const [vendorgetid, setVendorgetid] = useState({});
+  const [setVendorgetid] = useState({});
   const [vendornameid, setVendornameid] = useState({});
   const [vendormaster, setVendormaster] = useState([]);
   const handleUploadOverAllwarranty = () => {
     setUploadPopupOpenwarranty(false);
   };
 
-  const [stockArray, setStockArray] = useState([]);
+  const [setStockArray] = useState([]);
+
+  const totalQuantityStock = stockArray.reduce((sum, item) => {
+    return sum + Number(item.quantitynew || 0);
+
+    // return sum;
+  }, 0);
 
   const [uomcodes, setuomcodes] = useState([]);
 
@@ -758,6 +784,10 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       handleClickOpenPopupMalert();
     } else if (stockmanagemasteredit.quantitynew === '' || stockmanagemasteredit.quantitynew === undefined) {
       setPopupContentMalert('Please Enter Quantity!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (stockmanagemasteredit.quantitynew > requestquantity || stockmanagemasteredit.quantitynew > availqty) {
+      setPopupContentMalert('Please Enter Less Count Qunatity!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
@@ -786,6 +816,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
             materialnew: stockmanagemasteredit.materialnew,
             productdetailsnew: stockmanagemasteredit.productdetailsnew === undefined ? '' : stockmanagemasteredit.productdetailsnew,
             uomcodenew: findData.code,
+            totalbillamount: totalQuantityStock * stockmanagemasteredit.rate,
           },
         ]);
 
@@ -844,7 +875,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   //bill upload edit
 
   const [getImgedit, setGetImgedit] = useState(null);
-  const [refImageedit, setRefImageedit] = useState([]);
+  const [setRefImageedit] = useState([]);
   const [previewURLedit, setPreviewURLedit] = useState(null);
   const [fileedit, setFileedit] = useState();
 
@@ -1012,63 +1043,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     }
   };
 
-  const [refImagewarrantyedit, setRefImagewarrantyedit] = useState([]);
-
-  //get single row to edit....
-  const getCode = async (e) => {
-    try {
-      let res = await axios.get(`${SERVICE.STOCKPURCHASE_SINGLE}/${e}`, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-      });
-
-      setVendorGroup(res?.data?.sstock?.vendorgroup);
-      setVendorNew(res?.data?.sstock?.vendor);
-      handleChangeGroupName({ value: res?.data?.sstock?.vendorgroup });
-
-      setStockmanagemasteredit({
-        ...res?.data?.sstock,
-        materialnew: 'Please Select Material',
-      });
-      setRefImageedit(res?.data?.sstock?.files);
-      setRefImagewarrantyedit(res?.data?.sstock?.warrantyfiles);
-      // setSelectedAssetTypeEdit(res?.data?.sstock?.assettype);
-      setStockArray(res?.data?.sstock.stockmaterialarray);
-
-      setSelectedPurchaseDateEdit(res?.data?.sstock.purchasedate);
-
-      setSelectedBranchedit(res?.data?.sstock.branch);
-      setSelectedUnitedit(res?.data?.sstock.unit);
-      await fetchSubcategoryBased({
-        label: res?.data?.sstock.stockcategory,
-        value: res?.data?.sstock.stockcategory,
-      });
-      await fetchMaterialNew(
-        {
-          label: res?.data?.sstock.stocksubcategory,
-          value: res?.data?.sstock.stocksubcategory,
-        },
-        res?.data?.sstock.stockcategory
-      );
-
-      await fetchBranchDropdownsEdit(res?.data?.sstock?.company);
-      await fetchUnitsEdit(res?.data?.sstock?.branch);
-      await fetchFloorEdit(res?.data?.sstock?.branch);
-      await fetchAreaEdit(res?.data?.sstock?.branch, res?.data?.sstock?.floor);
-
-      if (res?.data?.sstock.vendorid) {
-        let resv = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.sstock.vendorid}`, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        });
-        setVendorgetid(resv?.data?.svendordetails);
-      }
-    } catch (err) {
-      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-    }
-  };
+  const [setRefImagewarrantyedit] = useState([]);
 
   // Alert delete popup
   // let projectid = deleteproject._id;
@@ -1080,12 +1055,13 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      await fetchStock();
+
       // handleCloseMod();
       handleCloseDelete();
       setPopupContent('Deleted Successfully');
       setPopupSeverity('success');
       handleClickOpenPopup();
+
       setSelectedRows([]);
       setPage(1);
     } catch (err) {
@@ -1192,10 +1168,9 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   };
 
   useEffect(() => {
-    fetchStock();
     // getexcelDatas();
-    addSerialNumber();
-    fetchCompanyDropdowns();
+    // addSerialNumber();
+    // fetchCompanyDropdowns();
     fetchCategoryAll();
     fetchUom();
     // fetchVomMaster();
@@ -1465,7 +1440,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const [branchsEdit, setBranchsEdit] = useState([]);
   const [unitsEdit, setUnitsEdit] = useState([]);
   const [companysEdit, setCompanysEdit] = useState([]);
-  const [floorsEdit, setFloorEdit] = useState([]);
+  const [setFloorEdit] = useState([]);
   const [areasEdit, setAreasEdit] = useState([]);
   const [locationsEdit, setLocationsEdit] = useState([{ label: 'ALL', value: 'ALL' }]);
 
@@ -1518,105 +1493,16 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const editSubmit = (e) => {
     setBtnSubmit(true);
     e.preventDefault();
-    fetchStockedit();
-    const isNameMatch = stockmanageedit.some(
-      (item) =>
-        item.company == stockmanagemasteredit.company &&
-        item.branch == stockmanagemasteredit.branch &&
-        item.unit == stockmanagemasteredit.unit &&
-        item.floor == stockmanagemasteredit.floor &&
-        item.area == stockmanagemasteredit.area &&
-        item.location == stockmanagemasteredit.location &&
-        item.vendorname == stockmanagemasteredit.vendorname &&
-        item.billno == stockmanagemasteredit.billno &&
-        item?.productdetailsnew?.toLowerCase() == stockmanagemasteredit?.productdetailsnew?.toLowerCase() &&
-        item.requestmode == stockmanagemasteredit.requestmode &&
-        item.stockcategory == stockmanagemasteredit.stockcategory &&
-        item.stocksubcategory == stockmanagemasteredit.stocksubcategory &&
-        item.warrantydetails == stockmanagemasteredit.warrantydetails &&
-        item.uomnew == stockmanagemasteredit.uomnew &&
-        item.quantitynew == Number(stockmanagemasteredit.quantitynew) &&
-        item.materialnew == stockmanagemasteredit.materialnew &&
-        item.rate == Number(stockmanagemasteredit.rate) &&
-        item.billdate == stockmanagemasteredit.billdate
-    );
-
-    if (stockmanagemasteredit.company === 'Please Select Company') {
-      setPopupContentMalert('Please Select Company!');
+    if (stockmanagemasteredit.quantitynew == '') {
+      setPopupContentMalert('Please Enter Quantity!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.branch === 'Please Select Branch') {
-      setPopupContentMalert('Please Select Branch!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.unit === 'Please Select Unit') {
-      setPopupContentMalert('Please Select Unit!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.floor === 'Please Select Floor') {
-      setPopupContentMalert('Please Select Floor!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.area === 'Please Select Area') {
-      setPopupContentMalert('Please Select Area!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.location === 'Please Select Location') {
-      setPopupContentMalert('Please Select Location!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (vendorGroup === 'Choose Vendor Group') {
-      setPopupContentMalert('Please Select Vendor Group!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (vendorNew === 'Choose Vendor') {
-      setPopupContentMalert('Please Select Vendor!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    }
-    // else if (stockmanagemasteredit.gstno === "") {
-    //   setShowAlert(
-    //     <>
-    //       <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-    //       <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter GST No"}</p>
-    //     </>
-    //   );
-    //   handleClickOpenerr();
-    // }
-    else if (stockmanagemasteredit.billno === '') {
-      setPopupContentMalert('Please Enter Billno!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.requestmode === 'Please Select Request Mode' || stockmanagemasteredit.requestmode === '') {
-      setPopupContentMalert('Please Select Request Mode For!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.stockcategory === 'Please Select Stock Category' || stockmanagemasteredit.stockcategory === '') {
-      setPopupContentMalert('Please Select Stock Category!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.stocksubcategory === 'Please Select Stock Sub Category' || stockmanagemasteredit.stocksubcategory === '') {
-      setPopupContentMalert('Please Select Stock Sub Category!');
+    } else if (stockmanagemasteredit.quantitynew > requestquantity || stockmanagemasteredit.quantitynew > availqty) {
+      setPopupContentMalert('Please Enter Less Count Qunatity!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (stockArray.length === 0) {
       setPopupContentMalert('Please Insert Stock Todo List!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.warrantydetails === '') {
-      setPopupContentMalert('Please Enter Warranty Details!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.rate === '') {
-      setPopupContentMalert('Please Enter Rate!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (stockmanagemasteredit.billdate === '') {
-      setPopupContentMalert('Please Select Bill Date!');
-      setPopupSeverityMalert('info');
-      handleClickOpenPopupMalert();
-    } else if (isNameMatch) {
-      setPopupContentMalert('Data Already Exist!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
@@ -1663,7 +1549,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   //editing the single data...
   const sendEditRequest = async () => {
     try {
-      let res = await axios.put(`${SERVICE.STOCKPURCHASE_SINGLE}/${stockmanagemasteredit?._id}`, {
+      let stockcreate = await axios.post(SERVICE.STOCKPURCHASE_CREATE, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
@@ -1700,25 +1586,19 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         billdate: String(stockmanagemasteredit.billdate),
         files: [...refImageedit],
         warrantyfiles: refImagewarrantyedit,
-
+        status: String('Transfer'),
         requestmode: String(stockmanagemasteredit.requestmode),
         stockcategory: stockmanagemasteredit.stockcategory === 'Please Select Stock Category' ? '' : String(stockmanagemasteredit.stockcategory),
         stocksubcategory: stockmanagemasteredit.stocksubcategory === 'Please Select Stock Sub Category' ? '' : String(stockmanagemasteredit.stocksubcategory),
         stockmaterialarray: stockArray,
-        updatedby: [
-          ...updateby,
-          {
-            name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
-          },
-        ],
       });
-      await fetchStock();
+      handleCloseviewalertvendorstock();
       setBtnSubmit(false);
-      setPopupContent('Updated Successfully');
+      setPopupContent('Added Successfully');
       setPopupSeverity('success');
       handleClickOpenPopup();
       handleCloseModEdit();
+      // await fetchStock("Filtered");
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -1744,42 +1624,8 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   //     fetchStockedit();
   // }, [isEditOpen, stockmanagemasteredit]);
   const [stockmanagemasteredit, setStockmanagemasteredit] = useState({
-    company: 'Please Select Company',
-    branch: 'Please Select Branch',
-    unit: 'Please Select Unit',
-    floor: 'Please Select Floor',
-    area: 'Please Select Area',
-    location: 'Please Select Location',
-    workstation: 'Please Select Workstation',
-    producthead: '',
-    vendorname: 'Please Select Vendor',
-    material: 'Please Select Material',
-    component: 'Please Select Component',
-    gstno: '',
-    billno: '',
-    productname: '',
-    productdetails: '',
-    warrantydetails: '',
-    uom: 'Please Select UOM',
-    quantity: '',
-    rate: '',
-    billdate: '',
-    files: '',
-    warrantyfiles: '',
-
-    warranty: '',
-    warrantycalculation: '',
-    estimation: '',
-    estimationtime: '',
-    purchasedate: '',
-
-    requestmode: 'Please Select Request Mode',
-    stockcategory: 'Please Select Stock Category',
-    stocksubcategory: 'Please Select Stock Sub Category',
-    uomnew: '',
+    ...stockmanagemasteredit1,
     quantitynew: '',
-    materialnew: 'Please Select Material',
-    productdetailsnew: '',
   });
   const renderFilePreview = async (file) => {
     const response = await fetch(file.preview);
@@ -1921,176 +1767,6 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   // }
 
   //get all project.
-  const fetchStock = async () => {
-    setPageName(!pageName);
-    setLoading(true);
-    const queryParams = {
-      page: Number(page),
-      pageSize: Number(pageSize),
-      assignbranch: accessbranch,
-    };
-
-    const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
-    // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== '') {
-      queryParams.allFilters = allFilters;
-      queryParams.logicOperator = logicOperator;
-    } else if (searchQuery) {
-      queryParams.searchQuery = searchQuery;
-    }
-    try {
-      // let res_project = await axios.get(SERVICE.STOCKPURCHASE, {
-      let res_employee = await axios.post(SERVICE.STOCK_ACCESS_PAGINATION, queryParams, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-      });
-
-      // let filteredData = res_project?.data?.stock
-      //   .filter((data) => {
-      //     return data.requestmode === "Asset Material";
-      //   });
-      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
-
-      let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-      });
-
-      let codeValues = res_project_1?.data?.vommaster.map((data) => ({
-        name: data.name,
-        code: data.code,
-      }));
-      // setuomcodes(codeValues);
-
-      let setData = ans.map((item) => {
-        // Find the corresponding item in codeValues array
-        const matchingItem = codeValues.find((item1) => item.uom === item1.name);
-
-        // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-        return matchingItem ? { ...item, uomcode: matchingItem.code } : { ...item, uomcode: '' };
-      });
-
-      const itemsWithSerialNumber = setData?.map((item, index) => {
-        let quantityNew = item.stockmaterialarray.map((data, newindex) => {
-          return ` ${data.quantitynew}`;
-        });
-
-        let materialNew = item.stockmaterialarray.map((data, newindex) => {
-          return ` ${data.materialnew}`;
-        });
-
-        let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
-          return ` ${data.productdetailsnew}`;
-        });
-
-        let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
-          return ` ${data.quantitynew}#${data.uomcodenew}`;
-        });
-        return {
-          id: item._id,
-          serialNumber: (page - 1) * pageSize + index + 1,
-          company: item.company,
-          branch: item.branch,
-          unit: item.unit,
-          floor: item.floor,
-          area: item.area,
-          location: item.location,
-          requestmode: item.requestmode,
-          stockcategory: item.stockcategory,
-          stocksubcategory: item.stocksubcategory,
-
-          uomnew: quantityAndUom.join(','),
-          quantitynew: quantityNew.join(','),
-          materialnew: materialNew.join(',').toString(),
-          productdetailsnew: item.stockmaterialarray.length > 0 ? productdetailsNew.join(',') : '',
-
-          gstno: item.gstno,
-          billno: item.billno,
-          warrantydetails: item.warrantydetails,
-          warranty: item.warranty,
-          purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
-          billdate: moment(item.billdate).format('DD/MM/YYYY'),
-          rate: item.rate,
-          vendor: item.vendor,
-          vendorgroup: item.vendorgroup,
-        };
-      });
-      setStockmanage(itemsWithSerialNumber);
-
-      setOverallFilterdata(
-        res_employee?.data?.totalProjectsData?.length > 0
-          ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-              let quantityNew = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.quantitynew}`;
-              });
-
-              let materialNew = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.materialnew}`;
-              });
-
-              let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.productdetailsnew}`;
-              });
-
-              let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
-                return ` ${data.quantitynew}#${data.uomcodenew}`;
-              });
-              return {
-                ...item,
-                serialNumber: (page - 1) * pageSize + index + 1,
-                id: item._id,
-                company: item.company,
-                branch: item.branch,
-                unit: item.unit,
-                floor: item.floor,
-                area: item.area,
-                location: item.location,
-                requestmode: item.requestmode,
-                stockcategory: item.stockcategory,
-                stocksubcategory: item.stocksubcategory,
-
-                uomnew: quantityAndUom.join(','),
-                quantitynew: quantityNew.join(','),
-                materialnew: materialNew.join(',').toString(),
-                productdetailsnew: item.stockmaterialarray.length > 0 ? productdetailsNew.join(',') : '',
-
-                gstno: item.gstno,
-                billno: item.billno,
-                warrantydetails: item.warrantydetails,
-                warranty: item.warranty,
-                purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
-                billdate: moment(item.billdate).format('DD/MM/YYYY'),
-                rate: item.rate,
-                vendor: item.vendor,
-                vendorgroup: item.vendorgroup,
-              };
-            })
-          : []
-      );
-
-      setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
-      setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-      setPageSize((data) => {
-        return ans?.length > 0 ? data : 10;
-      });
-      setPage((data) => {
-        return ans?.length > 0 ? data : 1;
-      });
-
-      setLoading(false);
-    } catch (err) {
-      console.log(err, 'errorororo');
-      setLoading(false);
-
-      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-    }
-  };
-
-  useEffect(() => {
-    fetchStock();
-  }, [page, pageSize, searchQuery]);
 
   // Error Popup model
   const handleClickOpenerr = () => {
@@ -2237,7 +1913,6 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       setSelectedRows([]);
       setSelectAllChecked(false);
       setPage(1);
-      await fetchStock();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -2578,64 +2253,6 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       minHeight: '40px',
       hide: !columnVisibility.billdate,
     },
-    {
-      field: 'actions',
-      headerName: 'Action',
-      flex: 0,
-      width: 250,
-      sortable: false,
-      hide: !columnVisibility.actions,
-      cellRenderer: (params) => (
-        <Grid sx={{ display: 'flex' }}>
-          {isUserRoleCompare?.includes('estockpurchase') && (
-            <Button
-              sx={userStyle.buttonedit}
-              style={{ minWidth: '0px' }}
-              onClick={() => {
-                handleClickOpenEdit();
-                getCode(params.data.id);
-                fetchStockedit(params.data.id);
-              }}
-            >
-              <EditOutlinedIcon sx={buttonStyles.buttonedit} />
-            </Button>
-          )}
-          {isUserRoleCompare?.includes('dstockpurchase') && (
-            <Button
-              sx={userStyle.buttondelete}
-              onClick={(e) => {
-                getinfoCode(params.data.id);
-                handleClickOpen();
-              }}
-            >
-              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
-            </Button>
-          )}
-          {isUserRoleCompare?.includes('vstockpurchase') && (
-            <Button
-              sx={userStyle.buttonedit}
-              onClick={(e) => {
-                getviewCode(params.data.id);
-                handleViewOpen();
-              }}
-            >
-              <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
-            </Button>
-          )}
-          {isUserRoleCompare?.includes('istockpurchase') && (
-            <Button
-              sx={userStyle.buttonedit}
-              onClick={() => {
-                handleClickOpeninfo();
-                getinfoCode(params.data.id);
-              }}
-            >
-              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />
-            </Button>
-          )}
-        </Grid>
-      ),
-    },
   ];
 
   const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
@@ -2767,9 +2384,129 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
 
+  const handleCloseFilterOpen = async () => {
+    let res_employee = await axios.get(SERVICE.EXCEL_DOWNLOAD_STOCK, {
+      headers: {
+        Authorization: `Bearer ${auth.APIToken}`,
+      },
+    });
+
+    setOverallFilterdata(
+      res_employee?.data?.stock?.length > 0
+        ? res_employee?.data?.stock?.map((item, index) => {
+            let quantityNew = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.quantitynew}`;
+            });
+
+            let materialNew = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.materialnew}`;
+            });
+
+            let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.productdetailsnew}`;
+            });
+
+            let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.quantitynew}#${data.uomcodenew}`;
+            });
+            return {
+              ...item,
+              serialNumber: (page - 1) * pageSize + index + 1,
+              id: item._id,
+              company: item.company,
+              branch: item.branch,
+              unit: item.unit,
+              floor: item.floor,
+              area: item.area,
+              location: item.location,
+              requestmode: item.requestmode,
+              stockcategory: item.stockcategory,
+              stocksubcategory: item.stocksubcategory,
+
+              uomnew: quantityAndUom.join(','),
+              quantitynew: quantityNew.join(','),
+              materialnew: materialNew.join(',').toString(),
+              productdetailsnew: item.stockmaterialarray.length > 0 ? productdetailsNew.join(',') : '',
+
+              gstno: item.gstno,
+              billno: item.billno,
+              warrantydetails: item.warrantydetails,
+              warranty: item.warranty,
+              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+              billdate: moment(item.billdate).format('DD/MM/YYYY'),
+              rate: item.rate,
+              vendor: item.vendor,
+              vendorgroup: item.vendorgroup,
+            };
+          })
+        : []
+    );
+    setIsFilterOpen(false);
+  };
+
   // page refersh reload
   const handleCloseFilterMod = () => {
     setIsFilterOpen(false);
+  };
+
+  const handleCloseFilterOpenPdf = async () => {
+    let res_employee = await axios.get(SERVICE.EXCEL_DOWNLOAD_STOCK, {
+      headers: {
+        Authorization: `Bearer ${auth.APIToken}`,
+      },
+    });
+
+    setOverallFilterdata(
+      res_employee?.data?.stock?.length > 0
+        ? res_employee?.data?.stock?.map((item, index) => {
+            let quantityNew = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.quantitynew}`;
+            });
+
+            let materialNew = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.materialnew}`;
+            });
+
+            let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.productdetailsnew}`;
+            });
+
+            let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+              return ` ${data.quantitynew}#${data.uomcodenew}`;
+            });
+            return {
+              ...item,
+              serialNumber: (page - 1) * pageSize + index + 1,
+              id: item._id,
+              company: item.company,
+              branch: item.branch,
+              unit: item.unit,
+              floor: item.floor,
+              area: item.area,
+              location: item.location,
+              requestmode: item.requestmode,
+              stockcategory: item.stockcategory,
+              stocksubcategory: item.stocksubcategory,
+
+              uomnew: quantityAndUom.join(','),
+              quantitynew: quantityNew.join(','),
+              materialnew: materialNew.join(',').toString(),
+              productdetailsnew: item.stockmaterialarray.length > 0 ? productdetailsNew.join(',') : '',
+
+              gstno: item.gstno,
+              billno: item.billno,
+              warrantydetails: item.warrantydetails,
+              warranty: item.warranty,
+              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+              billdate: moment(item.billdate).format('DD/MM/YYYY'),
+              rate: item.rate,
+              vendor: item.vendor,
+              vendorgroup: item.vendorgroup,
+            };
+          })
+        : []
+    );
+    setIsPdfFilterOpen(false);
   };
 
   const handleClosePdfFilterMod = () => {
@@ -3076,448 +2813,155 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     }
   };
 
+  //company multiselect
+  //team multiselect
+  const [selectedOptionsCompany, setSelectedOptionsCompany] = useState([]);
+  let [valueCompanyCat, setValueCompanyCat] = useState([]);
+
+  const handleCompanyChange = (options) => {
+    setValueCompanyCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
+    setSelectedOptionsCompany(options);
+    setValueBranchCat([]);
+    setSelectedOptionsBranch([]);
+    setValueUnitCat([]);
+    setSelectedOptionsUnit([]);
+  };
+
+  const customValueRendererCompany = (valueCompanyCat, _categoryname) => {
+    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(', ') : 'Please Select Company';
+  };
+
+  //branch multiselect
+  const [selectedOptionsBranch, setSelectedOptionsBranch] = useState([]);
+  let [valueBranchCat, setValueBranchCat] = useState([]);
+
+  const handleBranchChangeFilter = (options) => {
+    setValueBranchCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
+    setSelectedOptionsBranch(options);
+    setValueUnitCat([]);
+    setSelectedOptionsUnit([]);
+  };
+
+  const customValueRendererBranch = (valueBranchCat, _categoryname) => {
+    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(', ') : 'Please Select Branch';
+  };
+
+  //unit multiselect
+  const [selectedOptionsUnit, setSelectedOptionsUnit] = useState([]);
+  let [valueUnitCat, setValueUnitCat] = useState([]);
+
+  const handleUnitChange = (options) => {
+    setValueUnitCat(
+      options.map((a, index) => {
+        return a.value;
+      })
+    );
+    setSelectedOptionsUnit(options);
+  };
+
+  const customValueRendererUnit = (valueUnitCat, _categoryname) => {
+    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(', ') : 'Please Select Unit';
+  };
+
+  //auto select all dropdowns
+  const handleAutoSelect = async () => {
+    setPageName(!pageName);
+    try {
+      let selectedValues = accessbranch
+        ?.map((data) => ({
+          company: data.company,
+          branch: data.branch,
+          unit: data.unit,
+        }))
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit));
+      let selectedCompany = selectedValues
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
+        .map((a, index) => {
+          return a.company;
+        });
+
+      let mappedCompany = selectedValues
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
+        ?.map((data) => ({
+          label: data?.company,
+          value: data?.company,
+        }));
+
+      setValueCompanyCat(selectedCompany);
+      setSelectedOptionsCompany(mappedCompany);
+
+      let selectedBranch = selectedValues
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
+        .map((a, index) => {
+          return a.branch;
+        });
+
+      let mappedBranch = selectedValues
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
+        ?.map((data) => ({
+          label: data?.branch,
+          value: data?.branch,
+        }));
+
+      setValueBranchCat(selectedBranch);
+      setSelectedOptionsBranch(mappedBranch);
+
+      let selectedUnit = selectedValues
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
+        .map((a, index) => {
+          return a.unit;
+        });
+
+      let mappedUnit = selectedValues
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
+        ?.map((data) => ({
+          label: data?.unit,
+          value: data?.unit,
+        }));
+
+      setValueUnitCat(selectedUnit);
+      setSelectedOptionsUnit(mappedUnit);
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
+
+  useEffect(() => {
+    handleAutoSelect();
+  }, [isAssignBranch]);
+
+  const handleClearFilter = () => {
+    setStockmanage([]);
+    setItems([]);
+    setPage(1);
+    setTotalProjects(0);
+    setTotalPages(0);
+    setPageSize(10);
+    setOverallFilterdata([]);
+    setSelectedOptionsCompany([]);
+    setSelectedOptionsBranch([]);
+    setSelectedOptionsUnit([]);
+    setValueCompanyCat([]);
+    setValueBranchCat([]);
+    setValueUnitCat([]);
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
+    handleClickOpenPopup();
+  };
+
   return (
     <Box>
       {/* <Headtitle title={"REFERENCE DOCUMENTS LIST"} /> */}
       {/* ****** Header Content ****** */}
       {/* <Typography sx={userStyle.HeaderText}>Reference Documents List</Typography> */}
-
-      <>
-        {isUserRoleCompare?.includes('lstockpurchase') && (
-          <>
-            <Box sx={userStyle.container}>
-              {/* ******************************************************EXPORT Buttons****************************************************** */}
-              <Grid container spacing={2}>
-                <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>Stock Purchase List</Typography>
-                </Grid>
-              </Grid>
-              <Grid
-                item
-                md={8}
-                xs={12}
-                sm={12}
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Grid>
-                  {isUserRoleCompare?.includes('excelstockpurchase') && (
-                    <>
-                      <Button
-                        onClick={(e) => {
-                          setIsFilterOpen(true);
-                          fetchStock();
-                          setFormat('xl');
-                        }}
-                        sx={userStyle.buttongrp}
-                      >
-                        <FaFileExcel />
-                        &ensp;Export to Excel&ensp;
-                      </Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes('csvstockpurchase') && (
-                    <>
-                      <Button
-                        onClick={(e) => {
-                          setIsFilterOpen(true);
-                          fetchStock();
-                          setFormat('csv');
-                        }}
-                        sx={userStyle.buttongrp}
-                      >
-                        <FaFileCsv />
-                        &ensp;Export to CSV&ensp;
-                      </Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes('printstockpurchase') && (
-                    <>
-                      <Button sx={userStyle.buttongrp} onClick={handleprint}>
-                        &ensp;
-                        <FaPrint />
-                        &ensp;Print&ensp;
-                      </Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes('pdfstockpurchase') && (
-                    <>
-                      <Button
-                        sx={userStyle.buttongrp}
-                        onClick={() => {
-                          setIsPdfFilterOpen(true);
-                          fetchStock();
-                        }}
-                      >
-                        <FaFilePdf />
-                        &ensp;Export to PDF&ensp;
-                      </Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes('imagestockpurchase') && (
-                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                      {' '}
-                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
-                    </Button>
-                  )}
-                </Grid>
-              </Grid>
-              <br />
-              {/* ****** Table Grid Container ****** */}
-              <Grid style={userStyle.dataTablestyle}>
-                <Box>
-                  <label>Show entries:</label>
-                  <Select
-                    id="pageSizeSelect"
-                    value={pageSize}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 180,
-                          width: 80,
-                        },
-                      },
-                    }}
-                    onChange={handlePageSizeChange}
-                    sx={{ width: '77px' }}
-                  >
-                    <MenuItem value={1}>1</MenuItem>
-                    <MenuItem value={5}>5</MenuItem>
-                    <MenuItem value={10}>10</MenuItem>
-                    <MenuItem value={25}>25</MenuItem>
-                    <MenuItem value={50}>50</MenuItem>
-                    <MenuItem value={100}>100</MenuItem>
-                    <MenuItem value={totalProjects}>All</MenuItem>
-                  </Select>
-                </Box>
-                <Box>
-                  <Grid item md={2} xs={12} sm={12}>
-                    <FormControl fullWidth size="small">
-                      <OutlinedInput
-                        size="small"
-                        id="outlined-adornment-weight"
-                        startAdornment={
-                          <InputAdornment position="start">
-                            <FaSearch />
-                          </InputAdornment>
-                        }
-                        endAdornment={
-                          <InputAdornment position="end">
-                            {advancedFilter && (
-                              <IconButton onClick={handleResetSearch}>
-                                <MdClose />
-                              </IconButton>
-                            )}
-                            <Tooltip title="Show search options">
-                              <span>
-                                <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
-                              </span>
-                            </Tooltip>
-                          </InputAdornment>
-                        }
-                        aria-describedby="outlined-weight-helper-text"
-                        inputProps={{ 'aria-label': 'weight' }}
-                        type="text"
-                        value={getSearchDisplay()}
-                        onChange={handleSearchChange}
-                        placeholder="Type to search..."
-                        disabled={!!advancedFilter}
-                      />
-                    </FormControl>
-                  </Grid>
-                </Box>
-              </Grid>
-              <br />
-              <br />
-              <Button
-                sx={userStyle.buttongrp}
-                onClick={() => {
-                  handleShowAllColumns();
-                  setColumnVisibility(initialColumnVisibility);
-                }}
-              >
-                Show All Columns
-              </Button>
-              &emsp;
-              <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
-                Manage Columns
-              </Button>
-              &emsp;
-              {isUserRoleCompare?.includes('bdstockpurchase') && (
-                <Button variant="contained" sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
-                  Bulk Delete
-                </Button>
-              )}
-              {/* ****** Table start ****** */}
-              {loading ? (
-                <Box sx={userStyle.container}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      minHeight: '350px',
-                    }}
-                  >
-                    <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
-                  </Box>
-                </Box>
-              ) : (
-                <>
-                  <Box style={{ width: '100%', overflowY: 'hidden' }}>
-                    <>
-                      <AggridTableForPaginationTable
-                        rowDataTable={rowDataTable}
-                        columnDataTable={columnDataTable}
-                        columnVisibility={columnVisibility}
-                        page={page}
-                        setPage={setPage}
-                        pageSize={pageSize}
-                        totalPages={totalPages}
-                        setColumnVisibility={setColumnVisibility}
-                        selectedRows={selectedRows}
-                        setSelectedRows={setSelectedRows}
-                        gridRefTable={gridRefTable}
-                        totalDatas={totalProjects}
-                        setFilteredRowData={setFilteredRowData}
-                        filteredRowData={filteredRowData}
-                        gridRefTableImg={gridRefTableImg}
-                        itemsList={overallFilterdata}
-                      />
-                    </>
-                  </Box>
-                </>
-              )}
-              {/* ****** Table End ****** */}
-            </Box>
-            <TableContainer component={Paper} sx={userStyle.printcls}>
-              <Table aria-label="customized table" id="jobopening" ref={componentRef}>
-                <TableHead sx={{ fontWeight: '600' }}>
-                  <StyledTableRow>
-                    <StyledTableCell>SNo</StyledTableCell>
-                    <StyledTableCell>Company</StyledTableCell>
-                    <StyledTableCell>Branch</StyledTableCell>
-                    <StyledTableCell>Unit</StyledTableCell>
-                    <StyledTableCell>Floor</StyledTableCell>
-                    <StyledTableCell>Area</StyledTableCell>
-                    <StyledTableCell>Location</StyledTableCell>
-                    {/* <StyledTableCell>Workstation</StyledTableCell> */}
-                    <StyledTableCell>Request Mode</StyledTableCell>
-                    <StyledTableCell>Stock Category</StyledTableCell>
-                    <StyledTableCell>Stock Subcategory</StyledTableCell>
-
-                    <StyledTableCell>Quantity</StyledTableCell>
-                    <StyledTableCell>UOM & Qunatity</StyledTableCell>
-                    <StyledTableCell>Material</StyledTableCell>
-                    <StyledTableCell>Product Details</StyledTableCell>
-
-                    <StyledTableCell>GST No</StyledTableCell>
-                    <StyledTableCell>Bill No</StyledTableCell>
-                    <StyledTableCell>Warranty Details</StyledTableCell>
-                    <StyledTableCell>Warranty</StyledTableCell>
-                    <StyledTableCell>Purchased Date</StyledTableCell>
-                    <StyledTableCell>Bill Date</StyledTableCell>
-                    <StyledTableCell>Rate</StyledTableCell>
-                    <StyledTableCell>Vendor Group</StyledTableCell>
-                    <StyledTableCell>Vendor Name</StyledTableCell>
-                  </StyledTableRow>
-                </TableHead>
-                <TableBody>
-                  {rowDataTable?.length > 0 ? (
-                    rowDataTable?.map((row, index) => (
-                      <StyledTableRow key={index}>
-                        <StyledTableCell>{row.serialNumber}</StyledTableCell>
-                        <StyledTableCell>{row.company}</StyledTableCell>
-                        <StyledTableCell>{row.branch}</StyledTableCell>
-                        <StyledTableCell>{row.unit}</StyledTableCell>
-                        <StyledTableCell>{row.floor}</StyledTableCell>
-                        <StyledTableCell>{row.area}</StyledTableCell>
-                        <StyledTableCell>{row.location}</StyledTableCell>
-                        {/* <StyledTableCell>{row.workstation}</StyledTableCell> */}
-                        <StyledTableCell>{row.requestmode}</StyledTableCell>
-                        <StyledTableCell>{row.stockcategory}</StyledTableCell>
-                        <StyledTableCell>{row.stocksubcategory}</StyledTableCell>
-
-                        <StyledTableCell>{row.quantitynew}</StyledTableCell>
-                        <StyledTableCell>{row.uomnew}</StyledTableCell>
-                        <StyledTableCell>{row.materialnew}</StyledTableCell>
-                        <StyledTableCell>{row.productdetailsnew}</StyledTableCell>
-
-                        <StyledTableCell>{row.gstno}</StyledTableCell>
-                        <StyledTableCell>{row.billno}</StyledTableCell>
-                        <StyledTableCell>{row.warrantydetails}</StyledTableCell>
-                        <StyledTableCell>{row.warranty}</StyledTableCell>
-                        <StyledTableCell>{row.purchasedate}</StyledTableCell>
-                        <StyledTableCell>{row.billdate}</StyledTableCell>
-                        <StyledTableCell>{row.rate}</StyledTableCell>
-                        <StyledTableCell>{row.vendorgroup}</StyledTableCell>
-                        <StyledTableCell>{row.vendor}</StyledTableCell>
-                        {/* <StyledTableCell>{row.subcategoryname}</StyledTableCell> */}
-                      </StyledTableRow>
-                    ))
-                  ) : (
-                    <StyledTableRow>
-                      {' '}
-                      <StyledTableCell colSpan={7} align="center">
-                        No Data Available
-                      </StyledTableCell>{' '}
-                    </StyledTableRow>
-                  )}
-                  <StyledTableRow></StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-            <Popover id={id} open={isManageColumnsOpen} anchorEl={anchorEl} onClose={handleCloseManageColumns} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} transformOrigin={{ vertical: 'center', horizontal: 'right' }}>
-              {manageColumnsContent}
-            </Popover>
-            <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-              <Box style={{ padding: '10px', maxWidth: '450px' }}>
-                <Typography variant="h6">Advance Search</Typography>
-                <IconButton
-                  aria-label="close"
-                  onClick={handleCloseSearch}
-                  sx={{
-                    position: 'absolute',
-                    right: 8,
-                    top: 8,
-                    color: (theme) => theme.palette.grey[500],
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-                <DialogContent sx={{ width: '100%' }}>
-                  <Box
-                    sx={{
-                      width: '350px',
-                      maxHeight: '400px',
-                      overflow: 'hidden',
-                      position: 'relative',
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        maxHeight: '300px',
-                        overflowY: 'auto',
-                        // paddingRight: '5px'
-                      }}
-                    >
-                      <Grid container spacing={1}>
-                        <Grid item md={12} sm={12} xs={12}>
-                          <Typography>Columns</Typography>
-                          <Select
-                            fullWidth
-                            size="small"
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  maxHeight: 200,
-                                  width: 'auto',
-                                },
-                              },
-                            }}
-                            style={{ minWidth: 150 }}
-                            value={selectedColumn}
-                            onChange={(e) => setSelectedColumn(e.target.value)}
-                            displayEmpty
-                          >
-                            <MenuItem value="" disabled>
-                              Select Column
-                            </MenuItem>
-                            {filteredSelectedColumn.map((col) => (
-                              <MenuItem key={col.field} value={col.field}>
-                                {col.headerName}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </Grid>
-                        <Grid item md={12} sm={12} xs={12}>
-                          <Typography>Operator</Typography>
-                          <Select
-                            fullWidth
-                            size="small"
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  maxHeight: 200,
-                                  width: 'auto',
-                                },
-                              },
-                            }}
-                            style={{ minWidth: 150 }}
-                            value={selectedCondition}
-                            onChange={(e) => setSelectedCondition(e.target.value)}
-                            disabled={!selectedColumn}
-                          >
-                            {conditions.map((condition) => (
-                              <MenuItem key={condition} value={condition}>
-                                {condition}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </Grid>
-                        <Grid item md={12} sm={12} xs={12}>
-                          <Typography>Value</Typography>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
-                            onChange={(e) => setFilterValue(e.target.value)}
-                            disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
-                            placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
-                            sx={{
-                              '& .MuiOutlinedInput-root.Mui-disabled': {
-                                backgroundColor: 'rgb(0 0 0 / 26%)',
-                              },
-                              '& .MuiOutlinedInput-input.Mui-disabled': {
-                                cursor: 'not-allowed',
-                              },
-                            }}
-                          />
-                        </Grid>
-                        {additionalFilters.length > 0 && (
-                          <>
-                            <Grid item md={12} sm={12} xs={12}>
-                              <RadioGroup row value={logicOperator} onChange={(e) => setLogicOperator(e.target.value)}>
-                                <FormControlLabel value="AND" control={<Radio />} label="AND" />
-                                <FormControlLabel value="OR" control={<Radio />} label="OR" />
-                              </RadioGroup>
-                            </Grid>
-                          </>
-                        )}
-                        {additionalFilters.length === 0 && (
-                          <Grid item md={4} sm={12} xs={12}>
-                            <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
-                              Add Filter
-                            </Button>
-                          </Grid>
-                        )}
-
-                        <Grid item md={2} sm={12} xs={12}>
-                          <Button
-                            variant="contained"
-                            onClick={() => {
-                              fetchStock();
-                              setIsSearchActive(true);
-                              setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
-                            }}
-                            sx={{ textTransform: 'capitalize' }}
-                            disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
-                          >
-                            Search
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
-                </DialogContent>
-              </Box>
-            </Popover>
-          </>
-        )}
-      </>
 
       {/* this is info view details */}
       <Dialog open={openInfo} onClose={handleCloseinfo} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
@@ -3585,859 +3029,693 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       </Dialog>
       <Box>
         {/* Edit DIALOG */}
-        <Dialog
-          open={isEditOpen}
-          onClose={handleCloseModEdit}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="lg"
-          fullWidth={true}
-          sx={{
-            overflow: 'scroll',
-            '& .MuiPaper-root': {
-              overflow: 'scroll',
-            },
-            marginTop: '95px',
-          }}
-        >
-          <Box sx={{ padding: '20px 50px' }}>
-            <>
-              <Grid container spacing={2}>
-                <Typography sx={userStyle.HeaderText}>Edit Stock Purchase</Typography>
-              </Grid>
-              <br />
-              <Grid container spacing={2}>
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Company<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      // options={companysEdit}
-                      options={accessbranch
-                        ?.map((data) => ({
-                          label: data.company,
-                          value: data.company,
-                        }))
-                        .filter((item, index, self) => {
-                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                        })}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.company,
-                        value: stockmanagemasteredit.company,
-                      }}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          company: e.value,
-                          branch: 'Please Select Branch',
-                          unit: 'Please Select Unit',
-                          floor: 'Please Select Floor',
-                          area: 'Please Select Area',
-                          location: 'Please Select Location',
-                        });
-                        // setBranchsEdit([]);
-                        setUnitsEdit([]);
-                        setAreasEdit([]);
-                        setFloorEdit([]);
-                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
-                        fetchBranchDropdownsEdit(e.value);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Branch<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      // options={branchsEdit}
-                      options={accessbranch
-                        ?.filter((comp) => stockmanagemasteredit.company === comp.company)
-                        ?.map((data) => ({
-                          label: data.branch,
-                          value: data.branch,
-                        }))
-                        .filter((item, index, self) => {
-                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                        })}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.branch,
-                        value: stockmanagemasteredit.branch,
-                      }}
-                      onChange={(e) => {
-                        setNewcheckBranch(e.value);
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          branch: e.value,
-                          unit: 'Please Select Unit',
-                          floor: 'Please Select Floor',
-                          area: 'Please Select Area',
-                          location: 'Please Select Location',
-                        });
-                        // setUnitsEdit([]);
-                        setAreasEdit([]);
-                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
-                        setFloorEdit([]);
-                        fetchUnitsEdit(e.value);
-                        fetchFloorEdit(e.value);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Unit<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      // options={unitsEdit}
-                      options={accessbranch
-                        ?.filter((comp) => stockmanagemasteredit.company === comp.company && stockmanagemasteredit.branch === comp.branch)
-                        ?.map((data) => ({
-                          label: data.unit,
-                          value: data.unit,
-                        }))
-                        .filter((item, index, self) => {
-                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                        })}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.unit,
-                        value: stockmanagemasteredit.unit,
-                      }}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          unit: e.value,
-                          workstation: '',
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Floor<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      options={floorsEdit}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.floor,
-                        value: stockmanagemasteredit.floor,
-                      }}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          floor: e.value,
-                          workstation: '',
-                          area: 'Please Select Area',
-                          location: 'Please Select Location',
-                        });
-                        // setAreasEdit([]);
-                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
-                        fetchAreaEdit(stockmanagemasteredit.branch, e.value);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Area<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      options={areasEdit}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.area,
-                        value: stockmanagemasteredit.area,
-                      }}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          area: e.value,
-                          workstation: '',
-                          location: 'Please Select Location',
-                        });
-                        setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
-                        fetchAllLocationEdit(stockmanagemasteredit.branch, stockmanagemasteredit.floor, e.value);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Location<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      options={locationsEdit}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.location,
-                        value: stockmanagemasteredit.location,
-                      }}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          location: e.value,
-                          workstation: '',
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>Warranty</Typography>
-                    <Selects
-                      options={[
-                        { label: 'Yes', value: 'Yes' },
-                        { label: 'No', value: 'No' },
-                      ]}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.warranty,
-                        value: stockmanagemasteredit.warranty,
-                      }}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          warranty: e.value,
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                {stockmanagemasteredit.warranty === 'Yes' && (
-                  <>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <Grid container>
-                        <Grid item md={6} xs={6} sm={6}>
-                          <Typography>Warranty Time</Typography>
-                          <FormControl fullWidth size="small">
-                            <OutlinedInput id="component-outlined" type="text" placeholder="Enter Time" value={stockmanagemasteredit.estimation} onChange={(e) => handleChangephonenumberEdit(e)} />
-                          </FormControl>
-                        </Grid>
-                        <Grid item md={6} xs={6} sm={6}>
-                          <Typography>Estimation</Typography>
-                          <Select
-                            fullWidth
-                            size="small"
-                            labelId="demo-select-small"
-                            id="demo-select-small"
-                            value={stockmanagemasteredit.estimationtime}
-                            // onChange={(e) => {
-                            //   setAssetdetail({ ...assetdetail, estimationtime: e.target.value });
-                            // }}
-                            onChange={handleEstimationChangeEdit}
-                          >
-                            <MenuItem value="" disabled>
-                              {' '}
-                              Please Select
-                            </MenuItem>
-                            <MenuItem value="Days"> {'Days'} </MenuItem>
-                            <MenuItem value="Month"> {'Month'} </MenuItem>
-                            <MenuItem value="Year"> {'Year'} </MenuItem>
-                          </Select>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </>
-                )}
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>Purchase date </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="date"
-                      value={selectedPurchaseDateEdit}
-                      // onChange={(e) => {
-                      //   setAssetdetail({ ...assetdetail, purchasedate: e.target.value });
-                      // }}
-                      onChange={handlePurchaseDateChangeEdit}
-                    />
-                  </FormControl>
-                </Grid>
-                {stockmanagemasteredit.warranty === 'Yes' && (
-                  <>
-                    <Grid item md={3} xs={12} sm={12}>
-                      <FormControl fullWidth size="small">
-                        <Typography>Expiry Date </Typography>
-                        <OutlinedInput id="component-outlined" type="text" placeholder="" value={stockmanagemasteredit.warrantycalculation} />
-                      </FormControl>
-                    </Grid>
-                  </>
-                )}
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      {' '}
-                      Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <Selects
-                      options={vendorGroupOpt}
-                      styles={colourStyles}
-                      value={{ label: vendorGroup, value: vendorGroup }}
-                      onChange={(e) => {
-                        handleChangeGroupName(e);
-                        setVendorGroup(e.value);
-                        setVendorNew('Choose Vendor');
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl size="small" fullWidth>
-                    <Typography>
-                      Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <Selects
-                      options={vendorOpt}
-                      styles={colourStyles}
-                      value={{ label: vendorNew, value: vendorNew }}
-                      onChange={(e) => {
-                        setVendorNew(e.value);
 
-                        vendorid(e._id);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      GST No <b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} sm={12} xs={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Bill No <b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="number"
-                      sx={userStyle.input}
-                      value={stockmanagemasteredit.billno}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          billno: e.target.value,
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>Request Mode For</Typography>
-                    <OutlinedInput value={stockmanagemasteredit.requestmode} readOnly={true} />
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Stock Category<b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <Selects
-                      options={categoryOption}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.stockcategory,
-                        value: stockmanagemasteredit.stockcategory,
-                      }}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          stockcategory: e.value,
-                          stocksubcategory: 'Please Select Stock Sub Category',
-                          uomnew: '',
-                          materialnew: 'Please Select Material',
-                        });
-                        fetchSubcategoryBased(e);
-                        setMaterialoptNew([]);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Stock Sub-category<b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <Selects
-                      options={subcategoryOpt}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.stocksubcategory,
-                        value: stockmanagemasteredit.stocksubcategory,
-                      }}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          stocksubcategory: e.value,
-                          uomnew: '',
-                          materialnew: 'Please Select Material',
-                        });
-                        fetchMaterialNew(e, stockmanagemasteredit.stockcategory);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Material<b style={{ color: 'red' }}>*</b>
-                    </Typography>
-                    <Selects
-                      options={materialOptNew}
-                      styles={colourStyles}
-                      value={{
-                        label: stockmanagemasteredit.materialnew,
-                        value: stockmanagemasteredit.materialnew,
-                      }}
-                      onChange={(e) => {
-                        // fetchAsset();
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          materialnew: e.value,
-                        });
-                        fetchVomMaster(e);
-
-                        // fetchspecification(e);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      UOM<b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <OutlinedInput readOnly={true} value={stockmanagemasteredit.uomnew} onChange={(e) => {}} />
-                    {/* <Selects
-                                            options={uomOpt}
-                                            styles={colourStyles}
-                                            value={{
-                                                label: stockmanagemasteredit.uomnew,
-                                                value: stockmanagemasteredit.uomnew,
-                                            }}
-                                            onChange={(e) => {
-
-                                                setStockmanagemasteredit({
-                                                    ...stockmanagemasteredit,
-                                                    uomnew: e.value, materialnew: "Please Select Material"
-                                                });
-                                                
-                                            }}
-                                        /> */}
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} sm={12} xs={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Quantity<b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="number"
-                      sx={userStyle.input}
-                      placeholder="Please Enter Quantity"
-                      value={stockmanagemasteredit.quantitynew}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          quantitynew: e.target.value > 0 ? e.target.value : 0,
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-
-                <Grid item md={3.5} sm={12} xs={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>Product Details</Typography>
-                    <TextareaAutosize
-                      aria-label="minimum height"
-                      minRows={2}
-                      value={stockmanagemasteredit.productdetailsnew}
-                      placeholder="Please Enter Product Details"
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          productdetailsnew: e.target.value,
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={0.5} sm={1} xs={1}>
-                  <Button
-                    variant="contained"
-                    style={{
-                      height: '30px',
-                      minWidth: '20px',
-                      padding: '19px 13px',
-                      color: 'white',
-                      marginTop: '23px',
-                      marginLeft: '-10px',
-                    }}
-                    color="success"
-                    onClick={() => {
-                      handleStockArray();
-                    }}
-                  >
-                    <FaPlus style={{ fontSize: '15px' }} />
-                  </Button>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      value={stockmanagemasteredit.warrantydetails}
-                      sx={userStyle.input}
-                      placeholder="Please Enter Warranty Details"
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          warrantydetails: e.target.value,
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} sm={12} xs={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Rate<b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="number"
-                      sx={userStyle.input}
-                      placeholder="Please Enter Rate"
-                      value={stockmanagemasteredit.rate}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          rate: e.target.value,
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <FormControl fullWidth size="small">
-                    <Typography>
-                      Bill Date <b style={{ color: 'red' }}>*</b>{' '}
-                    </Typography>
-                    <TextField
-                      size="small"
-                      type="date"
-                      value={stockmanagemasteredit.billdate}
-                      onChange={(e) => {
-                        setStockmanagemasteredit({
-                          ...stockmanagemasteredit,
-                          billdate: e.target.value,
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <Typography>
-                    Bill <b style={{ color: 'red' }}>*</b>{' '}
-                  </Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                    <Button variant="contained" onClick={handleClickUploadPopupOpenedit}>
-                      Upload
-                    </Button>
-                  </Box>
-                </Grid>
-                <Grid item md={3} xs={12} sm={12}>
-                  <Typography>Warranty Card </Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                    <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
-                      Upload
-                    </Button>
-                  </Box>
-                </Grid>
-                {stockArray.length > 0 && (
-                  <>
-                    <Grid item md={12} xs={12} sm={12}>
-                      {' '}
-                      <Typography variant="h6">Stock Todo List</Typography>
-                    </Grid>
-
-                    <Grid item md={3} xs={12} sm={12}></Grid>
-                    <Grid item md={3} xs={12} sm={12}></Grid>
-                    <Grid item md={3} xs={12} sm={12}></Grid>
-                    <Grid item md={3} xs={12} sm={12}></Grid>
-                  </>
-                )}
-                {stockArray.length > 0 &&
-                  stockArray.map((item, index) => {
-                    return (
-                      <>
-                        <Grid item md={3} xs={3} sm={3}>
-                          <FormControl fullWidth size="small">
-                            <Typography>Material</Typography>
-                            <OutlinedInput readOnly={true} value={item.materialnew} />
-                          </FormControl>
-                        </Grid>
-                        <Grid item md={3} xs={3} sm={3}>
-                          <FormControl fullWidth size="small">
-                            <Typography>UOM </Typography>
-                            <OutlinedInput readOnly={true} value={item.uomnew} />
-                          </FormControl>
-                        </Grid>
-                        <Grid item md={3} sm={3} xs={3}>
-                          <FormControl fullWidth size="small">
-                            <Typography>Qty </Typography>
-                            <OutlinedInput readOnly={true} value={item.quantitynew} />
-                          </FormControl>
-                        </Grid>
-                        <Grid item md={3} sm={3} xs={3} sx={{ display: 'flex' }}>
-                          <FormControl fullWidth size="small">
-                            <Typography>Product Details</Typography>
-
-                            <TextareaAutosize aria-label="minimum height" minRows={2} readOnly={true} value={item.productdetailsnew} placeholder="Please Enter Product Details" />
-                          </FormControl>
-                          &nbsp; &emsp;
-                          <Button
-                            variant="contained"
-                            color="error"
-                            type="button"
-                            onClick={(e) => deleteTodo(index)}
-                            sx={{
-                              height: '30px',
-                              minWidth: '30px',
-                              marginTop: '28px',
-                              padding: '6px 10px',
-                            }}
-                          >
-                            <AiOutlineClose />
-                          </Button>
-                        </Grid>
-                      </>
-                    );
-                  })}
-              </Grid>
-              <br /> <br />
-              <Grid container spacing={2}>
-                <Grid item md={6} xs={12} sm={12}>
-                  {btnSubmit ? (
-                    <Box sx={{ display: 'flex' }}>
-                      <CircularProgress />
-                    </Box>
-                  ) : (
-                    <>
-                      <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
-                        {' '}
-                        Update
-                      </Button>
-                    </>
-                  )}
-                </Grid>
-                <br />
-                <Grid item md={6} xs={12} sm={12}>
-                  <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
-                    {' '}
-                    Cancel{' '}
-                  </Button>
-                </Grid>
-              </Grid>
-            </>
-          </Box>
-        </Dialog>
-      </Box>
-      {/* Delete modal */}
-      <Dialog open={openDelete} onClose={handleCloseDelete} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
-          <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
-          <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
-            Are you sure?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDelete} variant="outlined">
-            Cancel
-          </Button>
-          <Button onClick={(e) => delProject()} autoFocus variant="contained" color="error">
-            {' '}
-            OK{' '}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <br />
-      <br />
-      {/* view model */}
-      <Dialog open={openView} onClose={handlViewClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '95px' }}>
         <Box sx={{ padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}> View Stock Purchase</Typography>
+            <Grid container spacing={2}>
+              <Typography sx={userStyle.HeaderText}>Stock Purchase</Typography>
+            </Grid>
+            <br />
+            <Grid container spacing={2}>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Company<b style={{ color: 'red' }}>*</b>
+                  </Typography>
+                  <Selects
+                    // options={companysEdit}
+                    options={accessbranch
+                      ?.map((data) => ({
+                        label: data.company,
+                        value: data.company,
+                      }))
+                      .filter((item, index, self) => {
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                      })}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.company,
+                      value: stockmanagemasteredit.company,
+                    }}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         company: e.value,
+                    //         branch: "Please Select Branch",
+                    //         unit: "Please Select Unit",
+                    //         floor: "Please Select Floor",
+                    //         area: "Please Select Area",
+                    //         location: "Please Select Location",
+                    //     });
+                    //     // setBranchsEdit([]);
+                    //     setUnitsEdit([])
+                    //     setAreasEdit([]);
+                    //     setFloorEdit([]);
+                    //     setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                    //     fetchBranchDropdownsEdit(e.value);
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Branch<b style={{ color: 'red' }}>*</b>
+                  </Typography>
+                  <Selects
+                    // options={branchsEdit}
+                    options={accessbranch
+                      ?.filter((comp) => stockmanagemasteredit.company === comp.company)
+                      ?.map((data) => ({
+                        label: data.branch,
+                        value: data.branch,
+                      }))
+                      .filter((item, index, self) => {
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                      })}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.branch,
+                      value: stockmanagemasteredit.branch,
+                    }}
+                    // onChange={(e) => {
+                    //     setNewcheckBranch(e.value);
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         branch: e.value,
+                    //         unit: "Please Select Unit",
+                    //         floor: "Please Select Floor",
+                    //         area: "Please Select Area",
+                    //         location: "Please Select Location",
+                    //     });
+                    //     // setUnitsEdit([]);
+                    //     setAreasEdit([]);
+                    //     setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                    //     setFloorEdit([]);
+                    //     fetchUnitsEdit(e.value);
+                    //     fetchFloorEdit(e.value);
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Unit<b style={{ color: 'red' }}>*</b>
+                  </Typography>
+                  <Selects
+                    // options={unitsEdit}
+                    options={accessbranch
+                      ?.filter((comp) => stockmanagemasteredit.company === comp.company && stockmanagemasteredit.branch === comp.branch)
+                      ?.map((data) => ({
+                        label: data.unit,
+                        value: data.unit,
+                      }))
+                      .filter((item, index, self) => {
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                      })}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.unit,
+                      value: stockmanagemasteredit.unit,
+                    }}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         unit: e.value,
+                    //         workstation: "",
+                    //     });
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Floor<b style={{ color: 'red' }}>*</b>
+                  </Typography>
+                  <Selects
+                    options={floorsEdit}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.floor,
+                      value: stockmanagemasteredit.floor,
+                    }}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         floor: e.value,
+                    //         workstation: "",
+                    //         area: "Please Select Area",
+                    //         location: "Please Select Location",
+                    //     });
+                    //     // setAreasEdit([]);
+                    //     setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                    //     fetchAreaEdit(stockmanagemasteredit.branch, e.value);
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Area<b style={{ color: 'red' }}>*</b>
+                  </Typography>
+                  <Selects
+                    options={areasEdit}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.area,
+                      value: stockmanagemasteredit.area,
+                    }}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         area: e.value,
+                    //         workstation: "",
+                    //         location: "Please Select Location",
+                    //     });
+                    //     setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                    //     fetchAllLocationEdit(
+                    //         stockmanagemasteredit.branch,
+                    //         stockmanagemasteredit.floor,
+                    //         e.value
+                    //     );
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Location<b style={{ color: 'red' }}>*</b>
+                  </Typography>
+                  <Selects
+                    options={locationsEdit}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.location,
+                      value: stockmanagemasteredit.location,
+                    }}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         location: e.value,
+                    //         workstation: "",
+                    //     });
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={3} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>Warranty</Typography>
+                  <Selects
+                    options={[
+                      { label: 'Yes', value: 'Yes' },
+                      { label: 'No', value: 'No' },
+                    ]}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.warranty,
+                      value: stockmanagemasteredit.warranty,
+                    }}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         warranty: e.value,
+                    //     });
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              {stockmanagemasteredit.warranty === 'Yes' && (
+                <>
+                  <Grid item md={3} xs={12} sm={12}>
+                    <Grid container>
+                      <Grid item md={6} xs={6} sm={6}>
+                        <Typography>Warranty Time</Typography>
+                        <FormControl fullWidth size="small">
+                          <OutlinedInput
+                            id="component-outlined"
+                            type="text"
+                            placeholder="Enter Time"
+                            value={stockmanagemasteredit.estimation}
+                            // onChange={(e) => handleChangephonenumberEdit(e)}
+                          />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={6} xs={6} sm={6}>
+                        <Typography>Estimation</Typography>
+                        <Select
+                          fullWidth
+                          size="small"
+                          labelId="demo-select-small"
+                          id="demo-select-small"
+                          value={stockmanagemasteredit.estimationtime}
+                          // onChange={(e) => {
+                          //   setAssetdetail({ ...assetdetail, estimationtime: e.target.value });
+                          // }}
+                          // onChange={handleEstimationChangeEdit}
+                        >
+                          <MenuItem value="" disabled>
+                            {' '}
+                            Please Select
+                          </MenuItem>
+                          <MenuItem value="Days"> {'Days'} </MenuItem>
+                          <MenuItem value="Month"> {'Month'} </MenuItem>
+                          <MenuItem value="Year"> {'Year'} </MenuItem>
+                        </Select>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </>
+              )}
+              <Grid item md={3} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>Purchase date </Typography>
+                  <OutlinedInput
+                    id="component-outlined"
+                    type="date"
+                    value={selectedPurchaseDateEdit}
+                    // onChange={(e) => {
+                    //   setAssetdetail({ ...assetdetail, purchasedate: e.target.value });
+                    // }}
+                    // onChange={handlePurchaseDateChangeEdit}
+                  />
+                </FormControl>
+              </Grid>
+              {stockmanagemasteredit.warranty === 'Yes' && (
+                <>
+                  <Grid item md={3} xs={12} sm={12}>
+                    <FormControl fullWidth size="small">
+                      <Typography>Expiry Date </Typography>
+                      <OutlinedInput id="component-outlined" type="text" placeholder="" value={stockmanagemasteredit.warrantycalculation} />
+                    </FormControl>
+                  </Grid>
+                </>
+              )}
+              <Grid item md={3} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    {' '}
+                    Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <Selects
+                    options={vendorGroupOpt}
+                    styles={colourStyles}
+                    value={{ label: vendorGroup, value: vendorGroup }}
+                    // onChange={(e) => {
+                    //     handleChangeGroupName(e);
+                    //     setVendorGroup(e.value);
+                    //     setVendorNew("Choose Vendor");
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={3} xs={12} sm={12}>
+                <FormControl size="small" fullWidth>
+                  <Typography>
+                    Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <Selects
+                    options={vendorOpt}
+                    styles={colourStyles}
+                    value={{ label: vendorNew, value: vendorNew }}
+                    // onChange={(e) => {
+                    //     setVendorNew(e.value);
+
+                    //     vendorid(e._id);
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={3} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    GST No <b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <OutlinedInput id="component-outlined" type="text" value={vendorgetid?.gstnumber} readOnly />
+                </FormControl>
+              </Grid>
+              <Grid item md={3} sm={12} xs={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Bill No <b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <OutlinedInput
+                    id="component-outlined"
+                    type="number"
+                    sx={userStyle.input}
+                    value={stockmanagemasteredit.billno}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         billno: e.target.value,
+                    //     });
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>Request Mode For</Typography>
+                  <OutlinedInput value={stockmanagemasteredit.requestmode} readOnly={true} />
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Stock Category<b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <Selects
+                    options={categoryOption}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.stockcategory,
+                      value: stockmanagemasteredit.stockcategory,
+                    }}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         stockcategory: e.value,
+                    //         stocksubcategory: "Please Select Stock Sub Category",
+                    //         uomnew: "",
+                    //         materialnew: "Please Select Material",
+                    //     });
+                    //     fetchSubcategoryBased(e);
+                    //     setMaterialoptNew([]);
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Stock Sub-category<b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <Selects
+                    options={subcategoryOpt}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.stocksubcategory,
+                      value: stockmanagemasteredit.stocksubcategory,
+                    }}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         stocksubcategory: e.value,
+                    //         uomnew: "",
+                    //         materialnew: "Please Select Material",
+                    //     });
+                    //     fetchMaterialNew(
+                    //         e,
+                    //         stockmanagemasteredit.stockcategory
+                    //     );
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Material<b style={{ color: 'red' }}>*</b>
+                  </Typography>
+                  <Selects
+                    options={materialOptNew}
+                    styles={colourStyles}
+                    value={{
+                      label: stockmanagemasteredit.materialnew,
+                      value: stockmanagemasteredit.materialnew,
+                    }}
+                    onChange={(e) => {
+                      // fetchAsset();
+                      setStockmanagemasteredit({
+                        ...stockmanagemasteredit,
+                        materialnew: e.value,
+                      });
+                      fetchVomMaster(e);
+
+                      // fetchspecification(e);
+                    }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    UOM<b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <OutlinedInput readOnly={true} value={stockmanagemasteredit.uomnew} onChange={(e) => {}} />
+                  {/* <Selects
+                                        options={uomOpt}
+                                        styles={colourStyles}
+                                        value={{
+                                            label: stockmanagemasteredit.uomnew,
+                                            value: stockmanagemasteredit.uomnew,
+                                        }}
+                                        onChange={(e) => {
+
+                                            setStockmanagemasteredit({
+                                                ...stockmanagemasteredit,
+                                                uomnew: e.value, materialnew: "Please Select Material"
+                                            });
+
+                                        }}
+                                    /> */}
+                </FormControl>
+              </Grid>
+              <Grid item md={4} sm={12} xs={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Quantity<b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <OutlinedInput
+                    id="component-outlined"
+                    type="number"
+                    sx={userStyle.input}
+                    placeholder="Please Enter Quantity"
+                    value={stockmanagemasteredit.quantitynew}
+                    onChange={(e) => {
+                      setStockmanagemasteredit({
+                        ...stockmanagemasteredit,
+                        quantitynew: e.target.value > 0 ? e.target.value : 0,
+                      });
+                    }}
+                  />
+                </FormControl>
+              </Grid>
+
+              <Grid item md={3.5} sm={12} xs={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>Product Details</Typography>
+                  <TextareaAutosize
+                    aria-label="minimum height"
+                    minRows={2}
+                    value={stockmanagemasteredit.productdetailsnew}
+                    placeholder="Please Enter Product Details"
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         productdetailsnew: e.target.value,
+                    //     });
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={0.5} sm={1} xs={1}>
+                <Button
+                  variant="contained"
+                  style={{
+                    height: '30px',
+                    minWidth: '20px',
+                    padding: '19px 13px',
+                    color: 'white',
+                    marginTop: '23px',
+                    marginLeft: '-10px',
+                  }}
+                  color="success"
+                  onClick={() => {
+                    handleStockArray();
+                  }}
+                >
+                  <FaPlus style={{ fontSize: '15px' }} />
+                </Button>
+              </Grid>
+              <Grid item md={3} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <OutlinedInput
+                    id="component-outlined"
+                    type="text"
+                    value={stockmanagemasteredit.warrantydetails}
+                    sx={userStyle.input}
+                    placeholder="Please Enter Warranty Details"
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         warrantydetails: e.target.value,
+                    //     });
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={3} sm={12} xs={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Rate<b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <OutlinedInput
+                    id="component-outlined"
+                    type="number"
+                    sx={userStyle.input}
+                    placeholder="Please Enter Rate"
+                    value={stockmanagemasteredit.rate}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         rate: e.target.value,
+                    //     });
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={3} sm={12} xs={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={totalQuantityStock * stockmanagemasteredit.rate} />
+                </FormControl>
+              </Grid>
+              <Grid item md={3} xs={12} sm={12}>
+                <FormControl fullWidth size="small">
+                  <Typography>
+                    Bill Date <b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <TextField
+                    size="small"
+                    type="date"
+                    value={stockmanagemasteredit.billdate}
+                    // onChange={(e) => {
+                    //     setStockmanagemasteredit({
+                    //         ...stockmanagemasteredit,
+                    //         billdate: e.target.value,
+                    //     });
+                    // }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={3} xs={12} sm={12}>
+                <Typography>
+                  Bill <b style={{ color: 'red' }}>*</b>{' '}
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                  <Button variant="contained" onClick={handleClickUploadPopupOpenedit}>
+                    Upload
+                  </Button>
+                </Box>
+              </Grid>
+              <Grid item md={3} xs={12} sm={12}>
+                <Typography>Warranty Card </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                  <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
+                    Upload
+                  </Button>
+                </Box>
+              </Grid>
+              {stockArray.length > 0 && (
+                <>
+                  <Grid item md={12} xs={12} sm={12}>
+                    {' '}
+                    <Typography variant="h6">Stock Todo List</Typography>
+                  </Grid>
+
+                  <Grid item md={3} xs={12} sm={12}></Grid>
+                  <Grid item md={3} xs={12} sm={12}></Grid>
+                  <Grid item md={3} xs={12} sm={12}></Grid>
+                  <Grid item md={3} xs={12} sm={12}></Grid>
+                </>
+              )}
+              {stockArray.length > 0 &&
+                stockArray.map((item, index) => {
+                  return (
+                    <>
+                      <Grid item md={3} xs={3} sm={3}>
+                        <FormControl fullWidth size="small">
+                          <Typography>Material</Typography>
+                          <OutlinedInput readOnly={true} value={item.materialnew} />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={3} xs={3} sm={3}>
+                        <FormControl fullWidth size="small">
+                          <Typography>UOM </Typography>
+                          <OutlinedInput readOnly={true} value={item.uomnew} />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={3} sm={3} xs={3}>
+                        <FormControl fullWidth size="small">
+                          <Typography>Qty </Typography>
+                          <OutlinedInput readOnly={true} value={item.quantitynew} />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={3} sm={3} xs={3} sx={{ display: 'flex' }}>
+                        <FormControl fullWidth size="small">
+                          <Typography>Product Details</Typography>
+
+                          <TextareaAutosize aria-label="minimum height" minRows={2} readOnly={true} value={item.productdetailsnew} placeholder="Please Enter Product Details" />
+                        </FormControl>
+                        &nbsp; &emsp;
+                        <Button
+                          variant="contained"
+                          color="error"
+                          type="button"
+                          onClick={(e) => deleteTodo(index)}
+                          sx={{
+                            height: '30px',
+                            minWidth: '30px',
+                            marginTop: '28px',
+                            padding: '6px 10px',
+                          }}
+                        >
+                          <AiOutlineClose />
+                        </Button>
+                      </Grid>
+                    </>
+                  );
+                })}
+            </Grid>
             <br /> <br />
             <Grid container spacing={2}>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6"> Company</Typography>
-                  <Typography>{stockmanagemasteredit.company}</Typography>
-                </FormControl>
+              <Grid item md={6} xs={12} sm={12}>
+                {btnSubmit ? (
+                  <Box sx={{ display: 'flex' }}>
+                    <CircularProgress />
+                  </Box>
+                ) : (
+                  <>
+                    <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
+                      {' '}
+                      Update
+                    </Button>
+                  </>
+                )}
               </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6"> Branch</Typography>
-                  <Typography>{stockmanagemasteredit.branch}</Typography>
-                </FormControl>
+              <br />
+              <Grid item md={6} xs={12} sm={12}>
+                <Button sx={buttonStyles.btncancel} onClick={handleCloseviewalertvendorstock}>
+                  {' '}
+                  Cancel{' '}
+                </Button>
               </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Unit</Typography>
-                  <Typography>{stockmanagemasteredit.unit}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Floor</Typography>
-                  <Typography>{stockmanagemasteredit.floor}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Area</Typography>
-                  <Typography>{stockmanagemasteredit.area}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Location</Typography>
-                  <Typography>{stockmanagemasteredit.location}</Typography>
-                </FormControl>
-              </Grid>
-
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Request Mode For</Typography>
-                  <Typography>{stockmanagemasteredit.requestmode}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Vendor Group</Typography>
-                  <Typography>{stockmanagemasteredit?.vendorgroup}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Dealers Name</Typography>
-                  <Typography>{stockmanagemasteredit?.vendor}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">GST No</Typography>
-                  <Typography>{stockmanagemasteredit.gstno}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Bill No</Typography>
-                  <Typography>{stockmanagemasteredit.billno}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Warranty</Typography>
-                  <Typography>{stockmanagemasteredit.warranty}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Purchase Date</Typography>
-                  <Typography>{stockmanagemasteredit.purchasedate === '' ? '' : moment(stockmanagemasteredit.purchasedate).format('DD/MM/YYYY')}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Stock Category</Typography>
-                  <Typography>{stockmanagemasteredit.stockcategory}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Stock Subcategory</Typography>
-                  <Typography>{stockmanagemasteredit.stocksubcategory}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6"> Quantity & UOM</Typography>
-                  <Typography>{quantityAndUom}</Typography>
-                </FormControl>
-              </Grid>
-
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6"> Product Details</Typography>
-                  <Typography>{productdetailsNeww}</Typography>
-                </FormControl>
-              </Grid>
-
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6"> Quantity</Typography>
-                  <Typography>{quantityNeww}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6">Material</Typography>
-                  <Typography>{materialNeww}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6"> Warranty Details</Typography>
-                  <Typography>{stockmanagemasteredit.warrantydetails}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6"> Rate</Typography>
-                  <Typography>{stockmanagemasteredit.rate}</Typography>
-                </FormControl>
-              </Grid>
-              <Grid item md={4} xs={12} sm={12}>
-                <FormControl fullWidth size="small">
-                  <Typography variant="h6"> Bill Date</Typography>
-                  <Typography>{moment(stockmanagemasteredit.billdate).format('DD/MM/YYYY')}</Typography>
-                </FormControl>
-              </Grid>
-            </Grid>
-            <br /> <br /> <br />
-            <Grid container spacing={2}>
-              <Button variant="contained" color="primary" onClick={handlViewClose}>
-                Back
-              </Button>
             </Grid>
           </>
         </Box>
-      </Dialog>
+      </Box>
 
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
@@ -4720,4 +3998,4 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     </Box>
   );
 }
-export default ListReferenceCategoryDoc;
+export default Stockmaterialeditdialog;

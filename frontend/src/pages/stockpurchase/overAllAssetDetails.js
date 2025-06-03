@@ -1,91 +1,82 @@
-import ImageIcon from "@mui/icons-material/Image";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import LoadingButton from "@mui/lab/LoadingButton";
-import {
-  Box, Button,
-  Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton,
-  InputAdornment,
-  MenuItem, OutlinedInput,
-  Popover, Select,
-  Tooltip,
-  Typography
-} from "@mui/material";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import { AgGridReact } from "ag-grid-react";
-import axios from "axios";
+import ImageIcon from '@mui/icons-material/Image';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { Box, Button, Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton, InputAdornment, MenuItem, OutlinedInput, Popover, Select, Tooltip, Typography } from '@mui/material';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import { AgGridReact } from 'ag-grid-react';
+import axios from '../../axiosInstance';
 import domtoimage from 'dom-to-image';
-import { saveAs } from "file-saver";
-import "jspdf-autotable";
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { saveAs } from 'file-saver';
+import 'jspdf-autotable';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch } from 'react-icons/fa';
-import { IoMdOptions } from "react-icons/io";
-import { MdClose } from "react-icons/md";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
+import { IoMdOptions } from 'react-icons/io';
+import { MdClose } from 'react-icons/md';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
 import ResizeObserver from 'resize-observer-polyfill';
-import AlertDialog from "../../components/Alert";
-import { handleApiError } from "../../components/Errorhandling";
-import ExportData from "../../components/ExportData";
-import Headtitle from "../../components/Headtitle";
-import ManageColumnsContent from "../../components/ManageColumn";
-import MessageAlert from "../../components/MessageAlert";
-import PageHeading from "../../components/PageHeading";
+import AlertDialog from '../../components/Alert';
+import { handleApiError } from '../../components/Errorhandling';
+import ExportData from '../../components/ExportData';
+import Headtitle from '../../components/Headtitle';
+import ManageColumnsContent from '../../components/ManageColumn';
+import MessageAlert from '../../components/MessageAlert';
+import PageHeading from '../../components/PageHeading';
 import AdvancedSearchBar from '../../components/Searchbar';
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { colourStyles, userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
-import OverAllStockCount from "./OverAllStockCount"
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { colourStyles, userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
+import OverAllStockCount from './OverAllStockCount';
 window.ResizeObserver = ResizeObserver;
 
 function OverAssetDetails() {
-
   let today = new Date();
 
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
   var yyyy = today.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
 
   const gridRefTableTeamLveVerif = useRef(null);
   const gridRefImageTeamLveVerif = useRef(null);
   const [isBtn, setIsBtn] = useState(false);
-  const [Accessdrop, setAccesDrop] = useState("Employee");
-  const [AccessdropEdit, setAccesDropEdit] = useState("Employee");
+  const [Accessdrop, setAccesDrop] = useState('Employee');
+  const [AccessdropEdit, setAccesDropEdit] = useState('Employee');
   const modeDropDowns = [
-    { label: "Asset", value: "Asset" },
-    { label: "Stock", value: "Stock" },
+    { label: 'Asset', value: 'Asset' },
+    { label: 'Stock', value: 'Stock' },
   ];
   const sectorDropDowns = [
-    { label: "Primary", value: "Primary" },
-    { label: "Secondary", value: "Secondary" },
-    { label: "Tertiary", value: "Tertiary" },
-    { label: "All", value: "all" },
+    { label: 'Primary', value: 'Primary' },
+    { label: 'Secondary', value: 'Secondary' },
+    { label: 'Tertiary', value: 'Tertiary' },
+    { label: 'All', value: 'all' },
   ];
   const [modeselection, setModeSelection] = useState({
-    label: "Asset",
-    value: "Asset",
+    label: 'Asset',
+    value: 'Asset',
   });
   const [sectorSelection, setSectorSelection] = useState({
-    label: "Primary",
-    value: "Primary",
+    label: 'Primary',
+    value: 'Primary',
   });
   const [appleave, setAppleave] = useState({
-    employeename: "Please Select Employee Name",
-    employeeid: "",
-    leavetype: "Please Select LeaveType",
-    date: "",
-    todate: "",
-    reasonforleave: "",
-    reportingto: "",
-    department: "",
-    designation: "",
-    doj: "",
-    availabledays: "",
-    durationtype: "Random",
-    weekoff: "",
-    workmode: "",
+    employeename: 'Please Select Employee Name',
+    employeeid: '',
+    leavetype: 'Please Select LeaveType',
+    date: '',
+    todate: '',
+    reasonforleave: '',
+    reportingto: '',
+    department: '',
+    designation: '',
+    doj: '',
+    availabledays: '',
+    durationtype: 'Random',
+    weekoff: '',
+    workmode: '',
   });
 
   const [appleaveEdit, setAppleaveEdit] = useState([]);
@@ -101,160 +92,136 @@ function OverAssetDetails() {
   const [filteredDataItems, setFilteredDataItems] = useState(applyleaves);
   const [filteredRowData, setFilteredRowData] = useState([]);
 
-  const [leave, setLeave] = useState("Please Select LeaveType");
-  const [leaveEdit, setLeaveEdit] = useState("Please Select LeaveType");
+  const [leave, setLeave] = useState('Please Select LeaveType');
+  const [leaveEdit, setLeaveEdit] = useState('Please Select LeaveType');
 
   const { isUserRoleCompare, allProjects, isUserRoleAccess, pageName, setPageName, buttonStyles, isAssignBranch } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [
-          "asset/assetlist",
-          "/asset/assetlist",
-        ];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
-  const accessbranchstock = isUserRoleAccess?.role?.includes("Manager")
-    ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
+      }))
     : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
+        ?.filter((data) => {
+          let fetfinalurl = [];
 
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
 
-        const remove = [
-          "stockpurchase/manualstock",
-          "/stockpurchase/manualstock",
-          "stockpurchase/stock",
-          "/stockpurchase/stock",
-        ];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
+          const remove = ['asset/assetlist', '/asset/assetlist'];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
+  const accessbranchstock = isUserRoleAccess?.role?.includes('Manager')
+    ? isAssignBranch?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
+
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = ['stockpurchase/manualstock', '/stockpurchase/manualstock', 'stockpurchase/stock', '/stockpurchase/stock'];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
 
   const [applyleaveCheck, setApplyleavecheck] = useState(true);
 
   const [selectedRows, setSelectedRows] = useState([]);
 
   const [statusOpen, setStatusOpen] = useState(false);
-  const handleStatusOpen = () => { setStatusOpen(true); };
-  const handleStatusClose = () => { setStatusOpen(false); };
+  const handleStatusOpen = () => {
+    setStatusOpen(true);
+  };
+  const handleStatusClose = () => {
+    setStatusOpen(false);
+  };
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
   // page refersh reload
-  const handleCloseFilterMod = () => { setIsFilterOpen(false); };
-  const handleClosePdfFilterMod = () => { setIsPdfFilterOpen(false); };
+  const handleCloseFilterMod = () => {
+    setIsFilterOpen(false);
+  };
+  const handleClosePdfFilterMod = () => {
+    setIsPdfFilterOpen(false);
+  };
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
-  const handleClickOpenPopupMalert = () => { setOpenPopupMalert(true); };
-  const handleClosePopupMalert = () => { setOpenPopupMalert(false); };
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
+  const handleClickOpenPopupMalert = () => {
+    setOpenPopupMalert(true);
+  };
+  const handleClosePopupMalert = () => {
+    setOpenPopupMalert(false);
+  };
 
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
-  const handleClickOpenPopup = () => { setOpenPopup(true); };
-  const handleClosePopup = () => { setOpenPopup(false); }
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
+  const handleClickOpenPopup = () => {
+    setOpenPopup(true);
+  };
+  const handleClosePopup = () => {
+    setOpenPopup(false);
+  };
 
   //Datatable
   const [pageTeamLveVerif, setPageTeamLveVerif] = useState(1);
   const [pageSizeTeamLveVerif, setPageSizeTeamLveVerif] = useState(10);
-  const [searchQueryTeamLveVerif, setSearchQueryTeamLveVerif] = useState("");
+  const [searchQueryTeamLveVerif, setSearchQueryTeamLveVerif] = useState('');
   const [totalPagesTeamLveVerif, setTotalPagesTeamLveVerif] = useState(1);
 
   // Error Popup model
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const [showAlert, setShowAlert] = useState();
-  const handleClickOpenerr = () => { setIsErrorOpen(true); };
-  const handleCloseerr = () => { setIsErrorOpen(false); };
+  const handleClickOpenerr = () => {
+    setIsErrorOpen(true);
+  };
+  const handleCloseerr = () => {
+    setIsErrorOpen(false);
+  };
 
   // Manage Columns
-  const [searchQueryManageTeamLveVerif, setSearchQueryManageTeamLveVerif] = useState("");
+  const [searchQueryManageTeamLveVerif, setSearchQueryManageTeamLveVerif] = useState('');
   const [isManageColumnsOpenTeamLveVerif, setManageColumnsOpenTeamLveVerif] = useState(false);
   const [anchorElTeamLveVerif, setAnchorElTeamLveVerif] = useState(null);
 
@@ -264,11 +231,11 @@ function OverAssetDetails() {
   };
   const handleCloseManageColumnsTeamLveVerif = () => {
     setManageColumnsOpenTeamLveVerif(false);
-    setSearchQueryManageTeamLveVerif("");
+    setSearchQueryManageTeamLveVerif('');
   };
 
   const openTeamLveVerif = Boolean(anchorElTeamLveVerif);
-  const idTeamLveVerif = openTeamLveVerif ? "simple-popover" : undefined;
+  const idTeamLveVerif = openTeamLveVerif ? 'simple-popover' : undefined;
 
   // Search bar
   const [anchorElSearchTeamLveVerif, setAnchorElSearchTeamLveVerif] = React.useState(null);
@@ -277,7 +244,7 @@ function OverAssetDetails() {
   };
   const handleCloseSearchTeamLveVerif = () => {
     setAnchorElSearchTeamLveVerif(null);
-    setSearchQueryTeamLveVerif("");
+    setSearchQueryTeamLveVerif('');
   };
 
   const openSearchTeamLveVerif = Boolean(anchorElSearchTeamLveVerif);
@@ -290,7 +257,7 @@ function OverAssetDetails() {
     } else {
       return { background: '#ffffff' }; // Odd row
     }
-  }
+  };
 
   useEffect(() => {
     getapi();
@@ -299,11 +266,11 @@ function OverAssetDetails() {
   const getapi = async () => {
     let userchecks = axios.post(`${SERVICE.CREATE_USERCHECKS}`, {
       headers: {
-        'Authorization': `Bearer ${auth.APIToken}`,
+        Authorization: `Bearer ${auth.APIToken}`,
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("All Stock Details"),
+      pagename: String('All Stock Details'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
       addedby: [
@@ -313,34 +280,15 @@ function OverAssetDetails() {
         },
       ],
     });
-  }
-
-
+  };
 
   //webcam
 
-
-
   //add webcamera popup
-
-
-
-
-
-
-
-
-
 
   //---------------------------------------------------------------------------------------------------------------
 
-
   //------------------------------------------------------------------------------------------------------------
-
-
-
-
-
 
   // Show All Columns & Manage Columns
   const initialColumnVisibilityTeamLveVerif = {
@@ -359,15 +307,8 @@ function OverAssetDetails() {
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
-
-
-
-
-
-
-
 
   //Project updateby edit page...
 
@@ -376,63 +317,72 @@ function OverAssetDetails() {
   //get all Sub vendormasters.
 
   const [stockCountDatas, setStockCountDatas] = useState([]);
-  const [tableName, setTableName] = useState("Asset");
+  const [tableName, setTableName] = useState('Asset');
   //get all Sub vendormasters.
   const fetchApplyleave = async () => {
     setApplyleavecheck(false);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      let res_employee = await axios.post(`${SERVICE.ASSET_STOCK_COUNT}`, {
-        countof: modeselection?.value?.toLowerCase(),
-        accessbranch: modeselection?.value === "Asset" ? accessbranch : accessbranchstock,
-      }, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
+      let res_employee = await axios.post(
+        `${SERVICE.ASSET_STOCK_COUNT}`,
+        {
+          countof: modeselection?.value?.toLowerCase(),
+          accessbranch: modeselection?.value === 'Asset' ? accessbranch : accessbranchstock,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        }
+      );
       setApplyleavecheck(true);
-      setTableName(modeselection?.value)
-      if (modeselection?.value === "Asset") {
+      setTableName(modeselection?.value);
+      if (modeselection?.value === 'Asset') {
         let answer = res_employee?.data?.countdata?.length > 0 ? res_employee?.data?.countdata : [];
-        setApplyleaves(answer?.map((item, index) => ({
-          ...item, serialNumber: index + 1,
-          id: item?._id,
-          filter: modeselection?.value?.toLowerCase()
-        })));
+        setApplyleaves(
+          answer?.map((item, index) => ({
+            ...item,
+            serialNumber: index + 1,
+            id: item?._id,
+            filter: modeselection?.value?.toLowerCase(),
+          }))
+        );
         setTotalPagesTeamLveVerif(Math.ceil(answer.length / pageSizeTeamLveVerif));
         setStockCountDatas([]);
-      } else if (modeselection?.value === "Stock") {
+      } else if (modeselection?.value === 'Stock') {
         let answer = res_employee?.data?.countdata?.length > 0 ? res_employee?.data?.countdata : [];
-        setStockCountDatas(answer?.map((item, index) => ({
-          ...item, serialNumber: index + 1,
-          id: item?._id,
-          filter: modeselection?.value?.toLowerCase()
-        })));
+        setStockCountDatas(
+          answer?.map((item, index) => ({
+            ...item,
+            serialNumber: index + 1,
+            id: item?._id,
+            filter: modeselection?.value?.toLowerCase(),
+          }))
+        );
         setTotalPagesTeamLveVerif(Math.ceil(answer.length / pageSizeTeamLveVerif));
         setApplyleaves([]);
       }
 
-
-
       setIsApplyLeave([]);
-    } catch (err) { setApplyleavecheck(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setApplyleavecheck(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //id for login...
 
-  useEffect(() => {
-  }, [appleaveEdit, appleave,]);
+  useEffect(() => {}, [appleaveEdit, appleave]);
 
   useEffect(() => {
     // fetchLeaveVerification();
-
   }, []);
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -450,13 +400,12 @@ function OverAssetDetails() {
     addSerialNumber();
   }, [applyleaves]);
 
-
   const defaultColDef = useMemo(() => {
     return {
       filter: true,
       resizable: true,
       filterParams: {
-        buttons: ["apply", "reset", "cancel"],
+        buttons: ['apply', 'reset', 'cancel'],
       },
     };
   }, []);
@@ -496,8 +445,6 @@ function OverAssetDetails() {
     }
   }, []);
 
-
-
   // Pagination for outer filter
   const filteredData = filteredDataItems?.slice((pageTeamLveVerif - 1) * pageSizeTeamLveVerif, pageTeamLveVerif * pageSizeTeamLveVerif);
   const totalPagesTeamLveVerifOuter = Math.ceil(filteredDataItems?.length / pageSizeTeamLveVerif);
@@ -507,85 +454,76 @@ function OverAssetDetails() {
   const pageNumbers = [];
   const indexOfLastItem = pageTeamLveVerif * pageSizeTeamLveVerif;
   const indexOfFirstItem = indexOfLastItem - pageSizeTeamLveVerif;
-  for (let i = firstVisiblePage; i <= lastVisiblePage; i++) { pageNumbers.push(i); }
-
-
-
-
-
-
+  for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
+    pageNumbers.push(i);
+  }
 
   const columnDataTableTeamLveVerif = [
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 80,
       hide: !columnVisibilityTeamLveVerif.serialNumber,
-      headerClassName: "bold-header", pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
 
     {
-      field: "name",
-      headerName: "Material Name",
+      field: 'name',
+      headerName: 'Material Name',
       flex: 0,
       width: 200,
       hide: !columnVisibilityTeamLveVerif.name,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "materialcode",
-      headerName: "Material Code",
+      field: 'materialcode',
+      headerName: 'Material Code',
       flex: 0,
       width: 200,
       hide: !columnVisibilityTeamLveVerif.materialcode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "totalCount",
-      headerName: "Total Count",
+      field: 'totalCount',
+      headerName: 'Total Count',
       flex: 0,
       width: 150,
       hide: !columnVisibilityTeamLveVerif.totalCount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     {
-      field: "distributedCount",
-      headerName: "Distributed Count",
+      field: 'distributedCount',
+      headerName: 'Distributed Count',
       flex: 0,
       width: 200,
       hide: !columnVisibilityTeamLveVerif.distributedCount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "balanceCount",
-      headerName: "Balance Count",
+      field: 'balanceCount',
+      headerName: 'Balance Count',
       flex: 0,
       width: 200,
       hide: !columnVisibilityTeamLveVerif.balanceCount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
-
-
-
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 200,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibilityTeamLveVerif.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-
-
-
-          {isUserRoleCompare?.includes("vallstockdetails") && params?.data?.filter === "asset" && (
-
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('vallstockdetails') && params?.data?.filter === 'asset' && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -595,12 +533,9 @@ function OverAssetDetails() {
               <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
             </Button>
           )}
-
-
         </Grid>
       ),
     },
-
   ];
 
   // Datatable
@@ -611,18 +546,13 @@ function OverAssetDetails() {
     setFilteredRowData([]);
   };
 
-
-
   const applyNormalFilter = (searchValue) => {
-
     // Split the search query into individual terms
-    const searchTerms = searchValue.toLowerCase().split(" ");
+    const searchTerms = searchValue.toLowerCase().split(' ');
 
     // Modify the filtering logic to check each term
     const filtered = items?.filter((item) => {
-      return searchTerms.every((term) =>
-        Object.values(item).join(" ").toLowerCase().includes(term)
-      );
+      return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
     });
     setFilteredDataItems(filtered);
     setPageTeamLveVerif(1);
@@ -638,28 +568,28 @@ function OverAssetDetails() {
 
         let match;
         switch (condition) {
-          case "Contains":
+          case 'Contains':
             match = itemValue.includes(filterValue);
             break;
-          case "Does Not Contain":
+          case 'Does Not Contain':
             match = !itemValue?.includes(filterValue);
             break;
-          case "Equals":
+          case 'Equals':
             match = itemValue === filterValue;
             break;
-          case "Does Not Equal":
+          case 'Does Not Equal':
             match = itemValue !== filterValue;
             break;
-          case "Begins With":
+          case 'Begins With':
             match = itemValue.startsWith(filterValue);
             break;
-          case "Ends With":
+          case 'Ends With':
             match = itemValue.endsWith(filterValue);
             break;
-          case "Blank":
+          case 'Blank':
             match = !itemValue;
             break;
-          case "Not Blank":
+          case 'Not Blank':
             match = !!itemValue;
             break;
           default:
@@ -669,7 +599,7 @@ function OverAssetDetails() {
         // Combine conditions with AND/OR logic
         if (index === 0) {
           return match; // First filter is applied directly
-        } else if (logicOperator === "AND") {
+        } else if (logicOperator === 'AND') {
           return acc && match;
         } else {
           return acc || match;
@@ -679,23 +609,25 @@ function OverAssetDetails() {
 
     setFilteredDataItems(filtered);
     setAdvancedFilter(filters);
-    // handleCloseSearchTeamLveVerif(); 
+    // handleCloseSearchTeamLveVerif();
   };
 
   // Undo filter funtion
   const handleResetSearch = () => {
     setAdvancedFilter(null);
-    setSearchQueryTeamLveVerif("");
+    setSearchQueryTeamLveVerif('');
     setFilteredDataItems(applyleaves);
   };
 
   // Show filtered combination in the search bar
   const getSearchDisplay = () => {
     if (advancedFilter && advancedFilter.length > 0) {
-      return advancedFilter.map((filter, index) => {
-        let showname = columnDataTableTeamLveVerif.find(col => col.field === filter.column)?.headerName;
-        return `${showname} ${filter.condition} "${filter.value}"`;
-      }).join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
+      return advancedFilter
+        .map((filter, index) => {
+          let showname = columnDataTableTeamLveVerif.find((col) => col.field === filter.column)?.headerName;
+          return `${showname} ${filter.condition} "${filter.value}"`;
+        })
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQueryTeamLveVerif;
   };
@@ -722,7 +654,7 @@ function OverAssetDetails() {
 
   useEffect(() => {
     // Retrieve column visibility from localStorage (if available)
-    const savedVisibility = localStorage.getItem("columnVisibilityTeamLveVerif");
+    const savedVisibility = localStorage.getItem('columnVisibilityTeamLveVerif');
     if (savedVisibility) {
       setColumnVisibilityTeamLveVerif(JSON.parse(savedVisibility));
     }
@@ -730,13 +662,11 @@ function OverAssetDetails() {
 
   useEffect(() => {
     // Save column visibility to localStorage whenever it changes
-    localStorage.setItem("columnVisibilityTeamLveVerif", JSON.stringify(columnVisibilityTeamLveVerif));
+    localStorage.setItem('columnVisibilityTeamLveVerif', JSON.stringify(columnVisibilityTeamLveVerif));
   }, [columnVisibilityTeamLveVerif]);
 
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTableTeamLveVerif.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManageTeamLveVerif.toLowerCase())
-  );
+  const filteredColumns = columnDataTableTeamLveVerif.filter((column) => column.headerName.toLowerCase().includes(searchQueryManageTeamLveVerif.toLowerCase()));
 
   function debounce(func, wait) {
     let timeout;
@@ -763,25 +693,31 @@ function OverAssetDetails() {
     });
   };
 
-  const handleColumnMoved = useCallback(debounce((event) => {
-    if (!event.columnApi) return;
+  const handleColumnMoved = useCallback(
+    debounce((event) => {
+      if (!event.columnApi) return;
 
-    const visible_columns = event.columnApi.getAllColumns().filter(col => {
-      const colState = event.columnApi.getColumnState().find(state => state.colId === col.colId);
-      return colState && !colState.hide;
-    }).map(col => col.colId);
+      const visible_columns = event.columnApi
+        .getAllColumns()
+        .filter((col) => {
+          const colState = event.columnApi.getColumnState().find((state) => state.colId === col.colId);
+          return colState && !colState.hide;
+        })
+        .map((col) => col.colId);
 
-    setColumnVisibilityTeamLveVerif((prevVisibility) => {
-      const updatedVisibility = { ...prevVisibility };
+      setColumnVisibilityTeamLveVerif((prevVisibility) => {
+        const updatedVisibility = { ...prevVisibility };
 
-      // Ensure columns that are visible stay visible
-      Object.keys(updatedVisibility).forEach(colId => {
-        updatedVisibility[colId] = visible_columns.includes(colId);
+        // Ensure columns that are visible stay visible
+        Object.keys(updatedVisibility).forEach((colId) => {
+          updatedVisibility[colId] = visible_columns.includes(colId);
+        });
+
+        return updatedVisibility;
       });
-
-      return updatedVisibility;
-    });
-  }, 300), []);
+    }, 300),
+    []
+  );
 
   const handleColumnVisible = useCallback((event) => {
     const colId = event.column.getColId();
@@ -795,57 +731,37 @@ function OverAssetDetails() {
 
   // Excel
   const [fileFormat, setFormat] = useState('');
-  let exportColumnNamescrt = [
-    "Material Name",
-    "Material Code",
-    "Total Count",
-    "Distributed Count",
-    "Balance Count",
-  ]
-  let exportRowValuescrt = [
-    "name",
-    "materialcode",
-    "totalCount",
-    "distributedCount",
-    "balanceCount",
-  ]
+  let exportColumnNamescrt = ['Material Name', 'Material Code', 'Total Count', 'Distributed Count', 'Balance Count'];
+  let exportRowValuescrt = ['name', 'materialcode', 'totalCount', 'distributedCount', 'balanceCount'];
 
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Over All Asset Count",
-    pageStyle: "print",
+    documentTitle: 'Over All Asset Count',
+    pageStyle: 'print',
   });
-
 
   // image
   const handleCaptureImage = () => {
     if (gridRefImageTeamLveVerif.current) {
-      domtoimage.toBlob(gridRefImageTeamLveVerif.current)
+      domtoimage
+        .toBlob(gridRefImageTeamLveVerif.current)
         .then((blob) => {
-          saveAs(blob, "OverAllAssetCount.png");
+          saveAs(blob, 'OverAllAssetCount.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
 
   return (
     <Box>
-      <Headtitle title={"OVERALL ASSET COUNT"} />
-
+      <Headtitle title={'OVERALL ASSET COUNT'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="All Stock Details"
-        modulename="Asset"
-        submodulename="Stock"
-        mainpagename="All Stock Details"
-        subpagename=""
-        subsubpagename=""
-      />
-      {isUserRoleCompare?.includes("lallstockdetails") && (
+      <PageHeading title="All Stock Details" modulename="Asset" submodulename="Stock" mainpagename="All Stock Details" subpagename="" subsubpagename="" />
+      {isUserRoleCompare?.includes('lallstockdetails') && (
         <>
           <Box sx={userStyle.selectcontainer}>
             <>
@@ -859,33 +775,27 @@ function OverAssetDetails() {
                 <br /> */}
               <Grid container spacing={2}>
                 <Grid item lg={2} md={2.5} xs={12} sm={6}>
-                  <Selects
-                    options={modeDropDowns}
-                    styles={colourStyles}
-                    value={{ label: modeselection.label, value: modeselection.value }}
-                    onChange={(e) => setModeSelection(e)}
-                  />
+                  <Selects options={modeDropDowns} styles={colourStyles} value={{ label: modeselection.label, value: modeselection.value }} onChange={(e) => setModeSelection(e)} />
                 </Grid>
                 <Grid item lg={3} md={2} xs={12} sm={6}>
-                  <LoadingButton loading={isBtn} variant="contained" sx={buttonStyles.buttonsubmit}
-                    onClick={(e) => fetchApplyleave(e)}
-                  >Filter</LoadingButton>
+                  <LoadingButton loading={isBtn} variant="contained" sx={buttonStyles.buttonsubmit} onClick={(e) => fetchApplyleave(e)}>
+                    Filter
+                  </LoadingButton>
                 </Grid>
               </Grid>
             </>
           </Box>
         </>
-      )} <br />
-      {tableName === "Asset" ?
+      )}{' '}
+      <br />
+      {tableName === 'Asset' ? (
         <>
-          {isUserRoleCompare?.includes("lallstockdetails") && (
+          {isUserRoleCompare?.includes('lallstockdetails') && (
             <>
               <Box sx={userStyle.container}>
                 {/* ******************************************************EXPORT Buttons****************************************************** */}
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    OverAll Asset Count
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>OverAll Asset Count</Typography>
                 </Grid>
                 <Grid container spacing={2} style={userStyle.dataTablestyle}>
                   <Grid item md={2} xs={12} sm={12}>
@@ -903,7 +813,7 @@ function OverAssetDetails() {
                           },
                         }}
                         onChange={handlePageSizeChange}
-                        sx={{ width: "77px" }}
+                        sx={{ width: '77px' }}
                       >
                         <MenuItem value={1}>1</MenuItem>
                         <MenuItem value={5}>5</MenuItem>
@@ -921,68 +831,74 @@ function OverAssetDetails() {
                     xs={12}
                     sm={12}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Box>
-                      {isUserRoleCompare?.includes(
-                        "excelallstockdetails"
-                      ) && (
-                          <>
-                            <Button onClick={(e) => {
-                              setIsFilterOpen(true)
-                              setFormat("xl")
-                            }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes("csvallstockdetails") && (
+                      {isUserRoleCompare?.includes('excelallstockdetails') && (
                         <>
-                          <Button onClick={(e) => {
-                            setIsFilterOpen(true)
-                            setFormat("csv")
-                          }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
-                        </>
-                      )}
-                      {isUserRoleCompare?.includes(
-                        "printallstockdetails"
-                      ) && (
-                          <>
-                            <Button sx={userStyle.buttongrp} onClick={handleprint}>
-                              &ensp;
-                              <FaPrint />
-                              &ensp;Print&ensp;
-                            </Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes("pdfallstockdetails") && (
-                        <>
-                          <Button sx={userStyle.buttongrp}
-                            onClick={() => {
-                              setIsPdfFilterOpen(true)
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpen(true);
+                              setFormat('xl');
                             }}
-                          ><FaFilePdf />&ensp;Export to PDF&ensp;</Button>
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileExcel />
+                            &ensp;Export to Excel&ensp;
+                          </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes(
-                        "imageallstockdetails"
-                      ) && (
+                      {isUserRoleCompare?.includes('csvallstockdetails') && (
+                        <>
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpen(true);
+                              setFormat('csv');
+                            }}
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileCsv />
+                            &ensp;Export to CSV&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('printallstockdetails') && (
+                        <>
+                          <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                            &ensp;
+                            <FaPrint />
+                            &ensp;Print&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('pdfallstockdetails') && (
+                        <>
                           <Button
                             sx={userStyle.buttongrp}
-                            onClick={handleCaptureImage}
+                            onClick={() => {
+                              setIsPdfFilterOpen(true);
+                            }}
                           >
-                            {" "}
-                            <ImageIcon
-                              sx={{ fontSize: "15px" }}
-                            /> &ensp;Image&ensp;{" "}
+                            <FaFilePdf />
+                            &ensp;Export to PDF&ensp;
                           </Button>
-                        )}
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('imageallstockdetails') && (
+                        <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                          {' '}
+                          <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                        </Button>
+                      )}
                     </Box>
                   </Grid>
                   <Grid item md={2} xs={6} sm={6}>
                     <FormControl fullWidth size="small">
-                      <OutlinedInput size="small"
+                      <OutlinedInput
+                        size="small"
                         id="outlined-adornment-weight"
                         startAdornment={
                           <InputAdornment position="start">
@@ -998,12 +914,13 @@ function OverAssetDetails() {
                             )}
                             <Tooltip title="Show search options">
                               <span>
-                                <IoMdOptions style={{ cursor: 'pointer', }} onClick={handleClickSearchTeamLveVerif} />
+                                <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearchTeamLveVerif} />
                               </span>
                             </Tooltip>
-                          </InputAdornment>}
+                          </InputAdornment>
+                        }
                         aria-describedby="outlined-weight-helper-text"
-                        inputProps={{ 'aria-label': 'weight', }}
+                        inputProps={{ 'aria-label': 'weight' }}
                         type="text"
                         value={getSearchDisplay()}
                         onChange={handleSearchChange}
@@ -1012,47 +929,36 @@ function OverAssetDetails() {
                       />
                     </FormControl>
                   </Grid>
-                </Grid>  <br />
+                </Grid>{' '}
+                <br />
                 <Grid container spacing={1}>
                   <Grid item lg={1.5} md={1} xs={12} sm={6}>
                     <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
                       Show All Columns
                     </Button>
-
                   </Grid>
                   <Grid item lg={1.5} md={1} xs={12} sm={6}>
                     <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumnsTeamLveVerif}>
                       Manage Columns
                     </Button>
-
                   </Grid>
-
                 </Grid>
                 <br />
                 {!applyleaveCheck ? (
                   <>
-                    <Box sx={{ display: "flex", justifyContent: "center" }}>
-                      <ThreeDots
-                        height="80"
-                        width="80"
-                        radius="9"
-                        color="#1976d2"
-                        ariaLabel="three-dots-loading"
-                        wrapperStyle={{}}
-                        wrapperClassName=""
-                        visible={true}
-                      />
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                     </Box>
                   </>
                 ) : (
                   <>
-                    <Box sx={{ width: "100%", }} className={"ag-theme-quartz"} ref={gridRefImageTeamLveVerif} >
+                    <Box sx={{ width: '100%' }} className={'ag-theme-quartz'} ref={gridRefImageTeamLveVerif}>
                       <AgGridReact
                         rowData={filteredDataItems}
                         columnDefs={columnDataTableTeamLveVerif.filter((column) => columnVisibilityTeamLveVerif[column.field])}
                         ref={gridRefTableTeamLveVerif}
                         defaultColDef={defaultColDef}
-                        domLayout={"autoHeight"}
+                        domLayout={'autoHeight'}
                         getRowStyle={getRowStyle}
                         pagination={true}
                         paginationPageSize={pageSizeTeamLveVerif}
@@ -1065,7 +971,7 @@ function OverAssetDetails() {
                         suppressSizeToFit={true}
                         suppressAutoSize={true}
                         suppressColumnVirtualisation={true}
-                        colResizeDefault={"shift"}
+                        colResizeDefault={'shift'}
                         cellSelection={true}
                         copyHeadersToClipboard={true}
                       />
@@ -1132,16 +1038,12 @@ function OverAssetDetails() {
               </Box>
             </>
           )}
-        </> : <OverAllStockCount stockDatas={stockCountDatas} />}
-
+        </>
+      ) : (
+        <OverAllStockCount stockDatas={stockCountDatas} />
+      )}
       {/* Manage Column */}
-      <Popover
-        id={idTeamLveVerif}
-        open={isManageColumnsOpenTeamLveVerif}
-        anchorEl={anchorElTeamLveVerif}
-        onClose={handleCloseManageColumnsTeamLveVerif}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left", }}
-      >
+      <Popover id={idTeamLveVerif} open={isManageColumnsOpenTeamLveVerif} anchorEl={anchorElTeamLveVerif} onClose={handleCloseManageColumnsTeamLveVerif} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
         <ManageColumnsContent
           handleClose={handleCloseManageColumnsTeamLveVerif}
           searchQuery={searchQueryManageTeamLveVerif}
@@ -1154,29 +1056,14 @@ function OverAssetDetails() {
           columnDataTable={columnDataTableTeamLveVerif}
         />
       </Popover>
-
       {/* Search Bar */}
-      <Popover
-        id={idSearchTeamLveVerif}
-        open={openSearchTeamLveVerif}
-        anchorEl={anchorElSearchTeamLveVerif}
-        onClose={handleCloseSearchTeamLveVerif}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
-      >
-        <AdvancedSearchBar columns={columnDataTableTeamLveVerif?.filter(data => data.field && data.field !== 'actions')} onSearch={applyAdvancedFilter} initialSearchValue={searchQueryTeamLveVerif} handleCloseSearch={handleCloseSearchTeamLveVerif} />
+      <Popover id={idSearchTeamLveVerif} open={openSearchTeamLveVerif} anchorEl={anchorElSearchTeamLveVerif} onClose={handleCloseSearchTeamLveVerif} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <AdvancedSearchBar columns={columnDataTableTeamLveVerif?.filter((data) => data.field && data.field !== 'actions')} onSearch={applyAdvancedFilter} initialSearchValue={searchQueryTeamLveVerif} handleCloseSearch={handleCloseSearchTeamLveVerif} />
       </Popover>
-
-
-
       {/* ALERT DIALOG */}
       <Box>
-        <Dialog
-          open={isErrorOpen}
-          onClose={handleCloseerr}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}          >
+        <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
@@ -1186,19 +1073,9 @@ function OverAssetDetails() {
           </DialogActions>
         </Dialog>
       </Box>
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* EXTERNAL COMPONENTS -------------- END */}
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
@@ -1211,13 +1088,11 @@ function OverAssetDetails() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredRowData.length > 0 ? filteredRowData : filteredData) ?? []}
         itemsTwo={items ?? []}
-        filename={"OverAllAssetCount"}
+        filename={'OverAllAssetCount'}
         exportColumnNames={exportColumnNamescrt}
         exportRowValues={exportRowValuescrt}
         componentRef={componentRef}
       />
-
-
     </Box>
   );
 }

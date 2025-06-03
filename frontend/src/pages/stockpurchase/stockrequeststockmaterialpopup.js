@@ -110,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,itemsName,handleCloseviewalertvendorstock,Specification }) {
+function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit, itemsName, handleCloseviewalertvendorstock, Specification }) {
     const [assetSpecificationTypeArray, setAssetSpecificationTypeArray] = useState([]);
     const [assetSpecificationType, setAssetSpecificationType] = useState({ name: '', code: '' });
     const [assetModel, setAssetModel] = useState({ name: '', code: '' });
@@ -119,7 +119,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
     const [brandMaster, setBrandMaster] = useState({ name: '', code: '' });
 
 
-       const [stockmaster, setStockmaster] = useState({
+    const [stockmaster, setStockmaster] = useState({
         // company: "Please Select Company",
         // branch: "Please Select Branch",
         // unit: "Please Select Unit",
@@ -133,11 +133,12 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
         area: stockmaterialedit.area,
         location: stockmaterialedit.location,
         productname: stockmaterialedit.material,
-          assettype: stockmaterialedit.assettype,
-          asset: stockmaterialedit.asset,
-          productdetails: stockmaterialedit.productdetails,
-          uom:stockmaterialedit.uom,
-          quantity:stockmaterialedit.quantity,
+        component: stockmaterialedit.component,
+        assettype: stockmaterialedit.assettype,
+        asset: stockmaterialedit.asset,
+        productdetails: stockmaterialedit.productdetails,
+        uom: stockmaterialedit.uom,
+        quantity: stockmaterialedit.quantity,
         workstation: 'Please Select Workstation',
         workcheck: false,
         producthead: '',
@@ -146,10 +147,10 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
         component: 'Please Select Component',
         gstno: '',
         billno: '',
-      
-        warrantydetails: '',
-       
-      
+
+        warrantydetails: stockmaterialedit.warrantydetails,
+
+
         rate: '',
         billdate: '',
         files: '',
@@ -163,11 +164,11 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
 
         addedby: '',
         updatedby: '',
-       
+
 
         requestmode: stockmaterialedit.requestmode,
-        stockcategory:  stockmaterialedit.category,
-        stocksubcategory:  stockmaterialedit.subcategory,
+        stockcategory: stockmaterialedit.category,
+        stocksubcategory: stockmaterialedit.subcategory,
         uomnew: '',
         quantitynew: '',
         materialnew: stockmaterialedit.productname,
@@ -242,38 +243,38 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
     var yyyy = today1.getFullYear();
     let formattedDate = yyyy + '-' + mm + '-' + dd;
 
-     
 
-      const [vendorOptInd, setVendoroptInd] = useState([]);
-      const handleChangeGroupNameIndexBased = async (e, index) => {
+
+    const [vendorOptInd, setVendoroptInd] = useState([]);
+    const handleChangeGroupNameIndexBased = async (e, index) => {
         let foundDatas = vendorOverall
-          .filter((data) => {
-            return data.name == e.value;
-          })
-          .map((item) => item.vendor);
-    
+            .filter((data) => {
+                return data.name == e.value;
+            })
+            .map((item) => item.vendor);
+
         let res = await axios.get(SERVICE.ALL_VENDORDETAILS, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
+            headers: {
+                Authorization: `Bearer ${auth.APIToken}`,
+            },
         });
         const all = [
-          ...res?.data?.vendordetails.map((d) => ({
-            ...d,
-            label: d.vendorname,
-            value: d.vendorname,
-          })),
+            ...res?.data?.vendordetails.map((d) => ({
+                ...d,
+                label: d.vendorname,
+                value: d.vendorname,
+            })),
         ];
-    
+
         let final = all.filter((data) => {
-          return foundDatas.includes(data.value);
+            return foundDatas.includes(data.value);
         });
-    
+
         let spreaded = [...vendorOptInd];
         spreaded[index] = final;
-    
+
         setVendoroptInd(spreaded);
-      };
+    };
 
 
     //useStates
@@ -397,11 +398,11 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
     const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
     const handleClickOpenPopupMalert = () => {
         setOpenPopupMalert(true);
-    
+
     };
     const handleClosePopupMalert = () => {
         setOpenPopupMalert(false);
-          setBtnSubmit(false)
+        setBtnSubmit(false)
     };
     const [openPopup, setOpenPopup] = useState(false);
     const [popupContent, setPopupContent] = useState('');
@@ -411,7 +412,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
     };
     const handleClosePopup = () => {
         setOpenPopup(false);
-          setBtnSubmit(false)
+        setBtnSubmit(false)
     };
 
     const handleChangeGroupName = async (e) => {
@@ -2003,7 +2004,7 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
                 duedate: String(expensecreate.duedate ? expensecreate.duedate : ""),
                 totalbillamountstock: stockmaster.totalbillamount,
                 area: String(stockmaster.area),
-               
+
                 workstation: String(stockmaster.workcheck ? stockmaster.workstation : ''),
                 workcheck: String(stockmaster.workcheck),
 
@@ -2257,360 +2258,364 @@ function Stockmaster({ sendDataToParentUIStock, openpop, stockmaterialedit,items
     };
 
     //submit option for saving
-const handleSubmit = async (e) => {
-    setBtnSubmit(true);
-    e.preventDefault();
-    await fetchStock('Filtered');
+    const handleSubmit = async (e) => {
+        setBtnSubmit(true);
+        e.preventDefault();
+        await fetchStock('Filtered');
 
-  if (stockmaster.requestmode === "Asset Material") {
-      const isNameMatch = stock.some(
-        (item) =>
-          item.company == stockmaster.company &&
-          item.branch == stockmaster.branch &&
-          item.unit == stockmaster.unit &&
-          item.floor == stockmaster.floor &&
-          item.area == stockmaster.area &&
-          item.location == stockmaster.location &&
-          item.vendorgroup == vendorGroup &&
-          Number(item.billno) === Number(stockmaster.billno) &&
-          item.assettype == stockmaster.assettype &&
-          item.assethead == stockmaster.assethead &&
-          item.component == stockmaster.component &&
-          item.productdetails.toLowerCase() == stockmaster.productdetails.toLowerCase() &&
-          item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
-          item.uom == stockmaster.uom &&
-          item.quantity == stockmaster.quantity &&
-          item.rate == stockmaster.rate &&
-          item.billdate == stockmaster.billdate
+        if (stockmaster.requestmode === "Asset Material") {
+            const isNameMatch = stock.some(
+                (item) =>
+                    item.company == stockmaster.company &&
+                    item.branch == stockmaster.branch &&
+                    item.unit == stockmaster.unit &&
+                    item.floor == stockmaster.floor &&
+                    item.area == stockmaster.area &&
+                    item.location == stockmaster.location &&
+                    item.vendorgroup == vendorGroup &&
+                    Number(item.billno) === Number(stockmaster.billno) &&
+                    item.assettype == stockmaster.assettype &&
+                    item.assethead == stockmaster.assethead &&
+                    item.component == stockmaster.component &&
+                    item.productdetails.toLowerCase() == stockmaster.productdetails.toLowerCase() &&
+                    item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
+                    item.uom == stockmaster.uom &&
+                    item.quantity == stockmaster.quantity &&
+                    item.rate == stockmaster.rate &&
+                    item.billdate == stockmaster.billdate
 
-        // console.log(
+                // console.log(
 
-        //   item.company == stockmaster.company,
-        //   item.branch == stockmaster.branch,
-        //   item.unit == stockmaster.unit,
-        //   item.floor == stockmaster.floor,
-        //   item.area == stockmaster.area,
-        //   item.location == stockmaster.location,
-        //   item.vendorgroup == vendorGroup,
-        //   Number(item.billno) === Number(stockmaster.billno),
-        //   item.assettype == stockmaster.assettype,
-        //   item.assethead == stockmaster.assethead,
-        //   item.component == stockmaster.component,
-        //   item.productdetails.toLowerCase() ==
-        //   stockmaster.productdetails.toLowerCase(),
-        //   item.warrantydetails.toLowerCase() ==
-        //   stockmaster.warrantydetails.toLowerCase(),
-        //   item.uom == stockmaster.uom,
-        //   item.quantity == stockmaster.quantity,
-        //   item.rate == stockmaster.rate,
-        //   item.billdate == stockmaster.billdate
+                //   item.company == stockmaster.company,
+                //   item.branch == stockmaster.branch,
+                //   item.unit == stockmaster.unit,
+                //   item.floor == stockmaster.floor,
+                //   item.area == stockmaster.area,
+                //   item.location == stockmaster.location,
+                //   item.vendorgroup == vendorGroup,
+                //   Number(item.billno) === Number(stockmaster.billno),
+                //   item.assettype == stockmaster.assettype,
+                //   item.assethead == stockmaster.assethead,
+                //   item.component == stockmaster.component,
+                //   item.productdetails.toLowerCase() ==
+                //   stockmaster.productdetails.toLowerCase(),
+                //   item.warrantydetails.toLowerCase() ==
+                //   stockmaster.warrantydetails.toLowerCase(),
+                //   item.uom == stockmaster.uom,
+                //   item.quantity == stockmaster.quantity,
+                //   item.rate == stockmaster.rate,
+                //   item.billdate == stockmaster.billdate
 
-        //   , "cond")
-      );
-      if (stockmaster.company === 'Please Select Company') {
-        setPopupContentMalert('Please Select Company!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.branch === 'Please Select Branch') {
-        setPopupContentMalert('Please Select Branch!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.unit === 'Please Select Unit') {
-        setPopupContentMalert('Please Select Unit!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.floor === 'Please Select Floor') {
-        setPopupContentMalert('Please Select Floor!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.area === 'Please Select Area') {
-        setPopupContentMalert('Please Select Area!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.location === 'Please Select Location') {
-        setPopupContentMalert('Please Select Location!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (vendorGroup === 'Please Select Vendor Group') {
-        setPopupContentMalert('Please Select Vendor Group!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (vendorNew === 'Please Select Vendor') {
-        setPopupContentMalert('Please Select Vendor!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } 
-      else if (stockmaster.billno === '') {
-        setPopupContentMalert('Please Enter Billno!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-      else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
-        setPopupContentMalert('Please Select Request Mode For!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.productname === '' || stockmaster.productname === 'Please Select Material') {
-        setPopupContentMalert('Please Select Material!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }   else if (stockmaster.productdetails === '') {
-        setPopupContentMalert('Please Enter Product Details!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.warranty === 'Yes' && stockmaster.warrantydetails === '') {
-        setPopupContentMalert('Please Enter Warranty Details!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
-        setPopupContentMalert('Please Select Uom!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.quantity === '') {
-        setPopupContentMalert('Please Enter Quantity!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }  else if (stockmaster.billdate === '') {
-        setPopupContentMalert('Please Select Bill Date!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-       else if (stockmaster.rate === '') {
-        setPopupContentMalert('Please Enter Rate!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-       else if (refImage.length == 0) {
-        setPopupContentMalert('Please Upload Bill!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } 
-      else if (stockmaster.component === '' || stockmaster.component === 'Please Select Component') {
-        setPopupContentMalert('Please Select Component!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-      else if (isNameMatch) {
-        setPopupContentMalert('Data Already Exist!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (todos.length > 0 && todos.some((d) => (d.warranty === 'Yes' && (d.subcomponentcheck == true || d.subcomponentcheck == 'true') && d.estimation === undefined) || d.estimation === '')) {
-        setPopupContentMalert('Please Enter Warranty Time in Component');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else {
-        sendRequest();
-      }
-    } 
-    
-    else {
-      const isNameMatch = stockMaterial.some(
-        (item) =>
-          item.company == stockmaster.company &&
-          item.branch == stockmaster.branch &&
-          item.unit == stockmaster.unit &&
-          item.floor == stockmaster.floor &&
-          item.area == stockmaster.area &&
-          item.location == stockmaster.location &&
-          item.vendorgroup == vendorGroup &&
-          Number(item.billno) == Number(stockmaster.billno) &&
-          item.requestmode == stockmaster.requestmode &&
-          item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
-          item.rate == stockmaster.rate &&
-          item.billdate == stockmaster.billdate
+                //   , "cond")
+            );
+            if (stockmaster.company === 'Please Select Company') {
+                setPopupContentMalert('Please Select Company!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.branch === 'Please Select Branch') {
+                setPopupContentMalert('Please Select Branch!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.unit === 'Please Select Unit') {
+                setPopupContentMalert('Please Select Unit!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.floor === 'Please Select Floor') {
+                setPopupContentMalert('Please Select Floor!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.area === 'Please Select Area') {
+                setPopupContentMalert('Please Select Area!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.location === 'Please Select Location') {
+                setPopupContentMalert('Please Select Location!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (vendorGroup === 'Please Select Vendor Group' || vendorGroup === '' || vendorGroup === undefined) {
+                setPopupContentMalert('Please Select Vendor Group!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (vendorNew === 'Please Select Vendor' || vendorNew === '' || vendorNew === undefined) {
+                setPopupContentMalert('Please Select Vendor!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            }
 
-        // console.log(item.company == stockmaster.company,
-        //   item.branch == stockmaster.branch,
-        //   item.unit == stockmaster.unit,
-        //   item.floor == stockmaster.floor,
-        //   item.area == stockmaster.area,
-        //   item.location == stockmaster.location,
-        //   item.vendorgroup == vendorGroup,
-        //   Number(item.billno) == Number(stockmaster.billno),
-        //   item.productdetailsnew.toLowerCase() ==
-        //   stockmaster.productdetailsnew.toLowerCase(),
-        //   item.requestmode == stockmaster.requestmode,
-        //   item.stockcategory == stockmaster.stockcategory,
-        //   item.stocksubcategory == stockmaster.stocksubcategory,
-        //   item.warrantydetails.toLowerCase() ==
-        //   stockmaster.warrantydetails.toLowerCase(),
-        //   item.uomnew == stockmaster.uomnew,
-        //   item.quantitynew == stockmaster.quantitynew,
-        //   item.materialnew == stockmaster.materialnew,
-        //   item.rate == stockmaster.rate,
-        //   item.billdate == stockmaster.billdate, "condstock")
-      );
+            else if (stockmaster.billno === '') {
+                setPopupContentMalert('Please Enter Billno!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            }
+            else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
+                setPopupContentMalert('Please Select Request Mode For!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.productname === '' || stockmaster.productname === 'Please Select Material') {
+                setPopupContentMalert('Please Select Material!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.productdetails === '') {
+                setPopupContentMalert('Please Enter Product Details!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.warranty === 'Yes' && stockmaster.warrantydetails === '') {
+                setPopupContentMalert('Please Enter Warranty Details!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.uom === '' || stockmaster.uom === 'Please Select UOM') {
+                setPopupContentMalert('Please Select Uom!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.quantity === '') {
+                setPopupContentMalert('Please Enter Quantity!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.billdate === '') {
+                setPopupContentMalert('Please Select Bill Date!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            }
+            else if (stockmaster.rate === '') {
+                setPopupContentMalert('Please Enter Rate!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            }
+            else if (refImage.length == 0) {
+                setPopupContentMalert('Please Upload Bill!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            }
+            else if (stockmaster.component === '' || stockmaster.component === 'Please Select Component') {
+                setPopupContentMalert('Please Select Component!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            }
+            else if (isNameMatch) {
+                setPopupContentMalert('Data Already Exist!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (todos.length > 0 && todos.some((d) => (d.warranty === 'Yes' && (d.subcomponentcheck == true || d.subcomponentcheck == 'true') && d.estimation === undefined) || d.estimation === '')) {
+                setPopupContentMalert('Please Enter Warranty Time in Component');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else {
+                sendRequest();
+            }
+        }
 
-      if (stockmaster.company === 'Please Select Company') {
-        setPopupContentMalert('Please Select Company!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.branch === 'Please Select Branch') {
-        setPopupContentMalert('Please Select Branch!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.unit === 'Please Select Unit') {
-        setPopupContentMalert('Please Select Unit!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.floor === 'Please Select Floor') {
-        setPopupContentMalert('Please Select Floor!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.area === 'Please Select Area') {
-        setPopupContentMalert('Please Select Area!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.location === 'Please Select Location') {
-        setPopupContentMalert('Please Select Location!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-      // else if (stockmaster.vendorname === "" || stockmaster.vendorname === "Please Select Vendor") {
-      //   setShowAlert(
-      //     <>
-      //       <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-      //       <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Vendor"}</p>
-      //     </>
-      //   );
-      //   handleClickOpenerr();
-      // }
-      // else if (stockmaster.gstno === "") {
-      //   setShowAlert(
-      //     <>
-      //       <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-      //       <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter GST No"}</p>
-      //     </>
-      //   );
-      //   handleClickOpenerr();
-      // }
-      else if (stockmaster.billno === '') {
-        setPopupContentMalert('Please Enter Billno!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
-        setPopupContentMalert('Please Select Request Mode For!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.warranty === 'Yes' && stockmaster.warrantydetails === '') {
-        setPopupContentMalert('Please Enter Warranty Details!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.billdate === '') {
-        setPopupContentMalert('Please Select Bill Date!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (refImage.length == 0) {
-        setPopupContentMalert('Please Upload Bill!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.totalbillamount == '') {
-        setPopupContentMalert('Please Enter Totalbillamounts!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (educationtodo.length == 0) {
-        setPopupContentMalert('Please Insert Todo!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Please Select Paid Mode') {
-        setPopupContentMalert('Please Select Paid Mode!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidamount === '') {
-        setPopupContentMalert('Please Enter Paid Amount!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal)) {
-        handleClickOpenerrAmount();
-      } else if (isNameMatch) {
-        setPopupContentMalert('Data Already Exist!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else {
-        sendRequest();
-      }
-    }
-  };
+        else {
+            const isNameMatch = stockMaterial.some(
+                (item) =>
+                    item.company == stockmaster.company &&
+                    item.branch == stockmaster.branch &&
+                    item.unit == stockmaster.unit &&
+                    item.floor == stockmaster.floor &&
+                    item.area == stockmaster.area &&
+                    item.location == stockmaster.location &&
+                    item.vendorgroup == vendorGroup &&
+                    Number(item.billno) == Number(stockmaster.billno) &&
+                    item.requestmode == stockmaster.requestmode &&
+                    item.warrantydetails.toLowerCase() == stockmaster.warrantydetails.toLowerCase() &&
+                    item.rate == stockmaster.rate &&
+                    item.billdate == stockmaster.billdate
+
+                // console.log(item.company == stockmaster.company,
+                //   item.branch == stockmaster.branch,
+                //   item.unit == stockmaster.unit,
+                //   item.floor == stockmaster.floor,
+                //   item.area == stockmaster.area,
+                //   item.location == stockmaster.location,
+                //   item.vendorgroup == vendorGroup,
+                //   Number(item.billno) == Number(stockmaster.billno),
+                //   item.productdetailsnew.toLowerCase() ==
+                //   stockmaster.productdetailsnew.toLowerCase(),
+                //   item.requestmode == stockmaster.requestmode,
+                //   item.stockcategory == stockmaster.stockcategory,
+                //   item.stocksubcategory == stockmaster.stocksubcategory,
+                //   item.warrantydetails.toLowerCase() ==
+                //   stockmaster.warrantydetails.toLowerCase(),
+                //   item.uomnew == stockmaster.uomnew,
+                //   item.quantitynew == stockmaster.quantitynew,
+                //   item.materialnew == stockmaster.materialnew,
+                //   item.rate == stockmaster.rate,
+                //   item.billdate == stockmaster.billdate, "condstock")
+            );
+
+            if (stockmaster.company === 'Please Select Company') {
+                setPopupContentMalert('Please Select Company!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.branch === 'Please Select Branch') {
+                setPopupContentMalert('Please Select Branch!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.unit === 'Please Select Unit') {
+                setPopupContentMalert('Please Select Unit!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.floor === 'Please Select Floor') {
+                setPopupContentMalert('Please Select Floor!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.area === 'Please Select Area') {
+                setPopupContentMalert('Please Select Area!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.location === 'Please Select Location') {
+                setPopupContentMalert('Please Select Location!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            }
+            // else if (stockmaster.vendorname === "" || stockmaster.vendorname === "Please Select Vendor") {
+            //   setShowAlert(
+            //     <>
+            //       <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
+            //       <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Select Vendor"}</p>
+            //     </>
+            //   );
+            //   handleClickOpenerr();
+            // }
+            // else if (stockmaster.gstno === "") {
+            //   setShowAlert(
+            //     <>
+            //       <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
+            //       <p style={{ fontSize: "20px", fontWeight: 900 }}>{"Please Enter GST No"}</p>
+            //     </>
+            //   );
+            //   handleClickOpenerr();
+            // }
+            else if (stockmaster.billno === '') {
+                setPopupContentMalert('Please Enter Billno!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.requestmode === 'Please Select Request Mode' || stockmaster.requestmode === '') {
+                setPopupContentMalert('Please Select Request Mode For!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.warranty === 'Yes' && stockmaster.warrantydetails === '') {
+                setPopupContentMalert('Please Enter Warranty Details!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.billdate === '') {
+                setPopupContentMalert('Please Select Bill Date!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (refImage.length == 0) {
+                setPopupContentMalert('Please Upload Bill!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (stockmaster.totalbillamount == '') {
+                setPopupContentMalert('Please Enter Totalbillamounts!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (educationtodo.length == 0) {
+                setPopupContentMalert('Please Insert Todo!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Please Select Paid Mode') {
+                setPopupContentMalert('Please Select Paid Mode!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (expensecreate.paidstatus === 'Paid' && expensecreate.paidamount === '') {
+                setPopupContentMalert('Please Enter Paid Amount!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else if (expensecreate.paidstatus === 'Paid' && Number(expensecreate.paidamount) !== Number(Expensetotal)) {
+                handleClickOpenerrAmount();
+            } else if (isNameMatch) {
+                setPopupContentMalert('Data Already Exist!');
+                setPopupSeverityMalert('info');
+                handleClickOpenPopupMalert();
+            } else {
+                sendRequest();
+            }
+        }
+    };
 
     const handleclear = (e) => {
         e.preventDefault();
 
         setStockmaster({
+            ...stockmaster,
             company: 'Please Select Company',
             branch: 'Please Select Branch',
             unit: 'Please Select Unit',
             floor: 'Please Select Floor',
             area: 'Please Select Area',
             location: 'Please Select Location',
-            workstation: 'Please Select Workstation',
-            workcheck: false,
-            producthead: '',
-            vendorname: 'Please Select Vendor',
-            // productname: "Please Select Material",
-            component: 'Please Select Component',
-            gstno: '',
-            billno: '',
-            assettype: '',
-            asset: '',
-            productdetails: '',
-            warrantydetails: '',
-            uom: 'Please Select UOM',
-            quantity: '',
-            rate: '',
-            billdate: '',
-            files: '',
-            warrantyfiles: '',
+            // workstation: 'Please Select Workstation',
+            // workcheck: false,
+            // producthead: '',
+            // vendorname: 'Please Select Vendor',
+            // // productname: "Please Select Material",
+            // component: 'Please Select Component',
+            // gstno: '',
+            // billno: '',
+            // assettype: '',
+            // asset: '',
+            // productdetails: '',
+            // warrantydetails: '',
+            // uom: 'Please Select UOM',
+            // quantity: '',
+            // rate: '',
+            // billdate: '',
+            // files: '',
+            // warrantyfiles: '',
 
-            warranty: 'Yes',
-            warrantycalculation: '',
-            estimation: '',
-            estimationtime: 'Days',
-            purchasedate: '',
+            // warranty: 'Yes',
+            // warrantycalculation: '',
+            // estimation: '',
+            // estimationtime: 'Days',
+            // purchasedate: '',
 
-            addedby: '',
-            updatedby: '',
+            // addedby: '',
+            // updatedby: '',
 
-            requestmode: 'Please Select Request Mode',
-            stockcategory: 'Please Select Stock Category',
-            stocksubcategory: 'Please Select Stock Sub Category',
-            uomnew: '',
-            quantitynew: '',
-            // materialnew: "Please Select Material",
-            productdetailsnew: '',
+            // requestmode: 'Please Select Request Mode',
+            // stockcategory: 'Please Select Stock Category',
+            // stocksubcategory: 'Please Select Stock Sub Category',
+            // uomnew: '',
+            // quantitynew: '',
+            // // materialnew: "Please Select Material",
+            // productdetailsnew: '',
         });
-        setExpensecreate({
-            totalbillamount: '',
+        // setExpensecreate({
 
-            paidstatus: 'Not Paid',
+        //     totalbillamount: '',
 
-            paidmode: 'Please Select Paid Mode',
-        });
+        //     paidstatus: 'Not Paid',
+
+        //     paidmode: 'Please Select Paid Mode',
+        // });
         setTodoDetails({
-            particularmode: 'Please Select Particular Mode',
-            category: stockmaterialedit.category,
-            subcategory: stockmaterialedit.subcategory,
-            materialnew: 'Please Select Item Name',
-            uomnew: '',
-            rate: '',
+            ...todoDetails,
+            // particularmode: 'Please Select Particular Mode',
+            // category: stockmaterialedit.category,
+            // subcategory: stockmaterialedit.subcategory,
+            // materialnew: 'Please Select Item Name',
+            // uomnew: '',
+            // rate: '',
             quantitynew: '',
-            amount: '',
+            // amount: '',
         });
-        setEducationtodo([]);
-        setVendorModeOfPayments('');
+        // setEducationtodo([]);
+        // setVendorModeOfPayments('');
         setBranchs([]);
         setUnits([]);
         setFloors([]);
         setStockArray([]);
         setAreas([]);
         setLocations([{ label: 'ALL', value: 'ALL' }]);
-        setSelectedBranch('Please Select Branch');
-        setSelectedUnit('Please Select Unit');
-        setSelectedProducthead('Please Select Assethead');
-        setSelectedProductname('Please Select Materila Name');
-        setAccount([]);
-        setFile('');
-        setRefImage([]);
-        setGetImg(null);
-        setVendorgetid({ gstnumber: '', address: '', phonenumber: '' });
+        // setSelectedBranch('Please Select Branch');
+        // setSelectedUnit('Please Select Unit');
+        // setSelectedProducthead('Please Select Assethead');
+        // setSelectedProductname('Please Select Materila Name');
+        // setAccount([]);
+        // setFile('');
+        // setRefImage([]);
+        // setGetImg(null);
+        // setVendorgetid({ gstnumber: '', address: '', phonenumber: '' });
         setShowAlert(
             <>
                 <CheckCircleOutlineIcon sx={{ fontSize: '100px', color: 'Green' }} />
@@ -4277,130 +4282,130 @@ const handleSubmit = async (e) => {
     const [todos, setTodos] = useState([]);
     const [todosEdit, setTodosEdit] = useState([]);
 
-  const handleAddInput = (e) => {
-    let specificationItem = Specification.find((item) => e === item.categoryname);
-    let filtersub = specificationItem?.subcategoryname;
-    let result;
-    if (filtersub.length > 0) {
-      result = filtersub?.map((sub, index) => ({
-        subname: sub.subcomponent,
-        sub: `${index + 1}.${sub.subcomponent}`,
-        subcomponentcheck: false,
-        type: sub.type ? 'Choose Type' : '',
-        model: sub.model ? 'Choose Model' : '',
-        size: sub.size ? 'Choose Size' : '',
-        variant: sub.variant ? 'Choose variant' : '',
-        brand: sub.brand ? 'Choose Brand' : '',
-        serial: sub.serial ? '' : undefined,
-        other: sub.other ? '' : undefined,
-        capacity: sub.capacity ? 'Choose Capacity' : '',
-        hdmiport: sub.hdmiport ? '' : undefined,
-        vgaport: sub.vgaport ? '' : undefined,
-        dpport: sub.dpport ? '' : undefined,
-        usbport: sub.usbport ? '' : undefined,
-        paneltypescreen: sub.paneltypescreen ? 'Choose Panel Type' : '',
-        resolution: sub.resolution ? 'Choose Screen Resolution' : '',
-        connectivity: sub.connectivity ? 'Choose Connectivity' : '',
-        daterate: sub.daterate ? 'Choose Data Rate' : '',
-        compatibledevice: sub.compatibledevice ? 'Choose Compatible Device' : '',
-        outputpower: sub.outputpower ? 'Choose Output Power' : '',
-        collingfancount: sub.collingfancount ? 'Choose Cooling Fan Count' : '',
-        clockspeed: sub.clockspeed ? 'Choose Clock Speed' : '',
-        core: sub.core ? 'Choose Core' : '',
-        speed: sub.speed ? 'Choose Speed' : '',
-        frequency: sub.frequency ? 'Choose Frequency' : '',
-        output: sub.output ? 'Choose Output' : '',
-        ethernetports: sub.ethernetports ? 'Choose Ethernet Ports' : '',
-        distance: sub.distance ? 'Choose Distance' : '',
-        lengthname: sub.lengthname ? 'Choose Length' : '',
-        slot: sub.slot ? 'Choose Slot' : '',
-        noofchannels: sub.noofchannels ? 'Choose No. Of Channels' : '',
-        colours: sub.colours ? 'Choose Colour' : '',
+    const handleAddInput = (e) => {
+        let specificationItem = Specification.find((item) => e === item.categoryname);
+        let filtersub = specificationItem?.subcategoryname;
+        let result;
+        if (filtersub.length > 0) {
+            result = filtersub?.map((sub, index) => ({
+                subname: sub.subcomponent,
+                sub: `${index + 1}.${sub.subcomponent}`,
+                subcomponentcheck: false,
+                type: sub.type ? 'Choose Type' : '',
+                model: sub.model ? 'Choose Model' : '',
+                size: sub.size ? 'Choose Size' : '',
+                variant: sub.variant ? 'Choose variant' : '',
+                brand: sub.brand ? 'Choose Brand' : '',
+                serial: sub.serial ? '' : undefined,
+                other: sub.other ? '' : undefined,
+                capacity: sub.capacity ? 'Choose Capacity' : '',
+                hdmiport: sub.hdmiport ? '' : undefined,
+                vgaport: sub.vgaport ? '' : undefined,
+                dpport: sub.dpport ? '' : undefined,
+                usbport: sub.usbport ? '' : undefined,
+                paneltypescreen: sub.paneltypescreen ? 'Choose Panel Type' : '',
+                resolution: sub.resolution ? 'Choose Screen Resolution' : '',
+                connectivity: sub.connectivity ? 'Choose Connectivity' : '',
+                daterate: sub.daterate ? 'Choose Data Rate' : '',
+                compatibledevice: sub.compatibledevice ? 'Choose Compatible Device' : '',
+                outputpower: sub.outputpower ? 'Choose Output Power' : '',
+                collingfancount: sub.collingfancount ? 'Choose Cooling Fan Count' : '',
+                clockspeed: sub.clockspeed ? 'Choose Clock Speed' : '',
+                core: sub.core ? 'Choose Core' : '',
+                speed: sub.speed ? 'Choose Speed' : '',
+                frequency: sub.frequency ? 'Choose Frequency' : '',
+                output: sub.output ? 'Choose Output' : '',
+                ethernetports: sub.ethernetports ? 'Choose Ethernet Ports' : '',
+                distance: sub.distance ? 'Choose Distance' : '',
+                lengthname: sub.lengthname ? 'Choose Length' : '',
+                slot: sub.slot ? 'Choose Slot' : '',
+                noofchannels: sub.noofchannels ? 'Choose No. Of Channels' : '',
+                colours: sub.colours ? 'Choose Colour' : '',
 
-        warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
-        estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
-        estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
-        warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
-        purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
+                warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
+                estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
+                estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
+                warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
+                purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
 
-        vendor: vendorNew ? vendorNew : undefined,
-        vendorgroup: vendorGroup ? vendorGroup : undefined,
+                vendor: vendorNew ? vendorNew : undefined,
+                vendorgroup: vendorGroup ? vendorGroup : undefined,
 
-        phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
-        vendorid: vendornameid ? vendornameid : undefined,
-        address: vendorgetid.address ? vendorgetid.address : undefined,
-      }));
-    } else if (
-      filtersub.length === 0 &&
-      !(
-        !specificationItem.type &&
-        !specificationItem.model &&
-        !specificationItem.size &&
-        !specificationItem.variant &&
-        !specificationItem.brand &&
-        !specificationItem.serial &&
-        !specificationItem.other &&
-        !specificationItem.capacity &&
-        !specificationItem.hdmiport &&
-        !specificationItem.vgaport &&
-        !specificationItem.dpport &&
-        !specificationItem.usbport
-      )
-    ) {
-      result = [
-        {
-          // sub: `${index + 1}.${sub.subcomponent}`,
-          subcomponentcheck: false,
-          type: specificationItem.type ? 'Choose Type' : '',
-          model: specificationItem.model ? 'Choose Model' : '',
-          size: specificationItem.size ? 'Choose Size' : '',
-          variant: specificationItem.variant ? 'Choose variant' : '',
-          brand: specificationItem.brand ? 'Choose Brand' : '',
-          serial: specificationItem.serial ? '' : undefined,
-          other: specificationItem.other ? '' : undefined,
-          capacity: specificationItem.capacity ? 'Choose Capacity' : '',
-          hdmiport: specificationItem.hdmiport ? '' : undefined,
-          vgaport: specificationItem.vgaport ? '' : undefined,
-          dpport: specificationItem.dpport ? '' : undefined,
-          usbport: specificationItem.usbport ? '' : undefined,
-          paneltypescreen: specificationItem.paneltypescreen ? 'Choose Panel Type' : '',
-          resolution: specificationItem.resolution ? 'Choose Screen Resolution' : '',
-          connectivity: specificationItem.connectivity ? 'Choose Connectivity' : '',
-          daterate: specificationItem.daterate ? 'Choose Data Rate' : '',
-          compatibledevice: specificationItem.compatibledevice ? 'Choose Compatible Device' : '',
-          outputpower: specificationItem.outputpower ? 'Choose Output Power' : '',
-          collingfancount: specificationItem.collingfancount ? 'Choose Cooling Fan Count' : '',
-          clockspeed: specificationItem.clockspeed ? 'Choose Clock Speed' : '',
-          core: specificationItem.core ? 'Choose Core' : '',
-          speed: specificationItem.speed ? 'Choose Speed' : '',
-          frequency: specificationItem.frequency ? 'Choose Frequency' : '',
-          output: specificationItem.output ? 'Choose Output' : '',
-          ethernetports: specificationItem.ethernetports ? 'Choose Ethernet Ports' : '',
-          distance: specificationItem.distance ? 'Choose Distance' : '',
-          lengthname: specificationItem.lengthname ? 'Choose Length' : '',
-          slot: specificationItem.slot ? 'Choose Slot' : '',
-          noofchannels: specificationItem.noofchannels ? 'Choose No. Of Channels' : '',
-          colours: specificationItem.colours ? 'Choose Colour' : '',
+                phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
+                vendorid: vendornameid ? vendornameid : undefined,
+                address: vendorgetid.address ? vendorgetid.address : undefined,
+            }));
+        } else if (
+            filtersub.length === 0 &&
+            !(
+                !specificationItem.type &&
+                !specificationItem.model &&
+                !specificationItem.size &&
+                !specificationItem.variant &&
+                !specificationItem.brand &&
+                !specificationItem.serial &&
+                !specificationItem.other &&
+                !specificationItem.capacity &&
+                !specificationItem.hdmiport &&
+                !specificationItem.vgaport &&
+                !specificationItem.dpport &&
+                !specificationItem.usbport
+            )
+        ) {
+            result = [
+                {
+                    // sub: `${index + 1}.${sub.subcomponent}`,
+                    subcomponentcheck: false,
+                    type: specificationItem.type ? 'Choose Type' : '',
+                    model: specificationItem.model ? 'Choose Model' : '',
+                    size: specificationItem.size ? 'Choose Size' : '',
+                    variant: specificationItem.variant ? 'Choose variant' : '',
+                    brand: specificationItem.brand ? 'Choose Brand' : '',
+                    serial: specificationItem.serial ? '' : undefined,
+                    other: specificationItem.other ? '' : undefined,
+                    capacity: specificationItem.capacity ? 'Choose Capacity' : '',
+                    hdmiport: specificationItem.hdmiport ? '' : undefined,
+                    vgaport: specificationItem.vgaport ? '' : undefined,
+                    dpport: specificationItem.dpport ? '' : undefined,
+                    usbport: specificationItem.usbport ? '' : undefined,
+                    paneltypescreen: specificationItem.paneltypescreen ? 'Choose Panel Type' : '',
+                    resolution: specificationItem.resolution ? 'Choose Screen Resolution' : '',
+                    connectivity: specificationItem.connectivity ? 'Choose Connectivity' : '',
+                    daterate: specificationItem.daterate ? 'Choose Data Rate' : '',
+                    compatibledevice: specificationItem.compatibledevice ? 'Choose Compatible Device' : '',
+                    outputpower: specificationItem.outputpower ? 'Choose Output Power' : '',
+                    collingfancount: specificationItem.collingfancount ? 'Choose Cooling Fan Count' : '',
+                    clockspeed: specificationItem.clockspeed ? 'Choose Clock Speed' : '',
+                    core: specificationItem.core ? 'Choose Core' : '',
+                    speed: specificationItem.speed ? 'Choose Speed' : '',
+                    frequency: specificationItem.frequency ? 'Choose Frequency' : '',
+                    output: specificationItem.output ? 'Choose Output' : '',
+                    ethernetports: specificationItem.ethernetports ? 'Choose Ethernet Ports' : '',
+                    distance: specificationItem.distance ? 'Choose Distance' : '',
+                    lengthname: specificationItem.lengthname ? 'Choose Length' : '',
+                    slot: specificationItem.slot ? 'Choose Slot' : '',
+                    noofchannels: specificationItem.noofchannels ? 'Choose No. Of Channels' : '',
+                    colours: specificationItem.colours ? 'Choose Colour' : '',
 
-          warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
-          estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
-          estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
-          warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
-          purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
+                    warranty: stockmaster.warranty ? stockmaster.warranty : undefined,
+                    estimation: stockmaster.estimation ? stockmaster.estimation : undefined,
+                    estimationtime: stockmaster.estimationtime ? stockmaster.estimationtime : undefined,
+                    warrantycalculation: stockmaster.warrantycalculation ? stockmaster.warrantycalculation : undefined,
+                    purchasedate: selectedPurchaseDate ? selectedPurchaseDate : undefined,
 
-          vendor: vendorNew ? vendorNew : undefined,
-          vendorgroup: vendorGroup ? vendorGroup : undefined,
+                    vendor: vendorNew ? vendorNew : undefined,
+                    vendorgroup: vendorGroup ? vendorGroup : undefined,
 
-          phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
-          vendorid: vendornameid ? vendornameid : undefined,
-          address: vendorgetid.address ? vendorgetid.address : undefined,
-        },
-      ];
-    }
+                    phonenumber: vendorgetid.phonenumber ? vendorgetid.phonenumber : undefined,
+                    vendorid: vendornameid ? vendornameid : undefined,
+                    address: vendorgetid.address ? vendorgetid.address : undefined,
+                },
+            ];
+        }
 
-    setTodos(result);
-    setVendoroptInd(new Array(result?.length).fill(vendorOpt));
-  };
+        setTodos(result);
+        setVendoroptInd(new Array(result?.length).fill(vendorOpt));
+    };
 
     const handleChange = async (index, name, value, id) => {
         const updatedTodos = [...todos];
@@ -4858,6 +4863,8 @@ const handleSubmit = async (e) => {
         fetchHoliday()
     }, [])
 
+    console.log(vendorGroup, vendorNew, "dffdf")
+
     return (
         <Box>
             <Headtitle title={'Stock Purchase'} />
@@ -4894,12 +4901,12 @@ const handleSubmit = async (e) => {
                                                 fetchBranchDropdowns(e.value);
                                             }}
                                         /> */}
-                                         <OutlinedInput
+                                        <OutlinedInput
                                             id="component-outlined"
                                             type="text"
                                             value={stockmaster.company}
-                                         readOnly
-                                          
+                                            readOnly
+
                                         />
                                     </FormControl>
                                 </Grid>
@@ -4923,12 +4930,12 @@ const handleSubmit = async (e) => {
                                                 fetchFloor(e.value);
                                             }}
                                         /> */}
-                                         <OutlinedInput
+                                        <OutlinedInput
                                             id="component-outlined"
                                             type="text"
                                             value={stockmaster.branch}
-                                         readOnly
-                                          
+                                            readOnly
+
                                         />
                                     </FormControl>
                                 </Grid>
@@ -4945,12 +4952,12 @@ const handleSubmit = async (e) => {
                                                 setStockmaster({ ...stockmaster, unit: e.value, workstation: '' });
                                             }}
                                         /> */}
-                                         <OutlinedInput
+                                        <OutlinedInput
                                             id="component-outlined"
                                             type="text"
                                             value={stockmaster.unit}
-                                         readOnly
-                                          
+                                            readOnly
+
                                         />
                                     </FormControl>
                                 </Grid>
@@ -4970,12 +4977,12 @@ const handleSubmit = async (e) => {
                                                 fetchArea(stockmaster.branch, e.value);
                                             }}
                                         /> */}
-                                         <OutlinedInput
+                                        <OutlinedInput
                                             id="component-outlined"
-                                           type="text"
+                                            type="text"
                                             value={stockmaster.floor}
-                                         readOnly
-                                          
+                                            readOnly
+
                                         />
                                     </FormControl>
                                 </Grid>
@@ -4994,12 +5001,12 @@ const handleSubmit = async (e) => {
                                                 fetchLocation(stockmaster.branch, stockmaster.floor, stockmaster.area, e.value);
                                             }}
                                         /> */}
-                                         <OutlinedInput
+                                        <OutlinedInput
                                             id="component-outlined"
                                             type="text"
                                             value={stockmaster.area}
-                                         readOnly
-                                          
+                                            readOnly
+
                                         />
                                     </FormControl>
                                 </Grid>
@@ -5016,12 +5023,12 @@ const handleSubmit = async (e) => {
                                                 setStockmaster({ ...stockmaster, location: e.value, workstation: '' });
                                             }}
                                         /> */}
-                                         <OutlinedInput
+                                        <OutlinedInput
                                             id="component-outlined"
                                             type="text"
                                             value={stockmaster.location}
-                                         readOnly
-                                          
+                                            readOnly
+
                                         />
                                     </FormControl>
                                 </Grid>
@@ -5148,7 +5155,7 @@ const handleSubmit = async (e) => {
                                             onChange={(e) => {
                                                 setDueDate(e)
                                                 setVendorNew(e.value);
-                                                 setVendorModeOfPayments(e?.modeofpayments);
+                                                setVendorModeOfPayments(e?.modeofpayments);
                                                 setFrequencyValue(e?.paymentfrequency);
 
                                                 vendorid(e._id);
@@ -5195,7 +5202,7 @@ const handleSubmit = async (e) => {
                                 <Grid item lg={3} md={3} xs={12} sm={6}>
                                     <FormControl size="small" fullWidth>
                                         <Typography>Frequency</Typography>
-                                        <OutlinedInput id="component-outlined" type="text" sx={userStyle.input}  value={frequencyValue} readOnly />
+                                        <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} value={frequencyValue} readOnly />
                                     </FormControl>
                                 </Grid>
                                 <Grid item md={3} xs={12} sm={12}>
@@ -5235,7 +5242,7 @@ const handleSubmit = async (e) => {
                                             value={{ label: stockmaster.requestmode, value: stockmaster.requestmode }}
 
                                         /> */}
-                                         <OutlinedInput value={stockmaster.requestmode} readOnly={true} />
+                                        <OutlinedInput value={stockmaster.requestmode} readOnly={true} />
                                     </FormControl>
                                 </Grid>
                                 {stockmaster.warranty === 'Yes' && (
@@ -5314,63 +5321,63 @@ const handleSubmit = async (e) => {
                                         />
                                     </FormControl>
                                 </Grid> */}
-                                    {stockmaster.requestmode === 'Asset Material' && (
-                                                  <>
-                                                    <Grid item md={3} sm={12} xs={12}>
-                                                      <FormControl fullWidth size="small">
-                                                        <Typography>
-                                                          Rate<b style={{ color: 'red' }}>*</b>{' '}
-                                                        </Typography>
-                                                        <OutlinedInput
-                                                          id="component-outlined"
-                                                          type="number"
-                                                          sx={userStyle.input}
-                                                          placeholder="Please Enter Rate"
-                                                          value={stockmaster.rate}
-                                                          onChange={(e) => {
-                                                            setStockmaster({
-                                                              ...stockmaster,
-                                                              rate: e.target.value,
-                                                            });
-                                                          }}
-                                                        />
-                                                      </FormControl>
-                                                    </Grid>
-                                                
-                                                  </>
-                                                )}
-                                  <Grid item md={3} sm={12} xs={12}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
-                                                    </Typography>
-                                                    <OutlinedInput
-                                                      id="component-outlined"
-                                                      type="number"
-                                                      sx={userStyle.input}
-                                
-                                                      value={stockmaster.requestmode === 'Stock Material' ? stockmaster.totalbillamount : stockmaster.quantity * stockmaster.rate}
-                                
-                                                      // onChange={(e) => {
-                                                      //   setStockmaster({
-                                                      //     ...stockmaster,
-                                                      //     totalbillamount: e.target.value,
-                                                      //   });
-                                                      // }}
-                                                      onChange={
-                                                        stockmaster.requestmode === 'Stock Material'
-                                                          ? (e) =>
-                                                            setStockmaster({
-                                                              ...stockmaster,
-                                                              totalbillamount: e.target.value,
-                                                            })
-                                                          : undefined
-                                                      }
-                                
-                                
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
+                                {stockmaster.requestmode === 'Asset Material' && (
+                                    <>
+                                        <Grid item md={3} sm={12} xs={12}>
+                                            <FormControl fullWidth size="small">
+                                                <Typography>
+                                                    Rate<b style={{ color: 'red' }}>*</b>{' '}
+                                                </Typography>
+                                                <OutlinedInput
+                                                    id="component-outlined"
+                                                    type="number"
+                                                    sx={userStyle.input}
+                                                    placeholder="Please Enter Rate"
+                                                    value={stockmaster.rate}
+                                                    onChange={(e) => {
+                                                        setStockmaster({
+                                                            ...stockmaster,
+                                                            rate: e.target.value,
+                                                        });
+                                                    }}
+                                                />
+                                            </FormControl>
+                                        </Grid>
+
+                                    </>
+                                )}
+                                <Grid item md={3} sm={12} xs={12}>
+                                    <FormControl fullWidth size="small">
+                                        <Typography>
+                                            Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
+                                        </Typography>
+                                        <OutlinedInput
+                                            id="component-outlined"
+                                            type="number"
+                                            sx={userStyle.input}
+
+                                            value={stockmaster.requestmode === 'Stock Material' ? stockmaster.totalbillamount : stockmaster.quantity * stockmaster.rate}
+
+                                            // onChange={(e) => {
+                                            //   setStockmaster({
+                                            //     ...stockmaster,
+                                            //     totalbillamount: e.target.value,
+                                            //   });
+                                            // }}
+                                            onChange={
+                                                stockmaster.requestmode === 'Stock Material'
+                                                    ? (e) =>
+                                                        setStockmaster({
+                                                            ...stockmaster,
+                                                            totalbillamount: e.target.value,
+                                                        })
+                                                    : undefined
+                                            }
+
+
+                                        />
+                                    </FormControl>
+                                </Grid>
                                 <Grid item md={1.5} xs={12} sm={12}>
                                     <Typography>
                                         Bill <b style={{ color: 'red' }}>*</b>{' '}
@@ -5396,19 +5403,19 @@ const handleSubmit = async (e) => {
                             </Grid>
                             <br />
 
-                             {stockmaster.requestmode === 'Asset Material' && (
-                                            <>
-                                              <Grid container spacing={2}>
-                                                <Grid item md={12} xs={12} sm={12}>
-                                                  {' '}
-                                                  <Typography variant="h6">Asset Material List</Typography>
-                                                </Grid>
-                                                <Grid item md={3} xs={12} sm={12}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Material<b style={{ color: 'red' }}>*</b>
-                                                    </Typography>
-                                                    {/* <Selects
+                            {stockmaster.requestmode === 'Asset Material' && (
+                                <>
+                                    <Grid container spacing={2}>
+                                        <Grid item md={12} xs={12} sm={12}>
+                                            {' '}
+                                            <Typography variant="h6">Asset Material List</Typography>
+                                        </Grid>
+                                        <Grid item md={3} xs={12} sm={12}>
+                                            <FormControl fullWidth size="small">
+                                                <Typography>
+                                                    Material<b style={{ color: 'red' }}>*</b>
+                                                </Typography>
+                                                {/* <Selects
                                                       options={materialOpt}
                                                       styles={colourStyles}
                                                       value={{
@@ -5429,1771 +5436,1771 @@ const handleSubmit = async (e) => {
                                                         setTodos([]);
                                                       }}
                                                     /> */}
-                                                     <OutlinedInput readOnly={true} value={stockmaster.productname} />
-                                                  </FormControl>
-                                                </Grid>
-                            
-                                                <Grid item md={3} xs={12} sm={12}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Asset Type</Typography>
-                                                    <OutlinedInput id="component-outlined" type="text" value={stockmaster.assettype} readOnly />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={3} xs={12} sm={12}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>Asset Head</Typography>
-                                                    <OutlinedInput id="component-outlined" type="text" value={stockmaster.asset} readOnly />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={3} sm={6} xs={12}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Component<b style={{ color: 'red' }}>*</b>
-                                                    </Typography>
-                                                    <Selects
-                                                      options={Specification}
-                                                      styles={colourStyles}
-                                                      value={{
+                                                <OutlinedInput readOnly={true} value={stockmaster.productname} />
+                                            </FormControl>
+                                        </Grid>
+
+                                        <Grid item md={3} xs={12} sm={12}>
+                                            <FormControl fullWidth size="small">
+                                                <Typography>Asset Type</Typography>
+                                                <OutlinedInput id="component-outlined" type="text" value={stockmaster.assettype} readOnly />
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item md={3} xs={12} sm={12}>
+                                            <FormControl fullWidth size="small">
+                                                <Typography>Asset Head</Typography>
+                                                <OutlinedInput id="component-outlined" type="text" value={stockmaster.asset} readOnly />
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item md={3} sm={6} xs={12}>
+                                            <FormControl fullWidth size="small">
+                                                <Typography>
+                                                    Component<b style={{ color: 'red' }}>*</b>
+                                                </Typography>
+                                                <Selects
+                                                    options={Specification}
+                                                    styles={colourStyles}
+                                                    value={{
                                                         label: stockmaster.component,
                                                         value: stockmaster.component,
-                                                      }}
-                                                      onChange={(e) => {
+                                                    }}
+                                                    onChange={(e) => {
                                                         setStockmaster({
-                                                          ...stockmaster,
-                                                          component: e.value,
+                                                            ...stockmaster,
+                                                            component: e.value,
                                                         });
                                                         setTodos([]);
                                                         handleAddInput(e.value);
-                                                      }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={12} sm={12} xs={12}>
-                                                  {todos &&
-                                                    todos.map((todo, index) => {
-                                                      return (
+                                                    }}
+                                                />
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item md={12} sm={12} xs={12}>
+                                            {todos &&
+                                                todos.map((todo, index) => {
+                                                    return (
                                                         <>
-                                                          {todo.sub ? (
-                                                            <Grid container key={index} spacing={1}>
-                                                              <Grid item md={2} sm={2} xs={2} marginTop={2}>
-                                                                <Typography>{todo.sub}</Typography>
-                                                              </Grid>
-                                                              <Grid item md={10} sm={10} xs={10} marginTop={2}>
+                                                            {todo.sub ? (
                                                                 <Grid container key={index} spacing={1}>
-                                                                  <>
-                                                                    <Grid item md={3} sm={6} xs={12}>
-                                                                      <Grid container spacing={2}>
-                                                                        <Grid item md={10} sm={10} xs={10}>
-                                                                          <FormGroup>
-                                                                            <FormControlLabel
-                                                                              control={
-                                                                                <Switch
-                                                                                  // color="success"
-                                                                                  sx={{
-                                                                                    '& .MuiSwitch-switchBase.Mui-checked': {
-                                                                                      color: 'green', // Thumb color when checked
-                                                                                    },
-                                                                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                                                                      backgroundColor: 'green', // Track color when checked
-                                                                                    },
-                                                                                    '& .MuiSwitch-switchBase': {
-                                                                                      color: '#ff0000a3', // Thumb color when not checked
-                                                                                    },
-                                                                                    '& .MuiSwitch-switchBase + .MuiSwitch-track': {
-                                                                                      backgroundColor: '#ff0000a3', // Track color when not checked
-                                                                                    },
-                                                                                  }}
-                                                                                  checked={todo.subcomponentcheck}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'subcomponentcheck', e.target.checked);
-                                                                                  }}
-                                                                                />
-                                                                              }
-                                                                              label="Enable Subcomponent"
-                                                                            />
-                                                                          </FormGroup>
-                                                                        </Grid>
-                                                                      </Grid>
+                                                                    <Grid item md={2} sm={2} xs={2} marginTop={2}>
+                                                                        <Typography>{todo.sub}</Typography>
                                                                     </Grid>
-                                                                  </>
-                            
-                                                                  {todo.subcomponentcheck === true && (
-                                                                    <>
-                                                                      {todo.type && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Type</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.type?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.type,
-                                                                                      value: todo.type,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'type', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  disabled
-                                                                                  size="small"
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    // color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenType();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.model && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Model</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.model?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.model,
-                                                                                      value: todo.model,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'model', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  disabled
-                                                                                  size="small"
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenModel();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.size && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Size</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.size?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.size,
-                                                                                      value: todo.size,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'size', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenSize();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.variant && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Variants</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.variant?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.variant,
-                                                                                      value: todo.variant,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'variant', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenVariant();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.brand && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl size="small" fullWidth>
-                                                                                  <Typography>Brand</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.brand?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.brand,
-                                                                                      value: todo.brand,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'brand', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenBrand();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.serial !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>Serial</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="text"
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter Serial"
-                                                                                  value={todo.serial}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'serial', e.target.value);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.other !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>Others</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="text"
-                                                                                  size="small"
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  placeholder="Please Enter Other"
-                                                                                  value={todo.other}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'other', e.target.value);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.capacity && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Capacity</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.capacity?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.capacity,
-                                                                                      value: todo.capacity,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'capacity', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.hdmiport !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>HDMI Port</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="number"
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter HDMI Port"
-                                                                                  value={todo.hdmiport}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  // onChange={(e) => {
-                                                                                  //   handleChange(index, "hdmiport", e.target.value);
-                                                                                  // }}
-                                                                                  onChange={(e) => {
-                                                                                    const inputText = e.target.value;
-                                                                                    // Regex to allow only non-negative numbers
-                                                                                    const validatedInput = inputText.match(/^\d*$/);
-                            
-                                                                                    const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
-                                                                                    handleChange(index, 'hdmiport', sanitizedInput);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.vgaport !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>VGA Port</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="number"
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter VGA Port"
-                                                                                  value={todo.vgaport}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  onChange={(e) => {
-                                                                                    const inputText = e.target.value;
-                                                                                    // Regex to allow only non-negative numbers
-                                                                                    const validatedInput = inputText.match(/^\d*$/);
-                            
-                                                                                    const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
-                                                                                    handleChange(index, 'vgaport', sanitizedInput);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.dpport !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>DP Port</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="number"
-                                                                                  size="small"
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  placeholder="Please Enter DP Port"
-                                                                                  value={todo.dpport}
-                                                                                  onChange={(e) => {
-                                                                                    const inputText = e.target.value;
-                                                                                    // Regex to allow only non-negative numbers
-                                                                                    const validatedInput = inputText.match(/^\d*$/);
-                            
-                                                                                    const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
-                                                                                    handleChange(index, 'dpport', sanitizedInput);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.usbport !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>USB Port</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="number"
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter USB Port"
-                                                                                  value={todo.usbport}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  onChange={(e) => {
-                                                                                    const inputText = e.target.value;
-                                                                                    // Regex to allow only non-negative numbers
-                                                                                    const validatedInput = inputText.match(/^\d*$/);
-                            
-                                                                                    const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
-                                                                                    handleChange(index, 'usbport', sanitizedInput);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.paneltypescreen && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Panel Type</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.paneltype?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.paneltypescreen,
-                                                                                      value: todo.paneltypescreen,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'paneltypescreen', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.resolution && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Screen Resolution</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.screenresolution?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.resolution,
-                                                                                      value: todo.resolution,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'resolution', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.connectivity && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Connectivity</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.connectivity?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.connectivity,
-                                                                                      value: todo.connectivity,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'connectivity', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.daterate && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Data Rate</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.datarate?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.daterate,
-                                                                                      value: todo.daterate,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'daterate', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.compatibledevice && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Compatible Device</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.compatibledevices?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.compatibledevice,
-                                                                                      value: todo.compatibledevice,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'compatibledevice', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.outputpower && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Output Power</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.outputpower?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.outputpower,
-                                                                                      value: todo.outputpower,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'outputpower', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.collingfancount && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Cooling Fan Count</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.coolingfancount?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.collingfancount,
-                                                                                      value: todo.collingfancount,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'collingfancount', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.clockspeed && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Clock Speed</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.clockspeed?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.clockspeed,
-                                                                                      value: todo.clockspeed,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'clockspeed', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.core && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Core</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.core?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.core,
-                                                                                      value: todo.core,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'core', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.speed && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Speed</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.speed?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.speed,
-                                                                                      value: todo.speed,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'speed', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.frequency && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Frequency</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.frequency?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.frequency,
-                                                                                      value: todo.frequency,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'frequency', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.output && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Output</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.output?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.output,
-                                                                                      value: todo.output,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'output', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.ethernetports && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Ethernet Ports</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.ethernetports?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.ethernetports,
-                                                                                      value: todo.ethernetports,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'ethernetports', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.distance && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Distance</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.distance?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.distance,
-                                                                                      value: todo.distance,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'distance', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.lengthname && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Length</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.lengthname?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.lengthname,
-                                                                                      value: todo.lengthname,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'lengthname', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.slot && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Slot</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.slot?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.slot,
-                                                                                      value: todo.slot,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'slot', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.noofchannels && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>No. Of Channels</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.noofchannels?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.noofchannels,
-                                                                                      value: todo.noofchannels,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'noofchannels', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.colours && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Colour</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      ?.find((item) => item.subcomponent === todo.subname)
-                                                                                      ?.colours?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.colours,
-                                                                                      value: todo.colours,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'colours', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>
-                                                                                  Warranty <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <Select
-                                                                                  fullWidth
-                                                                                  labelId="demo-select-small"
-                                                                                  id="demo-select-small"
-                                                                                  value={todo.warranty}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  // onChange={(e) => {
-                                                                                  //   setAssetdetail({ ...stockmaster, warranty: e.target.value });
-                                                                                  // }}
-                                                                                  // value={todo.serial}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'warranty', e.target.value);
-                                                                                  }}
-                                                                                >
-                                                                                  <MenuItem value="" disabled>
-                                                                                    {' '}
-                                                                                    Please Select
-                                                                                  </MenuItem>
-                                                                                  <MenuItem value="Yes"> {'Yes'} </MenuItem>
-                                                                                  <MenuItem value="No"> {'No'} </MenuItem>
-                                                                                </Select>
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                            
-                                                                      {todo.warranty === 'Yes' && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={6} xs={6} sm={6}>
-                                                                                <Typography>
-                                                                                  Warranty Time <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <OutlinedInput
-                                                                                    id="component-outlined"
-                                                                                    type="text"
-                                                                                    placeholder="Enter Time"
-                                                                                    disabled={todo.subcomponentcheck === false}
-                                                                                    value={todo.estimation}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'estimation', e.target.value);
-                                                                                      // handleChangephonenumber(e)
-                                                                                    }}
-                                                                                  // onChange={(e) => handleChangephonenumber(e)}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={6} xs={6} sm={6}>
-                                                                                <Typography>
-                                                                                  Estimation <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <Select
-                                                                                  fullWidth
-                                                                                  labelId="demo-select-small"
-                                                                                  id="demo-select-small"
-                                                                                  size="small"
-                                                                                  value={todo.estimationtime}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  // onChange={(e) => {
-                                                                                  //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
-                                                                                  // }}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'estimationtime', e.target.value);
-                                                                                    // handleEstimationChange()
-                                                                                  }}
-                                                                                // onChange={handleEstimationChange}
-                                                                                >
-                                                                                  <MenuItem value="" disabled>
-                                                                                    {' '}
-                                                                                    Please Select
-                                                                                  </MenuItem>
-                                                                                  <MenuItem value="Days"> {'Days'} </MenuItem>
-                                                                                  <MenuItem value="Month"> {'Month'} </MenuItem>
-                                                                                  <MenuItem value="Year"> {'Year'} </MenuItem>
-                                                                                </Select>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>Purchase date </Typography>
-                                                                                <OutlinedInput
-                                                                                  id="component-outlined"
-                                                                                  type="date"
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  value={todo.purchasedate}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'purchasedate', e.target.value);
-                                                                                    // handlePurchaseDateChange()
-                                                                                  }}
-                                                                                // onChange={handlePurchaseDateChange}
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                                                                      {todo.warranty === 'Yes' && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Expiry Date </Typography>
-                                                                                  <OutlinedInput
-                                                                                    id="component-outlined"
-                                                                                    type="text"
-                                                                                    disabled={todo.subcomponentcheck === false}
-                                                                                    placeholder=""
-                                                                                    value={todo.warrantycalculation}
-                                                                                  // onChange={(e) => {
-                                                                                  //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                                                  // }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>
-                                                                                  Vendor Group Name
-                                                                                  <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <Selects
-                                                                                  options={vendorGroupOpt}
-                                                                                  styles={colourStyles}
-                                                                                  isDisabled={todo.subcomponentcheck === false}
-                                                                                  value={{
-                                                                                    label: todo.vendorgroup,
-                                                                                    value: todo.vendorgroup,
-                                                                                  }}
-                                                                                  onChange={(e) => {
-                                                                                    handleChangeGroupNameIndexBased(e, index);
-                                                                                    handleChange(index, 'vendorgroup', e.value);
-                                                                                    setTodos((prev) => {
-                                                                                      const updated = [...prev];
-                                                                                      updated[index].vendor = 'Choose Vendor';
-                                                                                      return updated;
-                                                                                    });
-                                                                                  }}
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>
-                                                                                  Vendor
-                                                                                  <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <Selects
-                                                                                  options={vendorOptInd[index]}
-                                                                                  styles={colourStyles}
-                                                                                  isDisabled={todo.subcomponentcheck === false}
-                                                                                  value={{
-                                                                                    label: todo.vendor,
-                                                                                    value: todo.vendor,
-                                                                                  }}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'vendor', e.value, e._id);
-                                                                                    // setVendor(e.value);
-                                                                                    // vendorid(e._id);
-                                                                                  }}
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>Address</Typography>
-                                                                                <OutlinedInput
-                                                                                  id="component-outlined"
-                                                                                  type="text"
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  // value={vendorgetid?.address}
-                                                                                  value={todo?.address}
-                                                                                  readOnly
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>Phone Number</Typography>
-                                                                                <OutlinedInput
-                                                                                  id="component-outlined"
-                                                                                  type="text"
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  // value={vendorgetid?.phonenumber}
-                                                                                  value={todo?.phonenumber}
-                                                                                  readOnly
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                                                                    </>
-                                                                  )}
-                            
-                                                                  {/* <Grid item md={1} sm={3} xs={3}>
+                                                                    <Grid item md={10} sm={10} xs={10} marginTop={2}>
+                                                                        <Grid container key={index} spacing={1}>
+                                                                            <>
+                                                                                <Grid item md={3} sm={6} xs={12}>
+                                                                                    <Grid container spacing={2}>
+                                                                                        <Grid item md={10} sm={10} xs={10}>
+                                                                                            <FormGroup>
+                                                                                                <FormControlLabel
+                                                                                                    control={
+                                                                                                        <Switch
+                                                                                                            // color="success"
+                                                                                                            sx={{
+                                                                                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                                                                                    color: 'green', // Thumb color when checked
+                                                                                                                },
+                                                                                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                                                                                    backgroundColor: 'green', // Track color when checked
+                                                                                                                },
+                                                                                                                '& .MuiSwitch-switchBase': {
+                                                                                                                    color: '#ff0000a3', // Thumb color when not checked
+                                                                                                                },
+                                                                                                                '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                                                                                    backgroundColor: '#ff0000a3', // Track color when not checked
+                                                                                                                },
+                                                                                                            }}
+                                                                                                            checked={todo.subcomponentcheck}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'subcomponentcheck', e.target.checked);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    }
+                                                                                                    label="Enable Subcomponent"
+                                                                                                />
+                                                                                            </FormGroup>
+                                                                                        </Grid>
+                                                                                    </Grid>
+                                                                                </Grid>
+                                                                            </>
+
+                                                                            {todo.subcomponentcheck === true && (
+                                                                                <>
+                                                                                    {todo.type && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Type</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.type?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.type,
+                                                                                                                    value: todo.type,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'type', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            disabled
+                                                                                                            size="small"
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                // color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenType();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.model && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Model</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.model?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.model,
+                                                                                                                    value: todo.model,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'model', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            disabled
+                                                                                                            size="small"
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenModel();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.size && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Size</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.size?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.size,
+                                                                                                                    value: todo.size,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'size', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenSize();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.variant && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Variants</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.variant?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.variant,
+                                                                                                                    value: todo.variant,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'variant', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenVariant();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.brand && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl size="small" fullWidth>
+                                                                                                            <Typography>Brand</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.brand?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.brand,
+                                                                                                                    value: todo.brand,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'brand', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenBrand();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.serial !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>Serial</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="text"
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter Serial"
+                                                                                                            value={todo.serial}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'serial', e.target.value);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.other !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>Others</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="text"
+                                                                                                            size="small"
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            placeholder="Please Enter Other"
+                                                                                                            value={todo.other}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'other', e.target.value);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.capacity && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Capacity</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.capacity?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.capacity,
+                                                                                                                    value: todo.capacity,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'capacity', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.hdmiport !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>HDMI Port</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="number"
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter HDMI Port"
+                                                                                                            value={todo.hdmiport}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            // onChange={(e) => {
+                                                                                                            //   handleChange(index, "hdmiport", e.target.value);
+                                                                                                            // }}
+                                                                                                            onChange={(e) => {
+                                                                                                                const inputText = e.target.value;
+                                                                                                                // Regex to allow only non-negative numbers
+                                                                                                                const validatedInput = inputText.match(/^\d*$/);
+
+                                                                                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                                                                                handleChange(index, 'hdmiport', sanitizedInput);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.vgaport !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>VGA Port</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="number"
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter VGA Port"
+                                                                                                            value={todo.vgaport}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            onChange={(e) => {
+                                                                                                                const inputText = e.target.value;
+                                                                                                                // Regex to allow only non-negative numbers
+                                                                                                                const validatedInput = inputText.match(/^\d*$/);
+
+                                                                                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                                                                                handleChange(index, 'vgaport', sanitizedInput);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.dpport !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>DP Port</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="number"
+                                                                                                            size="small"
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            placeholder="Please Enter DP Port"
+                                                                                                            value={todo.dpport}
+                                                                                                            onChange={(e) => {
+                                                                                                                const inputText = e.target.value;
+                                                                                                                // Regex to allow only non-negative numbers
+                                                                                                                const validatedInput = inputText.match(/^\d*$/);
+
+                                                                                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                                                                                handleChange(index, 'dpport', sanitizedInput);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.usbport !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>USB Port</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="number"
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter USB Port"
+                                                                                                            value={todo.usbport}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            onChange={(e) => {
+                                                                                                                const inputText = e.target.value;
+                                                                                                                // Regex to allow only non-negative numbers
+                                                                                                                const validatedInput = inputText.match(/^\d*$/);
+
+                                                                                                                const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                                                                                handleChange(index, 'usbport', sanitizedInput);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.paneltypescreen && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Panel Type</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.paneltype?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.paneltypescreen,
+                                                                                                                    value: todo.paneltypescreen,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'paneltypescreen', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.resolution && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Screen Resolution</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.screenresolution?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.resolution,
+                                                                                                                    value: todo.resolution,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'resolution', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.connectivity && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Connectivity</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.connectivity?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.connectivity,
+                                                                                                                    value: todo.connectivity,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'connectivity', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.daterate && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Data Rate</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.datarate?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.daterate,
+                                                                                                                    value: todo.daterate,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'daterate', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.compatibledevice && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Compatible Device</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.compatibledevices?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.compatibledevice,
+                                                                                                                    value: todo.compatibledevice,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'compatibledevice', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.outputpower && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Output Power</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.outputpower?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.outputpower,
+                                                                                                                    value: todo.outputpower,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'outputpower', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.collingfancount && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Cooling Fan Count</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.coolingfancount?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.collingfancount,
+                                                                                                                    value: todo.collingfancount,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'collingfancount', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.clockspeed && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Clock Speed</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.clockspeed?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.clockspeed,
+                                                                                                                    value: todo.clockspeed,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'clockspeed', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.core && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Core</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.core?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.core,
+                                                                                                                    value: todo.core,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'core', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.speed && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Speed</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.speed?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.speed,
+                                                                                                                    value: todo.speed,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'speed', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.frequency && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Frequency</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.frequency?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.frequency,
+                                                                                                                    value: todo.frequency,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'frequency', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.output && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Output</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.output?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.output,
+                                                                                                                    value: todo.output,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'output', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.ethernetports && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Ethernet Ports</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.ethernetports?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.ethernetports,
+                                                                                                                    value: todo.ethernetports,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'ethernetports', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.distance && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Distance</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.distance?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.distance,
+                                                                                                                    value: todo.distance,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'distance', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.lengthname && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Length</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.lengthname?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.lengthname,
+                                                                                                                    value: todo.lengthname,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'lengthname', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.slot && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Slot</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.slot?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.slot,
+                                                                                                                    value: todo.slot,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'slot', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.noofchannels && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>No. Of Channels</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.noofchannels?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.noofchannels,
+                                                                                                                    value: todo.noofchannels,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'noofchannels', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.colours && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Colour</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                                                                                    ?.colours?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.colours,
+                                                                                                                    value: todo.colours,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'colours', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>
+                                                                                                            Warranty <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <Select
+                                                                                                            fullWidth
+                                                                                                            labelId="demo-select-small"
+                                                                                                            id="demo-select-small"
+                                                                                                            value={todo.warranty}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            // onChange={(e) => {
+                                                                                                            //   setAssetdetail({ ...stockmaster, warranty: e.target.value });
+                                                                                                            // }}
+                                                                                                            // value={todo.serial}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'warranty', e.target.value);
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <MenuItem value="" disabled>
+                                                                                                                {' '}
+                                                                                                                Please Select
+                                                                                                            </MenuItem>
+                                                                                                            <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                                                                                            <MenuItem value="No"> {'No'} </MenuItem>
+                                                                                                        </Select>
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+
+                                                                                    {todo.warranty === 'Yes' && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={6} xs={6} sm={6}>
+                                                                                                        <Typography>
+                                                                                                            Warranty Time <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <OutlinedInput
+                                                                                                                id="component-outlined"
+                                                                                                                type="text"
+                                                                                                                placeholder="Enter Time"
+                                                                                                                disabled={todo.subcomponentcheck === false}
+                                                                                                                value={todo.estimation}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'estimation', e.target.value);
+                                                                                                                    // handleChangephonenumber(e)
+                                                                                                                }}
+                                                                                                            // onChange={(e) => handleChangephonenumber(e)}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={6} xs={6} sm={6}>
+                                                                                                        <Typography>
+                                                                                                            Estimation <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <Select
+                                                                                                            fullWidth
+                                                                                                            labelId="demo-select-small"
+                                                                                                            id="demo-select-small"
+                                                                                                            size="small"
+                                                                                                            value={todo.estimationtime}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            // onChange={(e) => {
+                                                                                                            //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
+                                                                                                            // }}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'estimationtime', e.target.value);
+                                                                                                                // handleEstimationChange()
+                                                                                                            }}
+                                                                                                        // onChange={handleEstimationChange}
+                                                                                                        >
+                                                                                                            <MenuItem value="" disabled>
+                                                                                                                {' '}
+                                                                                                                Please Select
+                                                                                                            </MenuItem>
+                                                                                                            <MenuItem value="Days"> {'Days'} </MenuItem>
+                                                                                                            <MenuItem value="Month"> {'Month'} </MenuItem>
+                                                                                                            <MenuItem value="Year"> {'Year'} </MenuItem>
+                                                                                                        </Select>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>Purchase date </Typography>
+                                                                                                        <OutlinedInput
+                                                                                                            id="component-outlined"
+                                                                                                            type="date"
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            value={todo.purchasedate}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'purchasedate', e.target.value);
+                                                                                                                // handlePurchaseDateChange()
+                                                                                                            }}
+                                                                                                        // onChange={handlePurchaseDateChange}
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+                                                                                    {todo.warranty === 'Yes' && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Expiry Date </Typography>
+                                                                                                            <OutlinedInput
+                                                                                                                id="component-outlined"
+                                                                                                                type="text"
+                                                                                                                disabled={todo.subcomponentcheck === false}
+                                                                                                                placeholder=""
+                                                                                                                value={todo.warrantycalculation}
+                                                                                                            // onChange={(e) => {
+                                                                                                            //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
+                                                                                                            // }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>
+                                                                                                            Vendor Group Name
+                                                                                                            <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <Selects
+                                                                                                            options={vendorGroupOpt}
+                                                                                                            styles={colourStyles}
+                                                                                                            isDisabled={todo.subcomponentcheck === false}
+                                                                                                            value={{
+                                                                                                                label: todo.vendorgroup,
+                                                                                                                value: todo.vendorgroup,
+                                                                                                            }}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChangeGroupNameIndexBased(e, index);
+                                                                                                                handleChange(index, 'vendorgroup', e.value);
+                                                                                                                setTodos((prev) => {
+                                                                                                                    const updated = [...prev];
+                                                                                                                    updated[index].vendor = 'Choose Vendor';
+                                                                                                                    return updated;
+                                                                                                                });
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>
+                                                                                                            Vendor
+                                                                                                            <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <Selects
+                                                                                                            options={vendorOptInd[index]}
+                                                                                                            styles={colourStyles}
+                                                                                                            isDisabled={todo.subcomponentcheck === false}
+                                                                                                            value={{
+                                                                                                                label: todo.vendor,
+                                                                                                                value: todo.vendor,
+                                                                                                            }}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'vendor', e.value, e._id);
+                                                                                                                // setVendor(e.value);
+                                                                                                                // vendorid(e._id);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>Address</Typography>
+                                                                                                        <OutlinedInput
+                                                                                                            id="component-outlined"
+                                                                                                            type="text"
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            // value={vendorgetid?.address}
+                                                                                                            value={todo?.address}
+                                                                                                            readOnly
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>Phone Number</Typography>
+                                                                                                        <OutlinedInput
+                                                                                                            id="component-outlined"
+                                                                                                            type="text"
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            // value={vendorgetid?.phonenumber}
+                                                                                                            value={todo?.phonenumber}
+                                                                                                            readOnly
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+                                                                                </>
+                                                                            )}
+
+                                                                            {/* <Grid item md={1} sm={3} xs={3}>
                                                                   {todos.length > 0 && (
                                                                     <>
                                                                       <Button
@@ -7218,1702 +7225,1702 @@ const handleSubmit = async (e) => {
                                                                     </>
                                                                   )}
                                                                 </Grid> */}
-                                                                </Grid>
-                                                              </Grid>
-                                                            </Grid>
-                                                          ) : (
-                                                            <Grid container key={index} spacing={1}>
-                                                              <Grid item md={12} sm={12} xs={12} marginTop={2}>
-                                                                <Grid container key={index} spacing={1}>
-                                                                  <>
-                                                                    <Grid item md={3} sm={6} xs={12}>
-                                                                      <Grid container spacing={2}>
-                                                                        <Grid item md={10} sm={10} xs={10}>
-                                                                          <FormGroup>
-                                                                            <FormControlLabel
-                                                                              control={
-                                                                                <Switch
-                                                                                  // color="success"
-                                                                                  sx={{
-                                                                                    '& .MuiSwitch-switchBase.Mui-checked': {
-                                                                                      color: 'green', // Thumb color when checked
-                                                                                    },
-                                                                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                                                                      backgroundColor: 'green', // Track color when checked
-                                                                                    },
-                                                                                    '& .MuiSwitch-switchBase': {
-                                                                                      color: '#ff0000a3', // Thumb color when not checked
-                                                                                    },
-                                                                                    '& .MuiSwitch-switchBase + .MuiSwitch-track': {
-                                                                                      backgroundColor: '#ff0000a3', // Track color when not checked
-                                                                                    },
-                                                                                  }}
-                                                                                  checked={todo.subcomponentcheck}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'subcomponentcheck', e.target.checked);
-                                                                                  }}
-                                                                                />
-                                                                              }
-                                                                              label="Enable Subcomponent"
-                                                                            />
-                                                                          </FormGroup>
                                                                         </Grid>
-                                                                      </Grid>
                                                                     </Grid>
-                                                                  </>
-                            
-                                                                  {todo.subcomponentcheck === true && (
-                                                                    <>
-                                                                      {todo.type && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Type</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.type?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.type,
-                                                                                      value: todo.type,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'type', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenType();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.model && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Model</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.model?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.model,
-                                                                                      value: todo.model,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'model', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenModel();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.size && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Size</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.size?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.size,
-                                                                                      value: todo.size,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'size', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenSize();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.variant && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Variants</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.variant?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.variant,
-                                                                                      value: todo.variant,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'variant', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenVariant();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.brand && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl size="small" fullWidth>
-                                                                                  <Typography>Brand</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.brand?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.brand,
-                                                                                      value: todo.brand,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'brand', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenBrand();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.serial !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>Serial</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="text"
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter Serial"
-                                                                                  value={todo.serial}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'serial', e.target.value);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      {todo.other !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>Others</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="text"
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter Other"
-                                                                                  value={todo.other}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'other', e.target.value);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.capacity && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Capacity</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.capacity?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    disabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.capacity,
-                                                                                      value: todo.capacity,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'capacity', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.hdmiport !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>HDMI Port</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="number"
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter HDMI Port"
-                                                                                  value={todo.hdmiport}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'hdmiport', e.target.value);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.vgaport !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>VGA Port</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="text"
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter VGA Port"
-                                                                                  value={todo.vgaport}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'vgaport', e.target.value);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.dpport !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>DP Port</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="text"
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter DP Port"
-                                                                                  value={todo.dpport}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'dpport', e.target.value);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.usbport !== undefined && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={11.6} sm={10} xs={10}>
-                                                                                <Typography>USB Port</Typography>
-                            
-                                                                                <OutlinedInput
-                                                                                  fullWidth
-                                                                                  type="text"
-                                                                                  size="small"
-                                                                                  placeholder="Please Enter USB Port"
-                                                                                  value={todo.usbport}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'usbport', e.target.value);
-                                                                                  }}
-                                                                                />
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.paneltypescreen && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Panel Type</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.paneltype?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.paneltypescreen,
-                                                                                      value: todo.paneltypescreen,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'paneltypescreen', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.resolution && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Screen Resolution</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.screenresolution?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.resolution,
-                                                                                      value: todo.resolution,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'resolution', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.connectivity && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Connectivity</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.connectivity?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.connectivity,
-                                                                                      value: todo.connectivity,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'connectivity', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.daterate && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Data Rate</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.datarate?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.daterate,
-                                                                                      value: todo.daterate,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'daterate', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.compatibledevice && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Compatible Device</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.compatibledevices?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.compatibledevice,
-                                                                                      value: todo.compatibledevice,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'compatibledevice', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.outputpower && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Output Power</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.outputpower?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.outputpower,
-                                                                                      value: todo.outputpower,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'outputpower', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.collingfancount && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Cooling Fan Count</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.coolingfancount?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.collingfancount,
-                                                                                      value: todo.collingfancount,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'collingfancount', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.clockspeed && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Clock Speed</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.clockspeed?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.clockspeed,
-                                                                                      value: todo.clockspeed,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'clockspeed', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.core && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Core</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.core?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.core,
-                                                                                      value: todo.core,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'core', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.speed && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Speed</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.speed?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.speed,
-                                                                                      value: todo.speed,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'speed', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.frequency && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Frequency</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.frequency?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.frequency,
-                                                                                      value: todo.frequency,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'frequency', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.output && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Output</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.output?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.output,
-                                                                                      value: todo.output,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'output', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.ethernetports && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Ethernet Ports</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.ethernetports?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.ethernetports,
-                                                                                      value: todo.ethernetports,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'ethernetports', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.distance && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Distance</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.distance?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.distance,
-                                                                                      value: todo.distance,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'distance', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.lengthname && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Length</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.lengthname?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.lengthname,
-                                                                                      value: todo.lengthname,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'lengthname', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.slot && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Slot</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.slot?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.slot,
-                                                                                      value: todo.slot,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'slot', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.noofchannels && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>No. Of Channels</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.noofchannels?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.noofchannels,
-                                                                                      value: todo.noofchannels,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'noofchannels', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                                                                      {todo.colours && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Colour</Typography>
-                                                                                  <Selects
-                                                                                    options={specificationGrouping
-                                                                                      .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
-                                                                                      ?.colours?.map((item) => ({
-                                                                                        ...item,
-                                                                                        label: item,
-                                                                                        value: item,
-                                                                                      }))}
-                                                                                    styles={colourStyles}
-                                                                                    isDisabled={todo.subcomponentcheck === false}
-                                                                                    value={{
-                                                                                      label: todo.colours,
-                                                                                      value: todo.colours,
-                                                                                    }}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'colours', e.value);
-                                                                                    }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                            
-                                                                              <Grid item md={2} sm={2} xs={2}>
-                                                                                <Button
-                                                                                  variant="contained"
-                                                                                  size="small"
-                                                                                  disabled
-                                                                                  style={{
-                                                                                    height: '30px',
-                                                                                    minWidth: '20px',
-                                                                                    padding: '19px 13px',
-                                                                                    //  color: "white",
-                                                                                    marginTop: '23px',
-                                                                                    marginLeft: '-10px',
-                                                                                    // background: "rgb(25, 118, 210)",
-                                                                                  }}
-                                                                                  onClick={() => {
-                                                                                    handleClickOpenCapacity();
-                                                                                  }}
-                                                                                >
-                                                                                  <FaPlus style={{ fontSize: '15px' }} />
-                                                                                </Button>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>
-                                                                                  Warranty <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <Select
-                                                                                  fullWidth
-                                                                                  labelId="demo-select-small"
-                                                                                  id="demo-select-small"
-                                                                                  value={todo.warranty}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  // onChange={(e) => {
-                            
-                                                                                  //   setAssetdetail({ ...stockmaster, warranty: e.target.value });
-                                                                                  // }}
-                                                                                  // value={todo.serial}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'warranty', e.target.value);
-                                                                                  }}
-                                                                                >
-                                                                                  <MenuItem value="" disabled>
-                                                                                    {' '}
-                                                                                    Please Select
-                                                                                  </MenuItem>
-                                                                                  <MenuItem value="Yes"> {'Yes'} </MenuItem>
-                                                                                  <MenuItem value="No"> {'No'} </MenuItem>
-                                                                                </Select>
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                            
-                                                                      {todo.warranty === 'Yes' && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container>
-                                                                              <Grid item md={6} xs={6} sm={6}>
-                                                                                <Typography>
-                                                                                  Warranty Time <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <OutlinedInput
-                                                                                    id="component-outlined"
-                                                                                    type="text"
-                                                                                    placeholder="Enter Time"
-                                                                                    value={todo.estimation}
-                                                                                    disabled={todo.subcomponentcheck === false}
-                                                                                    onChange={(e) => {
-                                                                                      handleChange(index, 'estimation', e.target.value);
-                                                                                      handleChangephonenumber(e);
-                                                                                    }}
-                                                                                  // onChange={(e) => handleChangephonenumber(e)}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                              <Grid item md={6} xs={6} sm={6}>
-                                                                                <Typography>
-                                                                                  Estimation <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <Select
-                                                                                  fullWidth
-                                                                                  labelId="demo-select-small"
-                                                                                  id="demo-select-small"
-                                                                                  value={todo.estimationtime}
-                                                                                   size="small"
-                                                                                  // onChange={(e) => {
-                                                                                  //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
-                                                                                  // }}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'estimationtime', e.target.value);
-                                                                                    // handleEstimationChange()
-                                                                                  }}
-                                                                                // onChange={handleEstimationChange}
-                                                                                >
-                                                                                  <MenuItem value="" disabled>
-                                                                                    {' '}
-                                                                                    Please Select
-                                                                                  </MenuItem>
-                                                                                  <MenuItem value="Days"> {'Days'} </MenuItem>
-                                                                                  <MenuItem value="Month"> {'Month'} </MenuItem>
-                                                                                  <MenuItem value="Year"> {'Year'} </MenuItem>
-                                                                                </Select>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>Purchase date </Typography>
-                                                                                <OutlinedInput
-                                                                                  id="component-outlined"
-                                                                                  type="date"
-                                                                                  value={todo.purchasedate}
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'purchasedate', e.target.value);
-                                                                                    // handlePurchaseDateChange()
-                                                                                  }}
-                                                                                // onChange={handlePurchaseDateChange}
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                                                                      {todos.warranty === 'Yes' && (
-                                                                        <>
-                                                                          <Grid item md={3} sm={6} xs={12}>
-                                                                            <Grid container spacing={2}>
-                                                                              <Grid item md={10} sm={10} xs={10}>
-                                                                                <FormControl fullWidth size="small">
-                                                                                  <Typography>Expiry Date </Typography>
-                                                                                  <OutlinedInput
-                                                                                    id="component-outlined"
-                                                                                    type="text"
-                                                                                    disabled={todo.subcomponentcheck === false}
-                                                                                    placeholder=""
-                                                                                    value={todo.warrantycalculation}
-                                                                                  // onChange={(e) => {
-                                                                                  //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
-                                                                                  // }}
-                                                                                  />
-                                                                                </FormControl>
-                                                                              </Grid>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </>
-                                                                      )}
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>
-                                                                                  Vendor Group Name
-                                                                                  <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <Selects
-                                                                                  options={vendorGroupOpt}
-                                                                                  styles={colourStyles}
-                                                                                  isDisabled={todo.subcomponentcheck === false}
-                                                                                  value={{
-                                                                                    label: todo.vendorgroup,
-                                                                                    value: todo.vendorgroup,
-                                                                                  }}
-                                                                                  onChange={(e) => {
-                                                                                    handleChangeGroupNameIndexBased(e, index);
-                                                                                    handleChange(index, 'vendorgroup', e.value);
-                                                                                    setTodos((prev) => {
-                                                                                      const updated = [...prev];
-                                                                                      updated[index].vendor = 'Choose Vendor';
-                                                                                      return updated;
-                                                                                    });
-                                                                                  }}
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>
-                                                                                  Vendor
-                                                                                  <b style={{ color: 'red' }}>*</b>
-                                                                                </Typography>
-                                                                                <Selects
-                                                                                  options={vendorOptInd[index]}
-                                                                                  styles={colourStyles}
-                                                                                  value={{
-                                                                                    label: todo.vendor,
-                                                                                    value: todo.vendor,
-                                                                                  }}
-                                                                                  onChange={(e) => {
-                                                                                    handleChange(index, 'vendor', e.value, e._id);
-                                                                                    // setVendor(e.value);
-                                                                                    // vendorid(e._id);
-                                                                                  }}
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>Address</Typography>
-                                                                                <OutlinedInput
-                                                                                  id="component-outlined"
-                                                                                  type="text"
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  // value={vendorgetid?.address}
-                                                                                  value={todo?.address}
-                                                                                  readOnly
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                            
-                                                                      <>
-                                                                        <Grid item md={3} sm={6} xs={12}>
-                                                                          <Grid container spacing={2}>
-                                                                            <Grid item md={10} sm={10} xs={10}>
-                                                                              <FormControl fullWidth size="small">
-                                                                                <Typography>Phone Number</Typography>
-                                                                                <OutlinedInput
-                                                                                  id="component-outlined"
-                                                                                  type="text"
-                                                                                  disabled={todo.subcomponentcheck === false}
-                                                                                  // value={vendorgetid?.phonenumber}
-                                                                                  value={todo?.phonenumber}
-                                                                                  readOnly
-                                                                                />
-                                                                              </FormControl>
-                                                                            </Grid>
-                                                                          </Grid>
-                                                                        </Grid>
-                                                                      </>
-                                                                    </>
-                                                                  )}
-                                                                  {/* <Grid item md={1} sm={3} xs={3}>
+                                                                </Grid>
+                                                            ) : (
+                                                                <Grid container key={index} spacing={1}>
+                                                                    <Grid item md={12} sm={12} xs={12} marginTop={2}>
+                                                                        <Grid container key={index} spacing={1}>
+                                                                            <>
+                                                                                <Grid item md={3} sm={6} xs={12}>
+                                                                                    <Grid container spacing={2}>
+                                                                                        <Grid item md={10} sm={10} xs={10}>
+                                                                                            <FormGroup>
+                                                                                                <FormControlLabel
+                                                                                                    control={
+                                                                                                        <Switch
+                                                                                                            // color="success"
+                                                                                                            sx={{
+                                                                                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                                                                                    color: 'green', // Thumb color when checked
+                                                                                                                },
+                                                                                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                                                                                    backgroundColor: 'green', // Track color when checked
+                                                                                                                },
+                                                                                                                '& .MuiSwitch-switchBase': {
+                                                                                                                    color: '#ff0000a3', // Thumb color when not checked
+                                                                                                                },
+                                                                                                                '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                                                                                    backgroundColor: '#ff0000a3', // Track color when not checked
+                                                                                                                },
+                                                                                                            }}
+                                                                                                            checked={todo.subcomponentcheck}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'subcomponentcheck', e.target.checked);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    }
+                                                                                                    label="Enable Subcomponent"
+                                                                                                />
+                                                                                            </FormGroup>
+                                                                                        </Grid>
+                                                                                    </Grid>
+                                                                                </Grid>
+                                                                            </>
+
+                                                                            {todo.subcomponentcheck === true && (
+                                                                                <>
+                                                                                    {todo.type && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Type</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.type?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.type,
+                                                                                                                    value: todo.type,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'type', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenType();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.model && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Model</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.model?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.model,
+                                                                                                                    value: todo.model,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'model', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenModel();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.size && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Size</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.size?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.size,
+                                                                                                                    value: todo.size,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'size', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenSize();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.variant && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Variants</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.variant?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.variant,
+                                                                                                                    value: todo.variant,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'variant', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenVariant();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.brand && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl size="small" fullWidth>
+                                                                                                            <Typography>Brand</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.brand?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.brand,
+                                                                                                                    value: todo.brand,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'brand', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenBrand();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.serial !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>Serial</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="text"
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter Serial"
+                                                                                                            value={todo.serial}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'serial', e.target.value);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    {todo.other !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>Others</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="text"
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter Other"
+                                                                                                            value={todo.other}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'other', e.target.value);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.capacity && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Capacity</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.capacity?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                disabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.capacity,
+                                                                                                                    value: todo.capacity,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'capacity', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.hdmiport !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>HDMI Port</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="number"
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter HDMI Port"
+                                                                                                            value={todo.hdmiport}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'hdmiport', e.target.value);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.vgaport !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>VGA Port</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="text"
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter VGA Port"
+                                                                                                            value={todo.vgaport}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'vgaport', e.target.value);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.dpport !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>DP Port</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="text"
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter DP Port"
+                                                                                                            value={todo.dpport}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'dpport', e.target.value);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.usbport !== undefined && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={11.6} sm={10} xs={10}>
+                                                                                                        <Typography>USB Port</Typography>
+
+                                                                                                        <OutlinedInput
+                                                                                                            fullWidth
+                                                                                                            type="text"
+                                                                                                            size="small"
+                                                                                                            placeholder="Please Enter USB Port"
+                                                                                                            value={todo.usbport}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'usbport', e.target.value);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.paneltypescreen && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Panel Type</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.paneltype?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.paneltypescreen,
+                                                                                                                    value: todo.paneltypescreen,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'paneltypescreen', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.resolution && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Screen Resolution</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.screenresolution?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.resolution,
+                                                                                                                    value: todo.resolution,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'resolution', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.connectivity && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Connectivity</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.connectivity?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.connectivity,
+                                                                                                                    value: todo.connectivity,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'connectivity', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.daterate && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Data Rate</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.datarate?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.daterate,
+                                                                                                                    value: todo.daterate,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'daterate', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.compatibledevice && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Compatible Device</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.compatibledevices?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.compatibledevice,
+                                                                                                                    value: todo.compatibledevice,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'compatibledevice', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.outputpower && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Output Power</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.outputpower?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.outputpower,
+                                                                                                                    value: todo.outputpower,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'outputpower', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.collingfancount && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Cooling Fan Count</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.coolingfancount?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.collingfancount,
+                                                                                                                    value: todo.collingfancount,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'collingfancount', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.clockspeed && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Clock Speed</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.clockspeed?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.clockspeed,
+                                                                                                                    value: todo.clockspeed,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'clockspeed', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.core && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Core</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.core?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.core,
+                                                                                                                    value: todo.core,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'core', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.speed && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Speed</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.speed?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.speed,
+                                                                                                                    value: todo.speed,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'speed', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.frequency && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Frequency</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.frequency?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.frequency,
+                                                                                                                    value: todo.frequency,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'frequency', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.output && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Output</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.output?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.output,
+                                                                                                                    value: todo.output,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'output', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.ethernetports && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Ethernet Ports</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.ethernetports?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.ethernetports,
+                                                                                                                    value: todo.ethernetports,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'ethernetports', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.distance && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Distance</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.distance?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.distance,
+                                                                                                                    value: todo.distance,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'distance', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.lengthname && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Length</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.lengthname?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.lengthname,
+                                                                                                                    value: todo.lengthname,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'lengthname', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.slot && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Slot</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.slot?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.slot,
+                                                                                                                    value: todo.slot,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'slot', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.noofchannels && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>No. Of Channels</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.noofchannels?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.noofchannels,
+                                                                                                                    value: todo.noofchannels,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'noofchannels', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {todo.colours && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Colour</Typography>
+                                                                                                            <Selects
+                                                                                                                options={specificationGrouping
+                                                                                                                    .find((item) => stockmaster.component === item.component && stockmaster.productname === item.assetmaterial)
+                                                                                                                    ?.colours?.map((item) => ({
+                                                                                                                        ...item,
+                                                                                                                        label: item,
+                                                                                                                        value: item,
+                                                                                                                    }))}
+                                                                                                                styles={colourStyles}
+                                                                                                                isDisabled={todo.subcomponentcheck === false}
+                                                                                                                value={{
+                                                                                                                    label: todo.colours,
+                                                                                                                    value: todo.colours,
+                                                                                                                }}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'colours', e.value);
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid item md={2} sm={2} xs={2}>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            size="small"
+                                                                                                            disabled
+                                                                                                            style={{
+                                                                                                                height: '30px',
+                                                                                                                minWidth: '20px',
+                                                                                                                padding: '19px 13px',
+                                                                                                                //  color: "white",
+                                                                                                                marginTop: '23px',
+                                                                                                                marginLeft: '-10px',
+                                                                                                                // background: "rgb(25, 118, 210)",
+                                                                                                            }}
+                                                                                                            onClick={() => {
+                                                                                                                handleClickOpenCapacity();
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <FaPlus style={{ fontSize: '15px' }} />
+                                                                                                        </Button>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>
+                                                                                                            Warranty <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <Select
+                                                                                                            fullWidth
+                                                                                                            labelId="demo-select-small"
+                                                                                                            id="demo-select-small"
+                                                                                                            value={todo.warranty}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            // onChange={(e) => {
+
+                                                                                                            //   setAssetdetail({ ...stockmaster, warranty: e.target.value });
+                                                                                                            // }}
+                                                                                                            // value={todo.serial}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'warranty', e.target.value);
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <MenuItem value="" disabled>
+                                                                                                                {' '}
+                                                                                                                Please Select
+                                                                                                            </MenuItem>
+                                                                                                            <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                                                                                            <MenuItem value="No"> {'No'} </MenuItem>
+                                                                                                        </Select>
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+
+                                                                                    {todo.warranty === 'Yes' && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container>
+                                                                                                    <Grid item md={6} xs={6} sm={6}>
+                                                                                                        <Typography>
+                                                                                                            Warranty Time <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <OutlinedInput
+                                                                                                                id="component-outlined"
+                                                                                                                type="text"
+                                                                                                                placeholder="Enter Time"
+                                                                                                                value={todo.estimation}
+                                                                                                                disabled={todo.subcomponentcheck === false}
+                                                                                                                onChange={(e) => {
+                                                                                                                    handleChange(index, 'estimation', e.target.value);
+                                                                                                                    handleChangephonenumber(e);
+                                                                                                                }}
+                                                                                                            // onChange={(e) => handleChangephonenumber(e)}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                    <Grid item md={6} xs={6} sm={6}>
+                                                                                                        <Typography>
+                                                                                                            Estimation <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <Select
+                                                                                                            fullWidth
+                                                                                                            labelId="demo-select-small"
+                                                                                                            id="demo-select-small"
+                                                                                                            value={todo.estimationtime}
+                                                                                                            size="small"
+                                                                                                            // onChange={(e) => {
+                                                                                                            //   setAssetdetail({ ...stockmaster, estimationtime: e.target.value });
+                                                                                                            // }}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'estimationtime', e.target.value);
+                                                                                                                // handleEstimationChange()
+                                                                                                            }}
+                                                                                                        // onChange={handleEstimationChange}
+                                                                                                        >
+                                                                                                            <MenuItem value="" disabled>
+                                                                                                                {' '}
+                                                                                                                Please Select
+                                                                                                            </MenuItem>
+                                                                                                            <MenuItem value="Days"> {'Days'} </MenuItem>
+                                                                                                            <MenuItem value="Month"> {'Month'} </MenuItem>
+                                                                                                            <MenuItem value="Year"> {'Year'} </MenuItem>
+                                                                                                        </Select>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>Purchase date </Typography>
+                                                                                                        <OutlinedInput
+                                                                                                            id="component-outlined"
+                                                                                                            type="date"
+                                                                                                            value={todo.purchasedate}
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'purchasedate', e.target.value);
+                                                                                                                // handlePurchaseDateChange()
+                                                                                                            }}
+                                                                                                        // onChange={handlePurchaseDateChange}
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+                                                                                    {todos.warranty === 'Yes' && (
+                                                                                        <>
+                                                                                            <Grid item md={3} sm={6} xs={12}>
+                                                                                                <Grid container spacing={2}>
+                                                                                                    <Grid item md={10} sm={10} xs={10}>
+                                                                                                        <FormControl fullWidth size="small">
+                                                                                                            <Typography>Expiry Date </Typography>
+                                                                                                            <OutlinedInput
+                                                                                                                id="component-outlined"
+                                                                                                                type="text"
+                                                                                                                disabled={todo.subcomponentcheck === false}
+                                                                                                                placeholder=""
+                                                                                                                value={todo.warrantycalculation}
+                                                                                                            // onChange={(e) => {
+                                                                                                            //   setAssetdetail({ ...stockmaster, warrantyCalculation: e.target.value });
+                                                                                                            // }}
+                                                                                                            />
+                                                                                                        </FormControl>
+                                                                                                    </Grid>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </>
+                                                                                    )}
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>
+                                                                                                            Vendor Group Name
+                                                                                                            <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <Selects
+                                                                                                            options={vendorGroupOpt}
+                                                                                                            styles={colourStyles}
+                                                                                                            isDisabled={todo.subcomponentcheck === false}
+                                                                                                            value={{
+                                                                                                                label: todo.vendorgroup,
+                                                                                                                value: todo.vendorgroup,
+                                                                                                            }}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChangeGroupNameIndexBased(e, index);
+                                                                                                                handleChange(index, 'vendorgroup', e.value);
+                                                                                                                setTodos((prev) => {
+                                                                                                                    const updated = [...prev];
+                                                                                                                    updated[index].vendor = 'Choose Vendor';
+                                                                                                                    return updated;
+                                                                                                                });
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>
+                                                                                                            Vendor
+                                                                                                            <b style={{ color: 'red' }}>*</b>
+                                                                                                        </Typography>
+                                                                                                        <Selects
+                                                                                                            options={vendorOptInd[index]}
+                                                                                                            styles={colourStyles}
+                                                                                                            value={{
+                                                                                                                label: todo.vendor,
+                                                                                                                value: todo.vendor,
+                                                                                                            }}
+                                                                                                            onChange={(e) => {
+                                                                                                                handleChange(index, 'vendor', e.value, e._id);
+                                                                                                                // setVendor(e.value);
+                                                                                                                // vendorid(e._id);
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>Address</Typography>
+                                                                                                        <OutlinedInput
+                                                                                                            id="component-outlined"
+                                                                                                            type="text"
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            // value={vendorgetid?.address}
+                                                                                                            value={todo?.address}
+                                                                                                            readOnly
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+
+                                                                                    <>
+                                                                                        <Grid item md={3} sm={6} xs={12}>
+                                                                                            <Grid container spacing={2}>
+                                                                                                <Grid item md={10} sm={10} xs={10}>
+                                                                                                    <FormControl fullWidth size="small">
+                                                                                                        <Typography>Phone Number</Typography>
+                                                                                                        <OutlinedInput
+                                                                                                            id="component-outlined"
+                                                                                                            type="text"
+                                                                                                            disabled={todo.subcomponentcheck === false}
+                                                                                                            // value={vendorgetid?.phonenumber}
+                                                                                                            value={todo?.phonenumber}
+                                                                                                            readOnly
+                                                                                                        />
+                                                                                                    </FormControl>
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        </Grid>
+                                                                                    </>
+                                                                                </>
+                                                                            )}
+                                                                            {/* <Grid item md={1} sm={3} xs={3}>
                                                                   <Button
                                                                     sx={{
                                                                       padding: "14px 14px",
@@ -8934,21 +8941,21 @@ const handleSubmit = async (e) => {
                                                                     />
                                                                   </Button>
                                                                 </Grid> */}
+                                                                        </Grid>
+                                                                    </Grid>
                                                                 </Grid>
-                                                              </Grid>
-                                                            </Grid>
-                                                          )}
-                                                          <br />
+                                                            )}
+                                                            <br />
                                                         </>
-                                                      );
-                                                    })}
-                                                </Grid>
-                                                <Grid item md={3} sm={12} xs={12}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Product Details <b style={{ color: 'red' }}>*</b>{' '}
-                                                    </Typography>
-                                                    {/* <TextareaAutosize
+                                                    );
+                                                })}
+                                        </Grid>
+                                        <Grid item md={3} sm={12} xs={12}>
+                                            <FormControl fullWidth size="small">
+                                                <Typography>
+                                                    Product Details <b style={{ color: 'red' }}>*</b>{' '}
+                                                </Typography>
+                                                {/* <TextareaAutosize
                                                       aria-label="minimum height"
                                                       minRows={2}
                                                       value={stockmaster.productdetails}
@@ -8960,16 +8967,16 @@ const handleSubmit = async (e) => {
                                                         });
                                                       }}
                                                     /> */}
-                                                      <OutlinedInput readOnly={true} value={stockmaster.productdetails} />
-                                                  </FormControl>
-                                                </Grid>
-                            
-                                                <Grid item md={3} xs={12} sm={12}>
-                                                  <FormControl size="small" fullWidth>
-                                                    <Typography>
-                                                      UOM <b style={{ color: 'red' }}>*</b>{' '}
-                                                    </Typography>
-                                                    {/* <Selects
+                                                <OutlinedInput readOnly={true} value={stockmaster.productdetails} />
+                                            </FormControl>
+                                        </Grid>
+
+                                        <Grid item md={3} xs={12} sm={12}>
+                                            <FormControl size="small" fullWidth>
+                                                <Typography>
+                                                    UOM <b style={{ color: 'red' }}>*</b>{' '}
+                                                </Typography>
+                                                {/* <Selects
                                                       options={vomMasterget}
                                                       styles={colourStyles}
                                                       value={{
@@ -8980,35 +8987,35 @@ const handleSubmit = async (e) => {
                                                         setStockmaster({ ...stockmaster, uom: e.value });
                                                       }}
                                                     /> */}
-                                                     <OutlinedInput readOnly={true} value={stockmaster.uom} />
-                                                  </FormControl>
-                                                </Grid>
-                                                <Grid item md={3} sm={12} xs={12}>
-                                                  <FormControl fullWidth size="small">
-                                                    <Typography>
-                                                      Qty<b style={{ color: 'red' }}>*</b>{' '}
-                                                    </Typography>
-                                                    <OutlinedInput
+                                                <OutlinedInput readOnly={true} value={stockmaster.uom} />
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item md={3} sm={12} xs={12}>
+                                            <FormControl fullWidth size="small">
+                                                <Typography>
+                                                    Qty<b style={{ color: 'red' }}>*</b>{' '}
+                                                </Typography>
+                                                <OutlinedInput
                                                     //   id="component-outlined"
                                                     //   type="number"
-                                                      sx={userStyle.input}
+                                                    sx={userStyle.input}
                                                     //   placeholder="Please Enter Quantity"
-                                                      value={stockmaster.quantity}
-                                                      readOnly
-                                                    //   onChange={(e) => {
-                                                    //     setStockmaster({
-                                                    //       ...stockmaster,
-                                                    //       quantity: e.target.value,
-                                                    //     });
-                                                    //   }}
-                                                    />
-                                                  </FormControl>
-                                                </Grid>
-                                              </Grid>
-                                              <br />
-                                              {/* <Divider /> */}
-                                            </>
-                                          )}
+                                                    value={stockmaster.quantity}
+                                                    readOnly
+                                                //   onChange={(e) => {
+                                                //     setStockmaster({
+                                                //       ...stockmaster,
+                                                //       quantity: e.target.value,
+                                                //     });
+                                                //   }}
+                                                />
+                                            </FormControl>
+                                        </Grid>
+                                    </Grid>
+                                    <br />
+                                    {/* <Divider /> */}
+                                </>
+                            )}
 
                             {stockmaster.requestmode === 'Stock Material' && (
                                 <>
@@ -9045,13 +9052,13 @@ const handleSubmit = async (e) => {
                                                                     });
                                                                 }}
                                                             /> */}
-                                                               <OutlinedInput
-                                            id="component-outlined"
-                                            type="text"
-                                            value={todoDetails.category}
-                                         readOnly
-                                          
-                                        />
+                                                            <OutlinedInput
+                                                                id="component-outlined"
+                                                                type="text"
+                                                                value={todoDetails.category}
+                                                                readOnly
+
+                                                            />
                                                         </FormControl>
                                                     </Grid>
                                                     {/* {isUserRoleCompare?.includes('astockcategory') && (
@@ -9111,13 +9118,13 @@ const handleSubmit = async (e) => {
                                                                     });
                                                                 }}
                                                             /> */}
-                                                                                 <OutlinedInput
-                                            id="component-outlined"
-                                            type="text"
-                                            value={todoDetails.subcategory}
-                                         readOnly
-                                          
-                                        />
+                                                            <OutlinedInput
+                                                                id="component-outlined"
+                                                                type="text"
+                                                                value={todoDetails.subcategory}
+                                                                readOnly
+
+                                                            />
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item md={2.5} sm={6} xs={12}>

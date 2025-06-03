@@ -24514,6 +24514,8 @@ exports.getUserWithStatusHomeCount = catchAsyncErrors(async (req, res, next) => 
   });
 });
 
+
+
 exports.getAllUserHomeCountReleive = catchAsyncErrors(async (req, res, next) => {
     let user;
 
@@ -24529,6 +24531,7 @@ exports.getAllUserHomeCountReleive = catchAsyncErrors(async (req, res, next) => 
         let filterQuery = {
             resonablestatus: { $in: ['Absconded', 'Not Joined', 'Hold', 'Terminate', 'Postponed', 'Rejected', 'Closed', 'Releave Employee'] },
             workmode: { $ne: "Internship" },
+              successfullyrejoined: { $exists: false },
             ...Query
         }
         user = await User.countDocuments(filterQuery);

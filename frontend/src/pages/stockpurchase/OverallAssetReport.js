@@ -1,78 +1,53 @@
-import CloseIcon from "@mui/icons-material/Close";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import ImageIcon from "@mui/icons-material/Image";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import PageHeading from "../../components/PageHeading";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  FormControl,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Paper,
-  Popover,
-  Select,
-  Table,
-  TableBody,
-  TableContainer,
-  TableHead,
-  TextField,
-  Typography,
-} from "@mui/material";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import * as FileSaver from "file-saver";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import { MultiSelect } from "react-multi-select-component";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import * as XLSX from "xlsx";
-import { handleApiError } from "../../components/Errorhandling";
-import Headtitle from "../../components/Headtitle";
-import { StyledTableCell, StyledTableRow } from "../../components/Table";
-import StyledDataGrid from "../../components/TableStyle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { colourStyles, userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
+import CloseIcon from '@mui/icons-material/Close';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ImageIcon from '@mui/icons-material/Image';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import PageHeading from '../../components/PageHeading';
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton, List, ListItem, ListItemText, MenuItem, OutlinedInput, Paper, Popover, Select, Table, TableBody, TableContainer, TableHead, TextField, Typography } from '@mui/material';
+import Switch from '@mui/material/Switch';
+import axios from '../../axiosInstance';
+import * as FileSaver from 'file-saver';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import { MultiSelect } from 'react-multi-select-component';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import * as XLSX from 'xlsx';
+import { handleApiError } from '../../components/Errorhandling';
+import Headtitle from '../../components/Headtitle';
+import { StyledTableCell, StyledTableRow } from '../../components/Table';
+import StyledDataGrid from '../../components/TableStyle';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { colourStyles, userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
 
-import AlertDialog from "../../components/Alert";
-import MessageAlert from "../../components/MessageAlert";
+import AlertDialog from '../../components/Alert';
+import MessageAlert from '../../components/MessageAlert';
 
-import AggregatedSearchBar from "../../components/AggregatedSearchBar";
-import AggridTable from "../../components/AggridTable";
+import AggregatedSearchBar from '../../components/AggregatedSearchBar';
+import AggridTable from '../../components/AggridTable';
 import domtoimage from 'dom-to-image';
-
 
 function OverallAssetReport() {
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
-  const [searchedString, setSearchedString] = useState("");
+  const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTableImg = useRef(null);
   const gridRefTable = useRef(null);
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -80,8 +55,8 @@ function OverallAssetReport() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -90,24 +65,21 @@ function OverallAssetReport() {
   };
 
   const [employees, setEmployees] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const { isUserRoleAccess, buttonStyles, isUserRoleCompare, pageName, setPageName, isAssignBranch } = useContext(
-    UserRoleAccessContext
-  );
-  const accessbranch = isAssignBranch
-    ?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
+  const [searchQuery, setSearchQuery] = useState('');
+  const { isUserRoleAccess, buttonStyles, isUserRoleCompare, pageName, setPageName, isAssignBranch } = useContext(UserRoleAccessContext);
+  const accessbranch = isAssignBranch?.map((data) => ({
+    branch: data.branch,
+    company: data.company,
+    unit: data.unit,
+  }));
   //Datatable
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const PmodeOpt = [
-    { label: "Working", value: "In Working" },
-    { label: "Repair", value: "Repair" },
-    { label: "Damage", value: "Damage" },
+    { label: 'Working', value: 'In Working' },
+    { label: 'Repair', value: 'Repair' },
+    { label: 'Damage', value: 'Damage' },
   ];
 
   const [selectedOptionsMode, setSelectedOptionsMode] = useState([]);
@@ -123,9 +95,7 @@ function OverallAssetReport() {
   };
 
   const customValueRendererMode = (valueMode, _categoryname) => {
-    return valueMode?.length
-      ? valueMode.map(({ label }) => label)?.join(", ")
-      : "Please Select Status";
+    return valueMode?.length ? valueMode.map(({ label }) => label)?.join(', ') : 'Please Select Status';
   };
 
   const { auth } = useContext(AuthContext);
@@ -137,10 +107,8 @@ function OverallAssetReport() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [workStationOpt, setWorkStationOpt] = useState([]);
   const [filteredWorkStation, setFilteredWorkStation] = useState([]);
-  const [selectedOptionsWorkStation, setSelectedOptionsWorkStation] = useState(
-    []
-  );
-  let [valueWorkStation, setValueWorkStation] = useState("");
+  const [selectedOptionsWorkStation, setSelectedOptionsWorkStation] = useState([]);
+  let [valueWorkStation, setValueWorkStation] = useState('');
 
   const [exceldata, setexceldata] = useState([]);
 
@@ -151,8 +119,8 @@ function OverallAssetReport() {
   const gridRef = useRef(null);
 
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [copiedData, setCopiedData] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [copiedData, setCopiedData] = useState('');
 
   //image
   // const handleCaptureImage = () => {
@@ -167,12 +135,13 @@ function OverallAssetReport() {
 
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Overall Asset Report.png");
+          saveAs(blob, 'Overall Asset Report.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -188,34 +157,32 @@ function OverallAssetReport() {
 
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const [employee, setEmployee] = useState({
-    employee: "Please Select Employee",
-    employeeId: "",
+    employee: 'Please Select Employee',
+    employeeId: '',
   });
 
   // company multiselect add
-  const [selectedOptionsCompanyAdd, setSelectedOptionsCompanyAdd] = useState(
-    []
-  );
-  let [valueCompanyAdd, setValueCompanyAdd] = useState("");
+  const [selectedOptionsCompanyAdd, setSelectedOptionsCompanyAdd] = useState([]);
+  let [valueCompanyAdd, setValueCompanyAdd] = useState('');
 
   // branch multiselect add
   const [selectedOptionsBranchAdd, setSelectedOptionsBranchAdd] = useState([]);
-  let [valueBranchAdd, setValueBranchAdd] = useState("");
+  let [valueBranchAdd, setValueBranchAdd] = useState('');
 
   //units multiselcest add
   const [selectedOptionsUnitAdd, setSelectedOptionsUnitAdd] = useState([]);
-  let [valueUnitAdd, setValueUnitAdd] = useState("");
+  let [valueUnitAdd, setValueUnitAdd] = useState('');
 
   //teams multiselcest add
   const [selectedOptionsTeamAdd, setSelectedOptionsTeamAdd] = useState([]);
-  let [valueTeamAdd, setValueTeamAdd] = useState("");
+  let [valueTeamAdd, setValueTeamAdd] = useState('');
 
   //for workstation value get
   const [subsubcabinname, setSubsubcabinname] = useState({
-    company: "",
-    branch: "",
-    unit: "",
-    subsubcabinname: "",
+    company: '',
+    branch: '',
+    unit: '',
+    subsubcabinname: '',
   });
 
   //fetch companies for dropdown
@@ -227,9 +194,7 @@ function OverallAssetReport() {
         },
       });
       // Remove duplicates from companies
-      let uniqueCompanies = Array.from(
-        new Set(res?.data?.companies.map((t) => t.name))
-      );
+      let uniqueCompanies = Array.from(new Set(res?.data?.companies.map((t) => t.name)));
       setCompanies(
         uniqueCompanies.map((t) => ({
           label: t,
@@ -299,11 +264,7 @@ function OverallAssetReport() {
   };
 
   const customValueRendererBranchAdd = (valueBranchAdd, _branches) => {
-    return valueBranchAdd.length ? (
-      valueBranchAdd.map(({ label }) => label)?.join(", ")
-    ) : (
-      <span style={{ color: "hsl(0, 0%, 20%)" }}>Choose Branch</span>
-    );
+    return valueBranchAdd.length ? valueBranchAdd.map(({ label }) => label)?.join(', ') : <span style={{ color: 'hsl(0, 0%, 20%)' }}>Choose Branch</span>;
   };
 
   //for fetching units
@@ -339,11 +300,7 @@ function OverallAssetReport() {
   };
 
   const customValueRendererUnitAdd = (valueUnitAdd, _branches) => {
-    return valueUnitAdd.length ? (
-      valueUnitAdd.map(({ label }) => label)?.join(", ")
-    ) : (
-      <span style={{ color: "hsl(0, 0%, 20%)" }}>Choose Unit</span>
-    );
+    return valueUnitAdd.length ? valueUnitAdd.map(({ label }) => label)?.join(', ') : <span style={{ color: 'hsl(0, 0%, 20%)' }}>Choose Unit</span>;
   };
 
   //for fetching teams
@@ -413,21 +370,10 @@ function OverallAssetReport() {
   };
 
   const [maintentancemasteredit, setMaintentancemasteredit] = useState({});
-  const [maintentancemastereditmaterial, setMaintentancemastereditmaterial] =
-    useState({});
+  const [maintentancemastereditmaterial, setMaintentancemastereditmaterial] = useState({});
   const [assetlimited, setAssetlimited] = useState([]);
 
-  const getviewCode = async (
-    company,
-    branch,
-    unit,
-    floor,
-    area,
-    location,
-    components,
-    code,
-    index
-  ) => {
+  const getviewCode = async (company, branch, unit, floor, area, location, components, code, index) => {
     try {
       let res = await axios.get(SERVICE.OVERALL_ASSET_LIMITED, {
         headers: {
@@ -476,33 +422,34 @@ function OverallAssetReport() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   let allComponents = {};
 
   const [countqty, setCountqty] = useState([]);
   const [allLocs, setallLocs] = useState([]);
-  const [filtertable, setFiltertable] = useState("");
+  const [filtertable, setFiltertable] = useState('');
 
   //get all employees list details
   const fetchEmployee = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       setBankdetail(true);
-      setColumnVisibility(initialColumnVisibility)
-      setFiltertable("Location");
-      if (datasToAllot.requestmode === "Location") {
+      setFiltertable('Location');
+
+      if (datasToAllot.requestmode === 'Location') {
+
         // let res_hand = await axios.get(SERVICE.ASSETDETAIL, {
         let res_hand = await axios.post(SERVICE.ASSET_DATA_FILTER_ACCESS_OLD, {
           headers: {
@@ -519,21 +466,10 @@ function OverallAssetReport() {
 
         let singlehand = res_hand.data?.assetdetails;
 
-        let statusmodefilterddata = singlehand.filter((item) =>
-          valueMode.includes(item.status)
-        );
+        let statusmodefilterddata = singlehand.filter((item) => valueMode.includes(item.status));
 
         let singlehandtotal = statusmodefilterddata.reduce((acc, current) => {
-          const existingItemIndex = acc.findIndex(
-            (item) =>
-              item.company === current.company &&
-              item.branch === current.branch &&
-              item.unit === current.unit &&
-              item.floor === current.floor &&
-              item.area === current.area &&
-              item.location === current.location &&
-              item.material === current.material
-          );
+          const existingItemIndex = acc.findIndex((item) => item.company === current.company && item.branch === current.branch && item.unit === current.unit && item.floor === current.floor && item.area === current.area && item.location === current.location && item.material === current.material);
 
           if (existingItemIndex !== -1) {
             // Update existing item
@@ -567,41 +503,26 @@ function OverallAssetReport() {
         }, []);
 
         const modifiedEntries = singlehandtotal.map((entry) => {
-          const filteredLocs = locationgrp
-            .filter(
-              (loc) =>
-                loc.company === entry.company &&
-                loc.branch === entry.branch &&
-                loc.unit === entry.unit &&
-                loc.floor === entry.floor &&
-                loc.area === entry.area
-            )
-            .flatMap((loc) => loc.location);
-          if (entry.location === "ALL") {
+          let filteredLocs = locationgrp.filter((loc) => loc.company === entry.company && loc.branch === entry.branch && loc.unit === entry.unit && loc.floor === entry.floor && loc.area === entry.area).flatMap((loc) => loc.location);
+          if (entry.location === 'ALL') {
             return { ...entry, locs: filteredLocs, countquantity: 1 };
           } else {
             return entry;
           }
         });
 
+
+
+        // const alldocs = filteredLocs.filter(item => )
         let result = [...modifiedEntries];
+
+        console.log(result, "result")
         // Find entries with loc === "ALL"
-        let allEntries = modifiedEntries.filter(
-          (entry) => entry.location === "ALL"
-        );
+        let allEntries = modifiedEntries.filter((entry) => entry.location === 'ALL');
         allEntries.forEach((allE) => {
           // Check if the material already exists for any of the locations
           allE.locs.forEach((loc) => {
-            const existingEntry = modifiedEntries.find(
-              (entry) =>
-                entry.location === loc &&
-                entry.material === allE.material &&
-                entry.company === allE.company &&
-                entry.branch === allE.branch &&
-                entry.unit === allE.unit &&
-                entry.floor === allE.floor &&
-                entry.area === allE.area
-            );
+            const existingEntry = modifiedEntries.find((entry) => entry.location === loc && entry.material === allE.material && entry.company === allE.company && entry.branch === allE.branch && entry.unit === allE.unit && entry.floor === allE.floor && entry.area === allE.area);
             if (!existingEntry) {
               // If material doesn't exist for this location, add a new entry
               result.push({ ...allE, countquantity: 1, location: loc });
@@ -609,26 +530,21 @@ function OverallAssetReport() {
           });
         });
 
-        result = result.filter((d) => d.location !== "ALL");
+        result = result.filter((d) => d.location !== 'ALL');
 
         // Extracting unique components
 
         setCountqty(result);
+
+        let componentsdupenew = Array.from(new Set(result.map((item) => item.material)));
+
         // Create an array to hold the transformed data
         let transformedData = [];
 
         // Iterating over the original data
         result.forEach((item) => {
           // Finding if there's already an entry for this combination of company, branch, unit, and loc
-          let existingEntry = transformedData.find(
-            (entry) =>
-              entry.company === item.company &&
-              entry.branch === item.branch &&
-              entry.unit === item.unit &&
-              entry.floor === item.floor &&
-              entry.area === item.area &&
-              entry.location === item.location
-          );
+          let existingEntry = transformedData.find((entry) => entry.company === item.company && entry.branch === item.branch && entry.unit === item.unit && entry.floor === item.floor && entry.area === item.area && entry.location === item.location);
 
           // If an entry already exists, update the quantity for the component
           if (existingEntry) {
@@ -646,7 +562,7 @@ function OverallAssetReport() {
 
             // Initialize quantities for each component to empty string
             components.forEach((material) => {
-              newEntry[material] = "";
+              newEntry[material] = '';
             });
 
             // Set the quantity for the current component
@@ -659,10 +575,33 @@ function OverallAssetReport() {
 
         setEmployees(transformedData);
         setBankdetail(false);
+        setColumnVisibility({
+          serialNumber: true,
+          checkbox: true,
+          company: true,
+          branch: true,
+          unit: true,
+          floor: true,
+          area: true,
+          location: true,
+          component: true,
+          material: true,
+          code: true,
+          countquantity: true,
+          ...componentsdupenew.reduce((acc, component) => {
+            acc[component] = true;
+            return acc;
+          }, {}),
+          ...result.reduce((acc, mat) => {
+            acc[mat] = true;
+            return acc;
+          }, {}),
+          actions: true,
+        })
         // setEmployees(singlehandtotal);
-      } else if (datasToAllot.requestmode === "Material") {
-        setFiltertable("Material");
-
+      } else if (datasToAllot.requestmode === 'Material') {
+        setFiltertable('Material');
+        setColumnVisibility(initialColumnVisibility);
         // let res_hand = await axios.get(SERVICE.ASSETDETAIL, {
         let res_hand = await axios.post(SERVICE.ASSET_DATA_FILTER_ACCESS_OLD, {
           headers: {
@@ -680,21 +619,10 @@ function OverallAssetReport() {
 
         let singlehand = res_hand.data?.assetdetails;
 
-        let statusmodefilterddata = singlehand.filter((item) =>
-          valueMode.includes(item.status)
-        );
+        let statusmodefilterddata = singlehand.filter((item) => valueMode.includes(item.status));
 
         let singlehandtotal = statusmodefilterddata.reduce((acc, current) => {
-          const existingItemIndex = acc.findIndex(
-            (item) =>
-              item.company === current.company &&
-              item.branch === current.branch &&
-              item.unit === current.unit &&
-              item.floor === current.floor &&
-              item.area === current.area &&
-              item.location === current.location &&
-              item.component === current.component
-          );
+          const existingItemIndex = acc.findIndex((item) => item.company === current.company && item.branch === current.branch && item.unit === current.unit && item.floor === current.floor && item.area === current.area && item.location === current.location && item.component === current.component);
 
           if (existingItemIndex !== -1) {
             // Update existing item
@@ -753,17 +681,8 @@ function OverallAssetReport() {
         // singlehandtotal = singlehandtotal.filter(d => d.location !== "ALL")
 
         const modifiedEntries = singlehandtotal.map((entry) => {
-          const filteredLocs = locationgrp
-            .filter(
-              (loc) =>
-                loc.company === entry.company &&
-                loc.branch === entry.branch &&
-                loc.unit === entry.unit &&
-                loc.floor === entry.floor &&
-                loc.area === entry.area
-            )
-            .flatMap((loc) => loc.location);
-          if (entry.location === "ALL") {
+          const filteredLocs = locationgrp.filter((loc) => loc.company === entry.company && loc.branch === entry.branch && loc.unit === entry.unit && loc.floor === entry.floor && loc.area === entry.area).flatMap((loc) => loc.location);
+          if (entry.location === 'ALL') {
             return { ...entry, locs: filteredLocs, countquantity: 1 };
           } else {
             return entry;
@@ -772,22 +691,11 @@ function OverallAssetReport() {
 
         let result = [...modifiedEntries];
         // Find entries with loc === "ALL"
-        let allEntries = modifiedEntries.filter(
-          (entry) => entry.location === "ALL"
-        );
+        let allEntries = modifiedEntries.filter((entry) => entry.location === 'ALL');
         allEntries.forEach((allE) => {
           // Check if the material already exists for any of the locations
           allE.locs.forEach((loc) => {
-            const existingEntry = modifiedEntries.find(
-              (entry) =>
-                entry.location === loc &&
-                entry.material === allE.material &&
-                entry.company === allE.company &&
-                entry.branch === allE.branch &&
-                entry.unit === allE.unit &&
-                entry.floor === allE.floor &&
-                entry.area === allE.area
-            );
+            const existingEntry = modifiedEntries.find((entry) => entry.location === loc && entry.material === allE.material && entry.company === allE.company && entry.branch === allE.branch && entry.unit === allE.unit && entry.floor === allE.floor && entry.area === allE.area);
             if (!existingEntry) {
               // If material doesn't exist for this location, add a new entry
               result.push({ ...allE, countquantity: 1, location: loc });
@@ -795,16 +703,9 @@ function OverallAssetReport() {
           });
         });
 
-        result = result.filter((d) => d.location !== "ALL");
+        result = result.filter((d) => d.location !== 'ALL');
 
-        const alllocations = [
-          ...new Set(
-            result.map(
-              (item) =>
-                `${item.company}-${item.branch}-${item.unit}-${item.floor}-${item.area}-${item.location}`
-            )
-          ),
-        ];
+        const alllocations = [...new Set(result.map((item) => `${item.company}-${item.branch}-${item.unit}-${item.floor}-${item.area}-${item.location}`))];
         setallLocs(alllocations);
 
         const gridData = {};
@@ -825,7 +726,7 @@ function OverallAssetReport() {
           const rowData = { material };
           Object.keys(gridData).forEach((key) => {
             const quantity = gridData[key][material];
-            rowData[key] = quantity !== undefined ? quantity : "";
+            rowData[key] = quantity !== undefined ? quantity : '';
           });
           return rowData;
         });
@@ -833,7 +734,34 @@ function OverallAssetReport() {
         setEmployees(tableRows);
         setBankdetail(false);
         // setEmployees(combinationMap);
+        let componentsdupe = Array.from(new Set(result.map((item) => item.material)));
+
+        setColumnVisibility({
+          serialNumber: true,
+          checkbox: true,
+          company: true,
+          branch: true,
+          unit: true,
+          floor: true,
+          area: true,
+          location: true,
+          component: true,
+          material: true,
+          code: true,
+          countquantity: true,
+          ...componentsdupe.reduce((acc, component) => {
+            acc[component] = true;
+            return acc;
+          }, {}),
+          ...alllocations.reduce((acc, mat) => {
+            acc[mat] = true;
+            return acc;
+          }, {}),
+          actions: true,
+        })
       }
+
+
     } catch (err) {
       setBankdetail(false);
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -841,12 +769,12 @@ function OverallAssetReport() {
   };
 
   const handlesubmit = (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     e.preventDefault();
 
     if (selectedOptionsMode.length === 0) {
-      setPopupContentMalert("Please Select Status!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Status!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       fetchEmployee();
@@ -865,12 +793,12 @@ function OverallAssetReport() {
 
   //  PDF
   const columns = [
-    { title: "Company", field: "company" },
-    { title: "Branch", field: "branch" },
-    { title: "Unit", field: "unit" },
-    { title: "Floor", field: "floor" },
-    { title: "Area", field: "area" },
-    { title: "Location", field: "location" },
+    { title: 'Company', field: 'company' },
+    { title: 'Branch', field: 'branch' },
+    { title: 'Unit', field: 'unit' },
+    { title: 'Floor', field: 'floor' },
+    { title: 'Area', field: 'area' },
+    { title: 'Location', field: 'location' },
   ];
 
   // const downloadPdf = () => {
@@ -914,14 +842,14 @@ function OverallAssetReport() {
 
   //  pdf download functionality
   const downloadPdf = (isfilter) => {
-    const doc = new jsPDF({ orientation: "landscape" });
+    const doc = new jsPDF({ orientation: 'landscape' });
 
     // Initialize serial number counter
     let serialNumberCounter = 1;
 
     // Modify row data to include serial number based on the isfilter parameter
     const dataWithSerial =
-      isfilter === "filtered"
+      isfilter === 'filtered'
         ? rowDataTable.map((row) => {
           const additionalFields = components.reduce((acc, loc) => {
             acc[loc] = row[loc]; // Assume each `loc` is a key in `row`
@@ -947,10 +875,10 @@ function OverallAssetReport() {
 
     // Generate PDF with autoTable
     doc.autoTable({
-      theme: "grid",
+      theme: 'grid',
       styles: { fontSize: 5 },
       columns: [
-        { title: "SNo", dataKey: "serialNumber" },
+        { title: 'SNo', dataKey: 'serialNumber' },
         ...columns.map((col) => ({ ...col, dataKey: col.field })),
         ...components.map((loc) => ({
           title: loc.charAt(0).toUpperCase() + loc.slice(1), // Assuming loc is simple strings like 'humidity'
@@ -961,11 +889,11 @@ function OverallAssetReport() {
       body: dataWithSerial,
     });
 
-    doc.save("Overall Asset Report List.pdf");
+    doc.save('Overall Asset Report List.pdf');
   };
 
   //  PDF
-  const columnsmat = [{ title: "Material", field: "material" }];
+  const columnsmat = [{ title: 'Material', field: 'material' }];
 
   // const downloadPdfMaterial = () => {
   //     const docmat = new jsPDF();
@@ -1007,14 +935,14 @@ function OverallAssetReport() {
   // };
 
   const downloadPdfMaterial = (isfilter) => {
-    const docmat = new jsPDF({ orientation: "landscape" });
+    const docmat = new jsPDF({ orientation: 'landscape' });
 
     // Initialize serial number counter
     let serialNumberCounter = 1;
 
     // Modify row data to include serial number
     const dataWithSerial =
-      isfilter === "filtered"
+      isfilter === 'filtered'
         ? rowDataTable.map((row) => {
           const additionalFields = allLocs.reduce((acc, loc) => {
             acc[loc] = row[loc]; // Assume each `loc` is a key in `row`
@@ -1038,7 +966,7 @@ function OverallAssetReport() {
           };
         });
     let allcolumns = [
-      { title: "SNo", dataKey: "serialNumber" },
+      { title: 'SNo', dataKey: 'serialNumber' },
       ...columnsmat.map((col) => ({ ...col, dataKey: col.field })),
       ...allLocs.map((loc) => ({
         title: loc.charAt(0).toUpperCase() + loc.slice(1), // Assuming loc is simple strings like 'humidity'
@@ -1057,7 +985,7 @@ function OverallAssetReport() {
       const currentPageColumns = allcolumns.slice(startIdx, endIdx);
 
       docmat.autoTable({
-        theme: "grid",
+        theme: 'grid',
         styles: { fontSize: 5 },
         columns: currentPageColumns,
         body: dataWithSerial,
@@ -1066,27 +994,27 @@ function OverallAssetReport() {
         docmat.addPage(); // Add a new page if there are more columns to display
       }
     }
-    docmat.save("Overall Asset Report.pdf");
+    docmat.save('Overall Asset Report.pdf');
   };
 
   // Excel
-  const fileName = "Overall Asset Report";
+  const fileName = 'Overall Asset Report';
   // get particular columns for export excel
 
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Overall Asset Report",
-    pageStyle: "print",
+    documentTitle: 'Overall Asset Report',
+    pageStyle: 'print',
   });
 
   //print...
   const componentRefMat = useRef();
   const handleprintMat = useReactToPrint({
     content: () => componentRefMat.current,
-    documentTitle: "Overall Asset Report",
-    pageStyle: "print",
+    documentTitle: 'Overall Asset Report',
+    pageStyle: 'print',
   });
 
   //table entries ..,.
@@ -1123,28 +1051,20 @@ function OverallAssetReport() {
     setSearchQuery(event.target.value);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
-  const filteredData = filteredDatas.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
 
   const totalPages = Math.ceil(filteredDatas.length / pageSize);
 
   const visiblePages = Math.min(totalPages, 3);
 
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
 
   const pageNumbers = [];
 
@@ -1169,9 +1089,7 @@ function OverallAssetReport() {
         },
       });
 
-      let sub = res.data.assetdetails?.filter(
-        (item) => item?.workcheck === false
-      );
+      let sub = res.data.assetdetails?.filter((item) => item?.workcheck === false);
       setAssetDetails(res.data.assetdetails);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -1179,16 +1097,16 @@ function OverallAssetReport() {
   };
 
   const [datasToAllot, setDatasToAllot] = useState({
-    company: "",
-    branch: "",
-    unit: "",
-    floor: "",
-    area: "",
-    location: "",
-    subsubcabinname: "",
-    component: "",
-    newArray: "",
-    requestmode: "Location",
+    company: '',
+    branch: '',
+    unit: '',
+    floor: '',
+    area: '',
+    location: '',
+    subsubcabinname: '',
+    component: '',
+    newArray: '',
+    requestmode: 'Location',
   });
 
   let components = Array.from(new Set(countqty.map((item) => item.material)));
@@ -1217,9 +1135,9 @@ function OverallAssetReport() {
     }, {}),
     actions: true,
   });
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+
+
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
   const columnDatatable = [
     // {
@@ -1277,10 +1195,10 @@ function OverallAssetReport() {
     //   headerClassName: "bold-header",
     // },
     {
-      field: "checkbox",
-      headerName: "", // Default header name
+      field: 'checkbox',
+      headerName: '', // Default header name
       headerStyle: {
-        fontWeight: "bold",
+        fontWeight: 'bold',
       },
       sortable: false,
       width: 90,
@@ -1288,66 +1206,66 @@ function OverallAssetReport() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 75,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     // { field: "empcode", headerName: "Emp Code", flex: 0, width: 150, hide: !columnVisibility.empcode, headerClassName: "bold-header" },
     // { field: "companyname", headerName: "Name", flex: 0, width: 200, hide: !columnVisibility.companyname, headerClassName: "bold-header" },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 150,
       hide: !columnVisibility.company,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 150,
       hide: !columnVisibility.branch,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 100,
       hide: !columnVisibility.unit,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "floor",
-      headerName: "Floor",
+      field: 'floor',
+      headerName: 'Floor',
       flex: 0,
       width: 100,
       hide: !columnVisibility.floor,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "area",
-      headerName: "Area",
+      field: 'area',
+      headerName: 'Area',
       flex: 0,
       width: 150,
       hide: !columnVisibility.area,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "location",
-      headerName: "Location",
+      field: 'location',
+      headerName: 'Location',
       flex: 0,
       width: 100,
       hide: !columnVisibility.location,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     ...components.map((material) => ({
@@ -1402,10 +1320,10 @@ function OverallAssetReport() {
 
   const columnDatatableStock = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
       headerComponent: (params) => (
@@ -1433,9 +1351,7 @@ function OverallAssetReport() {
           onChange={() => {
             let updatedSelectedRows;
             if (selectedRows.includes(params.data.id)) {
-              updatedSelectedRows = selectedRows.filter(
-                (selectedId) => selectedId !== params.data.id
-              );
+              updatedSelectedRows = selectedRows.filter((selectedId) => selectedId !== params.data.id);
             } else {
               updatedSelectedRows = [...selectedRows, params.data.id];
             }
@@ -1443,9 +1359,7 @@ function OverallAssetReport() {
             setSelectedRows(updatedSelectedRows);
 
             // Update the "Select All" checkbox based on whether all rows are selected
-            setSelectAllChecked(
-              updatedSelectedRows.length === filteredData.length
-            );
+            setSelectAllChecked(updatedSelectedRows.length === filteredData.length);
           }}
         />
       ),
@@ -1453,23 +1367,23 @@ function OverallAssetReport() {
       width: 75,
 
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 85,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "material",
-      headerName: "Material",
+      field: 'material',
+      headerName: 'Material',
       flex: 0,
       width: 200,
       hide: !columnVisibility.material,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     ...allLocs.map((mat) => ({
@@ -1509,8 +1423,7 @@ function OverallAssetReport() {
     };
   });
 
-  let columnDataTable =
-    filtertable === "Material" ? columnDatatableStock : columnDatatable;
+  let columnDataTable = filtertable === 'Material' ? columnDatatableStock : columnDatatable;
 
   const rowsWithCheckboxes = rowDataTable.map((row) => ({
     ...row,
@@ -1529,7 +1442,7 @@ function OverallAssetReport() {
 
   useEffect(() => {
     // Retrieve column visibility from localStorage (if available)
-    const savedVisibility = localStorage.getItem("columnVisibility");
+    const savedVisibility = localStorage.getItem('columnVisibility');
     if (savedVisibility) {
       setColumnVisibility(JSON.parse(savedVisibility));
     }
@@ -1537,13 +1450,11 @@ function OverallAssetReport() {
 
   useEffect(() => {
     // Save column visibility to localStorage whenever it changes
-    localStorage.setItem("columnVisibility", JSON.stringify(columnVisibility));
+    localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
   }, [columnVisibility]);
 
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
 
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
@@ -1557,9 +1468,9 @@ function OverallAssetReport() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1567,7 +1478,7 @@ function OverallAssetReport() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1575,37 +1486,19 @@ function OverallAssetReport() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
               <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
+                sx={{ display: 'flex' }}
+                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
+                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
               // secondary={column.headerName }
               />
             </ListItem>
@@ -1617,7 +1510,7 @@ function OverallAssetReport() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() =>
                 setColumnVisibility({
                   ...initialColumnVisibility,
@@ -1632,7 +1525,7 @@ function OverallAssetReport() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -1650,17 +1543,17 @@ function OverallAssetReport() {
   );
 
   const requestModeOptions = [
-    { label: "Location", value: "Location" },
-    { label: "Material", value: "Material" },
+    { label: 'Location', value: 'Location' },
+    { label: 'Material', value: 'Material' },
   ];
 
   const handleclear = (e) => {
     e.preventDefault();
-    setDatasToAllot({ requestmode: "Location" });
+    setDatasToAllot({ requestmode: 'Location' });
     setSelectedOptionsMode([]);
     setEmployees([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
 
@@ -1688,20 +1581,19 @@ function OverallAssetReport() {
     setIsPdfFilterOpenmat(false);
   };
 
-  const [fileFormat, setFormat] = useState("");
-  const fileType =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = fileFormat === "xl" ? ".xlsx" : ".csv";
+  const [fileFormat, setFormat] = useState('');
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+  const fileExtension = fileFormat === 'xl' ? '.xlsx' : '.csv';
   const exportToCSV = (csvData, fileName) => {
     const ws = XLSX.utils.json_to_sheet(csvData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
     FileSaver.saveAs(data, fileName + fileExtension);
   };
 
   const handleExportXL = (isfilter) => {
-    if (isfilter === "filtered") {
+    if (isfilter === 'filtered') {
       exportToCSV(
         rowDataTable?.map((item, index) => ({
           Sno: index + 1,
@@ -1718,7 +1610,7 @@ function OverallAssetReport() {
         })),
         fileName
       );
-    } else if (isfilter === "overall") {
+    } else if (isfilter === 'overall') {
       exportToCSV(
         employees.map((item, index) => ({
           Sno: index + 1,
@@ -1741,7 +1633,7 @@ function OverallAssetReport() {
   };
 
   const handleExportXLMat = (isfilter) => {
-    if (isfilter === "filtered") {
+    if (isfilter === 'filtered') {
       exportToCSV(
         rowDataTable?.map((item, index) => ({
           Sno: index + 1,
@@ -1753,7 +1645,7 @@ function OverallAssetReport() {
         })),
         fileName
       );
-    } else if (isfilter === "overall") {
+    } else if (isfilter === 'overall') {
       exportToCSV(
         employees.map((item, index) => ({
           Sno: index + 1,
@@ -1773,41 +1665,32 @@ function OverallAssetReport() {
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
   return (
     <Box>
       {/* ****** Header Content ****** */}
-      <Headtitle title={"Overall Asset Report"} />
+      <Headtitle title={'Overall Asset Report'} />
       {/* <Typography sx={userStyle.HeaderText}>Overall Asset Report</Typography> */}
-      <PageHeading
-        title="Overall Asset Report"
-        modulename="Asset"
-        submodulename="Stock"
-        mainpagename="Overall Asset Report"
-        subpagename=""
-        subsubpagename=""
-      />
+      <PageHeading title="Overall Asset Report" modulename="Asset" submodulename="Stock" mainpagename="Overall Asset Report" subpagename="" subsubpagename="" />
       <br />
 
-      {isUserRoleCompare?.includes("aoverallassetreport") && (
+      {isUserRoleCompare?.includes('aoverallassetreport') && (
         <>
           <Box sx={userStyle.selectcontainer}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Overall Asset Report
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Overall Asset Report</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -1834,7 +1717,7 @@ function OverallAssetReport() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth>
                     <Typography>
-                      Status<b style={{ color: "red" }}>*</b>
+                      Status<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <MultiSelect
                       maxMenuHeight={250}
@@ -1849,11 +1732,7 @@ function OverallAssetReport() {
                   </FormControl>
                 </Grid>
                 <Grid item md={1} xs={12} sm={6} marginTop={3}>
-                  <Button
-                    variant="contained"
-                    sx={buttonStyles.buttonsubmit}
-                    onClick={handlesubmit}
-                  >
+                  <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handlesubmit}>
                     Filter
                   </Button>
                 </Grid>
@@ -1886,14 +1765,12 @@ function OverallAssetReport() {
       )}
       <br />
 
-      {isUserRoleCompare?.includes("loverallassetreport") && (
+      {isUserRoleCompare?.includes('loverallassetreport') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
-              <Typography sx={userStyle.importheadtext}>
-                Overall Asset Report List
-              </Typography>
+              <Typography sx={userStyle.importheadtext}>Overall Asset Report List</Typography>
             </Grid>
             <br />
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
@@ -1912,7 +1789,7 @@ function OverallAssetReport() {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -1930,38 +1807,36 @@ function OverallAssetReport() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {filtertable === "Location" ? (
+                  {filtertable === 'Location' ? (
                     <>
-                      {isUserRoleCompare?.includes(
-                        "exceloverallassetreport"
-                      ) && (
-                          <>
-                            <Button
-                              onClick={(e) => {
-                                setIsFilterOpen(true);
-                                // fetchEmployee();
-                                setFormat("xl");
-                              }}
-                              sx={userStyle.buttongrp}
-                            >
-                              <FaFileExcel />
-                              &ensp;Export to Excel&ensp;
-                            </Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes("csvoverallassetreport") && (
+                      {isUserRoleCompare?.includes('exceloverallassetreport') && (
                         <>
                           <Button
                             onClick={(e) => {
                               setIsFilterOpen(true);
                               // fetchEmployee();
-                              setFormat("csv");
+                              setFormat('xl');
+                            }}
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileExcel />
+                            &ensp;Export to Excel&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('csvoverallassetreport') && (
+                        <>
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpen(true);
+                              // fetchEmployee();
+                              setFormat('csv');
                             }}
                             sx={userStyle.buttongrp}
                           >
@@ -1970,21 +1845,16 @@ function OverallAssetReport() {
                           </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes(
-                        "printoverallassetreport"
-                      ) && (
-                          <>
-                            <Button
-                              sx={userStyle.buttongrp}
-                              onClick={handleprint}
-                            >
-                              &ensp;
-                              <FaPrint />
-                              &ensp;Print&ensp;
-                            </Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes("pdfoverallassetreport") && (
+                      {isUserRoleCompare?.includes('printoverallassetreport') && (
+                        <>
+                          <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                            &ensp;
+                            <FaPrint />
+                            &ensp;Print&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('pdfoverallassetreport') && (
                         <>
                           <Button
                             sx={userStyle.buttongrp}
@@ -1998,45 +1868,37 @@ function OverallAssetReport() {
                           </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes(
-                        "imageoverallassetreport"
-                      ) && (
-                          <Button
-                            sx={userStyle.buttongrp}
-                            onClick={handleCaptureImage}
-                          >
-                            {" "}
-                            <ImageIcon sx={{ fontSize: "15px" }} />{" "}
-                            &ensp;Image&ensp;{" "}
-                          </Button>
-                        )}
+                      {isUserRoleCompare?.includes('imageoverallassetreport') && (
+                        <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                          {' '}
+                          <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                        </Button>
+                      )}
                     </>
                   ) : (
                     <>
-                      {isUserRoleCompare?.includes(
-                        "exceloverallassetreport"
-                      ) && (
-                          <>
-                            <Button
-                              onClick={(e) => {
-                                setIsFilterOpenmat(true);
-                                // fetchEmployee();
-                                setFormat("xl");
-                              }}
-                              sx={userStyle.buttongrp}
-                            >
-                              <FaFileExcel />
-                              &ensp;Export to Excel&ensp;
-                            </Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes("csvoverallassetreport") && (
+                      {isUserRoleCompare?.includes('exceloverallassetreport') && (
                         <>
                           <Button
                             onClick={(e) => {
                               setIsFilterOpenmat(true);
                               // fetchEmployee();
-                              setFormat("csv");
+                              setFormat('xl');
+                            }}
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileExcel />
+                            &ensp;Export to Excel&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('csvoverallassetreport') && (
+                        <>
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpenmat(true);
+                              // fetchEmployee();
+                              setFormat('csv');
                             }}
                             sx={userStyle.buttongrp}
                           >
@@ -2045,21 +1907,16 @@ function OverallAssetReport() {
                           </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes(
-                        "printoverallassetreport"
-                      ) && (
-                          <>
-                            <Button
-                              sx={userStyle.buttongrp}
-                              onClick={handleprintMat}
-                            >
-                              &ensp;
-                              <FaPrint />
-                              &ensp;Print&ensp;
-                            </Button>
-                          </>
-                        )}
-                      {isUserRoleCompare?.includes("pdfoverallassetreport") && (
+                      {isUserRoleCompare?.includes('printoverallassetreport') && (
+                        <>
+                          <Button sx={userStyle.buttongrp} onClick={handleprintMat}>
+                            &ensp;
+                            <FaPrint />
+                            &ensp;Print&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('pdfoverallassetreport') && (
                         <>
                           <Button
                             sx={userStyle.buttongrp}
@@ -2073,18 +1930,12 @@ function OverallAssetReport() {
                           </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes(
-                        "imageoverallassetreport"
-                      ) && (
-                          <Button
-                            sx={userStyle.buttongrp}
-                            onClick={handleCaptureImage}
-                          >
-                            {" "}
-                            <ImageIcon sx={{ fontSize: "15px" }} />{" "}
-                            &ensp;Image&ensp;{" "}
-                          </Button>
-                        )}
+                      {isUserRoleCompare?.includes('imageoverallassetreport') && (
+                        <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                          {' '}
+                          <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                        </Button>
+                      )}
                     </>
                   )}
                 </Box>
@@ -2137,24 +1988,13 @@ function OverallAssetReport() {
             <br />
             {isBankdetail ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
             ) : (
               <>
-
-
-                <Box style={{ width: "100%", overflowY: "hidden" }}>
+                <Box style={{ width: '100%', overflowY: 'hidden' }}>
                   <>
                     <AggridTable
                       rowDataTable={rowDataTable}
@@ -2184,7 +2024,6 @@ function OverallAssetReport() {
                     />
                   </>
                 </Box>
-
               </>
             )}
           </Box>
@@ -2197,8 +2036,8 @@ function OverallAssetReport() {
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
@@ -2247,34 +2086,17 @@ function OverallAssetReport() {
             </Box> */}
       <Box>
         {/* ALERT DIALOG */}
-        <Dialog
-          open={isDeleteOpenalert}
-          onClose={handleCloseModalert}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
-            <ErrorOutlineOutlinedIcon
-              sx={{ fontSize: "70px", color: "orange" }}
-            />
-            <Typography
-              variant="h6"
-              sx={{ color: "black", textAlign: "center" }}
-            >
+        <Dialog open={isDeleteOpenalert} onClose={handleCloseModalert} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '70px', color: 'orange' }} />
+            <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
               Please Select any Row
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button
-              autoFocus
-              variant="contained"
-              color="error"
-              onClick={handleCloseModalert}
-            >
-              {" "}
-              OK{" "}
+            <Button autoFocus variant="contained" color="error" onClick={handleCloseModalert}>
+              {' '}
+              OK{' '}
             </Button>
           </DialogActions>
         </Dialog>
@@ -2283,36 +2105,22 @@ function OverallAssetReport() {
       {/* view model */}
 
       {/* view model */}
-      <Dialog
-        open={openview}
-        onClose={handleClickOpenview}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        fullWidth={true}
-      >
-        <Box sx={{ padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth={true}>
+        <Box sx={{ padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              View Location Overall Asset Report
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> View Location Overall Asset Report</Typography>
             <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Company</Typography>
-                  <Typography>
-                    {maintentancemastereditmaterial.company}
-                  </Typography>
+                  <Typography>{maintentancemastereditmaterial.company}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Branch</Typography>
-                  <Typography>
-                    {maintentancemastereditmaterial.branch}
-                  </Typography>
+                  <Typography>{maintentancemastereditmaterial.branch}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={4} xs={12} sm={12}>
@@ -2324,9 +2132,7 @@ function OverallAssetReport() {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Floor</Typography>
-                  <Typography>
-                    {maintentancemastereditmaterial.floor}
-                  </Typography>
+                  <Typography>{maintentancemastereditmaterial.floor}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={4} xs={12} sm={12}>
@@ -2338,22 +2144,16 @@ function OverallAssetReport() {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Location</Typography>
-                  <Typography>
-                    {maintentancemastereditmaterial.location}
-                  </Typography>
+                  <Typography>{maintentancemastereditmaterial.location}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={12} sm={12} xs={12}>
                 <TableContainer component={Paper}>
-                  <Table
-                    sx={{ minWidth: 700 }}
-                    aria-label="customized table"
-                    id="usertable"
-                  >
-                    <TableHead sx={{ fontWeight: "600" }}>
+                  <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable">
+                    <TableHead sx={{ fontWeight: '600' }}>
                       <StyledTableRow>
-                        <StyledTableCell>{"Material"}</StyledTableCell>
-                        <StyledTableCell>{"Material Code"}</StyledTableCell>
+                        <StyledTableCell>{'Material'}</StyledTableCell>
+                        <StyledTableCell>{'Material Code'}</StyledTableCell>
                       </StyledTableRow>
                     </TableHead>
                     <TableBody align="left">
@@ -2361,30 +2161,25 @@ function OverallAssetReport() {
                         Object.keys(maintentancemastereditmaterial)
                           .filter(
                             (key) =>
-                              key !== "company" &&
-                              key !== "branch" &&
-                              key !== "unit" &&
-                              key !== "floor" &&
-                              key !== "area" &&
-                              key !== "location" &&
-                              maintentancemastereditmaterial[key] !== "" &&
-                              key !== "id" &&
-                              key !== "countquantity" &&
-                              key !== "material" &&
-                              key !== "components" &&
-                              key !== "component" &&
-                              key !== "code" &&
-                              key !== "serialNumber"
+                              key !== 'company' &&
+                              key !== 'branch' &&
+                              key !== 'unit' &&
+                              key !== 'floor' &&
+                              key !== 'area' &&
+                              key !== 'location' &&
+                              maintentancemastereditmaterial[key] !== '' &&
+                              key !== 'id' &&
+                              key !== 'countquantity' &&
+                              key !== 'material' &&
+                              key !== 'components' &&
+                              key !== 'component' &&
+                              key !== 'code' &&
+                              key !== 'serialNumber'
                           )
                           .map((key) => (
                             <StyledTableRow key={key}>
                               <StyledTableCell>{key}</StyledTableCell>
-                              <StyledTableCell>
-                                {
-                                  assetlimited.find((d) => d.material === key)
-                                    ?.code
-                                }
-                              </StyledTableCell>
+                              <StyledTableCell>{assetlimited.find((d) => d.material === key)?.code}</StyledTableCell>
                             </StyledTableRow>
                           ))}
                     </TableBody>
@@ -2394,28 +2189,17 @@ function OverallAssetReport() {
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleCloseview}
-              >
-                {" "}
-                Back{" "}
+              <Button variant="contained" color="primary" onClick={handleCloseview}>
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
         </Box>
       </Dialog>
 
-      <Dialog
-        open={isErrorOpen}
-        onClose={handleCloseerr}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogContent
-          sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-        >
+      <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
           <Typography variant="h6">{showAlert}</Typography>
         </DialogContent>
         <DialogActions>
@@ -2428,7 +2212,7 @@ function OverallAssetReport() {
       {/* print layout */}
       <TableContainer component={Paper} sx={userStyle.printcls}>
         <Table aria-label="simple table" id="branch" ref={componentRef}>
-          <TableHead sx={{ fontWeight: "600" }}>
+          <TableHead sx={{ fontWeight: '600' }}>
             <StyledTableRow>
               <StyledTableCell>SI.NO</StyledTableCell>
               <StyledTableCell>Material</StyledTableCell>
@@ -2439,9 +2223,7 @@ function OverallAssetReport() {
               <StyledTableCell>Area</StyledTableCell>
               <StyledTableCell>Location</StyledTableCell>
               {components.map((component, index) => (
-                <StyledTableCell key={index}>
-                  {component.charAt(0).toUpperCase() + component.slice(1)}
-                </StyledTableCell>
+                <StyledTableCell key={index}>{component.charAt(0).toUpperCase() + component.slice(1)}</StyledTableCell>
               ))}
             </StyledTableRow>
           </TableHead>
@@ -2458,9 +2240,7 @@ function OverallAssetReport() {
                   <StyledTableCell> {row.area}</StyledTableCell>
                   <StyledTableCell> {row.location}</StyledTableCell>
                   {components.map((component) => (
-                    <StyledTableCell key={component}>
-                      {row[component]}
-                    </StyledTableCell>
+                    <StyledTableCell key={component}>{row[component]}</StyledTableCell>
                   ))}
                 </StyledTableRow>
               ))}
@@ -2470,14 +2250,12 @@ function OverallAssetReport() {
 
       <TableContainer component={Paper} sx={userStyle.printcls}>
         <Table aria-label="simple table" id="branch" ref={componentRefMat}>
-          <TableHead sx={{ fontWeight: "600" }}>
+          <TableHead sx={{ fontWeight: '600' }}>
             <StyledTableRow>
               <StyledTableCell>SI.NO</StyledTableCell>
               <StyledTableCell>Material</StyledTableCell>
               {allLocs.map((component, index) => (
-                <StyledTableCell key={index}>
-                  {component.charAt(0).toUpperCase() + component.slice(1)}
-                </StyledTableCell>
+                <StyledTableCell key={index}>{component.charAt(0).toUpperCase() + component.slice(1)}</StyledTableCell>
               ))}
             </StyledTableRow>
           </TableHead>
@@ -2488,9 +2266,7 @@ function OverallAssetReport() {
                   <StyledTableCell>{index + 1}</StyledTableCell>
                   <StyledTableCell> {row.material}</StyledTableCell>
                   {allLocs.map((component) => (
-                    <StyledTableCell key={component}>
-                      {row[component]}
-                    </StyledTableCell>
+                    <StyledTableCell key={component}>{row[component]}</StyledTableCell>
                   ))}
                 </StyledTableRow>
               ))}
@@ -2498,24 +2274,19 @@ function OverallAssetReport() {
         </Table>
       </TableContainer>
 
-      <Dialog
-        open={isFilterOpen}
-        onClose={handleCloseFilterMod}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={isFilterOpen} onClose={handleCloseFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent
           sx={{
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <IconButton
             aria-label="close"
             onClick={handleCloseFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2524,12 +2295,8 @@ function OverallAssetReport() {
             <CloseIcon />
           </IconButton>
 
-          {fileFormat === "xl" ? (
-            <FaFileExcel style={{ fontSize: "70px", color: "green" }} />
-          ) : (
-            <FaFileCsv style={{ fontSize: "70px", color: "green" }} />
-          )}
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          {fileFormat === 'xl' ? <FaFileExcel style={{ fontSize: '70px', color: 'green' }} /> : <FaFileCsv style={{ fontSize: '70px', color: 'green' }} />}
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2538,7 +2305,7 @@ function OverallAssetReport() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              handleExportXL("filtered");
+              handleExportXL('filtered');
             }}
           >
             Export Filtered Data
@@ -2547,7 +2314,7 @@ function OverallAssetReport() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              handleExportXL("overall");
+              handleExportXL('overall');
               // fetchEmployee();
             }}
           >
@@ -2556,24 +2323,19 @@ function OverallAssetReport() {
         </DialogActions>
       </Dialog>
       {/*Export pdf Data  */}
-      <Dialog
-        open={isPdfFilterOpen}
-        onClose={handleClosePdfFilterMod}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={isPdfFilterOpen} onClose={handleClosePdfFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent
           sx={{
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <IconButton
             aria-label="close"
             onClick={handleClosePdfFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2582,8 +2344,8 @@ function OverallAssetReport() {
             <CloseIcon />
           </IconButton>
 
-          <PictureAsPdfIcon sx={{ fontSize: "80px", color: "red" }} />
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          <PictureAsPdfIcon sx={{ fontSize: '80px', color: 'red' }} />
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2591,7 +2353,7 @@ function OverallAssetReport() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdf("filtered");
+              downloadPdf('filtered');
               setIsPdfFilterOpen(false);
             }}
           >
@@ -2600,7 +2362,7 @@ function OverallAssetReport() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdf("overall");
+              downloadPdf('overall');
               setIsPdfFilterOpen(false);
             }}
           >
@@ -2611,24 +2373,19 @@ function OverallAssetReport() {
 
       {/* //material */}
 
-      <Dialog
-        open={isFilterOpenmat}
-        onClose={handleCloseFilterModmat}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={isFilterOpenmat} onClose={handleCloseFilterModmat} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent
           sx={{
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <IconButton
             aria-label="close"
             onClick={handleCloseFilterModmat}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2637,12 +2394,8 @@ function OverallAssetReport() {
             <CloseIcon />
           </IconButton>
 
-          {fileFormat === "xl" ? (
-            <FaFileExcel style={{ fontSize: "70px", color: "green" }} />
-          ) : (
-            <FaFileCsv style={{ fontSize: "70px", color: "green" }} />
-          )}
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          {fileFormat === 'xl' ? <FaFileExcel style={{ fontSize: '70px', color: 'green' }} /> : <FaFileCsv style={{ fontSize: '70px', color: 'green' }} />}
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2651,7 +2404,7 @@ function OverallAssetReport() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              handleExportXLMat("filtered");
+              handleExportXLMat('filtered');
             }}
           >
             Export Filtered Data
@@ -2660,7 +2413,7 @@ function OverallAssetReport() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              handleExportXLMat("overall");
+              handleExportXLMat('overall');
               fetchEmployee();
             }}
           >
@@ -2669,24 +2422,19 @@ function OverallAssetReport() {
         </DialogActions>
       </Dialog>
       {/*Export pdf Data  */}
-      <Dialog
-        open={isPdfFilterOpenmat}
-        onClose={handleClosePdfFilterModmat}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={isPdfFilterOpenmat} onClose={handleClosePdfFilterModmat} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent
           sx={{
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <IconButton
             aria-label="close"
             onClick={handleClosePdfFilterModmat}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2695,8 +2443,8 @@ function OverallAssetReport() {
             <CloseIcon />
           </IconButton>
 
-          <PictureAsPdfIcon sx={{ fontSize: "80px", color: "red" }} />
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          <PictureAsPdfIcon sx={{ fontSize: '80px', color: 'red' }} />
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2704,7 +2452,7 @@ function OverallAssetReport() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdfMaterial("filtered");
+              downloadPdfMaterial('filtered');
               setIsPdfFilterOpenmat(false);
             }}
           >
@@ -2713,7 +2461,7 @@ function OverallAssetReport() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdfMaterial("overall");
+              downloadPdfMaterial('overall');
               setIsPdfFilterOpenmat(false);
             }}
           >
@@ -2724,19 +2472,9 @@ function OverallAssetReport() {
 
       {/* EXTERNAL COMPONENTS -------------- START */}
       {/* VALIDATION */}
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
 
       {/* EXTERNAL COMPONENTS -------------- END */}
     </Box>

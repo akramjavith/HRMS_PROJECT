@@ -111,10 +111,10 @@ const NavbarSwitch = styled((props) => (
   },
 }));
 
-function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendor,vendorasset,vendorGroupasset,handover }) {
-  
-  console.log(handover,"handover")
-    const [openPopupMalert, setOpenPopupMalert] = useState(false);
+function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendor, vendorasset, vendorGroupasset, handover }) {
+
+  console.log(stockedit, "stockedit")
+  const [openPopupMalert, setOpenPopupMalert] = useState(false);
   const [popupContentMalert, setPopupContentMalert] = useState("");
   const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
   const handleClickOpenPopupMalert = () => {
@@ -181,8 +181,8 @@ function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendo
   } = useContext(UserRoleAccessContext);
   const [showAlert, setShowAlert] = useState();
   const [isErrorOpen, setIsErrorOpen] = useState(false);
-  const [vendor,setVendor] = useState(vendorasset);
-  const [vendorGroup,setVendorGroup] = useState(vendorGroupasset);
+  const [vendor, setVendor] = useState(vendorasset);
+  const [vendorGroup, setVendorGroup] = useState(vendorGroupasset);
   const [materialOpt, setMaterialopt] = useState([]);
   const [vendorOpt, setVendoropt] = useState([]);
   const [vendorOptInd, setVendoroptInd] = useState([]);
@@ -205,31 +205,31 @@ function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendo
   //   post call setstate
   const [assetdetail, setAssetdetail] = useState({
     company: stockedit.company,
-        branch: stockedit.branch,
-        unit: stockedit.unit,
-        floor: stockedit.floor,
-        area: stockedit.area,
-        location: stockedit.location,
+    branch: stockedit.branch,
+    unit: stockedit.unit,
+    floor: stockedit.floor,
+    area: stockedit.area,
+    location: stockedit.location,
     workstation: stockedit.workstation,
     workcheck: false,
     department: "Please Select Department",
     responsibleteam: "Please Select Responsible Person",
     team: "Please Select Responsible Team",
-   assettype: stockedit.assettype,
-        asset: stockedit.asset,
-        material: stockedit.productname,
-        component: stockedit.component,
+    assettype: stockedit.assettype,
+    asset: stockedit.asset,
+    material: stockedit.productname,
+    component: stockedit.component,
     branchcode: "",
     companycode: "",
     code: "",
     countquantity: 1,
-    asset:stockedit.producthhead,
+    asset: stockedit.producthhead,
     materialcountcode: 0,
     serial: "",
     rate: "",
     warranty: stockedit.warranty,
 
-    warrantycalculation:stockedit.warrantycalculation,
+    warrantycalculation: stockedit.warrantycalculation,
     estimation: stockedit.estimation,
     estimationtime: stockedit.estimationtime,
     asset: stockedit.producthead,
@@ -288,7 +288,7 @@ function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendo
     setIsDeleteOpenalert(true);
   };
 
-  console.log(todos,todos.brand,"todos")
+  console.log(todos, todos.brand, "todos")
 
   const handleAddInput = async (e) => {
     setAssetdetail({ ...assetdetail, component: e });
@@ -306,10 +306,10 @@ function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendo
       (item) => e === item.categoryname
     );
 
-    console.log(specificationItem,e,"dffaser")
+    console.log(specificationItem, e, "dffaser")
     let filtersub = specificationItem?.subcategoryname;
     let result;
-   console.log(filtersub,"filtersub")
+    console.log(filtersub, "filtersub")
     if (filtersub.length > 0) {
       result = filtersub?.map((sub, index) => {
         let strings = assetdetail.code + "#" + autovalid;
@@ -486,13 +486,13 @@ function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendo
       ];
     }
     setTodos(result);
-    console.log(result,"result")
+    console.log(result, "result")
     setVendoroptInd(new Array(result.length).fill(vendorOpt));
   };
 
-  useEffect(() =>{
-    handleAddInput(assetdetail.component)
-  },[assetdetail.component,stockedit.component])
+  useEffect(() => {
+    handleAddInput(stockedit.component)
+  }, [stockedit.component, Specification, stockedit.productname])
 
   const calculateTotalRate = () => {
     let sum = 0;
@@ -598,82 +598,25 @@ function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendo
   //cancel for create section
   const handleClear = async () => {
     try {
-      let res = await axios.get(SERVICE.ASSETS, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-      });
-      const resultall = res?.data?.assetmaterial.map((d) => ({
-        ...d,
-        label: d.name,
-        value: d.name,
-        assettype: d.assettype,
-        asset: d.assethead,
-      }));
 
-      const assetmaterialuniqueArray = resultall.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) => i.label === item.label && i.value === item.value
-          ) === index
-        );
-      });
-
-      setMaterialopt(assetmaterialuniqueArray);
       setFloors([]);
-      setPreviewURL(null);
-      setVendorGroup("Please Select Vendor Group");
-      setVendoropt([]);
-      setSpecification([])
+
       setAreas([])
       setLocations([{ label: "ALL", value: "ALL" }]);
-      setTodos([]);
+
       setAssetdetail({
+        ...assetdetail,
         company: "Please Select Company",
         branch: "Please Select Branch",
         unit: "Please Select Unit",
         floor: "Please Select Floor",
         area: "Please Select Area",
         location: "Please Select Location",
-        department: "Please Select Department",
-        responsibleteam: "Please Select Responsible Person",
-        team: "Please Select Responsible Team",
-        assettype: "",
-        asset: "",
-        material: "Please Select Material",
-        component: "Please Select Component",
-        branchcode: "",
-        companycode: "",
-        code: "",
-        countquantity: 1,
-        materialcountcode: 0,
-        brand: "Please Select Brand",
-        serial: "",
-        rate: "",
-        overallrate: true,
-        warranty: "Yes",
-        warrantycalculation: "",
-        estimation: "",
-        estimationtime: "Days",
-        purchasedate: "",
-        address: "",
-        phonenumber: "",
-        vendor: "Please Select Vendor ",
-        customercare: "",
-        stockcode: stockCodeCount,
-        workstation: "",
-        workcheck: false,
         ebusage: "Please Select EB Usage",
         biometric: "Please Select Biometric",
       });
-      setSelectedPurchaseDate("");
-      setVendor("Please Select Vendor ");
-      setVendorgetid({ address: "", phonenumber: "" });
       setPopupContent("Cleared Successfully");
       setPopupSeverity("success");
-      setRefImage([])
-      setCapturedImages([])
-      setRefImageDrag([])
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -1027,7 +970,7 @@ function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendo
 
 
   const handleChangeGroupName = async (e) => {
-    console.log(e,vendorOverall,"e")
+    console.log(e, vendorOverall, "e")
     let foundDatas = vendorOverall
       .filter((data) => {
         return data.name == e.value;
@@ -1054,14 +997,22 @@ function AssetDetails({ sendDataToParentUI, stockedit, handleCloseviewalertvendo
     setVendoropt(final);
   };
 
-    useEffect(() =>{
+  useEffect(() => {
 
-fetchspecification(assetdetail.material)
-  },[assetdetail.material,assetdetail.component])
+    fetchspecification(assetdetail.material)
+  }, [assetdetail.material, assetdetail.component])
 
-  useEffect(() =>{
-handleChangeGroupName({value:vendorGroupasset})
-  },[vendorGroupasset,vendorOverall])
+
+
+  useEffect(() => {
+
+    vendorid(stockedit.vendorid)
+  }, [stockedit.vendorid])
+
+
+  useEffect(() => {
+    handleChangeGroupName({ value: vendorGroupasset })
+  }, [vendorGroupasset, vendorOverall])
 
   const handleChangeGroupNameIndexBased = async (e, index) => {
     let foundDatas = vendorOverall
@@ -1119,12 +1070,12 @@ handleChangeGroupName({value:vendorGroupasset})
   };
 
 
-    useEffect(() => {
-  
-      fetchFloor(stockedit.branch);
-      fetchArea(stockedit.branch, stockedit.floor);
-      fetchLocation(stockedit.branch, stockedit.floor, stockedit.area);
-    }, [stockedit]);
+  useEffect(() => {
+
+    fetchFloor(stockedit.branch);
+    fetchArea(stockedit.branch, stockedit.floor);
+    fetchLocation(stockedit.branch, stockedit.floor, stockedit.area);
+  }, [stockedit]);
 
 
 
@@ -1345,8 +1296,8 @@ handleChangeGroupName({value:vendorGroupasset})
         area: String(assetdetail.area),
         ebusage: String(assetdetail.ebusage),
         biometric: String(assetdetail.biometric),
-        productname:String(assetdetail.material),
-        countquantity:String(assetdetail.countquantity),
+        productname: String(assetdetail.material),
+        countquantity: String(assetdetail.countquantity),
         workstation: String(
           assetdetail.workcheck === "Please Select Workstation" ? "" : assetdetail.workstation
         ),
@@ -1444,37 +1395,37 @@ handleChangeGroupName({value:vendorGroupasset})
       setPopupSeverity("success");
       handleClickOpenPopup();
 
-      setAssetdetail({
-        ...assetdetail,
-        branchcode: "",
-        companycode: "",
-        countquantity: 1,
-        brand: "Please Select Brand",
-        workstation: "Please Select Workstation",
-        workcheck: false,
-        serial: "",
-        rate: "",
-        warrantycalculation: "",
-        estimation: "",
-        estimationtime: "Days",
-        component: "Please Select Component",
-        customercare: "",
-        stockcode: stockCodeCount,
-      });
-      setTodos([]);
-        sendDataToParentUI(true);
-      await handleFileUpload([...refImage, ...refImageDrag, ...capturedImages], "bill", uniqueId);
-      await fetchAssetAll(assetdetail.material);
-      await fetchMaintentance();
-      await fetchMaintentanceIndividual();
-      await fetchAsset(
-        assetdetail.material,
-        assetdetail.code,
-        assetdetail.assettype,
-        assetdetail.asset,
-        assetdetail.countquantity
-      );
-        handleCloseviewalertvendor();
+      // setAssetdetail({
+      //   ...assetdetail,
+      //   branchcode: "",
+      //   companycode: "",
+      //   countquantity: 1,
+      //   brand: "Please Select Brand",
+      //   workstation: "Please Select Workstation",
+      //   workcheck: false,
+      //   serial: "",
+      //   rate: "",
+      //   warrantycalculation: "",
+      //   estimation: "",
+      //   estimationtime: "Days",
+      //   component: "Please Select Component",
+      //   customercare: "",
+      //   stockcode: stockCodeCount,
+      // });
+      // setTodos([]);
+      // sendDataToParentUI(true);
+      // await handleFileUpload([...refImage, ...refImageDrag, ...capturedImages], "bill", uniqueId);
+      // await fetchAssetAll(assetdetail.material);
+      // await fetchMaintentance();
+      // await fetchMaintentanceIndividual();
+      // await fetchAsset(
+      //   assetdetail.material,
+      //   assetdetail.code,
+      //   assetdetail.assettype,
+      //   assetdetail.asset,
+      //   assetdetail.countquantity
+      // );
+      handleCloseviewalertvendor();
     } catch (err) {
       console.log(err, "errsend")
       setloadingdeloverall(false);
@@ -1692,13 +1643,13 @@ handleChangeGroupName({value:vendorGroupasset})
       setPopupContentMalert("Please Select Component!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
-    } 
-    else if (assetdetail.biometric === "Yes" &&   todos.some(d =>d.subcomponentcheck === true&& d.brand && (d.brand === "Please Select Brand" || d.brand === ""))) {
+    }
+    else if (assetdetail.biometric === "Yes" && todos.some(d => d.subcomponentcheck === true && d.brand && (d.brand === "Please Select Brand" || d.brand === ""))) {
       setPopupContentMalert("Please Select Brand");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
     }
-    else if (assetdetail.biometric === "Yes" &&   todos.some(d =>d.subcomponentcheck === true && d.model && (d.model === "Please Select Model" || d.model === ""))) {
+    else if (assetdetail.biometric === "Yes" && todos.some(d => d.subcomponentcheck === true && d.model && (d.model === "Please Select Model" || d.model === ""))) {
       setPopupContentMalert("Please Select Model");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
@@ -1707,19 +1658,19 @@ handleChangeGroupName({value:vendorGroupasset})
       setPopupContentMalert("Please Enter Count(Qty)!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
-    } 
-     else if (handover.balancedcount < assetdetail.countquantity) {
+    }
+    else if (handover.balancedcount < assetdetail.countquantity) {
       setPopupContentMalert("Please Enter Less Than Balance Count!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
-    } 
+    }
     else if (checkbalance && checkbalance.balancedcount === 0) {
       setPopupContentMalert("Not Enough Material!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
-    } 
- 
-    
+    }
+
+
     else {
       sendRequest(isNameMatch);
     }
@@ -2692,14 +2643,14 @@ handleChangeGroupName({value:vendorGroupasset})
                   <MenuItem value="Yes"> {"Yes"} </MenuItem>
                   <MenuItem value="No"> {"No"} </MenuItem>
                 </Select> */}
-                 <OutlinedInput
-                          id="component-outlined"
-                        //   type="text"
-                        //   placeholder="Enter Time"
-                          value={assetdetail.warranty}
-                          readOnly
-                        //   onChange={(e) => handleChangephonenumber(e)}
-                        />
+                <OutlinedInput
+                  id="component-outlined"
+                  //   type="text"
+                  //   placeholder="Enter Time"
+                  value={assetdetail.warranty}
+                  readOnly
+                //   onChange={(e) => handleChangephonenumber(e)}
+                />
               </FormControl>
             </Grid>
             {assetdetail.warranty === "Yes" && (
@@ -2714,7 +2665,7 @@ handleChangeGroupName({value:vendorGroupasset})
                         <OutlinedInput
                           id="component-outlined"
                           type="text"
-                        //   placeholder="Enter Time"
+                          //   placeholder="Enter Time"
                           value={assetdetail.estimation}
                           readOnly
                         //   onChange={(e) => handleChangephonenumber(e)}
@@ -2741,12 +2692,12 @@ handleChangeGroupName({value:vendorGroupasset})
                         <MenuItem value="Month"> {"Month"} </MenuItem>
                         <MenuItem value="Year"> {"Year"} </MenuItem>
                       </Select> */}
-                      <OutlinedInput id="component-outlined"  
-                                                  size="small"
-                                                  value={assetdetail.estimationtime}
-                                                    readOnly
-                                                  //  onChange={(e) => handleChangephonenumber(e)} 
-                                                   />
+                      <OutlinedInput id="component-outlined"
+                        size="small"
+                        value={assetdetail.estimationtime}
+                        readOnly
+                      //  onChange={(e) => handleChangephonenumber(e)} 
+                      />
                     </Grid>
                   </Grid>
                 </Grid>
@@ -2757,7 +2708,7 @@ handleChangeGroupName({value:vendorGroupasset})
                 <Typography>Purchase date </Typography>
                 <OutlinedInput
                   id="component-outlined"
-                   value={stockedit.purchasedate}
+                  value={stockedit.purchasedate}
                 //   type="date"
                 //   value={selectedPurchaseDate}
                 //   onChange={handlePurchaseDateChange}
@@ -2771,7 +2722,7 @@ handleChangeGroupName({value:vendorGroupasset})
                     <Typography>Expiry Date </Typography>
                     <OutlinedInput
                       id="component-outlined"
-                    //   type="text"
+                      //   type="text"
                       value={assetdetail.warrantycalculation}
                       readOnly
                     />
@@ -2807,7 +2758,7 @@ handleChangeGroupName({value:vendorGroupasset})
                     fetchAssetAll(e.value);
                   }}
                 /> */}
-                  <OutlinedInput
+                <OutlinedInput
                   id="component-outlined"
                   type="text"
                   value={assetdetail.material}
@@ -6339,11 +6290,11 @@ handleChangeGroupName({value:vendorGroupasset})
                 Clear
               </Button>
             </Grid>
-             <Grid item lg={1} md={2} sm={2} xs={12} marginTop={3}>
-                                        <Button sx={buttonStyles.btncancel} onClick={handleCloseviewalertvendor}>
-                                            Cancel
-                                        </Button>
-                                    </Grid>
+            <Grid item lg={1} md={2} sm={2} xs={12} marginTop={3}>
+              <Button sx={buttonStyles.btncancel} onClick={handleCloseviewalertvendor}>
+                Cancel
+              </Button>
+            </Grid>
           </Grid>
         </Box>
       )}

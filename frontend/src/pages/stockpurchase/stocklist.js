@@ -1,103 +1,128 @@
-import React, { useContext, useEffect, useRef, useState, useMemo, useCallback } from "react";
+import React, { useContext, useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { FaEdit, FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch } from 'react-icons/fa';
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import InfoIcon from "@mui/icons-material/Info";
+import InfoIcon from '@mui/icons-material/Info';
 import AssignmentReturnedIcon from '@mui/icons-material/AssignmentReturned';
-import DeleteIcon from "@mui/icons-material/Delete";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import ImageIcon from "@mui/icons-material/Image";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import LoadingButton from "@mui/lab/LoadingButton";
+import DeleteIcon from '@mui/icons-material/Delete';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ImageIcon from '@mui/icons-material/Image';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Accordion as MUIAccordion,
   AccordionSummary,
-  AccordionDetails, Box, Button, Checkbox, Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton, InputLabel, MenuItem, OutlinedInput, Paper, Popover, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextareaAutosize, Typography, InputAdornment, Tooltip
-} from "@mui/material";
+  AccordionDetails,
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Paper,
+  Popover,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextareaAutosize,
+  Typography,
+  InputAdornment,
+  Tooltip,
+} from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Stack from '@mui/material/Stack';
-import axios from "axios";
-import { saveAs } from "file-saver";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import { handleApiError } from "../../components/Errorhandling";
-import Headtitle from "../../components/Headtitle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { userStyle, colourStyles } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
-import Webcamimage from "../hr/webcamprofile";
-import { IoMdOptions } from "react-icons/io";
-import { MdClose } from "react-icons/md";
+import axios from '../../axiosInstance';
+import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import { handleApiError } from '../../components/Errorhandling';
+import Headtitle from '../../components/Headtitle';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { userStyle, colourStyles } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
+import Webcamimage from '../hr/webcamprofile';
+import { IoMdOptions } from 'react-icons/io';
+import { MdClose } from 'react-icons/md';
 import domtoimage from 'dom-to-image';
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import ExportData from "../../components/ExportData";
-import MessageAlert from "../../components/MessageAlert";
-import PageHeading from "../../components/PageHeading";
-import AlertDialog from "../../components/Alert";
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import ExportData from '../../components/ExportData';
+import MessageAlert from '../../components/MessageAlert';
+import PageHeading from '../../components/PageHeading';
+import AlertDialog from '../../components/Alert';
 import AdvancedSearchBar from '../../components/Searchbar';
-import ManageColumnsContent from "../../components/ManageColumn";
+import ManageColumnsContent from '../../components/ManageColumn';
 import ResizeObserver from 'resize-observer-polyfill';
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from 'react-router-dom';
 window.ResizeObserver = ResizeObserver;
 
 function StockList() {
-  const logid = useParams().id
+  const logid = useParams().id;
   let today = new Date();
 
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
   var yyyy = today.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
 
   const gridRefTableTeamLveVerif = useRef(null);
   const gridRefImageTeamLveVerif = useRef(null);
   const [isBtn, setIsBtn] = useState(false);
-  const [Accessdrop, setAccesDrop] = useState("Employee");
-  const [AccessdropEdit, setAccesDropEdit] = useState("Employee");
+  const [Accessdrop, setAccesDrop] = useState('Employee');
+  const [AccessdropEdit, setAccesDropEdit] = useState('Employee');
   const modeDropDowns = [
-    { label: "Asset", value: "Asset" },
-    { label: "Stock", value: "Stock" },
+    { label: 'Asset', value: 'Asset' },
+    { label: 'Stock', value: 'Stock' },
   ];
   const sectorDropDowns = [
-    { label: "Primary", value: "Primary" },
-    { label: "Secondary", value: "Secondary" },
-    { label: "Tertiary", value: "Tertiary" },
-    { label: "All", value: "all" },
+    { label: 'Primary', value: 'Primary' },
+    { label: 'Secondary', value: 'Secondary' },
+    { label: 'Tertiary', value: 'Tertiary' },
+    { label: 'All', value: 'all' },
   ];
   const [modeselection, setModeSelection] = useState({
-    label: "Asset",
-    value: "Asset",
+    label: 'Asset',
+    value: 'Asset',
   });
   const [sectorSelection, setSectorSelection] = useState({
-    label: "Primary",
-    value: "Primary",
+    label: 'Primary',
+    value: 'Primary',
   });
   const [appleave, setAppleave] = useState({
-    employeename: "Please Select Employee Name",
-    employeeid: "",
-    leavetype: "Please Select LeaveType",
-    date: "",
-    todate: "",
-    reasonforleave: "",
-    reportingto: "",
-    department: "",
-    designation: "",
-    doj: "",
-    availabledays: "",
-    durationtype: "Random",
-    weekoff: "",
-    workmode: "",
+    employeename: 'Please Select Employee Name',
+    employeeid: '',
+    leavetype: 'Please Select LeaveType',
+    date: '',
+    todate: '',
+    reasonforleave: '',
+    reportingto: '',
+    department: '',
+    designation: '',
+    doj: '',
+    availabledays: '',
+    durationtype: 'Random',
+    weekoff: '',
+    workmode: '',
   });
 
   const [appleaveEdit, setAppleaveEdit] = useState([]);
@@ -113,63 +138,42 @@ function StockList() {
   const [filteredDataItems, setFilteredDataItems] = useState(applyleaves);
   const [filteredRowData, setFilteredRowData] = useState([]);
 
-  const [leave, setLeave] = useState("Please Select LeaveType");
-  const [leaveEdit, setLeaveEdit] = useState("Please Select LeaveType");
+  const [leave, setLeave] = useState('Please Select LeaveType');
+  const [leaveEdit, setLeaveEdit] = useState('Please Select LeaveType');
 
   const { isUserRoleCompare, allProjects, isUserRoleAccess, pageName, setPageName, buttonStyles, isAssignBranch } = useContext(UserRoleAccessContext);
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [
-          "asset/assetlist",
-          "/asset/assetlist",
-        ];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
+
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = ['asset/assetlist', '/asset/assetlist'];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
   const { auth } = useContext(AuthContext);
 
   const [applyleaveCheck, setApplyleavecheck] = useState(true);
@@ -177,41 +181,61 @@ function StockList() {
   const [selectedRows, setSelectedRows] = useState([]);
 
   const [statusOpen, setStatusOpen] = useState(false);
-  const handleStatusOpen = () => { setStatusOpen(true); };
-  const handleStatusClose = () => { setStatusOpen(false); };
+  const handleStatusOpen = () => {
+    setStatusOpen(true);
+  };
+  const handleStatusClose = () => {
+    setStatusOpen(false);
+  };
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
   // page refersh reload
-  const handleCloseFilterMod = () => { setIsFilterOpen(false); };
-  const handleClosePdfFilterMod = () => { setIsPdfFilterOpen(false); };
+  const handleCloseFilterMod = () => {
+    setIsFilterOpen(false);
+  };
+  const handleClosePdfFilterMod = () => {
+    setIsPdfFilterOpen(false);
+  };
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
-  const handleClickOpenPopupMalert = () => { setOpenPopupMalert(true); };
-  const handleClosePopupMalert = () => { setOpenPopupMalert(false); };
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
+  const handleClickOpenPopupMalert = () => {
+    setOpenPopupMalert(true);
+  };
+  const handleClosePopupMalert = () => {
+    setOpenPopupMalert(false);
+  };
 
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
-  const handleClickOpenPopup = () => { setOpenPopup(true); };
-  const handleClosePopup = () => { setOpenPopup(false); }
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
+  const handleClickOpenPopup = () => {
+    setOpenPopup(true);
+  };
+  const handleClosePopup = () => {
+    setOpenPopup(false);
+  };
 
   //Datatable
   const [pageTeamLveVerif, setPageTeamLveVerif] = useState(1);
   const [pageSizeTeamLveVerif, setPageSizeTeamLveVerif] = useState(10);
-  const [searchQueryTeamLveVerif, setSearchQueryTeamLveVerif] = useState("");
+  const [searchQueryTeamLveVerif, setSearchQueryTeamLveVerif] = useState('');
   const [totalPagesTeamLveVerif, setTotalPagesTeamLveVerif] = useState(1);
 
   // Error Popup model
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const [showAlert, setShowAlert] = useState();
-  const handleClickOpenerr = () => { setIsErrorOpen(true); };
-  const handleCloseerr = () => { setIsErrorOpen(false); };
+  const handleClickOpenerr = () => {
+    setIsErrorOpen(true);
+  };
+  const handleCloseerr = () => {
+    setIsErrorOpen(false);
+  };
 
   // Manage Columns
-  const [searchQueryManageTeamLveVerif, setSearchQueryManageTeamLveVerif] = useState("");
+  const [searchQueryManageTeamLveVerif, setSearchQueryManageTeamLveVerif] = useState('');
   const [isManageColumnsOpenTeamLveVerif, setManageColumnsOpenTeamLveVerif] = useState(false);
   const [anchorElTeamLveVerif, setAnchorElTeamLveVerif] = useState(null);
 
@@ -221,11 +245,11 @@ function StockList() {
   };
   const handleCloseManageColumnsTeamLveVerif = () => {
     setManageColumnsOpenTeamLveVerif(false);
-    setSearchQueryManageTeamLveVerif("");
+    setSearchQueryManageTeamLveVerif('');
   };
 
   const openTeamLveVerif = Boolean(anchorElTeamLveVerif);
-  const idTeamLveVerif = openTeamLveVerif ? "simple-popover" : undefined;
+  const idTeamLveVerif = openTeamLveVerif ? 'simple-popover' : undefined;
 
   // Search bar
   const [anchorElSearchTeamLveVerif, setAnchorElSearchTeamLveVerif] = React.useState(null);
@@ -234,7 +258,7 @@ function StockList() {
   };
   const handleCloseSearchTeamLveVerif = () => {
     setAnchorElSearchTeamLveVerif(null);
-    setSearchQueryTeamLveVerif("");
+    setSearchQueryTeamLveVerif('');
   };
 
   const openSearchTeamLveVerif = Boolean(anchorElSearchTeamLveVerif);
@@ -247,36 +271,15 @@ function StockList() {
     } else {
       return { background: '#ffffff' }; // Odd row
     }
-  }
-
-
-
-
+  };
 
   //webcam
 
-
-
   //add webcamera popup
-
-
-
-
-
-
-
-
-
 
   //---------------------------------------------------------------------------------------------------------------
 
-
   //------------------------------------------------------------------------------------------------------------
-
-
-
-
-
 
   // Show All Columns & Manage Columns
   const initialColumnVisibilityTeamLveVerif = {
@@ -310,21 +313,21 @@ function StockList() {
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   let dateselect = new Date();
   dateselect.setDate(dateselect.getDate() + 3);
-  var ddt = String(dateselect.getDate()).padStart(2, "0");
-  var mmt = String(dateselect.getMonth() + 1).padStart(2, "0");
+  var ddt = String(dateselect.getDate()).padStart(2, '0');
+  var mmt = String(dateselect.getMonth() + 1).padStart(2, '0');
   var yyyyt = dateselect.getFullYear();
-  let formattedDatet = yyyyt + "-" + mmt + "-" + ddt;
+  let formattedDatet = yyyyt + '-' + mmt + '-' + ddt;
 
   let datePresent = new Date();
   var ddp = String(datePresent.getDate());
   var mmp = String(datePresent.getMonth() + 1);
   var yyyyp = datePresent.getFullYear();
-  let formattedDatePresent = yyyyp + "-" + mmp + "-" + ddp;
+  let formattedDatePresent = yyyyp + '-' + mmp + '-' + ddp;
 
   // Assuming appleave.date is the "from date" and appleave.todate is the "to date"
   const calculateDaysDifference = () => {
@@ -333,9 +336,7 @@ function StockList() {
 
     if (!isNaN(fromDate) && !isNaN(toDate)) {
       // Calculate the number of days between the two dates
-      const daysDifference = Math.floor(
-        (toDate - fromDate) / (1000 * 60 * 60 * 24)
-      );
+      const daysDifference = Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24));
       return daysDifference + 1;
     }
 
@@ -352,21 +353,12 @@ function StockList() {
 
     if (!isNaN(fromDate) && !isNaN(toDate)) {
       // Calculate the number of days between the two dates
-      const daysDifferenceEdit = Math.floor(
-        (toDate - fromDate) / (1000 * 60 * 60 * 24)
-      );
+      const daysDifferenceEdit = Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24));
       return daysDifferenceEdit + 1;
     }
 
     return 0; // Return 0 if either date is invalid
   };
-
-
-
-
-
-
-
 
   //Project updateby edit page...
 
@@ -376,20 +368,20 @@ function StockList() {
 
   useEffect(() => {
     fetchApplyleave();
-  }, [])
+  }, []);
   //get all Sub vendormasters.
-  const [materialName, setMaterialName] = useState("")
+  const [materialName, setMaterialName] = useState('');
   const fetchApplyleave = async () => {
     setApplyleavecheck(false);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_employee = await axios.post(`${SERVICE.ASSET_STOCK_DETAIL_VIEW}`, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
-        view: "asset",
+        view: 'asset',
         materialid: logid,
-        accessbranch
+        accessbranch,
       });
       setApplyleavecheck(true);
 
@@ -401,14 +393,11 @@ function StockList() {
       //   (data) => data.status === "In Working" || data.status === "Repair" || data.status === "Damage"
       // ) : []
       const itemsWithSerialNumber = answer?.map((item, index) => {
-
         return {
           ...item,
           serialNumber: index + 1,
-          purchasedate: (item.purchasedate === "Invalid date" || item.purchasedate === "" || item.purchasedate === undefined) ? "" : moment(item.purchasedate).format("DD/MM/YYYY"),
-          workstation: item.workstation === "Please Select Workstation" ? "" : item.workstation,
-
-
+          purchasedate: item.purchasedate === 'Invalid date' || item.purchasedate === '' || item.purchasedate === undefined ? '' : moment(item.purchasedate).format('DD/MM/YYYY'),
+          workstation: item.workstation === 'Please Select Workstation' ? '' : item.workstation,
 
           id: item._id,
           company: item.company,
@@ -437,32 +426,32 @@ function StockList() {
           files: item.files,
           status: item.status,
           distributed: item?.distributed,
-          distributedstring: item?.distributed ? "Yes" : "No",
-          distributedto: item?.distributedto || "",
-
-        }
+          distributedstring: item?.distributed ? 'Yes' : 'No',
+          distributedto: item?.distributedto || '',
+        };
       });
-      setMaterialName(res_employee?.data?.returnmaterialData?.name)
+      setMaterialName(res_employee?.data?.returnmaterialData?.name);
       setApplyleaves(itemsWithSerialNumber);
       setIsApplyLeave([]);
-    } catch (err) { setApplyleavecheck(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setApplyleavecheck(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //id for login...
 
-  useEffect(() => {
-  }, [appleaveEdit, appleave,]);
+  useEffect(() => {}, [appleaveEdit, appleave]);
 
   useEffect(() => {
     // fetchLeaveVerification();
-
   }, []);
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -480,13 +469,12 @@ function StockList() {
     addSerialNumber();
   }, [applyleaves]);
 
-
   const defaultColDef = useMemo(() => {
     return {
       filter: true,
       resizable: true,
       filterParams: {
-        buttons: ["apply", "reset", "cancel"],
+        buttons: ['apply', 'reset', 'cancel'],
       },
     };
   }, []);
@@ -526,8 +514,6 @@ function StockList() {
     }
   }, []);
 
-
-
   // Pagination for outer filter
   const filteredData = filteredDataItems?.slice((pageTeamLveVerif - 1) * pageSizeTeamLveVerif, pageTeamLveVerif * pageSizeTeamLveVerif);
   const totalPagesTeamLveVerifOuter = Math.ceil(filteredDataItems?.length / pageSizeTeamLveVerif);
@@ -537,8 +523,9 @@ function StockList() {
   const pageNumbers = [];
   const indexOfLastItem = pageTeamLveVerif * pageSizeTeamLveVerif;
   const indexOfFirstItem = indexOfLastItem - pageSizeTeamLveVerif;
-  for (let i = firstVisiblePage; i <= lastVisiblePage; i++) { pageNumbers.push(i); }
-
+  for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
+    pageNumbers.push(i);
+  }
 
   const [isimgviewbill, setImgviewbill] = useState(false);
   const handleImgcodeviewbill = () => {
@@ -551,9 +538,9 @@ function StockList() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   const [getimgbillcode, setGetImgbillcode] = useState([]);
@@ -562,39 +549,35 @@ function StockList() {
     handleImgcodeviewbill();
   };
 
-
   const columnDataTableTeamLveVerif = [
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 80,
       hide: !columnVisibilityTeamLveVerif?.serialNumber,
-      headerClassName: "bold-header", pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
 
     {
-      field: "status",
-      headerName: "Status",
+      field: 'status',
+      headerName: 'Status',
       flex: 0,
       width: 140,
       hide: !columnVisibilityTeamLveVerif.status,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <Button
           variant="contained"
           style={{
-            padding: "5px",
-            backgroundColor:
-              params.data.status === "Repair"
-                ? "#FFC300"
-                : params.data.status === "In Working"
-                  ? "green"
-                  : "blue",
-            color: params.data.status === "Repair" ? "black" : "white",
-            fontSize: "10px",
-            width: "90px",
-            fontWeight: "bold",
+            padding: '5px',
+            backgroundColor: params.data.status === 'Repair' ? '#FFC300' : params.data.status === 'In Working' ? 'green' : 'blue',
+            color: params.data.status === 'Repair' ? 'black' : 'white',
+            fontSize: '10px',
+            width: '90px',
+            fontWeight: 'bold',
           }}
         >
           {params.data.status}
@@ -602,184 +585,184 @@ function StockList() {
       ),
     },
     {
-      field: "distributedstring",
-      headerName: "Distributed",
+      field: 'distributedstring',
+      headerName: 'Distributed',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.distributedstring,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "distributedto",
-      headerName: "Distributed To",
+      field: 'distributedto',
+      headerName: 'Distributed To',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.distributedto,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.company,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.branch,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.unit,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "floor",
-      headerName: "Floor",
+      field: 'floor',
+      headerName: 'Floor',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.floor,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "area",
-      headerName: "Area",
+      field: 'area',
+      headerName: 'Area',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.area,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "location",
-      headerName: "Location",
+      field: 'location',
+      headerName: 'Location',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.location,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "workstation",
-      headerName: "WorkStation",
+      field: 'workstation',
+      headerName: 'WorkStation',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.workstation,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "asset",
-      headerName: "Asset",
+      field: 'asset',
+      headerName: 'Asset',
       flex: 0,
       width: 150,
       hide: !columnVisibilityTeamLveVerif.asset,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "assettype",
-      headerName: "Asset Type",
+      field: 'assettype',
+      headerName: 'Asset Type',
       flex: 0,
       width: 150,
       hide: !columnVisibilityTeamLveVerif.assettype,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "material",
-      headerName: "Material",
+      field: 'material',
+      headerName: 'Material',
       flex: 0,
       width: 150,
       hide: !columnVisibilityTeamLveVerif.material,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "component",
-      headerName: "Component",
+      field: 'component',
+      headerName: 'Component',
       flex: 0,
       width: 150,
       hide: !columnVisibilityTeamLveVerif.component,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "code",
-      headerName: "Material Code",
+      field: 'code',
+      headerName: 'Material Code',
       flex: 0,
       width: 150,
       hide: !columnVisibilityTeamLveVerif.code,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "countquantity",
-      headerName: "Count(Qty)",
+      field: 'countquantity',
+      headerName: 'Count(Qty)',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.countquantity,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "rate",
-      headerName: "Rate",
+      field: 'rate',
+      headerName: 'Rate',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.rate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "warranty",
-      headerName: "Warranty",
+      field: 'warranty',
+      headerName: 'Warranty',
       flex: 0,
       width: 100,
       hide: !columnVisibilityTeamLveVerif.warranty,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "purchasedate",
-      headerName: "Purchasedate",
+      field: 'purchasedate',
+      headerName: 'Purchasedate',
       flex: 0,
       width: 150,
       hide: !columnVisibilityTeamLveVerif.purchasedate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "vendorgroup",
-      headerName: "Vendor Group",
+      field: 'vendorgroup',
+      headerName: 'Vendor Group',
       flex: 0,
       width: 150,
       hide: !columnVisibilityTeamLveVerif.vendorgroup,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "vendor",
-      headerName: "Vendor",
+      field: 'vendor',
+      headerName: 'Vendor',
       flex: 0,
       width: 150,
       hide: !columnVisibilityTeamLveVerif.vendor,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "files",
-      headerName: "Attachment",
+      field: 'files',
+      headerName: 'Attachment',
       flex: 0,
       width: 100,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibilityTeamLveVerif.files,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <>
           {params.data.files.length > 0 ? (
             <Button
               sx={{
-                padding: "14px 14px",
-                minWidth: "40px !important",
-                borderRadius: "50% !important",
-                ":hover": {
-                  backgroundColor: "#80808036", // theme.palette.primary.main
+                padding: '14px 14px',
+                minWidth: '40px !important',
+                borderRadius: '50% !important',
+                ':hover': {
+                  backgroundColor: '#80808036', // theme.palette.primary.main
                 },
               }}
               onClick={() => getimgbillCode(params.data.files)}
@@ -787,14 +770,11 @@ function StockList() {
               view
             </Button>
           ) : (
-            ""
+            ''
           )}
         </>
       ),
     },
-
-
-
 
     // {
     //   field: "actions",
@@ -808,8 +788,6 @@ function StockList() {
     //   cellRenderer: (params) => (
     //     <Grid sx={{ display: "flex" }}>
 
-
-
     //       {isUserRoleCompare?.includes("vallstockdetails") && (
 
     //         <Button
@@ -822,11 +800,9 @@ function StockList() {
     //         </Button>
     //       )}
 
-
     //     </Grid>
     //   ),
     // },
-
   ];
 
   // Datatable
@@ -837,18 +813,13 @@ function StockList() {
     setFilteredRowData([]);
   };
 
-
-
   const applyNormalFilter = (searchValue) => {
-
     // Split the search query into individual terms
-    const searchTerms = searchValue.toLowerCase().split(" ");
+    const searchTerms = searchValue.toLowerCase().split(' ');
 
     // Modify the filtering logic to check each term
     const filtered = items?.filter((item) => {
-      return searchTerms.every((term) =>
-        Object.values(item).join(" ").toLowerCase().includes(term)
-      );
+      return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
     });
     setFilteredDataItems(filtered);
     setPageTeamLveVerif(1);
@@ -864,28 +835,28 @@ function StockList() {
 
         let match;
         switch (condition) {
-          case "Contains":
+          case 'Contains':
             match = itemValue.includes(filterValue);
             break;
-          case "Does Not Contain":
+          case 'Does Not Contain':
             match = !itemValue?.includes(filterValue);
             break;
-          case "Equals":
+          case 'Equals':
             match = itemValue === filterValue;
             break;
-          case "Does Not Equal":
+          case 'Does Not Equal':
             match = itemValue !== filterValue;
             break;
-          case "Begins With":
+          case 'Begins With':
             match = itemValue.startsWith(filterValue);
             break;
-          case "Ends With":
+          case 'Ends With':
             match = itemValue.endsWith(filterValue);
             break;
-          case "Blank":
+          case 'Blank':
             match = !itemValue;
             break;
-          case "Not Blank":
+          case 'Not Blank':
             match = !!itemValue;
             break;
           default:
@@ -895,7 +866,7 @@ function StockList() {
         // Combine conditions with AND/OR logic
         if (index === 0) {
           return match; // First filter is applied directly
-        } else if (logicOperator === "AND") {
+        } else if (logicOperator === 'AND') {
           return acc && match;
         } else {
           return acc || match;
@@ -905,23 +876,25 @@ function StockList() {
 
     setFilteredDataItems(filtered);
     setAdvancedFilter(filters);
-    // handleCloseSearchTeamLveVerif(); 
+    // handleCloseSearchTeamLveVerif();
   };
 
   // Undo filter funtion
   const handleResetSearch = () => {
     setAdvancedFilter(null);
-    setSearchQueryTeamLveVerif("");
+    setSearchQueryTeamLveVerif('');
     setFilteredDataItems(applyleaves);
   };
 
   // Show filtered combination in the search bar
   const getSearchDisplay = () => {
     if (advancedFilter && advancedFilter.length > 0) {
-      return advancedFilter.map((filter, index) => {
-        let showname = columnDataTableTeamLveVerif.find(col => col.field === filter.column)?.headerName;
-        return `${showname} ${filter.condition} "${filter.value}"`;
-      }).join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
+      return advancedFilter
+        .map((filter, index) => {
+          let showname = columnDataTableTeamLveVerif.find((col) => col.field === filter.column)?.headerName;
+          return `${showname} ${filter.condition} "${filter.value}"`;
+        })
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQueryTeamLveVerif;
   };
@@ -948,7 +921,7 @@ function StockList() {
 
   useEffect(() => {
     // Retrieve column visibility from localStorage (if available)
-    const savedVisibility = localStorage.getItem("columnVisibilityTeamLveVerif");
+    const savedVisibility = localStorage.getItem('columnVisibilityTeamLveVerif');
     if (savedVisibility) {
       setColumnVisibilityTeamLveVerif(JSON.parse(savedVisibility));
     }
@@ -956,13 +929,11 @@ function StockList() {
 
   useEffect(() => {
     // Save column visibility to localStorage whenever it changes
-    localStorage.setItem("columnVisibilityTeamLveVerif", JSON.stringify(columnVisibilityTeamLveVerif));
+    localStorage.setItem('columnVisibilityTeamLveVerif', JSON.stringify(columnVisibilityTeamLveVerif));
   }, [columnVisibilityTeamLveVerif]);
 
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTableTeamLveVerif.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManageTeamLveVerif.toLowerCase())
-  );
+  const filteredColumns = columnDataTableTeamLveVerif.filter((column) => column.headerName.toLowerCase().includes(searchQueryManageTeamLveVerif.toLowerCase()));
 
   function debounce(func, wait) {
     let timeout;
@@ -989,25 +960,31 @@ function StockList() {
     });
   };
 
-  const handleColumnMoved = useCallback(debounce((event) => {
-    if (!event.columnApi) return;
+  const handleColumnMoved = useCallback(
+    debounce((event) => {
+      if (!event.columnApi) return;
 
-    const visible_columns = event.columnApi.getAllColumns().filter(col => {
-      const colState = event.columnApi.getColumnState().find(state => state.colId === col.colId);
-      return colState && !colState.hide;
-    }).map(col => col.colId);
+      const visible_columns = event.columnApi
+        .getAllColumns()
+        .filter((col) => {
+          const colState = event.columnApi.getColumnState().find((state) => state.colId === col.colId);
+          return colState && !colState.hide;
+        })
+        .map((col) => col.colId);
 
-    setColumnVisibilityTeamLveVerif((prevVisibility) => {
-      const updatedVisibility = { ...prevVisibility };
+      setColumnVisibilityTeamLveVerif((prevVisibility) => {
+        const updatedVisibility = { ...prevVisibility };
 
-      // Ensure columns that are visible stay visible
-      Object.keys(updatedVisibility).forEach(colId => {
-        updatedVisibility[colId] = visible_columns.includes(colId);
+        // Ensure columns that are visible stay visible
+        Object.keys(updatedVisibility).forEach((colId) => {
+          updatedVisibility[colId] = visible_columns.includes(colId);
+        });
+
+        return updatedVisibility;
       });
-
-      return updatedVisibility;
-    });
-  }, 300), []);
+    }, 300),
+    []
+  );
 
   const handleColumnVisible = useCallback((event) => {
     const colId = event.column.getColId();
@@ -1021,71 +998,27 @@ function StockList() {
 
   // Excel
   const [fileFormat, setFormat] = useState('');
-  let exportColumnNamescrt = [
-    "Status",
-    "Distributed",
-    "Distributedto",
-    "Company",
-    "Branch",
-    "Unit",
-    "Floor",
-    "Area",
-    "Location",
-    "Workstation",
-    "Asset",
-    "Assettype",
-    "Material",
-    "Component",
-    "Code",
-    "Countquantity",
-    "Rate",
-    "Warranty",
-    "Purchasedate",
-    "Vendorgroup",
-    "Vendor",
-  ]
-  let exportRowValuescrt = [
-    "status",
-    "distributedstring",
-    "distributedto",
-    "company",
-    "branch",
-    "unit",
-    "floor",
-    "area",
-    "location",
-    "workstation",
-    "asset",
-    "assettype",
-    "material",
-    "component",
-    "code",
-    "countquantity",
-    "rate",
-    "warranty",
-    "purchasedate",
-    "vendorgroup",
-    "vendor",
-  ]
+  let exportColumnNamescrt = ['Status', 'Distributed', 'Distributedto', 'Company', 'Branch', 'Unit', 'Floor', 'Area', 'Location', 'Workstation', 'Asset', 'Assettype', 'Material', 'Component', 'Code', 'Countquantity', 'Rate', 'Warranty', 'Purchasedate', 'Vendorgroup', 'Vendor'];
+  let exportRowValuescrt = ['status', 'distributedstring', 'distributedto', 'company', 'branch', 'unit', 'floor', 'area', 'location', 'workstation', 'asset', 'assettype', 'material', 'component', 'code', 'countquantity', 'rate', 'warranty', 'purchasedate', 'vendorgroup', 'vendor'];
 
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
     documentTitle: `View Asset ${materialName} Details`,
-    pageStyle: "print",
+    pageStyle: 'print',
   });
-
 
   // image
   const handleCaptureImage = () => {
     if (gridRefImageTeamLveVerif.current) {
-      domtoimage.toBlob(gridRefImageTeamLveVerif.current)
+      domtoimage
+        .toBlob(gridRefImageTeamLveVerif.current)
         .then((blob) => {
           saveAs(blob, `View_Asset_${materialName}_Details.png`);
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -1094,29 +1027,19 @@ function StockList() {
     <Box>
       <Headtitle title={`VIEW ASSET ${materialName?.toLocaleUpperCase()} DETAILS`} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title={`View Asset ${materialName} Details`}
-        modulename="Asset"
-        submodulename="Stock"
-        mainpagename="All Stock Details"
-        subpagename=""
-        subsubpagename=""
-      />
+      <PageHeading title={`View Asset ${materialName} Details`} modulename="Asset" submodulename="Stock" mainpagename="All Stock Details" subpagename="" subsubpagename="" />
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lallstockdetails") && (
+      {isUserRoleCompare?.includes('lallstockdetails') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
-
             <Grid container spacing={2}>
               <Grid item xs={8}>
-                <Typography sx={userStyle.importheadtext}>
-                  {`View Asset ${materialName} Details`}
-                </Typography>
+                <Typography sx={userStyle.importheadtext}>{`View Asset ${materialName} Details`}</Typography>
               </Grid>
               <Grid item md={3} xs={3}></Grid>
               <Grid item md={1} xs={1}>
-                <Link to={"/asset/overassetdetails"}>
+                <Link to={'/asset/overassetdetails'}>
                   <Button variant="contained" sx={buttonStyles.btncancel}>
                     Back
                   </Button>
@@ -1139,7 +1062,7 @@ function StockList() {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -1157,68 +1080,74 @@ function StockList() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes(
-                    "excelallstockdetails"
-                  ) && (
-                      <>
-                        <Button onClick={(e) => {
-                          setIsFilterOpen(true)
-                          setFormat("xl")
-                        }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
-                      </>
-                    )}
-                  {isUserRoleCompare?.includes("csvallstockdetails") && (
+                  {isUserRoleCompare?.includes('excelallstockdetails') && (
                     <>
-                      <Button onClick={(e) => {
-                        setIsFilterOpen(true)
-                        setFormat("csv")
-                      }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes(
-                    "printallstockdetails"
-                  ) && (
-                      <>
-                        <Button sx={userStyle.buttongrp} onClick={handleprint}>
-                          &ensp;
-                          <FaPrint />
-                          &ensp;Print&ensp;
-                        </Button>
-                      </>
-                    )}
-                  {isUserRoleCompare?.includes("pdfallstockdetails") && (
-                    <>
-                      <Button sx={userStyle.buttongrp}
-                        onClick={() => {
-                          setIsPdfFilterOpen(true)
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          setFormat('xl');
                         }}
-                      ><FaFilePdf />&ensp;Export to PDF&ensp;</Button>
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileExcel />
+                        &ensp;Export to Excel&ensp;
+                      </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes(
-                    "imageallstockdetails"
-                  ) && (
+                  {isUserRoleCompare?.includes('csvallstockdetails') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          setFormat('csv');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileCsv />
+                        &ensp;Export to CSV&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('printallstockdetails') && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                        &ensp;
+                        <FaPrint />
+                        &ensp;Print&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('pdfallstockdetails') && (
+                    <>
                       <Button
                         sx={userStyle.buttongrp}
-                        onClick={handleCaptureImage}
+                        onClick={() => {
+                          setIsPdfFilterOpen(true);
+                        }}
                       >
-                        {" "}
-                        <ImageIcon
-                          sx={{ fontSize: "15px" }}
-                        /> &ensp;Image&ensp;{" "}
+                        <FaFilePdf />
+                        &ensp;Export to PDF&ensp;
                       </Button>
-                    )}
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('imageallstockdetails') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                    </Button>
+                  )}
                 </Box>
               </Grid>
               <Grid item md={2} xs={6} sm={6}>
                 <FormControl fullWidth size="small">
-                  <OutlinedInput size="small"
+                  <OutlinedInput
+                    size="small"
                     id="outlined-adornment-weight"
                     startAdornment={
                       <InputAdornment position="start">
@@ -1234,12 +1163,13 @@ function StockList() {
                         )}
                         <Tooltip title="Show search options">
                           <span>
-                            <IoMdOptions style={{ cursor: 'pointer', }} onClick={handleClickSearchTeamLveVerif} />
+                            <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearchTeamLveVerif} />
                           </span>
                         </Tooltip>
-                      </InputAdornment>}
+                      </InputAdornment>
+                    }
                     aria-describedby="outlined-weight-helper-text"
-                    inputProps={{ 'aria-label': 'weight', }}
+                    inputProps={{ 'aria-label': 'weight' }}
                     type="text"
                     value={getSearchDisplay()}
                     onChange={handleSearchChange}
@@ -1248,48 +1178,36 @@ function StockList() {
                   />
                 </FormControl>
               </Grid>
-            </Grid>  <br />
+            </Grid>{' '}
+            <br />
             <Grid container spacing={1}>
               <Grid item lg={1.5} md={1} xs={12} sm={6}>
                 <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
                   Show All Columns
                 </Button>
-
               </Grid>
               <Grid item lg={1.5} md={1} xs={12} sm={6}>
                 <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumnsTeamLveVerif}>
                   Manage Columns
                 </Button>
-
               </Grid>
-
-
             </Grid>
             <br />
             {!applyleaveCheck ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
             ) : (
               <>
-                <Box sx={{ width: "100%", }} className={"ag-theme-quartz"} ref={gridRefImageTeamLveVerif} >
+                <Box sx={{ width: '100%' }} className={'ag-theme-quartz'} ref={gridRefImageTeamLveVerif}>
                   <AgGridReact
                     rowData={filteredDataItems}
                     columnDefs={columnDataTableTeamLveVerif.filter((column) => columnVisibilityTeamLveVerif[column.field])}
                     ref={gridRefTableTeamLveVerif}
                     defaultColDef={defaultColDef}
-                    domLayout={"autoHeight"}
+                    domLayout={'autoHeight'}
                     getRowStyle={getRowStyle}
                     pagination={true}
                     paginationPageSize={pageSizeTeamLveVerif}
@@ -1302,7 +1220,7 @@ function StockList() {
                     suppressSizeToFit={true}
                     suppressAutoSize={true}
                     suppressColumnVirtualisation={true}
-                    colResizeDefault={"shift"}
+                    colResizeDefault={'shift'}
                     cellSelection={true}
                     copyHeadersToClipboard={true}
                   />
@@ -1371,13 +1289,7 @@ function StockList() {
       )}
 
       {/* Manage Column */}
-      <Popover
-        id={idTeamLveVerif}
-        open={isManageColumnsOpenTeamLveVerif}
-        anchorEl={anchorElTeamLveVerif}
-        onClose={handleCloseManageColumnsTeamLveVerif}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left", }}
-      >
+      <Popover id={idTeamLveVerif} open={isManageColumnsOpenTeamLveVerif} anchorEl={anchorElTeamLveVerif} onClose={handleCloseManageColumnsTeamLveVerif} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
         <ManageColumnsContent
           handleClose={handleCloseManageColumnsTeamLveVerif}
           searchQuery={searchQueryManageTeamLveVerif}
@@ -1392,27 +1304,14 @@ function StockList() {
       </Popover>
 
       {/* Search Bar */}
-      <Popover
-        id={idSearchTeamLveVerif}
-        open={openSearchTeamLveVerif}
-        anchorEl={anchorElSearchTeamLveVerif}
-        onClose={handleCloseSearchTeamLveVerif}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
-      >
-        <AdvancedSearchBar columns={columnDataTableTeamLveVerif?.filter(data => data.field && data.field !== 'actions')} onSearch={applyAdvancedFilter} initialSearchValue={searchQueryTeamLveVerif} handleCloseSearch={handleCloseSearchTeamLveVerif} />
+      <Popover id={idSearchTeamLveVerif} open={openSearchTeamLveVerif} anchorEl={anchorElSearchTeamLveVerif} onClose={handleCloseSearchTeamLveVerif} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <AdvancedSearchBar columns={columnDataTableTeamLveVerif?.filter((data) => data.field && data.field !== 'actions')} onSearch={applyAdvancedFilter} initialSearchValue={searchQueryTeamLveVerif} handleCloseSearch={handleCloseSearchTeamLveVerif} />
       </Popover>
-
-
 
       {/* ALERT DIALOG */}
       <Box>
-        <Dialog
-          open={isErrorOpen}
-          onClose={handleCloseerr}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}          >
+        <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
@@ -1422,19 +1321,9 @@ function StockList() {
           </DialogActions>
         </Dialog>
       </Box>
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* EXTERNAL COMPONENTS -------------- END */}
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
@@ -1453,14 +1342,7 @@ function StockList() {
         componentRef={componentRef}
       />
 
-      <Dialog
-        open={isimgviewbill}
-        onClose={handlecloseImgcodeviewbill}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={isimgviewbill} onClose={handlecloseImgcodeviewbill} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth>
         <DialogContent>
           <Typography variant="h6">Images</Typography>
           {getimgbillcode.map((imagefilebill, index) => (
@@ -1469,39 +1351,33 @@ function StockList() {
                 <img
                   src={imagefilebill.preview}
                   style={{
-                    maxWidth: "70px",
-                    maxHeight: "70px",
-                    marginTop: "10px",
+                    maxWidth: '70px',
+                    maxHeight: '70px',
+                    marginTop: '10px',
                   }}
                 />
               </Grid>
 
-              <Grid
-                item
-                md={4}
-                sm={10}
-                xs={10}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
+              <Grid item md={4} sm={10} xs={10} sx={{ display: 'flex', alignItems: 'center' }}>
                 <Typography>{imagefilebill.name}</Typography>
               </Grid>
               <Grid item md={2} sm={2} xs={2}>
                 <Button
                   sx={{
-                    padding: "14px 14px",
-                    minWidth: "40px !important",
-                    borderRadius: "50% !important",
-                    ":hover": {
-                      backgroundColor: "#80808036", // theme.palette.primary.main
+                    padding: '14px 14px',
+                    minWidth: '40px !important',
+                    borderRadius: '50% !important',
+                    ':hover': {
+                      backgroundColor: '#80808036', // theme.palette.primary.main
                     },
                   }}
                   onClick={() => renderFilePreview(imagefilebill)}
                 >
                   <VisibilityOutlinedIcon
                     style={{
-                      fontsize: "12px",
-                      color: "#357AE8",
-                      marginTop: "35px !important",
+                      fontsize: '12px',
+                      color: '#357AE8',
+                      marginTop: '35px !important',
                     }}
                   />
                 </Button>

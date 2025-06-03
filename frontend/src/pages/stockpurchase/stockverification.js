@@ -144,6 +144,8 @@ function Stockverification() {
     setIsMove(false);
   };
 
+    const [frequencyValue, setFrequencyValue] = useState('');
+
   const [vendorNew, setVendorNew] = useState("Choose Vendor");
   const [totalAmountEdit, setAmountEdit] = useState(0)
 
@@ -351,7 +353,6 @@ function Stockverification() {
   };
   const [vendorNewEdit, setVendorNewEdit] = useState("Choose Vendor");
 
-  const [stockmaterialedit, setStockmaterialedit] = useState([]);
 
 
   const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState("");
@@ -1147,6 +1148,7 @@ function Stockverification() {
   };
 
   const fetchspecificationEdit = async (e) => {
+    console.log(e,"eeee")
     try {
       let res = await axios.get(SERVICE.ASSETWORKSTAION, {
         headers: {
@@ -1172,7 +1174,27 @@ function Stockverification() {
 
   const [availqty, setAvailQty] = useState(0)
 
-  const getCodeAsset = async (row) => {
+
+
+
+  const [stockmaterialedit, setStockmaterialedit] = useState({});
+
+    const [handoverstock, setHandoverstock] = useState({
+      company: "",
+      branch: "",
+      unit: "",
+      floor: "",
+      area: "",
+      location: "",
+      productname: "",
+      usagecount: "",
+      requestmode: "",
+      status: "",
+      balancedcount: "",
+      quantitynew: ""
+    });
+
+      const getCodeAsset = async (row) => {
     setPageName(!pageName)
 
     try {
@@ -1181,6 +1203,14 @@ function Stockverification() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
+        handleClickOpenviewalertvendorstock();
+
+        setHandoverstock({
+      ...handoverstock,
+    
+balancedcount:row.balancedcount
+    });
+
 
       setStockmasteredit({ ...res?.data?.sstock, quantity: "" });
       setSelectedBranchedit(res?.data?.sstock.branch);
@@ -1234,24 +1264,45 @@ function Stockverification() {
 
 
       fetchspecificationEdit(res?.data?.sstock.component)
-      handleClickOpenEdit();
+      // handleClickOpenEdit();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
   const getCodeStock = async (row) => {
+    console.log(row,"row")
     try {
+      if(row.status === "Stock"){
       let res = await axios.get(`${SERVICE.STOCKPURCHASE_SINGLE}/${row._id}`, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      handleClickOpenviewalertvendorstock();
+    
+     setHandoverstock({
+      ...handoverstock,
+    
+balancedcount:row.balancedcount
+    });
+
       setVendorGroup(res?.data?.sstock?.vendorgroup);
+      setStockmaterialedit({
+        ...res?.data?.sstock,
+       category:res?.data?.sstock.tododetails?.[0]?.category,
+       subcategory:res?.data?.sstock.tododetails?.[0]?.subcategory,
+       materialnew:res?.data?.sstock.tododetails?.[0]?.materialnew,
+       uomnew:res?.data?.sstock.tododetails?.[0]?.uomnew,
+       productdetailsnew:res?.data?.sstock.tododetails?.[0]?.productdetailsnew,
+       rate:res?.data?.sstock.tododetails?.[0]?.rate,
+       quantitynew:res?.data?.sstock.tododetails?.[0]?.quantitynew,
+       amount:res?.data?.sstock.tododetails?.[0]?.amount,
+      
+      })
+  
       setVendorNew(res?.data?.sstock?.vendor);
       handleChangeGroupName({ value: res?.data?.sstock?.vendorgroup });
-
+      setFrequencyValue(res?.data?.sstock?.vendorfrequency)
       setStockmanagemasteredit({
         ...res?.data?.sstock,
         materialnew: "Please Select Material",
@@ -1261,6 +1312,8 @@ function Stockverification() {
       setRefImagewarrantyedit(res?.data?.sstock?.warrantyfiles);
       // setSelectedAssetTypeEdit(res?.data?.sstock?.assettype);
       setStockArray(res?.data?.sstock.tododetails);
+
+       await fetchspecificationEdit(res?.data?.sstock?.productname);
 
       setSelectedPurchaseDateEdit(res?.data?.sstock.purchasedate);
 
@@ -1294,6 +1347,83 @@ function Stockverification() {
         );
         setVendorgetid(resv?.data?.svendordetails);
       }
+        handleClickOpenviewalertvendorstock();
+    }else{
+      let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${row._id}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+    
+     setHandoverstock({
+      ...handoverstock,
+    
+balancedcount:row.balancedcount
+    });
+
+      setVendorGroup(res?.data?.smanualstock?.vendorgroup);
+      setStockmaterialedit({
+        ...res?.data?.smanualstock,
+       category:res?.data?.smanualstock.tododetails?.[0]?.category,
+       subcategory:res?.data?.smanualstock.tododetails?.[0]?.subcategory,
+       materialnew:res?.data?.smanualstock.tododetails?.[0]?.materialnew,
+       uomnew:res?.data?.smanualstock.tododetails?.[0]?.uomnew,
+       productdetailsnew:res?.data?.smanualstock.tododetails?.[0]?.productdetailsnew,
+       rate:res?.data?.smanualstock.tododetails?.[0]?.rate,
+       quantitynew:res?.data?.smanualstock.tododetails?.[0]?.quantitynew,
+       amount:res?.data?.smanualstock.tododetails?.[0]?.amount,
+      
+      })
+  console.log(res?.data,"data")
+      setVendorNew(res?.data?.smanualstock?.vendor);
+      handleChangeGroupName({ value: res?.data?.smanualstock?.vendorgroup });
+      setFrequencyValue(res?.data?.smanualstock?.vendorfrequency)
+      setStockmanagemasteredit({
+        ...res?.data?.smanualstock,
+        materialnew: "Please Select Material",
+        quantitynew: ""
+      });
+      setRefImageedit(res?.data?.smanualstock?.files);
+      setRefImagewarrantyedit(res?.data?.smanualstock?.warrantyfiles);
+      // setSelectedAssetTypeEdit(res?.data?.sstock?.assettype);
+      setStockArray(res?.data?.smanualstock.tododetails);
+
+       await fetchspecificationEdit(res?.data?.smanualstock?.productname);
+
+      setSelectedPurchaseDateEdit(res?.data?.smanualstock.purchasedate);
+
+      setSelectedBranchedit(res?.data?.smanualstock.branch);
+      setSelectedUnitedit(res?.data?.smanualstock.unit);
+      await fetchSubcategoryBased({
+        label: res?.data?.smanualstock.stockcategory,
+        value: res?.data?.smanualstock.stockcategory,
+      });
+      await fetchMaterialNew(
+        {
+          label: res?.data?.smanualstock.stocksubcategory,
+          value: res?.data?.smanualstock.stocksubcategory,
+        },
+        res?.data?.smanualstock.stockcategory
+      );
+
+      await fetchBranchDropdownsEdit(res?.data?.smanualstock?.company);
+      await fetchUnitsEdit(res?.data?.smanualstock?.branch);
+      await fetchFloorEdit(res?.data?.smanualstock?.branch);
+      await fetchAreaEdit(res?.data?.smanualstock?.branch, res?.data?.smanualstock?.floor);
+
+      if (res?.data?.smanualstock.vendorid) {
+        let resv = await axios.get(
+          `${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.smanualstock.vendorid}`,
+          {
+            headers: {
+              Authorization: `Bearer ${auth.APIToken}`,
+            },
+          }
+        );
+        setVendorgetid(resv?.data?.svendordetails);
+      }
+        handleClickOpenviewalertvendormanualstock();
+    }
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -1387,84 +1517,166 @@ function Stockverification() {
   };
 
 
-  const getCodeManualStock = async (row) => {
-    try {
+  // const getCodeManualStock = async (row) => {
+  //   try {
 
 
-      let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${row._id}`, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-      });
+  //     let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${row._id}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${auth.APIToken}`,
+  //       },
+  //     });
 
-      setVendorGroupEdit(res?.data?.smanualstock?.vendorgroup);
-      setVendorNewEdit(res?.data?.smanualstock?.vendorname);
-      await handleChangeGroupNameEdit({
-        value: res?.data?.smanualstock?.vendorgroup,
-      });
-      setStockmanagemasteredit({
-        ...res?.data?.smanualstock,
-        materialnew: "Please Select Material",
-        quantitynew: "",
-      });
-      setAmountEdit(res?.data?.smanualstock?.stockmaterialarray.totalbillamount)
-      setRefImageedit(res?.data?.smanualstock?.files);
-      setRefImagewarrantyedit(
-        res?.data?.smanualstock?.warrantyfiles
-          ? res?.data?.smanualstock?.warrantyfiles
-          : []
-      );
-      // setSelectedAssetTypeEdit(res?.data?.smanualstock?.assettype);
-      setStockArray(res?.data?.smanualstock.stockmaterialarray);
+  //     setVendorGroupEdit(res?.data?.smanualstock?.vendorgroup);
+  //     setVendorNewEdit(res?.data?.smanualstock?.vendorname);
+  //     await handleChangeGroupNameEdit({
+  //       value: res?.data?.smanualstock?.vendorgroup,
+  //     });
+  //     setStockmanagemasteredit({
+  //       ...res?.data?.smanualstock,
+  //       materialnew: "Please Select Material",
+  //       quantitynew: "",
+  //     });
+  //     setAmountEdit(res?.data?.smanualstock?.stockmaterialarray.totalbillamount)
+  //     setRefImageedit(res?.data?.smanualstock?.files);
+  //     setRefImagewarrantyedit(
+  //       res?.data?.smanualstock?.warrantyfiles
+  //         ? res?.data?.smanualstock?.warrantyfiles
+  //         : []
+  //     );
+  //     // setSelectedAssetTypeEdit(res?.data?.smanualstock?.assettype);
+  //     setStockArray(res?.data?.smanualstock.stockmaterialarray);
 
-      setSelectedPurchaseDateEdit(res?.data?.smanualstock.purchasedate);
+  //     setSelectedPurchaseDateEdit(res?.data?.smanualstock.purchasedate);
 
-      setSelectedBranchedit(res?.data?.smanualstock.branch);
-      setSelectedUnitedit(res?.data?.smanualstock.unit);
-      await fetchSubcategoryBased({
-        label: res?.data?.smanualstock.stockcategory,
-        value: res?.data?.smanualstock.stockcategory,
-      });
-      await fetchMaterialNew(
-        {
-          label: res?.data?.smanualstock.stocksubcategory,
-          value: res?.data?.smanualstock.stocksubcategory,
-        },
-        res?.data?.smanualstock.stockcategory
-      );
+  //     setSelectedBranchedit(res?.data?.smanualstock.branch);
+  //     setSelectedUnitedit(res?.data?.smanualstock.unit);
+  //     await fetchSubcategoryBased({
+  //       label: res?.data?.smanualstock.stockcategory,
+  //       value: res?.data?.smanualstock.stockcategory,
+  //     });
+  //     await fetchMaterialNew(
+  //       {
+  //         label: res?.data?.smanualstock.stocksubcategory,
+  //         value: res?.data?.smanualstock.stocksubcategory,
+  //       },
+  //       res?.data?.smanualstock.stockcategory
+  //     );
 
-      await fetchBranchDropdownsEdit(res?.data?.smanualstock?.company);
-      await fetchUnitsEdit(res?.data?.smanualstock?.branch);
-      await fetchFloorEdit(res?.data?.smanualstock?.branch);
-      await fetchAreaEdit(
-        res?.data?.smanualstock?.branch,
-        res?.data?.smanualstock?.floor
-      );
-      await fetchAllLocationEdit(
-        res?.data?.smanualstock?.branch,
-        res?.data?.smanualstock?.floor,
-        res?.data?.smanualstock?.area
-      );
-      if (
-        res?.data?.smanualstock.vendorid !== "" &&
-        res?.data?.smanualstock.vendorid !== undefined
-      ) {
-        let resv = await axios.get(
-          `${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.smanualstock.vendorid}`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-          }
-        );
-        setVendorgetid(resv?.data?.svendordetails);
-      }
-      handleClickOpenviewalertvendormanualstock()
-    } catch (err) {
-      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-    }
-  };
+  //     await fetchBranchDropdownsEdit(res?.data?.smanualstock?.company);
+  //     await fetchUnitsEdit(res?.data?.smanualstock?.branch);
+  //     await fetchFloorEdit(res?.data?.smanualstock?.branch);
+  //     await fetchAreaEdit(
+  //       res?.data?.smanualstock?.branch,
+  //       res?.data?.smanualstock?.floor
+  //     );
+  //     await fetchAllLocationEdit(
+  //       res?.data?.smanualstock?.branch,
+  //       res?.data?.smanualstock?.floor,
+  //       res?.data?.smanualstock?.area
+  //     );
+  //     if (
+  //       res?.data?.smanualstock.vendorid !== "" &&
+  //       res?.data?.smanualstock.vendorid !== undefined
+  //     ) {
+  //       let resv = await axios.get(
+  //         `${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.smanualstock.vendorid}`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${auth.APIToken}`,
+  //           },
+  //         }
+  //       );
+  //       setVendorgetid(resv?.data?.svendordetails);
+  //     }
+  //     handleClickOpenviewalertvendormanualstock()
+  //   } catch (err) {
+  //     handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+  //   }
+  // };
 
+
+//     const getCodeManualStock = async (row) => {
+//     console.log(row,"row")
+//     try {
+//       let res = await axios.get(`${SERVICE.MANUAL_STOCKPURCHASE_SINGLE}/${row._id}`, {
+//         headers: {
+//           Authorization: `Bearer ${auth.APIToken}`,
+//         },
+//       });
+    
+//      setHandoverstock({
+//       ...handoverstock,
+    
+// balancedcount:row.balancedcount
+//     });
+
+//       setVendorGroup(res?.data?.smanualstock?.vendorgroup);
+//       setStockmaterialedit({
+//         ...res?.data?.smanualstock,
+//        category:res?.data?.smanualstock.tododetails?.[0]?.category,
+//        subcategory:res?.data?.smanualstock.tododetails?.[0]?.subcategory,
+//        materialnew:res?.data?.smanualstock.tododetails?.[0]?.materialnew,
+//        uomnew:res?.data?.smanualstock.tododetails?.[0]?.uomnew,
+//        productdetailsnew:res?.data?.smanualstock.tododetails?.[0]?.productdetailsnew,
+//        rate:res?.data?.smanualstock.tododetails?.[0]?.rate,
+//        quantitynew:res?.data?.smanualstock.tododetails?.[0]?.quantitynew,
+//        amount:res?.data?.smanualstock.tododetails?.[0]?.amount,
+      
+//       })
+  
+//       setVendorNew(res?.data?.smanualstock?.vendor);
+//       handleChangeGroupName({ value: res?.data?.smanualstock?.vendorgroup });
+//       setFrequencyValue(res?.data?.smanualstock?.vendorfrequency)
+//       setStockmanagemasteredit({
+//         ...res?.data?.smanualstock,
+//         materialnew: "Please Select Material",
+//         quantitynew: ""
+//       });
+//       setRefImageedit(res?.data?.smanualstock?.files);
+//       setRefImagewarrantyedit(res?.data?.smanualstock?.warrantyfiles);
+//       // setSelectedAssetTypeEdit(res?.data?.sstock?.assettype);
+//       setStockArray(res?.data?.smanualstock.tododetails);
+
+//        await fetchspecificationEdit(res?.data?.smanualstock?.productname);
+
+//       setSelectedPurchaseDateEdit(res?.data?.smanualstock.purchasedate);
+
+//       setSelectedBranchedit(res?.data?.smanualstock.branch);
+//       setSelectedUnitedit(res?.data?.smanualstock.unit);
+//       await fetchSubcategoryBased({
+//         label: res?.data?.smanualstock.stockcategory,
+//         value: res?.data?.smanualstock.stockcategory,
+//       });
+//       await fetchMaterialNew(
+//         {
+//           label: res?.data?.smanualstock.stocksubcategory,
+//           value: res?.data?.smanualstock.stocksubcategory,
+//         },
+//         res?.data?.smanualstock.stockcategory
+//       );
+
+//       await fetchBranchDropdownsEdit(res?.data?.smanualstock?.company);
+//       await fetchUnitsEdit(res?.data?.smanualstock?.branch);
+//       await fetchFloorEdit(res?.data?.smanualstock?.branch);
+//       await fetchAreaEdit(res?.data?.smanualstock?.branch, res?.data?.smanualstock?.floor);
+
+//       if (res?.data?.smanualstock.vendorid) {
+//         let resv = await axios.get(
+//           `${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.smanualstock.vendorid}`,
+//           {
+//             headers: {
+//               Authorization: `Bearer ${auth.APIToken}`,
+//             },
+//           }
+//         );
+//         setVendorgetid(resv?.data?.svendordetails);
+//       }
+//         handleClickOpenviewalertvendormanualstock();
+//     } catch (err) {
+//       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+//     }
+//   };
 
   const [rowState, setRowstate] = useState()
 
@@ -1474,24 +1686,24 @@ function Stockverification() {
     // console.log(row, requestmode, "row")
     const getcountqty = row.status == "Stock" ? row.balancedcount : row.balancedcountmanual
     setAvailQty(getcountqty)
-    if (row.requestmode == "Asset Material" && row.status == "Stock") {
-      getCodeAsset(row)
-    }
-
-
-    if (row.requestmode == "Stock Material" && row.status == "Stock") {
+    // if (row.requestmode == "Asset Material" && row.status == "Stock" || row.requestmode == "Stock Material" && row.status == "Stock") {
       getCodeStock(row)
+    // }
 
-    }
 
-    if (row.requestmode == "Asset Material" && row.status == "Manual") {
-      getCodeManualAsset(row)
+    // if (row.requestmode == "Stock Material" && row.status == "Stock") {
+    //   getCodeStock(row)
 
-    }
-    if (row.requestmode == "Stock Material" && row.status == "Manual") {
-      getCodeManualStock(row)
+    // }
 
-    }
+    // if (row.requestmode == "Asset Material" && row.status == "Manual") {
+    //   getCodeManualAsset(row)
+
+    // }
+    // if (row.requestmode == "Asset Material" && row.status == "Stock" || row.requestmode == "Stock Material" && row.status == "Stock") {
+    //   getCodeManualStock(row)
+
+    // }
 
 
 
@@ -9563,7 +9775,7 @@ function Stockverification() {
           </Dialog>
         </Box>
 
-{/* stock wise stock material */}
+
         <Dialog
           open={openviewalertvendorstock}
           onClose={handleCloseviewalertvendorstock}
@@ -9578,12 +9790,16 @@ function Stockverification() {
           <Stockmaterialeditdialog
             sendDataToParentUIStock={handleDataFromChildUIDeignStock}
             openpop={!openviewalertvendorstock}
-            stockmaterialedit={stockmaterialedit}
             requestquantity={stockbalance.quantitynew}
             availqty={availqty}
             vendorGroup={vendorGroup}
             vendorNew={vendorNew}
-            stockmanagemasteredit1={stockmanagemasteredit}
+            Specificationeditcomp={Specificationedit}
+            // stockmanagemasteredit1={stockmanagemasteredit}
+            stockmaterialedit={stockmanagemasteredit}
+            stockmaterialedittodo={stockmaterialedit}
+            handover={handoverstock}
+             frequencyValue={frequencyValue}
             refImageedit={refImageedit}
             refImagewarrantyedit={refImagewarrantyedit}
             handleChangeGroupName={handleChangeGroupName}
@@ -9600,7 +9816,6 @@ function Stockverification() {
 
 
 
-{/* manual asset material */}
         <Dialog
           open={openviewalertvendormanualasset}
           onClose={handleCloseviewalertvendormanualasset}
@@ -9619,6 +9834,10 @@ function Stockverification() {
             requestquantity={stockbalance.quantitynew}
             availqty={availqty}
             stockmasteredit1={stockmasteredit}
+             Specificationeditcomp={Specificationedit}
+              stockmaterialedit={stockmanagemasteredit}
+               handover={handoverstock}
+             frequencyValue={frequencyValue}
             selectedPurchaseDateEdit={selectedPurchaseDateEdit}
             vendorGroupEdit={vendorGroupEdit}
             stockbalance={stockbalance}
@@ -9636,8 +9855,6 @@ function Stockverification() {
           />
         </Dialog>
 
-        {/* manual stock material */}
-
         <Dialog
           open={openviewalertvendormanualstock}
           onClose={handleCloseviewalertvendormanualstock}
@@ -9652,27 +9869,26 @@ function Stockverification() {
           <Manuastockmaterial
             sendDataToParentUIManual={handleDataFromChildUIDeignManualStock}
             openpop={!openviewalertvendormanualstock}
-            totalAmountEdit={totalAmountEdit}
-            stockmanagemasteredit1={stockmanagemasteredit}
             requestquantity={stockbalance.quantitynew}
             availqty={availqty}
-            materialOptNew={materialOptNew}
-            selectedPurchaseDateEdit={selectedPurchaseDateEdit}
-            vendorGroupEdit={vendorGroupEdit}
-            vendorNewEdit={vendorNewEdit}
-            subcategoryOpt={subcategoryOpt}
-            vendorOptIndEdit={vendorOptIndEdit}
+            vendorGroup={vendorGroup}
+            vendorNew={vendorNew}
+            Specificationeditcomp={Specificationedit}
+            // stockmanagemasteredit1={stockmanagemasteredit}
+            stockmaterialedit={stockmanagemasteredit}
+            stockmaterialedittodo={stockmaterialedit}
+            handover={handoverstock}
+             frequencyValue={frequencyValue}
             refImageedit={refImageedit}
             refImagewarrantyedit={refImagewarrantyedit}
-            todosEdit={todosEdit}
+            handleChangeGroupName={handleChangeGroupName}
+            stockArray={stockArray}
+            subcategoryOpt={subcategoryOpt}
+            materialOptNew={materialOptNew}
             floorsEdit={floorsEdit}
-            locationsEdit={locationsEdit}
-            vendorOptEdit={vendorOptEdit}
             areasEdit={areasEdit}
-            stockArray1={stockArray}
             vendorgetid={vendorgetid}
-            Specificationedit={Specificationedit}
-            handleChangeGroupNameEdit={handleChangeGroupNameEdit}
+            selectedPurchaseDateEdit={selectedPurchaseDateEdit}
             handleCloseviewalertvendormanualstock={handleCloseviewalertvendormanualstock}
           />
         </Dialog>

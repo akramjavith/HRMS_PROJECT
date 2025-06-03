@@ -1245,6 +1245,42 @@ function StockManagement() {
     initialColumnVisibility
   );
 
+
+  useEffect(() => {
+    setColumnVisibility({
+      serialNumber: true,
+      checkbox: true,
+      company: true,
+      branch: true,
+      status: true,
+      unit: true,
+      floor: true,
+      area: true,
+      location: true,
+      productname: true,
+      quantity: true,
+      material: true,
+      materialnew: true,
+
+      employeenameto: true,
+      purchasecount: true,
+      purchasecountstock: true,
+      requestmode: true,
+      usedcount: true,
+      usedcountstock: true,
+      balancedcount: true,
+      actions: true,
+      viewactions: true,
+      assetviewactions: true,
+      handovercount: true,
+      returncount: true,
+
+      handovercountbtn: true,
+      returncountbtn: true,
+      usagecountbtn: true,
+    })
+  }, [])
+
   //Datatable
   const [pageviewusage, setPageviewusage] = useState(1);
   const [pageSizeviewusage, setPageSizeviewusage] = useState(10);
@@ -1850,6 +1886,7 @@ function StockManagement() {
         gstno: data.gstno,
         producthead: data.producthead,
         warranty: data.warranty,
+        vendorid: data.vendorid
         // rate:data.rate
       });
       setHandover({
@@ -1960,7 +1997,7 @@ function StockManagement() {
         ...handover,
 
         balancedcount: data.balancedcount,
-        productname: data.productname,
+        productname: data.materialnew,
         quantitynew: data.quantitynew
 
       });
@@ -3362,6 +3399,7 @@ function StockManagement() {
   //get all project.
   const fetchStock = async () => {
     setPageName(!pageName)
+
     let columnsnew1 =
       stockManagefilter.requestmode === "Stock Material"
         ? columnDatatableStock
@@ -3369,7 +3407,7 @@ function StockManagement() {
     setColumnsnew(columnsnew1)
     try {
       setProjectCheck(true);
-      setColumnVisibility(initialColumnVisibility)
+
 
       if (stockManagefilter.requestmode === "Asset Material") {
         setColumnVisibility(initialColumnVisibility)
@@ -3858,7 +3896,7 @@ function StockManagement() {
 
         let single = res_project?.data?.stock;
 
-        let singletransfer = res_transfer?.data?.stock.filter(d => d.status === "Transfer").flatMap(item =>
+        let singletransfer = res_transfer?.data?.stock.flatMap(item =>
           item.tododetails.map(todoItem => ({
             ...item,
             productname: todoItem.materialnew,
@@ -4305,7 +4343,38 @@ function StockManagement() {
         setStock(quantityAndUom);
         setColumnVisibility(initialColumnVisibility)
       }
+      setColumnVisibility({
+        serialNumber: true,
+        checkbox: true,
+        company: true,
+        branch: true,
+        status: true,
+        unit: true,
+        floor: true,
+        area: true,
+        location: true,
+        productname: true,
+        quantity: true,
+        material: true,
+        materialnew: true,
 
+        employeenameto: true,
+        purchasecount: true,
+        purchasecountstock: true,
+        requestmode: true,
+        usedcount: true,
+        usedcountstock: true,
+        balancedcount: true,
+        actions: true,
+        viewactions: true,
+        assetviewactions: true,
+        handovercount: true,
+        returncount: true,
+
+        handovercountbtn: true,
+        returncountbtn: true,
+        usagecountbtn: true,
+      })
 
       setProjectCheck(false);
     } catch (err) {

@@ -419,7 +419,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
             sx={buttonStyles}
           >
             {params.data.handover === "handover" ? "Allot" :
-              params.data.handover === "return" ? "Return" :   params.data.status === "Transfer" ? "Transfer" :"Usage Count" }
+              params.data.handover === "return" ? "Return" : params.data.status === "Transfer" ? "Transfer" : "Usage Count"}
 
           </Button>
         );
@@ -585,7 +585,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
               <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
             </Button>
           )}
-           {isUserRoleCompare?.includes('vstockpurchase') && (
+          {isUserRoleCompare?.includes('vstockpurchase') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={(e) => {
@@ -610,7 +610,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       serialNumber: item.serialNumber,
     }
   });
-  console.log(rowDataTablecom, "rowdat")
+  // console.log(rowDataTablecom, "rowdat")
   const rowsWithCheckboxescom = rowDataTablecom?.map((row) => ({
     ...row,
     // Create a custom field for rendering the checkbox
@@ -1210,7 +1210,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     checkbox: true,
     serialNumber: true,
     company: true,
-    paidstatus:true,
+    paidstatus: true,
     branch: true,
     unit: true,
     floor: true,
@@ -2122,7 +2122,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       setExpensecreate(alldata);
       setFrequencyValue(res?.data?.sstock?.vendorfrequency);
 
-      setVendorNewstock(res?.data?.sstock);
+      // setVendorNewstock(res?.data?.sstock);
       setEducationtodo(res?.data?.sstock?.tododetails);
       setVendorGroup(res?.data?.sstock?.vendorgroup);
       setVendorNew(res?.data?.sstock?.vendor);
@@ -2133,12 +2133,19 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         materialnew: 'Please Select Material',
         totalbillamount: res?.data?.sstock?.totalbillamountstock,
       });
-const paidmode = vendorOpt?.find((data) => vendorOverall?.filter((item) => item.name === res?.data?.sstock?.vendorgroup)?.map((data) => data?.vendor)?.includes?.(res?.data?.sstock?.vendor))?.modeofpayments
-setVendorModeOfPayments(paidmode)
-// .find(d => d.value === res?.data?.sstock?.vendor)
-     console.log(paidmode,"paidmode")
 
-// const fileswarranty = await getMultipleFilesAsObjects(res?.data?.sstock?.filenames, "todo", res?.data?.sstock?.uniqueId);
+      const allvendor = vendorOpt?.find((data) => vendorOverall?.filter((item) => item.name === res?.data?.sstock?.vendorgroup)?.map((data) => data?.vendor)?.includes?.(res?.data?.sstock?.vendor))
+      const paidmode = allvendor?.modeofpayments
+      setVendorModeOfPayments(paidmode)
+
+      setVendorNewstock((prev) => ({
+        ...prev,
+        ...allvendor,
+      }))
+      // .find(d => d.value === res?.data?.sstock?.vendor)
+      console.log(paidmode, "paidmode")
+
+      // const fileswarranty = await getMultipleFilesAsObjects(res?.data?.sstock?.filenames, "todo", res?.data?.sstock?.uniqueId);
 
       // handleFetchWarranty(fileswarranty);
 
@@ -3115,7 +3122,7 @@ setVendorModeOfPayments(paidmode)
     setOpenView(false);
   };
 
-   const handleViewOpenstatus = () => {
+  const handleViewOpenstatus = () => {
     setOpenViewstatus(true);
   };
   const handlViewClosestatus = () => {
@@ -3299,13 +3306,13 @@ setVendorModeOfPayments(paidmode)
           serialNumber: index + 1,
           date: item.handover === "handover" ? moment(item.allotdate).format("DD/MM/YYYY") :
             item.handover === "return" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
-            item.status === "Transfer" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
-              moment(item.usagedate).format("DD/MM/YYYY"),
+              item.status === "Transfer" ? moment(item.addedby[0]?.date).format("DD/MM/YYYY") :
+                moment(item.usagedate).format("DD/MM/YYYY"),
 
           time: item.handover === "handover" ? item.allottime :
             item.handover === "return" ? moment(item.addedby[0]?.date).format("hh:mm") :
-             item.status === "Transfer" ? moment(item.addedby[0]?.date).format("hh:mm") :
-              item.usagetime,
+              item.status === "Transfer" ? moment(item.addedby[0]?.date).format("hh:mm") :
+                item.usagetime,
         }
       }));
       setIsAttandance(false)
@@ -3806,7 +3813,7 @@ setVendorModeOfPayments(paidmode)
       minHeight: '40px',
       hide: !columnVisibility.billdate,
     },
-     {
+    {
       field: 'paidstatus',
       headerName: 'Paid Status',
       flex: 0,
@@ -4005,67 +4012,67 @@ setVendorModeOfPayments(paidmode)
 
   const handleCloseFilterOpen = async () => {
 
-    try{
-    let res_employee = await axios.get(SERVICE.EXCEL_DOWNLOAD_STOCK, {
-      headers: {
-        Authorization: `Bearer ${auth.APIToken}`,
-      },
-    });
+    try {
+      let res_employee = await axios.get(SERVICE.EXCEL_DOWNLOAD_STOCK, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
 
-    setOverallFilterdata(
-      res_employee?.data?.stock?.length > 0
-        ? res_employee?.data?.stock?.map((item, index) => {
-          let quantityNew = item.tododetails.map((data, newindex) => {
-            return ` ${data.quantitynew}`;
-          });
+      setOverallFilterdata(
+        res_employee?.data?.stock?.length > 0
+          ? res_employee?.data?.stock?.map((item, index) => {
+            let quantityNew = item.tododetails.map((data, newindex) => {
+              return ` ${data.quantitynew}`;
+            });
 
-          let materialNew = item.tododetails.map((data, newindex) => {
-            return ` ${data.materialnew}`;
-          });
+            let materialNew = item.tododetails.map((data, newindex) => {
+              return ` ${data.materialnew}`;
+            });
 
-          let productdetailsNew = item.tododetails.map((data, newindex) => {
-            return ` ${data.productdetailsnew}`;
-          });
+            let productdetailsNew = item.tododetails.map((data, newindex) => {
+              return ` ${data.productdetailsnew}`;
+            });
 
-          let quantityAndUom = item.tododetails.map((data, newindex) => {
-            return ` ${data.quantitynew}#${data.uomnew}`;
-          });
-          return {
-            ...item,
-            serialNumber: (page - 1) * pageSize + index + 1,
-            id: item._id,
-            company: item.company,
-            branch: item.branch,
-            unit: item.unit,
-            floor: item.floor,
-            area: item.area,
-            location: item.location,
-            requestmode: item.requestmode,
-            stockcategory: item.stockcategory,
-            stocksubcategory: item.stocksubcategory,
+            let quantityAndUom = item.tododetails.map((data, newindex) => {
+              return ` ${data.quantitynew}#${data.uomnew}`;
+            });
+            return {
+              ...item,
+              serialNumber: (page - 1) * pageSize + index + 1,
+              id: item._id,
+              company: item.company,
+              branch: item.branch,
+              unit: item.unit,
+              floor: item.floor,
+              area: item.area,
+              location: item.location,
+              requestmode: item.requestmode,
+              stockcategory: item.stockcategory,
+              stocksubcategory: item.stocksubcategory,
 
-            uomnew: quantityAndUom.join(','),
-            quantitynew: quantityNew.join(','),
-            materialnew: materialNew.join(',').toString(),
-            productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(',') : '',
+              uomnew: quantityAndUom.join(','),
+              quantitynew: quantityNew.join(','),
+              materialnew: materialNew.join(',').toString(),
+              productdetailsnew: item.tododetails.length > 0 ? productdetailsNew.join(',') : '',
 
-            gstno: item.gstno,
-            billno: item.billno,
-            warrantydetails: item.warrantydetails,
-            warranty: item.warranty,
-            purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
-            billdate: moment(item.billdate).format('DD/MM/YYYY'),
-            rate: item.rate,
-            vendor: item.vendor,
-            vendorgroup: item.vendorgroup,
-          };
-        })
-        : []
-    );
-    setIsFilterOpen(true);
-  }catch(err){
-    console.log(err,"Errorexcel")
-  }
+              gstno: item.gstno,
+              billno: item.billno,
+              warrantydetails: item.warrantydetails,
+              warranty: item.warranty,
+              purchasedate: item.purchasedate != '' ? moment(item.purchasedate).format('DD/MM/YYYY') : '',
+              billdate: moment(item.billdate).format('DD/MM/YYYY'),
+              rate: item.rate,
+              vendor: item.vendor,
+              vendorgroup: item.vendorgroup,
+            };
+          })
+          : []
+      );
+      setIsFilterOpen(true);
+    } catch (err) {
+      console.log(err, "Errorexcel")
+    }
   };
 
   // page refersh reload
@@ -4755,7 +4762,7 @@ setVendorModeOfPayments(paidmode)
                       <Button
                         onClick={(e) => {
                           // handleCloseFilterOpen();
-  setIsFilterOpen(true);
+                          setIsFilterOpen(true);
                           setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
@@ -4770,7 +4777,7 @@ setVendorModeOfPayments(paidmode)
                       <Button
                         onClick={(e) => {
                           // handleCloseFilterOpen();
-                            setIsFilterOpen(true);
+                          setIsFilterOpen(true);
                           setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
@@ -6749,7 +6756,7 @@ setVendorModeOfPayments(paidmode)
                   <Typography>{moment(stockmanagemasteredit.billdate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
-                  <Grid item md={4} xs={12} sm={12}>
+              <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6"> Paid Status</Typography>
                   <Typography>{stockmanagemasteredit.paidstatus}</Typography>
@@ -6768,7 +6775,7 @@ setVendorModeOfPayments(paidmode)
 
 
 
-        <Dialog open={openViewstatus} onClose={handlViewClosestatus} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '95px' }}>
+      <Dialog open={openViewstatus} onClose={handlViewClosestatus} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '95px' }}>
         <Box sx={{ padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}>Status View Stock Purchase</Typography>
@@ -6857,12 +6864,12 @@ setVendorModeOfPayments(paidmode)
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Time</Typography>
                   <Typography>{stockmanagemasteredit.handover === "handover" ? stockmanagemasteredit.allottime :
-            stockmanagemasteredit.handover === "return" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
-             stockmanagemasteredit.status === "Transfer" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
-              stockmanagemasteredit.usagetime}</Typography>
+                    stockmanagemasteredit.handover === "return" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
+                      stockmanagemasteredit.status === "Transfer" ? moment(stockmanagemasteredit.addedby[0]?.date).format("hh:mm") :
+                        stockmanagemasteredit.usagetime}</Typography>
                 </FormControl>
               </Grid>
-             
+
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
@@ -7137,8 +7144,8 @@ setVendorModeOfPayments(paidmode)
         setIsPdfFilterOpen={setIsPdfFilterOpen}
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
-        
-         itemsTwo={stockmanages ?? []}
+
+        itemsTwo={stockmanages ?? []}
         // itemsTwo={overallFilterdata ?? []}
         filename={'StockPurchase'}
         exportColumnNames={exportColumnNames}

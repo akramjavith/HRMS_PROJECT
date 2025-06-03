@@ -174,7 +174,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     "productdetailsnew",
   ];
 
-    const [stockmanagemasteredit, setStockmanagemasteredit] = useState({
+  const [stockmanagemasteredit, setStockmanagemasteredit] = useState({
     company: "Please Select Company",
     branch: "Please Select Branch",
     unit: "Please Select Unit",
@@ -182,7 +182,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     area: "Please Select Area",
     location: "Please Select Location",
     workstation: "Please Select Workstation",
-    duedate:"",
+    duedate: "",
     assettype: "",
     asset: "",
     material: "Choose Material",
@@ -1156,7 +1156,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     }
   };
 
-console.log(stockmanagemasteredit.duedate,"duedate")
+  console.log(stockmanagemasteredit.duedate, "duedate")
   //editing the single data...
   const sendEditRequest = async () => {
     try {
@@ -1530,116 +1530,116 @@ console.log(stockmanagemasteredit.duedate,"duedate")
   }
 
 
-    const fetchStock = async (e) => {
+  const fetchStock = async (e) => {
     setPageName(!pageName)
     setLoading(true);
     const queryParams = {
-    
+
       assignbranch: accessbranch,
       company: valueCompanyCat,
       branch: valueBranchCat,
       unit: valueUnitCat,
     };
 
-   
+
 
     try {
-  
-          setColumnVisibility(initialColumnVisibility);
 
-        let res_employee = await axios.post(SERVICE.MANAGE_STOCK_ACCESS_PAGINATION, queryParams, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
+      setColumnVisibility(initialColumnVisibility);
+
+      let res_employee = await axios.post(SERVICE.MANAGE_STOCK_ACCESS_PAGINATION, queryParams, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+
+
+      let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+
+      let codeValues = res_project_1?.data?.vommaster.map((data) => ({
+        name: data.name,
+        code: data?.code,
+      }));
+      // setuomcodes(codeValues);
+
+      let setData = ans.map((item) => {
+        // Find the corresponding item in codeValues array
+        const matchingItem = codeValues.find(
+          (item1) => item.uom === item1.name
+        );
+
+        // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
+        return matchingItem
+          ? { ...item, uomcode: matchingItem?.code }
+          : { ...item, uomcode: "" };
+      });
+      // const itemsWithSerialNumber = setData?.map((item, index) => ({
+      //   ...item,
+      //   serialNumber: (page - 1) * pageSize + index + 1,
+      // }));
+
+
+      const itemsWithSerialNumber = setData?.map((item, index) => {
+        let quantityNew = item.stockmaterialarray.map((data, newindex) => {
+          return ` ${data.quantitynew}`;
         });
 
-        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
-
-
-        let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
+        let materialNew = item.stockmaterialarray.map((data, newindex) => {
+          return ` ${data.materialnew}`;
         });
 
-        let codeValues = res_project_1?.data?.vommaster.map((data) => ({
-          name: data.name,
-          code: data?.code,
-        }));
-        // setuomcodes(codeValues);
-
-        let setData = ans.map((item) => {
-          // Find the corresponding item in codeValues array
-          const matchingItem = codeValues.find(
-            (item1) => item.uom === item1.name
-          );
-
-          // If matchingItem is found, return item with uomcode set to its code, otherwise set it to an empty string
-          return matchingItem
-            ? { ...item, uomcode: matchingItem?.code }
-            : { ...item, uomcode: "" };
+        let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+          return ` ${data.productdetailsnew}`;
         });
-        // const itemsWithSerialNumber = setData?.map((item, index) => ({
-        //   ...item,
-        //   serialNumber: (page - 1) * pageSize + index + 1,
-        // }));
 
-
-        const itemsWithSerialNumber = setData?.map((item, index) => {
-          let quantityNew = item.stockmaterialarray.map((data, newindex) => {
-            return ` ${data.quantitynew}`;
-          });
-
-          let materialNew = item.stockmaterialarray.map((data, newindex) => {
-            return ` ${data.materialnew}`;
-          });
-
-          let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
-            return ` ${data.productdetailsnew}`;
-          });
-
-          let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
-            return ` ${data.quantitynew}#${data.uomcodenew}`;
-          });
-          return {
-            ...item,
-            id: item._id,
-            serialNumber:  index + 1,
-            company: item.company,
-            branch: item.branch,
-            unit: item.unit,
-            floor: item.floor,
-            requestdate: moment(item.requestdate).format("DD/MM/YYYY"),
-            requesttime: item.requesttime,
-            duedate: item.duedate,
-            expecttime: item.expecttime,
-            area: item.area,
-            location: item.location,
-            requestmode: item.requestmode,
-            stockcategory: item.stockcategory,
-            stocksubcategory: item.stocksubcategory,
-
-            uomnew:
-              //  quantityAndUom.join(","),
-              quantityAndUom.filter(item => item.trim() !== "").join(","),
-            quantitynew: quantityNew.filter(item => item.trim() !== "").join(","),
-            //  quantityNew.join(","),
-            materialnew: materialNew.filter(item => item.trim() !== "").join(","),
-            // materialNew.join(",").toString(),
-            productdetailsnew:
-              // productdetailsNew.join(",")
-              productdetailsNew.filter(item => item.trim() !== "").join(",")
-
-          };
+        let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+          return ` ${data.quantitynew}#${data.uomcodenew}`;
         });
-console.log(itemsWithSerialNumber,"itemsWithSerialNumber")
+        return {
+          ...item,
+          id: item._id,
+          serialNumber: index + 1,
+          company: item.company,
+          branch: item.branch,
+          unit: item.unit,
+          floor: item.floor,
+          requestdate: moment(item.requestdate).format("DD/MM/YYYY"),
+          requesttime: item.requesttime,
+          duedate: item.duedate,
+          expecttime: item.expecttime,
+          area: item.area,
+          location: item.location,
+          requestmode: item.requestmode,
+          stockcategory: item.stockcategory,
+          stocksubcategory: item.stocksubcategory,
 
-        setStockmanage(itemsWithSerialNumber);
+          uomnew:
+            //  quantityAndUom.join(","),
+            quantityAndUom.filter(item => item.trim() !== "").join(","),
+          quantitynew: quantityNew.filter(item => item.trim() !== "").join(","),
+          //  quantityNew.join(","),
+          materialnew: materialNew.filter(item => item.trim() !== "").join(","),
+          // materialNew.join(",").toString(),
+          productdetailsnew:
+            // productdetailsNew.join(",")
+            productdetailsNew.filter(item => item.trim() !== "").join(",")
+
+        };
+      });
+      console.log(itemsWithSerialNumber, "itemsWithSerialNumber")
+
+      setStockmanage(itemsWithSerialNumber);
 
 
-        setLoading(false);
+      setLoading(false);
 
-     
+
     }
 
     catch (err) {
@@ -2971,22 +2971,22 @@ console.log(itemsWithSerialNumber,"itemsWithSerialNumber")
                       />
                     </FormControl>
                   </Grid> */}
-                   <Grid item md={2} xs={6} sm={6}>
-                                                  <Box>
-                                                    <AggregatedSearchBar
-                                                      columnDataTable={columnDataTable}
-                                                      setItems={setItems}
-                                                      addSerialNumber={addSerialNumber}
-                                                      setPage={setPage}
-                                                      maindatas={stockmanages}
-                                                      setSearchedString={setSearchedString}
-                                                      searchQuery={searchQuery}
-                                                      setSearchQuery={setSearchQuery}
-                                                      paginated={false}
-                                                      totalDatas={stockmanages}
-                                                    />
-                                                  </Box>
-                                                </Grid>
+                  <Grid item md={2} xs={6} sm={6}>
+                    <Box>
+                      <AggregatedSearchBar
+                        columnDataTable={columnDataTable}
+                        setItems={setItems}
+                        addSerialNumber={addSerialNumber}
+                        setPage={setPage}
+                        maindatas={stockmanages}
+                        setSearchedString={setSearchedString}
+                        searchQuery={searchQuery}
+                        setSearchQuery={setSearchQuery}
+                        paginated={false}
+                        totalDatas={stockmanages}
+                      />
+                    </Box>
+                  </Grid>
                 </Box>
               </Grid>
               <Button

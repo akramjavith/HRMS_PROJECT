@@ -115,7 +115,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ManualMaster({ sendDataToParentUIManual,frequencyValue, stockmaterialedit, handleCloseviewalertvendormanual,vendorNew,vendorGroup,handover,stockManagehand }) {
+function ManualMaster({ sendDataToParentUIManual, frequencyValue, stockmaterialedit, handleCloseviewalertvendormanual, vendorNew, vendorGroup, handover, stockManagehand }) {
   let Expensetotal = 0;
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
@@ -125,11 +125,11 @@ function ManualMaster({ sendDataToParentUIManual,frequencyValue, stockmaterialed
   const gridRefTable = useRef(null);
   const [totalAmount, setAmount] = useState(0);
   const [totalAmountEdit, setAmountEdit] = useState(0);
-  const [ setFrequencyValue] = useState('');
+  const [setFrequencyValue] = useState('');
   const [frequencyValueedit, setFrequencyValueedit] = useState('');
 
 
-  console.log(handover,stockManagehand,"ddfere")
+  console.log(handover, stockManagehand, "ddfere")
 
   const [refImgWarrantyEdit, setRefImgWarrantyEdit] = useState([]);
   const [refImgWarrantyBillEdit, setRefImgWarrantyBillEdit] = useState([]);
@@ -196,7 +196,7 @@ function ManualMaster({ sendDataToParentUIManual,frequencyValue, stockmaterialed
     vendorname: 'Please Select Vendor',
     purpose: 'Please Select Purpose',
     totalbillamount: '',
-    duedate:stockmaterialedit.duedate,
+    duedate: stockmaterialedit.duedate,
     date,
     files: '',
     vendorfrequency: '',
@@ -248,32 +248,32 @@ function ManualMaster({ sendDataToParentUIManual,frequencyValue, stockmaterialed
     cardsecuritycode: '',
   });
 
- const [todoDetails, setTodoDetails] = useState({
+  const [todoDetails, setTodoDetails] = useState({
     category: stockmaterialedit.category,
-      subcategory: stockmaterialedit.subcategory,
-      materialnew: stockmaterialedit.materialnew,
-      uomnew:  stockmaterialedit.uomnew,
-      rate: stockmaterialedit.rate,
-      quantitynew: '',
-      amount:stockmaterialedit.amount,
-      productdetailsnew:stockmaterialedit.productdetailsnew,
+    subcategory: stockmaterialedit.subcategory,
+    materialnew: stockmaterialedit.materialnew,
+    uomnew: stockmaterialedit.uomnew,
+    rate: stockmaterialedit.rate,
+    quantitynew: '',
+    amount: stockmaterialedit.amount,
+    productdetailsnew: stockmaterialedit.productdetailsnew,
   });
 
   const [vendorstock, setVendorNewstock] = useState({
     bankname: stockmaterialedit.bankname,
-    bankbranchname:stockmaterialedit.bankbranchname,
-    accountholdername:stockmaterialedit.accountholdername,
+    bankbranchname: stockmaterialedit.bankbranchname,
+    accountholdername: stockmaterialedit.accountholdername,
     accountnumber: stockmaterialedit.accountnumber,
     ifsccode: stockmaterialedit.ifsccode,
-    upinumber:stockmaterialedit.upinumber,
+    upinumber: stockmaterialedit.upinumber,
     chequenumber: stockmaterialedit.chequenumber,
     cardnumber: stockmaterialedit.cardnumber,
     cardholdername: stockmaterialedit.cardholdername,
     cardtransactionnumber: stockmaterialedit.cardtransactionnumber,
-    cardtype:stockmaterialedit.cardtype,
+    cardtype: stockmaterialedit.cardtype,
     cardmonth: stockmaterialedit.cardmonth,
-    cardyear:  stockmaterialedit.cardyear,
-    cardsecuritycode:stockmaterialedit.cardsecuritycode,
+    cardyear: stockmaterialedit.cardyear,
+    cardsecuritycode: stockmaterialedit.cardsecuritycode,
   });
   const [educationtodo, setEducationtodo] = useState([]);
   const [upload, setUpload] = useState([]);
@@ -468,7 +468,7 @@ function ManualMaster({ sendDataToParentUIManual,frequencyValue, stockmaterialed
 
   const [changeTable, setChangeTable] = useState([]);
 
- const [stockmaster, setStockmaster] = useState({
+  const [stockmaster, setStockmaster] = useState({
     // company: "Please Select Company",
     // branch: "Please Select Branch",
     // unit: "Please Select Unit",
@@ -487,22 +487,22 @@ function ManualMaster({ sendDataToParentUIManual,frequencyValue, stockmaterialed
     vendorname: 'Please Select Vendor',
     // productname: "Please Select Material",
     component: 'Please Select Component',
-    gstno:stockmaterialedit.gstno,
+    gstno: stockmaterialedit.gstno,
     billno: stockmaterialedit.billno,
     assettype: '',
     asset: '',
     productdetails: '',
-    warrantydetails:  stockmaterialedit.warrantydetails,
+    warrantydetails: stockmaterialedit.warrantydetails,
     uom: 'Please Select UOM',
     quantity: '',
     rate: '',
-    billdate:stockmaterialedit.billdate,
+    billdate: stockmaterialedit.billdate,
     files: '',
     warrantyfiles: '',
-totalbillamount:stockmaterialedit.totalbillamountstock,
-    warranty:  stockmaterialedit.warranty,
+    totalbillamount: stockmaterialedit.totalbillamountstock,
+    warranty: stockmaterialedit.warranty,
     warrantycalculation: stockmaterialedit.warrantycalculation,
-    estimation:stockmaterialedit.estimation,
+    estimation: stockmaterialedit.estimation,
     estimationtime: stockmaterialedit.estimationtime,
     purchasedate: stockmaterialedit.purchasedate,
 
@@ -561,7 +561,7 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
   const [stockArray, setStockArray] = useState([]);
   const [uomcodes, setuomcodes] = useState([]);
 
-  const [ setVendorGroup] = useState('Choose Vendor Group');
+  const [setVendorGroup] = useState('Choose Vendor Group');
   const [vendorGroupOpt, setVendorGroupopt] = useState([]);
   const [vendorOverall, setVendorOverall] = useState([]);
   const [vendorGroupEdit, setVendorGroupEdit] = useState('Choose Vendor Group');
@@ -2388,35 +2388,38 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
+  const totalQuantityStock = educationtodo.reduce((sum, item) => {
+    return sum + Number(item.quantitynew || 0);
 
+    // return sum;
+  }, 0);
   //add function
   const sendRequest = async () => {
     setPageName(!pageName);
     setChangeTable('new');
     const uniqueId = uuidv4();
+
     try {
       let stockcreate = await axios.post(SERVICE.MANUAL_STOCKPURCHASE_CREATE, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
-         company: String(stockmaster.company),
+        company: String(stockmaster.company),
         branch: String(stockmaster.branch),
         unit: String(stockmaster.unit),
         floor: String(stockmaster.floor),
-          productname:String(handover.productname),
         location: String(stockmaster.location),
-          productname:String(handover.productname),
-        countquantity:String(todoDetails.quantitynew),
-         duedate: String(expensecreate.duedate ? expensecreate.duedate : ""),
-         totalbillamountstock: stockmaster.totalbillamount,
-         area: String(stockmaster.area),
+        productname: String(handover.productname),
+        countquantity: String(totalQuantityStock),
+        duedate: String(expensecreate.duedate ? expensecreate.duedate : ""),
+        totalbillamountstock: stockmaster.totalbillamount,
+        area: String(stockmaster.area),
         status: String('Transfer'),
         workstation: String(stockmaster.workcheck ? stockmaster.workstation : ''),
         workcheck: String(stockmaster.workcheck),
 
         assettype: String(stockmaster.assettype === undefined ? '' : stockmaster.assettype),
         // asset: String(stockmaster.asset),
-        productname: String(stockmaster.productname === 'Please Select Material' ? '' : stockmaster.productname),
 
         component: String(stockmaster.component === 'Please Select Component' ? '' : stockmaster.component),
 
@@ -2525,14 +2528,14 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
       await handleFileUpload(refImgWarranty, 'todo', uniqueId);
       await handleFileUpload(refImgWarrantyBill, 'bill', uniqueId);
       setRefImgWarrantyfilenames([]);
-       handleCloseviewalertvendormanual();
-         sendDataToParentUIManual(true);
+      handleCloseviewalertvendormanual();
+      sendDataToParentUIManual(true);
       setRefImgbillfilenames([]);
       setPopupContent('Added Successfully');
       setPopupSeverity('success');
       handleClickOpenPopup();
       // setStockmaster(stockcreate.data);
-     
+
       setChangeTable('old');
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -2625,45 +2628,45 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
 
 
 
-    
-      if (stockmaster.company === 'Please Select Company') {
-        setPopupContentMalert('Please Select Company!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.branch === 'Please Select Branch') {
-        setPopupContentMalert('Please Select Branch!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.unit === 'Please Select Unit') {
-        setPopupContentMalert('Please Select Unit!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.floor === 'Please Select Floor') {
-        setPopupContentMalert('Please Select Floor!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.area === 'Please Select Area') {
-        setPopupContentMalert('Please Select Area!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else if (stockmaster.location === 'Please Select Location') {
-        setPopupContentMalert('Please Select Location!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-       else if (refImage.length == 0) {
-        setPopupContentMalert('Please Upload Bill!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      }
-      else if (educationtodo.length == 0) {
-        setPopupContentMalert('Please Insert Todo!');
-        setPopupSeverityMalert('info');
-        handleClickOpenPopupMalert();
-      } else {
-        sendRequest();
-      }
- 
+
+    if (stockmaster.company === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (stockmaster.branch === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (stockmaster.unit === 'Please Select Unit') {
+      setPopupContentMalert('Please Select Unit!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (stockmaster.floor === 'Please Select Floor') {
+      setPopupContentMalert('Please Select Floor!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (stockmaster.area === 'Please Select Area') {
+      setPopupContentMalert('Please Select Area!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (stockmaster.location === 'Please Select Location') {
+      setPopupContentMalert('Please Select Location!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    }
+    else if (refImage.length == 0) {
+      setPopupContentMalert('Please Upload Bill!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    }
+    else if (educationtodo.length == 0) {
+      setPopupContentMalert('Please Insert Todo!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else {
+      sendRequest();
+    }
+
   };
 
   const handleclear = (e) => {
@@ -2671,19 +2674,21 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
     e.preventDefault();
 
     setStockmaster({
+      ...stockmaster,
       company: 'Please Select Company',
       branch: 'Please Select Branch',
       unit: 'Please Select Unit',
       floor: 'Please Select Floor',
       area: 'Please Select Area',
       location: 'Please Select Location',
-    
+
     });
-   
+
     setTodoDetails({
+      ...todoDetails,
       quantitynew: '',
     });
-   
+
     setBranchs([]);
     setUnits([]);
     setFloors([]);
@@ -2890,7 +2895,7 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
     setVendorgetid({ gstnumber: '' });
   };
 
-  const [ setVendorNew] = useState('Choose Vendor');
+  const [setVendorNew] = useState('Choose Vendor');
   const [vendorNewEdit, setVendorNewEdit] = useState('Choose Vendor');
 
   //   const getMultipleFilesAsObjects = async (filenames, type, uniqueId) => {
@@ -3157,7 +3162,7 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
     }
   };
 
- 
+
 
   const fetchCompanyDropdowns = async () => {
     try {
@@ -3203,7 +3208,7 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
     // fetchVomMaster();
   }, []);
 
- const fetchBranchDropdowns = async (e) => {
+  const fetchBranchDropdowns = async (e) => {
     try {
       let res_branch = await axios.get(SERVICE.BRANCH, {
         headers: {
@@ -3401,13 +3406,13 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
     fetchAllLocationEdit();
   }, [isEditOpen, stockmasteredit.floor]);
 
-    useEffect(() => {
-      fetchBranchDropdowns(stockmaterialedit.company);
-      fetchUnits(stockmaterialedit.branch);
-      fetchFloor(stockmaterialedit.branch);
-      fetchArea(stockmaterialedit.branch, stockmaterialedit.floor);
-      fetchLocation(stockmaterialedit.branch, stockmaterialedit.floor, stockmaterialedit.area);
-    }, [stockmaterialedit, isEditOpen]);
+  useEffect(() => {
+    fetchBranchDropdowns(stockmaterialedit.company);
+    fetchUnits(stockmaterialedit.branch);
+    fetchFloor(stockmaterialedit.branch);
+    fetchArea(stockmaterialedit.branch, stockmaterialedit.floor);
+    fetchLocation(stockmaterialedit.branch, stockmaterialedit.floor, stockmaterialedit.area);
+  }, [stockmaterialedit, isEditOpen]);
 
   const fetchAssetTypeDropdowns = async () => {
     try {
@@ -5005,13 +5010,17 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
   const handleCloseviewalertstockitem = () => {
     setOpenviewalertstockitem(false);
   };
-
+  console.log(educationtodo, "educationtodo")
   const educationTodo = () => {
     const isNameMatch = educationtodo?.some((item) => {
       if (stockmaster?.requestmode === 'Stock Material') {
-        return item?.category === todoDetails?.category && item?.subcategory === todoDetails?.subcategory && item?.itemname?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
+        return item?.category === todoDetails?.category &&
+          item?.subcategory === todoDetails?.subcategory &&
+          item?.materialnew?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() &&
+          item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
       } else {
-        return item?.materialnew?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() && item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
+        return item?.materialnew?.toLowerCase() === todoDetails?.materialnew?.toLowerCase() &&
+          item?.uomnew?.toLowerCase() === todoDetails?.uomnew?.toLowerCase();
       }
     });
     // if (todoDetails.particularmode === "Please Select Particular Mode") {
@@ -5048,8 +5057,8 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
       setPopupContentMalert("Please Enter Less Than Balance Count!");
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
-    } 
-     else if (todoDetails.amount === '' || todoDetails.amount == 0) {
+    }
+    else if (todoDetails.amount === '' || todoDetails.amount == 0) {
       setPopupContentMalert('Please Enter Amount!');
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
@@ -5282,7 +5291,7 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
       <PageHeading title="Manual Stock Purchase" modulename="Asset" submodulename="Stock" mainpagename="Manual Stock Entry" subpagename="" subsubpagename="" />
       {isUserRoleCompare?.includes('amanualstockentry') && (
         <>
-          <Box  sx={{ padding: '20px' }}>
+          <Box sx={{ padding: '20px' }}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
@@ -5291,161 +5300,161 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
               </Grid>
               <br />
               <Grid container spacing={2}>
-                             <Grid item md={3} xs={12} sm={12}>
-                                                                <FormControl fullWidth size="small">
-                                                                    <Typography>
-                                                                        Company<b style={{ color: 'red' }}>*</b>
-                                                                    </Typography>
-                                                                    <Selects
-                                                                        options={companys}
-                                                                        styles={colourStyles}
-                                                                        value={{ label: stockmaster.company, value: stockmaster.company }}
-                                                                        onChange={(e) => {
-                                                                            setStockmaster({ ...stockmaster, company: e.value, branch: 'Please Select Branch', unit: 'Please Select Unit', floor: 'Please Select Floor', area: 'Please Select Area', location: 'Please Select Location' });
-                                                                            // setBranchs([]);
-                                                                            setUnits([]);
-                                                                            setFloors([]);
-                                                                            setAreas([]);
-                                                                            setLocations([{ label: 'ALL', value: 'ALL' }]);
-                                                                            fetchBranchDropdowns(e.value);
-                                                                        }}
-                                                                    />
-                                                                     {/* <OutlinedInput
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Company<b style={{ color: 'red' }}>*</b>
+                    </Typography>
+                    <Selects
+                      options={companys}
+                      styles={colourStyles}
+                      value={{ label: stockmaster.company, value: stockmaster.company }}
+                      onChange={(e) => {
+                        setStockmaster({ ...stockmaster, company: e.value, branch: 'Please Select Branch', unit: 'Please Select Unit', floor: 'Please Select Floor', area: 'Please Select Area', location: 'Please Select Location' });
+                        // setBranchs([]);
+                        setUnits([]);
+                        setFloors([]);
+                        setAreas([]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
+                        fetchBranchDropdowns(e.value);
+                      }}
+                    />
+                    {/* <OutlinedInput
                                                                         id="component-outlined"
                                                                         type="text"
                                                                         value={stockmaster.company}
                                                                      readOnly
                                                                       
                                                                     /> */}
-                                                                </FormControl>
-                                                            </Grid>
-                                                            <Grid item md={3} xs={12} sm={12}>
-                                                                <FormControl fullWidth size="small">
-                                                                    <Typography>
-                                                                        Branch<b style={{ color: 'red' }}>*</b>
-                                                                    </Typography>
-                                                                    <Selects
-                                                                        options={branchs}
-                                                                        styles={colourStyles}
-                                                                        value={{ label: stockmaster.branch, value: stockmaster.branch }}
-                                                                        onChange={(e) => {
-                                                                            setNewcheckBranch(e.value);
-                                                                            setStockmaster({ ...stockmaster, branch: e.value, unit: 'Please Select Unit', floor: 'Please Select Floor', area: 'Please Select Area', location: 'Please Select Location' });
-                                                                            // setUnits([]);
-                                                                            // setFloors([]);
-                                                                            // setAreas([]);
-                                                                            setLocations([{ label: 'ALL', value: 'ALL' }]);
-                                                                            fetchUnits(e.value);
-                                                                            fetchFloor(e.value);
-                                                                        }}
-                                                                    />
-                                                                     {/* <OutlinedInput
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Branch<b style={{ color: 'red' }}>*</b>
+                    </Typography>
+                    <Selects
+                      options={branchs}
+                      styles={colourStyles}
+                      value={{ label: stockmaster.branch, value: stockmaster.branch }}
+                      onChange={(e) => {
+                        setNewcheckBranch(e.value);
+                        setStockmaster({ ...stockmaster, branch: e.value, unit: 'Please Select Unit', floor: 'Please Select Floor', area: 'Please Select Area', location: 'Please Select Location' });
+                        // setUnits([]);
+                        // setFloors([]);
+                        // setAreas([]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
+                        fetchUnits(e.value);
+                        fetchFloor(e.value);
+                      }}
+                    />
+                    {/* <OutlinedInput
                                                                         id="component-outlined"
                                                                         type="text"
                                                                         value={stockmaster.branch}
                                                                      readOnly
                                                                       
                                                                     /> */}
-                                                                </FormControl>
-                                                            </Grid>
-                                                            <Grid item md={3} xs={12} sm={12}>
-                                                                <FormControl fullWidth size="small">
-                                                                    <Typography>
-                                                                        Unit<b style={{ color: 'red' }}>*</b>
-                                                                    </Typography>
-                                                                    <Selects
-                                                                        options={units}
-                                                                        styles={colourStyles}
-                                                                        value={{ label: stockmaster.unit, value: stockmaster.unit }}
-                                                                        onChange={(e) => {
-                                                                            setStockmaster({ ...stockmaster, unit: e.value, workstation: '' });
-                                                                        }}
-                                                                    />
-                                                                     {/* <OutlinedInput
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Unit<b style={{ color: 'red' }}>*</b>
+                    </Typography>
+                    <Selects
+                      options={units}
+                      styles={colourStyles}
+                      value={{ label: stockmaster.unit, value: stockmaster.unit }}
+                      onChange={(e) => {
+                        setStockmaster({ ...stockmaster, unit: e.value, workstation: '' });
+                      }}
+                    />
+                    {/* <OutlinedInput
                                                                         id="component-outlined"
                                                                         type="text"
                                                                         value={stockmaster.unit}
                                                                      readOnly
                                                                       
                                                                     /> */}
-                                                                </FormControl>
-                                                            </Grid>
-                                                            <Grid item md={3} xs={12} sm={12}>
-                                                                <FormControl fullWidth size="small">
-                                                                    <Typography>
-                                                                        Floor<b style={{ color: 'red' }}>*</b>
-                                                                    </Typography>
-                                                                    <Selects
-                                                                        options={floors}
-                                                                        styles={colourStyles}
-                                                                        value={{ label: stockmaster.floor, value: stockmaster.floor }}
-                                                                        onChange={(e) => {
-                                                                            setStockmaster({ ...stockmaster, floor: e.value, workstation: '', area: 'Please Select Area' });
-                                                                            // setAreas([]);
-                                                                            setLocations([{ label: 'ALL', value: 'ALL' }]);
-                                                                            fetchArea(stockmaster.branch, e.value);
-                                                                        }}
-                                                                    />
-                                                                     {/* <OutlinedInput
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Floor<b style={{ color: 'red' }}>*</b>
+                    </Typography>
+                    <Selects
+                      options={floors}
+                      styles={colourStyles}
+                      value={{ label: stockmaster.floor, value: stockmaster.floor }}
+                      onChange={(e) => {
+                        setStockmaster({ ...stockmaster, floor: e.value, workstation: '', area: 'Please Select Area' });
+                        // setAreas([]);
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
+                        fetchArea(stockmaster.branch, e.value);
+                      }}
+                    />
+                    {/* <OutlinedInput
                                                                         id="component-outlined"
                                                                        type="text"
                                                                         value={stockmaster.floor}
                                                                      readOnly
                                                                       
                                                                     /> */}
-                                                                </FormControl>
-                                                            </Grid>
-                                                            <Grid item md={3} xs={12} sm={12}>
-                                                                <FormControl fullWidth size="small">
-                                                                    <Typography>
-                                                                        Area<b style={{ color: 'red' }}>*</b>
-                                                                    </Typography>
-                                                                    <Selects
-                                                                        options={areas}
-                                                                        styles={colourStyles}
-                                                                        value={{ label: stockmaster.area, value: stockmaster.area }}
-                                                                        onChange={(e) => {
-                                                                            setStockmaster({ ...stockmaster, area: e.value, workstation: '', location: 'Please Select Location' });
-                                                                            setLocations([{ label: 'ALL', value: 'ALL' }]);
-                                                                            fetchLocation(stockmaster.branch, stockmaster.floor, stockmaster.area, e.value);
-                                                                        }}
-                                                                    />
-                                                                     {/* <OutlinedInput
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Area<b style={{ color: 'red' }}>*</b>
+                    </Typography>
+                    <Selects
+                      options={areas}
+                      styles={colourStyles}
+                      value={{ label: stockmaster.area, value: stockmaster.area }}
+                      onChange={(e) => {
+                        setStockmaster({ ...stockmaster, area: e.value, workstation: '', location: 'Please Select Location' });
+                        setLocations([{ label: 'ALL', value: 'ALL' }]);
+                        fetchLocation(stockmaster.branch, stockmaster.floor, stockmaster.area, e.value);
+                      }}
+                    />
+                    {/* <OutlinedInput
                                                                         id="component-outlined"
                                                                         type="text"
                                                                         value={stockmaster.area}
                                                                      readOnly
                                                                       
                                                                     /> */}
-                                                                </FormControl>
-                                                            </Grid>
-                                                            <Grid item md={3} xs={12} sm={12}>
-                                                                <FormControl fullWidth size="small">
-                                                                    <Typography>
-                                                                        Location<b style={{ color: 'red' }}>*</b>
-                                                                    </Typography>
-                                                                    <Selects
-                                                                        options={locations}
-                                                                        styles={colourStyles}
-                                                                        value={{ label: stockmaster.location, value: stockmaster.location }}
-                                                                        onChange={(e) => {
-                                                                            setStockmaster({ ...stockmaster, location: e.value, workstation: '' });
-                                                                        }}
-                                                                    />
-                                                                     {/* <OutlinedInput
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Location<b style={{ color: 'red' }}>*</b>
+                    </Typography>
+                    <Selects
+                      options={locations}
+                      styles={colourStyles}
+                      value={{ label: stockmaster.location, value: stockmaster.location }}
+                      onChange={(e) => {
+                        setStockmaster({ ...stockmaster, location: e.value, workstation: '' });
+                      }}
+                    />
+                    {/* <OutlinedInput
                                                                         id="component-outlined"
                                                                         type="text"
                                                                         value={stockmaster.location}
                                                                      readOnly
                                                                       
                                                                     /> */}
-                                                                </FormControl>
-                                                            </Grid>
-             
-                             <Grid item md={3} xs={12} sm={12}>
-                               <FormControl fullWidth size="small">
-                                 <Typography>Warranty</Typography>
-                                 {/* <Select
+                  </FormControl>
+                </Grid>
+
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>Warranty</Typography>
+                    {/* <Select
                                    fullWidth
                                    labelId="demo-select-small"
                                    id="demo-select-small"
@@ -5461,32 +5470,32 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                    <MenuItem value="Yes"> {'Yes'} </MenuItem>
                                    <MenuItem value="No"> {'No'} </MenuItem>
                                  </Select> */}
-             
-                                                             <OutlinedInput id="component-outlined" 
-                                                             type="text"  
-                                                             value={stockmaster.warranty}
-                                                              />
-             
-                               </FormControl>
-                             </Grid>
-             
-                             {stockmaster.warranty === 'Yes' && (
-                               <>
-                                 <Grid item md={3} xs={12} sm={12}>
-                                   <Grid container>
-                                     <Grid item md={6} xs={6} sm={6}>
-                                       <Typography>Warranty Time</Typography>
-                                       <FormControl fullWidth size="small">
-                                         <OutlinedInput id="component-outlined" type="text" 
-                                         placeholder="Enter Time" value={stockmaster.estimation}
-                                         readOnly
-                                         //  onChange={(e) => handleChangephonenumber(e)} 
-                                          />
-                                       </FormControl>
-                                     </Grid>
-                                     <Grid item md={6} xs={6} sm={6}>
-                                       <Typography>Estimation</Typography>
-                                       {/* <Select
+
+                    <OutlinedInput id="component-outlined"
+                      type="text"
+                      value={stockmaster.warranty}
+                    />
+
+                  </FormControl>
+                </Grid>
+
+                {stockmaster.warranty === 'Yes' && (
+                  <>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <Grid container>
+                        <Grid item md={6} xs={6} sm={6}>
+                          <Typography>Warranty Time</Typography>
+                          <FormControl fullWidth size="small">
+                            <OutlinedInput id="component-outlined" type="text"
+                              placeholder="Enter Time" value={stockmaster.estimation}
+                              readOnly
+                            //  onChange={(e) => handleChangephonenumber(e)} 
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={6} xs={6} sm={6}>
+                          <Typography>Estimation</Typography>
+                          {/* <Select
                                          fullWidth
                                          labelId="demo-select-small"
                                          size='small'
@@ -5505,56 +5514,56 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                          <MenuItem value="Month"> {'Month'} </MenuItem>
                                          <MenuItem value="Year"> {'Year'} </MenuItem>
                                        </Select> */}
-                                         <OutlinedInput id="component-outlined"  
-                                         size="small"
-                                         value={stockmaster.estimationtime}
-                                           readOnly
-                                         //  onChange={(e) => handleChangephonenumber(e)} 
-                                          />
-                                     </Grid>
-                                   </Grid>
-                                 </Grid>
-                               </>
-                             )}
-                             <Grid item md={3} xs={12} sm={12}>
-                               <FormControl fullWidth size="small">
-                                 <Typography>Purchase date </Typography>
-                                 <OutlinedInput
-                                   id="component-outlined"
-                                   type="date"
-                                   value={stockmaterialedit.purchasedate}
-                                  readOnly
-                                   // onChange={handlePurchaseDateChange}
-                                 />
-                               </FormControl>
-                             </Grid>
-                             {stockmaster.warranty === 'Yes' && (
-                               <>
-                                 <Grid item md={3} xs={12} sm={12}>
-                                   <FormControl fullWidth size="small">
-                                     <Typography>Expiry Date </Typography>
-                                     <OutlinedInput
-                                       id="component-outlined"
-                                       type="text"
-                                       placeholder=""
-                                       value={stockmaster.warrantycalculation}
-                                       readOnly
-                                     // onChange={(e) => {
-                                     //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
-                                     // }}
-                                     />
-                                   </FormControl>
-                                 </Grid>
-                               </>
-                             )}
-             
-                             <Grid item md={2.5} xs={12} sm={12}>
-                               <FormControl fullWidth size="small">
-                                 <Typography>
-                                   {' '}
-                                   Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
-                                 </Typography>
-                                 {/* <Selects
+                          <OutlinedInput id="component-outlined"
+                            size="small"
+                            value={stockmaster.estimationtime}
+                            readOnly
+                          //  onChange={(e) => handleChangephonenumber(e)} 
+                          />
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </>
+                )}
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>Purchase date </Typography>
+                    <OutlinedInput
+                      id="component-outlined"
+                      type="date"
+                      value={stockmaterialedit.purchasedate}
+                      readOnly
+                    // onChange={handlePurchaseDateChange}
+                    />
+                  </FormControl>
+                </Grid>
+                {stockmaster.warranty === 'Yes' && (
+                  <>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>Expiry Date </Typography>
+                        <OutlinedInput
+                          id="component-outlined"
+                          type="text"
+                          placeholder=""
+                          value={stockmaster.warrantycalculation}
+                          readOnly
+                        // onChange={(e) => {
+                        //   setStockmaster({ ...stockmaster, warrantyCalculation: e.target.value });
+                        // }}
+                        />
+                      </FormControl>
+                    </Grid>
+                  </>
+                )}
+
+                <Grid item md={2.5} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      {' '}
+                      Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
+                    </Typography>
+                    {/* <Selects
                                    options={vendorGroupOpt}
                                    styles={colourStyles}
                                    value={{ label: vendorGroup, value: vendorGroup }}
@@ -5564,22 +5573,22 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                      setVendorNew('Please Select Vendor');
                                    }}
                                  /> */}
-                                  <OutlinedInput
-                                                                        id="component-outlined"
-                                                                        type="text"
-                                                                        value={vendorGroup}
-                                                                     readOnly
-                                                                      
-                                                                    />
-                               </FormControl>
-                             </Grid>
-             
-                             <Grid item md={2.5} xs={12} sm={12}>
-                               <FormControl size="small" fullWidth>
-                                 <Typography>
-                                   Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
-                                 </Typography>
-                                 {/* <Selects
+                    <OutlinedInput
+                      id="component-outlined"
+                      type="text"
+                      value={vendorGroup}
+                      readOnly
+
+                    />
+                  </FormControl>
+                </Grid>
+
+                <Grid item md={2.5} xs={12} sm={12}>
+                  <FormControl size="small" fullWidth>
+                    <Typography>
+                      Vendor Name <b style={{ color: 'red' }}>*</b>{' '}
+                    </Typography>
+                    {/* <Selects
                                    options={vendorOpt}
                                    styles={colourStyles}
                                    value={{ label: vendorNew, value: vendorNew }}
@@ -5591,18 +5600,18 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                      vendorid(e._id);
                                    }}
                                  /> */}
-                                                      <OutlinedInput
-                                                                        id="component-outlined"
-                                                                        type="text"
-                                                                        value={vendorNew}
-                                                                     readOnly
-                                                                      
-                                                                    />
-                               </FormControl>
-                             </Grid>
-             
-                         
-                             {/* <Grid item md={0.5} sm={1} xs={1}>
+                    <OutlinedInput
+                      id="component-outlined"
+                      type="text"
+                      value={vendorNew}
+                      readOnly
+
+                    />
+                  </FormControl>
+                </Grid>
+
+
+                {/* <Grid item md={0.5} sm={1} xs={1}>
                                <Button
                                  variant="contained"
                                  style={{
@@ -5621,161 +5630,161 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                  <FaPlus style={{ fontSize: '15px' }} />
                                </Button>
                              </Grid> */}
-                             <Grid item lg={3} md={3} xs={12} sm={6}>
-                               <FormControl size="small" fullWidth>
-                                 <Typography>Frequency</Typography>
-                                 <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValue} readOnly />
-                               </FormControl>
-                             </Grid>
-                             <Grid item md={3} xs={12} sm={12}>
-                               <FormControl fullWidth size="small">
-                                 <Typography>
-                                   GST No
-                                 </Typography>
-                                 <OutlinedInput id="component-outlined" type="text" value={stockmaster?.gstno} readOnly />
-                               </FormControl>
-                             </Grid>
-                             <Grid item md={3} sm={12} xs={12}>
-                               <FormControl fullWidth size="small">
-                                 <Typography>
-                                   Bill No <b style={{ color: 'red' }}>*</b>{' '}
-                                 </Typography>
-                                 <OutlinedInput
-                                   id="component-outlined"
-                                   type="number"
-                                   sx={userStyle.input}
-                                   placeholder="Please Enter Billno"
-                                   value={stockmaster.billno}
-                                   readOnly
-                                   // onChange={(e) => {
-                                   //   setStockmaster({ ...stockmaster, billno: e.target.value });
-                                   // }}
-                                 />
-                               </FormControl>
-                             </Grid>
-                             <Grid item md={3} xs={12} sm={12}>
-                               <FormControl fullWidth size="small">
-                                 <Typography>
-                                   Request Mode For<b style={{ color: 'red' }}>*</b>
-                                 </Typography>
-                                 <OutlinedInput
-                                   readOnly
-                                   value={stockmaster.requestmode}
-                               
-                                 />
-                               </FormControl>
-                             </Grid>
-               {stockmaster.warranty === 'Yes' && (
-                               <>
-                             <Grid item md={3} xs={12} sm={12}>
-                               <FormControl fullWidth size="small">
-                                 <Typography>
-                                   Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
-                                 </Typography>
-                                 <OutlinedInput
-                                   id="component-outlined"
-                                   type="text"
-                                   value={stockmaster.warrantydetails}
-                                   sx={userStyle.input}
-                                   placeholder="Please Enter Warranty Details"
-                                   // onChange={(e) => {
-                                   //   setStockmaster({ ...stockmaster, warrantydetails: e.target.value });
-                                   // }}
-                                   readOnly
-                                 />
-                               </FormControl>
-                             </Grid>
-               </>
-                             )}
-                             <Grid item md={3} xs={12} sm={12}>
-                               <FormControl fullWidth size="small">
-                                 <Typography>
-                                   Bill Date <b style={{ color: 'red' }}>*</b>{' '}
-                                 </Typography>
-                                 <TextField
-                                   size="small"
-                                   type="date"
-                                   value={stockmaster.billdate}
-                                   onChange={(e) => {
-                                     setStockmaster({ ...stockmaster, billdate: e.target.value,duedate:'' });
-                                   }}
-                                 />
-                               </FormControl>
-                             </Grid>
-                                 <Grid item lg={2} md={4} xs={12} sm={6}>
-                                               <FormControl fullWidth size="small">
-                                                 <Typography>Due Date</Typography>
-                                                 <OutlinedInput
-                                                   id="to-date"
-                                                   type="date"
-                                                   value={expensecreate.duedate}
-                                                   onChange={(e) => {
-                                                     setExpensecreate({
-                                                       ...expensecreate,
-                                                       duedate: e.target.value,
-                                                     });
-                                                   }}
-                                                   inputProps={{
-                                                     min: stockmaster.billdate,
-                                                     // max: today
-                                                   }}
-                                                 />
-                                               </FormControl>
-                                             </Grid>
-                                               <Grid item md={3} sm={12} xs={12}>
-                                                               <FormControl fullWidth size="small">
-                                                                 <Typography>
-                                                                   Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
-                                                                 </Typography>
-                                                                 <OutlinedInput
-                                                                   id="component-outlined"
-                                                                   type="number"
-                                                                   sx={userStyle.input}
-                                                                   //  value={totalQuantityStock * stockmanagemasteredit.rate}
-                                                                   value={stockmaster.totalbillamount}
-                                                                   readOnly
-                                                                   // onChange={(e) => {
-                                                                   //   setStockmaster({
-                                                                   //     ...stockmaster,
-                                                                   //     totalbillamount: e.target.value,
-                                                                   //   });
-                                                                   // }}
-                                                                 />
-                                                               </FormControl>
-                                                             </Grid>
-                             <Grid item md={1.5} xs={12} sm={12}>
-                               <Typography>
-                                 Bill <b style={{ color: 'red' }}>*</b>{' '}
-                               </Typography>
-                               <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                                 <Button variant="contained" onClick={handleClickUploadPopupOpen}>
-                                   Upload
-                                 </Button>
-                               </Box>
-                             </Grid>
-                              {stockmaster.warranty === 'Yes' && (
-                               <>
-                             <Grid item md={1.5} xs={12} sm={12}>
-                               <Typography>Warranty Card </Typography>
-                               <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                                 <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
-                                   Upload
-                                 </Button>
-                               </Box>
-                             </Grid>
-                             </>
-                              )}
-                           </Grid>
-                           <br />
-                           {stockmaster.requestmode === 'Stock Material' && (
-                             <>
-                               <Grid item md={12} xs={12} sm={12}>
-                                 {' '}
-                                 <Typography variant="h6">Stock Purchase Todo List</Typography>
-                               </Grid>
-                               <Grid item md={12} sm={12} xs={12}>
-                                 <Grid container spacing={3} sx={{ display: 'flex' }}>
-                                   {/* <Grid item md={3} sm={6} xs={12}>
+                <Grid item lg={3} md={3} xs={12} sm={6}>
+                  <FormControl size="small" fullWidth>
+                    <Typography>Frequency</Typography>
+                    <OutlinedInput id="component-outlined" type="text" sx={userStyle.input} placeholder="Please Enter Frequency" value={frequencyValue} readOnly />
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      GST No
+                    </Typography>
+                    <OutlinedInput id="component-outlined" type="text" value={stockmaster?.gstno} readOnly />
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} sm={12} xs={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Bill No <b style={{ color: 'red' }}>*</b>{' '}
+                    </Typography>
+                    <OutlinedInput
+                      id="component-outlined"
+                      type="number"
+                      sx={userStyle.input}
+                      placeholder="Please Enter Billno"
+                      value={stockmaster.billno}
+                      readOnly
+                    // onChange={(e) => {
+                    //   setStockmaster({ ...stockmaster, billno: e.target.value });
+                    // }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Request Mode For<b style={{ color: 'red' }}>*</b>
+                    </Typography>
+                    <OutlinedInput
+                      readOnly
+                      value={stockmaster.requestmode}
+
+                    />
+                  </FormControl>
+                </Grid>
+                {stockmaster.warranty === 'Yes' && (
+                  <>
+                    <Grid item md={3} xs={12} sm={12}>
+                      <FormControl fullWidth size="small">
+                        <Typography>
+                          Warranty Details <b style={{ color: 'red' }}>*</b>{' '}
+                        </Typography>
+                        <OutlinedInput
+                          id="component-outlined"
+                          type="text"
+                          value={stockmaster.warrantydetails}
+                          sx={userStyle.input}
+                          placeholder="Please Enter Warranty Details"
+                          // onChange={(e) => {
+                          //   setStockmaster({ ...stockmaster, warrantydetails: e.target.value });
+                          // }}
+                          readOnly
+                        />
+                      </FormControl>
+                    </Grid>
+                  </>
+                )}
+                <Grid item md={3} xs={12} sm={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Bill Date <b style={{ color: 'red' }}>*</b>{' '}
+                    </Typography>
+                    <TextField
+                      size="small"
+                      type="date"
+                      value={stockmaster.billdate}
+                      onChange={(e) => {
+                        setStockmaster({ ...stockmaster, billdate: e.target.value, duedate: '' });
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item lg={2} md={4} xs={12} sm={6}>
+                  <FormControl fullWidth size="small">
+                    <Typography>Due Date</Typography>
+                    <OutlinedInput
+                      id="to-date"
+                      type="date"
+                      value={expensecreate.duedate}
+                      onChange={(e) => {
+                        setExpensecreate({
+                          ...expensecreate,
+                          duedate: e.target.value,
+                        });
+                      }}
+                      inputProps={{
+                        min: stockmaster.billdate,
+                        // max: today
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item md={3} sm={12} xs={12}>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Total Bill Amounts<b style={{ color: 'red' }}>*</b>{' '}
+                    </Typography>
+                    <OutlinedInput
+                      id="component-outlined"
+                      type="number"
+                      sx={userStyle.input}
+                      //  value={totalQuantityStock * stockmanagemasteredit.rate}
+                      value={stockmaster.totalbillamount}
+                      readOnly
+                    // onChange={(e) => {
+                    //   setStockmaster({
+                    //     ...stockmaster,
+                    //     totalbillamount: e.target.value,
+                    //   });
+                    // }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item md={1.5} xs={12} sm={12}>
+                  <Typography>
+                    Bill <b style={{ color: 'red' }}>*</b>{' '}
+                  </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                    <Button variant="contained" onClick={handleClickUploadPopupOpen}>
+                      Upload
+                    </Button>
+                  </Box>
+                </Grid>
+                {stockmaster.warranty === 'Yes' && (
+                  <>
+                    <Grid item md={1.5} xs={12} sm={12}>
+                      <Typography>Warranty Card </Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                        <Button variant="contained" onClick={handleClickUploadPopupOpenwarranty}>
+                          Upload
+                        </Button>
+                      </Box>
+                    </Grid>
+                  </>
+                )}
+              </Grid>
+              <br />
+              {stockmaster.requestmode === 'Stock Material' && (
+                <>
+                  <Grid item md={12} xs={12} sm={12}>
+                    {' '}
+                    <Typography variant="h6">Stock Purchase Todo List</Typography>
+                  </Grid>
+                  <Grid item md={12} sm={12} xs={12}>
+                    <Grid container spacing={3} sx={{ display: 'flex' }}>
+                      {/* <Grid item md={3} sm={6} xs={12}>
                                                                  <FormControl fullWidth size="small">
                                                                    <Typography>
                                                                      Particular Mode <b style={{ color: "red" }}>*</b>
@@ -5805,13 +5814,13 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                                                    />
                                                                  </FormControl>
                                                                </Grid> */}
-             
-                                   {stockmaster.requestmode === 'Stock Material' && (
-                                     <>
-                                       <Grid item md={2.5} sm={6} xs={12}>
-                                         <FormControl fullWidth size="small">
-                                           <Typography>Category</Typography>
-                                           {/* <Selects
+
+                      {stockmaster.requestmode === 'Stock Material' && (
+                        <>
+                          <Grid item md={2.5} sm={6} xs={12}>
+                            <FormControl fullWidth size="small">
+                              <Typography>Category</Typography>
+                              {/* <Selects
                                              options={stockCategoryOptions}
                                              styles={colourStyles}
                                              value={{
@@ -5832,16 +5841,16 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                                });
                                              }}
                                            /> */}
-                                           <OutlinedInput
-                                                                                       id="component-outlined"
-                                                                                       type="text"
-                                                                                       value={todoDetails.category}
-                                                                                    readOnly
-                                                                                     
-                                                                                   />
-                                         </FormControl>
-                                       </Grid>
-                                       {/* {isUserRoleCompare?.includes('astockcategory') && (
+                              <OutlinedInput
+                                id="component-outlined"
+                                type="text"
+                                value={todoDetails.category}
+                                readOnly
+
+                              />
+                            </FormControl>
+                          </Grid>
+                          {/* {isUserRoleCompare?.includes('astockcategory') && (
                                          <Grid item md={0.5} sm={1} xs={1}>
                                            <Button
                                              variant="contained"
@@ -5862,10 +5871,10 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                            </Button>
                                          </Grid>
                                        )} */}
-                                       <Grid item md={3} sm={6} xs={12}>
-                                         <FormControl fullWidth size="small">
-                                           <Typography>Sub Category</Typography>
-                                           {/* <Selects
+                          <Grid item md={3} sm={6} xs={12}>
+                            <FormControl fullWidth size="small">
+                              <Typography>Sub Category</Typography>
+                              {/* <Selects
                                              options={allStockCategory
                                                .filter((item) => item.categoryname === todoDetails.category)
                                                .map((item) => {
@@ -5898,21 +5907,21 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                                });
                                              }}
                                            /> */}
-                                               <OutlinedInput
-                                                                                       id="component-outlined"
-                                                                                       type="text"
-                                                                                       value={todoDetails.subcategory}
-                                                                                    readOnly
-                                                                                     
-                                                                                   />
-                                         </FormControl>
-                                       </Grid>
-                                       <Grid item md={2.5} sm={6} xs={12}>
-                                         <FormControl fullWidth size="small">
-                                           <Typography>
-                                             Item Name <b style={{ color: 'red' }}>*</b>
-                                           </Typography>
-                                           {/* <Selects
+                              <OutlinedInput
+                                id="component-outlined"
+                                type="text"
+                                value={todoDetails.subcategory}
+                                readOnly
+
+                              />
+                            </FormControl>
+                          </Grid>
+                          <Grid item md={2.5} sm={6} xs={12}>
+                            <FormControl fullWidth size="small">
+                              <Typography>
+                                Item Name <b style={{ color: 'red' }}>*</b>
+                              </Typography>
+                              {/* <Selects
                                              options={
                                                !itemAllShow
                                                  ? allStockValues
@@ -5945,16 +5954,16 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                                });
                                              }}
                                            /> */}
-                                            <OutlinedInput
-                                                                                       id="component-outlined"
-                                                                                       type="text"
-                                                                                       value={todoDetails.materialnew}
-                                                                                    readOnly
-                                                                                     
-                                                                                   />
-                                         </FormControl>
-                                       </Grid>
-                                       {/* {isUserRoleCompare?.includes('amanagestockitems') && (
+                              <OutlinedInput
+                                id="component-outlined"
+                                type="text"
+                                value={todoDetails.materialnew}
+                                readOnly
+
+                              />
+                            </FormControl>
+                          </Grid>
+                          {/* {isUserRoleCompare?.includes('amanagestockitems') && (
                                          <Grid item md={0.5} sm={1} xs={1}>
                                            <Button
                                              variant="contained"
@@ -5975,437 +5984,179 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                                            </Button>
                                          </Grid>
                                        )} */}
-                                       <Grid item md={3} sm={6} xs={12}>
-                                         <FormControl fullWidth size="small">
-                                           <Typography>UOM</Typography>
-                                           <OutlinedInput id="component-outlined" type="text" placeholder="Please Enter UOM" value={todoDetails.uomnew} readOnly />
-                                         </FormControl>
-                                       </Grid>
-                                     </>
-                                   )}
-             
-                                   <Grid item md={3} sm={6} xs={12}>
-                                     <FormControl fullWidth size="small">
-                                       <Typography>
-                                         Rate <b style={{ color: 'red' }}>*</b>
-                                       </Typography>
-                                       <OutlinedInput
-                                         id="component-outlined"
-                                         // type="text"
-                                         // placeholder="Please Enter Rate"
-                                         // inputMode="decimal"
-                                         // pattern="[0-9]*"
-                                         value={todoDetails.rate}
-                                         // onChange={(e) => {
-                                         //   const value = e.target.value;
-                                         //   const regex = /^\d*\.?\d{0,2}$/;
-                                         //   if (regex.test(value) || value === '') {
-                                         //     setTodoDetails({
-                                         //       ...todoDetails,
-                                         //       rate: value,
-                                         //       amount: Number(value) * Number(todoDetails.quantitynew),
-                                         //     });
-                                         //   }
-                                         // }}
-                                         readOnly
-                                       />
-                                     </FormControl>
-                                   </Grid>
-                                   <Grid item md={3} sm={6} xs={12}>
-                                     <FormControl fullWidth size="small">
-                                       <Typography>
-                                         Quantity <b style={{ color: 'red' }}>*</b>
-                                       </Typography>
-                                       <OutlinedInput
-                                         id="component-outlined"
-                                         type="text"
-                                         placeholder="Please Enter Quantity"
-                                         value={todoDetails.quantitynew}
-                                         onChange={(e) => {
-                                           const input = e.target.value;
-                                           if (/^\d*\.?\d*$/.test(input) && input >= 0) {
-                                             setTodoDetails({
-                                               ...todoDetails,
-                                               quantitynew: input,
-                                               amount: Number(input) * Number(todoDetails.rate),
-                                             });
-                                           }
-                                         }}
-                                    
-                                       />
-                                     </FormControl>
-                                   </Grid>
-                                   <Grid item md={3} sm={6} xs={12}>
-                                     <FormControl fullWidth size="small">
-                                       <Typography>
-                                         Amount<b style={{ color: 'red' }}>*</b>
-                                       </Typography>
-                                       <OutlinedInput id="component-outlined" type="number" placeholder="Please Enter Amount" sx={userStyle.input} value={todoDetails.amount} readOnly />
-                                     </FormControl>
-                                   </Grid>
-                                   <Grid item md={todoDetails.particularmode !== 'Others' ? 2.5 : 3} sm={6} xs={12}>
-                                     <Typography>
-                                       Product Details<b style={{ color: 'red' }}>*</b>
-                                     </Typography>
-                                     <TextareaAutosize
-                                       aria-label="minimum height"
-                                       minRows={3}
-                                       minCols={10}
-                                       value={todoDetails.productdetailsnew}
-                                       readOnly
-                                       // placeholder="Please Enter Product Details"
-                                       // onChange={(e) => {
-                                       //   setTodoDetails({
-                                       //     ...todoDetails,
-                                       //     productdetailsnew: e.target.value,
-                                       //   });
-                                       // }}
-                                     />
-                                   </Grid>
-                                   <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: '-20px' }}>
-                                     <Button
-                                       variant="contained"
-                                       color="success"
-                                       style={{
-                                         height: '30px',
-                                         minWidth: '20px',
-                                         padding: '19px 13px',
-                                         marginTop: '25px',
-                                       }}
-                                       onClick={educationTodo}
-                                     >
-                                       <FaPlus />
-                                     </Button>
-                                   </Grid>
-                                 </Grid>
-                               </Grid>{' '}
-                               <br />
-                               <Grid container spacing={2}>
-                                 <Grid item md={12} xs={12} sm={12}>
-                                   <TableContainer component={Paper}>
-                                     <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable">
-                                       <TableHead sx={{ fontWeight: '600' }}>
-                                         <StyledTableRow>
-                                           {/* <StyledTableCell>SNo</StyledTableCell> */}
-                                           <StyledTableCell>Item Name</StyledTableCell>
-                                           <StyledTableCell>UOM</StyledTableCell>
-                                           <StyledTableCell>Rate</StyledTableCell>
-                                           <StyledTableCell>Quantity</StyledTableCell>
-                                           <StyledTableCell>Amount</StyledTableCell>
-                                           <StyledTableCell>Product Details</StyledTableCell>
-                                           <StyledTableCell>Actions</StyledTableCell>
-                                         </StyledTableRow>
-                                       </TableHead>
-                                       <TableBody align="left">
-                                         {educationtodo?.length > 0 ? (
-                                           educationtodo?.map((row, index) => (
-                                             <StyledTableRow>
-                                               <StyledTableCell>{index + 1}</StyledTableCell>
-                                               <StyledTableCell>{row.materialnew}</StyledTableCell>
-                                               <StyledTableCell>{row.uomnew}</StyledTableCell>
-                                               <StyledTableCell>{row.rate}</StyledTableCell>
-                                               <StyledTableCell>{row.quantitynew}</StyledTableCell>
-                                               <StyledTableCell>{row.amount}</StyledTableCell>
-                                               <StyledTableCell>{row.productdetailsnew}</StyledTableCell>
-                                               <StyledTableCell>
-                                                 <CloseIcon
-                                                   sx={{ color: 'red', cursor: 'pointer' }}
-                                                   onClick={() => {
-                                                     educationTodoremove(index);
-                                                   }}
-                                                 />
-                                               </StyledTableCell>
-                                             </StyledTableRow>
-                                           ))
-                                         ) : (
-                                           <StyledTableRow>
-                                             {' '}
-                                             <StyledTableCell colSpan={8} align="center">
-                                               No Data Available
-                                             </StyledTableCell>{' '}
-                                           </StyledTableRow>
-                                         )} 
-                                         <StyledTableRow></StyledTableRow>
-                                       </TableBody>
-                                       <TableFooter sx={{ backgroundColor: '#9591914f', height: '50px' }}>
-                                         {educationtodo &&
-                                           educationtodo.forEach((item) => {
-                                             Expensetotal += +item.amount;
-                                           })}
-                                         <StyledTableRow className="table2_total">
-                                           <StyledTableCell align="left" colSpan={4}></StyledTableCell>
-                                           <StyledTableCell align="left">Stock Total (Rs.)</StyledTableCell>
-                                           <StyledTableCell align="left">{Expensetotal.toFixed(2)}</StyledTableCell>
-                                           <StyledTableCell align="left"></StyledTableCell>
-                                           <StyledTableCell align="left"></StyledTableCell>
-                                         </StyledTableRow>
-                                       </TableFooter>
-                                     </Table>
-                                   </TableContainer>{' '}
-                                 </Grid>
-                               </Grid>
-                               <br />
-                               <Grid container spacing={2} sx={{ display: 'flex' }}>
-                                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                                   <FormControl fullWidth size="small">
-                                     <Typography>
-                                       Paid Status<b style={{ color: 'red' }}>*</b>
-                                     </Typography>
-                                     {/* <Selects
-                                       maxMenuHeight={250}
-                                       options={statusOpt}
-                                       placeholder="Please Select Status"
-                                       value={{
-                                         label: expensecreate.paidstatus,
-                                         value: expensecreate.paidstatus,
-                                       }}
-                                       onChange={(e) => {
-                                         setExpensecreate({
-                                           ...expensecreate,
-                                           paidstatus: e.value,
-                                           paidmode: 'Please Select Paid Mode',
-                                         });
-                                       }}
-                                       isDisabled={Number(Expensetotal) !== Number(stockmaster.totalbillamount)}
-                                     /> */}
-                                       <OutlinedInput
-                                         id="component-outlined"
-                                         // type="number"
-                                         
-                                         sx={userStyle.input}
-                                         disabled={Number(Expensetotal) !== Number(stockmaster.totalbillamount)}
-                                         value={expensecreate.paidstatus}
-                                        readOnly
-                                       />
-                                   </FormControl>
-                                 </Grid>
-                                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                                   {expensecreate.paidstatus === 'Paid' && (
-                                     <FormControl fullWidth size="small">
-                                       <Typography>
-                                         Paid Mode<b style={{ color: 'red' }}>*</b>
-                                       </Typography>
-                                       {/* <Selects
-                                         maxMenuHeight={250}
-                                         options={paidOpt?.filter((data) => vendorModeOfPayments?.includes(data?.label))}
-                                         placeholder="Please Select Paid Mode"
-                                         value={{
-                                           label: expensecreate.paidmode,
-                                           value: expensecreate.paidmode,
-                                         }}
-                                         onChange={(e) => {
-                                           setExpensecreate({
-                                             ...expensecreate,
-                                             paidmode: e.value,
-                                           });
-                                         }}
-                                       /> */}
-                                        <OutlinedInput
-                                         id="component-outlined"
-                                         type="number"
-                                         sx={userStyle.input}
-                                         value={expensecreate.paidmode}
-                                        readOnly
-                                       />
-                                     </FormControl>
-                                   )}
-                                 </Grid>
-                                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                                   {expensecreate.paidstatus === 'Paid' && (
-                                     <FormControl fullWidth size="small">
-                                       <Typography>
-                                         Paid Amount<b style={{ color: 'red' }}>*</b>
-                                       </Typography>
-                                       <OutlinedInput
-                                         id="component-outlined"
-                                         type="number"
-                                         // placeholder="Please Enter Paid Amount"
-                                         sx={userStyle.input}
-                                         value={expensecreate.paidamount}
-                                         readOnly
-                                         // onChange={(e) => {
-                                         //   if (Number(e.target.value) <= Number(stockmaster.totalbillamount)) {
-                                         //     setExpensecreate({
-                                         //       ...expensecreate,
-                                         //       paidamount: e.target.value,
-                                         //       balanceamount: stockmaster.totalbillamount - e.target.value,
-                                         //     });
-                                         //   }
-                                         // }}
-                                       />
-                                     </FormControl>
-                                   )}
-                                 </Grid>
-                                 <Grid item lg={3} md={4} xs={12} sm={6}>
-                                   {expensecreate.paidstatus === 'Paid' && (
-                                     <FormControl fullWidth size="small">
-                                       <Typography>
-                                         Balance Amount<b style={{ color: 'red' }}>*</b>
-                                       </Typography>
-                                       <OutlinedInput readOnly id="component-outlined"
-                                        type="number" sx={userStyle.input}
-                                         value={expensecreate.balanceamount}
-                                          />
-                                     </FormControl>
-                                   )}
-                                 </Grid>
-                                 <br /> <br />
-                                 {expensecreate.paidstatus === 'Paid' && expensecreate.paidmode === 'Cash' && (
-                                   <>
-                                     <br />
-                                     <br />
-                                     <br />
-             
-                                     <Grid item md={4} lg={3} xs={12} sm={12} sx={{ display: 'flex' }}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography sx={{ fontWeight: 'bold' }}>Cash</Typography>
-                                         <br />
-             
-                                         <OutlinedInput id="component-outlined" type="text" readOnly={true} value={'Cash'} onChange={(e) => { }} />
-                                       </FormControl>
-                                     </Grid>
-                                   </>
-                                 )}
-                                 <br />
-                                 <br />
-                                 {expensecreate.paidmode === 'Bank Transfer' && expensecreate.paidstatus === 'Paid' && (
-                                   <>
-                                     <br />
-                                     <br />
-             
-                                     <Grid item md={12} xs={8}>
-                                       <Typography sx={{ fontWeight: 'bold' }}>Bank Details</Typography>
-                                     </Grid>
-             
-                                     <br />
-                                     <br />
-             
-                                     <Grid item md={4} xs={12} sm={12}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Bank Name</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.bankname} />
-                                       </FormControl>
-                                     </Grid>
-                                     <Grid item md={4} xs={12} sm={12}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Bank Branch Name</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.bankbranchname} />
-                                       </FormControl>
-                                     </Grid>
-                                     <Grid item md={4} xs={12} sm={12}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Account Holder Name</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.accountholdername} />
-                                       </FormControl>
-                                     </Grid>
-                                     <Grid item md={4} xs={12} sm={12}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Account Number</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.accountnumber} />
-                                       </FormControl>
-                                     </Grid>
-                                     <Grid item md={4} xs={12} sm={12} sx={{ display: 'flex' }}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>IFSC Code</Typography>
-                                         <OutlinedInput readOnly={true} value={vendor.ifsccode} />
-                                       </FormControl>
-                                     </Grid>
-                                   </>
-                                 )}
-                                 <br /> <br />
-                                 {expensecreate.paidmode === 'UPI' && expensecreate.paidstatus === 'Paid' && (
-                                   <>
-                                     <Grid item md={12} xs={8}>
-                                       <Typography sx={{ fontWeight: 'bold' }}>UPI Details</Typography>
-                                     </Grid>
-             
-                                     <br />
-                                     <br />
-             
-                                     <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>UPI Number</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.upinumber} />
-                                       </FormControl>
-                                     </Grid>
-                                   </>
-                                 )}
-                                 <br /> <br />
-                                 {expensecreate.paidmode === 'Card' && expensecreate.paidstatus === 'Paid' && (
-                                   <>
-                                     <Grid md={12} item xs={8}>
-                                       <Typography sx={{ fontWeight: 'bold' }}>Card Details</Typography>
-                                     </Grid>
-             
-                                     <br />
-                                     <Grid item md={3} xs={12} sm={12}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Card Number</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.cardnumber} />
-                                       </FormControl>
-                                     </Grid>
-                                     <Grid item md={3} xs={12} sm={12}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Card Holder Name</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.cardholdername} />
-                                       </FormControl>
-                                     </Grid>
-                                     <Grid item md={3} xs={12} sm={12}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Card Transaction Number</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.cardtransactionnumber} />
-                                       </FormControl>
-                                     </Grid>
-                                     <Grid item md={3} xs={12} sm={12}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Card Type</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.cardtype} />
-                                       </FormControl>
-                                     </Grid>
-                                     <Grid item md={3} xs={12} sm={6}>
-                                       <Typography>Expire At</Typography>
-                                       <Grid container spacing={1}>
-                                         <Grid item md={6} xs={12} sm={6}>
-                                           <FormControl fullWidth size="small">
-                                             <OutlinedInput readOnly={true} value={vendorstock.cardmonth} />
-                                           </FormControl>
-                                         </Grid>
-                                         <Grid item md={6} xs={12} sm={6}>
-                                           <FormControl fullWidth size="small">
-                                             <OutlinedInput readOnly={true} value={vendorstock.cardyear} />
-                                           </FormControl>
-                                         </Grid>
-                                       </Grid>
-                                     </Grid>
-                                     <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Security Code</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.cardsecuritycode} />
-                                       </FormControl>
-                                     </Grid>
-                                   </>
-                                 )}
-                                 <br />
-                                 <br />
-                                 {expensecreate.paidmode === 'Cheque' && expensecreate.paidstatus === 'Paid' && (
-                                   <>
-                                     <Grid item md={12} xs={8}>
-                                       <Typography sx={{ fontWeight: 'bold' }}>Cheque Details</Typography>
-                                     </Grid>
-             
-                                     <br />
-             
-                                     <Grid item md={3} xs={12} sm={12} sx={{ display: 'flex' }}>
-                                       <FormControl fullWidth size="small">
-                                         <Typography>Cheque Number</Typography>
-                                         <OutlinedInput readOnly={true} value={vendorstock.chequenumber} />
-                                       </FormControl>
-                                     </Grid>
-                                   </>
-                                 )}
-                               </Grid>
-                             </>
-                           )}
+                          <Grid item md={3} sm={6} xs={12}>
+                            <FormControl fullWidth size="small">
+                              <Typography>UOM</Typography>
+                              <OutlinedInput id="component-outlined" type="text" placeholder="Please Enter UOM" value={todoDetails.uomnew} readOnly />
+                            </FormControl>
+                          </Grid>
+                        </>
+                      )}
+
+                      <Grid item md={3} sm={6} xs={12}>
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Rate <b style={{ color: 'red' }}>*</b>
+                          </Typography>
+                          <OutlinedInput
+                            id="component-outlined"
+                            // type="text"
+                            // placeholder="Please Enter Rate"
+                            // inputMode="decimal"
+                            // pattern="[0-9]*"
+                            value={todoDetails.rate}
+                            // onChange={(e) => {
+                            //   const value = e.target.value;
+                            //   const regex = /^\d*\.?\d{0,2}$/;
+                            //   if (regex.test(value) || value === '') {
+                            //     setTodoDetails({
+                            //       ...todoDetails,
+                            //       rate: value,
+                            //       amount: Number(value) * Number(todoDetails.quantitynew),
+                            //     });
+                            //   }
+                            // }}
+                            readOnly
+                          />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={3} sm={6} xs={12}>
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Quantity <b style={{ color: 'red' }}>*</b>
+                          </Typography>
+                          <OutlinedInput
+                            id="component-outlined"
+                            type="text"
+                            placeholder="Please Enter Quantity"
+                            value={todoDetails.quantitynew}
+                            onChange={(e) => {
+                              const input = e.target.value;
+                              if (/^\d*\.?\d*$/.test(input) && input >= 0) {
+                                setTodoDetails({
+                                  ...todoDetails,
+                                  quantitynew: input,
+                                  amount: Number(input) * Number(todoDetails.rate),
+                                });
+                              }
+                            }}
+
+                          />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={3} sm={6} xs={12}>
+                        <FormControl fullWidth size="small">
+                          <Typography>
+                            Amount<b style={{ color: 'red' }}>*</b>
+                          </Typography>
+                          <OutlinedInput id="component-outlined" type="number" placeholder="Please Enter Amount" sx={userStyle.input} value={todoDetails.amount} readOnly />
+                        </FormControl>
+                      </Grid>
+                      <Grid item md={todoDetails.particularmode !== 'Others' ? 2.5 : 3} sm={6} xs={12}>
+                        <Typography>
+                          Product Details<b style={{ color: 'red' }}>*</b>
+                        </Typography>
+                        <TextareaAutosize
+                          aria-label="minimum height"
+                          minRows={3}
+                          minCols={10}
+                          value={todoDetails.productdetailsnew}
+                          readOnly
+                        // placeholder="Please Enter Product Details"
+                        // onChange={(e) => {
+                        //   setTodoDetails({
+                        //     ...todoDetails,
+                        //     productdetailsnew: e.target.value,
+                        //   });
+                        // }}
+                        />
+                      </Grid>
+                      <Grid item md={0.1} sm={6} xs={12} sx={{ marginTop: '-20px' }}>
+                        <Button
+                          variant="contained"
+                          color="success"
+                          style={{
+                            height: '30px',
+                            minWidth: '20px',
+                            padding: '19px 13px',
+                            marginTop: '25px',
+                          }}
+                          onClick={educationTodo}
+                        >
+                          <FaPlus />
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Grid>{' '}
+                  <br />
+                  <Grid container spacing={2}>
+                    <Grid item md={12} xs={12} sm={12}>
+                      <TableContainer component={Paper}>
+                        <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable">
+                          <TableHead sx={{ fontWeight: '600' }}>
+                            <StyledTableRow>
+                              <StyledTableCell>SNo</StyledTableCell>
+                              <StyledTableCell>Item Name</StyledTableCell>
+                              <StyledTableCell>UOM</StyledTableCell>
+                              <StyledTableCell>Rate</StyledTableCell>
+                              <StyledTableCell>Quantity</StyledTableCell>
+                              <StyledTableCell>Amount</StyledTableCell>
+                              <StyledTableCell>Product Details</StyledTableCell>
+                              <StyledTableCell>Actions</StyledTableCell>
+                            </StyledTableRow>
+                          </TableHead>
+                          <TableBody align="left">
+                            {educationtodo?.length > 0 ? (
+                              educationtodo?.map((row, index) => (
+                                <StyledTableRow>
+                                  <StyledTableCell>{index + 1}</StyledTableCell>
+                                  <StyledTableCell>{row.materialnew}</StyledTableCell>
+                                  <StyledTableCell>{row.uomnew}</StyledTableCell>
+                                  <StyledTableCell>{row.rate}</StyledTableCell>
+                                  <StyledTableCell>{row.quantitynew}</StyledTableCell>
+                                  <StyledTableCell>{row.amount}</StyledTableCell>
+                                  <StyledTableCell>{row.productdetailsnew}</StyledTableCell>
+                                  <StyledTableCell>
+                                    <CloseIcon
+                                      sx={{ color: 'red', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        educationTodoremove(index);
+                                      }}
+                                    />
+                                  </StyledTableCell>
+                                </StyledTableRow>
+                              ))
+                            ) : (
+                              <StyledTableRow>
+                                {' '}
+                                <StyledTableCell colSpan={8} align="center">
+                                  No Data Available
+                                </StyledTableCell>{' '}
+                              </StyledTableRow>
+                            )}
+                            <StyledTableRow></StyledTableRow>
+                          </TableBody>
+                          <TableFooter sx={{ backgroundColor: '#9591914f', height: '50px' }}>
+                            {educationtodo &&
+                              educationtodo.forEach((item) => {
+                                Expensetotal += +item.amount;
+                              })}
+                            <StyledTableRow className="table2_total">
+                              <StyledTableCell align="left" colSpan={4}></StyledTableCell>
+                              <StyledTableCell align="left">Stock Total (Rs.)</StyledTableCell>
+                              <StyledTableCell align="left">{Expensetotal.toFixed(2)}</StyledTableCell>
+                              <StyledTableCell align="left"></StyledTableCell>
+                              <StyledTableCell align="left"></StyledTableCell>
+                            </StyledTableRow>
+                          </TableFooter>
+                        </Table>
+                      </TableContainer>{' '}
+                    </Grid>
+                  </Grid>
+                  <br />
+
+                </>
+              )}
 
               <Grid container spacing={2}>
                 <Grid item lg={1} md={2} sm={2} xs={12} marginTop={3}>
@@ -6415,10 +6166,10 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                     </Box>
                   ) : (
                     <>
-                  <LoadingButton loading={btnSubmit} variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
-                    Create
-                  </LoadingButton>
-                  </>
+                      <LoadingButton loading={btnSubmit} variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
+                        Create
+                      </LoadingButton>
+                    </>
                   )}
                 </Grid>
                 <Grid item lg={1} md={2} sm={2} xs={12} marginTop={3}>
@@ -6426,7 +6177,7 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
                     Clear
                   </Button>
                 </Grid>
-                 <Grid item lg={1} md={2} sm={2} xs={12} marginTop={3}>
+                <Grid item lg={1} md={2} sm={2} xs={12} marginTop={3}>
                   <Button sx={buttonStyles.btncancel} onClick={handleCloseviewalertvendormanual}>
                     Cancel
                   </Button>
@@ -6436,9 +6187,9 @@ totalbillamount:stockmaterialedit.totalbillamountstock,
           </Box>
         </>
       )}
-  
 
- 
+
+
 
 
       {/* dialog box for vendor details */}

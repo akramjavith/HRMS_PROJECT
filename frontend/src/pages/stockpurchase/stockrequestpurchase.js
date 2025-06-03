@@ -143,11 +143,11 @@ function Stockpurchaserequest() {
   const [stockmaterialedit, setStockmaterialedit] = useState([]);
 
   const handleDataFromChildUIDeignStock = (data) => {
-    console.log(data,"data")
+    console.log(data, "data")
     // Handle the data received from the child component
-  // setDataFromChildUIDeign(data);
+    // setDataFromChildUIDeign(data);
     if (data === true) {
-       fetchStock('Filtered');
+      fetchStock('Filtered');
 
     }
   };
@@ -3009,16 +3009,16 @@ function Stockpurchaserequest() {
       area: 'Please Select Area',
       location: 'Please Select Location',
       unit: '',
-      vendorname: 'Please Select Vendor',
-      gstno: '',
-      billno: '',
-      warrantydetails: '',
-      rate: '',
-      billdate: '',
-      files: '',
-      warrantyfiles: '',
-      addedby: '',
-      updatedby: '',
+      // vendorname: 'Please Select Vendor',
+      // gstno: '',
+      // billno: '',
+      // warrantydetails: '',
+      // rate: '',
+      // billdate: '',
+      // files: '',
+      // warrantyfiles: '',
+      // addedby: '',
+      // updatedby: '',
     });
     setStockmasterupdate({
       ...stockmasterupdate,
@@ -3028,47 +3028,47 @@ function Stockpurchaserequest() {
       area: 'Please Select Area',
       location: 'Please Select Location',
       unit: '',
-      vendorname: 'Please Select Vendor',
-      gstno: '',
-      billno: '',
-      warrantydetails: '',
-      rate: '',
-      billdate: '',
-      files: '',
-      requesttime: currtime,
-      requestdate: today,
-      warrantyfiles: '',
-      Warranty: 'Yes',
+      // vendorname: 'Please Select Vendor',
+      // gstno: '',
+      // billno: '',
+      // warrantydetails: '',
+      // rate: '',
+      // billdate: '',
+      // files: '',
+      // requesttime: currtime,
+      // requestdate: today,
+      // warrantyfiles: '',
+      // Warranty: 'Yes',
     });
-    setVendorGroup('Please Select Vendor Group');
-    setSelectedBranch('Please Select Branch');
-    setSelectedUnit('Please Select Unit');
-    // setSelectedProducthead("Please Select Producthead");
-    // setSelectedProductname("Please Select Productname");
-    setFile('');
-    setRefImage([]);
-    setGetImg(null);
-    setVendorgetid({ gstnumber: '' });
-    setVendormaster([]);
+    // setVendorGroup('Please Select Vendor Group');
+    // setSelectedBranch('Please Select Branch');
+    // setSelectedUnit('Please Select Unit');
+    // // setSelectedProducthead("Please Select Producthead");
+    // // setSelectedProductname("Please Select Productname");
+    // setFile('');
+    // setRefImage([]);
+    // setGetImg(null);
+    // setVendorgetid({ gstnumber: '' });
+    // setVendormaster([]);
     setBranches([]);
-    setAreasEdit([]);
-    setFloorEdit([]);
-    setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
-    setMaterialoptNew([]);
-    setSubcategoryOption([]);
-    setVendorgetid({});
-    setRefImageedit([]);
-    setRefImage([]);
-    setFile('');
-    setGetImg(null);
-    setGetImgedit(null);
-    setRefImagewarranty([]);
-    setRefImagewarrantyedit([]);
-    setFilewarranty('');
-    setGetImgwarranty(null);
-    setFilewarrantyedit('');
-    setGetImgwarrantyedit(null);
-    setBtnSubmit(false);
+    // setAreasEdit([]);
+    // setFloorEdit([]);
+    // setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
+    // setMaterialoptNew([]);
+    // setSubcategoryOption([]);
+    // setVendorgetid({});
+    // setRefImageedit([]);
+    // setRefImage([]);
+    // setFile('');
+    // setGetImg(null);
+    // setGetImgedit(null);
+    // setRefImagewarranty([]);
+    // setRefImagewarrantyedit([]);
+    // setFilewarranty('');
+    // setGetImgwarranty(null);
+    // setFilewarrantyedit('');
+    // setGetImgwarrantyedit(null);
+    // setBtnSubmit(false);
     setPopupContent('Cleared Successfully');
     setPopupSeverity('success');
     handleClickOpenPopup();
@@ -3500,31 +3500,31 @@ function Stockpurchaserequest() {
     setAsset({ materialcode: '', name: '' });
   };
 
-const [itemsName,setitemsName] = useState([])
-const [Specification, setSpecification] = useState([]);
+  const [itemsName, setitemsName] = useState([])
+  const [Specification, setSpecification] = useState([]);
 
 
   const fetchspecification = async (e) => {
-        try {
-            let res = await axios.get(SERVICE.ASSETWORKSTAION, {
-                headers: {
-                    Authorization: `Bearer ${auth.APIToken}`,
-                },
-            });
+    try {
+      let res = await axios.get(SERVICE.ASSETWORKSTAION, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
 
-            let result = res.data.assetworkstation.filter((d) => d.workstation === e);
+      let result = res.data.assetworkstation.filter((d) => d.workstation === e);
 
-            const resultall = result.map((d) => ({
-                ...d,
-                label: d.categoryname,
-                value: d.categoryname,
-            }));
+      const resultall = result.map((d) => ({
+        ...d,
+        label: d.categoryname,
+        value: d.categoryname,
+      }));
 
-            setSpecification(resultall);
-        } catch (err) {
-            handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-        }
-    };
+      setSpecification(resultall);
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
   //get single row to edit....
   const getCode = async (id, data) => {
     try {
@@ -3533,13 +3533,13 @@ const [Specification, setSpecification] = useState([]);
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-       if (data.requestmode === 'Stock Material') {
-       
-          let materialNew = data.stockmaterialarray.map(data =>({label:data.materialnew,value:data.materialnew,uom:data.uomnew}));
+      if (data.requestmode === 'Stock Material') {
 
-      setitemsName(materialNew)
+        let materialNew = data.stockmaterialarray.map(data => ({ label: data.materialnew, value: data.materialnew, uom: data.uomnew }));
+
+        setitemsName(materialNew)
       }
-await fetchspecification(res?.data?.sstockmanage.material)
+      await fetchspecification(res?.data?.sstockmanage.material)
       setStockmaster({
         ...res?.data?.sstockmanage,
         vendorname: 'Please Select Vendor',
@@ -3816,7 +3816,7 @@ await fetchspecification(res?.data?.sstockmanage.material)
               company: item.company,
               requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
               requesttime: item.requesttime,
-             duedate: moment(item.duedate).format('DD/MM/YYYY'),
+              duedate: moment(item.duedate).format('DD/MM/YYYY'),
               expecttime: item.expecttime,
               branch: item.branch,
               unit: item.unit,
@@ -3855,11 +3855,11 @@ await fetchspecification(res?.data?.sstockmanage.material)
               // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
               // expecttime: item.expecttime,
               requesttime: item.requesttime,
-              duedate:moment(item.duedate).format('DD/MM/YYYY'),
+              duedate: moment(item.duedate).format('DD/MM/YYYY'),
               productdetailsnew: item.productdetails,
               uomnew: `${item.quantity}#${item.uomcode}`,
               quantitynew: item.quantity,
-             
+
             };
           }
         });
@@ -4533,201 +4533,201 @@ await fetchspecification(res?.data?.sstockmanage.material)
 
     setPageName(!pageName);
 
-      try {
-    
-        let res_employee = await axios.post(SERVICE.STOCK_MANAGE_FILTER, queryParams, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        });
+    try {
 
-        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
+      let res_employee = await axios.post(SERVICE.STOCK_MANAGE_FILTER, queryParams, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
 
-        // let filteredData = ans.filter((data) => {
-        //   return data.requestmode === "Asset Material";
-        // });
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
 
-        let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        });
+      // let filteredData = ans.filter((data) => {
+      //   return data.requestmode === "Asset Material";
+      // });
 
-        let codeValues = res_project_1?.data?.vommaster.map((data) => ({
-          name: data.name,
-          code: data?.code,
-        }));
-        // setuomcodes(codeValues);
+      let res_project_1 = await axios.get(SERVICE.ALL_VOMMASTERNAME, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
 
-        let setData = ans.map((item) => {
-          const matchingItem = codeValues.find((item1) => item.uom === item1.name);
+      let codeValues = res_project_1?.data?.vommaster.map((data) => ({
+        name: data.name,
+        code: data?.code,
+      }));
+      // setuomcodes(codeValues);
 
-          const matchingItem1 = codeValues.find((item1) => item.uomnew === item1.name);
+      let setData = ans.map((item) => {
+        const matchingItem = codeValues.find((item1) => item.uom === item1.name);
 
-          if (matchingItem) {
-            return { ...item, uomcode: matchingItem.code };
-          } else if (matchingItem1) {
-            return { ...item, uomcode: matchingItem1.code };
-          } else {
-            return { ...item };
-          }
-        });
+        const matchingItem1 = codeValues.find((item1) => item.uomnew === item1.name);
 
-        // const itemsWithSerialNumber = setData?.map((item, index) => ({
-        //   ...item,
-        //   serialNumber: (page - 1) * pageSize + index + 1,
-        // }));
+        if (matchingItem) {
+          return { ...item, uomcode: matchingItem.code };
+        } else if (matchingItem1) {
+          return { ...item, uomcode: matchingItem1.code };
+        } else {
+          return { ...item };
+        }
+      });
 
-        const itemsWithSerialNumber = setData?.map((item, index) => {
-          if (item.requestmode === 'Stock Material') {
-            let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
+      // const itemsWithSerialNumber = setData?.map((item, index) => ({
+      //   ...item,
+      //   serialNumber: (page - 1) * pageSize + index + 1,
+      // }));
 
-            let materialNew = item.stockmaterialarray.map((data, newindex) => {
-              return ` ${data.materialnew}`;
-            });
+      const itemsWithSerialNumber = setData?.map((item, index) => {
+        if (item.requestmode === 'Stock Material') {
+          let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
-            let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
-              return ` ${data.productdetailsnew}`;
-            });
+          let materialNew = item.stockmaterialarray.map((data, newindex) => {
+            return ` ${data.materialnew}`;
+          });
 
-            let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
-              return ` ${data.quantitynew}#${data.uomcodenew}`;
-            });
+          let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+            return ` ${data.productdetailsnew}`;
+          });
 
-            const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
-            const result = nonEmptyParts.join(',');
+          let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+            return ` ${data.quantitynew}#${data.uomcodenew}`;
+          });
 
-            return {
-              ...item,
-              id: item._id,
-              serialNumber: (page - 1) * pageSize + index + 1,
-              company: item.company,
-              requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
-              requesttime: item.requesttime,
-             duedate: moment(item.duedate).format('DD/MM/YYYY'),
-              expecttime: item.expecttime,
-              branch: item.branch,
-              unit: item.unit,
-              floor: item.floor,
-              area: item.area,
-              location: item.location,
-              requestmode: item.requestmode,
+          const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+          const result = nonEmptyParts.join(',');
 
-              // uomnew: quantityAndUom.join(","),
-              uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
-              // quantitynew: quantityNew.join(","),
-              quantitynew: quantityNew,
+          return {
+            ...item,
+            id: item._id,
+            serialNumber: (page - 1) * pageSize + index + 1,
+            company: item.company,
+            requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+            requesttime: item.requesttime,
+            duedate: moment(item.duedate).format('DD/MM/YYYY'),
+            expecttime: item.expecttime,
+            branch: item.branch,
+            unit: item.unit,
+            floor: item.floor,
+            area: item.area,
+            location: item.location,
+            requestmode: item.requestmode,
 
-              // materialnew: materialNew.join(',').toString(),
-              // productdetailsnew:
-              //   item.stockmaterialarray.length > 0
-              //     ? productdetailsNew.join(",")
-              //     : "",
-              productdetailsnew:
-                // productdetailsNew.join(",")
-                productdetailsNew.filter((item) => item.trim() !== '').join(','),
-            };
-          } else {
-            return {
-              ...item,
-              id: item._id,
-              serialNumber: (page - 1) * pageSize + index + 1,
-              company: item.company,
-              branch: item.branch,
-              unit: item.unit,
-              floor: item.floor,
-              area: item.area,
-              location: item.location,
-              requestmode: item.requestmode,
-              requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
-              // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
-              // expecttime: item.expecttime,
-              requesttime: item.requesttime,
-              duedate:moment(item.duedate).format('DD/MM/YYYY'),
-              productdetailsnew: item.productdetails,
-              uomnew: `${item.quantity}#${item.uomcode}`,
-              quantitynew: item.quantity,
-             
-            };
-          }
-        });
-        setStockmanage(itemsWithSerialNumber);
+            // uomnew: quantityAndUom.join(","),
+            uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
+            // quantitynew: quantityNew.join(","),
+            quantitynew: quantityNew,
 
-        setOverallFilterdata(
-          res_employee?.data?.totalProjectsData?.length > 0
-            ? res_employee?.data?.totalProjectsData?.map((item, index) => {
-              if (item.requestmode === 'Stock Material') {
-                let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
+            // materialnew: materialNew.join(',').toString(),
+            // productdetailsnew:
+            //   item.stockmaterialarray.length > 0
+            //     ? productdetailsNew.join(",")
+            //     : "",
+            productdetailsnew:
+              // productdetailsNew.join(",")
+              productdetailsNew.filter((item) => item.trim() !== '').join(','),
+          };
+        } else {
+          return {
+            ...item,
+            id: item._id,
+            serialNumber: (page - 1) * pageSize + index + 1,
+            company: item.company,
+            branch: item.branch,
+            unit: item.unit,
+            floor: item.floor,
+            area: item.area,
+            location: item.location,
+            requestmode: item.requestmode,
+            requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+            // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
+            // expecttime: item.expecttime,
+            requesttime: item.requesttime,
+            duedate: moment(item.duedate).format('DD/MM/YYYY'),
+            productdetailsnew: item.productdetails,
+            uomnew: `${item.quantity}#${item.uomcode}`,
+            quantitynew: item.quantity,
 
-                let materialNew = item.stockmaterialarray.map((data, newindex) => {
-                  return ` ${data.materialnew}`;
-                });
+          };
+        }
+      });
+      setStockmanage(itemsWithSerialNumber);
 
-                let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
-                  return ` ${data.productdetailsnew}`;
-                });
+      setOverallFilterdata(
+        res_employee?.data?.totalProjectsData?.length > 0
+          ? res_employee?.data?.totalProjectsData?.map((item, index) => {
+            if (item.requestmode === 'Stock Material') {
+              let quantityNew = item.stockmaterialarray.reduce((total, person) => total + Number(person.quantitynew), 0);
 
-                let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
-                  return ` ${data.quantitynew}#${data.uomcodenew}`;
-                });
+              let materialNew = item.stockmaterialarray.map((data, newindex) => {
+                return ` ${data.materialnew}`;
+              });
 
-                const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
-                const result = nonEmptyParts.join(',');
+              let productdetailsNew = item.stockmaterialarray.map((data, newindex) => {
+                return ` ${data.productdetailsnew}`;
+              });
 
-                return {
-                  ...item,
-                  id: item._id,
-                  serialNumber: (page - 1) * pageSize + index + 1,
-                  company: item.company,
-                  branch: item.branch,
-                  unit: item.unit,
-                  requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
-                  duedate: moment(item.duedate).format('DD/MM/YYYY'),
-                  expecttime: item.expecttime,
-                  requesttime: item.requesttime,
-                  floor: item.floor,
-                  area: item.area,
-                  location: item.location,
-                  requestmode: item.requestmode,
+              let quantityAndUom = item.stockmaterialarray.map((data, newindex) => {
+                return ` ${data.quantitynew}#${data.uomcodenew}`;
+              });
 
-                  // uomnew: quantityAndUom.join(","),
-                  uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
-                  // quantitynew: quantityNew.join(","),
-                  quantitynew: quantityNew,
+              const nonEmptyParts = productdetailsNew.filter((part) => part.trim() !== '');
+              const result = nonEmptyParts.join(',');
 
-                  // materialnew: materialNew.join(',').toString(),
-                  // productdetailsnew:
-                  //   item.stockmaterialarray.length > 0
-                  //     ? productdetailsNew.join(",")
-                  //     : "",
-                  productdetailsnew:
-                    // productdetailsNew.join(",")
-                    productdetailsNew.filter((item) => item.trim() !== '').join(','),
-                };
-              } else {
-                return {
-                  ...item,
-                  serialNumber: (page - 1) * pageSize + index + 1,
-                  requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
-                  requesttime: item.requesttime,
-                  // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
-                  // expecttime: item.expecttime,
-                };
-              }
-            })
-            : []
-        );
+              return {
+                ...item,
+                id: item._id,
+                serialNumber: (page - 1) * pageSize + index + 1,
+                company: item.company,
+                branch: item.branch,
+                unit: item.unit,
+                requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+                duedate: moment(item.duedate).format('DD/MM/YYYY'),
+                expecttime: item.expecttime,
+                requesttime: item.requesttime,
+                floor: item.floor,
+                area: item.area,
+                location: item.location,
+                requestmode: item.requestmode,
 
-        setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
-        setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-        setPageSize((data) => {
-          return ans?.length > 0 ? data : 10;
-        });
-        setPage((data) => {
-          return ans?.length > 0 ? data : 1;
-        });
-        setProjectCheck(false);
-      
+                // uomnew: quantityAndUom.join(","),
+                uomnew: quantityAndUom.filter((item) => item.trim() !== '').join(','),
+                // quantitynew: quantityNew.join(","),
+                quantitynew: quantityNew,
+
+                // materialnew: materialNew.join(',').toString(),
+                // productdetailsnew:
+                //   item.stockmaterialarray.length > 0
+                //     ? productdetailsNew.join(",")
+                //     : "",
+                productdetailsnew:
+                  // productdetailsNew.join(",")
+                  productdetailsNew.filter((item) => item.trim() !== '').join(','),
+              };
+            } else {
+              return {
+                ...item,
+                serialNumber: (page - 1) * pageSize + index + 1,
+                requestdate: moment(item.requestdate).format('DD/MM/YYYY'),
+                requesttime: item.requesttime,
+                // expecttdate: moment(item.expecttdate).format("DD/MM/YYYY"),
+                // expecttime: item.expecttime,
+              };
+            }
+          })
+          : []
+      );
+
+      setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
+      setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
+      setPageSize((data) => {
+        return ans?.length > 0 ? data : 10;
+      });
+      setPage((data) => {
+        return ans?.length > 0 ? data : 1;
+      });
+      setProjectCheck(false);
+
     } catch (err) {
       setProjectCheck(false);
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -4913,7 +4913,7 @@ await fetchspecification(res?.data?.sstockmanage.material)
     handleClickOpenPopup();
   };
 
-  
+
 
   return (
     <>
@@ -5885,7 +5885,7 @@ await fetchspecification(res?.data?.sstockmanage.material)
                         />
                       </FormControl>
                     </Grid>
-                     {/* <Grid item lg={2} md={4} xs={12} sm={6}>
+                    {/* <Grid item lg={2} md={4} xs={12} sm={6}>
                                       <FormControl fullWidth size="small">
                                         <Typography>Due Date</Typography>
                                         <OutlinedInput

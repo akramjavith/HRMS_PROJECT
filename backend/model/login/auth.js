@@ -2004,6 +2004,31 @@ const userSchema = new Schema({
 
   }],
 
+  attendancemodelog: [
+    {
+      fromdate: {
+        type: String,
+        required: false,
+      },
+      todate: {
+        type: String,
+        require: false,
+      },
+      updateddatetime: {
+        type: Date,
+        default: Date.now,
+      },
+      updatedusername: {
+        type: String,
+        require: false,
+      },
+      mode: {
+        type: [String],
+        required: false,
+      }
+    }
+  ],
+
   loginUserStatus: [{
     version: {
       type: String,

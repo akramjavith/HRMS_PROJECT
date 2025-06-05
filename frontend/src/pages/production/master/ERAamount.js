@@ -1,51 +1,50 @@
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, Divider, FormControl, Grid, IconButton, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, TextField, Typography, FormControlLabel } from "@mui/material";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import { saveAs } from "file-saver";
-import { CsvBuilder } from "filefy";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaDownload, FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaTrash, FaSearch } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import CircularProgress, {
-  circularProgressClasses,
-} from "@mui/material/CircularProgress";
-import * as XLSX from "xlsx";
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, Divider, FormControl, Grid, IconButton, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, TextField, Typography, FormControlLabel } from '@mui/material';
+import Switch from '@mui/material/Switch';
+import axios from '../../../axiosInstance';
+import { saveAs } from 'file-saver';
+import { CsvBuilder } from 'filefy';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaDownload, FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaTrash, FaSearch } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import CircularProgress, { circularProgressClasses } from '@mui/material/CircularProgress';
+import * as XLSX from 'xlsx';
 import AggregatedSearchBar from '../../../components/AggregatedSearchBar';
-import AggridTable from "../../../components/AggridTable";
-import AlertDialog from "../../../components/Alert.js";
-import { DeleteConfirmation, PleaseSelectRow, } from "../../../components/DeleteConfirmation.js";
-import { handleApiError } from "../../../components/Errorhandling.js";
-import ExportData from "../../../components/ExportData.js";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import Headtitle from "../../../components/Headtitle.js";
-import InfoPopup from "../../../components/InfoPopup.js";
-import MessageAlert from "../../../components/MessageAlert.js";
-import PageHeading from "../../../components/PageHeading.js";
-import { AuthContext, UserRoleAccessContext } from "../../../context/Appcontext.js";
-import { userStyle } from "../../../pageStyle.js";
-import { SERVICE } from "../../../services/Baseservice.js";
-import SendToServer from "../../sendtoserver.js";
+import AggridTable from '../../../components/AggridTable';
+import AlertDialog from '../../../components/Alert.js';
+import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
+import { handleApiError } from '../../../components/Errorhandling.js';
+import ExportData from '../../../components/ExportData.js';
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
+import Headtitle from '../../../components/Headtitle.js';
+import InfoPopup from '../../../components/InfoPopup.js';
+import MessageAlert from '../../../components/MessageAlert.js';
+import PageHeading from '../../../components/PageHeading.js';
+import { AuthContext, UserRoleAccessContext } from '../../../context/Appcontext.js';
+import { userStyle } from '../../../pageStyle.js';
+import { SERVICE } from '../../../services/Baseservice.js';
+import SendToServer from '../../sendtoserver.js';
 import domtoimage from 'dom-to-image';
-import { BASE_URL } from "../../../services/Authservice.js";
+import { BASE_URL } from '../../../services/Authservice.js';
+import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
+
 
 // Inspired by the former Facebook spinners.
 function FacebookCircularProgress(props) {
   return (
-    <Box sx={{ position: "relative" }}>
+    <Box sx={{ position: 'relative' }}>
       <CircularProgress
         variant="determinate"
         sx={{
-          color: (theme) =>
-            theme.palette.grey[theme.palette.mode === "light" ? 200 : 800],
+          color: (theme) => theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
         }}
         size={40}
         thickness={4}
@@ -56,13 +55,12 @@ function FacebookCircularProgress(props) {
         variant="indeterminate"
         disableShrink
         sx={{
-          color: (theme) =>
-            theme.palette.mode === "light" ? "#1a90ff" : "#308fe8",
-          animationDuration: "550ms",
-          position: "absolute",
+          color: (theme) => (theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8'),
+          animationDuration: '550ms',
+          position: 'absolute',
           left: 0,
           [`& .${circularProgressClasses.circle}`]: {
-            strokeLinecap: "round",
+            strokeLinecap: 'round',
           },
         }}
         size={40}
@@ -73,7 +71,15 @@ function FacebookCircularProgress(props) {
   );
 }
 function EraAmount() {
-
+  const [serverTime, setServerTime] = useState(null);
+    useEffect(() => {
+      const fetchTime = async () => {
+        const time = await getCurrentServerTime();
+        setServerTime(time);
+      };
+  
+      fetchTime();
+    }, []);
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
 
@@ -81,22 +87,30 @@ function EraAmount() {
   const [filteredChangesFilename, setFilteredChangesFilename] = useState(null);
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
-  const handleClickOpenPopupMalert = () => { setOpenPopupMalert(true); };
-  const handleClosePopupMalert = () => { setOpenPopupMalert(false); };
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
+  const handleClickOpenPopupMalert = () => {
+    setOpenPopupMalert(true);
+  };
+  const handleClosePopupMalert = () => {
+    setOpenPopupMalert(false);
+  };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
-  const handleClickOpenPopup = () => { setOpenPopup(true); };
-  const handleClosePopup = () => { setOpenPopup(false); };
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
+  const handleClickOpenPopup = () => {
+    setOpenPopup(true);
+  };
+  const handleClosePopup = () => {
+    setOpenPopup(false);
+  };
 
   let exportColumnNames = ['Company', 'Branch', 'File Name'];
   let exportRowValues = ['company', 'branch', 'filename'];
 
   const gridRef = useRef(null);
   const gridRefFilename = useRef(null);
-  const [updateSheet, setUpdatesheet] = useState([])
+  const [updateSheet, setUpdatesheet] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [eraAmounts, setEraAmounts] = useState([]);
   const [eraAmountEdit, setEraAmountEdit] = useState([]);
@@ -104,17 +118,17 @@ function EraAmount() {
   const { isUserRoleCompare, isUserRoleAccess, isAssignBranch, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
   const [loading, setLoading] = useState(false);
   const { auth } = useContext(AuthContext);
-  const [selectedCompany, setSelectedCompany] = useState("Please Select Company");
-  const [selectedBranch, setSelectedBranch] = useState("Please Select Branch");
-  const [selectedBranchCode, setSelectedBranchCode] = useState("");
-  const [selectedCompanyEdit, setSelectedCompanyEdit] = useState("Please Select Company");
-  const [selectedBranchEdit, setSelectedBranchEdit] = useState("Please Select Branch");
-  const [selectedBranchCodeEdit, setSelectedBranchCodeEdit] = useState("");
-  const [eraAmountmanual, setEraAmountmanual] = useState({ processcode: "", amount: "" });
+  const [selectedCompany, setSelectedCompany] = useState('Please Select Company');
+  const [selectedBranch, setSelectedBranch] = useState('Please Select Branch');
+  const [selectedBranchCode, setSelectedBranchCode] = useState('');
+  const [selectedCompanyEdit, setSelectedCompanyEdit] = useState('Please Select Company');
+  const [selectedBranchEdit, setSelectedBranchEdit] = useState('Please Select Branch');
+  const [selectedBranchCodeEdit, setSelectedBranchCodeEdit] = useState('');
+  const [eraAmountmanual, setEraAmountmanual] = useState({ processcode: '', amount: '' });
 
   // excelupload
-  const [fileUploadName, setFileUploadName] = useState("");
-  const [dataupdated, setDataupdated] = useState("");
+  const [fileUploadName, setFileUploadName] = useState('');
+  const [dataupdated, setDataupdated] = useState('');
 
   //Datatable
   const [page, setPage] = useState(1);
@@ -122,11 +136,11 @@ function EraAmount() {
   const [items, setItems] = useState([]);
   const [splitArray, setSplitArray] = useState([]);
   const [sheets, setSheets] = useState([]);
-  const [selectedSheet, setSelectedSheet] = useState("Please Select Sheet");
+  const [selectedSheet, setSelectedSheet] = useState('Please Select Sheet');
   const [selectedSheetindex, setSelectedSheetindex] = useState();
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [copiedData, setCopiedData] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedData, setCopiedData] = useState('');
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -135,14 +149,14 @@ function EraAmount() {
   const [pageSizeFilename, setPageSizeFilename] = useState(10);
   const [itemsFilename, setItemsFilename] = useState([]);
   const [selectedRowsFilename, setSelectedRowsFilename] = useState([]);
-  const [searchQueryFilename, setSearchQueryFilename] = useState("");
+  const [searchQueryFilename, setSearchQueryFilename] = useState('');
   const [isManageColumnsOpenFilename, setManageColumnsOpenFilename] = useState(false);
   const [anchorElFilename, setAnchorElFilename] = useState(null);
   const [selectAllCheckedFilename, setSelectAllCheckedFilename] = useState(false);
-  const [searchQueryManageFilename, setSearchQueryManageFilename] = useState("");
+  const [searchQueryManageFilename, setSearchQueryManageFilename] = useState('');
 
-  const [searchedString, setSearchedString] = useState("")
-  const [searchedStringFilename, setSearchedStringFilename] = useState("")
+  const [searchedString, setSearchedString] = useState('');
+  const [searchedStringFilename, setSearchedStringFilename] = useState('');
   const gridRefTable = useRef(null);
   const gridRefTableFilename = useRef(null);
   const [isHandleChangeFilename, setIsHandleChangeFilename] = useState(false);
@@ -160,59 +174,38 @@ function EraAmount() {
   };
   const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      codeval: data.branchcode
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [
-          window.location.pathname?.substring(1),
-          window.location.pathname,
-        ];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
-        codeval: data.branchcode
-      }));
+        codeval: data.branchcode,
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
+
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          codeval: data.branchcode,
+        }));
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
@@ -241,7 +234,7 @@ function EraAmount() {
 
   const username = isUserRoleAccess.companyname;
 
-  // Error Popup model 
+  // Error Popup model
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const [showAlert, setShowAlert] = useState();
   const handleClickOpenerr = () => {
@@ -277,10 +270,10 @@ function EraAmount() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
 
-  // View Functionlity 
+  // View Functionlity
   //Delete single model first table view delete
   const [isDeleteSingleOpenView, setIsDeleteSingleOpenView] = useState(false);
   const handleClickSingleOpenView = () => {
@@ -294,7 +287,7 @@ function EraAmount() {
   const [filteredChangesViewAll, setFilteredChangesViewAll] = useState(null);
 
   const [productionfirstViewCheck, setProductionfirstViewcheck] = useState(false);
-  const [fileNameView, setFileNameView] = useState("");
+  const [fileNameView, setFileNameView] = useState('');
   //Edit model...
   const [isEditOpenView, setIsEditOpenView] = useState(false);
   const handleClickOpenEditView = () => {
@@ -307,7 +300,7 @@ function EraAmount() {
 
   const [openviewAll, setOpenviewAll] = useState(false);
   const handleClickOpenviewAll = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setOpenviewAll(true);
   };
   const [isHandleChangeviewAll, setIsHandleChangeviewAll] = useState(false);
@@ -321,9 +314,9 @@ function EraAmount() {
     addSerialNumberviewAll(productionoriginalviewAll);
   }, [productionoriginalviewAll]);
 
-  const [searchedStringviewAll, setSearchedStringviewAll] = useState("")
-  const [searchQueryviewAll, setSearchQueryviewAll] = useState("");
-  const [searchQueryManageviewAll, setSearchQueryManageviewAll] = useState("");
+  const [searchedStringviewAll, setSearchedStringviewAll] = useState('');
+  const [searchQueryviewAll, setSearchQueryviewAll] = useState('');
+  const [searchQueryManageviewAll, setSearchQueryManageviewAll] = useState('');
   const [pageviewAll, setPageviewAll] = useState(1);
   const [pageSizeviewAll, setPageSizeviewAll] = useState(10);
   const [isFilterOpen1, setIsFilterOpen1] = useState(false);
@@ -350,11 +343,9 @@ function EraAmount() {
     branch: true,
     processcode: true,
     amount: true,
-    actions: true
+    actions: true,
   };
-  const [columnVisibilityviewAll, setColumnVisibilityviewAll] = useState(
-    initialColumnVisibilityviewAll
-  );
+  const [columnVisibilityviewAll, setColumnVisibilityviewAll] = useState(initialColumnVisibilityviewAll);
   // Show All Columns functionality
   const handleShowAllColumnsviewAll = () => {
     const updatedVisibility = { ...columnVisibilityviewAll };
@@ -372,7 +363,7 @@ function EraAmount() {
   };
   const handleCloseManageColumnsviewAll = () => {
     setManageColumnsOpenviewAll(false);
-    setSearchQueryManageviewAll("");
+    setSearchQueryManageviewAll('');
   };
   // page refersh reload
   const handleCloseFilterMod1 = () => {
@@ -391,96 +382,93 @@ function EraAmount() {
   };
 
   const openviewpopall = Boolean(anchorElviewAll);
-  const idviewall = openviewpopall ? "simple-popover" : undefined;
+  const idviewall = openviewpopall ? 'simple-popover' : undefined;
   // datavallist:datavallist,
   const columnDataTableviewAll = [
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 70,
       hide: !columnVisibilityviewAll.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 180,
       hide: !columnVisibility.company,
-      headerClassName: "bold-header",
-      pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 180,
       hide: !columnVisibility.branch,
-      headerClassName: "bold-header",
-      pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
     {
-      field: "processcode",
-      headerName: "Process Code",
+      field: 'processcode',
+      headerName: 'Process Code',
       flex: 0,
       width: 200,
       hide: !columnVisibility.processcode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "amount",
-      headerName: "Amount",
+      field: 'amount',
+      headerName: 'Amount',
       flex: 0,
       width: 200,
       hide: !columnVisibility.amount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibilityviewAll.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("eeraamount") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('eeraamount') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 rowdatasingleeditView(params.data.id);
               }}
             >
-              <EditOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonedit} />
+              <EditOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonedit} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("deraamount") && (
+          {isUserRoleCompare?.includes('deraamount') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
                 rowDataSingleDeleteView(params.data.id);
               }}
             >
-              <DeleteOutlineOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttondelete} />
+              <DeleteOutlineOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttondelete} />
             </Button>
           )}
         </Grid>
       ),
     },
-
   ];
   // // Function to filter columns based on search query
-  const filteredColumnsviewAll = columnDataTableviewAll.filter((column) =>
-    column.headerName
-      .toLowerCase()
-      .includes(searchQueryManageviewAll.toLowerCase())
-  );
+  const filteredColumnsviewAll = columnDataTableviewAll.filter((column) => column.headerName.toLowerCase().includes(searchQueryManageviewAll.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibilityviewAll = (field) => {
     setColumnVisibilityviewAll((prevVisibility) => ({
@@ -494,47 +482,38 @@ function EraAmount() {
   const handleprintviewall = useReactToPrint({
     content: () => componentRefviewall.current,
     documentTitle: fileNameView,
-    pageStyle: "print",
+    pageStyle: 'print',
   });
   const exportColumnNames3 = ['Company', 'Branch', 'Process Code', 'Amount'];
   const exportRowValues3 = ['company', 'branch', 'processcode', 'amount'];
-  const modifiedString = fileNameView?.replace(".csv", "");
+  const modifiedString = fileNameView?.replace('.csv', '');
   const gridRefviewall = useRef(null);
 
   const gridRefTableImgviewall = useRef(null);
   // image view all
   const handleCaptureImageviewall = () => {
     if (gridRefTableImgviewall.current) {
-      domtoimage.toBlob(gridRefTableImgviewall.current)
+      domtoimage
+        .toBlob(gridRefTableImgviewall.current)
         .then((blob) => {
-          saveAs(blob, "ERA Amount.png");
+          saveAs(blob, 'ERA Amount.png');
           // saveAs(blob, fileNameView);
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
 
-  const searchTermsviewAll = searchQueryviewAll.toLowerCase().split(" ");
+  const searchTermsviewAll = searchQueryviewAll.toLowerCase().split(' ');
   const filteredDataviewAlls = productionoriginalviewAll?.filter((item) => {
-    return searchTermsviewAll.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTermsviewAll.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
-  const filteredDataviewAll = filteredDataviewAlls.slice(
-    (pageviewAll - 1) * pageSizeviewAll,
-    pageviewAll * pageSizeviewAll
-  );
-  const totalPagesviewAll = Math.ceil(
-    filteredDataviewAlls.length / pageSizeviewAll
-  );
+  const filteredDataviewAll = filteredDataviewAlls.slice((pageviewAll - 1) * pageSizeviewAll, pageviewAll * pageSizeviewAll);
+  const totalPagesviewAll = Math.ceil(filteredDataviewAlls.length / pageSizeviewAll);
   const visiblePagesviewAll = Math.min(totalPagesviewAll, 3);
   const firstVisiblePageviewAll = Math.max(1, pageviewAll - 1);
-  const lastVisiblePageviewAll = Math.min(
-    firstVisiblePageviewAll + visiblePagesviewAll - 1,
-    totalPagesviewAll
-  );
+  const lastVisiblePageviewAll = Math.min(firstVisiblePageviewAll + visiblePagesviewAll - 1, totalPagesviewAll);
   const pageNumbersviewall = [];
   const indexOfLastItemviewAll = pageviewAll * pageSizeviewAll;
   const indexOfFirstItemviewAll = indexOfLastItemviewAll - pageSizeviewAll;
@@ -556,9 +535,9 @@ function EraAmount() {
   const manageColumnsContentviewAll = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -566,7 +545,7 @@ function EraAmount() {
         aria-label="close"
         onClick={handleCloseManageColumnsviewAll}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -574,38 +553,20 @@ function EraAmount() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManageviewAll}
-          onChange={(e) => setSearchQueryManageviewAll(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManageviewAll} onChange={(e) => setSearchQueryManageviewAll(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumnsviewAll.map((column) => (
             <ListItem key={column.field}>
               <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibilityviewAll[column.field]}
-                    onChange={() => toggleColumnVisibilityviewAll(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              // secondary={column.headerName }
+                sx={{ display: 'flex' }}
+                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibilityviewAll[column.field]} onChange={() => toggleColumnVisibilityviewAll(column.field)} />}
+                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
+                // secondary={column.headerName }
               />
             </ListItem>
           ))}
@@ -614,13 +575,7 @@ function EraAmount() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() =>
-                setColumnVisibilityviewAll(initialColumnVisibilityviewAll)
-              }
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibilityviewAll(initialColumnVisibilityviewAll)}>
               Show All
             </Button>
           </Grid>
@@ -628,7 +583,7 @@ function EraAmount() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTableviewAll.forEach((column) => {
@@ -647,13 +602,13 @@ function EraAmount() {
 
   // View functionlity end
 
-  //  multer concepts wise upload file download 
+  //  multer concepts wise upload file download
 
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const handleFileUpload = async () => {
     if (!selectedFiles || selectedFiles.length === 0) {
-      console.log("Please select one or more files to upload.");
+      console.log('Please select one or more files to upload.');
       // return;
     }
     // let getuniqudid = productionoriginalid ? productionoriginalid + 1 : 1;
@@ -676,15 +631,15 @@ function EraAmount() {
 
             const chunk = selectedFile.slice(start, end, selectedFile.type);
             const formData = new FormData();
-            formData.append("file", chunk);
-            formData.append("chunkNumber", chunkNumber);
-            formData.append("totalChunks", totalChunks);
-            formData.append("filesize", selectedFile.size);
-            formData.append("originalname", `${selectedFile.name}`);
+            formData.append('file', chunk);
+            formData.append('chunkNumber', chunkNumber);
+            formData.append('totalChunks', totalChunks);
+            formData.append('filesize', selectedFile.size);
+            formData.append('originalname', `${selectedFile.name}`);
             try {
               const response = await axios.post(SERVICE.ERAAMOUNTSEXCELFILEUPLOADSTORE, formData, {
                 headers: {
-                  "Content-Type": "multipart/form-data",
+                  'Content-Type': 'multipart/form-data',
                 },
               });
 
@@ -705,7 +660,7 @@ function EraAmount() {
         await uploadNextChunk();
       }
       setSelectedFiles([]);
-      console.log("All file uploads completed");
+      console.log('All file uploads completed');
     };
 
     uploadFiles();
@@ -719,28 +674,28 @@ function EraAmount() {
     fetch(fullURL)
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error('Network response was not ok');
         }
         return response.blob();
       })
       .then((blob) => {
         // Handle the blob (e.g., create a download link)
-        const downloadLink = document.createElement("a");
+        const downloadLink = document.createElement('a');
         downloadLink.href = window.URL.createObjectURL(blob);
         downloadLink.download = downloadname;
         downloadLink.click();
       })
-      .catch((error) => console.error("Error:", error));
+      .catch((error) => console.error('Error:', error));
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   const [overallFilterdataAll, setOverallFilterdataAll] = useState([]);
@@ -748,10 +703,10 @@ function EraAmount() {
   const [totalProjects, setTotalProjects] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  const [filterValue, setFilterValue] = useState("");
+  const [filterValue, setFilterValue] = useState('');
 
   // const fetchEmployee = async () => {
-  //   setPageName(!pageName);
+  //   setPageName(!pageName)
   //   setLoader(true);
 
   //   try {
@@ -761,8 +716,7 @@ function EraAmount() {
   //       },
   //       assignbranch: accessbranch,
   //     });
-
-  //     const ansTotal = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
+  //     const ansTotal = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
 
   //     const itemsWithSerialNumberTotal = ansTotal?.map((item, index) => ({
   //       ...item,
@@ -772,7 +726,6 @@ function EraAmount() {
   //     setEraAmounts(itemsWithSerialNumberTotal);
   //     setFilteredChanges(null);
   //     setEraAmountEdit(itemsWithSerialNumberTotal.filter((item) => item._id !== editsingleData._id));
-
   //     let getFilenames = itemsWithSerialNumberTotal.filter((item) => item.filename !== "nonexcel");
 
   //     const uniqueArray = Array.from(
@@ -782,14 +735,13 @@ function EraAmount() {
   //     });
 
   //     const uniqueArrayFilt = Array.from(new Set(uniqueArray));
-
   //     setEraAmountFilename(uniqueArrayFilt?.map((item, index) => ({
   //       ...item,
   //       serialNumber: index + 1,
   //       company: item.company,
   //       branch: item.branch,
   //       processcode: item.processcode,
-  //       amount: Number(item?.amount ?? 0), // ✅ Fix for undefined `amount`
+  //       amount: Number(item.amount),
   //     })));
 
   //     setOverallFilterdata(itemsWithSerialNumberTotal.map((item, index) => {
@@ -799,13 +751,13 @@ function EraAmount() {
   //         company: item.company,
   //         branch: item.branch,
   //         processcode: item.processcode,
-  //         amount: Number(item?.amount ?? 0), // ✅ Fix for undefined `amount`
+  //         amount: Number(item.amount),
   //       };
   //     }));
+  //     setLoader(false)
 
-  //     setLoader(false);
   //   } catch (err) {
-  //     setLoader(false);
+  //     setLoader(false)
   //     handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
   //   }
   // };
@@ -829,20 +781,21 @@ function EraAmount() {
 
       const ansTotal = res_employee?.data?.result ?? [];
 
-
+      // 🔥 Add serial number efficiently
       const itemsWithSerialNumberTotal = ansTotal.map((item, index) => ({
         ...item,
         serialNumber: index + 1,
         amount: Number(item.amount),
       }));
 
-
+      // 🔥 Direct set
       setEraAmounts(itemsWithSerialNumberTotal);
       setEraAmountEdit(itemsWithSerialNumberTotal.filter((item) => item._id !== editsingleData._id));
 
+      // 🔥 Filter unique filenames
       const uniqueFileMap = new Map();
       itemsWithSerialNumberTotal.forEach((item) => {
-        if (item.filename !== "nonexcel") {
+        if (item.filename !== 'nonexcel') {
           const key = `${item.company}-${item.branch}-${item.filename}`;
           if (!uniqueFileMap.has(key)) uniqueFileMap.set(key, item);
         }
@@ -874,12 +827,9 @@ function EraAmount() {
     }
   };
 
-
   useEffect(() => {
     fetchEmployee();
   }, []);
-
-
 
   const getapi = async () => {
     let userchecks = axios.post(`${SERVICE.CREATE_USERCHECKS}`, {
@@ -888,83 +838,89 @@ function EraAmount() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("ERA Amount"),
+      pagename: String('ERA Amount'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(new Date()),
+      date: String(new Date(serverTime)),
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(new Date()),
+          date: String(new Date(serverTime)),
         },
       ],
     });
-  }
+  };
 
   useEffect(() => {
     getapi();
-  }, [])
+  }, []);
 
-  const [eraAmountFilenameArray, setEraAmountFilenameArray] = useState([])
-  const [eraAmountsArray, setEraAmountsArray] = useState([])
-  const [eraAmountEditArray, setEraAmountEditArray] = useState([])
-  const [editsingleData, setEditsingleData] = useState({ processcode: "", amount: "" });
+  const [eraAmountFilenameArray, setEraAmountFilenameArray] = useState([]);
+  const [eraAmountsArray, setEraAmountsArray] = useState([]);
+  const [eraAmountEditArray, setEraAmountEditArray] = useState([]);
+  const [editsingleData, setEditsingleData] = useState({ processcode: '', amount: '' });
 
   const fetchEraAmountDataArray = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      let Res = await axios.post(SERVICE.ERAAMOUNTSASSIGNBRANCH, {
-        assignbranch: accessbranch
-      }, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
+      let Res = await axios.post(
+        SERVICE.ERAAMOUNTSASSIGNBRANCH,
+        {
+          assignbranch: accessbranch,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        }
+      );
       setEraAmountsArray(Res?.data?.eraamounts);
       setEraAmountEdit(Res?.data?.eraamounts.filter((item) => item._id !== editsingleData._id));
-      let getFilenames = Res?.data?.eraamounts.filter((item) => item.filename !== "nonexcel");
+      let getFilenames = Res?.data?.eraamounts.filter((item) => item.filename !== 'nonexcel');
       const uniqueArray = Array.from(new Set(getFilenames.map((obj) => obj.filename))).map((filename) => {
         return getFilenames.find((obj) => obj.filename === filename);
       });
       setEraAmountFilenameArray(uniqueArray);
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   useEffect(() => {
-    fetchEraAmountDataArray()
+    fetchEraAmountDataArray();
   }, []);
 
   //submit option for saving
   const handleSubmit = (e) => {
     e.preventDefault();
     const isNameMatch = eraAmounts?.some((item) => item.company === selectedCompany && item.branch === selectedBranch && item.processcode?.toLowerCase() === eraAmountmanual.processcode?.toLowerCase() && item.amount?.toLowerCase() === eraAmountmanual.amount?.toLowerCase());
-    if (selectedCompany === "Please Select Company" || selectedBranch === "Please Select Branch") {
-      let alertMsg = selectedCompany === "Please Select Company" && selectedBranch === "Please Select Branch" ? "Please Select Company & Branch" : selectedCompany === "Please Select Company" ? "Please Select Company" : "Please Select Branch";
+    if (selectedCompany === 'Please Select Company' || selectedBranch === 'Please Select Branch') {
+      let alertMsg = selectedCompany === 'Please Select Company' && selectedBranch === 'Please Select Branch' ? 'Please Select Company & Branch' : selectedCompany === 'Please Select Company' ? 'Please Select Company' : 'Please Select Branch';
       setPopupContentMalert(alertMsg);
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (eraAmountmanual.processcode === "") {
-      setPopupContentMalert("Please Enter Process Code");
-      setPopupSeverityMalert("info");
+    } else if (eraAmountmanual.processcode === '') {
+      setPopupContentMalert('Please Enter Process Code');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (eraAmountmanual.amount === "") {
-      setPopupContentMalert("Please Enter Amount");
-      setPopupSeverityMalert("info");
+    } else if (eraAmountmanual.amount === '') {
+      setPopupContentMalert('Please Enter Amount');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data already exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data already exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequest();
     }
   };
 
-  const [isBtn, setIsBtn] = useState(false)
+  const [isBtn, setIsBtn] = useState(false);
 
   //add function...
   const sendRequest = async () => {
-    setPageName(!pageName)
-    setIsBtn(true)
+    setPageName(!pageName);
+    setIsBtn(true);
     try {
       let res = await axios.post(SERVICE.ERAAMOUNT_CREATE, {
         headers: {
@@ -974,48 +930,51 @@ function EraAmount() {
         amount: String(eraAmountmanual.amount),
         branch: String(selectedBranch),
         company: String(selectedCompany),
-        filename: "nonexcel",
+        filename: 'nonexcel',
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
 
       await fetchEraAmountDataArray();
       await fetchEmployee();
-      setEraAmountmanual({ ...eraAmountmanual, processcode: "", amount: "" });
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setEraAmountmanual({ ...eraAmountmanual, processcode: '', amount: '' });
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-      setIsBtn(false)
-    } catch (err) { setIsBtn(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setIsBtn(false);
+    } catch (err) {
+      setIsBtn(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const handleClear = (e) => {
     e.preventDefault();
-    setFileUploadName("");
+    setFileUploadName('');
     setSplitArray([]);
     fetchEmployee();
     // readExcel(null);
-    setDataupdated("");
-    setSearchQuery("");
-    setSearchQueryFilename("");
+    setDataupdated('');
+    setSearchQuery('');
+    setSearchQueryFilename('');
     setSheets([]);
-    setSelectedSheet("Please Select Sheet");
-    setSelectedCompany("Please Select Company");
-    setSelectedBranch("Please Select Branch");
-    setEraAmountmanual({ ...eraAmountmanual, processcode: "", amount: "" });
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setSelectedSheet('Please Select Sheet');
+    setSelectedCompany('Please Select Company');
+    setSelectedBranch('Please Select Branch');
+    setEraAmountmanual({ ...eraAmountmanual, processcode: '', amount: '' });
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
   //delete singledata functionality
   const [deletesingleDataView, setDeletesingledataView] = useState();
 
   const rowDataSingleDeleteView = async (id) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let Res = await axios.get(`${SERVICE.ERAAMOUNT_SINGLE}/${id}`, {
         headers: {
@@ -1024,11 +983,13 @@ function EraAmount() {
       });
       setDeletesingledataView(Res?.data?.seraamount);
       handleClickSingleOpenView();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const deleteSingleListView = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     let deleteSingleid = deletesingleDataView?._id;
     try {
       const deletePromises = await axios.delete(`${SERVICE.ERAAMOUNT_SINGLE}/${deleteSingleid}`, {
@@ -1038,20 +999,21 @@ function EraAmount() {
       });
       setPage(1);
       handleCloseSingleModView();
-      setFilteredRowDataViewAll([])
-      setFilteredChangesViewAll(null)
-      await getviewCodeall(deletesingleDataView.filename)
+      setFilteredRowDataViewAll([]);
+      setFilteredChangesViewAll(null);
+      await getviewCodeall(deletesingleDataView.filename);
       await fetchEmployee();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //edit get data functionality single list
 
   const rowdatasingleeditView = async (id) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let Res = await axios.get(`${SERVICE.ERAAMOUNT_SINGLE}/${id}`, {
         headers: {
@@ -1062,7 +1024,9 @@ function EraAmount() {
       setSelectedCompanyEdit(Res?.data?.seraamount?.company);
       setSelectedBranchEdit(Res?.data?.seraamount?.branch);
       handleClickOpenEditView();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const editSubmitView = async (e) => {
@@ -1073,30 +1037,29 @@ function EraAmount() {
     });
     const eraAmountEditArray = Res?.data?.eraamounts.filter((item) => item._id !== editsingleData._id);
     e.preventDefault();
-    const isNameMatch = eraAmountEditArray?.some((item) => item.company?.toLowerCase() == selectedCompanyEdit?.toLowerCase()
-      && item.branch?.toLowerCase() == selectedBranchEdit?.toLowerCase()
-      && item.processcode?.toLowerCase() == editsingleData.processcode?.toLowerCase()
-      && item.amount?.toLowerCase() == editsingleData.amount?.toLowerCase());
+    const isNameMatch = eraAmountEditArray?.some(
+      (item) => item.company?.toLowerCase() == selectedCompanyEdit?.toLowerCase() && item.branch?.toLowerCase() == selectedBranchEdit?.toLowerCase() && item.processcode?.toLowerCase() == editsingleData.processcode?.toLowerCase() && item.amount?.toLowerCase() == editsingleData.amount?.toLowerCase()
+    );
 
-    if (selectedCompanyEdit === "Please Select Company") {
-      setPopupContentMalert("Please Select Company");
-      setPopupSeverityMalert("info");
+    if (selectedCompanyEdit === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (selectedBranchEdit === "Please Select Branch") {
-      setPopupContentMalert("Please Select Branch");
-      setPopupSeverityMalert("info");
+    } else if (selectedBranchEdit === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (editsingleData.processcode === "") {
-      setPopupContentMalert("Please Enter Process Code");
-      setPopupSeverityMalert("info");
+    } else if (editsingleData.processcode === '') {
+      setPopupContentMalert('Please Enter Process Code');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (editsingleData.amount === "") {
-      setPopupContentMalert("Please Enter Amount");
-      setPopupSeverityMalert("info");
+    } else if (editsingleData.amount === '') {
+      setPopupContentMalert('Please Enter Amount');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data already exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data already exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequestView();
@@ -1104,7 +1067,7 @@ function EraAmount() {
   };
 
   const sendEditRequestView = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     let editid = editsingleData._id;
     try {
       let res = await axios.put(`${SERVICE.ERAAMOUNT_SINGLE}/${editid}`, {
@@ -1119,7 +1082,7 @@ function EraAmount() {
           ...updateby,
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
@@ -1127,11 +1090,13 @@ function EraAmount() {
       await getviewCodeall(editsingleData.filename);
       await fetchEraAmountDataArray();
       await fetchEmployee();
-      setEraAmountmanual({ ...eraAmountmanual, processcode: "", amount: "" });
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setEraAmountmanual({ ...eraAmountmanual, processcode: '', amount: '' });
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const gridRefTableImg = useRef(null);
@@ -1161,10 +1126,10 @@ function EraAmount() {
   let updateby = editsingleData.updatedby;
   let addedby = editsingleData.addedby;
 
-  const [infosingleFileData, setinfosingleFileData] = useState([])
+  const [infosingleFileData, setinfosingleFileData] = useState([]);
 
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.ERAAMOUNT_SINGLE}/${e}`, {
         headers: {
@@ -1173,14 +1138,16 @@ function EraAmount() {
       });
       setinfosingleFileData(res?.data?.seraamount);
       handleClickOpenFileinfo();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
 
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
   const [selectAllChecked, setSelectAllChecked] = useState(false);
@@ -1195,15 +1162,15 @@ function EraAmount() {
   const handleCloseviewAll = () => {
     setOpenviewAll(false);
     setProductionoriginalViewAll([]);
-    setSearchQueryviewAll("");
+    setSearchQueryviewAll('');
     setPageviewAll(1);
     setColumnVisibilityviewAll(initialColumnVisibilityviewAll);
   };
-  const [filenameDataArray3, setFilenameDataArray3] = useState([])
+  const [filenameDataArray3, setFilenameDataArray3] = useState([]);
 
   // get single row to view....
   const getviewCodeall = async (filename) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       setProductionfirstViewcheck(false);
       let res = await axios.get(SERVICE.ERAAMOUNTS, {
@@ -1211,10 +1178,10 @@ function EraAmount() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let getFilenames = res?.data?.eraamounts.filter((item) => item.filename === filename)
+      let getFilenames = res?.data?.eraamounts.filter((item) => item.filename === filename);
       // .map((item) => item._id);
-      setProductionoriginalViewAll(getFilenames?.map(
-        (item, index) => ({
+      setProductionoriginalViewAll(
+        getFilenames?.map((item, index) => ({
           ...item,
           id: item._id,
           serialNumber: index + 1,
@@ -1222,23 +1189,25 @@ function EraAmount() {
           branch: item.branch,
           processcode: item.processcode,
           amount: Number(item.amount),
-
+        }))
+      );
+      setFilenameDataArray3(
+        getFilenames.map((item, index) => {
+          return {
+            id: item._id,
+            serialNumber: item.serialNumber,
+            company: item.company,
+            branch: item.branch,
+            processcode: item.processcode,
+            amount: Number(item.amount),
+          };
         })
-      ));
-      setFilenameDataArray3(getFilenames.map((item, index) => {
-        return {
-          id: item._id,
-          serialNumber: item.serialNumber,
-          company: item.company,
-          branch: item.branch,
-          processcode: item.processcode,
-          amount: Number(item.amount),
-
-        };
-      }))
+      );
       setFileNameView(filename);
       handleClickOpenviewAll();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); } finally {
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    } finally {
       setProductionfirstViewcheck(true);
       setPageviewAll(1);
       setColumnVisibilityviewAll(initialColumnVisibilityviewAll);
@@ -1247,7 +1216,7 @@ function EraAmount() {
 
   const [deleteFilenameData, setDeletefilenamedata] = useState([]);
   const rowDatafileNameDelete = async (filename) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let Res = await axios.get(SERVICE.ERAAMOUNTS, {
         headers: {
@@ -1257,36 +1226,38 @@ function EraAmount() {
       let getFilenames = Res?.data?.eraamounts.filter((item) => item.filename === filename).map((item) => item._id);
       setDeletefilenamedata(getFilenames);
       handleClickOpen();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const [loader, setLoader] = useState(false);
 
   const deleteFilenameList = async () => {
-    setPageName(!pageName)
-    setLoader(true)
+    setPageName(!pageName);
+    setLoader(true);
     try {
-      const deletePromises = await axios.post(
-        SERVICE.ERAAMOUNT_FILEDEL,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-          ids: deleteFilenameData,
-        }
-      );
+      const deletePromises = await axios.post(SERVICE.ERAAMOUNT_FILEDEL, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        ids: deleteFilenameData,
+      });
       if (deletePromises?.data?.success) {
         // await Promise.all(deletePromises);
         await fetchEraAmountDataArray();
         await fetchEmployee();
         handleCloseMod();
 
-        setPopupContent("Deleted Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Deleted Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
-        setLoader(false)
+        setLoader(false);
       }
-    } catch (err) { setLoader(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setLoader(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   // Manage Columns
@@ -1312,7 +1283,7 @@ function EraAmount() {
 
   useEffect(() => {
     // Retrieve column visibility from localStorage (if available)
-    const savedVisibility = localStorage.getItem("columnVisibilityFilename");
+    const savedVisibility = localStorage.getItem('columnVisibilityFilename');
     if (savedVisibility) {
       setColumnVisibilityFilename(JSON.parse(savedVisibility));
     }
@@ -1320,7 +1291,7 @@ function EraAmount() {
 
   useEffect(() => {
     // Save column visibility to localStorage whenever it changes
-    localStorage.setItem("columnVisibilityFilename", JSON.stringify(columnVisibilityFilename));
+    localStorage.setItem('columnVisibilityFilename', JSON.stringify(columnVisibilityFilename));
   }, [columnVisibilityFilename]);
 
   const handleSelectionChangeFilename = (newSelection) => {
@@ -1331,12 +1302,13 @@ function EraAmount() {
   // image
   const handleCaptureImageFilename = () => {
     if (gridRefTableImgFilename.current) {
-      domtoimage.toBlob(gridRefTableImgFilename.current)
+      domtoimage
+        .toBlob(gridRefTableImgFilename.current)
         .then((blob) => {
-          saveAs(blob, "Upload File List.png");
+          saveAs(blob, 'Upload File List.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -1345,8 +1317,8 @@ function EraAmount() {
   const componentRefFilename = useRef();
   const handleprintFilename = useReactToPrint({
     content: () => componentRefFilename.current,
-    documentTitle: "ERA Amount File Name",
-    pageStyle: "print",
+    documentTitle: 'ERA Amount File Name',
+    pageStyle: 'print',
   });
 
   //serial no for listing itemsFilename
@@ -1376,11 +1348,11 @@ function EraAmount() {
   };
 
   // Split the search query into individual terms
-  const searchTermsFilename = searchQueryFilename.toLowerCase().split(" ");
+  const searchTermsFilename = searchQueryFilename.toLowerCase().split(' ');
 
   // Modify the filtering logic to check each term
   const filteredDatasFilename = itemsFilename?.filter((item) => {
-    return searchTermsFilename.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTermsFilename.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
   const FilenameFilename = filteredDatasFilename?.slice((pageFilename - 1) * pageSizeFilename, pageFilename * pageSizeFilename);
@@ -1400,10 +1372,10 @@ function EraAmount() {
   );
   const columnDataTableFilename = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -1412,93 +1384,98 @@ function EraAmount() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 100,
       hide: !columnVisibilityFilename.serialNumber,
-      headerClassName: "bold-header",
-      pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 180,
       hide: !columnVisibilityFilename.company,
-      headerClassName: "bold-header",
-      pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 180,
       hide: !columnVisibilityFilename.branch,
-      headerClassName: "bold-header",
-      pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
     {
-      field: "filename",
-      headerName: "File Name",
+      field: 'filename',
+      headerName: 'File Name',
       flex: 0,
       width: 350,
       hide: !columnVisibilityFilename.filename,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibilityFilename.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("deraamount") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('deraamount') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
                 rowDatafileNameDelete(params.data.filename);
               }}
             >
-              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />            </Button>
+              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />{' '}
+            </Button>
           )}
-          {isUserRoleCompare?.includes("veraamount") && (
+          {isUserRoleCompare?.includes('veraamount') && (
             <Button
               // disabled
-              sx={{ minWidth: "40px" }}
+              sx={{ minWidth: '40px' }}
               onClick={(e) => {
                 handleDownloadReturn(params.data.filename);
               }}
             >
-              <DownloadOutlinedIcon style={{ fontsize: "large" }} />
+              <DownloadOutlinedIcon style={{ fontsize: 'large' }} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("veraamount") && (
+          {isUserRoleCompare?.includes('veraamount') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getviewCodeall(params.data.filename);
               }}
             >
-              <VisibilityOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonview} />
+              <VisibilityOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("ieraamount") && (
+          {isUserRoleCompare?.includes('ieraamount') && (
             <Button
               onClick={() => {
-
                 getinfoCode(params.data._id);
               }}
             >
-              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />            </Button>
+              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />{' '}
+            </Button>
           )}
         </Grid>
       ),
@@ -1542,9 +1519,9 @@ function EraAmount() {
   const manageColumnsContentFilename = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1552,7 +1529,7 @@ function EraAmount() {
         aria-label="close"
         onClick={handleCloseManageColumnsFilename}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1560,16 +1537,16 @@ function EraAmount() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManageFilename} onChange={(e) => setSearchQueryManageFilename(e.target.value)} sx={{ marginBottom: 5, position: "absolute" }} />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManageFilename} onChange={(e) => setSearchQueryManageFilename(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent sx={{ minWidth: "auto", height: "200px", position: "relative" }}>
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumnsFilename.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText sx={{ display: "flex" }} primary={<Switch sx={{ marginTop: "-5px" }} size="small" checked={columnVisibilityFilename[column.field]} onChange={() => toggleColumnVisibilityFilename(column.field)} />} secondary={column.field === "checkbox" ? "Checkbox" : column.headerName} />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibilityFilename[column.field]} onChange={() => toggleColumnVisibilityFilename(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -1577,8 +1554,8 @@ function EraAmount() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button variant="text" sx={{ textTransform: "none" }} onClick={() => setColumnVisibilityFilename(initialColumnVisibilityFilename)}>
-              {" "}
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibilityFilename(initialColumnVisibilityFilename)}>
+              {' '}
               Show All
             </Button>
           </Grid>
@@ -1586,7 +1563,7 @@ function EraAmount() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTableFilename.forEach((column) => {
@@ -1595,7 +1572,7 @@ function EraAmount() {
                 setColumnVisibilityFilename(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -1607,28 +1584,26 @@ function EraAmount() {
   // page refersh reload
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   useEffect(() => {
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
   const readExcel = (file) => {
-    if (selectedCompany === "Please Select Company") {
-
-      setPopupContentMalert("Please Select Company");
-      setPopupSeverityMalert("info");
+    if (selectedCompany === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (selectedBranch === "Please Select Branch") {
-
-      setPopupContentMalert("Please Select Branch");
-      setPopupSeverityMalert("info");
+    } else if (selectedBranch === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       const promise = new Promise((resolve, reject) => {
@@ -1640,7 +1615,7 @@ function EraAmount() {
 
         fileReader.onload = (e) => {
           const bufferArray = e.target.result;
-          const wb = XLSX.read(bufferArray, { type: "buffer" });
+          const wb = XLSX.read(bufferArray, { type: 'buffer' });
           const wsname = wb.SheetNames[0];
           const ws = wb.Sheets[wsname];
 
@@ -1648,9 +1623,9 @@ function EraAmount() {
           const data = XLSX.utils.sheet_to_json(ws);
 
           // Check if the required columns are present
-          if (data.length === 0 || !data[0].hasOwnProperty("ProcessCode") || !data[0].hasOwnProperty("Amount")) {
+          if (data.length === 0 || !data[0].hasOwnProperty('ProcessCode') || !data[0].hasOwnProperty('Amount')) {
             setPopupContentMalert("The uploaded file must contain 'ProcessCode' and 'Amount' columns.");
-            setPopupSeverityMalert("info");
+            setPopupSeverityMalert('info');
             handleClickOpenPopupMalert();
           } else {
             resolve(data);
@@ -1663,14 +1638,13 @@ function EraAmount() {
 
       setSelectedFiles((existingFiles) => [...existingFiles, file]);
 
-
       promise
         .then((d) => {
           // Check for missing ProcessCode or Amount in any row
           for (const item of d) {
             if (!item.ProcessCode || !item.Amount) {
               setPopupContentMalert("Each row must contain 'ProcessCode' and 'Amount'.");
-              setPopupSeverityMalert("info");
+              setPopupSeverityMalert('info');
               handleClickOpenPopupMalert();
             }
           }
@@ -1678,7 +1652,7 @@ function EraAmount() {
           // Filter out rows with "Sample Value" or any other placeholder values you want to remove
           const filteredData = d.filter((item) => {
             // Remove rows where the 'Sample Value' column or similar is present
-            return !(item["Sample Value"] && item["Sample Value"] === "Sample Data");
+            return !(item['Sample Value'] && item['Sample Value'] === 'Sample Data');
           });
 
           // Filter out duplicates within the newly read data
@@ -1693,16 +1667,7 @@ function EraAmount() {
             }
           });
 
-          let uniqueArray = uniqueData.filter(
-            (item) =>
-              !eraAmountsArray.some(
-                (tp) =>
-                  tp.company === selectedCompany &&
-                  tp.branch === selectedBranch &&
-                  tp.processcode == item.ProcessCode &&
-                  tp.amount == item.Amount
-              )
-          );
+          let uniqueArray = uniqueData.filter((item) => !eraAmountsArray.some((tp) => tp.company === selectedCompany && tp.branch === selectedBranch && tp.processcode == item.ProcessCode && tp.amount == item.Amount));
 
           const dataArray = uniqueArray.map((item) => ({
             processcode: item.ProcessCode,
@@ -1713,11 +1678,11 @@ function EraAmount() {
             addedby: [
               {
                 name: String(isUserRoleAccess.companyname),
-                date: String(new Date()),
+                date: String(new Date(serverTime)),
               },
             ],
           }));
-          setUpdatesheet([])
+          setUpdatesheet([]);
 
           const subarraySize = 1000;
           const splitedArray = [];
@@ -1730,23 +1695,25 @@ function EraAmount() {
           if (uniqueArray.length !== d.length) {
             const duplicateCount = d.length - uniqueArray.length;
             setPopupContentMalert(`${duplicateCount} Duplicate data's removed`);
-            setPopupSeverityMalert("info");
+            setPopupSeverityMalert('info');
             handleClickOpenPopupMalert();
           }
         })
-        .catch((err) => { handleApiError(err, setShowAlert, handleClickOpenerr) })
+        .catch((err) => {
+          handleApiError(err, setShowAlert, handleClickOpenerr);
+        });
     }
   };
 
   const getSheetExcel = () => {
-    if (!Array.isArray(splitArray) || (splitArray.length === 0 && fileUploadName === "")) {
-      setPopupContentMalert("Please Upload a file");
-      setPopupSeverityMalert("info");
+    if (!Array.isArray(splitArray) || (splitArray.length === 0 && fileUploadName === '')) {
+      setPopupContentMalert('Please Upload a file');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       let getsheets = splitArray.map((d, index) => ({
-        label: "Sheet" + (index + 1),
-        value: "Sheet" + (index + 1),
+        label: 'Sheet' + (index + 1),
+        value: 'Sheet' + (index + 1),
         index: index,
       }));
 
@@ -1758,17 +1725,17 @@ function EraAmount() {
     let uploadExceldata = splitArray[selectedSheetindex];
     let uniqueArray = uploadExceldata?.filter((item) => !eraAmountsArray.some((tp) => tp.company === selectedCompany && tp.branch === selectedBranch && tp.processcode == item.processcode && tp.amount == item.amount));
     // Ensure that items is an array of objects before sending
-    if (fileUploadName === "" || !Array.isArray(uniqueArray) || uniqueArray.length === 0 || selectedSheet === "Please Select Sheet") {
-      setPopupContentMalert(fileUploadName === "" ? "Please Upload File" : selectedSheet === "Please Select Sheet" ? "Please Select Sheet" : "No data to upload");
-      setPopupSeverityMalert("info");
+    if (fileUploadName === '' || !Array.isArray(uniqueArray) || uniqueArray.length === 0 || selectedSheet === 'Please Select Sheet') {
+      setPopupContentMalert(fileUploadName === '' ? 'Please Upload File' : selectedSheet === 'Please Select Sheet' ? 'Please Select Sheet' : 'No data to upload');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (selectedCompany === "Please Select Company") {
-      setPopupContentMalert("Please Select Company");
-      setPopupSeverityMalert("info");
+    } else if (selectedCompany === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (selectedBranch === "Please Select Branch") {
-      setPopupContentMalert("Please Select Branch");
-      setPopupSeverityMalert("info");
+    } else if (selectedBranch === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       var xmlhttp = new XMLHttpRequest();
@@ -1777,23 +1744,23 @@ function EraAmount() {
         }
       };
 
-      setPageName(!pageName)
+      setPageName(!pageName);
       try {
         setLoading(true); // Set loading to true when starting the upload
-        xmlhttp.open("POST", SERVICE.ERAAMOUNT_CREATE);
-        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlhttp.open('POST', SERVICE.ERAAMOUNT_CREATE);
+        xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
         xmlhttp.send(JSON.stringify(uniqueArray));
         await fetchEmployee();
         await fetchEraAmountDataArray();
       } catch (err) {
       } finally {
         setLoading(false); // Set loading back to false when the upload is complete
-        setPopupContent("Updated Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Updated Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
-        setSelectedSheet("Please Select Sheet");
-        setSelectedSheetindex(-1)
-        setUpdatesheet(prev => [...prev, selectedSheetindex])
+        setSelectedSheet('Please Select Sheet');
+        setSelectedSheetindex(-1);
+        setUpdatesheet((prev) => [...prev, selectedSheetindex]);
 
         await handleFileUpload();
         await fetchEmployee();
@@ -1802,59 +1769,49 @@ function EraAmount() {
     }
   };
   const clearFileSelection = () => {
-    setUpdatesheet([])
-    setFileUploadName("");
+    setUpdatesheet([]);
+    setFileUploadName('');
     setSplitArray([]);
     readExcel(null);
-    setDataupdated("");
+    setDataupdated('');
     setSheets([]);
-    setSelectedSheet("Please Select Sheet");
+    setSelectedSheet('Please Select Sheet');
   };
 
   //  Datefield
-  var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var today = new Date(serverTime);
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = dd + "-" + mm + "-" + yyyy;
+  today = dd + '-' + mm + '-' + yyyy;
 
   const ExportsHead = () => {
-    let fileDownloadName = "Filename_" + selectedBranchCode + "_" + today;
-    if (selectedCompany === "Please Select Company" || selectedBranch === "Please Select Branch") {
-      let alertMsg = selectedCompany === "Please Select Company" && selectedBranch === "Please Select Branch" ? "Please Select Company & Branch" : selectedCompany === "Please Select Company" ? "Please Select Company" : "Please Select Branch";
+    let fileDownloadName = 'Filename_' + selectedBranchCode + '_' + today;
+    if (selectedCompany === 'Please Select Company' || selectedBranch === 'Please Select Branch') {
+      let alertMsg = selectedCompany === 'Please Select Company' && selectedBranch === 'Please Select Branch' ? 'Please Select Company & Branch' : selectedCompany === 'Please Select Company' ? 'Please Select Company' : 'Please Select Branch';
       setPopupContentMalert(alertMsg);
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       const sampleData = [
-        ["QSEE01", "40", "Sample Data"],  // Sample data row 1
+        ['QSEE01', '40', 'Sample Data'], // Sample data row 1
       ];
 
       // Create and export the file
-      new CsvBuilder(fileDownloadName)
-        .setColumns(["ProcessCode", "Amount", "Sample Value"])
-        .addRows(sampleData)
-        .exportFile();
+      new CsvBuilder(fileDownloadName).setColumns(['ProcessCode', 'Amount', 'Sample Value']).addRows(sampleData).exportFile();
     }
   };
 
-  const [fileFormat, setFormat] = useState('')
+  const [fileFormat, setFormat] = useState('');
 
   return (
     <Box>
-      <Headtitle title={"ERA AMOUNT"} />
+      <Headtitle title={'ERA AMOUNT'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="ERA Amount"
-        modulename="Production"
-        submodulename="SetUp"
-        mainpagename="ERA Amount"
-        subpagename=""
-        subsubpagename=""
-      />
+      <PageHeading title="ERA Amount" modulename="Production" submodulename="SetUp" mainpagename="ERA Amount" subpagename="" subsubpagename="" />
 
       <>
-        {isUserRoleCompare?.includes("aeraamount") && (
+        {isUserRoleCompare?.includes('aeraamount') && (
           <Box sx={userStyle.selectcontainer}>
             <>
               <Grid container spacing={2}>
@@ -1867,21 +1824,23 @@ function EraAmount() {
                 <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Company<b style={{ color: "red" }}>*</b>
+                      Company<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
-                      options={accessbranch?.map(data => ({
-                        label: data.company,
-                        value: data.company,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={accessbranch
+                        ?.map((data) => ({
+                          label: data.company,
+                          value: data.company,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       placeholder="Please Select Company"
                       value={{ label: selectedCompany, value: selectedCompany }}
                       onChange={(e) => {
                         setSelectedCompany(e.value);
-                        setSelectedBranch("Please Select Branch");
+                        setSelectedBranch('Please Select Branch');
                       }}
                     />
                   </FormControl>
@@ -1889,41 +1848,39 @@ function EraAmount() {
                 <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Branch<b style={{ color: "red" }}>*</b>
+                      Branch<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
-                      options={accessbranch?.filter(
-                        (comp) =>
-                          comp.company === selectedCompany
-                      )?.map(data => ({
-                        label: data.branch,
-                        value: data.branch,
-                        codeval: data.codeval
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
+                      options={accessbranch
+                        ?.filter((comp) => comp.company === selectedCompany)
+                        ?.map((data) => ({
+                          label: data.branch,
+                          value: data.branch,
+                          codeval: data.codeval,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
                       placeholder="Please Select Branch"
                       value={{ label: selectedBranch, value: selectedBranch }}
                       onChange={(e) => {
                         setSelectedBranch(e.value);
                         setSelectedBranchCode(e.codeval);
-                        setFileUploadName("");
+                        setFileUploadName('');
                         //--
                         setSplitArray([]);
                         // readExcel(null);
-                        setDataupdated("");
+                        setDataupdated('');
                         setSheets([]);
-                        setSelectedSheet("Please Select Sheet");
+                        setSelectedSheet('Please Select Sheet');
                       }}
                     />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12} sm={6}>
-                  <Typography>
-                    &nbsp;
-                  </Typography>
-                  <Button variant="contained" color="success" disabled={eraAmountmanual.processcode !== "" || eraAmountmanual.amount != ""} sx={{ textTransform: "Capitalize" }} onClick={(e) => ExportsHead()}>
+                  <Typography>&nbsp;</Typography>
+                  <Button variant="contained" color="success" disabled={eraAmountmanual.processcode !== '' || eraAmountmanual.amount != ''} sx={{ textTransform: 'Capitalize' }} onClick={(e) => ExportsHead()}>
                     <FaDownload />
                     &ensp;Download template file
                   </Button>
@@ -1936,7 +1893,7 @@ function EraAmount() {
                 <Grid item md={4} xs={12} sm={6} marginTop={3}>
                   <Grid container spacing={2}>
                     <Grid item md={4}>
-                      <Button variant="contained" disabled={eraAmountmanual.processcode !== "" || eraAmountmanual.amount != ""} component="label" sx={{ textTransform: "capitalize" }}>
+                      <Button variant="contained" disabled={eraAmountmanual.processcode !== '' || eraAmountmanual.amount != ''} component="label" sx={{ textTransform: 'capitalize' }}>
                         Choose File
                         <input
                           hidden
@@ -1944,7 +1901,7 @@ function EraAmount() {
                           accept=".xlsx, .xls , .csv"
                           onChange={(e) => {
                             const file = e.target.files[0];
-                            setDataupdated("uploaded");
+                            setDataupdated('uploaded');
                             readExcel(file);
                             setFileUploadName(file.name);
                             e.target.value = null;
@@ -1953,11 +1910,11 @@ function EraAmount() {
                       </Button>
                     </Grid>
                     <Grid item md={7}>
-                      {fileUploadName != "" && splitArray.length > 0 ? (
-                        <Box sx={{ display: "flex", justifyContent: "left" }}>
+                      {fileUploadName != '' && splitArray.length > 0 ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                           <p>{fileUploadName}</p>
-                          <Button sx={{ minWidth: "36px", borderRadius: "50%" }} onClick={() => clearFileSelection()}>
-                            <FaTrash style={{ color: "red" }} />
+                          <Button sx={{ minWidth: '36px', borderRadius: '50%' }} onClick={() => clearFileSelection()}>
+                            <FaTrash style={{ color: 'red' }} />
                           </Button>
                         </Box>
                       ) : null}
@@ -1969,7 +1926,7 @@ function EraAmount() {
                     <Typography>Sheet</Typography>
                     <Selects
                       maxMenuHeight={250}
-                      options={sheets.filter(d => !updateSheet.includes(d.index))}
+                      options={sheets.filter((d) => !updateSheet.includes(d.index))}
                       value={{ label: selectedSheet, value: selectedSheet }}
                       onChange={(e) => {
                         setSelectedSheet(e.value);
@@ -1981,7 +1938,7 @@ function EraAmount() {
                 <Grid item md={5} xs={12} sm={6} marginTop={3}>
                   <Grid container>
                     <Grid item md={7} xs={12} sm={8}>
-                      <Button variant="contained" color="primary" disabled={eraAmountmanual.processcode !== "" || eraAmountmanual.amount != ""} onClick={getSheetExcel} sx={{ textTransform: "capitalize" }}>
+                      <Button variant="contained" color="primary" disabled={eraAmountmanual.processcode !== '' || eraAmountmanual.amount != ''} onClick={getSheetExcel} sx={{ textTransform: 'capitalize' }}>
                         Get Sheet
                       </Button>
                     </Grid>
@@ -1998,8 +1955,8 @@ function EraAmount() {
                 <Grid item md={6} xs={12} sm={6}>
                   <Grid container>
                     <Grid item md={5} xs={12} sm={6}>
-                      <Typography sx={{ marginTop: "3px" }}>
-                        Process Code<b style={{ color: "red" }}>*</b>
+                      <Typography sx={{ marginTop: '3px' }}>
+                        Process Code<b style={{ color: 'red' }}>*</b>
                       </Typography>
                     </Grid>
                     <Grid item md={7} xs={12} sm={6}>
@@ -2008,7 +1965,7 @@ function EraAmount() {
                           id="component-outlined"
                           type="text"
                           placeholder="Please Enter Process Code"
-                          disabled={fileUploadName != "" && splitArray.length > 0}
+                          disabled={fileUploadName != '' && splitArray.length > 0}
                           value={eraAmountmanual.processcode}
                           onChange={(e) => {
                             setEraAmountmanual({
@@ -2025,8 +1982,8 @@ function EraAmount() {
                 <Grid item md={6} xs={12} sm={6}>
                   <Grid container>
                     <Grid item md={5} xs={12} sm={6}>
-                      <Typography sx={{ marginTop: "3px" }}>
-                        Amount<b style={{ color: "red" }}>*</b>
+                      <Typography sx={{ marginTop: '3px' }}>
+                        Amount<b style={{ color: 'red' }}>*</b>
                       </Typography>
                     </Grid>
                     <Grid item md={7} xs={12} sm={6}>
@@ -2035,7 +1992,7 @@ function EraAmount() {
                           id="component-outlined"
                           type="text"
                           placeholder="Please Enter Amount"
-                          disabled={fileUploadName != "" && splitArray.length > 0}
+                          disabled={fileUploadName != '' && splitArray.length > 0}
                           value={eraAmountmanual.amount}
                           onChange={(e) => {
                             const value = e.target.value;
@@ -2051,9 +2008,9 @@ function EraAmount() {
                     </Grid>
                   </Grid>
                 </Grid>
-                <Grid item md={6} xs={12} sm={6} sx={{ display: "flex", justifyContent: "center", gap: "15px" }}>
+                <Grid item md={6} xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
                   {!loading ? (
-                    fileUploadName != "" && splitArray.length > 0 ? (
+                    fileUploadName != '' && splitArray.length > 0 ? (
                       <>
                         <div readExcel={readExcel}>
                           <SendToServer sendJSON={sendJSON} />
@@ -2079,7 +2036,6 @@ function EraAmount() {
                   </Button>
                 </Grid>
               </Grid>
-
             </>
           </Box>
         )}
@@ -2087,7 +2043,7 @@ function EraAmount() {
       <br />
       {/* ****** Table Start ****** */}
 
-      {isUserRoleCompare?.includes("leraamount") && (
+      {isUserRoleCompare?.includes('leraamount') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
@@ -2110,7 +2066,7 @@ function EraAmount() {
                       },
                     }}
                     onChange={handlePageSizeChangeFilename}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -2128,44 +2084,55 @@ function EraAmount() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("exceleraamount") && (
+                  {isUserRoleCompare?.includes('exceleraamount') && (
                     <>
-                      <Button onClick={(e) => {
-                        setIsFilterOpen(true)
-                        setFormat("xl")
-                      }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes("csveraamount") && (
-                    <>
-                      <Button onClick={(e) => {
-                        setIsFilterOpen(true)
-                        setFormat("csv")
-                      }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes("printeraamount") && (
-                    <>
-                      <Button sx={userStyle.buttongrp}
-                        onClick={handleprintFilename}
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          setFormat('xl');
+                        }}
+                        sx={userStyle.buttongrp}
                       >
+                        <FaFileExcel />
+                        &ensp;Export to Excel&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('csveraamount') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          setFormat('csv');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileCsv />
+                        &ensp;Export to CSV&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('printeraamount') && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleprintFilename}>
                         &ensp;
                         <FaPrint />
                         &ensp;Print&ensp;
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdferaamount") && (
+                  {isUserRoleCompare?.includes('pdferaamount') && (
                     <>
-                      <Button sx={userStyle.buttongrp}
+                      <Button
+                        sx={userStyle.buttongrp}
                         onClick={() => {
-                          setIsPdfFilterOpen(true)
+                          setIsPdfFilterOpen(true);
                         }}
                       >
                         <FaFilePdf />
@@ -2173,9 +2140,9 @@ function EraAmount() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imageeraamount") && (
+                  {isUserRoleCompare?.includes('imageeraamount') && (
                     <Button sx={userStyle.buttongrp} onClick={handleCaptureImageFilename}>
-                      <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
@@ -2209,8 +2176,8 @@ function EraAmount() {
               anchorElFilename={anchorElFilename}
               onClose={handleCloseManageColumnsFilename}
               anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
+                vertical: 'bottom',
+                horizontal: 'left',
               }}
             >
               {manageColumnsContentFilename}
@@ -2218,37 +2185,38 @@ function EraAmount() {
             <br />
             <br />
             {loader ? (
-              <Box sx={{ display: "flex", justifyContent: "center", minHeight: "350px" }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', minHeight: '350px' }}>
                 <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
               </Box>
-            ) : (<>
-              <AggridTable
-                rowDataTable={rowDataTableFilename}
-                columnDataTable={columnDataTableFilename}
-                columnVisibility={columnVisibilityFilename}
-                page={pageFilename}
-                setPage={setPageFilename}
-                pageSize={pageSizeFilename}
-                totalPages={totalPagesFilename}
-                setColumnVisibility={setColumnVisibilityFilename}
-                isHandleChange={isHandleChangeFilename}
-                items={itemsFilename}
-                selectedRows={selectedRowsFilename}
-                setSelectedRows={setSelectedRowsFilename}
-                gridRefTable={gridRefTableFilename}
-                paginated={false}
-                filteredDatas={filteredDatasFilename}
-                searchQuery={searchQueryFilename}
-                handleShowAllColumns={handleShowAllColumnsFilename}
-                setFilteredRowData={setFilteredRowDataFilename}
-                filteredRowData={filteredRowDataFilename}
-                setFilteredChanges={setFilteredChangesFilename}
-                filteredChanges={filteredChangesFilename}
-                gridRefTableImg={gridRefTableImgFilename}
-                // itemsList={loginAllotFilterOverall}    
-                itemsList={eraAmountFilename}
-              />
-            </>
+            ) : (
+              <>
+                <AggridTable
+                  rowDataTable={rowDataTableFilename}
+                  columnDataTable={columnDataTableFilename}
+                  columnVisibility={columnVisibilityFilename}
+                  page={pageFilename}
+                  setPage={setPageFilename}
+                  pageSize={pageSizeFilename}
+                  totalPages={totalPagesFilename}
+                  setColumnVisibility={setColumnVisibilityFilename}
+                  isHandleChange={isHandleChangeFilename}
+                  items={itemsFilename}
+                  selectedRows={selectedRowsFilename}
+                  setSelectedRows={setSelectedRowsFilename}
+                  gridRefTable={gridRefTableFilename}
+                  paginated={false}
+                  filteredDatas={filteredDatasFilename}
+                  searchQuery={searchQueryFilename}
+                  handleShowAllColumns={handleShowAllColumnsFilename}
+                  setFilteredRowData={setFilteredRowDataFilename}
+                  filteredRowData={filteredRowDataFilename}
+                  setFilteredChanges={setFilteredChangesFilename}
+                  filteredChanges={filteredChangesFilename}
+                  gridRefTableImg={gridRefTableImgFilename}
+                  // itemsList={loginAllotFilterOverall}
+                  itemsList={eraAmountFilename}
+                />
+              </>
             )}
             {/* ****** Table End ****** */}
           </Box>
@@ -2266,9 +2234,9 @@ function EraAmount() {
         maxWidth="sm"
         fullWidth={true}
         sx={{
-          overflow: "visible",
-          "& .MuiPaper-root": {
-            overflow: "visible",
+          overflow: 'visible',
+          '& .MuiPaper-root': {
+            overflow: 'visible',
           },
         }}
       >
@@ -2283,21 +2251,23 @@ function EraAmount() {
             <Grid item md={6} xs={12} sm={6}>
               <FormControl fullWidth size="small">
                 <Typography>
-                  Company<b style={{ color: "red" }}>*</b>
+                  Company<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <Selects
                   maxMenuHeight={250}
-                  options={accessbranch?.map(data => ({
-                    label: data.company,
-                    value: data.company,
-                  })).filter((item, index, self) => {
-                    return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                  })}
+                  options={accessbranch
+                    ?.map((data) => ({
+                      label: data.company,
+                      value: data.company,
+                    }))
+                    .filter((item, index, self) => {
+                      return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                    })}
                   placeholder="Please Select Company"
                   value={{ label: selectedCompanyEdit, value: selectedCompanyEdit }}
                   onChange={(e) => {
                     setSelectedCompanyEdit(e.value);
-                    setSelectedBranchEdit("Please Select Branch");
+                    setSelectedBranchEdit('Please Select Branch');
                   }}
                 />
               </FormControl>
@@ -2305,19 +2275,19 @@ function EraAmount() {
             <Grid item md={6} xs={12} sm={6}>
               <FormControl fullWidth size="small">
                 <Typography>
-                  Branch<b style={{ color: "red" }}>*</b>
+                  Branch<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <Selects
                   maxMenuHeight={250}
-                  options={accessbranch?.filter(
-                    (comp) =>
-                      comp.company === selectedCompanyEdit
-                  )?.map(data => ({
-                    label: data.branch,
-                    value: data.branch,
-                  })).filter((item, index, self) => {
-                    return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                  })}
+                  options={accessbranch
+                    ?.filter((comp) => comp.company === selectedCompanyEdit)
+                    ?.map((data) => ({
+                      label: data.branch,
+                      value: data.branch,
+                    }))
+                    .filter((item, index, self) => {
+                      return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                    })}
                   placeholder="Please Select Branch"
                   value={{ label: selectedBranchEdit, value: selectedBranchEdit }}
                   onChange={(e) => {
@@ -2330,7 +2300,7 @@ function EraAmount() {
             <Grid item md={6} xs={12} sm={6}>
               <FormControl fullWidth size="small">
                 <Typography>
-                  Process Code<b style={{ color: "red" }}>*</b>
+                  Process Code<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <OutlinedInput
                   placeholder="Please Enter Process Code"
@@ -2347,7 +2317,7 @@ function EraAmount() {
             <Grid item md={6} xs={12} sm={6}>
               <FormControl fullWidth size="small">
                 <Typography>
-                  Amount<b style={{ color: "red" }}>*</b>
+                  Amount<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <OutlinedInput
                   placeholder="Please Enter Amount"
@@ -2364,20 +2334,20 @@ function EraAmount() {
                 />
               </FormControl>
             </Grid>
-          </Grid>{" "}
+          </Grid>{' '}
           <br /> <br />
-          <Grid container spacing={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Grid item md={6} xs={12} sm={12}>
               <Button sx={buttonStyles.buttonsubmit} onClick={editSubmitView}>
-                {" "}
+                {' '}
                 Update
               </Button>
             </Grid>
             <br />
             <Grid item md={6} xs={12} sm={12}>
               <Button sx={buttonStyles.btncancel} onClick={handleCloseModEditView}>
-                {" "}
-                Cancel{" "}
+                {' '}
+                Cancel{' '}
               </Button>
             </Grid>
           </Grid>
@@ -2386,7 +2356,7 @@ function EraAmount() {
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
@@ -2396,15 +2366,7 @@ function EraAmount() {
           </DialogActions>
         </Dialog>
       </Box>
-      <Dialog
-        open={openviewAll}
-        onClose={handleClickOpenviewAll}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        fullWidth={true}
-        maxWidth="lg"
-        sx={{ marginTop: '50px' }}
-      >
+      <Dialog open={openviewAll} onClose={handleClickOpenviewAll} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" fullWidth={true} maxWidth="lg" sx={{ marginTop: '50px' }}>
         <DialogContent sx={{ marginTop: '70px' }}>
           <>
             <Typography sx={userStyle.HeaderText}>{fileNameView}</Typography>
@@ -2426,7 +2388,7 @@ function EraAmount() {
                       },
                     }}
                     onChange={handlePageSizeChangeviewAll}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -2434,9 +2396,7 @@ function EraAmount() {
                     <MenuItem value={25}>25</MenuItem>
                     <MenuItem value={50}>50</MenuItem>
                     <MenuItem value={100}>100</MenuItem>
-                    <MenuItem value={productionoriginalviewAll?.length}>
-                      All
-                    </MenuItem>
+                    <MenuItem value={productionoriginalviewAll?.length}>All</MenuItem>
                   </Select>
                 </Box>
               </Grid>
@@ -2446,46 +2406,55 @@ function EraAmount() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("exceleraamount") && (
-                    <>
-                      <Button onClick={(e) => {
-                        setIsFilterOpen3(true)
-                        setFormat("xl")
-                      }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes("csveraamount") && (
-                    <>
-                      <Button onClick={(e) => {
-                        setIsFilterOpen3(true)
-                        setFormat("csv")
-                      }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes("printeraamount") && (
+                  {isUserRoleCompare?.includes('exceleraamount') && (
                     <>
                       <Button
+                        onClick={(e) => {
+                          setIsFilterOpen3(true);
+                          setFormat('xl');
+                        }}
                         sx={userStyle.buttongrp}
-                        onClick={handleprintviewall}
                       >
+                        <FaFileExcel />
+                        &ensp;Export to Excel&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('csveraamount') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen3(true);
+                          setFormat('csv');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileCsv />
+                        &ensp;Export to CSV&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('printeraamount') && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleprintviewall}>
                         &ensp;
                         <FaPrint />
                         &ensp;Print&ensp;
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdferaamount") && (
+                  {isUserRoleCompare?.includes('pdferaamount') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
                         onClick={() => {
-                          setIsPdfFilterOpen3(true)
+                          setIsPdfFilterOpen3(true);
                         }}
                       >
                         <FaFilePdf />
@@ -2493,15 +2462,10 @@ function EraAmount() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imageeraamount") && (
-                    <Button
-                      sx={userStyle.buttongrp}
-                      onClick={handleCaptureImageviewall}
-                    >
-                      {" "}
-                      <ImageIcon
-                        sx={{ fontSize: "15px" }}
-                      /> &ensp;Image&ensp;{" "}
+                  {isUserRoleCompare?.includes('imageeraamount') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImageviewall}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
@@ -2519,20 +2483,13 @@ function EraAmount() {
                   paginated={false}
                   totalDatas={productionoriginalviewAll}
                 />
-
               </Grid>
             </Grid>
-            <Button
-              sx={userStyle.buttongrp}
-              onClick={handleShowAllColumnsviewAll}
-            >
+            <Button sx={userStyle.buttongrp} onClick={handleShowAllColumnsviewAll}>
               Show All Columns
             </Button>
             &ensp;
-            <Button
-              sx={userStyle.buttongrp}
-              onClick={handleOpenManageColumnsviewAll}
-            >
+            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumnsviewAll}>
               Manage Columns
             </Button>
             <br />
@@ -2544,8 +2501,8 @@ function EraAmount() {
               anchorEl={anchorElviewAll}
               onClose={handleCloseManageColumnsviewAll}
               anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
+                vertical: 'bottom',
+                horizontal: 'left',
               }}
             >
               {manageColumnsContentviewAll}
@@ -2553,7 +2510,7 @@ function EraAmount() {
             {/* <br /> */}
             {!productionfirstViewCheck ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   <FacebookCircularProgress />
                 </Box>
               </>
@@ -2576,7 +2533,6 @@ function EraAmount() {
                   paginated={false}
                   filteredDatas={filteredDataviewAlls}
                   handleShowAllColumns={handleShowAllColumnsviewAll}
-
                   setFilteredRowData={setFilteredRowDataViewAll}
                   filteredRowData={filteredRowDataViewAll}
                   setFilteredChanges={setFilteredChangesViewAll}
@@ -2584,18 +2540,12 @@ function EraAmount() {
                   gridRefTableImg={gridRefTableImgviewall}
                   itemsList={productionoriginalviewAll}
                 />
-
               </>
             )}
           </>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCloseviewAll}
-            sx={buttonStyles.btncancel}
-          >
+          <Button variant="contained" color="primary" onClick={handleCloseviewAll} sx={buttonStyles.btncancel}>
             Back
           </Button>
         </DialogActions>
@@ -2604,19 +2554,9 @@ function EraAmount() {
       {/* First table Details */}
       {/* EXTERNAL COMPONENTS -------------- START */}
       {/* VALIDATION */}
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
         isFilterOpen={isFilterOpen}
@@ -2628,7 +2568,7 @@ function EraAmount() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChangesFilename !== null ? filteredRowDataFilename : rowDataTableFilename) ?? []}
         itemsTwo={eraAmountFilenameArray ?? []}
-        filename={"EraAmount"}
+        filename={'EraAmount'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRefFilename}
@@ -2650,31 +2590,11 @@ function EraAmount() {
         exportRowValues={exportRowValues3}
         componentRef={componentRefviewall}
       />
-      <DeleteConfirmation
-        open={isDeleteSingleOpenView}
-        onClose={handleCloseSingleModView}
-        onConfirm={deleteSingleListView}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteSingleOpenView} onClose={handleCloseSingleModView} onConfirm={deleteSingleListView} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/* INFO */}
-      <InfoPopup
-        openInfo={openFileInfo}
-        handleCloseinfo={handleCloseFileinfo}
-        heading="ERA Amount File Info"
-        addedby={infosingleFileData.addedby}
-        updateby={infosingleFileData.updateby}
-      />
+      <InfoPopup openInfo={openFileInfo} handleCloseinfo={handleCloseFileinfo} heading="ERA Amount File Info" addedby={infosingleFileData.addedby} updateby={infosingleFileData.updateby} />
       {/*SINGLE DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={deleteFilenameList}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={deleteFilenameList} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/*BULK DELETE ALERT DIALOG ARE YOU SURE? */}
       {/* <DeleteConfirmation
         open={isDeleteOpen}
@@ -2689,8 +2609,7 @@ function EraAmount() {
       {/* First Table End */}
 
       <br />
-
-    </Box >
+    </Box>
   );
 }
 

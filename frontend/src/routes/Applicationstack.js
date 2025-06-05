@@ -956,6 +956,8 @@ const StockmanagerequestGetId = React.lazy(() => import("../pages/stockpurchase/
 
 const PenaltyErrorExcel = React.lazy(() => import("../pages/production/penalty/penaltyerrorexcelupload.js"));
 const BulkErrorExcel = React.lazy(() => import("../pages/production/penalty/bulkerroruploadexcel.js"));
+const Attendancemodeupdate = React.lazy(() => import('../pages/hr/employees/updatepages/Attendancemodeupdate'));
+
 
 const App = () => {
   return (
@@ -1982,6 +1984,8 @@ const App = () => {
             <Route path="/stockpurchase/stockmanagerequest/:id" element={<StockmanagerequestGetId />} />
             <Route path="/penalty/penaltyerrorexcel" element={<PenaltyErrorExcel />} />
             <Route path="/penalty/bulkerrorexcel" element={<BulkErrorExcel />} />
+           <Route path="/updatepages/attendancemode" element={<Attendancemodeupdate />} />
+
             
             
             

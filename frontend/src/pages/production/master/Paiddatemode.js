@@ -1,68 +1,46 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import {
-  Box,
-  Typography,
-  OutlinedInput,
-  Select,
-  MenuItem,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  Grid,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  Popover,
-  Checkbox,
-  TextField,
-  IconButton,
-} from "@mui/material";
-import { userStyle } from "../../../pageStyle.js";
-import { FaPrint, FaFilePdf } from "react-icons/fa";
-import "jspdf-autotable";
-import { MultiSelect } from "react-multi-select-component";
-import axios from "axios";
-import { SERVICE } from "../../../services/Baseservice.js";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { useReactToPrint } from "react-to-print";
-import StyledDataGrid from "../../../components/TableStyle.js";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { UserRoleAccessContext, AuthContext } from "../../../context/Appcontext.js";
-import { handleApiError } from "../../../components/Errorhandling.js";
-import Headtitle from "../../../components/Headtitle.js";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import { saveAs } from "file-saver";
-import Switch from "@mui/material/Switch";
-import CloseIcon from "@mui/icons-material/Close";
-import html2canvas from "html2canvas";
-import ImageIcon from "@mui/icons-material/Image";
-import { FaFileExcel, FaFileCsv } from "react-icons/fa";
-import AlertDialog from "../../../components/Alert.js";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../../components/DeleteConfirmation.js";
-import ExportData from "../../../components/ExportData.js";
-import InfoPopup from "../../../components/InfoPopup.js";
-import MessageAlert from "../../../components/MessageAlert.js";
-import PageHeading from "../../../components/PageHeading.js";
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { Box, Typography, OutlinedInput, Select, MenuItem, Dialog, DialogContent, DialogActions, FormControl, Grid, Button, List, ListItem, ListItemText, Popover, Checkbox, TextField, IconButton } from '@mui/material';
+import { userStyle } from '../../../pageStyle.js';
+import { FaPrint, FaFilePdf } from 'react-icons/fa';
+import 'jspdf-autotable';
+import { MultiSelect } from 'react-multi-select-component';
+import axios from '../../../axiosInstance';
+import { SERVICE } from '../../../services/Baseservice.js';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { useReactToPrint } from 'react-to-print';
+import StyledDataGrid from '../../../components/TableStyle.js';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { UserRoleAccessContext, AuthContext } from '../../../context/Appcontext.js';
+import { handleApiError } from '../../../components/Errorhandling.js';
+import Headtitle from '../../../components/Headtitle.js';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import { saveAs } from 'file-saver';
+import Switch from '@mui/material/Switch';
+import CloseIcon from '@mui/icons-material/Close';
+import html2canvas from 'html2canvas';
+import ImageIcon from '@mui/icons-material/Image';
+import { FaFileExcel, FaFileCsv } from 'react-icons/fa';
+import AlertDialog from '../../../components/Alert.js';
+import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
+import ExportData from '../../../components/ExportData.js';
+import InfoPopup from '../../../components/InfoPopup.js';
+import MessageAlert from '../../../components/MessageAlert.js';
+import PageHeading from '../../../components/PageHeading.js';
 import domtoimage from 'dom-to-image';
 function PaidDateMode() {
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
 
-const [overallItems, setOverallItems] = useState([]);
-  const [fileFormat, setFormat] = useState('')
+  const [overallItems, setOverallItems] = useState([]);
+  const [fileFormat, setFormat] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
   // page refersh reload
@@ -73,8 +51,8 @@ const [overallItems, setOverallItems] = useState([]);
     setIsPdfFilterOpen(false);
   };
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -82,19 +60,17 @@ const [overallItems, setOverallItems] = useState([]);
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
   const handleClosePopup = () => {
     setOpenPopup(false);
-  }
+  };
 
   useEffect(() => {
-
     getapi();
-
   }, []);
 
   const getapi = async () => {
@@ -104,7 +80,7 @@ const [overallItems, setOverallItems] = useState([]);
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Paid Date Mode"),
+      pagename: String('Paid Date Mode'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -115,96 +91,90 @@ const [overallItems, setOverallItems] = useState([]);
         },
       ],
     });
+  };
 
-  }
-
-
-  let exportColumnNames = ["Department", "Paymode", "Day", "Type"];
-  let exportRowValues = ["department", "paymode", "date", "type"];
+  let exportColumnNames = ['Department', 'Paymode', 'Day', 'Type'];
+  let exportRowValues = ['department', 'paymode', 'date', 'type'];
   let today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
   var yyyy = today.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
   const [paiddatemode, setPaiddatemode] = useState({
-    department: "Please Select Department",
-    date: "Please select Day",
-    paymode: "Please Select Paymode",
-    type: "Next Month",
+    department: 'Please Select Department',
+    date: 'Please select Day',
+    paymode: 'Please Select Paymode',
+    type: 'Next Month',
   });
   const [paiddatemodeEdit, setPaiddatemodeEdit] = useState({
-    department: "Please Select Department",
-    date: "Please select Day",
-    paymode: "Please Select Paymode",
-    type: "Next Month",
+    department: 'Please Select Department',
+    date: 'Please select Day',
+    paymode: 'Please Select Paymode',
+    type: 'Next Month',
   });
   const typeOptions = [
-    { value: "Next Month", label: "Next Month" },
-    { value: "Same Month", label: "Same Month" },
+    { value: 'Next Month', label: 'Next Month' },
+    { value: 'Same Month', label: 'Same Month' },
   ];
   const dayOptions = [
-    { value: "01", label: "01" },
-    { value: "02", label: "02" },
-    { value: "03", label: "03" },
-    { value: "04", label: "04" },
-    { value: "05", label: "05" },
-    { value: "06", label: "06" },
-    { value: "07", label: "07" },
-    { value: "08", label: "08" },
-    { value: "09", label: "09" },
-    { value: "10", label: "10" },
-    { value: "11", label: "11" },
-    { value: "12", label: "12" },
-    { value: "13", label: "13" },
-    { value: "14", label: "14" },
-    { value: "15", label: "15" },
-    { value: "16", label: "16" },
-    { value: "17", label: "17" },
-    { value: "18", label: "18" },
-    { value: "19", label: "19" },
-    { value: "20", label: "20" },
-    { value: "21", label: "21" },
-    { value: "22", label: "22" },
-    { value: "23", label: "23" },
-    { value: "24", label: "24" },
-    { value: "25", label: "25" },
-    { value: "26", label: "26" },
-    { value: "27", label: "27" },
-    { value: "28", label: "28" },
-    { value: "29", label: "29" },
-    { value: "30", label: "30" },
-    { value: "31", label: "31" },
+    { value: '01', label: '01' },
+    { value: '02', label: '02' },
+    { value: '03', label: '03' },
+    { value: '04', label: '04' },
+    { value: '05', label: '05' },
+    { value: '06', label: '06' },
+    { value: '07', label: '07' },
+    { value: '08', label: '08' },
+    { value: '09', label: '09' },
+    { value: '10', label: '10' },
+    { value: '11', label: '11' },
+    { value: '12', label: '12' },
+    { value: '13', label: '13' },
+    { value: '14', label: '14' },
+    { value: '15', label: '15' },
+    { value: '16', label: '16' },
+    { value: '17', label: '17' },
+    { value: '18', label: '18' },
+    { value: '19', label: '19' },
+    { value: '20', label: '20' },
+    { value: '21', label: '21' },
+    { value: '22', label: '22' },
+    { value: '23', label: '23' },
+    { value: '24', label: '24' },
+    { value: '25', label: '25' },
+    { value: '26', label: '26' },
+    { value: '27', label: '27' },
+    { value: '28', label: '28' },
+    { value: '29', label: '29' },
+    { value: '30', label: '30' },
+    { value: '31', label: '31' },
   ];
   const [paiddatemodes, setPaiddatemodes] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [allPaiddatemodeedit, setAllPaiddatemodeedit] = useState([]);
-  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, buttonStyles } = useContext(
-    UserRoleAccessContext
-  );
+  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
 
   // overall edit date
-  const [ovProj, setOvProj] = useState("");
-  const [ovProjj, setOvProjj] = useState("");
-  const [ovProjCount, setOvProjCount] = useState("");
-  const [getOverAllCount, setGetOverallCount] = useState("");
+  const [ovProj, setOvProj] = useState('');
+  const [ovProjj, setOvProjj] = useState('');
+  const [ovProjCount, setOvProjCount] = useState('');
+  const [getOverAllCount, setGetOverallCount] = useState('');
 
   const [paiddatemodeCheck, setPaiddatemodecheck] = useState(false);
   const username = isUserRoleAccess.username;
   const gridRef = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [copiedData, setCopiedData] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [copiedData, setCopiedData] = useState('');
   const [departments, setDepartments] = useState([]);
   const [paymodes, setPaymodes] = useState([]);
   const [departmentsEdit, setDepartmentsEdit] = useState([]);
   const [paymodesEdit, setPaymodesEdit] = useState([]);
 
-
-
   // Multi Select Create
   const [selectedOptionsCate, setSelectedOptionsCate] = useState([]);
-  let [valueCate, setValueCate] = useState("");
+  let [valueCate, setValueCate] = useState('');
   const handleCategoryChange = (options) => {
     setValueCate(
       options.map((a, index) => {
@@ -214,9 +184,7 @@ const [overallItems, setOverallItems] = useState([]);
     setSelectedOptionsCate(options);
   };
   const customValueRendererCate = (valueCate, _department) => {
-    return valueCate.length
-      ? valueCate.map(({ label }) => label).join(", ")
-      : "Please Select Department";
+    return valueCate.length ? valueCate.map(({ label }) => label).join(', ') : 'Please Select Department';
   };
   // Edit functionlity
   const [selectedOptionsCateEdit, setSelectedOptionsCateEdit] = useState([]);
@@ -224,13 +192,11 @@ const [overallItems, setOverallItems] = useState([]);
     setSelectedOptionsCateEdit(options);
   };
   const customValueRendererCateEdit = (valueCateEdit, _department) => {
-    return valueCateEdit.length
-      ? valueCateEdit.map(({ label }) => label).join(", ")
-      : "Please Select Department";
+    return valueCateEdit.length ? valueCateEdit.map(({ label }) => label).join(', ') : 'Please Select Department';
   };
   //get all Areas.
   const fetchDepartmentDropdown = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_dept = await axios.get(SERVICE.DEPARTMENT, {
         headers: {
@@ -252,7 +218,7 @@ const [overallItems, setOverallItems] = useState([]);
   };
   //get all Areas.
   const fetchPaymodeDropdown = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_pay = await axios.get(SERVICE.PAIDSTATUSFIX, {
         headers: {
@@ -260,10 +226,7 @@ const [overallItems, setOverallItems] = useState([]);
         },
       });
       let resdata = res_pay?.data?.paidstatusfixs.filter((data, index) => {
-        return (
-          data?.frequency?.toLowerCase() !== "hold" &&
-          data?.frequency?.toLowerCase() !== "reject"
-        );
+        return data?.frequency?.toLowerCase() !== 'hold' && data?.frequency?.toLowerCase() !== 'reject';
       });
       const paymodeall = [
         ...resdata.map((d) => ({
@@ -293,16 +256,16 @@ const [overallItems, setOverallItems] = useState([]);
     }
   };
 
- //image
- const handleCaptureImage = () => {
-  if (gridRef.current) {
-    html2canvas(gridRef.current).then((canvas) => {
-      canvas.toBlob((blob) => {
-        saveAs(blob, "Paid Date Mode.png");
+  //image
+  const handleCaptureImage = () => {
+    if (gridRef.current) {
+      html2canvas(gridRef.current).then((canvas) => {
+        canvas.toBlob((blob) => {
+          saveAs(blob, 'Paid Date Mode.png');
+        });
       });
-    });
-  }
-};
+    }
+  };
 
   const handleSelectionChange = (newSelection) => {
     setSelectedRows(newSelection.selectionModel);
@@ -373,15 +336,15 @@ const [overallItems, setOverallItems] = useState([]);
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
   // Show All Columns & Manage Columns
   const initialColumnVisibility = {
@@ -393,20 +356,18 @@ const [overallItems, setOverallItems] = useState([]);
     type: true,
     actions: true,
   };
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
-  const [deletePaiddate, setDeletePaiddate] = useState("");
+  const [deletePaiddate, setDeletePaiddate] = useState('');
 
   const [checkPaiddate, setCheckPaiddate] = useState();
 
   const rowData = async (id, department, paymode) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const [res, respaid] = await Promise.all([
         axios.get(`${SERVICE.PAIDDATEMODE_SINGLE}/${id}`, {
@@ -421,12 +382,11 @@ const [overallItems, setOverallItems] = useState([]);
           // checkpaiddatefixdepartment: String(department),
           checkpaiddatefixdepartment: department.split(','),
           checkpaiddatefixpaymode: paymode,
-        })
-
-      ])
+        }),
+      ]);
       setDeletePaiddate(res?.data?.spaiddatemode);
       setCheckPaiddate(respaid?.data?.paiddatefixs);
-      console.log(respaid?.data?.paiddatefixs)
+      console.log(respaid?.data?.paiddatefixs);
       // handleClickOpen();
       if ((respaid?.data?.paiddatefixs).length > 0) {
         handleClickOpenCheck();
@@ -434,14 +394,14 @@ const [overallItems, setOverallItems] = useState([]);
         handleClickOpen();
       }
     } catch (err) {
-      console.log(err, 'err')
+      console.log(err, 'err');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
   // Alert delete popup
   let Paiddatesid = deletePaiddate?._id;
   const delPaiddate = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       if (Paiddatesid) {
         await axios.delete(`${SERVICE.PAIDDATEMODE_SINGLE}/${Paiddatesid}`, {
@@ -453,8 +413,8 @@ const [overallItems, setOverallItems] = useState([]);
         handleCloseMod();
         setSelectedRows([]);
         setPage(1);
-        setPopupContent("Deleted Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Deleted Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
       }
     } catch (err) {
@@ -462,7 +422,7 @@ const [overallItems, setOverallItems] = useState([]);
     }
   };
   const delPaiddatecheckbox = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const deletePromises = selectedRows?.map((item) => {
         return axios.delete(`${SERVICE.PAIDDATEMODE_SINGLE}/${item}`, {
@@ -478,8 +438,8 @@ const [overallItems, setOverallItems] = useState([]);
       setSelectAllChecked(false);
       setPage(1);
       await fetchPaiddatemode();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -487,7 +447,7 @@ const [overallItems, setOverallItems] = useState([]);
   };
   //add function
   const sendRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let subprojectscreate = await axios.post(SERVICE.PAIDDATEMODE_CREATE, {
         headers: {
@@ -507,12 +467,12 @@ const [overallItems, setOverallItems] = useState([]);
       await fetchPaiddatemode();
       setPaiddatemode({
         ...paiddatemode,
-        department: "Please Select Department",
-        date: "Please select Day",
-        type: "Next Month",
+        department: 'Please Select Department',
+        date: 'Please select Day',
+        type: 'Next Month',
       });
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -522,26 +482,22 @@ const [overallItems, setOverallItems] = useState([]);
   const handleSubmit = (e) => {
     e.preventDefault();
     let departments = selectedOptionsCate.map((item) => item.value);
-    const isNameMatch = paiddatemodes.some(
-      (item) =>
-        item.paymode === paiddatemode.paymode &&
-        item.department.some((data) => departments.includes(data))
-    );
+    const isNameMatch = paiddatemodes.some((item) => item.paymode === paiddatemode.paymode && item.department.some((data) => departments.includes(data)));
     if (selectedOptionsCate.length == 0) {
-      setPopupContentMalert("Please Select Department");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Department');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paiddatemode.paymode === "Please Select Paymode") {
-      setPopupContentMalert("Please Select Paymode");
-      setPopupSeverityMalert("info");
+    } else if (paiddatemode.paymode === 'Please Select Paymode') {
+      setPopupContentMalert('Please Select Paymode');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paiddatemode.date === "Please select Day") {
-      setPopupContentMalert("Please Select Day");
-      setPopupSeverityMalert("info");
+    } else if (paiddatemode.date === 'Please select Day') {
+      setPopupContentMalert('Please Select Day');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequest();
@@ -550,14 +506,14 @@ const [overallItems, setOverallItems] = useState([]);
   const handleClear = (e) => {
     e.preventDefault();
     setPaiddatemode({
-      department: "Please Select Department",
-      type: "Next Month",
-      date: "Please select Day",
-      paymode: "Please Select Paymode",
+      department: 'Please Select Department',
+      type: 'Next Month',
+      date: 'Please select Day',
+      paymode: 'Please Select Paymode',
     });
     setSelectedOptionsCate([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
   //Edit model...
@@ -566,7 +522,7 @@ const [overallItems, setOverallItems] = useState([]);
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
   };
   // info model
@@ -589,7 +545,7 @@ const [overallItems, setOverallItems] = useState([]);
 
   //get single row to edit....
   const getCode = async (e, name) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.PAIDDATEMODE_SINGLE}/${e}`, {
         headers: {
@@ -614,7 +570,7 @@ const [overallItems, setOverallItems] = useState([]);
   };
   // get single row to view....
   const getviewCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.PAIDDATEMODE_SINGLE}/${e}`, {
         headers: {
@@ -629,7 +585,7 @@ const [overallItems, setOverallItems] = useState([]);
   };
   // get single row to view....
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.PAIDDATEMODE_SINGLE}/${e}`, {
         headers: {
@@ -649,36 +605,33 @@ const [overallItems, setOverallItems] = useState([]);
   //editing the single data...
   const sendEditRequest = async () => {
     let empCate = selectedOptionsCateEdit.map((item) => item.value);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      let res = await axios.put(
-        `${SERVICE.PAIDDATEMODE_SINGLE}/${subprojectsid}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
+      let res = await axios.put(`${SERVICE.PAIDDATEMODE_SINGLE}/${subprojectsid}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        department: [...empCate],
+        date: String(paiddatemodeEdit.date),
+        type: String(paiddatemodeEdit.type),
+        paymode: String(paiddatemodeEdit.paymode),
+        updatedby: [
+          ...updateby,
+          {
+            name: String(isUserRoleAccess.companyname),
+            date: String(new Date()),
           },
-          department: [...empCate],
-          date: String(paiddatemodeEdit.date),
-          type: String(paiddatemodeEdit.type),
-          paymode: String(paiddatemodeEdit.paymode),
-          updatedby: [
-            ...updateby,
-            {
-              name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
-            },
-          ],
-        }
-      );
+        ],
+      });
       await fetchPaiddatemode();
       await fetchPaiddatemodeAll();
       await getOverallEditSectionUpdate();
       handleCloseModEdit();
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
-      console.log(err, 'rre1')
+      console.log(err, 'rre1');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
@@ -686,39 +639,32 @@ const [overallItems, setOverallItems] = useState([]);
     e.preventDefault();
     fetchPaiddatemodeAll();
     let departmentsEditt = selectedOptionsCateEdit.map((item) => item.value);
-    const isNameMatch = allPaiddatemodeedit.some(
-      (item) =>
-        item.paymode === paiddatemodeEdit.paymode &&
-        item.department.some((data) => departmentsEditt.includes(data))
-    );
+    const isNameMatch = allPaiddatemodeedit.some((item) => item.paymode === paiddatemodeEdit.paymode && item.department.some((data) => departmentsEditt.includes(data)));
     if (selectedOptionsCateEdit.length == 0) {
-      setPopupContentMalert("Please Select Department");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Department');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paiddatemodeEdit.paymode === "Please Select Paymode") {
-      setPopupContentMalert("Please Select Paymode");
-      setPopupSeverityMalert("info");
+    } else if (paiddatemodeEdit.paymode === 'Please Select Paymode') {
+      setPopupContentMalert('Please Select Paymode');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paiddatemodeEdit.date === "Please select Day") {
-      setPopupContentMalert("Please Select Day");
-      setPopupSeverityMalert("info");
+    } else if (paiddatemodeEdit.date === 'Please select Day') {
+      setPopupContentMalert('Please Select Day');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exists!");
-      setPopupSeverityMalert("info");
+    } else if (isNameMatch) {
+      setPopupContentMalert('Data Already Exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (selectedOptionsCateEdit.length != ovProj && ovProjCount > 0) {
+    } else if (selectedOptionsCateEdit.length != ovProj && ovProjCount > 0) {
       setShowAlertpop(
         <>
-          <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>{getOverAllCount}</p>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{getOverAllCount}</p>
         </>
       );
       handleClickOpenerrpop();
-    }
-    else {
+    } else {
       sendEditRequest();
     }
   };
@@ -734,10 +680,10 @@ const [overallItems, setOverallItems] = useState([]);
         oldname2: paymode,
       });
       setOvProjCount(res?.data?.count);
-      setGetOverallCount(`The ${e} is linked in ${res?.data?.paiddatefixs?.length > 0 ? "Paid Date Fix ," : ""}   
+      setGetOverallCount(`The ${e} is linked in ${res?.data?.paiddatefixs?.length > 0 ? 'Paid Date Fix ,' : ''}   
           whether you want to do changes ..??`);
     } catch (err) {
-      console.log(err, 'eerr23')
+      console.log(err, 'eerr23');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
@@ -753,7 +699,7 @@ const [overallItems, setOverallItems] = useState([]);
       });
       sendEditRequestOverall(res?.data?.paiddatefixs);
     } catch (err) {
-      console.log(err, 'err2')
+      console.log(err, 'err2');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
@@ -772,17 +718,15 @@ const [overallItems, setOverallItems] = useState([]);
           });
         });
       }
-
     } catch (err) {
-      console.log(err, 'err1')
+      console.log(err, 'err1');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
-
   //get all Sub vendormasters.
   const fetchPaiddatemode = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_vendor = await axios.get(SERVICE.PAIDDATEMODE, {
         headers: {
@@ -799,18 +743,20 @@ const [overallItems, setOverallItems] = useState([]);
   const [paiddatemodesFilterArray, setPaiddatemodesFilterArray] = useState([]);
   //get all Sub vendormasters.
   const fetchPaiddatemodeArray = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_vendor = await axios.get(SERVICE.PAIDDATEMODE, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setPaiddatemodesFilterArray(res_vendor?.data?.paiddatemodes.map((t, index) => ({
-        ...t,
-        Sno: index + 1,
-        department: t.department.join(",").toString(),
-      })));
+      setPaiddatemodesFilterArray(
+        res_vendor?.data?.paiddatemodes.map((t, index) => ({
+          ...t,
+          Sno: index + 1,
+          department: t.department.join(',').toString(),
+        }))
+      );
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -820,18 +766,14 @@ const [overallItems, setOverallItems] = useState([]);
   }, [isFilterOpen]);
   //get all Sub vendormasters.
   const fetchPaiddatemodeAll = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_meet = await axios.get(SERVICE.PAIDDATEMODE, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setAllPaiddatemodeedit(
-        res_meet?.data?.paiddatemodes.filter(
-          (item) => item._id !== paiddatemodeEdit._id
-        )
-      );
+      setAllPaiddatemodeedit(res_meet?.data?.paiddatemodes.filter((item) => item._id !== paiddatemodeEdit._id));
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -840,8 +782,8 @@ const [overallItems, setOverallItems] = useState([]);
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Paid Date Mode",
-    pageStyle: "print",
+    documentTitle: 'Paid Date Mode',
+    pageStyle: 'print',
   });
   useEffect(() => {
     fetchDepartmentDropdown();
@@ -856,9 +798,9 @@ const [overallItems, setOverallItems] = useState([]);
   }, [isEditOpen, paiddatemodeEdit]);
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
   const [items, setItems] = useState([]);
@@ -890,24 +832,16 @@ const [overallItems, setOverallItems] = useState([]);
     setSearchQuery(event.target.value);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
-  const filteredData = filteredDatas.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.ceil(filteredDatas.length / pageSize);
   const visiblePages = Math.min(totalPages, 3);
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
   const pageNumbers = [];
   const indexOfLastItem = page * pageSize;
   const indexOfFirstItem = indexOfLastItem - pageSize;
@@ -922,10 +856,10 @@ const [overallItems, setOverallItems] = useState([]);
   );
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
       renderHeader: (params) => (
@@ -952,114 +886,110 @@ const [overallItems, setOverallItems] = useState([]);
           onChange={() => {
             let updatedSelectedRows;
             if (selectedRows.includes(params.row.id)) {
-              updatedSelectedRows = selectedRows.filter(
-                (selectedId) => selectedId !== params.row.id
-              );
+              updatedSelectedRows = selectedRows.filter((selectedId) => selectedId !== params.row.id);
             } else {
               updatedSelectedRows = [...selectedRows, params.row.id];
             }
             setSelectedRows(updatedSelectedRows);
             // Update the "Select All" checkbox based on whether all rows are selected
-            setSelectAllChecked(
-              updatedSelectedRows.length === filteredData.length
-            );
+            setSelectAllChecked(updatedSelectedRows.length === filteredData.length);
           }}
         />
       ),
       sortable: false, // Optionally, you can make this column not sortable
       width: 80,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 80,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "department",
-      headerName: "Department",
+      field: 'department',
+      headerName: 'Department',
       flex: 0,
       width: 260,
       hide: !columnVisibility.department,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "paymode",
-      headerName: "Paymode",
+      field: 'paymode',
+      headerName: 'Paymode',
       flex: 0,
       width: 200,
       hide: !columnVisibility.paymode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "date",
-      headerName: "Day",
+      field: 'date',
+      headerName: 'Day',
       flex: 0,
       width: 130,
       hide: !columnVisibility.date,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "type",
-      headerName: "Type",
+      field: 'type',
+      headerName: 'Type',
       flex: 0,
       width: 130,
       hide: !columnVisibility.date,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       renderCell: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("epaiddatemode") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('epaiddatemode') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getCode(params.row.id, params.row.name);
               }}
             >
-              <EditOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonedit} />
+              <EditOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonedit} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("dpaiddatemode") && (
+          {isUserRoleCompare?.includes('dpaiddatemode') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
                 rowData(params.row.id, params.row.department, params.row.paymode);
               }}
             >
-              <DeleteOutlineOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttondelete} />
+              <DeleteOutlineOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttondelete} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("vpaiddatemode") && (
+          {isUserRoleCompare?.includes('vpaiddatemode') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getviewCode(params.row.id);
               }}
             >
-              <VisibilityOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonview} />
+              <VisibilityOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("ipaiddatemode") && (
+          {isUserRoleCompare?.includes('ipaiddatemode') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getinfoCode(params.row.id);
               }}
             >
-              <InfoOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttoninfo} />
+              <InfoOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttoninfo} />
             </Button>
           )}
         </Grid>
@@ -1070,7 +1000,7 @@ const [overallItems, setOverallItems] = useState([]);
     return {
       id: item._id,
       serialNumber: item.serialNumber,
-      department: item.department.join(",").toString(),
+      department: item.department.join(',').toString(),
       date: item.date,
       type: item.type,
       paymode: item.paymode,
@@ -1090,9 +1020,7 @@ const [overallItems, setOverallItems] = useState([]);
     setColumnVisibility(updatedVisibility);
   };
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
     setColumnVisibility((prevVisibility) => ({
@@ -1104,9 +1032,9 @@ const [overallItems, setOverallItems] = useState([]);
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1114,7 +1042,7 @@ const [overallItems, setOverallItems] = useState([]);
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1122,38 +1050,20 @@ const [overallItems, setOverallItems] = useState([]);
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
               <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              // secondary={column.headerName }
+                sx={{ display: 'flex' }}
+                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
+                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
+                // secondary={column.headerName }
               />
             </ListItem>
           ))}
@@ -1162,11 +1072,7 @@ const [overallItems, setOverallItems] = useState([]);
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -1174,7 +1080,7 @@ const [overallItems, setOverallItems] = useState([]);
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -1192,25 +1098,16 @@ const [overallItems, setOverallItems] = useState([]);
   );
   return (
     <Box>
-      <Headtitle title={"Paid Date Mode"} />
+      <Headtitle title={'Paid Date Mode'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="Paid Date Mode"
-        modulename="PayRoll"
-        submodulename="PayRoll Setup"
-        mainpagename="Paid Date Mode"
-        subpagename=""
-        subsubpagename=""
-      />
-      {isUserRoleCompare?.includes("apaiddatemode") && (
+      <PageHeading title="Paid Date Mode" modulename="PayRoll" submodulename="PayRoll Setup" mainpagename="Paid Date Mode" subpagename="" subsubpagename="" />
+      {isUserRoleCompare?.includes('apaiddatemode') && (
         <>
           <Box sx={userStyle.dialogbox}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Add Paid Date Mode
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Add Paid Date Mode</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -1218,7 +1115,7 @@ const [overallItems, setOverallItems] = useState([]);
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Department<b style={{ color: "red" }}>*</b>
+                      Department<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <MultiSelect
                       options={departments}
@@ -1226,13 +1123,13 @@ const [overallItems, setOverallItems] = useState([]);
                       onChange={handleCategoryChange}
                       valueRenderer={customValueRendererCate}
                       labelledBy="Please Select Area"
-                    // className="scrollable-multiselect"
+                      // className="scrollable-multiselect"
                     />
                   </FormControl>
                 </Grid>
                 <Grid item md={3} sm={6} xs={12}>
                   <Typography>
-                    Pay Mode <b style={{ color: "red" }}>*</b>
+                    Pay Mode <b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <FormControl fullWidth size="small">
                     <Selects
@@ -1250,7 +1147,7 @@ const [overallItems, setOverallItems] = useState([]);
                 </Grid>
                 <Grid item md={3} sm={6} xs={12}>
                   <Typography>
-                    Day <b style={{ color: "red" }}>*</b>
+                    Day <b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <FormControl fullWidth size="small">
                     <Selects
@@ -1268,7 +1165,7 @@ const [overallItems, setOverallItems] = useState([]);
                 </Grid>
                 <Grid item md={3} sm={6} xs={12}>
                   <Typography>
-                    Type <b style={{ color: "red" }}>*</b>
+                    Type <b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <FormControl fullWidth size="small">
                     <Selects
@@ -1288,12 +1185,7 @@ const [overallItems, setOverallItems] = useState([]);
               <br /> <br />
               <Grid container spacing={2}>
                 <Grid item md={3} xs={12} sm={6}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmit}
-                    sx={buttonStyles.buttonsubmit}
-                  >
+                  <Button variant="contained" color="primary" onClick={handleSubmit} sx={buttonStyles.buttonsubmit}>
                     Submit
                   </Button>
                 </Grid>
@@ -1317,21 +1209,19 @@ const [overallItems, setOverallItems] = useState([]);
           fullWidth={true}
           maxWidth="md"
           sx={{
-            overflow: "visible",
-            "& .MuiPaper-root": {
-              overflow: "visible",
+            overflow: 'visible',
+            '& .MuiPaper-root': {
+              overflow: 'visible',
             },
           }}
         >
-          <Box sx={{ padding: "20px" }}>
+          <Box sx={{ padding: '20px' }}>
             <>
               <form onSubmit={editSubmit}>
                 {/* <DialogContent sx={{ width: '550px', padding: '20px' }}> */}
                 <Grid container spacing={2}>
                   <Grid item md={12} xs={12} sm={12}>
-                    <Typography sx={userStyle.HeaderText}>
-                      Edit Paid Date Mode
-                    </Typography>
+                    <Typography sx={userStyle.HeaderText}>Edit Paid Date Mode</Typography>
                   </Grid>
                 </Grid>
                 <br />
@@ -1339,7 +1229,7 @@ const [overallItems, setOverallItems] = useState([]);
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Department<b style={{ color: "red" }}>*</b>
+                        Department<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <MultiSelect
                         options={departmentsEdit}
@@ -1347,13 +1237,13 @@ const [overallItems, setOverallItems] = useState([]);
                         onChange={handleCategoryChangeEdit}
                         valueRenderer={customValueRendererCateEdit}
                         labelledBy="Please Select Department"
-                      // className="scrollable-multiselect"
+                        // className="scrollable-multiselect"
                       />
                     </FormControl>
                   </Grid>
                   <Grid item md={4} sm={6} xs={12}>
                     <Typography>
-                      Pay Mode <b style={{ color: "red" }}>*</b>
+                      Pay Mode <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <FormControl fullWidth size="small">
                       <Selects
@@ -1375,7 +1265,7 @@ const [overallItems, setOverallItems] = useState([]);
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Day<b style={{ color: "red" }}>*</b>
+                        Day<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={dayOptions}
@@ -1395,7 +1285,7 @@ const [overallItems, setOverallItems] = useState([]);
                   </Grid>
                   <Grid item md={4} sm={6} xs={12}>
                     <Typography>
-                      Type <b style={{ color: "red" }}>*</b>
+                      Type <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <FormControl fullWidth size="small">
                       <Selects
@@ -1424,10 +1314,7 @@ const [overallItems, setOverallItems] = useState([]);
                     </Button>
                   </Grid>
                   <Grid item md={6} xs={6} sm={6}>
-                    <Button
-                      sx={buttonStyles.btncancel}
-                      onClick={handleCloseModEdit}
-                    >
+                    <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
                       Cancel
                     </Button>
                   </Grid>
@@ -1440,14 +1327,12 @@ const [overallItems, setOverallItems] = useState([]);
       </Box>
       <br />
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lpaiddatemode") && (
+      {isUserRoleCompare?.includes('lpaiddatemode') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
-              <Typography sx={userStyle.importheadtext}>
-                Paid Date Mode List
-              </Typography>
+              <Typography sx={userStyle.importheadtext}>Paid Date Mode List</Typography>
             </Grid>
             <br />
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
@@ -1466,7 +1351,7 @@ const [overallItems, setOverallItems] = useState([]);
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -1484,19 +1369,19 @@ const [overallItems, setOverallItems] = useState([]);
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelpaiddatemode") && (
+                  {isUserRoleCompare?.includes('excelpaiddatemode') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
                           fetchPaiddatemodeArray();
-                          setFormat("xl");
+                          setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -1505,13 +1390,13 @@ const [overallItems, setOverallItems] = useState([]);
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvpaiddatemode") && (
+                  {isUserRoleCompare?.includes('csvpaiddatemode') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
                           fetchPaiddatemodeArray();
-                          setFormat("csv");
+                          setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -1520,7 +1405,7 @@ const [overallItems, setOverallItems] = useState([]);
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printpaiddatemode") && (
+                  {isUserRoleCompare?.includes('printpaiddatemode') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
@@ -1529,7 +1414,7 @@ const [overallItems, setOverallItems] = useState([]);
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfpaiddatemode") && (
+                  {isUserRoleCompare?.includes('pdfpaiddatemode') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
@@ -1543,15 +1428,10 @@ const [overallItems, setOverallItems] = useState([]);
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imagepaiddatemode") && (
-                    <Button
-                      sx={userStyle.buttongrp}
-                      onClick={handleCaptureImage}
-                    >
-                      {" "}
-                      <ImageIcon
-                        sx={{ fontSize: "15px" }}
-                      /> &ensp;Image&ensp;{" "}
+                  {isUserRoleCompare?.includes('imagepaiddatemode') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
@@ -1560,12 +1440,7 @@ const [overallItems, setOverallItems] = useState([]);
                 <Box>
                   <FormControl fullWidth size="small">
                     <Typography>Search</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                    />
+                    <OutlinedInput id="component-outlined" type="text" value={searchQuery} onChange={handleSearchChange} />
                   </FormControl>
                 </Box>
               </Grid>
@@ -1579,49 +1454,31 @@ const [overallItems, setOverallItems] = useState([]);
               Manage Columns
             </Button>
             &ensp;
-            {isUserRoleCompare?.includes("bdpaiddatemode") && (
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleClickOpenalert}
-              sx={buttonStyles.buttonbulkdelete}
-            >
-              Bulk Delete
-            </Button>
-           )}
+            {isUserRoleCompare?.includes('bdpaiddatemode') && (
+              <Button variant="contained" color="error" onClick={handleClickOpenalert} sx={buttonStyles.buttonbulkdelete}>
+                Bulk Delete
+              </Button>
+            )}
             <br />
             <br />
             {!paiddatemodeCheck ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
             ) : (
               <>
                 <Box
                   style={{
-                    width: "100%",
-                    overflowY: "hidden", // Hide the y-axis scrollbar
+                    width: '100%',
+                    overflowY: 'hidden', // Hide the y-axis scrollbar
                   }}
                 >
                   <StyledDataGrid
-                    onClipboardCopy={(copiedString) =>
-                      setCopiedData(copiedString)
-                    }
+                    onClipboardCopy={(copiedString) => setCopiedData(copiedString)}
                     rows={rowsWithCheckboxes}
-                    columns={columnDataTable.filter(
-                      (column) => columnVisibility[column.field]
-                    )}
+                    columns={columnDataTable.filter((column) => columnVisibility[column.field])}
                     onSelectionModelChange={handleSelectionChange}
                     selectionModel={selectedRows}
                     autoHeight={true}
@@ -1634,50 +1491,25 @@ const [overallItems, setOverallItems] = useState([]);
                 </Box>
                 <Box style={userStyle.dataTablestyle}>
                   <Box>
-                    Showing{" "}
-                    {filteredData.length > 0 ? (page - 1) * pageSize + 1 : 0} to{" "}
-                    {Math.min(page * pageSize, filteredDatas.length)} of{" "}
-                    {filteredDatas.length} entries
+                    Showing {filteredData.length > 0 ? (page - 1) * pageSize + 1 : 0} to {Math.min(page * pageSize, filteredDatas.length)} of {filteredDatas.length} entries
                   </Box>
                   <Box>
-                    <Button
-                      onClick={() => setPage(1)}
-                      disabled={page === 1}
-                      sx={userStyle.paginationbtn}
-                    >
+                    <Button onClick={() => setPage(1)} disabled={page === 1} sx={userStyle.paginationbtn}>
                       <FirstPageIcon />
                     </Button>
-                    <Button
-                      onClick={() => handlePageChange(page - 1)}
-                      disabled={page === 1}
-                      sx={userStyle.paginationbtn}
-                    >
+                    <Button onClick={() => handlePageChange(page - 1)} disabled={page === 1} sx={userStyle.paginationbtn}>
                       <NavigateBeforeIcon />
                     </Button>
                     {pageNumbers?.map((pageNumber) => (
-                      <Button
-                        key={pageNumber}
-                        sx={userStyle.paginationbtn}
-                        onClick={() => handlePageChange(pageNumber)}
-                        className={page === pageNumber ? "active" : ""}
-                        disabled={page === pageNumber}
-                      >
+                      <Button key={pageNumber} sx={userStyle.paginationbtn} onClick={() => handlePageChange(pageNumber)} className={page === pageNumber ? 'active' : ''} disabled={page === pageNumber}>
                         {pageNumber}
                       </Button>
                     ))}
                     {lastVisiblePage < totalPages && <span>...</span>}
-                    <Button
-                      onClick={() => handlePageChange(page + 1)}
-                      disabled={page === totalPages}
-                      sx={userStyle.paginationbtn}
-                    >
+                    <Button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
                       <NavigateNextIcon />
                     </Button>
-                    <Button
-                      onClick={() => setPage(totalPages)}
-                      disabled={page === totalPages}
-                      sx={userStyle.paginationbtn}
-                    >
+                    <Button onClick={() => setPage(totalPages)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
                       <LastPageIcon />
                     </Button>
                   </Box>
@@ -1694,26 +1526,17 @@ const [overallItems, setOverallItems] = useState([]);
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
       </Popover>
       {/* view model */}
-      <Dialog
-        open={openview}
-        onClose={handleClickOpenview}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="lg"
-      >
-        <Box sx={{ width: "auto", padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg">
+        <Box sx={{ width: 'auto', padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              View Paid Date Mode
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> View Paid Date Mode</Typography>
             <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={12} xs={12} sm={12}>
@@ -1743,14 +1566,9 @@ const [overallItems, setOverallItems] = useState([]);
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleCloseview}
-                sx={buttonStyles.btncancel}
-              >
-                {" "}
-                Back{" "}
+              <Button variant="contained" color="primary" onClick={handleCloseview} sx={buttonStyles.btncancel}>
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
@@ -1759,7 +1577,7 @@ const [overallItems, setOverallItems] = useState([]);
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
@@ -1776,26 +1594,26 @@ const [overallItems, setOverallItems] = useState([]);
           <Box>
             {/* ALERT DIALOG */}
             <Dialog open={isCheckOpen} onClose={handleCloseCheck} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-              <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-                <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: "orange" }} />
+              <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+                <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
 
-                <Typography variant="h6" sx={{ color: "black", textAlign: "center" }}>
+                <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
                   <>
                     {checkPaiddate?.length > 0 ? (
                       <>
-                        <span style={{ fontWeight: "700", color: "#777" }}>{`${deletePaiddate.department} `}</span>
-                        was linked in <span style={{ fontWeight: "700" }}>Paid Date Fix </span>
+                        <span style={{ fontWeight: '700', color: '#777' }}>{`${deletePaiddate.department} `}</span>
+                        was linked in <span style={{ fontWeight: '700' }}>Paid Date Fix </span>
                       </>
                     ) : (
-                      ""
+                      ''
                     )}
                   </>
                 </Typography>
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleCloseCheck} autoFocus variant="contained" color="error">
-                  {" "}
-                  OK{" "}
+                  {' '}
+                  OK{' '}
                 </Button>
               </DialogActions>
             </Dialog>
@@ -1803,20 +1621,19 @@ const [overallItems, setOverallItems] = useState([]);
         </>
       </Box>
 
-
       {/* ALERT DIALOG for the overall edit*/}
       <Box>
         <Dialog open={isErrorOpenpop} onClose={handleCloseerrpop} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlertpop}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={() => {
                 sendEditRequest();
@@ -1827,15 +1644,15 @@ const [overallItems, setOverallItems] = useState([]);
             </Button>
             <Button
               style={{
-                backgroundColor: "#f4f4f4",
-                color: "#444",
-                boxShadow: "none",
-                borderRadius: "3px",
-                padding: "7px 13px",
-                border: "1px solid #0000006b",
-                "&:hover": {
-                  "& .css-bluauu-MuiButtonBase-root-MuiButton-root": {
-                    backgroundColor: "#f4f4f4",
+                backgroundColor: '#f4f4f4',
+                color: '#444',
+                boxShadow: 'none',
+                borderRadius: '3px',
+                padding: '7px 13px',
+                border: '1px solid #0000006b',
+                '&:hover': {
+                  '& .css-bluauu-MuiButtonBase-root-MuiButton-root': {
+                    backgroundColor: '#f4f4f4',
                   },
                 },
               }}
@@ -1847,20 +1664,9 @@ const [overallItems, setOverallItems] = useState([]);
         </Dialog>
       </Box>
 
-
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* EXTERNAL COMPONENTS -------------- END */}
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
@@ -1873,41 +1679,15 @@ const [overallItems, setOverallItems] = useState([]);
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={filteredData ?? []}
         itemsTwo={paiddatemodesFilterArray ?? []}
-        filename={"Paid Date Mode"}
+        filename={'Paid Date Mode'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Paid Date Mode Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={delPaiddate}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={delPaiddatecheckbox}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Paid Date Mode Info" addedby={addedby} updateby={updateby} />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delPaiddate} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delPaiddatecheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
     </Box>
   );
 }

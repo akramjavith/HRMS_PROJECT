@@ -1,86 +1,56 @@
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import * as pdfMake from "pdfmake/build/pdfmake";
-import * as pdfFonts from "pdfmake/build/vfs_fonts";
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import * as XLSX from "xlsx";
-import { LoadingButton } from "@mui/lab";
+import * as XLSX from 'xlsx';
+import { LoadingButton } from '@mui/lab';
 
-import {
-  Box,
-  Button,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  FormControl,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Popover,
-  Select,
-  TextField,
-  Typography,
-  InputAdornment,
-  Tooltip,
-  Radio,
-  FormControlLabel,
-  RadioGroup,
-} from "@mui/material";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, TextField, Typography, InputAdornment, Tooltip, Radio, FormControlLabel, RadioGroup } from '@mui/material';
+import Switch from '@mui/material/Switch';
+import axios from '../../../axiosInstance';
 import domtoimage from 'dom-to-image';
-import { saveAs } from "file-saver";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import { MultiSelect } from "react-multi-select-component";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
+import { saveAs } from 'file-saver';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import { MultiSelect } from 'react-multi-select-component';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
 import AggregatedSearchBar from '../../../components/AggregatedSearchBar';
-import AggridTable from "../../../components/AggridTable";
-import AlertDialog from "../../../components/Alert.js";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../../components/DeleteConfirmation.js";
-import { handleApiError } from "../../../components/Errorhandling.js";
-import ExportData from "../../../components/ExportData.js";
-import Headtitle from "../../../components/Headtitle.js";
-import InfoPopup from "../../../components/InfoPopup.js";
-import MessageAlert from "../../../components/MessageAlert.js";
-import PageHeading from "../../../components/PageHeading";
-import { AuthContext, UserRoleAccessContext } from "../../../context/Appcontext.js";
-import { userStyle } from "../../../pageStyle.js";
-import { SERVICE } from "../../../services/Baseservice.js";
-import { MdClose } from "react-icons/md";
-import { IoMdOptions } from "react-icons/io";
-import AggridTableForPaginationTable from "../../../components/AggridTableForPaginationTable.js";
-
-
-
+import AggridTable from '../../../components/AggridTable';
+import AlertDialog from '../../../components/Alert.js';
+import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
+import { handleApiError } from '../../../components/Errorhandling.js';
+import ExportData from '../../../components/ExportData.js';
+import Headtitle from '../../../components/Headtitle.js';
+import InfoPopup from '../../../components/InfoPopup.js';
+import MessageAlert from '../../../components/MessageAlert.js';
+import PageHeading from '../../../components/PageHeading';
+import { AuthContext, UserRoleAccessContext } from '../../../context/Appcontext.js';
+import { userStyle } from '../../../pageStyle.js';
+import { SERVICE } from '../../../services/Baseservice.js';
+import { MdClose } from 'react-icons/md';
+import { IoMdOptions } from 'react-icons/io';
+import AggridTableForPaginationTable from '../../../components/AggridTableForPaginationTable.js';
 
 function PaidDateFix() {
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = ["Contains", "Does Not Contain", "Equals", "Does Not Equal", "Begins With", "Ends With", "Blank", "Not Blank"]; // AgGrid-like conditions
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
 
   const [advancedFilter, setAdvancedFilter] = useState(null);
   const [additionalFilters, setAdditionalFilters] = useState([]);
 
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [logicOperator, setLogicOperator] = useState("AND");
-  const [filterValue, setFilterValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [logicOperator, setLogicOperator] = useState('AND');
+  const [filterValue, setFilterValue] = useState('');
 
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
@@ -88,8 +58,8 @@ function PaidDateFix() {
   const [overallItems, setOverallItems] = useState([]);
 
   const [isHandleChange, setIsHandleChange] = useState(false);
-  const [searchedString, setSearchedString] = useState("")
-  const [fileFormat, setFormat] = useState('')
+  const [searchedString, setSearchedString] = useState('');
+  const [fileFormat, setFormat] = useState('');
   // const [isFilterOpen, setIsFilterOpen] = useState(false);
   // const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
   // // page refersh reload
@@ -100,7 +70,6 @@ function PaidDateFix() {
   //   setIsPdfFilterOpen(false);
   // };
 
-
   const [exportLoading, setExportLoading] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
@@ -109,39 +78,36 @@ function PaidDateFix() {
   const handleCloseFilterMod = () => {
     setIsFilterOpen(false);
     // setloadingdeloverall(false);
-    setExportLoading(false)
+    setExportLoading(false);
   };
 
   const handleClosePdfFilterMod = () => {
     setIsPdfFilterOpen(false);
-    setExportLoading(false)
+    setExportLoading(false);
   };
 
-
-
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
+    setIsXeroxLoad(false);
   };
   const handleClosePopupMalert = () => {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
   const handleClosePopup = () => {
     setOpenPopup(false);
-  }
+  };
 
   useEffect(() => {
-
     getapi();
-
   }, []);
   const gridRefTable = useRef(null);
 
@@ -152,7 +118,7 @@ function PaidDateFix() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Paid Date Fix"),
+      pagename: String('Paid Date Fix'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -163,15 +129,14 @@ function PaidDateFix() {
         },
       ],
     });
-
-  }
-  let exportColumnNames = ["Department", "Month", "Year", "Date", "Paymode", "After Expiry"];
-  let exportRowValues = ["department", "month", "year", "date", "paymode", "afterexpiry"];
+  };
+  let exportColumnNames = ['Department', 'Month', 'Year', 'Date', 'Paymode', 'After Expiry'];
+  let exportRowValues = ['department', 'month', 'year', 'date', 'paymode', 'afterexpiry'];
   let today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
   var yyyy = today.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
   //get current month
   let month = new Date().getMonth() + 1;
   let year = new Date().getFullYear();
@@ -182,85 +147,82 @@ function PaidDateFix() {
   const getyear = years.map((year) => {
     return { value: year, label: year };
   });
-  const xeroxyears = Array.from(
-    new Array(10),
-    (val, index) => Number(Number(currentYear) + 1) - index
-  );
+  const xeroxyears = Array.from(new Array(10), (val, index) => Number(Number(currentYear) + 1) - index);
   const xeroxgetyear = xeroxyears.map((year) => {
     return { value: year, label: year };
   });
   //get all months
   const months = [
-    { value: 1, label: "January" },
-    { value: 2, label: "February" },
-    { value: 3, label: "March" },
-    { value: 4, label: "April" },
-    { value: 5, label: "May" },
-    { value: 6, label: "June" },
-    { value: 7, label: "July" },
-    { value: 8, label: "August" },
-    { value: 9, label: "September" },
-    { value: 10, label: "October" },
-    { value: 11, label: "November" },
-    { value: 12, label: "December" },
+    { value: 1, label: 'January' },
+    { value: 2, label: 'February' },
+    { value: 3, label: 'March' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'May' },
+    { value: 6, label: 'June' },
+    { value: 7, label: 'July' },
+    { value: 8, label: 'August' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'December' },
   ];
   const xeroxmonths = [
-    { value: "01", label: "January" },
-    { value: "02", label: "February" },
-    { value: "03", label: "March" },
-    { value: "04", label: "April" },
-    { value: "05", label: "May" },
-    { value: "06", label: "June" },
-    { value: "07", label: "July" },
-    { value: "08", label: "August" },
-    { value: "09", label: "September" },
-    { value: "10", label: "October" },
-    { value: "11", label: "November" },
-    { value: "12", label: "December" },
+    { value: '01', label: 'January' },
+    { value: '02', label: 'February' },
+    { value: '03', label: 'March' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'May' },
+    { value: '06', label: 'June' },
+    { value: '07', label: 'July' },
+    { value: '08', label: 'August' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' },
   ];
   const check = months.find((item) => item.value === ans + 1);
   const [paiddatefix, setPaiddatefix] = useState({
-    department: "Please Select Department",
+    department: 'Please Select Department',
     month: check.label,
     year: year,
     date: formattedDate,
-    paymode: "Please Select Paymode",
+    paymode: 'Please Select Paymode',
   });
   const [paiddatefixEdit, setPaiddatefixEdit] = useState({
-    department: "Please Select Department",
-    month: "",
-    year: "",
+    department: 'Please Select Department',
+    month: '',
+    year: '',
     date: formattedDate,
-    paymode: "Please Select Paymode",
+    paymode: 'Please Select Paymode',
   });
   const [isXerox, setIsXerox] = useState({
-    year: "Select Year",
-    month: "Select Month",
-    monthvalue: "",
-    department: "Please Select Department",
-    paymode: "",
+    fromyear: 'Select Year',
+    frommonth: 'Select Month',
+    toyear: 'Select Year',
+    tomonth: 'Select Month',
+    monthvalue: '',
+    department: [],
+    paymode: '',
   });
   const [isXeroxLoad, setIsXeroxLoad] = useState(false);
   const [paiddatefixs, setPaiddatefixs] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [allPaiddatefixedit, setAllPaiddatefixedit] = useState([]);
-  const { isUserRoleCompare, isUserRoleAccess, buttonStyles } = useContext(
-    UserRoleAccessContext
-  );
+  const { isUserRoleCompare, isUserRoleAccess, buttonStyles } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
   const [paiddatefixCheck, setPaiddatefixcheck] = useState(false);
   const username = isUserRoleAccess.username;
   const gridRef = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [copiedData, setCopiedData] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [copiedData, setCopiedData] = useState('');
   const [departments, setDepartments] = useState([]);
   const [paymodes, setPaymodes] = useState([]);
   const [departmentsEdit, setDepartmentsEdit] = useState([]);
   const [paymodesEdit, setPaymodesEdit] = useState([]);
   // Multi Select Create
   const [selectedOptionsCate, setSelectedOptionsCate] = useState([]);
-  let [valueCate, setValueCate] = useState("");
+  let [valueCate, setValueCate] = useState('');
   const handleCategoryChange = (options) => {
     setValueCate(
       options.map((a, index) => {
@@ -270,9 +232,7 @@ function PaidDateFix() {
     setSelectedOptionsCate(options);
   };
   const customValueRendererCate = (valueCate, _department) => {
-    return valueCate.length
-      ? valueCate.map(({ label }) => label).join(", ")
-      : "Please Select Department";
+    return valueCate.length ? valueCate.map(({ label }) => label).join(', ') : 'Please Select Department';
   };
   // Edit functionlity
   const [selectedOptionsCateEdit, setSelectedOptionsCateEdit] = useState([]);
@@ -280,9 +240,7 @@ function PaidDateFix() {
     setSelectedOptionsCateEdit(options);
   };
   const customValueRendererCateEdit = (valueCateEdit, _department) => {
-    return valueCateEdit.length
-      ? valueCateEdit.map(({ label }) => label).join(", ")
-      : "Please Select Department";
+    return valueCateEdit.length ? valueCateEdit.map(({ label }) => label).join(', ') : 'Please Select Department';
   };
   //xerox filter
   const [selectedOptionsPaymode, setSelectedOptionsPaymode] = useState([]);
@@ -313,7 +271,9 @@ function PaidDateFix() {
       ];
       setDepartments(deptall);
       setDepartmentsEdit(deptall);
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //get all Areas.
   const fetchPaymodeDropdown = async () => {
@@ -324,10 +284,7 @@ function PaidDateFix() {
         },
       });
       let resdata = res_pay?.data?.paidstatusfixs.filter((data, index) => {
-        return (
-          data?.frequency?.toLowerCase() !== "hold" &&
-          data?.frequency?.toLowerCase() !== "reject"
-        );
+        return data?.frequency?.toLowerCase() !== 'hold' && data?.frequency?.toLowerCase() !== 'reject';
       });
       const paymodeall = [
         ...resdata.map((d) => ({
@@ -341,34 +298,37 @@ function PaidDateFix() {
       setPaymodes(
         totAns?.length > 0
           ? totAns?.map((d) => ({
-            ...d,
-            label: d,
-            value: d,
-          }))
+              ...d,
+              label: d,
+              value: d,
+            }))
           : []
       );
       setPaymodesEdit(
         totAns?.length > 0
           ? totAns?.map((d) => ({
-            ...d,
-            label: d,
-            value: d,
-          }))
+              ...d,
+              label: d,
+              value: d,
+            }))
           : []
       );
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //image
   const gridRefTableImg = useRef(null);
   // image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Paid Date Fix.png");
+          saveAs(blob, 'Paid Date Fix.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -433,15 +393,15 @@ function PaidDateFix() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
   // Show All Columns & Manage Columns
   const initialColumnVisibility = {
@@ -455,15 +415,13 @@ function PaidDateFix() {
     actions: true,
     afterexpiry: true,
   };
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
-  const [deletePaiddate, setDeletePaiddate] = useState("");
+  const [deletePaiddate, setDeletePaiddate] = useState('');
   const rowData = async (id, name) => {
     try {
       let res = await axios.get(`${SERVICE.PAIDDATEFIX_SINGLE}/${id}`, {
@@ -473,7 +431,9 @@ function PaidDateFix() {
       });
       setDeletePaiddate(res?.data?.spaiddatefix);
       handleClickOpen();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   // Alert delete popup
   let Paiddatesid = deletePaiddate?._id;
@@ -490,11 +450,13 @@ function PaidDateFix() {
         handleCloseMod();
         setSelectedRows([]);
         setPage(1);
-        setPopupContent("Deleted Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Deleted Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
       }
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   const delPaiddatecheckbox = async () => {
     try {
@@ -514,10 +476,12 @@ function PaidDateFix() {
       setPage(1);
       await fetchEmployee();
       // await fetchPaiddatefix();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //add function
   const sendRequest = async () => {
@@ -542,62 +506,58 @@ function PaidDateFix() {
       // await fetchPaiddatefix();
       setPaiddatefix({
         ...paiddatefix,
-        department: "Please Select Department",
+        department: 'Please Select Department',
         month: check.label,
         year: year,
         date: formattedDate,
       });
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //submit option for saving
   const handleSubmit = (e) => {
     e.preventDefault();
     let departments = selectedOptionsCate.map((item) => item.value);
-    const isNameMatch = paiddatefixsarrayDup.some(
-      (item) =>
-        item.month === paiddatefix.month &&
-        item.year == paiddatefix.year &&
-        item.paymode === paiddatefix.paymode &&
-        item.department.some((data) => departments.includes(data))
-    );
+    const isNameMatch = paiddatefixsarrayDup.some((item) => item.month === paiddatefix.month && item.year == paiddatefix.year && item.paymode === paiddatefix.paymode && item.department.some((data) => departments.includes(data)));
     if (selectedOptionsCate.length == 0) {
-      setPopupContentMalert("Please Select Department");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Department');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paiddatefix.paymode === "Please Select Paymode") {
-      setPopupContentMalert("Please Select Paymode");
-      setPopupSeverityMalert("info");
+    } else if (paiddatefix.paymode === 'Please Select Paymode') {
+      setPopupContentMalert('Please Select Paymode');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paiddatefix.date == "") {
-      setPopupContentMalert("Please Select Date");
-      setPopupSeverityMalert("info");
+    } else if (paiddatefix.date == '') {
+      setPopupContentMalert('Please Select Date');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
-      setSearchQuery("");
+      setSearchQuery('');
       sendRequest();
     }
   };
   const handleClear = (e) => {
     e.preventDefault();
     setPaiddatefix({
-      department: "Please Select Department",
+      department: 'Please Select Department',
       month: check.label,
       year: year,
       date: formattedDate,
-      paymode: "Please Select Paymode",
+      paymode: 'Please Select Paymode',
     });
     setSelectedOptionsCate([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
-    setSearchQuery("");
+    setSearchQuery('');
   };
   //Edit model...
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -605,7 +565,7 @@ function PaidDateFix() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
   };
   // info model
@@ -633,7 +593,9 @@ function PaidDateFix() {
         }))
       );
       handleClickOpenEdit();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   // get single row to view....
   const getviewCode = async (e) => {
@@ -645,7 +607,9 @@ function PaidDateFix() {
       });
       setPaiddatefixEdit(res?.data?.spaiddatefix);
       handleClickOpenview();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   // get single row to view....
   const getinfoCode = async (e) => {
@@ -657,7 +621,9 @@ function PaidDateFix() {
       });
       setPaiddatefixEdit(res?.data?.spaiddatefix);
       handleClickOpeninfo();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //Project updateby edit page...
   let updateby = paiddatefixEdit?.updatedby;
@@ -667,70 +633,63 @@ function PaidDateFix() {
   const sendEditRequest = async () => {
     let empCate = selectedOptionsCateEdit.map((item) => item.value);
     try {
-      let res = await axios.put(
-        `${SERVICE.PAIDDATEFIX_SINGLE}/${subprojectsid}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
+      let res = await axios.put(`${SERVICE.PAIDDATEFIX_SINGLE}/${subprojectsid}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        department: [...empCate],
+        month: String(paiddatefixEdit.month),
+        year: String(paiddatefixEdit.year),
+        date: String(paiddatefixEdit.date),
+        paymode: String(paiddatefixEdit.paymode),
+        updatedby: [
+          ...updateby,
+          {
+            name: String(isUserRoleAccess.companyname),
+            date: String(new Date()),
           },
-          department: [...empCate],
-          month: String(paiddatefixEdit.month),
-          year: String(paiddatefixEdit.year),
-          date: String(paiddatefixEdit.date),
-          paymode: String(paiddatefixEdit.paymode),
-          updatedby: [
-            ...updateby,
-            {
-              name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
-            },
-          ],
-        }
-      );
+        ],
+      });
       await fetchEmployee();
       //  fetchPaiddatefix();
       handleCloseModEdit();
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   const editSubmit = async (e) => {
     e.preventDefault();
     await fetchPaiddatefixAll();
     let departmentsEditt = selectedOptionsCateEdit.map((item) => item.value);
-    const isNameMatch = allPaiddatefixedit.some(
-      (item) =>
-        item.month === paiddatefixEdit.month &&
-        item.year == paiddatefixEdit.year &&
-        item.paymode === paiddatefixEdit.paymode &&
-        item.department.some((data) => departmentsEditt.includes(data))
-    );
+    const isNameMatch = allPaiddatefixedit.some((item) => item.month === paiddatefixEdit.month && item.year == paiddatefixEdit.year && item.paymode === paiddatefixEdit.paymode && item.department.some((data) => departmentsEditt.includes(data)));
     if (selectedOptionsCateEdit.length == 0) {
-      setPopupContentMalert("Please Select Department");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Department');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paiddatefixEdit.paymode === "Please Select Paymode") {
-      setPopupContentMalert("Please Select Paymode");
-      setPopupSeverityMalert("info");
+    } else if (paiddatefixEdit.paymode === 'Please Select Paymode') {
+      setPopupContentMalert('Please Select Paymode');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paiddatefixEdit.date == "") {
-      setPopupContentMalert("Please Select Date");
-      setPopupSeverityMalert("info");
+    } else if (paiddatefixEdit.date == '') {
+      setPopupContentMalert('Please Select Date');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequest();
     }
   };
-  const [paiddatefixsarrayDup, setPaiddatefixsarrayDup] = useState([])
+  const [paiddatefixsarrayDup, setPaiddatefixsarrayDup] = useState([]);
   //get all Sub vendormasters.
   const fetchPaiddatefix = async () => {
     try {
-      setPaiddatefixcheck(true)
+      setPaiddatefixcheck(true);
       let res_vendor = await axios.get(SERVICE.PAIDDATEFIX, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
@@ -738,9 +697,12 @@ function PaidDateFix() {
       });
       setPaiddatefixsarrayDup(res_vendor?.data?.paiddatefixs);
       setPaiddatefixcheck(false);
-    } catch (err) { setPaiddatefixcheck(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setPaiddatefixcheck(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
-  const [paiddatefixsFilterArray, setPaiddatefixsFilterArray] = useState([])
+  const [paiddatefixsFilterArray, setPaiddatefixsFilterArray] = useState([]);
   //get all Sub vendormasters.
   const fetchPaiddatefixArray = async () => {
     try {
@@ -749,49 +711,47 @@ function PaidDateFix() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setPaiddatefixsFilterArray(res_vendor?.data?.paiddatefixs.map((t, index) => ({
-        ...t,
-        Sno: index + 1,
-        Departments: t.department?.toString(),
-        Month: t.month,
-        Year: t.year,
-        Dates: moment(t.date).format("DD-MM-YYYY"),
-        Paymode: t.paymode,
-      })));
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setPaiddatefixsFilterArray(
+        res_vendor?.data?.paiddatefixs.map((t, index) => ({
+          ...t,
+          Sno: index + 1,
+          Departments: t.department?.toString(),
+          Month: t.month,
+          Year: t.year,
+          Dates: moment(t.date).format('DD-MM-YYYY'),
+          Paymode: t.paymode,
+        }))
+      );
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   useEffect(() => {
-    fetchPaiddatefixArray()
-  }, [isFilterOpen])
+    fetchPaiddatefixArray();
+  }, [isFilterOpen]);
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   // const [totalProjects, setTotalProjects] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [paidDateCount, setPaidDateCount] = useState(0);
   const [pageNumbers, setPageNumbers] = useState([]);
   const [filteredDatas, setFilteredDatas] = useState([]);
-  const [totalDatas, setTotalDatas] = useState(0)
+  const [totalDatas, setTotalDatas] = useState(0);
 
   const fetchEmployee = async () => {
-
     const queryParams = {
       page: Number(page),
       pageSize: Number(pageSize),
-      searchQuery: searchQuery
+      searchQuery: searchQuery,
     };
 
+    const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
 
-    const allFilters = [
-      ...additionalFilters,
-      { column: selectedColumn, condition: selectedCondition, value: filterValue }
-    ];
-
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
       queryParams.searchQuery = searchQuery;
     }
-
 
     try {
       setPaiddatefixcheck(true);
@@ -799,8 +759,8 @@ function PaidDateFix() {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
-
       });
+      console.log(res_employee?.data?.result, 'res_employee?.data?.result');
       let subcates = res_employee?.data?.result.map((d, index) => ({
         ...d,
         serialNumber: (page - 1) * pageSize + index + 1,
@@ -813,7 +773,7 @@ function PaidDateFix() {
       //     ...item, date: moment(item.date).format("DD-MM-YYYY"), serialNumber: index + 1
       //   }
       // }))
-      setTotalDatas(res_employee?.data?.totalDatas)
+      setTotalDatas(res_employee?.data?.totalDatas);
       setTotalPages(Math.ceil(subcatescount / pageSize));
       const firstVisiblePage = Math.max(1, page - 1);
       const lastVisiblePage = Math.min(firstVisiblePage + 3 - 1, totalPages);
@@ -825,11 +785,10 @@ function PaidDateFix() {
       let mappedDatas = subcates?.map((item, index) => {
         return {
           ...item,
-          date: moment(item.date).format("DD-MM-YYYY"),
-
-        }
-      })
-      setPaiddatefixs(mappedDatas)
+          date: moment(item.date).format('DD-MM-YYYY'),
+        };
+      });
+      setPaiddatefixs(mappedDatas);
 
       setOverallFilterdata(mappedDatas);
       setPaiddatefixcheck(false);
@@ -839,71 +798,66 @@ function PaidDateFix() {
     }
   };
 
-
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
   const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if (selectedColumn && filterValue || ["Blank", "Not Blank"].includes(selectedCondition)) {
-      setAdditionalFilters([
-        ...additionalFilters,
-        { column: selectedColumn, condition: selectedCondition, value: filterValue }
-      ]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
+      setAdditionalFilters([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
-
-
   const getSearchDisplay = () => {
     if (advancedFilter && advancedFilter.length > 0) {
-      return advancedFilter.map((filter, index) => {
-        let showname = columnDataTable.find(col => col.field === filter.column)?.headerName;
-        return `${showname} ${filter.condition} "${filter.value}"`;
-      }).join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
+      return advancedFilter
+        .map((filter, index) => {
+          let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
+          return `${showname} ${filter.condition} "${filter.value}"`;
+        })
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
 
   const handleResetSearch = async () => {
-
     setPaiddatefixcheck(true);
     // Reset all filters and pagination state
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
       page: Number(page),
       pageSize: Number(pageSize),
-      searchQuery: searchQuery
+      searchQuery: searchQuery,
     };
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
-      queryParams.searchQuery = searchQuery;  // Use searchQuery for regular search
+      queryParams.searchQuery = searchQuery; // Use searchQuery for regular search
     }
 
     try {
@@ -925,7 +879,7 @@ function PaidDateFix() {
       //     ...item, date: moment(item.date).format("DD-MM-YYYY"), serialNumber: index + 1
       //   }
       // }))
-      setTotalDatas(res_employee?.data?.totalDatas)
+      setTotalDatas(res_employee?.data?.totalDatas);
       setTotalPages(Math.ceil(subcatescount / pageSize));
       const firstVisiblePage = Math.max(1, page - 1);
       const lastVisiblePage = Math.min(firstVisiblePage + 3 - 1, totalPages);
@@ -937,12 +891,11 @@ function PaidDateFix() {
       let mappedDatas = subcates?.map((item, index) => {
         return {
           ...item,
-          date: moment(item.date).format("DD-MM-YYYY"),
-
-        }
-      })
-      setPaiddatefixs(mappedDatas)
-      setItems(mappedDatas)
+          date: moment(item.date).format('DD-MM-YYYY'),
+        };
+      });
+      setPaiddatefixs(mappedDatas);
+      setItems(mappedDatas);
 
       setOverallFilterdata(mappedDatas);
       setPaiddatefixcheck(false);
@@ -954,21 +907,18 @@ function PaidDateFix() {
 
   const fetchEmployeeUpdate = async () => {
     try {
-
       let res_employee = await axios.post(SERVICE.PAIDDATEFIX_SORT, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
         page: Number(page),
         pageSize: Number(pageSize),
-        searchQuery: searchQuery
+        searchQuery: searchQuery,
       });
 
       let subcates = res_employee?.data?.result.map((d, index) => ({
         ...d,
         serialNumber: (page - 1) * pageSize + index + 1,
-
-
       }));
       let subcatescount = res_employee?.data?.totalCount;
       // setOverallItems(res_employee?.data?.overallitems.map((item) => {
@@ -976,7 +926,7 @@ function PaidDateFix() {
       //     ...item, date: moment(item.date).format("DD-MM-YYYY")
       //   }
       // }))
-      setTotalDatas(res_employee?.data?.totalDatas)
+      setTotalDatas(res_employee?.data?.totalDatas);
       setPaidDateCount(subcatescount);
       setTotalPages(Math.ceil(subcatescount / pageSize));
       const firstVisiblePage = Math.max(1, page - 1);
@@ -986,23 +936,27 @@ function PaidDateFix() {
         newPageNumbers.push(i);
       }
       setPageNumbers(newPageNumbers);
-      setPaiddatefixs(subcates?.map((item) => {
-        return {
-          ...item, date: moment(item.date).format("DD-MM-YYYY")
-        }
-      }))
+      setPaiddatefixs(
+        subcates?.map((item) => {
+          return {
+            ...item,
+            date: moment(item.date).format('DD-MM-YYYY'),
+          };
+        })
+      );
 
-      setOverallFilterdata(subcates?.map((item) => {
-        return {
-          ...item, date: moment(item.date).format("DD-MM-YYYY")
-        }
-      }));
-
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setOverallFilterdata(
+        subcates?.map((item) => {
+          return {
+            ...item,
+            date: moment(item.date).format('DD-MM-YYYY'),
+          };
+        })
+      );
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
-
-
-
 
   useEffect(() => {
     fetchEmployee();
@@ -1016,19 +970,17 @@ function PaidDateFix() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setAllPaiddatefixedit(
-        res_meet?.data?.paiddatefixs.filter(
-          (item) => item._id !== paiddatefixEdit._id
-        )
-      );
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setAllPaiddatefixedit(res_meet?.data?.paiddatefixs.filter((item) => item._id !== paiddatefixEdit._id));
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Paid Date Fix",
-    pageStyle: "print",
+    documentTitle: 'Paid Date Fix',
+    pageStyle: 'print',
   });
   useEffect(() => {
     fetchDepartmentDropdown();
@@ -1044,20 +996,20 @@ function PaidDateFix() {
   }, [isEditOpen, paiddatefixEdit]);
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
   const [items, setItems] = useState([]);
   const addSerialNumber = (datas) => {
-
     let filteredDatas = datas?.map((item) => {
       return {
-        ...item, department: item?.department?.join(",").toString(),
-      }
-    })
-    setFilteredDatas(filteredDatas)
+        ...item,
+        department: item?.department?.join(',').toString(),
+      };
+    });
+    setFilteredDatas(filteredDatas);
     setItems(filteredDatas);
   };
   useEffect(() => {
@@ -1102,14 +1054,20 @@ function PaidDateFix() {
 
   // Set the current date to midnight to only compare dates
   currentDate.setHours(0, 0, 0, 0);
-
-
+  function isFutureDate(dateold) {
+    const [day, month, year] = dateold.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-based in JS
+    return date > currentDate;
+  }
+  function isPastDate(dateold) {
+    const [day, month, year] = dateold.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-based in JS
+    return date < currentDate;
+  }
   const handleExpiryChange = async (e, params) => {
-
     let value = e.target.value;
 
     try {
-
       try {
         let res = await axios.post(SERVICE.PAIDDATEFIX_UPDATE, {
           headers: {
@@ -1119,11 +1077,9 @@ function PaidDateFix() {
           afterexpiry: String(value),
           name: String(isUserRoleAccess.companyname),
           date: String(new Date()),
-
         });
-
       } catch (err) {
-        console.log(err, 'err')
+        console.log(err, 'err');
       }
       await fetchEmployeeUpdate();
     } catch (error) {
@@ -1132,13 +1088,12 @@ function PaidDateFix() {
     }
   };
 
-
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
       headerCheckboxSelection: true,
@@ -1147,146 +1102,142 @@ function PaidDateFix() {
       sortable: false, // Optionally, you can make this column not sortable
       width: 80,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 80,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "department",
-      headerName: "Department",
+      field: 'department',
+      headerName: 'Department',
       flex: 0,
       width: 160,
       hide: !columnVisibility.department,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "month",
-      headerName: "Month",
+      field: 'month',
+      headerName: 'Month',
       flex: 0,
       width: 130,
       hide: !columnVisibility.month,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "year",
-      headerName: "Year",
+      field: 'year',
+      headerName: 'Year',
       flex: 0,
       width: 130,
       hide: !columnVisibility.year,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "date",
-      headerName: "Date",
+      field: 'date',
+      headerName: 'Date',
       flex: 0,
       width: 130,
       hide: !columnVisibility.date,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "paymode",
-      headerName: "Paymode",
+      field: 'paymode',
+      headerName: 'Paymode',
       flex: 0,
       width: 130,
 
       hide: !columnVisibility.paymode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "afterexpiry",
-      headerName: "After Expiry",
+      field: 'afterexpiry',
+      headerName: 'After Expiry',
       flex: 0,
 
       width: 230,
       hide: !columnVisibility.afterexpiry,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <>
-          {new Date(params.data.dateold) < currentDate && (
-            <Select
-              onChange={(e) => handleExpiryChange(e, params)}
-              sx={{ minWidth: "120px" }}
-              value={params.data.afterexpiry}>
-              <MenuItem value={"Enable"}>Enable</MenuItem>
-              <MenuItem value={"Disable"}>Disable</MenuItem>
-
-            </Select >
-
+          {isPastDate(params?.data?.dateold) && params?.data?.bankrelease && (
+            // {new Date(params.data.dateold) >= currentDate && (
+            <Select onChange={(e) => handleExpiryChange(e, params)} sx={{ minWidth: '120px' }} value={params.data.afterexpiry}>
+              <MenuItem value={'Enable'}>Enable</MenuItem>
+              <MenuItem value={'Disable'}>Disable</MenuItem>
+            </Select>
           )}
         </>
       ),
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <>
-          {new Date(params.data.dateold) >= currentDate && (
-            <Grid sx={{ display: "flex" }}>
-
-              {isUserRoleCompare?.includes("epaiddatefix") && (
-                <Button
-                  sx={userStyle.buttonedit}
-                  onClick={() => {
-                    getCode(params.data.id, params.data.name);
-                  }}
-                >
-                  <EditOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonedit} />
-                </Button>
-              )}
-              {isUserRoleCompare?.includes("dpaiddatefix") && (
-                <Button
-                  sx={userStyle.buttondelete}
-                  onClick={(e) => {
-                    rowData(params.data.id, params.data.name);
-                  }}
-                >
-                  <DeleteOutlineOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttondelete} />
-                </Button>
-              )}
-              {isUserRoleCompare?.includes("vpaiddatefix") && (
-                <Button
-                  sx={userStyle.buttonedit}
-                  onClick={() => {
-                    getviewCode(params.data.id);
-                  }}
-                >
-                  <VisibilityOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonview} />
-                </Button>
-              )}
-              {isUserRoleCompare?.includes("ipaiddatefix") && (
-                <Button
-                  sx={userStyle.buttonedit}
-                  onClick={() => {
-                    getinfoCode(params.data.id);
-                  }}
-                >
-                  <InfoOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttoninfo} />
-                </Button>
-              )}
-            </Grid>
-
-          )}
+          <Grid sx={{ display: 'flex' }}>
+            {isFutureDate(params?.data?.dateold) && (
+              <>
+                {isUserRoleCompare?.includes('epaiddatefix') && (
+                  <Button
+                    sx={userStyle.buttonedit}
+                    onClick={() => {
+                      getCode(params.data.id, params.data.name);
+                    }}
+                  >
+                    <EditOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonedit} />
+                  </Button>
+                )}
+                {isUserRoleCompare?.includes('dpaiddatefix') && (
+                  <Button
+                    sx={userStyle.buttondelete}
+                    onClick={(e) => {
+                      rowData(params.data.id, params.data.name);
+                    }}
+                  >
+                    <DeleteOutlineOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttondelete} />
+                  </Button>
+                )}
+              </>
+            )}
+            {isUserRoleCompare?.includes('vpaiddatefix') && (
+              <Button
+                sx={userStyle.buttonedit}
+                onClick={() => {
+                  getviewCode(params.data.id);
+                }}
+              >
+                <VisibilityOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonview} />
+              </Button>
+            )}
+            {isUserRoleCompare?.includes('ipaiddatefix') && (
+              <Button
+                sx={userStyle.buttonedit}
+                onClick={() => {
+                  getinfoCode(params.data.id);
+                }}
+              >
+                <InfoOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttoninfo} />
+              </Button>
+            )}
+          </Grid>
         </>
       ),
     },
   ];
 
-  const filteredSelectedColumn = columnDataTable.filter(data => data.field !== 'checkbox' && data.field !== "actions" && data.field !== "serialNumber");
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = items.map((item, index) => {
     return {
@@ -1296,13 +1247,14 @@ function PaidDateFix() {
       month: item.month,
       year: item.year,
       date: item.date,
+      bankrelease: item.bankrelease,
       dateold: item.date,
       paymode: item.paymode,
       afterexpiry: item.afterexpiry,
-      afterexpirymodes: ["Enable", 'Disable']
+      afterexpirymodes: ['Enable', 'Disable'],
     };
   });
-
+  console.log(rowDataTable, 'row');
   const rowsWithCheckboxes = rowDataTable.map((row) => ({
     ...row,
     // Create a custom field for rendering the checkbox
@@ -1317,9 +1269,7 @@ function PaidDateFix() {
     setColumnVisibility(updatedVisibility);
   };
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
     setColumnVisibility((prevVisibility) => ({
@@ -1331,9 +1281,9 @@ function PaidDateFix() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1341,7 +1291,7 @@ function PaidDateFix() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1349,38 +1299,20 @@ function PaidDateFix() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
               <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              // secondary={column.headerName }
+                sx={{ display: 'flex' }}
+                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
+                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
+                // secondary={column.headerName }
               />
             </ListItem>
           ))}
@@ -1389,11 +1321,7 @@ function PaidDateFix() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -1401,7 +1329,7 @@ function PaidDateFix() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -1417,30 +1345,368 @@ function PaidDateFix() {
       </DialogActions>
     </Box>
   );
+  //xerox function
+  const handleXerox = async () => {
+    if (isXerox.department === 'Please Select Department') {
+      setPopupContentMalert('Please Select Department');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (isXerox.fromyear === 'Select Year') {
+      setPopupContentMalert('Please Select FromYear');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (isXerox.frommonth === 'Select Month') {
+      setPopupContentMalert('Please Select FromMonth');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (isXerox.toyear === 'Select Year') {
+      setPopupContentMalert('Please Select ToYear');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (isXerox.tomonth === 'Select Month') {
+      setPopupContentMalert('Please Select ToMonth');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else {
+      setIsXeroxLoad(true);
+      // Check if TO date is greater than FROM date
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const fromYear = Number(isXerox.fromyear);
+      const toYear = Number(isXerox.toyear);
+      const fromMonth = monthNames.indexOf(isXerox.frommonth) + 1;
+      const toMonth = monthNames.indexOf(isXerox.tomonth) + 1;
 
+      if (toYear < fromYear || (toYear === fromYear && toMonth <= fromMonth)) {
+        setPopupContentMalert('To Year and To Month must be greater than From Year and From Month');
+        setPopupSeverityMalert('warning');
+        handleClickOpenPopupMalert();
+        setIsXeroxLoad(false);
+        return;
+      }
+      await handleXeroxButtonClick();
 
+      await fetchEmployee();
+      // let res_status = await axios.post(SERVICE.XEROXMONTHYEARPAIDSTATUS, {
+      //   headers: {
+      //     Authorization: `Bearer ${auth.APIToken}`,
+      //   },
+      //   department: String(isXerox.department),
+      //   fromyear: String(isXerox.fromyear),
+      //   frommonth: String(isXerox.frommonth),
+      //   tomonth: String(isXerox.tomonth),
+      //   toyear: String(isXerox.toyear),
+      //   companyname: String(isUserRoleAccess.companyname),
+      //   path: String(SERVICE.PAIDSTATUSFIX_CREATE),
+      //   Authorization: `Bearer ${auth.APIToken}`,
+      // });
+      // const resdata = res_status?.data.statusresults;
+      // if (resdata.length > 0) {
+      //   setIsXeroxLoad(true);
+      //    //duplictae check
+      //     // const isNameMatch = paidstatusfixs.some(
+      //     //   (item) =>
+      //     //     item.frequency?.toLowerCase() === data.frequency?.toLowerCase() &&
+      //     //     item.month === isXerox.tomonth &&
+      //     //     item.year == isXerox.toyear &&
+      //     //     item.absentmodes === data.absentmodes &&
+      //     //     item.fromvalue.toLowerCase() === data.fromvalue.toLowerCase() &&
+      //     //     item.tovalue.toLowerCase() === data.tovalue.toLowerCase() &&
+      //     //     item.achievedmodes === data.achievedmodes &&
+      //     //     item.frompoint.toLowerCase() === data.frompoint.toLowerCase() &&
+      //     //     item.topoint.toLowerCase() === data.topoint.toLowerCase() &&
+      //     //     item.currentabsentmodes === data.currentabsentmodes &&
+      //     //     item.currentabsentvalue.toLowerCase() === data.currentabsentvalue.toLowerCase() &&
+      //     //     item.currentachievedmodes === data.currentachievedmodes &&
+      //     //     item.currentachievedvalue.toLowerCase() === data.currentachievedvalue.toLowerCase() &&
+      //     //     item.paidstatus.toLowerCase() === (changedslicedate + monthslice + '_' + changedpaidstatus[1] + '_' + changedpaidstatus[2]).toLowerCase() &&
+      //     //     item.department.some((data) => data.department.includes(data))
+      //     // );
+      //   await resdata.forEach((data, index) => {
+      //     const changedpaidstatus = data?.paidstatus?.split('_');
+      //     const changedslicedate = changedpaidstatus[0]?.substring(0, changedpaidstatus[0]?.length - 3);
+      //     const monthslice = isXerox?.tomonth?.slice(0, 3);
 
+      //     let subprojectscreate = axios.post(SERVICE.PAIDSTATUSFIX_CREATE, {
+      //       headers: {
+      //         Authorization: `Bearer ${auth.APIToken}`,
+      //       },
+      //       department: [...data.department],
+      //       month: String(isXerox.tomonth),
+      //       year: String(isXerox.toyear),
+      //       frequency: String(data.frequency),
+      //       absentmodes: String(data.absentmodes),
+      //       fromvalue: String(data.fromvalue),
+      //       tovalue: String(data.tovalue),
+      //       achievedmodes: String(data.achievedmodes),
+      //       frompoint: String(data.frompoint),
+      //       topoint: String(data.topoint),
+      //       currentabsentmodes: String(data.currentabsentmodes),
+      //       currentabsentvalue: String(data.currentabsentvalue),
+      //       currentachievedmodes: String(data.currentachievedmodes),
+      //       currentachievedvalue: String(data.currentachievedvalue),
+      //       paidstatus: String(changedslicedate + monthslice + '_' + changedpaidstatus[1] + '_' + changedpaidstatus[2]),
+      //       addedby: [
+      //         {
+      //           name: String(isUserRoleAccess.companyname),
+      //           date: String(new Date()),
+      //         },
+      //       ],
+      //     });
+      //   });
+      //   // await fetchEmployee();
+      //   await fetchPaidStatusfixDup();
+      //   await sendRequestFilter();
+      //   setPopupContentMalert('Generated Successfully');
+      //   setPopupSeverityMalert('info');
+      //   handleClickOpenPopupMalert();
+      //   setIsXerox({
+      //     fromyear: 'Select Year',
+      //     frommonth: 'Select Month',
+      //     toyear: 'Select Year',
+      //     tomonth: 'Select Month',
+      //   });
+      //   setIsXeroxLoad(false);
+      // } else {
+      //   setPopupContentMalert('Selected FromYear/Month there is no any data!');
+      //   setPopupSeverityMalert('info');
+      //   handleClickOpenPopupMalert();
+      // }
+      setIsXeroxLoad(false);
+
+      // await fetchPaidStatusfixDup();
+      // await sendRequestFilter();
+    }
+  };
+  const [paiddatemode, setPaiddatemode] = useState([]);
+  useEffect(() => {
+    fetchPaiddatemode();
+  }, []);
+  const fetchPaiddatemode = async () => {
+    try {
+      let res_vendor = await axios.get(SERVICE.PAIDDATEMODE, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
+      setPaiddatemode(res_vendor?.data?.paiddatemodes);
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
+  const handleXeroxButtonClick = async () => {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    // Convert month name to month number
+    const fromMonthNumber = monthNames.indexOf(isXerox.frommonth) + 1;
+    const toMonthNumber = monthNames.indexOf(isXerox.tomonth) + 1;
+    const fromYear = Number(isXerox.fromyear);
+    const toYear = Number(isXerox.toyear);
+
+    if (!isXerox.fromyear || !isXerox.frommonth || !isXerox.toyear || !isXerox.tomonth || isXerox.department.length === 0) {
+      // alert('Please select all the required fields properly.');
+      setPopupContentMalert('Please select all the required fields properly.');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+      return;
+    }
+
+    try {
+      // Extract department names from isXerox.department array of objects
+      const selectedDepartments = isXerox.department.map((dep) => dep.value);
+      const transformedData = paiddatemode.flatMap((item) => {
+        return item.department
+          .filter((dept) => selectedDepartments.includes(dept))
+          .map((department) => ({
+            department: department,
+            date: item.date,
+            type: item.type,
+            paymode: item.paymode,
+          }));
+      });
+
+      if (transformedData.length === 0) {
+        // alert('No matching departments found in Paid Date Mode data.');
+        setPopupContentMalert('No matching departments found in Paid Date Mode data.');
+        setPopupSeverityMalert('info');
+        handleClickOpenPopupMalert();
+        return;
+      }
+
+      // Helper to create list of months between two dates
+      const monthsBetween = [];
+      let year = fromYear;
+      let month = fromMonthNumber;
+
+      while (year < toYear || (year === toYear && month <= toMonthNumber)) {
+        monthsBetween.push({ year, month });
+        month++;
+        if (month > 12) {
+          month = 1;
+          year++;
+        }
+      }
+
+      // Now loop through each month and department
+      for (const { year, month } of monthsBetween) {
+        const monthName = monthNames[month - 1]; // Convert back to month name
+
+        for (const data of transformedData) {
+          const nextMonth = month + 1;
+          const finalMonth = nextMonth > 12 ? 1 : nextMonth;
+          const finalYear = nextMonth > 12 ? year + 1 : year;
+
+          const changeddate = data.type === 'Next Month' ? `${finalYear}-${finalMonth.toString().padStart(2, '0')}-${data.date}` : `${year}-${month.toString().padStart(2, '0')}-${data.date}`;
+
+          // Validate day with month's last day
+          const [y, m, d] = changeddate.split('-');
+          const lastDayOfMonth = new Date(y, m, 0).getDate();
+          const validatedDate = d > lastDayOfMonth ? `${y}-${m}-${lastDayOfMonth}` : changeddate;
+
+          // await axios.post(`http://192.168.82.183:7002/api/paiddatefix/new`, {
+          //   department: [data.department],
+          //   month: monthName,
+          //   year: String(year),
+          //   date: validatedDate,
+          //   paymode: String(data.paymode),
+          //   afterexpiry: "Disable",
+          // });
+
+          let subprojectscreate = await axios.post(SERVICE.PAIDDATEFIX_CREATE, {
+            headers: {
+              Authorization: `Bearer ${auth.APIToken}`,
+            },
+            department: [data.department],
+            month: monthName,
+            year: String(year),
+            date: validatedDate,
+            paymode: String(data.paymode),
+            afterexpiry: 'Disable',
+            addedby: [
+              {
+                name: String(isUserRoleAccess.companyname),
+                date: String(new Date()),
+              },
+            ],
+          });
+        }
+      }
+      setIsXerox({
+        fromyear: 'Select Year',
+        frommonth: 'Select Month',
+        toyear: 'Select Year',
+        tomonth: 'Select Month',
+        monthvalue: '',
+        department: [],
+        paymode: '',
+      });
+      setPopupContentMalert('Generated Successfully');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+      // alert("Xerox Posting Done Successfully!");
+    } catch (error) {
+      console.error('Error during xerox button click:', error);
+      setPopupContentMalert('Error during xerox');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+      // alert('Something went wrong!');
+    }
+  };
+  const handleclearXerox = () => {
+    setIsXeroxLoad(false);
+    setIsXerox({
+      fromyear: 'Select Year',
+      frommonth: 'Select Month',
+      toyear: 'Select Year',
+      tomonth: 'Select Month',
+      monthvalue: '',
+      department: [],
+      paymode: '',
+    });
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
+    handleClickOpenPopup();
+  };
+
+  // const sendRequestFilter = async (value) => {
+  //   // setPaidstatusfixcheck(true);
+
+  //   try {
+  //     if (value === 'filtered') {
+  //       const queryParams = {
+  //         monthfilter: valueMonth,
+  //         department: valueDepartment,
+  //         yearfilter: valueYear,
+  //         frequencystatusfilter: valueStatus,
+  //         page: Number(page),
+  //         pageSize: Number(pageSize),
+  //       };
+
+  //       const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
+
+  //       if (allFilters.length > 0 && selectedColumn !== '') {
+  //         queryParams.allFilters = allFilters;
+  //         queryParams.logicOperator = logicOperator;
+  //       } else if (searchQuery) {
+  //         queryParams.searchQuery = searchQuery;
+  //       }
+
+  //       // setIsBtn(true)
+  //       const response = await axios.post(SERVICE.PAIDSTATUSFIX_FILTEREDDATA, queryParams, {
+  //         headers: {
+  //           Authorization: `Bearer ${auth.APIToken}`,
+  //         },
+  //       });
+
+  //       const ans = response?.data?.result?.length > 0 ? response?.data?.result : [];
+  //       const anstotalDatas = response?.data?.totalDatas?.length > 0 ? response?.data?.totalDatas : [];
+  //       const itemsWithSerialNumber = ans?.map((item, index) => ({
+  //         ...item,
+  //         // serialNumber: (page - 1) * pageSize + index + 1,
+  //         // serialNumber: index + 1,
+  //       }));
+
+  //       setPaidstatusfixs(
+  //         anstotalDatas?.map((item, index) => ({
+  //           ...item,
+  //           serialNumber: index + 1,
+  //         }))
+  //       );
+
+  //       setOverallFilterdata(
+  //         itemsWithSerialNumber?.map((item, index) => ({
+  //           ...item,
+  //           serialNumber: (page - 1) * pageSize + index + 1,
+  //         }))
+  //       );
+
+  //       setOverallItems(response?.data?.totalDatas?.map((data, index) => ({ ...data, serialNumber: index + 1 })));
+
+  //       setTotalProjects(ans?.length > 0 ? response?.data?.totalProjects : 0);
+  //       setTotalPages(ans?.length > 0 ? response?.data?.totalPages : 0);
+  //       setPageSize((data) => {
+  //         return ans?.length > 0 ? data : 10;
+  //       });
+  //       setPage((data) => {
+  //         return ans?.length > 0 ? data : 1;
+  //       });
+
+  //       // setIsBtn(false)
+  //     }
+  //     setPaidstatusfixcheck(false);
+  //   } catch (err) {
+  //     setPaidstatusfixcheck(false);
+  //     // setIsBtn(false)
+  //     handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+  //   }
+  // };
   const handleExportXL = async (isfilter) => {
     try {
-
-      if (isfilter === "filtered") {
+      if (isfilter === 'filtered') {
         // Define headers
-        let headers = ["Department",
-          "Month",
-          "Year",
-          "Date",
-          "Paymode",
-          "After Expiry"];
+        let headers = ['Department', 'Month', 'Year', 'Date', 'Paymode', 'After Expiry'];
 
         // Transform data
-        const excelData = paiddatefixs.map((entry) => [
-          entry.department,
-          entry.month,
-          entry.year,
-          entry.date,
-          entry.paymode,
-          entry.afterexpiry,
-        ]);
+        const excelData = paiddatefixs.map((entry) => [entry.department, entry.month, entry.year, entry.date, entry.paymode, entry.afterexpiry]);
 
         // Combine headers and data
         const finalData = [headers, ...excelData];
@@ -1450,12 +1716,12 @@ function PaidDateFix() {
 
         // Create workbook and export
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
         // Save file
-        XLSX.writeFile(wb, "Paiddatefix.xlsx");
+        XLSX.writeFile(wb, 'Paiddatefix.xlsx');
         setIsFilterOpen(false);
-      } else if (isfilter === "overall") {
+      } else if (isfilter === 'overall') {
         let result = [];
         setExportLoading(true);
 
@@ -1463,19 +1729,19 @@ function PaidDateFix() {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
-          responseType: "blob", // Move this inside the same object
+          responseType: 'blob', // Move this inside the same object
         });
-        console.log(response, "response");
+        console.log(response, 'response');
         // Create a Blob from the response
         const blob = new Blob([response.data], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
 
         // Create a download link
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
-        a.download = "Paiddatefix.xlsx";
+        a.download = 'Paiddatefix.xlsx';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1485,30 +1751,17 @@ function PaidDateFix() {
         setIsFilterOpen(false);
       }
     } catch (err) {
-
-      setExportLoading(false)
+      setExportLoading(false);
     }
   };
 
   const downloadCSV = async (isfilter) => {
     try {
-      if (isfilter === "filtered") {
-        let headers = ["Department",
-          "Month",
-          "Year",
-          "Date",
-          "Paymode",
-          "After Expiry"];
+      if (isfilter === 'filtered') {
+        let headers = ['Department', 'Month', 'Year', 'Date', 'Paymode', 'After Expiry'];
 
         // Transform data
-        const excelData = paiddatefixs.map((entry) => [
-          entry.department,
-          entry.month,
-          entry.year,
-          entry.date,
-          entry.paymode,
-          entry.afterexpiry,
-        ]);
+        const excelData = paiddatefixs.map((entry) => [entry.department, entry.month, entry.year, entry.date, entry.paymode, entry.afterexpiry]);
         // Combine headers and data
         const finalData = [headers, ...excelData];
         // Convert to CSV
@@ -1516,14 +1769,15 @@ function PaidDateFix() {
         const csvOutput = XLSX.utils.sheet_to_csv(ws);
 
         // Trigger CSV file download in browser
-        const blob = new Blob([csvOutput], { type: "text/csv" });
-        const link = document.createElement("a");
+        const blob = new Blob([csvOutput], { type: 'text/csv' });
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = "Paiddatefix.csv";
+        link.download = 'Paiddatefix.csv';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      } else if (isfilter === "overall") {
+        setIsFilterOpen(false);
+      } else if (isfilter === 'overall') {
         let result = [];
         setExportLoading(true);
 
@@ -1532,15 +1786,15 @@ function PaidDateFix() {
             headers: {
               Authorization: `Bearer ${auth.APIToken}`,
             },
-            responseType: "blob", // Move this inside the same object
-          })
+            responseType: 'blob', // Move this inside the same object
+          });
           // Create a Blob from the response data
-          const blob = new Blob([response.data], { type: "text/csv" });
+          const blob = new Blob([response.data], { type: 'text/csv' });
           const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
+          const a = document.createElement('a');
 
           a.href = url;
-          a.download = "Paiddatefix.csv"; // File name
+          a.download = 'Paiddatefix.csv'; // File name
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -1548,35 +1802,22 @@ function PaidDateFix() {
           setExportLoading(false);
           setIsFilterOpen(false);
         } catch (error) {
-          console.error("Error downloading CSV:", error);
+          console.error('Error downloading CSV:', error);
         }
       }
     } catch (err) {
-      setExportLoading(false)
+      setExportLoading(false);
     }
   };
 
   const downloadPdf = async (isfilter) => {
     try {
-      if (isfilter === "filtered") {
+      if (isfilter === 'filtered') {
         try {
-          let headers = ["Department",
-            "Month",
-            "Year",
-            "Date",
-            "Paymode",
-            "After Expiry"];
+          let headers = ['Department', 'Month', 'Year', 'Date', 'Paymode', 'After Expiry'];
 
           // Transform data
-          const excelData = paiddatefixs.map((entry) => [
-            entry.department,
-            entry.month,
-            entry.year,
-            entry.date,
-            entry.paymode,
-            entry.afterexpiry ?? "",
-          ]);
-
+          const excelData = paiddatefixs.map((entry) => [entry.department, entry.month, entry.year, entry.date, entry.paymode, entry.afterexpiry ?? '']);
 
           // Combine headers and data
           const tableData = [headers, ...excelData];
@@ -1605,22 +1846,21 @@ function PaidDateFix() {
           //   defaultStyle: { fontSize: 8 }, // Reduce font size
           // };
 
-
           const docDefinition = {
-            pageSize: "A4",
-            pageOrientation: "landscape", // Landscape mode
+            pageSize: 'A4',
+            pageOrientation: 'landscape', // Landscape mode
             pageMargins: [20, 20, 20, 20], // Adjust margins
             content: [
-              { text: "paiddatefix", style: "header", alignment: "center" },
-              { text: `Generated on: ${new Date().toLocaleString()}`, style: "subheader", alignment: "right" },
-              "\n",
+              { text: 'paiddatefix', style: 'header', alignment: 'center' },
+              { text: `Generated on: ${new Date().toLocaleString()}`, style: 'subheader', alignment: 'right' },
+              '\n',
               {
                 table: {
                   headerRows: 1,
-                  widths: ["*", "*", "*", "*", "*", "*"], // Auto-expand columns
+                  widths: ['*', '*', '*', '*', '*', '*'], // Auto-expand columns
                   body: tableData,
                 },
-                layout: "lightHorizontalLines", // Table styling
+                layout: 'lightHorizontalLines', // Table styling
               },
             ],
             styles: {
@@ -1630,62 +1870,49 @@ function PaidDateFix() {
             defaultStyle: { fontSize: 10 }, // Adjust default font size
           };
 
-          pdfMake.createPdf(docDefinition).download("Paiddatefix.pdf");
-
-
+          pdfMake.createPdf(docDefinition).download('Paiddatefix.pdf');
 
           // pdfMake.createPdf(docDefinition).download("Paiddatefix.pdf"); // Trigger downloa
           setIsPdfFilterOpen(false);
         } catch (err) {
           console.log(err);
         }
-      } else if (isfilter === "overall") {
+      } else if (isfilter === 'overall') {
         setExportLoading(true);
         let response = await axios.get(SERVICE.PAID_DATE_FIX_PDFDOWNLOAD, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
-          responseType: "blob", // Move this inside the same object
+          responseType: 'blob', // Move this inside the same object
         });
-        const blob = new Blob([response.data], { type: "application/pdf" });
-        const link = document.createElement("a");
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = "Paiddatefix.pdf";
+        link.download = 'Paiddatefix.pdf';
         link.click();
         URL.revokeObjectURL(link.href);
         setExportLoading(false);
-        setIsFilterOpen(false);
+        setIsPdfFilterOpen(false);
       }
     } catch (err) {
-      console.log(err, "errpdf")
-      setExportLoading(false)
+      console.log(err, 'errpdf');
+      setExportLoading(false);
     }
   };
 
-
-
   return (
     <Box>
-      <Headtitle title={"Paid Date Fix"} />
+      <Headtitle title={'Paid Date Fix'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="Paid Date Fix"
-        modulename="PayRoll"
-        submodulename="PayRoll Setup"
-        mainpagename="Paid Date Fix"
-        subpagename=""
-        subsubpagename=""
-      />
+      <PageHeading title="Paid Date Fix" modulename="PayRoll" submodulename="PayRoll Setup" mainpagename="Paid Date Fix" subpagename="" subsubpagename="" />
 
-      {isUserRoleCompare?.includes("apaiddatefix") && (
+      {isUserRoleCompare?.includes('apaiddatefix') && (
         <>
           <Box sx={userStyle.dialogbox}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Add Paid Date Fix
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Add Paid Date Fix</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -1693,7 +1920,7 @@ function PaidDateFix() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Department<b style={{ color: "red" }}>*</b>
+                      Department<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <MultiSelect
                       options={departments}
@@ -1701,7 +1928,7 @@ function PaidDateFix() {
                       onChange={handleCategoryChange}
                       valueRenderer={customValueRendererCate}
                       labelledBy="Please Select Area"
-                    // className="scrollable-multiselect"
+                      // className="scrollable-multiselect"
                     />
                   </FormControl>
                 </Grid>
@@ -1739,7 +1966,9 @@ function PaidDateFix() {
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
-                    <Typography>Date <b style={{ color: "red" }}>*</b></Typography>
+                    <Typography>
+                      Date <b style={{ color: 'red' }}>*</b>
+                    </Typography>
                     <OutlinedInput
                       id="component-outlined"
                       type="date"
@@ -1755,7 +1984,7 @@ function PaidDateFix() {
                 </Grid>
                 <Grid item md={3} sm={6} xs={12}>
                   <Typography>
-                    Pay Mode <b style={{ color: "red" }}>*</b>
+                    Pay Mode <b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <FormControl fullWidth size="small">
                     <Selects
@@ -1773,25 +2002,16 @@ function PaidDateFix() {
                 </Grid>
                 <Grid item md={3} sm={6} xs={12} mt={3}>
                   <div style={{ display: 'flex', gap: '20px' }}>
-
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSubmit}
-                      sx={buttonStyles.buttonsubmit}
-                    >
+                    <Button variant="contained" color="primary" onClick={handleSubmit} sx={buttonStyles.buttonsubmit}>
                       Submit
                     </Button>
-
 
                     <Button sx={buttonStyles.btncancel} onClick={handleClear}>
                       Clear
                     </Button>
-
                   </div>
                 </Grid>
               </Grid>
-
             </>
           </Box>
         </>
@@ -1806,21 +2026,19 @@ function PaidDateFix() {
           fullWidth={true}
           maxWidth="md"
           sx={{
-            overflow: "visible",
-            "& .MuiPaper-root": {
-              overflow: "visible",
+            overflow: 'visible',
+            '& .MuiPaper-root': {
+              overflow: 'visible',
             },
           }}
         >
-          <Box sx={{ padding: "20px" }}>
+          <Box sx={{ padding: '20px' }}>
             <>
               <form onSubmit={editSubmit}>
                 {/* <DialogContent sx={{ width: '550px', padding: '20px' }}> */}
                 <Grid container spacing={2}>
                   <Grid item md={12} xs={12} sm={12}>
-                    <Typography sx={userStyle.HeaderText}>
-                      Edit Paid Date Fix
-                    </Typography>
+                    <Typography sx={userStyle.HeaderText}>Edit Paid Date Fix</Typography>
                   </Grid>
                 </Grid>
                 <br />
@@ -1828,7 +2046,7 @@ function PaidDateFix() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Department<b style={{ color: "red" }}>*</b>
+                        Department<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <MultiSelect
                         options={departmentsEdit}
@@ -1836,7 +2054,7 @@ function PaidDateFix() {
                         onChange={handleCategoryChangeEdit}
                         valueRenderer={customValueRendererCateEdit}
                         labelledBy="Please Select Department"
-                      // className="scrollable-multiselect"
+                        // className="scrollable-multiselect"
                       />
                     </FormControl>
                   </Grid>
@@ -1896,7 +2114,7 @@ function PaidDateFix() {
                   </Grid>
                   <Grid item md={4} sm={6} xs={12}>
                     <Typography>
-                      Pay Mode <b style={{ color: "red" }}>*</b>
+                      Pay Mode <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <FormControl fullWidth size="small">
                       <Selects
@@ -1925,10 +2143,7 @@ function PaidDateFix() {
                     </Button>
                   </Grid>
                   <Grid item md={6} xs={6} sm={6}>
-                    <Button
-                      sx={buttonStyles.btncancel}
-                      onClick={handleCloseModEdit}
-                    >
+                    <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
                       Cancel
                     </Button>
                   </Grid>
@@ -1941,14 +2156,102 @@ function PaidDateFix() {
       </Box>
       <br />
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lpaiddatefix") && (
+      {isUserRoleCompare?.includes('lpaiddatefix') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
-              <Typography sx={userStyle.importheadtext}>
-                Paid Date Fix List
-              </Typography>
+              <Typography sx={userStyle.importheadtext}>Paid Date Fix List</Typography>
+            </Grid>
+            <br />
+            <Grid container spacing={2}>
+              <Grid item md={2} sm={6} xs={12}>
+                <Typography> Department</Typography>
+                <FormControl fullWidth size="small">
+                  <MultiSelect
+                    options={departments}
+                    value={isXerox.department}
+                    onChange={(e) => {
+                      setIsXerox({ ...isXerox, department: e });
+                    }}
+                    valueRenderer={customValueRendererCate}
+                    labelledBy="Please Select Department"
+                  />
+                  {/* <Selects
+                    maxMenuHeight={200}
+                    value={{ label: isXerox.department, value: isXerox.department }}
+                    onChange={(e) => {
+                      setIsXerox({ ...isXerox, department: e.value });
+                    }}
+                    options={departments}
+                  /> */}
+                </FormControl>
+              </Grid>
+              <Grid item md={2} sm={6} xs={12}>
+                <Typography> From Year</Typography>
+                <FormControl fullWidth size="small">
+                  <Selects
+                    maxMenuHeight={200}
+                    value={{ label: isXerox.fromyear, value: isXerox.fromyear }}
+                    onChange={(e) => {
+                      setIsXerox({ ...isXerox, fromyear: e.value });
+                    }}
+                    options={getyear}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={2} sm={6} xs={12}>
+                <Typography>From Month</Typography>
+                <FormControl fullWidth size="small">
+                  <Selects
+                    maxMenuHeight={200}
+                    value={{
+                      label: isXerox.frommonth,
+                      value: isXerox.frommonth,
+                    }}
+                    onChange={(e) => {
+                      setIsXerox({ ...isXerox, frommonth: e.label });
+                    }}
+                    options={months}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={2} sm={6} xs={12}>
+                <Typography> To Year</Typography>
+                <FormControl fullWidth size="small">
+                  <Selects
+                    maxMenuHeight={200}
+                    value={{ label: isXerox.toyear, value: isXerox.toyear }}
+                    onChange={(e) => {
+                      setIsXerox({ ...isXerox, toyear: e.value });
+                    }}
+                    options={xeroxgetyear}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={2} sm={6} xs={12}>
+                <Typography> To Month</Typography>
+                <FormControl fullWidth size="small">
+                  <Selects
+                    maxMenuHeight={200}
+                    value={{ label: isXerox.tomonth, value: isXerox.tomonth }}
+                    onChange={(e) => {
+                      setIsXerox({ ...isXerox, tomonth: e.label });
+                    }}
+                    options={months}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={2} xs={12} sm={6} mt={0.5}>
+                <br />
+                <Button variant="contained" disabled={isXeroxLoad === true} onClick={handleXerox} sx={buttonStyles.buttonsubmit}>
+                  XEROX
+                </Button>
+                &nbsp;&nbsp;
+                <Button sx={buttonStyles.btncancel} onClick={handleclearXerox}>
+                  Clear
+                </Button>
+              </Grid>
             </Grid>
             <br />
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
@@ -1967,7 +2270,7 @@ function PaidDateFix() {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -1985,31 +2288,43 @@ function PaidDateFix() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelpaiddatefix") && (
+                  {isUserRoleCompare?.includes('excelpaiddatefix') && (
                     <>
-                      <Button onClick={(e) => {
-                        setIsFilterOpen(true)
-                        fetchPaiddatefixArray()
-                        setFormat("xl")
-                      }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          fetchPaiddatefixArray();
+                          setFormat('xl');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileExcel />
+                        &ensp;Export to Excel&ensp;
+                      </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvpaiddatefix") && (
+                  {isUserRoleCompare?.includes('csvpaiddatefix') && (
                     <>
-                      <Button onClick={(e) => {
-                        setIsFilterOpen(true)
-                        fetchPaiddatefixArray()
-                        setFormat("csv")
-                      }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          fetchPaiddatefixArray();
+                          setFormat('csv');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileCsv />
+                        &ensp;Export to CSV&ensp;
+                      </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printpaiddatefix") && (
+                  {isUserRoleCompare?.includes('printpaiddatefix') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
@@ -2018,13 +2333,13 @@ function PaidDateFix() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfpaiddatefix") && (
+                  {isUserRoleCompare?.includes('pdfpaiddatefix') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
                         onClick={() => {
-                          setIsPdfFilterOpen(true)
-                          fetchPaiddatefixArray()
+                          setIsPdfFilterOpen(true);
+                          fetchPaiddatefixArray();
                         }}
                       >
                         <FaFilePdf />
@@ -2032,15 +2347,10 @@ function PaidDateFix() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imagepaiddatefix") && (
-                    <Button
-                      sx={userStyle.buttongrp}
-                      onClick={handleCaptureImage}
-                    >
-                      {" "}
-                      <ImageIcon
-                        sx={{ fontSize: "15px" }}
-                      /> &ensp;Image&ensp;{" "}
+                  {isUserRoleCompare?.includes('imagepaiddatefix') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
@@ -2053,7 +2363,8 @@ function PaidDateFix() {
                   totalDatas={overallItems}
                 /> */}
                 <FormControl fullWidth size="small">
-                  <OutlinedInput size="small"
+                  <OutlinedInput
+                    size="small"
                     id="outlined-adornment-weight"
                     startAdornment={
                       <InputAdornment position="start">
@@ -2069,12 +2380,13 @@ function PaidDateFix() {
                         )}
                         <Tooltip title="Show search options">
                           <span>
-                            <IoMdOptions style={{ cursor: 'pointer', }} onClick={handleClickSearch} />
+                            <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
                           </span>
                         </Tooltip>
-                      </InputAdornment>}
+                      </InputAdornment>
+                    }
                     aria-describedby="outlined-weight-helper-text"
-                    inputProps={{ 'aria-label': 'weight', }}
+                    inputProps={{ 'aria-label': 'weight' }}
                     type="text"
                     value={getSearchDisplay()}
                     onChange={handleSearchChange}
@@ -2092,33 +2404,17 @@ function PaidDateFix() {
               Manage Columns
             </Button>
             &ensp;
-            {isUserRoleCompare?.includes("bdpaiddatefix") && (
-
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleClickOpenalert}
-                sx={buttonStyles.buttonbulkdelete}
-              >
+            {isUserRoleCompare?.includes('bdpaiddatefix') && (
+              <Button variant="contained" color="error" onClick={handleClickOpenalert} sx={buttonStyles.buttonbulkdelete}>
                 Bulk Delete
               </Button>
             )}
-
             <br />
             <br />
             {paiddatefixCheck ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
             ) : (
@@ -2171,20 +2467,14 @@ function PaidDateFix() {
               </>
             )}
           </Box>
-          <Popover
-            id={idSearch}
-            open={openSearch}
-            anchorEl={anchorElSearch}
-            onClose={handleCloseSearch}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
-          >
-            <Box style={{ padding: "10px", maxWidth: '450px' }}>
+          <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+            <Box style={{ padding: '10px', maxWidth: '450px' }}>
               <Typography variant="h6">Advance Search</Typography>
               <IconButton
                 aria-label="close"
                 onClick={handleCloseSearch}
                 sx={{
-                  position: "absolute",
+                  position: 'absolute',
                   right: 8,
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
@@ -2192,27 +2482,33 @@ function PaidDateFix() {
               >
                 <CloseIcon />
               </IconButton>
-              <DialogContent sx={{ width: "100%" }}>
-                <Box sx={{
-                  width: '350px',
-                  maxHeight: '400px',
-                  overflow: 'hidden',
-                  position: 'relative'
-                }}>
-                  <Box sx={{
-                    maxHeight: '300px',
-                    overflowY: 'auto',
-                    // paddingRight: '5px'
-                  }}>
+              <DialogContent sx={{ width: '100%' }}>
+                <Box
+                  sx={{
+                    width: '350px',
+                    maxHeight: '400px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                      // paddingRight: '5px'
+                    }}
+                  >
                     <Grid container spacing={1}>
                       <Grid item md={12} sm={12} xs={12}>
                         <Typography>Columns</Typography>
-                        <Select fullWidth size="small"
+                        <Select
+                          fullWidth
+                          size="small"
                           MenuProps={{
                             PaperProps: {
                               style: {
                                 maxHeight: 200,
-                                width: "auto",
+                                width: 'auto',
                               },
                             },
                           }}
@@ -2221,7 +2517,9 @@ function PaidDateFix() {
                           onChange={(e) => setSelectedColumn(e.target.value)}
                           displayEmpty
                         >
-                          <MenuItem value="" disabled>Select Column</MenuItem>
+                          <MenuItem value="" disabled>
+                            Select Column
+                          </MenuItem>
                           {filteredSelectedColumn.map((col) => (
                             <MenuItem key={col.field} value={col.field}>
                               {col.headerName}
@@ -2231,12 +2529,14 @@ function PaidDateFix() {
                       </Grid>
                       <Grid item md={12} sm={12} xs={12}>
                         <Typography>Operator</Typography>
-                        <Select fullWidth size="small"
+                        <Select
+                          fullWidth
+                          size="small"
                           MenuProps={{
                             PaperProps: {
                               style: {
                                 maxHeight: 200,
-                                width: "auto",
+                                width: 'auto',
                               },
                             },
                           }}
@@ -2254,11 +2554,13 @@ function PaidDateFix() {
                       </Grid>
                       <Grid item md={12} sm={12} xs={12}>
                         <Typography>Value</Typography>
-                        <TextField fullWidth size="small"
-                          value={["Blank", "Not Blank"].includes(selectedCondition) ? "" : filterValue}
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
                           onChange={(e) => setFilterValue(e.target.value)}
-                          disabled={["Blank", "Not Blank"].includes(selectedCondition)}
-                          placeholder={["Blank", "Not Blank"].includes(selectedCondition) ? "Disabled" : "Enter value"}
+                          disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                          placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
                           sx={{
                             '& .MuiOutlinedInput-root.Mui-disabled': {
                               backgroundColor: 'rgb(0 0 0 / 26%)',
@@ -2272,11 +2574,7 @@ function PaidDateFix() {
                       {additionalFilters.length > 0 && (
                         <>
                           <Grid item md={12} sm={12} xs={12}>
-                            <RadioGroup
-                              row
-                              value={logicOperator}
-                              onChange={(e) => setLogicOperator(e.target.value)}
-                            >
+                            <RadioGroup row value={logicOperator} onChange={(e) => setLogicOperator(e.target.value)}>
                               <FormControlLabel value="AND" control={<Radio />} label="AND" />
                               <FormControlLabel value="OR" control={<Radio />} label="OR" />
                             </RadioGroup>
@@ -2284,22 +2582,24 @@ function PaidDateFix() {
                         </>
                       )}
                       {additionalFilters.length === 0 && (
-                        <Grid item md={4} sm={12} xs={12} >
-                          <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                        <Grid item md={4} sm={12} xs={12}>
+                          <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
                             Add Filter
                           </Button>
                         </Grid>
                       )}
 
                       <Grid item md={2} sm={12} xs={12}>
-                        <Button variant="contained" onClick={() => {
-                          fetchEmployee();
-                          setIsSearchActive(true);
-                          setAdvancedFilter([
-                            ...additionalFilters,
-                            { column: selectedColumn, condition: selectedCondition, value: filterValue }
-                          ])
-                        }} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            fetchEmployee();
+                            setIsSearchActive(true);
+                            setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+                          }}
+                          sx={{ textTransform: 'capitalize' }}
+                          disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
+                        >
                           Search
                         </Button>
                       </Grid>
@@ -2318,32 +2618,23 @@ function PaidDateFix() {
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
       </Popover>
       {/* view model */}
-      <Dialog
-        open={openview}
-        onClose={handleClickOpenview}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="lg"
-      >
-        <Box sx={{ width: "auto", padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg">
+        <Box sx={{ width: 'auto', padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              View Paid Date Fix
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> View Paid Date Fix</Typography>
             <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={12} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Department</Typography>
-                  <Typography>{paiddatefixEdit.department + ","}</Typography>
+                  <Typography>{paiddatefixEdit.department + ','}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={4} xs={12} sm={12}>
@@ -2361,9 +2652,7 @@ function PaidDateFix() {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Date</Typography>
-                  <Typography>
-                    {moment(paiddatefixEdit.date).format("DD-MM-YYYY")}
-                  </Typography>
+                  <Typography>{moment(paiddatefixEdit.date).format('DD-MM-YYYY')}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={4} xs={12} sm={12}>
@@ -2375,14 +2664,9 @@ function PaidDateFix() {
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleCloseview}
-                sx={buttonStyles.btncancel}
-              >
-                {" "}
-                Back{" "}
+              <Button variant="contained" color="primary" onClick={handleCloseview} sx={buttonStyles.btncancel}>
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
@@ -2391,7 +2675,7 @@ function PaidDateFix() {
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
@@ -2401,19 +2685,9 @@ function PaidDateFix() {
           </DialogActions>
         </Dialog>
       </Box>
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* EXTERNAL COMPONENTS -------------- END */}
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
@@ -2426,50 +2700,24 @@ function PaidDateFix() {
         // handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={overallItems ?? []}
-        filename={"Paid Date Fix"}
+        filename={'Paid Date Fix'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Paid Date Fix Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={delPaiddate}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={delPaiddatecheckbox}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Paid Date Fix Info" addedby={addedby} updateby={updateby} />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delPaiddate} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delPaiddatecheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
 
       {/*Export XL Data  */}
       <Dialog open={isFilterOpen} onClose={handleCloseFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ textAlign: "center", alignItems: "center", justifyContent: "center" }}>
+        <DialogContent sx={{ textAlign: 'center', alignItems: 'center', justifyContent: 'center' }}>
           <IconButton
             aria-label="close"
             onClick={handleCloseFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2477,8 +2725,8 @@ function PaidDateFix() {
           >
             <CloseIcon />
           </IconButton>
-          {fileFormat === "xl" ? <FaFileExcel style={{ fontSize: "80px", color: "green" }} /> : <FaFileCsv style={{ fontSize: "80px", color: "green" }} />}
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          {fileFormat === 'xl' ? <FaFileExcel style={{ fontSize: '80px', color: 'green' }} /> : <FaFileCsv style={{ fontSize: '80px', color: 'green' }} />}
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2487,7 +2735,7 @@ function PaidDateFix() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              fileFormat === "xl" ? handleExportXL("filtered") : downloadCSV("filtered");
+              fileFormat === 'xl' ? handleExportXL('filtered') : downloadCSV('filtered');
             }}
           >
             Export Filtered Data
@@ -2497,7 +2745,7 @@ function PaidDateFix() {
             loading={exportLoading}
             variant="contained"
             onClick={(e) => {
-              fileFormat === "xl" ? handleExportXL("overall") : downloadCSV("overall");
+              fileFormat === 'xl' ? handleExportXL('overall') : downloadCSV('overall');
             }}
           >
             Export Over All Data
@@ -2506,12 +2754,12 @@ function PaidDateFix() {
       </Dialog>
 
       <Dialog open={isPdfFilterOpen} onClose={handleClosePdfFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ textAlign: "center", alignItems: "center", justifyContent: "center" }}>
+        <DialogContent sx={{ textAlign: 'center', alignItems: 'center', justifyContent: 'center' }}>
           <IconButton
             aria-label="close"
             onClick={handleClosePdfFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2519,8 +2767,8 @@ function PaidDateFix() {
           >
             <CloseIcon />
           </IconButton>
-          <PictureAsPdfIcon sx={{ fontSize: "80px", color: "red" }} />
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          <PictureAsPdfIcon sx={{ fontSize: '80px', color: 'red' }} />
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2528,7 +2776,7 @@ function PaidDateFix() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdf("filtered");
+              downloadPdf('filtered');
             }}
           >
             Export Filtered Data
@@ -2537,20 +2785,14 @@ function PaidDateFix() {
             variant="contained"
             loading={exportLoading}
             onClick={(e) => {
-              downloadPdf("overall");
+              downloadPdf('overall');
             }}
           >
             Export Over All Data
           </LoadingButton>
         </DialogActions>
       </Dialog>
-
-
     </Box>
-
-
-
-
   );
 }
 export default PaidDateFix;

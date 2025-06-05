@@ -27017,3 +27017,45 @@ exports.getAllTeamShiftHierarchyListNotificationCount = catchAsyncErrors(
 );
 
 
+exports.getCurrentServerTime = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const currentNewDate = new Date();
+    const currenttoLocaleTimeString = new Date().toLocaleTimeString();
+    const formatted = moment(currentNewDate).format('DD-MM-YYYY HH:mm:ss A');
+    return res.status(200).json({
+      success: true,
+      formatted,
+      currentNewDate,
+      currenttoLocaleTimeString,
+    });
+  } catch (err) {
+    return next(new ErrorHandler('Internal Server Error', 500));
+  }
+});
+
+
+exports.getAllDepartmentUsersUpdateAttendanceMode = catchAsyncErrors(async (req, res, next) => {
+  let departmentdetails;
+
+  try {
+const {deptname,attendancemode,companyname} = req.body
+
+
+
+    departmentdetails = await User.updateMany({ department: deptname }, {
+        $set: { attendancemode: attendancemode, 
+            "attendancemodelog.$[].mode":attendancemode,
+          }
+        }
+    );
+
+
+
+  } catch (err) {
+    console.log(err,"errdepa")
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+
+
+  return res.status(200).json({ departmentdetails, });
+});

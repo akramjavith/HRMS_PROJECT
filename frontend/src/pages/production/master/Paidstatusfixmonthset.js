@@ -1,75 +1,61 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import {
-  Box, Typography, OutlinedInput, Select, MenuItem, FormControl,
-  Grid, Divider, Button, Popover, Checkbox, IconButton, TextField,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemText,
-  Switch,
-  DialogActions,
-  Dialog
-} from "@mui/material";
-import * as pdfMake from "pdfmake/build/pdfmake";
-import * as pdfFonts from "pdfmake/build/vfs_fonts";
-import { userStyle } from "../../../pageStyle";
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { Box, Typography, OutlinedInput, Select, MenuItem, FormControl, Grid, Divider, Button, Popover, Checkbox, IconButton, TextField, DialogContent, List, ListItem, ListItemText, Switch, DialogActions, Dialog } from '@mui/material';
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import { userStyle } from '../../../pageStyle';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import { handleApiError } from "../../../components/Errorhandling";
-import { FaDownload, FaTrash, FaFilePdf, FaFileExcel, FaFileCsv, FaPrint } from "react-icons/fa";
-import { MultiSelect } from "react-multi-select-component";
-import axios from "axios";
-import { SERVICE } from "../../../services/Baseservice";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { CsvBuilder } from "filefy";
-import { UserRoleAccessContext, AuthContext } from "../../../context/Appcontext";
-import Headtitle from "../../../components/Headtitle";
-import Selects from "react-select";
-import SendToServer from "../../sendtoserver";
+import { handleApiError } from '../../../components/Errorhandling';
+import { FaDownload, FaTrash, FaFilePdf, FaFileExcel, FaFileCsv, FaPrint } from 'react-icons/fa';
+import { MultiSelect } from 'react-multi-select-component';
+import axios from '../../../axiosInstance';
+import { SERVICE } from '../../../services/Baseservice';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { CsvBuilder } from 'filefy';
+import { UserRoleAccessContext, AuthContext } from '../../../context/Appcontext';
+import Headtitle from '../../../components/Headtitle';
+import Selects from 'react-select';
+import SendToServer from '../../sendtoserver';
 import * as XLSX from 'xlsx';
-import AlertDialog from "../../../components/Alert";
-import MessageAlert from "../../../components/MessageAlert";
-import PageHeading from "../../../components/PageHeading";
+import AlertDialog from '../../../components/Alert';
+import MessageAlert from '../../../components/MessageAlert';
+import PageHeading from '../../../components/PageHeading';
 import AggregatedSearchBar from '../../../components/AggregatedSearchBar';
-import AggridTable from "../../../components/AggridTable";
+import AggridTable from '../../../components/AggridTable';
 import domtoimage from 'dom-to-image';
-import { saveAs } from "file-saver";
+import { saveAs } from 'file-saver';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ImageIcon from '@mui/icons-material/Image';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { useReactToPrint } from "react-to-print";
+import { useReactToPrint } from 'react-to-print';
 import { ThreeDots } from 'react-loader-spinner';
-import InfoPopup from "../../../components/InfoPopup.js";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../../components/DeleteConfirmation.js";
-import ExportData from "../../../components/ExportData.js";
+import InfoPopup from '../../../components/InfoPopup.js';
+import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
+import ExportData from '../../../components/ExportData.js';
 
 function PaidStatusFix() {
-
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
 
   const [isHandleChange, setIsHandleChange] = useState(false);
-  const [searchedString, setSearchedString] = useState("")
+  const [searchedString, setSearchedString] = useState('');
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
   const handleClosePopupMalert = () => {
     setOpenPopupMalert(false);
   };
-  const [updateSheet, setUpdatesheet] = useState([])
-  const [valueCate, setValueCate] = useState("");
+  const [updateSheet, setUpdatesheet] = useState([]);
+  const [valueCate, setValueCate] = useState('');
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -80,7 +66,7 @@ function PaidStatusFix() {
   let exportColumnNames = ['Department', 'Frequency', 'Absent Mode', 'From Value', 'To Value', 'Achieved mode', 'From Point', 'To Point', 'Current Absent Mode', 'Current Absend Value', 'Current Achieved Modes', 'Current Achieved Value', 'Paid Status'];
   let exportRowValues = ['department', 'frequency', 'absentmodes', 'fromvalue', 'tovalue', 'achievedmodes', 'frompoint', 'topoint', 'currentabsentmodes', 'currentabsentvalue', 'currentachievedmodes', 'currentachievedvalue', 'paidstatus'];
 
-  const [fileFormat, setFormat] = useState('')
+  const [fileFormat, setFormat] = useState('');
   // const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
   // // page refersh reload
   // const handleCloseFilterMod = () => {
@@ -98,19 +84,19 @@ function PaidStatusFix() {
   const handleCloseFilterMod = () => {
     setIsFilterOpen(false);
     // setloadingdeloverall(false);
-    setExportLoading(false)
+    setExportLoading(false);
   };
 
   const handleClosePdfFilterMod = () => {
     setIsPdfFilterOpen(false);
-    setExportLoading(false)
+    setExportLoading(false);
   };
 
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
     documentTitle: 'Paid Status Fix Month Set',
-    pageStyle: 'print'
+    pageStyle: 'print',
   });
 
   //get current month
@@ -126,137 +112,89 @@ function PaidStatusFix() {
 
   //get all months
   const months = [
-    { value: 1, label: "January" },
-    { value: 2, label: "February" },
-    { value: 3, label: "March" },
-    { value: 4, label: "April" },
-    { value: 5, label: "May" },
-    { value: 6, label: "June" },
-    { value: 7, label: "July" },
-    { value: 8, label: "August" },
-    { value: 9, label: "September" },
-    { value: 10, label: "October" },
-    { value: 11, label: "November" },
-    { value: 12, label: "December" },
+    { value: 1, label: 'January' },
+    { value: 2, label: 'February' },
+    { value: 3, label: 'March' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'May' },
+    { value: 6, label: 'June' },
+    { value: 7, label: 'July' },
+    { value: 8, label: 'August' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'December' },
   ];
   const check = months.find((item) => item.value === ans + 1);
   const [paidstatusfix, setPaidstatusfix] = useState({
-    department: "Please Select Department",
+    department: 'Please Select Department',
     month: check.label,
     year: year,
-    frequency: "",
-    absentmodes: "Between",
-    fromvalue: "",
-    tovalue: "",
-    achievedmodes: "Between",
-    frompoint: "",
-    topoint: "",
-    currentabsentmodes: "Less Than or Equal",
-    currentabsentvalue: "",
-    currentachievedmodes: "Less Than or Equal",
-    currentachievedvalue: "",
-    paidstatus: "",
+    frequency: '',
+    absentmodes: 'Between',
+    fromvalue: '',
+    tovalue: '',
+    achievedmodes: 'Between',
+    frompoint: '',
+    topoint: '',
+    currentabsentmodes: 'Less Than or Equal',
+    currentabsentvalue: '',
+    currentachievedmodes: 'Less Than or Equal',
+    currentachievedvalue: '',
+    paidstatus: '',
   });
 
   const [paidstatusfixs, setPaidstatusfixs] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, buttonStyles } = useContext(
-    UserRoleAccessContext
-  );
+  const [searchQuery, setSearchQuery] = useState('');
+  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
-  const [absentmodes, setAbsentmodes] = useState("Between");
-  const [achievedmodes, setAchievedmodes] = useState("Between");
-  const [currentabsentmodes, setCurrentabsentmodes] = useState("Less Than or Equal");
-  const [currentachievedmodes, setCurrentachievedmodes] = useState("Less Than or Equal");
+  const [absentmodes, setAbsentmodes] = useState('Between');
+  const [achievedmodes, setAchievedmodes] = useState('Between');
+  const [currentabsentmodes, setCurrentabsentmodes] = useState('Less Than or Equal');
+  const [currentachievedmodes, setCurrentachievedmodes] = useState('Less Than or Equal');
   const [isXeroxLoad, setIsXeroxLoad] = useState(false);
 
   // excelupload
-  const [fileUploadName, setFileUploadName] = useState("");
+  const [fileUploadName, setFileUploadName] = useState('');
   const [sheets, setSheets] = useState([]);
-  const [selectedSheet, setSelectedSheet] = useState("Please Select Sheet");
+  const [selectedSheet, setSelectedSheet] = useState('Please Select Sheet');
   const [splitArray, setSplitArray] = useState([]);
   const [selectedSheetindex, setSelectedSheetindex] = useState();
   const [loading, setLoading] = useState(false);
-  const [dataupdated, setDataupdated] = useState("");
+  const [dataupdated, setDataupdated] = useState('');
   //  Datefield
   var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = dd + "-" + mm + "-" + yyyy;
+  today = dd + '-' + mm + '-' + yyyy;
   let currentdate = new Date();
   let currentyear = currentdate.getFullYear();
   // get current month in string name
-  const monthstring = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const monthstring = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   let monthname = monthstring[new Date().getMonth()];
   const ExportsHead = () => {
-    const columns = [
-      "Department",
-      "Frequency",
-      "Absent Mode",
-      "Absent From Value",
-      "Absent To Value",
-      "Achieved Mode",
-      "Achieved From Value",
-      "Achieved To Value",
-      "Current Absent Mode",
-      "Current Absent Value",
-      "Current Achieved Mode",
-      "Current Achieved Value",
-      "Paid Status",
-    ];
+    const columns = ['Department', 'Frequency', 'Absent Mode', 'Absent From Value', 'Absent To Value', 'Achieved Mode', 'Achieved From Value', 'Achieved To Value', 'Current Absent Mode', 'Current Absent Value', 'Current Achieved Mode', 'Current Achieved Value', 'Paid Status'];
     const capitalizedColumns = columns.map((column) => {
       // Capitalize the first letter of each word in the column name
-      const words = column.split(" ");
-      const capitalizedWords = words.map(
-        (word) => word.charAt(0)?.toUpperCase() + word.slice(1)?.toLowerCase()
-      );
-      return capitalizedWords.join(" ");
+      const words = column.split(' ');
+      const capitalizedWords = words.map((word) => word.charAt(0)?.toUpperCase() + word.slice(1)?.toLowerCase());
+      return capitalizedWords.join(' ');
     });
-    const dataRow = [
-      "",
-      "",
-      "Between",
-      "",
-      "",
-      "Between",
-      "",
-      "",
-      "Less Than or Equal",
-      "",
-      "Less Than or Equal",
-      "",
-      "",
-    ];
+    const dataRow = ['', '', 'Between', '', '', 'Between', '', '', 'Less Than or Equal', '', 'Less Than or Equal', '', ''];
     if (selectedOptionsCate.length == 0) {
-      let alertMsg = "Please Select Department";
+      let alertMsg = 'Please Select Department';
       setPopupContentMalert(alertMsg);
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
-      new CsvBuilder(`Filename_ ${today}`)
-        .setColumns(capitalizedColumns)
-        .addRow(dataRow)
-        .exportFile();
+      new CsvBuilder(`Filename_ ${today}`).setColumns(capitalizedColumns).addRow(dataRow).exportFile();
     }
   };
   const readExcel = (file) => {
     if (selectedOptionsCate.length === 0) {
-      setPopupContentMalert("Please Select Department");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Department');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
       return;
     }
@@ -265,45 +203,42 @@ function PaidStatusFix() {
       fileReader.readAsArrayBuffer(file);
       fileReader.onload = (e) => {
         const bufferArray = e.target.result;
-        const wb = XLSX.read(bufferArray, { type: "buffer" });
+        const wb = XLSX.read(bufferArray, { type: 'buffer' });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws);
         // Check for missing required fields
-        const invalidEntries = data.filter(
-          (item) => !item.Frequency || !item["Paid Status"]
-        );
+        const invalidEntries = data.filter((item) => !item.Frequency || !item['Paid Status']);
         if (invalidEntries.length > 0) {
-          setPopupContentMalert("Frequency and Paid Status Must be Required");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('Frequency and Paid Status Must be Required');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
           return;
         }
         // Check for incorrect format in Paid Status
-        const incorrectFormatEntries = data.filter(
-          (item) => item["Paid Status"] && !item["Paid Status"].includes("_")
-        );
+        const incorrectFormatEntries = data.filter((item) => item['Paid Status'] && !item['Paid Status'].includes('_'));
         if (incorrectFormatEntries.length > 0) {
-          setPopupContentMalert("Please Enter Paid Status Format Correctly");
-          setPopupSeverityMalert("info");
+          setPopupContentMalert('Please Enter Paid Status Format Correctly');
+          setPopupSeverityMalert('info');
           handleClickOpenPopupMalert();
           return;
         }
         // Remove duplicates within the Excel file itself
         const uniqueData = data.reduce((acc, current) => {
-          const isDuplicate = acc.some((item) =>
-            item.Frequency === current.Frequency &&
-            item["Paid Status"] === current["Paid Status"] &&
-            item["Absent Mode"] === current["Absent Mode"] &&
-            item["Absent From Value"] === current["Absent From Value"] &&
-            item["Absent To Value"] === current["Absent To Value"] &&
-            item["Achieved Mode"] === current["Achieved Mode"] &&
-            item["Achieved From Value"] === current["Achieved From Value"] &&
-            item["Achieved To Value"] === current["Achieved To Value"] &&
-            item["Current Absent Mode"] === current["Current Absent Mode"] &&
-            item["Current Absent Value"] === current["Current Absent Value"] &&
-            item["Current Achieved Mode"] === current["Current Achieved Mode"] &&
-            item["Current Achieved Value"] === current["Current Achieved Value"]
+          const isDuplicate = acc.some(
+            (item) =>
+              item.Frequency === current.Frequency &&
+              item['Paid Status'] === current['Paid Status'] &&
+              item['Absent Mode'] === current['Absent Mode'] &&
+              item['Absent From Value'] === current['Absent From Value'] &&
+              item['Absent To Value'] === current['Absent To Value'] &&
+              item['Achieved Mode'] === current['Achieved Mode'] &&
+              item['Achieved From Value'] === current['Achieved From Value'] &&
+              item['Achieved To Value'] === current['Achieved To Value'] &&
+              item['Current Absent Mode'] === current['Current Absent Mode'] &&
+              item['Current Absent Value'] === current['Current Absent Value'] &&
+              item['Current Achieved Mode'] === current['Current Achieved Mode'] &&
+              item['Current Achieved Value'] === current['Current Achieved Value']
           );
           if (!isDuplicate) {
             acc.push(current);
@@ -318,32 +253,34 @@ function PaidStatusFix() {
     });
     promise.then((data) => {
       // Check for duplicates against existing data
-      const uniqueArray = data.filter((item) =>
-        !paidstatusfixsDup.some((tp) =>
-          tp.department.some((dep) => valueCate.includes(dep)) &&
-          tp.frequency === item.Frequency &&
-          tp.absentmodes === item["Absent Mode"] &&
-          tp.fromvalue === String(item["Absent From Value"]) &&
-          tp.tovalue === String(item["Absent To Value"]) &&
-          tp.achievedmodes === item["Achieved Mode"] &&
-          tp.frompoint === String(item["Achieved From Value"]) &&
-          tp.topoint === String(item["Achieved To Value"]) &&
-          tp.currentabsentmodes === item["Current Absent Mode"] &&
-          tp.currentabsentvalue === String(item["Current Absent Value"]) &&
-          tp.currentachievedmodes === item["Current Achieved Mode"] &&
-          tp.currentachievedvalue === String(item["Current Achieved Value"]) &&
-          tp.paidstatus === item["Paid Status"]
-        )
+      const uniqueArray = data.filter(
+        (item) =>
+          !paidstatusfixsDup.some(
+            (tp) =>
+              tp.department.some((dep) => valueCate.includes(dep)) &&
+              tp.frequency === item.Frequency &&
+              tp.absentmodes === item['Absent Mode'] &&
+              tp.fromvalue === String(item['Absent From Value']) &&
+              tp.tovalue === String(item['Absent To Value']) &&
+              tp.achievedmodes === item['Achieved Mode'] &&
+              tp.frompoint === String(item['Achieved From Value']) &&
+              tp.topoint === String(item['Achieved To Value']) &&
+              tp.currentabsentmodes === item['Current Absent Mode'] &&
+              tp.currentabsentvalue === String(item['Current Absent Value']) &&
+              tp.currentachievedmodes === item['Current Achieved Mode'] &&
+              tp.currentachievedvalue === String(item['Current Achieved Value']) &&
+              tp.paidstatus === item['Paid Status']
+          )
       );
-      console.log(uniqueArray)
+      console.log(uniqueArray);
       if (uniqueArray.length === 0) {
-        setPopupContentMalert("Already Added The Upload Data");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Already Added The Upload Data');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
         return;
       } else if (uniqueArray.length !== data.length) {
-        setPopupContentMalert("Duplicate & Not a Number Value Removed");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Duplicate & Not a Number Value Removed');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
       const dataArray = uniqueArray.map((item) => ({
@@ -351,17 +288,17 @@ function PaidStatusFix() {
         month: item.Month,
         year: item.Year,
         frequency: item.Frequency,
-        absentmodes: item["Absent Mode"],
-        fromvalue: item["Absent From Value"],
-        tovalue: item["Absent To Value"],
-        achievedmodes: item["Achieved Mode"],
-        frompoint: item["Achieved From Value"],
-        topoint: item["Achieved To Value"],
-        currentabsentmodes: item["Current Absent Mode"],
-        currentabsentvalue: item["Current Absent Value"],
-        currentachievedmodes: item["Current Achieved Mode"],
-        currentachievedvalue: item["Current Achieved Value"],
-        paidstatus: item["Paid Status"],
+        absentmodes: item['Absent Mode'],
+        fromvalue: item['Absent From Value'],
+        tovalue: item['Absent To Value'],
+        achievedmodes: item['Achieved Mode'],
+        frompoint: item['Achieved From Value'],
+        topoint: item['Achieved To Value'],
+        currentabsentmodes: item['Current Absent Mode'],
+        currentabsentvalue: item['Current Absent Value'],
+        currentachievedmodes: item['Current Achieved Mode'],
+        currentachievedvalue: item['Current Achieved Value'],
+        paidstatus: item['Paid Status'],
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
@@ -381,13 +318,13 @@ function PaidStatusFix() {
     });
   };
   const clearFileSelection = () => {
-    setUpdatesheet([])
-    setFileUploadName("");
+    setUpdatesheet([]);
+    setFileUploadName('');
     setSplitArray([]);
     readExcel(null);
-    setDataupdated("");
+    setDataupdated('');
     setSheets([]);
-    setSelectedSheet("Please Select Sheet");
+    setSelectedSheet('Please Select Sheet');
   };
   const [departments, setDepartments] = useState([]);
   // Multi Select Create
@@ -399,21 +336,19 @@ function PaidStatusFix() {
       })
     );
     setSelectedOptionsCate(options);
-    setFileUploadName("");
+    setFileUploadName('');
     setSplitArray([]);
-    setDataupdated("");
+    setDataupdated('');
     setSheets([]);
-    setSelectedSheet("Please Select Sheet");
+    setSelectedSheet('Please Select Sheet');
   };
   const customValueRendererCate = (valueCate, _department) => {
-    return valueCate.length
-      ? valueCate.map(({ label }) => label).join(", ")
-      : "Please Select Department";
+    return valueCate.length ? valueCate.map(({ label }) => label).join(', ') : 'Please Select Department';
   };
 
   //get all Areas.
   const fetchDepartmentDropdown = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_dept = await axios.get(SERVICE.DEPARTMENT, {
         headers: {
@@ -428,7 +363,9 @@ function PaidStatusFix() {
         })),
       ];
       setDepartments(deptall);
-    } catch (err) { handleApiError(err, setShowAlert, handleClickOpenerr); }
+    } catch (err) {
+      handleApiError(err, setShowAlert, handleClickOpenerr);
+    }
   };
   // Error Popup model
   const [isErrorOpen, setIsErrorOpen] = useState(false);
@@ -443,7 +380,7 @@ function PaidStatusFix() {
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   const [isDeleteOpencheckbox, setIsDeleteOpencheckbox] = useState(false);
@@ -455,7 +392,7 @@ function PaidStatusFix() {
   };
 
   const delPaidstatuscheckbox = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const deletePromises = selectedRows?.map((item) => {
         return axios.delete(`${SERVICE.PAIDSTATUSFIXMONTHSET_SINGLE}/${item}`, {
@@ -475,10 +412,12 @@ function PaidStatusFix() {
       // await fetchPaidStatusfixDup();
       await fetchPenaltyErrorUpload();
       // await sendRequestFilter('filtered');
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //Delete model
@@ -497,19 +436,15 @@ function PaidStatusFix() {
   const gridRef = useRef(null);
   const [sourceCheck, setSourcecheck] = useState(false);
 
-
   const getSheetExcel = () => {
-    if (
-      !Array.isArray(splitArray) ||
-      (splitArray.length === 0 && fileUploadName === "")
-    ) {
-      setPopupContentMalert("Please Upload a file");
-      setPopupSeverityMalert("info");
+    if (!Array.isArray(splitArray) || (splitArray.length === 0 && fileUploadName === '')) {
+      setPopupContentMalert('Please Upload a file');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       let getsheets = splitArray.map((d, index) => ({
-        label: "Sheet" + (index + 1),
-        value: "Sheet" + (index + 1),
+        label: 'Sheet' + (index + 1),
+        value: 'Sheet' + (index + 1),
         index: index,
       }));
       setSheets(getsheets);
@@ -521,9 +456,7 @@ function PaidStatusFix() {
       (item) =>
         !paidstatusfixs.some(
           (tp) =>
-            tp.department.some((item) =>
-              valueCate.map((item) => item).includes(item)
-            ) &&
+            tp.department.some((item) => valueCate.map((item) => item).includes(item)) &&
             tp.frequency == item.frequency &&
             tp.absentmodes == item.absentmodes &&
             // tp.fromvalue == item.fromvalue &&
@@ -539,22 +472,13 @@ function PaidStatusFix() {
         )
     );
     // Ensure that items is an array of objects before sending
-    if (
-      fileUploadName === "" ||
-      !Array.isArray(uniqueArray) ||
-      uniqueArray.length === 0 ||
-      selectedSheet === "Please Select Sheet"
-    ) {
-      setPopupContentMalert(fileUploadName === ""
-        ? "Please Upload File"
-        : selectedSheet === "Please Select Sheet"
-          ? "Please Select Sheet"
-          : "No data to upload");
-      setPopupSeverityMalert("info");
+    if (fileUploadName === '' || !Array.isArray(uniqueArray) || uniqueArray.length === 0 || selectedSheet === 'Please Select Sheet') {
+      setPopupContentMalert(fileUploadName === '' ? 'Please Upload File' : selectedSheet === 'Please Select Sheet' ? 'Please Select Sheet' : 'No data to upload');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (selectedOptionsCate.length == 0) {
-      setPopupContentMalert("Please Select Department");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Department');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       var xmlhttp = new XMLHttpRequest();
@@ -562,26 +486,23 @@ function PaidStatusFix() {
         if (this.readyState === 4 && this.status === 200) {
         }
       };
-      setPageName(!pageName)
+      setPageName(!pageName);
       try {
         setLoading(true); // Set loading to true when starting the upload
-        xmlhttp.open("POST", SERVICE.PAIDSTATUSFIXMONTHSET_CREATE);
-        xmlhttp.setRequestHeader(
-          "Content-Type",
-          "application/json;charset=UTF-8"
-        );
+        xmlhttp.open('POST', SERVICE.PAIDSTATUSFIXMONTHSET_CREATE);
+        xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
         xmlhttp.send(JSON.stringify(uniqueArray));
-        setSelectedSheet("Please Select Sheet")
+        setSelectedSheet('Please Select Sheet');
         await fetchEmployee();
         await fetchPaidStatusfixDup();
       } catch (err) {
       } finally {
         setLoading(false); // Set loading back to false when the upload is complete
-        setPopupContent("Updated Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Updated Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
-        setSelectedSheet("Please Select Sheet")
-        setUpdatesheet(prev => [...prev, selectedSheetindex])
+        setSelectedSheet('Please Select Sheet');
+        setUpdatesheet((prev) => [...prev, selectedSheetindex]);
         await fetchEmployee();
         await fetchPaidStatusfixDup();
       }
@@ -590,7 +511,7 @@ function PaidStatusFix() {
   //add function
   const sendRequest = async () => {
     setIsXeroxLoad(true);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let subprojectscreate = await axios.post(SERVICE.PAIDSTATUSFIXMONTHSET_CREATE, {
         headers: {
@@ -621,29 +542,32 @@ function PaidStatusFix() {
       await fetchPenaltyErrorUpload();
       setPaidstatusfix({
         ...paidstatusfix,
-        department: "Please Select Department",
+        department: 'Please Select Department',
         month: check.label,
         year: year,
-        frequency: "",
-        absentmodes: "Between",
-        fromvalue: "",
-        tovalue: "",
-        achievedmodes: "Between",
-        frompoint: "",
-        topoint: "",
-        currentabsentmodes: "Less Than or Equal",
-        currentabsentvalue: "",
-        currentachievedmodes: "Less Than or Equal",
-        currentachievedvalue: "",
-        paidstatus: "",
+        frequency: '',
+        absentmodes: 'Between',
+        fromvalue: '',
+        tovalue: '',
+        achievedmodes: 'Between',
+        frompoint: '',
+        topoint: '',
+        currentabsentmodes: 'Less Than or Equal',
+        currentabsentvalue: '',
+        currentachievedmodes: 'Less Than or Equal',
+        currentachievedvalue: '',
+        paidstatus: '',
       });
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       setIsXeroxLoad(false);
-    } catch (err) { setIsXeroxLoad(false); handleApiError(err, setShowAlert, handleClickOpenerr); }
+    } catch (err) {
+      setIsXeroxLoad(false);
+      handleApiError(err, setShowAlert, handleClickOpenerr);
+    }
   };
-  const [paidstatusfixsDup, setPaidstatusfixsDup] = useState([])
+  const [paidstatusfixsDup, setPaidstatusfixsDup] = useState([]);
   let departmen = selectedOptionsCate.map((item) => item.value);
   //submit option for saving
   const handleSubmit = (e) => {
@@ -651,42 +575,37 @@ function PaidStatusFix() {
     let departments = selectedOptionsCate.map((item) => item.value);
     const isNameMatch = paidstatusfixsDup.some(
       (item) =>
-        item.frequency?.toLowerCase() ===
-        paidstatusfix.frequency?.toLowerCase() &&
+        item.frequency?.toLowerCase() === paidstatusfix.frequency?.toLowerCase() &&
         item.absentmodes?.toLowerCase() === absentmodes?.toLowerCase() &&
         item.achievedmodes?.toLowerCase() === achievedmodes?.toLowerCase() &&
         item.currentabsentmodes?.toLowerCase() === currentabsentmodes?.toLowerCase() &&
         item.currentachievedmodes?.toLowerCase() === currentachievedmodes?.toLowerCase() &&
-        item.paidstatus?.toLowerCase() ===
-        paidstatusfix.paidstatus?.toLowerCase() &&
+        item.paidstatus?.toLowerCase() === paidstatusfix.paidstatus?.toLowerCase() &&
         item.department.some((data) => departments.includes(data))
     );
     if (selectedOptionsCate.length == 0) {
-      setPopupContentMalert("Please Select Department");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Department');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      fileUploadName != "" &&
-      selectedSheet === "Please Select Sheet"
-    ) {
-      setPopupContentMalert("Please Select Sheet");
-      setPopupSeverityMalert("info");
+    } else if (fileUploadName != '' && selectedSheet === 'Please Select Sheet') {
+      setPopupContentMalert('Please Select Sheet');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paidstatusfix.frequency === "") {
-      setPopupContentMalert("Please Enter Frequency");
-      setPopupSeverityMalert("info");
+    } else if (paidstatusfix.frequency === '') {
+      setPopupContentMalert('Please Enter Frequency');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paidstatusfix.paidstatus === "") {
-      setPopupContentMalert("Please Enter Paid Status");
-      setPopupSeverityMalert("info");
+    } else if (paidstatusfix.paidstatus === '') {
+      setPopupContentMalert('Please Enter Paid Status');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (!paidstatusfix.paidstatus.includes("_")) {
-      setPopupContentMalert("Please Enter Paid Status Format Correctly");
-      setPopupSeverityMalert("info");
+    } else if (!paidstatusfix.paidstatus.includes('_')) {
+      setPopupContentMalert('Please Enter Paid Status Format Correctly');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data already exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data already exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequest();
@@ -695,40 +614,40 @@ function PaidStatusFix() {
   const handleClear = (e) => {
     e.preventDefault();
     setPaidstatusfix({
-      department: "Please Select Department",
+      department: 'Please Select Department',
       month: check.label,
       year: year,
-      frequency: "",
-      absentmodes: "Between",
-      fromvalue: "",
-      tovalue: "",
-      achievedmodes: "Between",
-      frompoint: "",
-      topoint: "",
-      currentabsentmodes: "Less Than or Equal",
-      currentabsentvalue: "",
-      currentachievedmodes: "Less Than or Equal",
-      currentachievedvalue: "",
-      paidstatus: "",
+      frequency: '',
+      absentmodes: 'Between',
+      fromvalue: '',
+      tovalue: '',
+      achievedmodes: 'Between',
+      frompoint: '',
+      topoint: '',
+      currentabsentmodes: 'Less Than or Equal',
+      currentabsentvalue: '',
+      currentachievedmodes: 'Less Than or Equal',
+      currentachievedvalue: '',
+      paidstatus: '',
     });
     setSelectedOptionsCate([]);
-    setAchievedmodes("Between");
-    setAbsentmodes("Between");
-    setCurrentabsentmodes("Less Than or Equal");
-    setCurrentachievedmodes("Less Than or Equal");
-    setSelectedSheet("Please Select Sheet");
+    setAchievedmodes('Between');
+    setAbsentmodes('Between');
+    setCurrentabsentmodes('Less Than or Equal');
+    setCurrentachievedmodes('Less Than or Equal');
+    setSelectedSheet('Please Select Sheet');
     setSheets([]);
     setSplitArray([]);
-    setSelectedSheetindex("");
-    setFileUploadName("");
+    setSelectedSheetindex('');
+    setFileUploadName('');
     readExcel(null);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
   //get all Sub vendormasters.
   const fetchPaidStatusfixDup = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_vendor = await axios.get(SERVICE.PAIDSTATUSFIXMONTHSET, {
         headers: {
@@ -736,11 +655,13 @@ function PaidStatusFix() {
         },
       });
       setPaidstatusfixsDup(res_vendor?.data?.paidstatusfixs);
-    } catch (err) { handleApiError(err, setShowAlert, handleClickOpenerr); }
+    } catch (err) {
+      handleApiError(err, setShowAlert, handleClickOpenerr);
+    }
   };
-  const [paidstatusfixsFilterArray, setPaidstatusfixsFilterArray] = useState([])
+  const [paidstatusfixsFilterArray, setPaidstatusfixsFilterArray] = useState([]);
   const fetchPaidStatusfixArray = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_vendor = await axios.get(SERVICE.PAIDSTATUSFIXMONTHSET, {
         headers: {
@@ -748,15 +669,17 @@ function PaidStatusFix() {
         },
       });
       setPaidstatusfixsFilterArray(res_vendor?.data?.paidstatusfixs);
-    } catch (err) { handleApiError(err, setShowAlert, handleClickOpenerr); }
+    } catch (err) {
+      handleApiError(err, setShowAlert, handleClickOpenerr);
+    }
   };
   useEffect(() => {
-    fetchPaidStatusfixArray()
-  }, [isFilterOpen])
+    fetchPaidStatusfixArray();
+  }, [isFilterOpen]);
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
   const fetchEmployee = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_employee = await axios.post(SERVICE.PAIDSTATUSFIX_SORT, {
         headers: {
@@ -764,10 +687,11 @@ function PaidStatusFix() {
         },
         page: Number(page),
         pageSize: Number(pageSize),
-        searchQuery: searchQuery
+        searchQuery: searchQuery,
       });
-
-    } catch (err) { handleApiError(err, setShowAlert, handleClickOpenerr); }
+    } catch (err) {
+      handleApiError(err, setShowAlert, handleClickOpenerr);
+    }
   };
 
   useEffect(() => {
@@ -779,9 +703,9 @@ function PaidStatusFix() {
   }, []);
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -789,52 +713,53 @@ function PaidStatusFix() {
   const [overallItems, setOverallItems] = useState([]);
   const [items, setItems] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
   const [selectAllChecked, setSelectAllChecked] = useState(false);
 
   const fetchPenaltyErrorUpload = async () => {
-    setPageName(!pageName)
-    setSourcecheck(false)
+    setPageName(!pageName);
+    setSourcecheck(false);
 
     try {
       let res = await axios.get(SERVICE.PAIDSTATUSFIXMONTHSET_LIMITED, {
         headers: {
-          'Authorization': `Bearer ${auth.APIToken}`
-        }
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
       });
-      setSourcecheck(true)
-      console.log(res?.data?.paidstatusfixs)
+      setSourcecheck(true);
+      console.log(res?.data?.paidstatusfixs);
       setPenaltyErrorUpload(res?.data?.paidstatusfixs.map((item, index) => ({ ...item, serialNumber: index + 1 })));
-    } catch (err) { setSourcecheck(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
-
-
-  }
+    } catch (err) {
+      setSourcecheck(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
+  };
 
   const [paidstatusfixEdit, setPaidstatusfixEdit] = useState({
-    department: "Please Select Department",
-    month: "",
-    year: "",
-    frequency: "",
-    absentmodes: "Between",
-    fromvalue: "",
-    tovalue: "",
-    achievedmodes: "Between",
-    frompoint: "",
-    topoint: "",
-    currentabsentmodes: "Less Than or Equal",
-    currentabsentvalue: "",
-    currentachievedmodes: "Less Than or Equal",
-    currentachievedvalue: "",
-    paidstatus: "",
+    department: 'Please Select Department',
+    month: '',
+    year: '',
+    frequency: '',
+    absentmodes: 'Between',
+    fromvalue: '',
+    tovalue: '',
+    achievedmodes: 'Between',
+    frompoint: '',
+    topoint: '',
+    currentabsentmodes: 'Less Than or Equal',
+    currentabsentvalue: '',
+    currentachievedmodes: 'Less Than or Equal',
+    currentachievedvalue: '',
+    paidstatus: '',
   });
 
   const [selectedOptionsCateEdit, setSelectedOptionsCateEdit] = useState([]);
-  const [absentmodesEdit, setAbsentmodesEdit] = useState("Between");
-  const [currentabsentmodesEdit, setCurrentabsentmodesEdit] = useState("Less Than or Equal");
-  const [currentachievedmodesEdit, setCurrentachievedmodesEdit] = useState("Less Than or Equal");
-  const [ovProj, setOvProj] = useState("");
-  const [ovProjj, setOvProjj] = useState("");
-  const [achievedmodesEdit, setAchievedmodesEdit] = useState("Between");
+  const [absentmodesEdit, setAbsentmodesEdit] = useState('Between');
+  const [currentabsentmodesEdit, setCurrentabsentmodesEdit] = useState('Less Than or Equal');
+  const [currentachievedmodesEdit, setCurrentachievedmodesEdit] = useState('Less Than or Equal');
+  const [ovProj, setOvProj] = useState('');
+  const [ovProjj, setOvProjj] = useState('');
+  const [achievedmodesEdit, setAchievedmodesEdit] = useState('Between');
 
   //Edit model...
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -842,7 +767,7 @@ function PaidStatusFix() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
   };
   // info model
@@ -868,27 +793,25 @@ function PaidStatusFix() {
   let addedby = paidstatusfixEdit?.addedby;
   let subprojectsid = paidstatusfixEdit?._id;
 
-
   const sendEditRequest = async () => {
     let empCate = selectedOptionsCateEdit.map((item) => item.value);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.put(
         `${SERVICE.PAIDSTATUSFIXMONTHSET_SINGLE}/${subprojectsid}`,
         {
-
           department: [...empCate],
           frequency: String(paidstatusfixEdit.frequency),
           absentmodes: String(absentmodesEdit),
-          fromvalue: String(paidstatusfixEdit.fromvalue === undefined ? "" : paidstatusfixEdit.fromvalue),
-          tovalue: String(paidstatusfixEdit.tovalue === undefined ? "" : paidstatusfixEdit.tovalue),
+          fromvalue: String(paidstatusfixEdit.fromvalue === undefined ? '' : paidstatusfixEdit.fromvalue),
+          tovalue: String(paidstatusfixEdit.tovalue === undefined ? '' : paidstatusfixEdit.tovalue),
           achievedmodes: String(achievedmodesEdit),
-          frompoint: String(paidstatusfixEdit.frompoint === undefined ? "" : paidstatusfixEdit.frompoint),
-          topoint: String(paidstatusfixEdit.topoint === undefined ? "" : paidstatusfixEdit.topoint),
+          frompoint: String(paidstatusfixEdit.frompoint === undefined ? '' : paidstatusfixEdit.frompoint),
+          topoint: String(paidstatusfixEdit.topoint === undefined ? '' : paidstatusfixEdit.topoint),
           currentabsentmodes: String(currentabsentmodesEdit),
-          currentabsentvalue: String(paidstatusfixEdit.currentabsentvalue === undefined ? "" : paidstatusfixEdit.currentabsentvalue),
+          currentabsentvalue: String(paidstatusfixEdit.currentabsentvalue === undefined ? '' : paidstatusfixEdit.currentabsentvalue),
           currentachievedmodes: String(currentachievedmodesEdit),
-          currentachievedvalue: String(paidstatusfixEdit.currentachievedvalue === undefined ? "" : paidstatusfixEdit.currentachievedvalue),
+          currentachievedvalue: String(paidstatusfixEdit.currentachievedvalue === undefined ? '' : paidstatusfixEdit.currentachievedvalue),
           paidstatus: String(paidstatusfixEdit.paidstatus),
           updatedby: [
             ...updateby,
@@ -897,21 +820,24 @@ function PaidStatusFix() {
               date: String(new Date()),
             },
           ],
-        }, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
         },
-      }
+        {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        }
       );
       // await sendRequestFilter("filtered");;
       // await fetchPaidStatusfixDup();
       await fetchPenaltyErrorUpload();
 
       handleCloseModEdit();
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   const [allPaidstatusfixedit, setAllPaidstatusfixedit] = useState([]);
   const editSubmit = (e) => {
@@ -920,44 +846,39 @@ function PaidStatusFix() {
     let departmentsEditt = selectedOptionsCateEdit.map((item) => item.value);
     const isNameMatch = allPaidstatusfixedit.some(
       (item) =>
-        item.frequency?.toLowerCase() ===
-        paidstatusfixEdit.frequency?.toLowerCase() &&
+        item.frequency?.toLowerCase() === paidstatusfixEdit.frequency?.toLowerCase() &&
         item.absentmodes === absentmodesEdit &&
         item.achievedmodes === achievedmodesEdit &&
         item.currentabsentmodes === currentabsentmodesEdit &&
-        item.paidstatus.toLowerCase() ===
-        paidstatusfixEdit.paidstatus.toLowerCase() &&
+        item.paidstatus.toLowerCase() === paidstatusfixEdit.paidstatus.toLowerCase() &&
         item.department.some((data) => departmentsEditt.includes(data))
     );
     if (selectedOptionsCateEdit.length == 0) {
-      setPopupContentMalert("Please Select Department");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Department');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paidstatusfixEdit.frequency === "") {
-      setPopupContentMalert("Please Enter Frequency");
-      setPopupSeverityMalert("info");
+    } else if (paidstatusfixEdit.frequency === '') {
+      setPopupContentMalert('Please Enter Frequency');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (paidstatusfixEdit.paidstatus === "") {
-      setPopupContentMalert("Please Enter Paid Status");
-      setPopupSeverityMalert("info");
+    } else if (paidstatusfixEdit.paidstatus === '') {
+      setPopupContentMalert('Please Enter Paid Status');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (!paidstatusfixEdit.paidstatus.includes("_")) {
-      setPopupContentMalert("Please Enter Paid Status Format Correctly");
-      setPopupSeverityMalert("info");
+    } else if (!paidstatusfixEdit.paidstatus.includes('_')) {
+      setPopupContentMalert('Please Enter Paid Status Format Correctly');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (isNameMatch) {
-      setPopupContentMalert("Data already exits!");
-      setPopupSeverityMalert("info");
+    } else if (isNameMatch) {
+      setPopupContentMalert('Data already exits!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-
-    else {
+    } else {
       sendEditRequest();
     }
   };
 
-  const [deletePaidstatus, setDeletePaidstatus] = useState("");
+  const [deletePaidstatus, setDeletePaidstatus] = useState('');
   //Delete model
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const handleClickOpen = () => {
@@ -967,11 +888,10 @@ function PaidStatusFix() {
     setIsDeleteOpen(false);
   };
 
-
   // Alert delete popup
   let Paidstatussid = deletePaidstatus?._id;
   const delPaidstatus = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       await axios.delete(`${SERVICE.PAIDSTATUSFIXMONTHSET_SINGLE}/${Paidstatussid}`, {
         headers: {
@@ -985,15 +905,16 @@ function PaidStatusFix() {
       handleCloseMod();
       setSelectedRows([]);
       setPage(1);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
-    catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
   };
 
   const rowData = async (id, paidstatus) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const [res] = await Promise.all([
         axios.get(`${SERVICE.PAIDSTATUSFIXMONTHSET_SINGLE}/${id}`, {
@@ -1001,8 +922,7 @@ function PaidStatusFix() {
             Authorization: `Bearer ${auth.APIToken}`,
           },
         }),
-
-      ])
+      ]);
       setDeletePaidstatus(res?.data?.spaidstatusfix);
 
       handleClickOpen();
@@ -1012,7 +932,7 @@ function PaidStatusFix() {
   };
 
   const getCode = async (e, name) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const [res, resNew] = await Promise.all([
         await axios.get(`${SERVICE.PAIDSTATUSFIXMONTHSET_SINGLE}/${e}`, {
@@ -1022,10 +942,10 @@ function PaidStatusFix() {
         }),
         axios.get(SERVICE.PAIDSTATUSFIXMONTHSET, {
           headers: {
-            'Authorization': `Bearer ${auth.APIToken}`
-          }
-        })
-      ])
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        }),
+      ]);
       setAllPaidstatusfixedit(resNew?.data?.paidstatusfixs?.filter((item) => item?._id !== e));
       setPaidstatusfixEdit(res?.data?.spaidstatusfix);
       setSelectedOptionsCateEdit(
@@ -1038,17 +958,17 @@ function PaidStatusFix() {
       setAbsentmodesEdit(res?.data?.spaidstatusfix.absentmodes);
       setAchievedmodesEdit(res?.data?.spaidstatusfix.achievedmodes);
       setCurrentabsentmodesEdit(res?.data?.spaidstatusfix.currentabsentmodes);
-      setCurrentachievedmodesEdit(
-        res?.data?.spaidstatusfix.currentachievedmodes
-      );
+      setCurrentachievedmodesEdit(res?.data?.spaidstatusfix.currentachievedmodes);
       setOvProj(res?.data?.spaidstatusfix?.paidstatus);
       setOvProjj(res?.data?.spaidstatusfix?.department);
       handleClickOpenEdit();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   // get single row to view....
   const getviewCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.PAIDSTATUSFIXMONTHSET_SINGLE}/${e}`, {
         headers: {
@@ -1057,11 +977,13 @@ function PaidStatusFix() {
       });
       setPaidstatusfixEdit(res?.data?.spaidstatusfix);
       handleClickOpenview();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   // get single row to view....
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.PAIDSTATUSFIXMONTHSET_SINGLE}/${e}`, {
         headers: {
@@ -1070,29 +992,31 @@ function PaidStatusFix() {
       });
       setPaidstatusfixEdit(res?.data?.spaidstatusfix);
       handleClickOpeninfo();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   useEffect(() => {
     fetchPenaltyErrorUpload();
-  }, [])
+  }, []);
   const addSerialNumber = (datas) => {
     setItems(datas);
     setOverallItems(datas);
-  }
+  };
   useEffect(() => {
     addSerialNumber(penaltyErrorUpload);
-  }, [penaltyErrorUpload])
+  }, [penaltyErrorUpload]);
   //Datatable
   const handlePageChange = (newPage) => {
     setPage(newPage);
     setSelectedRows([]);
-    setSelectAllChecked(false)
+    setSelectAllChecked(false);
   };
   const handlePageSizeChange = (event) => {
     setPageSize(Number(event.target.value));
     setSelectedRows([]);
-    setSelectAllChecked(false)
+    setSelectAllChecked(false);
     setPage(1);
   };
 
@@ -1100,17 +1024,18 @@ function PaidStatusFix() {
   // image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Paid Status Fix Month Set.png");
+          saveAs(blob, 'Paid Status Fix Month Set.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
 
-  // Show All Columns & Manage Columns 
+  // Show All Columns & Manage Columns
   const initialColumnVisibility = {
     serialNumber: true,
     checkbox: true,
@@ -1133,12 +1058,10 @@ function PaidStatusFix() {
   };
   const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
   const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.ceil(filteredDatas?.length / pageSize);
@@ -1153,18 +1076,15 @@ function PaidStatusFix() {
   }
   const CheckboxHeader = ({ selectAllChecked, onSelectAll }) => (
     <div>
-      <Checkbox
-        checked={selectAllChecked}
-        onChange={onSelectAll}
-      />
+      <Checkbox checked={selectAllChecked} onChange={onSelectAll} />
     </div>
   );
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
       headerCheckboxSelection: true,
@@ -1174,77 +1094,92 @@ function PaidStatusFix() {
       sortable: false, // Optionally, you can make this column not sortable
       width: 90,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header"
+      headerClassName: 'bold-header',
     },
     {
-      field: "serialNumber", headerName: "SNo",
-      flex: 0, width: 100, hide: !columnVisibility.serialNumber, headerClassName: "bold-header", pinned: 'left',
+      field: 'serialNumber',
+      headerName: 'SNo',
+      flex: 0,
+      width: 100,
+      hide: !columnVisibility.serialNumber,
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
-    { field: "department", headerName: "Department", flex: 0, width: 150, hide: !columnVisibility.department, headerClassName: "bold-header", pinned: 'left', },
-    { field: "frequency", headerName: "Frequency", flex: 0, width: 100, hide: !columnVisibility.frequency, headerClassName: "bold-header", pinned: 'left', },
-    { field: "absentmodes", headerName: "Absent Modes", flex: 0, width: 150, hide: !columnVisibility.absentmodes, headerClassName: "bold-header" },
-    { field: "fromvalue", headerName: "From Value", flex: 0, width: 150, hide: !columnVisibility.fromvalue, headerClassName: "bold-header" },
-    { field: "tovalue", headerName: "To Value", flex: 0, width: 150, hide: !columnVisibility.tovalue, headerClassName: "bold-header" },
-    { field: "achievedmodes", headerName: "Achieved Modes", flex: 0, width: 100, hide: !columnVisibility.achievedmodes, headerClassName: "bold-header" },
-    { field: "frompoint", headerName: "From Point", flex: 0, width: 100, hide: !columnVisibility.frompoint, headerClassName: "bold-header" },
+    { field: 'department', headerName: 'Department', flex: 0, width: 150, hide: !columnVisibility.department, headerClassName: 'bold-header', pinned: 'left' },
+    { field: 'frequency', headerName: 'Frequency', flex: 0, width: 100, hide: !columnVisibility.frequency, headerClassName: 'bold-header', pinned: 'left' },
+    { field: 'absentmodes', headerName: 'Absent Modes', flex: 0, width: 150, hide: !columnVisibility.absentmodes, headerClassName: 'bold-header' },
+    { field: 'fromvalue', headerName: 'From Value', flex: 0, width: 150, hide: !columnVisibility.fromvalue, headerClassName: 'bold-header' },
+    { field: 'tovalue', headerName: 'To Value', flex: 0, width: 150, hide: !columnVisibility.tovalue, headerClassName: 'bold-header' },
+    { field: 'achievedmodes', headerName: 'Achieved Modes', flex: 0, width: 100, hide: !columnVisibility.achievedmodes, headerClassName: 'bold-header' },
+    { field: 'frompoint', headerName: 'From Point', flex: 0, width: 100, hide: !columnVisibility.frompoint, headerClassName: 'bold-header' },
 
-    { field: "topoint", headerName: "To Point", flex: 0, width: 100, hide: !columnVisibility.topoint, headerClassName: "bold-header" },
-    { field: "currentabsentmodes", headerName: "Current Absent Modes", flex: 0, width: 200, hide: !columnVisibility.currentabsentmodes, headerClassName: "bold-header" },
-    { field: "currentabsentvalue", headerName: "Current Absent Value", flex: 0, width: 100, hide: !columnVisibility.currentabsentvalue, headerClassName: "bold-header" },
-    { field: "currentachievedmodes", headerName: "Current Archived Modes", flex: 0, width: 200, hide: !columnVisibility.currentachievedmodes, headerClassName: "bold-header" },
-    { field: "currentachievedvalue", headerName: "Current Archived Value", flex: 0, width: 100, hide: !columnVisibility.currentachievedvalue, headerClassName: "bold-header" },
-    { field: "paidstatus", headerName: "Paid Status", flex: 0, width: 200, hide: !columnVisibility.paidstatus, headerClassName: "bold-header" },
+    { field: 'topoint', headerName: 'To Point', flex: 0, width: 100, hide: !columnVisibility.topoint, headerClassName: 'bold-header' },
+    { field: 'currentabsentmodes', headerName: 'Current Absent Modes', flex: 0, width: 200, hide: !columnVisibility.currentabsentmodes, headerClassName: 'bold-header' },
+    { field: 'currentabsentvalue', headerName: 'Current Absent Value', flex: 0, width: 100, hide: !columnVisibility.currentabsentvalue, headerClassName: 'bold-header' },
+    { field: 'currentachievedmodes', headerName: 'Current Archived Modes', flex: 0, width: 200, hide: !columnVisibility.currentachievedmodes, headerClassName: 'bold-header' },
+    { field: 'currentachievedvalue', headerName: 'Current Archived Value', flex: 0, width: 100, hide: !columnVisibility.currentachievedvalue, headerClassName: 'bold-header' },
+    { field: 'paidstatus', headerName: 'Paid Status', flex: 0, width: 200, hide: !columnVisibility.paidstatus, headerClassName: 'bold-header' },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
       minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <Grid sx={{ display: 'flex' }}>
-          {isUserRoleCompare?.includes("epaidstatusfixmonthset") && (
-            <Button sx={userStyle.buttonedit} onClick={() => {
-              getCode(params.data.id);
-            }}><EditOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonedit} /></Button>
+          {isUserRoleCompare?.includes('epaidstatusfixmonthset') && (
+            <Button
+              sx={userStyle.buttonedit}
+              onClick={() => {
+                getCode(params.data.id);
+              }}
+            >
+              <EditOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonedit} />
+            </Button>
           )}
-          {isUserRoleCompare?.includes("dpaidstatusfixmonthset") && (
-            <Button sx={userStyle.buttondelete} onClick={(e) => {
-              rowData(params.data.id, params.data.paidstatus);
-            }}><DeleteOutlineOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttondelete} /></Button>
+          {isUserRoleCompare?.includes('dpaidstatusfixmonthset') && (
+            <Button
+              sx={userStyle.buttondelete}
+              onClick={(e) => {
+                rowData(params.data.id, params.data.paidstatus);
+              }}
+            >
+              <DeleteOutlineOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttondelete} />
+            </Button>
           )}
-          {isUserRoleCompare?.includes("vpaidstatusfixmonthset") && (
+          {isUserRoleCompare?.includes('vpaidstatusfixmonthset') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getviewCode(params.data.id);
               }}
             >
-              <VisibilityOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonview} />
+              <VisibilityOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("ipaidstatusfixmonthset") && (
+          {isUserRoleCompare?.includes('ipaidstatusfixmonthset') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getinfoCode(params.data.id);
               }}
             >
-              <InfoOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttoninfo} />
+              <InfoOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttoninfo} />
             </Button>
           )}
         </Grid>
       ),
     },
-  ]
+  ];
   const rowDataTable = filteredData.map((item, index) => {
     return {
       ...item,
       id: item._id,
       serialNumber: item.serialNumber,
-    }
+    };
   });
   const rowsWithCheckboxes = rowDataTable.map((row) => ({
     ...row,
@@ -1261,21 +1196,19 @@ function PaidStatusFix() {
   };
   useEffect(() => {
     // Save column visibility to localStorage whenever it changes
-    localStorage.setItem("columnVisibility", JSON.stringify(columnVisibility));
+    localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
   }, [columnVisibility]);
 
   useEffect(() => {
     // Retrieve column visibility from localStorage (if available)
-    const savedVisibility = localStorage.getItem("columnVisibility");
+    const savedVisibility = localStorage.getItem('columnVisibility');
     if (savedVisibility) {
       setColumnVisibility(JSON.parse(savedVisibility));
     }
   }, []);
 
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
     setColumnVisibility((prevVisibility) => ({
@@ -1286,14 +1219,14 @@ function PaidStatusFix() {
 
   // Manage Columns
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleOpenManageColumns = (event) => {
     setAnchorEl(event.currentTarget);
     setManageColumnsOpen(true);
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("")
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl);
@@ -1301,7 +1234,7 @@ function PaidStatusFix() {
 
   // JSX for the "Manage Columns" popover content
   const manageColumnsContent = (
-    <Box style={{ padding: "10px", minWidth: "325px", '& .MuiDialogContent-root': { padding: '10px 0' } }} >
+    <Box style={{ padding: '10px', minWidth: '325px', '& .MuiDialogContent-root': { padding: '10px 0' } }}>
       <Typography variant="h6">Manage Columns</Typography>
       <IconButton
         aria-label="close"
@@ -1316,28 +1249,19 @@ function PaidStatusFix() {
         <CloseIcon />
       </IconButton>
       <Box sx={{ position: 'relative', margin: '10px' }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: 'absolute', }}
-        />
-      </Box><br /><br />
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
+      </Box>
+      <br />
+      <br />
       <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
-        <List sx={{ overflow: 'auto', height: '100%', }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText sx={{ display: 'flex' }}
-                primary={
-                  <Switch sx={{ marginTop: "-5px" }} size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={(column.field === "checkbox") ? "Checkbox" : column.headerName}
-              // secondary={column.headerName }
+              <ListItemText
+                sx={{ display: 'flex' }}
+                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
+                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
+                // secondary={column.headerName }
               />
             </ListItem>
           ))}
@@ -1346,11 +1270,7 @@ function PaidStatusFix() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: 'none', }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -1375,35 +1295,27 @@ function PaidStatusFix() {
     </Box>
   );
 
-
   const handleExportXL = async (isfilter) => {
     try {
-
-      if (isfilter === "filtered") {
+      if (isfilter === 'filtered') {
         // Define headers
-        let headers = [
-          "Department", "Frequency", "Absent Modes", "From Value", "To Value",
-          "Achieved Modes", "From Point", "To Point", "Current Absent Modes",
-          "Current Absent Value", "Current Archived Modes", "Current Archived Value",
-          "Paid Status"
-        ];
+        let headers = ['Department', 'Frequency', 'Absent Modes', 'From Value', 'To Value', 'Achieved Modes', 'From Point', 'To Point', 'Current Absent Modes', 'Current Absent Value', 'Current Archived Modes', 'Current Archived Value', 'Paid Status'];
 
         // Transform data
         const excelData = rowDataTable.map((doc) => [
-          doc.department ?? "",
-          doc.frequency ?? "",
-          doc.absentmodes ?? "",
-          doc.fromvalue ?? "",
-          doc.tovalue ?? "",
-          doc.achievedmodes ?? "",
-          doc.frompoint ?? "",
-          doc.topoint ?? "",
-          doc.currentabsentmodes ?? "",
-          doc.currentabsentvalue ?? "",
-          doc.currentachievedmodes ?? "",
-          doc.currentachievedvalue ?? "",
-          doc.paidstatus ?? "",
-
+          doc.department ?? '',
+          doc.frequency ?? '',
+          doc.absentmodes ?? '',
+          doc.fromvalue ?? '',
+          doc.tovalue ?? '',
+          doc.achievedmodes ?? '',
+          doc.frompoint ?? '',
+          doc.topoint ?? '',
+          doc.currentabsentmodes ?? '',
+          doc.currentabsentvalue ?? '',
+          doc.currentachievedmodes ?? '',
+          doc.currentachievedvalue ?? '',
+          doc.paidstatus ?? '',
         ]);
 
         // Combine headers and data
@@ -1414,37 +1326,33 @@ function PaidStatusFix() {
 
         // Create workbook and export
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
         // Save file
-        XLSX.writeFile(wb, "Paidstatusfixmonthset.xlsx");
+        XLSX.writeFile(wb, 'Paidstatusfixmonthset.xlsx');
         setIsFilterOpen(false);
-      } else if (isfilter === "overall") {
+      } else if (isfilter === 'overall') {
         let result = [];
         setExportLoading(true);
 
-        let response = await axios.get(
-          SERVICE.PAID_MONTHSET_EXCELDOWNLOAD,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-
-            responseType: "blob",
+        let response = await axios.get(SERVICE.PAID_MONTHSET_EXCELDOWNLOAD, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
           },
 
-        );
-        console.log(response, "response");
+          responseType: 'blob',
+        });
+        console.log(response, 'response');
         // Create a Blob from the response
         const blob = new Blob([response.data], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
 
         // Create a download link
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
-        a.download = "Paidstatusfixmonthset.xlsx";
+        a.download = 'Paidstatusfixmonthset.xlsx';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1454,37 +1362,30 @@ function PaidStatusFix() {
         setIsFilterOpen(false);
       }
     } catch (err) {
-
-      setExportLoading(false)
+      setExportLoading(false);
     }
   };
 
   const downloadCSV = async (isfilter) => {
     try {
-      if (isfilter === "filtered") {
-        let headers = [
-          "Department", "Frequency", "Absent Modes", "From Value", "To Value",
-          "Achieved Modes", "From Point", "To Point", "Current Absent Modes",
-          "Current Absent Value", "Current Archived Modes", "Current Archived Value",
-          "Paid Status"
-        ];
+      if (isfilter === 'filtered') {
+        let headers = ['Department', 'Frequency', 'Absent Modes', 'From Value', 'To Value', 'Achieved Modes', 'From Point', 'To Point', 'Current Absent Modes', 'Current Absent Value', 'Current Archived Modes', 'Current Archived Value', 'Paid Status'];
 
         // Transform data
         const excelData = rowDataTable.map((doc) => [
-          doc.department ?? "",
-          doc.frequency ?? "",
-          doc.absentmodes ?? "",
-          doc.fromvalue ?? "",
-          doc.tovalue ?? "",
-          doc.achievedmodes ?? "",
-          doc.frompoint ?? "",
-          doc.topoint ?? "",
-          doc.currentabsentmodes ?? "",
-          doc.currentabsentvalue ?? "",
-          doc.currentachievedmodes ?? "",
-          doc.currentachievedvalue ?? "",
-          doc.paidstatus ?? "",
-
+          doc.department ?? '',
+          doc.frequency ?? '',
+          doc.absentmodes ?? '',
+          doc.fromvalue ?? '',
+          doc.tovalue ?? '',
+          doc.achievedmodes ?? '',
+          doc.frompoint ?? '',
+          doc.topoint ?? '',
+          doc.currentabsentmodes ?? '',
+          doc.currentabsentvalue ?? '',
+          doc.currentachievedmodes ?? '',
+          doc.currentachievedvalue ?? '',
+          doc.paidstatus ?? '',
         ]);
         // Combine headers and data
         const finalData = [headers, ...excelData];
@@ -1493,35 +1394,32 @@ function PaidStatusFix() {
         const csvOutput = XLSX.utils.sheet_to_csv(ws);
 
         // Trigger CSV file download in browser
-        const blob = new Blob([csvOutput], { type: "text/csv" });
-        const link = document.createElement("a");
+        const blob = new Blob([csvOutput], { type: 'text/csv' });
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = "Paidstatusfixmonthset.csv";
+        link.download = 'Paidstatusfixmonthset.csv';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      } else if (isfilter === "overall") {
+        setIsFilterOpen(false);
+      } else if (isfilter === 'overall') {
         let result = [];
         setExportLoading(true);
 
         try {
-          let response = await axios.get(
-            SERVICE.PAID_MONTHSET_CSVDOWNLOAD,
-            {
-              headers: {
-                Authorization: `Bearer ${auth.APIToken}`,
-              },
-              responseType: "blob",
+          let response = await axios.get(SERVICE.PAID_MONTHSET_CSVDOWNLOAD, {
+            headers: {
+              Authorization: `Bearer ${auth.APIToken}`,
             },
-
-          );
+            responseType: 'blob',
+          });
           // Create a Blob from the response data
-          const blob = new Blob([response.data], { type: "text/csv" });
+          const blob = new Blob([response.data], { type: 'text/csv' });
           const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
+          const a = document.createElement('a');
 
           a.href = url;
-          a.download = "Paidstatusfixmonthset.csv"; // File name
+          a.download = 'Paidstatusfixmonthset.csv'; // File name
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -1529,17 +1427,17 @@ function PaidStatusFix() {
           setExportLoading(false);
           setIsFilterOpen(false);
         } catch (error) {
-          console.error("Error downloading CSV:", error);
+          console.error('Error downloading CSV:', error);
         }
       }
     } catch (err) {
-      setExportLoading(false)
+      setExportLoading(false);
     }
   };
 
   const downloadPdf = async (isfilter) => {
     try {
-      if (isfilter === "filtered") {
+      if (isfilter === 'filtered') {
         // try {
         //   let headers = [
         //     "Department", "Frequency", "Absent Modes", "From Value", "To Value",
@@ -1565,7 +1463,6 @@ function PaidStatusFix() {
         //     doc.paidstatus ?? "",
 
         //   ]);
-
 
         //   // Combine headers and data
         //   const tableData = [headers, ...excelData];
@@ -1603,48 +1500,43 @@ function PaidStatusFix() {
         // }
 
         try {
-          let headers = [
-            "Department", "Frequency", "Absent Modes", "From Value", "To Value",
-            "Achieved Modes", "From Point", "To Point", "Current Absent Modes",
-            "Current Absent Value", "Current Archived Modes", "Current Archived Value",
-            "Paid Status"
-          ];
+          let headers = ['Department', 'Frequency', 'Absent Modes', 'From Value', 'To Value', 'Achieved Modes', 'From Point', 'To Point', 'Current Absent Modes', 'Current Absent Value', 'Current Archived Modes', 'Current Archived Value', 'Paid Status'];
 
           // Ensure all data is in string format
           const excelData = rowDataTable.map((doc) => [
-            String(doc.department ?? ""),
-            String(doc.frequency ?? ""),
-            String(doc.absentmodes ?? ""),
-            String(doc.fromvalue ?? ""),
-            String(doc.tovalue ?? ""),
-            String(doc.achievedmodes ?? ""),
-            String(doc.frompoint ?? ""),
-            String(doc.topoint ?? ""),
-            String(doc.currentabsentmodes ?? ""),
-            String(doc.currentabsentvalue ?? ""),
-            String(doc.currentachievedmodes ?? ""),
-            String(doc.currentachievedvalue ?? ""),
-            String(doc.paidstatus ?? ""),
+            String(doc.department ?? ''),
+            String(doc.frequency ?? ''),
+            String(doc.absentmodes ?? ''),
+            String(doc.fromvalue ?? ''),
+            String(doc.tovalue ?? ''),
+            String(doc.achievedmodes ?? ''),
+            String(doc.frompoint ?? ''),
+            String(doc.topoint ?? ''),
+            String(doc.currentabsentmodes ?? ''),
+            String(doc.currentabsentvalue ?? ''),
+            String(doc.currentachievedmodes ?? ''),
+            String(doc.currentachievedvalue ?? ''),
+            String(doc.paidstatus ?? ''),
           ]);
 
           const tableData = [headers, ...excelData];
 
-          console.log("Table Data: ", tableData); // Debugging output
+          console.log('Table Data: ', tableData); // Debugging output
 
           const docDefinition = {
-            pageSize: "A4",
-            pageOrientation: "landscape",
+            pageSize: 'A4',
+            pageOrientation: 'landscape',
             content: [
-              { text: "paidstatusfixmonthset", style: "header", alignment: "center" },
-              { text: `Generated on: ${new Date().toLocaleString()}`, style: "subheader", alignment: "right" },
-              "\n",
+              { text: 'paidstatusfixmonthset', style: 'header', alignment: 'center' },
+              { text: `Generated on: ${new Date().toLocaleString()}`, style: 'subheader', alignment: 'right' },
+              '\n',
               {
                 table: {
                   headerRows: 1,
-                  widths: Array(headers.length).fill("auto"),
+                  widths: Array(headers.length).fill('auto'),
                   body: tableData,
                 },
-                layout: "lightHorizontalLines",
+                layout: 'lightHorizontalLines',
               },
             ],
             styles: {
@@ -1654,61 +1546,46 @@ function PaidStatusFix() {
             defaultStyle: { fontSize: 8 },
           };
 
-          pdfMake.createPdf(docDefinition).download("Paidstatusfixmonthset.pdf");
+          pdfMake.createPdf(docDefinition).download('Paidstatusfixmonthset.pdf');
           setIsPdfFilterOpen(false);
         } catch (err) {
-          console.error("Error generating PDF:", err);
+          console.error('Error generating PDF:', err);
         }
-
-      } else if (isfilter === "overall") {
+      } else if (isfilter === 'overall') {
         setExportLoading(true);
-        let response = await axios.get(
-          SERVICE.PAID_MONTHSET_PDFDOWNLOAD,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-            responseType: "blob",
-
+        let response = await axios.get(SERVICE.PAID_MONTHSET_PDFDOWNLOAD, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
           },
-
-        );
-        const blob = new Blob([response.data], { type: "application/pdf" });
-        const link = document.createElement("a");
+          responseType: 'blob',
+        });
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = "Paidstatusfixmonthset.pdf";
+        link.download = 'Paidstatusfixmonthset.pdf';
         link.click();
         URL.revokeObjectURL(link.href);
         setExportLoading(false);
-        setIsFilterOpen(false);
+        setIsPdfFilterOpen(false);
       }
     } catch (err) {
-      console.log(err, "errpdf")
-      setExportLoading(false)
+      console.log(err, 'errpdf');
+      setExportLoading(false);
     }
   };
 
   return (
     <Box>
-      <Headtitle title={"Paid Status Fix Month Set"} />
+      <Headtitle title={'Paid Status Fix Month Set'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="Paid Status Fix Month Set"
-        modulename="PayRoll"
-        submodulename="PayRoll Setup"
-        mainpagename="Paid Status Fix Month Set"
-        subpagename=""
-        subsubpagename=""
-      />
-      {isUserRoleCompare?.includes("apaidstatusfix") && (
+      <PageHeading title="Paid Status Fix Month Set" modulename="PayRoll" submodulename="PayRoll Setup" mainpagename="Paid Status Fix Month Set" subpagename="" subsubpagename="" />
+      {isUserRoleCompare?.includes('apaidstatusfix') && (
         <>
           <Box sx={userStyle.dialogbox}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Add Paid Status Fix Month Set
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Add Paid Status Fix Month Set</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -1716,15 +1593,9 @@ function PaidStatusFix() {
                 <Grid item md={5} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Department<b style={{ color: "red" }}>*</b>
+                      Department<b style={{ color: 'red' }}>*</b>
                     </Typography>
-                    <MultiSelect
-                      options={departments}
-                      value={selectedOptionsCate}
-                      onChange={handleCategoryChange}
-                      valueRenderer={customValueRendererCate}
-                      labelledBy="Please Select Area"
-                    />
+                    <MultiSelect options={departments} value={selectedOptionsCate} onChange={handleCategoryChange} valueRenderer={customValueRendererCate} labelledBy="Please Select Area" />
                   </FormControl>
                 </Grid>
               </Grid>
@@ -1733,12 +1604,7 @@ function PaidStatusFix() {
               <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={6}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    sx={{ textTransform: "Capitalize" }}
-                    onClick={(e) => ExportsHead()}
-                  >
+                  <Button variant="contained" color="success" sx={{ textTransform: 'Capitalize' }} onClick={(e) => ExportsHead()}>
                     <FaDownload />
                     &ensp;Download template file
                   </Button>
@@ -1752,17 +1618,17 @@ function PaidStatusFix() {
                       <Button
                         variant="contained"
                         disabled={
-                          paidstatusfix.frequency !== "" ||
-                          paidstatusfix.fromvalue !== "" ||
-                          paidstatusfix.tovalue != "" ||
-                          paidstatusfix.frompoint != "" ||
-                          paidstatusfix.topoint !== "" ||
-                          paidstatusfix.currentabsentvalue !== "" ||
-                          paidstatusfix.currentachievedvalue !== "" ||
-                          paidstatusfix.paidstatus !== ""
+                          paidstatusfix.frequency !== '' ||
+                          paidstatusfix.fromvalue !== '' ||
+                          paidstatusfix.tovalue != '' ||
+                          paidstatusfix.frompoint != '' ||
+                          paidstatusfix.topoint !== '' ||
+                          paidstatusfix.currentabsentvalue !== '' ||
+                          paidstatusfix.currentachievedvalue !== '' ||
+                          paidstatusfix.paidstatus !== ''
                         }
                         component="label"
-                        sx={{ textTransform: "capitalize" }}
+                        sx={{ textTransform: 'capitalize' }}
                       >
                         Choose File
                         <input
@@ -1771,26 +1637,23 @@ function PaidStatusFix() {
                           accept=".xlsx, .xls , .csv"
                           onChange={(e) => {
                             const file = e.target.files[0];
-                            setDataupdated("uploaded");
+                            setDataupdated('uploaded');
                             readExcel(file);
                             setFileUploadName(file.name);
                             e.target.value = null;
                             setSplitArray([]);
                             setSheets([]);
-                            setSelectedSheet("Please Select Sheet");
+                            setSelectedSheet('Please Select Sheet');
                           }}
                         />
                       </Button>
                     </Grid>
                     <Grid item md={6.5} xs={12} sm={6}>
-                      {fileUploadName != "" && splitArray.length > 0 ? (
-                        <Box sx={{ display: "flex", justifyContent: "left" }}>
+                      {fileUploadName != '' && splitArray.length > 0 ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                           <p>{fileUploadName}</p>
-                          <Button
-                            sx={{ minWidth: "36px", borderRadius: "50%" }}
-                            onClick={() => clearFileSelection()}
-                          >
-                            <FaTrash style={{ color: "red" }} />
+                          <Button sx={{ minWidth: '36px', borderRadius: '50%' }} onClick={() => clearFileSelection()}>
+                            <FaTrash style={{ color: 'red' }} />
                           </Button>
                         </Box>
                       ) : null}
@@ -1802,7 +1665,7 @@ function PaidStatusFix() {
                     <Typography>Sheet</Typography>
                     <Selects
                       maxMenuHeight={250}
-                      options={sheets.filter(d => !updateSheet.includes(d.index))}
+                      options={sheets.filter((d) => !updateSheet.includes(d.index))}
                       value={{ label: selectedSheet, value: selectedSheet }}
                       onChange={(e) => {
                         setSelectedSheet(e.value);
@@ -1818,17 +1681,17 @@ function PaidStatusFix() {
                         variant="contained"
                         color="primary"
                         disabled={
-                          paidstatusfix.frequency !== "" ||
-                          paidstatusfix.fromvalue !== "" ||
-                          paidstatusfix.tovalue != "" ||
-                          paidstatusfix.frompoint != "" ||
-                          paidstatusfix.topoint !== "" ||
-                          paidstatusfix.currentabsentvalue !== "" ||
-                          paidstatusfix.currentachievedvalue !== "" ||
-                          paidstatusfix.paidstatus !== ""
+                          paidstatusfix.frequency !== '' ||
+                          paidstatusfix.fromvalue !== '' ||
+                          paidstatusfix.tovalue != '' ||
+                          paidstatusfix.frompoint != '' ||
+                          paidstatusfix.topoint !== '' ||
+                          paidstatusfix.currentabsentvalue !== '' ||
+                          paidstatusfix.currentachievedvalue !== '' ||
+                          paidstatusfix.paidstatus !== ''
                         }
                         onClick={getSheetExcel}
-                        sx={{ textTransform: "capitalize" }}
+                        sx={{ textTransform: 'capitalize' }}
                       >
                         Get Sheet
                       </Button>
@@ -1878,12 +1741,12 @@ function PaidStatusFix() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Frequency <b style={{ color: "red" }}>*</b>
+                      Frequency <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       value={paidstatusfix.frequency}
                       onChange={(e) => {
                         setPaidstatusfix({
@@ -1901,7 +1764,7 @@ function PaidStatusFix() {
                       fullWidth
                       labelId="demo-select-small"
                       id="demo-select-small"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       MenuProps={{
                         PaperProps: {
                           style: {
@@ -1915,9 +1778,9 @@ function PaidStatusFix() {
                         setAbsentmodes(e.target.value);
                       }}
                       displayEmpty
-                      inputProps={{ "aria-label": "Without label" }}
+                      inputProps={{ 'aria-label': 'Without label' }}
                     >
-                      <MenuItem value="Between"> {"Between"} </MenuItem>
+                      <MenuItem value="Between"> {'Between'} </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -1927,7 +1790,7 @@ function PaidStatusFix() {
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       value={paidstatusfix.fromvalue}
                       onChange={(e) => {
                         setPaidstatusfix({
@@ -1944,7 +1807,7 @@ function PaidStatusFix() {
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       value={paidstatusfix.tovalue}
                       onChange={(e) => {
                         setPaidstatusfix({
@@ -1962,7 +1825,7 @@ function PaidStatusFix() {
                       fullWidth
                       labelId="demo-select-small"
                       id="demo-select-small"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       MenuProps={{
                         PaperProps: {
                           style: {
@@ -1976,9 +1839,9 @@ function PaidStatusFix() {
                         setAchievedmodes(e.target.value);
                       }}
                       displayEmpty
-                      inputProps={{ "aria-label": "Without label" }}
+                      inputProps={{ 'aria-label': 'Without label' }}
                     >
-                      <MenuItem value="Between"> {"Between"} </MenuItem>
+                      <MenuItem value="Between"> {'Between'} </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -1988,7 +1851,7 @@ function PaidStatusFix() {
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       value={paidstatusfix.frompoint}
                       onChange={(e) => {
                         setPaidstatusfix({
@@ -2005,7 +1868,7 @@ function PaidStatusFix() {
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       value={paidstatusfix.topoint}
                       onChange={(e) => {
                         setPaidstatusfix({
@@ -2023,7 +1886,7 @@ function PaidStatusFix() {
                       fullWidth
                       labelId="demo-select-small"
                       id="demo-select-small"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       MenuProps={{
                         PaperProps: {
                           style: {
@@ -2037,21 +1900,12 @@ function PaidStatusFix() {
                         setCurrentabsentmodes(e.target.value);
                       }}
                       displayEmpty
-                      inputProps={{ "aria-label": "Without label" }}
+                      inputProps={{ 'aria-label': 'Without label' }}
                     >
-                      <MenuItem value="Less Than or Equal">
-                        {" "}
-                        {"Less Than or Equal"}{" "}
-                      </MenuItem>
-                      <MenuItem value="Less Than"> {"Less Than"} </MenuItem>
-                      <MenuItem value="Greater Than">
-                        {" "}
-                        {"Greater Than"}{" "}
-                      </MenuItem>
-                      <MenuItem value="Greater Than  or Equal">
-                        {" "}
-                        {"Greater Than or Equal"}{" "}
-                      </MenuItem>
+                      <MenuItem value="Less Than or Equal"> {'Less Than or Equal'} </MenuItem>
+                      <MenuItem value="Less Than"> {'Less Than'} </MenuItem>
+                      <MenuItem value="Greater Than"> {'Greater Than'} </MenuItem>
+                      <MenuItem value="Greater Than  or Equal"> {'Greater Than or Equal'} </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -2061,7 +1915,7 @@ function PaidStatusFix() {
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       value={paidstatusfix.currentabsentvalue}
                       onChange={(e) => {
                         setPaidstatusfix({
@@ -2079,7 +1933,7 @@ function PaidStatusFix() {
                       fullWidth
                       labelId="demo-select-small"
                       id="demo-select-small"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       MenuProps={{
                         PaperProps: {
                           style: {
@@ -2093,21 +1947,12 @@ function PaidStatusFix() {
                         setCurrentachievedmodes(e.target.value);
                       }}
                       displayEmpty
-                      inputProps={{ "aria-label": "Without label" }}
+                      inputProps={{ 'aria-label': 'Without label' }}
                     >
-                      <MenuItem value="Less Than or Equal">
-                        {" "}
-                        {"Less Than or Equal"}{" "}
-                      </MenuItem>
-                      <MenuItem value="Less Than"> {"Less Than"} </MenuItem>
-                      <MenuItem value="Greater Than">
-                        {" "}
-                        {"Greater Than"}{" "}
-                      </MenuItem>
-                      <MenuItem value="Greater Than  or Equal">
-                        {" "}
-                        {"Greater Than or Equal"}{" "}
-                      </MenuItem>
+                      <MenuItem value="Less Than or Equal"> {'Less Than or Equal'} </MenuItem>
+                      <MenuItem value="Less Than"> {'Less Than'} </MenuItem>
+                      <MenuItem value="Greater Than"> {'Greater Than'} </MenuItem>
+                      <MenuItem value="Greater Than  or Equal"> {'Greater Than or Equal'} </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -2117,7 +1962,7 @@ function PaidStatusFix() {
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       value={paidstatusfix.currentachievedvalue}
                       onChange={(e) => {
                         setPaidstatusfix({
@@ -2131,12 +1976,12 @@ function PaidStatusFix() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Paid Status<b style={{ color: "red" }}>*</b>{" "}
+                      Paid Status<b style={{ color: 'red' }}>*</b>{' '}
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       value={paidstatusfix.paidstatus}
                       onChange={(e) => {
                         setPaidstatusfix({
@@ -2149,27 +1994,17 @@ function PaidStatusFix() {
                 </Grid>
               </Grid>
               <br /> <br />
-              <Grid
-                container
-                spacing={2}
-                sx={{ display: "flex", justifyContent: "center" }}
-              >
+              <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Grid item lg={1} md={2} sm={2} xs={12}>
                   {!loading ? (
-                    fileUploadName != "" &&
-                      splitArray.length > 0 &&
-                      selectedSheet !== "Please Select Sheet" ? (
+                    fileUploadName != '' && splitArray.length > 0 && selectedSheet !== 'Please Select Sheet' ? (
                       <>
                         <div readExcel={readExcel}>
                           <SendToServer sendJSON={sendJSON} />
                         </div>
                       </>
                     ) : (
-                      <Button
-                        variant="contained"
-                        disabled={isXeroxLoad === true}
-                        onClick={handleSubmit}
-                      >
+                      <Button variant="contained" disabled={isXeroxLoad === true} onClick={handleSubmit}>
                         Submit
                       </Button>
                     )
@@ -2193,19 +2028,20 @@ function PaidStatusFix() {
             </>
           </Box>
           <br />
-          {isUserRoleCompare?.includes("lpaidstatusfixmonthset") && (
+          {isUserRoleCompare?.includes('lpaidstatusfixmonthset') && (
             <>
               <Box sx={userStyle.container}>
-                { /* ******************************************************EXPORT Buttons****************************************************** */}
+                {/* ******************************************************EXPORT Buttons****************************************************** */}
                 <Grid item xs={8}>
                   <Typography sx={userStyle.importheadtext}>List Paid Status Fix Month Set</Typography>
                 </Grid>
-
                 <Grid container spacing={2} style={userStyle.dataTablestyle}>
                   <Grid item md={2} xs={12} sm={12}>
                     <Box>
-                      <label >Show entries:</label>
-                      <Select id="pageSizeSelect" value={pageSize}
+                      <label>Show entries:</label>
+                      <Select
+                        id="pageSizeSelect"
+                        value={pageSize}
                         MenuProps={{
                           PaperProps: {
                             style: {
@@ -2214,56 +2050,81 @@ function PaidStatusFix() {
                             },
                           },
                         }}
-                        onChange={handlePageSizeChange} sx={{ width: "77px" }}>
+                        onChange={handlePageSizeChange}
+                        sx={{ width: '77px' }}
+                      >
                         <MenuItem value={1}>1</MenuItem>
                         <MenuItem value={5}>5</MenuItem>
                         <MenuItem value={10}>10</MenuItem>
                         <MenuItem value={25}>25</MenuItem>
                         <MenuItem value={50}>50</MenuItem>
                         <MenuItem value={100}>100</MenuItem>
-                        <MenuItem value={(penaltyErrorUpload?.length)}>All</MenuItem>
+                        <MenuItem value={penaltyErrorUpload?.length}>All</MenuItem>
                       </Select>
                     </Box>
                   </Grid>
                   <Grid item md={8} xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Box >
-                      {isUserRoleCompare?.includes("excelpaidstatusfixmonthset") && (
+                    <Box>
+                      {isUserRoleCompare?.includes('excelpaidstatusfixmonthset') && (
                         <>
-                          <Button onClick={(e) => {
-                            setIsFilterOpen(true)
-                            // fetchPenaltyErrorUploadArray()
-                            setFormat("xl")
-                          }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
-                        </>
-                      )}
-                      {isUserRoleCompare?.includes("csvpaidstatusfixmonthset") && (
-                        <>
-                          <Button onClick={(e) => {
-                            setIsFilterOpen(true)
-                            // fetchPenaltyErrorUploadArray()
-                            setFormat("csv")
-                          }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
-                        </>
-                      )}
-                      {isUserRoleCompare?.includes("printpaidstatusfixmonthset") && (
-                        <>
-                          <Button sx={userStyle.buttongrp} onClick={handleprint}>&ensp;<FaPrint />&ensp;Print&ensp;</Button>
-                        </>
-                      )}
-                      {isUserRoleCompare?.includes("pdfpaidstatusfixmonthset") && (
-                        <>
-                          <Button sx={userStyle.buttongrp}
-                            onClick={() => {
-                              setIsPdfFilterOpen(true)
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpen(true);
                               // fetchPenaltyErrorUploadArray()
-                            }}>
-                            <FaFilePdf />&ensp;Export to PDF&ensp;</Button>
+                              setFormat('xl');
+                            }}
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileExcel />
+                            &ensp;Export to Excel&ensp;
+                          </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes("imagepaidstatusfixmonthset") && (
-                        <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}> <ImageIcon sx={{ fontSize: "15px" }} />  &ensp;Image&ensp; </Button>
+                      {isUserRoleCompare?.includes('csvpaidstatusfixmonthset') && (
+                        <>
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpen(true);
+                              // fetchPenaltyErrorUploadArray()
+                              setFormat('csv');
+                            }}
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileCsv />
+                            &ensp;Export to CSV&ensp;
+                          </Button>
+                        </>
                       )}
-                    </Box >
+                      {isUserRoleCompare?.includes('printpaidstatusfixmonthset') && (
+                        <>
+                          <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                            &ensp;
+                            <FaPrint />
+                            &ensp;Print&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('pdfpaidstatusfixmonthset') && (
+                        <>
+                          <Button
+                            sx={userStyle.buttongrp}
+                            onClick={() => {
+                              setIsPdfFilterOpen(true);
+                              // fetchPenaltyErrorUploadArray()
+                            }}
+                          >
+                            <FaFilePdf />
+                            &ensp;Export to PDF&ensp;
+                          </Button>
+                        </>
+                      )}
+                      {isUserRoleCompare?.includes('imagepaidstatusfixmonthset') && (
+                        <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                          {' '}
+                          <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                        </Button>
+                      )}
+                    </Box>
                   </Grid>
                   <Grid item md={2} xs={6} sm={6}>
                     <AggregatedSearchBar
@@ -2277,32 +2138,31 @@ function PaidStatusFix() {
                       setSearchQuery={setSearchQuery}
                       paginated={false}
                       totalDatas={overallItems}
-
                     />
                   </Grid>
                 </Grid>
-
-                <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>Show All Columns</Button>&ensp;
-                <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>Manage Columns</Button>&ensp;
-                {isUserRoleCompare?.includes("bderrortype") && (
-                  <Button variant="contained" color="error" onClick={handleClickOpenalert} sx={buttonStyles.buttonbulkdelete}>Bulk Delete</Button>)}
-                <br /><br />
-                {!sourceCheck ?
+                <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
+                  Show All Columns
+                </Button>
+                &ensp;
+                <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
+                  Manage Columns
+                </Button>
+                &ensp;
+                {isUserRoleCompare?.includes('bderrortype') && (
+                  <Button variant="contained" color="error" onClick={handleClickOpenalert} sx={buttonStyles.buttonbulkdelete}>
+                    Bulk Delete
+                  </Button>
+                )}
+                <br />
+                <br />
+                {!sourceCheck ? (
                   <>
                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      <ThreeDots
-                        height="80"
-                        width="80"
-                        radius="9"
-                        color="#1976d2"
-                        ariaLabel="three-dots-loading"
-                        wrapperStyle={{}}
-                        wrapperClassName=""
-                        visible={true}
-                      />
+                      <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                     </Box>
                   </>
-                  :
+                ) : (
                   <>
                     <AggridTable
                       rowDataTable={rowDataTable}
@@ -2329,13 +2189,12 @@ function PaidStatusFix() {
                       filteredChanges={filteredChanges}
                       gridRefTableImg={gridRefTableImg}
                       itemsList={overallItems}
-
                     />
-                  </>}
+                  </>
+                )}
               </Box>
             </>
-          )
-          }
+          )}
           {/* Manage Column */}
           <Popover
             id={id}
@@ -2354,41 +2213,21 @@ function PaidStatusFix() {
 
       {/* EXTERNAL COMPONENTS -------------- START */}
       {/* VALIDATION */}
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
 
       {/* view model */}
-      <Dialog
-        open={openview}
-        onClose={handleClickOpenview}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="lg"
-        sx={{ marginTop: '50px' }}
-      >
-        <Box sx={{ width: "auto", padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg" sx={{ marginTop: '50px' }}>
+        <Box sx={{ width: 'auto', padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              View Paid Status Fix List
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> View Paid Status Fix List</Typography>
             <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Department</Typography>
-                  <Typography>{paidstatusfixEdit.department + ","}</Typography>
+                  <Typography>{paidstatusfixEdit.department + ','}</Typography>
                 </FormControl>
               </Grid>
               {/* <Grid item md={3} xs={12} sm={12}>
@@ -2448,33 +2287,25 @@ function PaidStatusFix() {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Current Absent Mode</Typography>
-                  <Typography>
-                    {paidstatusfixEdit.currentabsentmodes}
-                  </Typography>
+                  <Typography>{paidstatusfixEdit.currentabsentmodes}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Current Absent Value</Typography>
-                  <Typography>
-                    {paidstatusfixEdit.currentabsentvalue}
-                  </Typography>
+                  <Typography>{paidstatusfixEdit.currentabsentvalue}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Current Achieved Mode</Typography>
-                  <Typography>
-                    {paidstatusfixEdit.currentachievedmodes}
-                  </Typography>
+                  <Typography>{paidstatusfixEdit.currentachievedmodes}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Current Achieved Value </Typography>
-                  <Typography>
-                    {paidstatusfixEdit.currentachievedvalue}
-                  </Typography>
+                  <Typography>{paidstatusfixEdit.currentachievedvalue}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
@@ -2486,26 +2317,15 @@ function PaidStatusFix() {
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleCloseview}
-                sx={buttonStyles.btncancel}
-              >
-                {" "}
-                Back{" "}
+              <Button variant="contained" color="primary" onClick={handleCloseview} sx={buttonStyles.btncancel}>
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
         </Box>
       </Dialog>
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Paid Status Fix Month Set List Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Paid Status Fix Month Set List Info" addedby={addedby} updateby={updateby} />
 
       <Box>
         {/* Edit DIALOG */}
@@ -2517,22 +2337,20 @@ function PaidStatusFix() {
           fullWidth={true}
           maxWidth="md"
           sx={{
-            overflow: "visible",
-            "& .MuiPaper-root": {
-              overflow: "visible",
-              marginTop: '50px'
+            overflow: 'visible',
+            '& .MuiPaper-root': {
+              overflow: 'visible',
+              marginTop: '50px',
             },
           }}
         >
-          <Box sx={{ padding: "20px" }}>
+          <Box sx={{ padding: '20px' }}>
             <>
               <form onSubmit={editSubmit}>
                 {/* <DialogContent sx={{ width: '550px', padding: '20px' }}> */}
                 <Grid container spacing={2}>
                   <Grid item md={12} xs={12} sm={12}>
-                    <Typography sx={userStyle.HeaderText}>
-                      Edit Paid Status Fix List
-                    </Typography>
+                    <Typography sx={userStyle.HeaderText}>Edit Paid Status Fix List</Typography>
                   </Grid>
                 </Grid>
                 <br />
@@ -2540,11 +2358,7 @@ function PaidStatusFix() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>Department </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="text"
-                        value={paidstatusfixEdit.department}
-                      />
+                      <OutlinedInput id="component-outlined" type="text" value={paidstatusfixEdit.department} />
                     </FormControl>
                     {/* <FormControl fullWidth size="small">
                       <Typography>
@@ -2602,7 +2416,7 @@ function PaidStatusFix() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Frequency <b style={{ color: "red" }}>*</b>
+                        Frequency <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -2637,9 +2451,9 @@ function PaidStatusFix() {
                           setAbsentmodesEdit(e.target.value);
                         }}
                         displayEmpty
-                        inputProps={{ "aria-label": "Without label" }}
+                        inputProps={{ 'aria-label': 'Without label' }}
                       >
-                        <MenuItem value="Between"> {"Between"} </MenuItem>
+                        <MenuItem value="Between"> {'Between'} </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -2695,9 +2509,9 @@ function PaidStatusFix() {
                           setAchievedmodesEdit(e.target.value);
                         }}
                         displayEmpty
-                        inputProps={{ "aria-label": "Without label" }}
+                        inputProps={{ 'aria-label': 'Without label' }}
                       >
-                        <MenuItem value="Between"> {"Between"} </MenuItem>
+                        <MenuItem value="Between"> {'Between'} </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -2753,21 +2567,12 @@ function PaidStatusFix() {
                           setCurrentabsentmodesEdit(e.target.value);
                         }}
                         displayEmpty
-                        inputProps={{ "aria-label": "Without label" }}
+                        inputProps={{ 'aria-label': 'Without label' }}
                       >
-                        <MenuItem value="Less Than or Equal">
-                          {" "}
-                          {"Less Than or Equal"}{" "}
-                        </MenuItem>
-                        <MenuItem value="Less Than"> {"Less Than"} </MenuItem>
-                        <MenuItem value="Greater Than">
-                          {" "}
-                          {"Greater Than"}{" "}
-                        </MenuItem>
-                        <MenuItem value="Greater Than  or Equal">
-                          {" "}
-                          {"Greater Than or Equal"}{" "}
-                        </MenuItem>
+                        <MenuItem value="Less Than or Equal"> {'Less Than or Equal'} </MenuItem>
+                        <MenuItem value="Less Than"> {'Less Than'} </MenuItem>
+                        <MenuItem value="Greater Than"> {'Greater Than'} </MenuItem>
+                        <MenuItem value="Greater Than  or Equal"> {'Greater Than or Equal'} </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -2807,21 +2612,12 @@ function PaidStatusFix() {
                           setCurrentachievedmodesEdit(e.target.value);
                         }}
                         displayEmpty
-                        inputProps={{ "aria-label": "Without label" }}
+                        inputProps={{ 'aria-label': 'Without label' }}
                       >
-                        <MenuItem value="Less Than or Equal">
-                          {" "}
-                          {"Less Than or Equal"}{" "}
-                        </MenuItem>
-                        <MenuItem value="Less Than"> {"Less Than"} </MenuItem>
-                        <MenuItem value="Greater Than">
-                          {" "}
-                          {"Greater Than"}{" "}
-                        </MenuItem>
-                        <MenuItem value="Greater Than  or Equal">
-                          {" "}
-                          {"Greater Than or Equal"}{" "}
-                        </MenuItem>
+                        <MenuItem value="Less Than or Equal"> {'Less Than or Equal'} </MenuItem>
+                        <MenuItem value="Less Than"> {'Less Than'} </MenuItem>
+                        <MenuItem value="Greater Than"> {'Greater Than'} </MenuItem>
+                        <MenuItem value="Greater Than  or Equal"> {'Greater Than or Equal'} </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -2844,7 +2640,7 @@ function PaidStatusFix() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Paid Status<b style={{ color: "red" }}>*</b>{" "}
+                        Paid Status<b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -2869,10 +2665,7 @@ function PaidStatusFix() {
                     </Button>
                   </Grid>
                   <Grid item md={6} xs={6} sm={6}>
-                    <Button
-                      sx={buttonStyles.btncancel}
-                      onClick={handleCloseModEdit}
-                    >
+                    <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
                       Cancel
                     </Button>
                   </Grid>
@@ -2884,31 +2677,11 @@ function PaidStatusFix() {
         </Dialog>
       </Box>
 
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={delPaidstatus}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delPaidstatus} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
 
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
 
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={delPaidstatuscheckbox}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delPaidstatuscheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
 
       <ExportData
         // isFilterOpen={isFilterOpen}
@@ -2921,7 +2694,7 @@ function PaidStatusFix() {
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         // itemsTwo={paidstatusfixsFilterArray ?? []}
         itemsTwo={penaltyErrorUpload ?? []}
-        filename={"Paid Status Fix Month Set List"}
+        filename={'Paid Status Fix Month Set List'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
@@ -2929,12 +2702,12 @@ function PaidStatusFix() {
 
       {/*Export XL Data  */}
       <Dialog open={isFilterOpen} onClose={handleCloseFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ textAlign: "center", alignItems: "center", justifyContent: "center" }}>
+        <DialogContent sx={{ textAlign: 'center', alignItems: 'center', justifyContent: 'center' }}>
           <IconButton
             aria-label="close"
             onClick={handleCloseFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2942,8 +2715,8 @@ function PaidStatusFix() {
           >
             <CloseIcon />
           </IconButton>
-          {fileFormat === "xl" ? <FaFileExcel style={{ fontSize: "80px", color: "green" }} /> : <FaFileCsv style={{ fontSize: "80px", color: "green" }} />}
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          {fileFormat === 'xl' ? <FaFileExcel style={{ fontSize: '80px', color: 'green' }} /> : <FaFileCsv style={{ fontSize: '80px', color: 'green' }} />}
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2952,7 +2725,7 @@ function PaidStatusFix() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              fileFormat === "xl" ? handleExportXL("filtered") : downloadCSV("filtered");
+              fileFormat === 'xl' ? handleExportXL('filtered') : downloadCSV('filtered');
             }}
           >
             Export Filtered Data
@@ -2962,7 +2735,7 @@ function PaidStatusFix() {
             loading={exportLoading}
             variant="contained"
             onClick={(e) => {
-              fileFormat === "xl" ? handleExportXL("overall") : downloadCSV("overall");
+              fileFormat === 'xl' ? handleExportXL('overall') : downloadCSV('overall');
             }}
           >
             Export Over All Data
@@ -2971,12 +2744,12 @@ function PaidStatusFix() {
       </Dialog>
 
       <Dialog open={isPdfFilterOpen} onClose={handleClosePdfFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ textAlign: "center", alignItems: "center", justifyContent: "center" }}>
+        <DialogContent sx={{ textAlign: 'center', alignItems: 'center', justifyContent: 'center' }}>
           <IconButton
             aria-label="close"
             onClick={handleClosePdfFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2984,8 +2757,8 @@ function PaidStatusFix() {
           >
             <CloseIcon />
           </IconButton>
-          <PictureAsPdfIcon sx={{ fontSize: "80px", color: "red" }} />
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          <PictureAsPdfIcon sx={{ fontSize: '80px', color: 'red' }} />
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2993,7 +2766,7 @@ function PaidStatusFix() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdf("filtered");
+              downloadPdf('filtered');
             }}
           >
             Export Filtered Data
@@ -3002,7 +2775,7 @@ function PaidStatusFix() {
             variant="contained"
             loading={exportLoading}
             onClick={(e) => {
-              downloadPdf("overall");
+              downloadPdf('overall');
             }}
           >
             Export Over All Data

@@ -5787,7 +5787,10 @@ export const SERVICE = {
     BULK_ERROR_UPLOAD_EXCEL: `${BASE_URL}/api/bulkerroruploadsexcel`,
     STOCK_PURCHASE_LIMITED_ASSIGN: `${BASE_URL}/api/stockpurchaselimitedassign`,
 
+    DEPARTMENT_FOR_UPDATE_USERS_ATTENDANCEMODELOG: `${BASE_URL}/api/getmatcheddepartmentsforupdateusersattendancemodelog`,
+
     
+    DEPARTMENT_USERS_UPDATE_ATTMODE: `${BASE_URL}/api/departmentusersupdateattmode`,
 
 
 

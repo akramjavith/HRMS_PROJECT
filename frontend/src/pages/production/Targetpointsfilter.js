@@ -53,8 +53,19 @@ import PageHeading from "../../components/PageHeading";
 import AlertDialog from "../../components/Alert";
 import MessageAlert from "../../components/MessageAlert";
 import ExportData from "../../components/ExportData";
+import { getCurrentServerTime } from '../../components/getCurrentServerTime';
+
 
 function TargetPointsFilter() {
+  const [serverTime, setServerTime] = useState(null);
+    useEffect(() => {
+      const fetchTime = async () => {
+        const time = await getCurrentServerTime();
+        setServerTime(time);
+      };
+  
+      fetchTime();
+    }, []);
   const [fileFormat, setFormat] = useState("");
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
@@ -90,7 +101,7 @@ function TargetPointsFilter() {
   const { auth } = useContext(AuthContext);
 
   //  Datefield
-  var today = new Date();
+  var today = new Date(serverTime);
   var dd = String(today.getDate()).padStart(2, "0");
   var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
   var yyyy = today.getFullYear();

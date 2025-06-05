@@ -33,6 +33,10 @@ const DepartmentSchema = new Schema({
         type:Boolean,
         required: false
     },
+     attendancemode: {
+    type: [String],
+    required: false,
+  },
     addedby:[
         {
         name:{

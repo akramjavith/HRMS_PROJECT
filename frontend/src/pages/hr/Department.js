@@ -1,64 +1,52 @@
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import ImageIcon from '@mui/icons-material/Image';
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormGroup, Grid, IconButton, LinearProgress, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, TextareaAutosize, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormGroup, Grid, IconButton, LinearProgress, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, TextareaAutosize, TextField, Typography } from '@mui/material';
 import Switch from '@mui/material/Switch';
-import axios from "axios";
-import { saveAs } from "file-saver";
-import "jspdf-autotable";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaFilePdf, FaPrint } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import { useReactToPrint } from "react-to-print";
-import { handleApiError } from "../../components/Errorhandling";
-import Headtitle from "../../components/Headtitle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
+import axios from 'axios';
+// import axios from '../../axiosInstance';
+import { MultiSelect } from 'react-multi-select-component';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { saveAs } from 'file-saver';
+import 'jspdf-autotable';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaFilePdf, FaPrint } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import { useReactToPrint } from 'react-to-print';
+import { handleApiError } from '../../components/Errorhandling';
+import Headtitle from '../../components/Headtitle';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
 
-import DialogContentText from "@mui/material/DialogContentText";
+import DialogContentText from '@mui/material/DialogContentText';
 import domtoimage from 'dom-to-image';
-import { FaFileCsv, FaFileExcel } from "react-icons/fa";
+import { FaFileCsv, FaFileExcel } from 'react-icons/fa';
 import AggregatedSearchBar from '../../components/AggregatedSearchBar';
-import AggridTable from "../../components/AggridTable";
-import AlertDialog from "../../components/Alert";
-import ExportData from "../../components/ExportData";
-import InfoPopup from "../../components/InfoPopup.js";
-import MessageAlert from "../../components/MessageAlert";
-import PageHeading from "../../components/PageHeading";
+import AggridTable from '../../components/AggridTable';
+import AlertDialog from '../../components/Alert';
+import ExportData from '../../components/ExportData';
+import InfoPopup from '../../components/InfoPopup.js';
+import MessageAlert from '../../components/MessageAlert';
+import PageHeading from '../../components/PageHeading';
 
 function Department() {
-
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
 
   const [isHandleChange, setIsHandleChange] = useState(false);
-  const [searchedString, setSearchedString] = useState("")
+  const [searchedString, setSearchedString] = useState('');
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
-  let exportColumnNames = [
-    'Name',
-    'Description',
-    'Deduction',
-    'ERA',
-    'Penalty',
-    'Prod',
-    'Allowance',
-    'Target',
-    'Tax'
-  ]
-  let exportRowValues = [
-    'deptname', 'descrip',
-    'deduction', 'era',
-    'penalty', 'prod', 'allowance',
-    'target', 'tax'
-  ];
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
+  let exportColumnNames = ['Name', 'Description', 'Deduction', 'ERA', 'Penalty', 'Prod', 'Allowance', 'Target', 'Tax', 'Attendance Mode'];
+  let exportRowValues = ['deptname', 'descrip', 'deduction', 'era', 'penalty', 'prod', 'allowance', 'target', 'tax', 'attendancemode'];
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -66,8 +54,8 @@ function Department() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -78,25 +66,59 @@ function Department() {
   const [btnSubmitEdit, setBtmSubmitEdit] = useState(false);
 
   const [depart, setDepart] = useState({
-    deptname: "",
-    descrip: "",
-    deduction: "",
-    era: "",
-    penalty: "",
-    prod: "",
-    target: "",
-    tax: "", allowance: "",
-    company: "",
+    deptname: '',
+    descrip: '',
+    deduction: '',
+    era: '',
+    penalty: '',
+    prod: '',
+    target: '',
+    tax: '',
+    allowance: '',
+    company: '',
   });
-  const [getrowid, setRowGetid] = useState("");
+  const [getrowid, setRowGetid] = useState('');
   const [deletebranch, setDeletebranch] = useState({});
-  const { isUserRoleCompare, pageName, setPageName, isUserRoleAccess, buttonStyles } = useContext(UserRoleAccessContext);
+  const { isUserRoleCompare, pageName, setPageName, isUserRoleAccess, buttonStyles, isServerCurrentdatetime } = useContext(UserRoleAccessContext);
   const gridRef = useRef(null);
 
+  const attModeOptions = [
+    { label: 'Domain', value: 'Domain' },
+    { label: 'Hrms-Self', value: 'Hrms-Self' },
+    { label: 'Hrms-Manual', value: 'Hrms-Manual' },
+    { label: 'Biometric', value: 'Biometric' },
+    { label: 'Production', value: 'Production' },
+  ];
+
+  //Attendance mode multiselect create
+  const [selectedOptionsAttmode, setSelectedOptionsAttmode] = useState([]);
+  let [valueAttmodeCat, setValueAttmodeCat] = useState([]);
+
+  const handleAttmodeChange = (options) => {
+    const values = options.map((a) => a.value);
+    setValueAttmodeCat(values);
+    setSelectedOptionsAttmode(options);
+  };
+
+  const customValueRendererAttmode = (valueAttmodeCat, _attendancemode) => {
+    return valueAttmodeCat?.length ? valueAttmodeCat?.map(({ label }) => label)?.join(', ') : 'Please Select Attendance Mode';
+  };
+
+  //Attendance mode multiselect Edit
+  const [selectedOptionsAttmodeEdit, setSelectedOptionsAttmodeEdit] = useState([]);
+  let [valueAttmodeCatEdit, setValueAttmodeCatEdit] = useState([]);
+
+  const handleAttmodeChangeEdit = (options) => {
+    setSelectedOptionsAttmodeEdit(options);
+    setValueAttmodeCatEdit(options); // Keep full objects
+  };
+
+  const customValueRendererAttmodeEdit = (valueAttmodeCatEdit, _attendancemode) => {
+    return valueAttmodeCatEdit?.length ? valueAttmodeCatEdit?.map(({ label }) => label)?.join(', ') : 'Please Select Attendance Mode';
+  };
+
   useEffect(() => {
-
     getapi();
-
   }, []);
 
   const getapi = async () => {
@@ -106,38 +128,36 @@ function Department() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Department"),
+      pagename: String('Department'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(new Date()),
+      date: String(isServerCurrentdatetime?.currentNewDate),
 
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(new Date()),
+          date: String(isServerCurrentdatetime?.currentNewDate),
         },
       ],
     });
-
-  }
+  };
 
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
-
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [copiedData, setCopiedData] = useState('');
 
   //edit function state...
@@ -149,22 +169,20 @@ function Department() {
 
   const [isDept, setIsDept] = useState(false);
 
-
-
   const gridRefTableImg = useRef(null);
   // image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Department.png");
+          saveAs(blob, 'Department.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
-
 
   const handleSelectionChange = (newSelection) => {
     setSelectedRows(newSelection.selectionModel);
@@ -173,9 +191,9 @@ function Department() {
   //Datatable
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [ovProj, setOvProj] = useState("");
-  const [ovProjCount, setOvProjCount] = useState("");
-  const [getOverAllCount, setGetOverallCount] = useState("");
+  const [ovProj, setOvProj] = useState('');
+  const [ovProjCount, setOvProjCount] = useState('');
+  const [getOverAllCount, setGetOverallCount] = useState('');
 
   // view model
   const [openview, setOpenview] = useState(false);
@@ -227,7 +245,7 @@ function Department() {
   };
   const handleCloseerrpop = () => {
     setIsErrorOpenpop(false);
-    setBtmSubmitEdit(false)
+    setBtmSubmitEdit(false);
   };
 
   // Error Popup model
@@ -251,9 +269,11 @@ function Department() {
     deduction: true,
     era: true,
     penalty: true,
-    prod: true, allowance: true,
+    prod: true,
+    allowance: true,
     target: true,
     tax: true,
+    attendancemode: true,
     actions: true,
   };
 
@@ -272,22 +292,238 @@ function Department() {
     }
   };
 
+  // drag and drop code line start create
+
+  const DraggableQuestion = ({
+    valueAttmodeCat,
+    index,
+    moveQuestion,
+    updatedQuestions,
+    setUpdatedQuestions,
+    // selectedOptionsAttmode
+  }) => {
+    const [, ref] = useDrag({
+      type: 'QUESTION',
+      item: { index },
+    });
+
+    const [, drop] = useDrop({
+      accept: 'QUESTION',
+      hover: (draggedItem) => {
+        if (draggedItem.index !== index) {
+          moveQuestion(draggedItem.index, index);
+          draggedItem.index = index;
+          setUpdatedQuestions(updatedQuestions);
+        }
+      },
+    });
+
+    return (
+      <div
+        ref={(node) => ref(drop(node))}
+        style={{
+          padding: '8px',
+          border: '1px solid #ccc',
+          marginBottom: '4px',
+          cursor: 'grab',
+          ':active': {
+            cursor: 'grabbing',
+          },
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '16px',
+            fontWeight: 'bold',
+          }}
+        >
+          {/* Main Value */}
+          <span style={{ marginRight: '8px' }}>{valueAttmodeCat}</span>
+        </div>
+      </div>
+    );
+  };
+  const roundNames = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth'];
+  const DragDropList = ({ valueAttmodeCat, selectedOptionsAttmode, setValueAttmodeCat }) => {
+    const [orderedQuestions, setOrderedQuestions] = useState(valueAttmodeCat);
+    const [updatedQuestions, setUpdatedQuestions] = useState(valueAttmodeCat);
+
+    useEffect(() => {
+      setUpdatedQuestions(valueAttmodeCat);
+    }, [valueAttmodeCat]);
+    const moveQuestion = (fromIndex, toIndex) => {
+      // const updatedQuestionsCopy = [...orderedQuestions];
+      const updatedQuestionsCopy = [...valueAttmodeCat];
+      const [movedQuestion] = updatedQuestionsCopy.splice(fromIndex, 1);
+      updatedQuestionsCopy.splice(toIndex, 0, movedQuestion);
+      // setOrderedQuestions(updatedQuestionsCopy);
+
+      setValueAttmodeCat(updatedQuestionsCopy);
+      setUpdatedQuestions(updatedQuestionsCopy);
+    };
+
+    return (
+      <div>
+        {updatedQuestions &&
+          updatedQuestions.map((valueAttmodeCat, index) => {
+            const roundName = roundNames[index] || `Round ${index + 1}`; // Default to Round 1, 2, 3... if exceeds predefined names
+
+            return (
+              <div
+                key={index}
+                style={{
+                  marginBottom: '8px', // Add spacing between each round
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  backgroundColor: '#f9f9f9',
+                }}
+              >
+                {/* Serial Number and Default Round Name */}
+                <Typography variant="h6">
+                  {index + 1}. {roundName}
+                </Typography>
+
+                {/* Your DraggableQuestion component */}
+                <DraggableQuestion
+                  valueAttmodeCat={valueAttmodeCat}
+                  index={index}
+                  moveQuestion={moveQuestion}
+                  updatedQuestions={updatedQuestions}
+                  setUpdatedQuestions={setUpdatedQuestions}
+                  // selectedOptionsAttmode={selectedOptionsAttmode}
+                  selectedOptionsAttmode={selectedOptionsAttmode}
+                />
+              </div>
+            );
+          })}
+      </div>
+    );
+  };
+
+  // drag and drop code line end create
+
+  // drag and drop code start Edit
+
+  const DraggableQuestionEdit = ({
+    valueAttmodeCatEdit,
+    index,
+    moveQuestion,
+    updatedQuestionsEdit,
+    setUpdatedQuestionsEdit,
+    // selectedOptionsAttmodeEdit
+  }) => {
+    const [, ref] = useDrag({
+      type: 'QUESTION',
+      item: { index },
+    });
+
+    const [, drop] = useDrop({
+      accept: 'QUESTION',
+      hover: (draggedItem) => {
+        if (draggedItem.index !== index) {
+          moveQuestion(draggedItem.index, index);
+          draggedItem.index = index;
+          setUpdatedQuestionsEdit(updatedQuestionsEdit);
+        }
+      },
+    });
+
+    return (
+      <div
+        ref={(node) => ref(drop(node))}
+        style={{
+          padding: '8px',
+          border: '1px solid #ccc',
+          marginBottom: '4px',
+          cursor: 'grab',
+          ':active': {
+            cursor: 'grabbing',
+          },
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '16px',
+            fontWeight: 'bold',
+          }}
+        >
+          {/* Main Value */}
+          <span style={{ marginRight: '8px' }}>{valueAttmodeCatEdit?.label}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const DragDropListEdit = ({ valueAttmodeCatEdit, selectedOptionsAttmodeEdit, setValueAttmodeCatEdit }) => {
+    const [updateLoader, setUpdateLoader] = useState(false);
+    const [orderedQuestionsEdit, setOrderedQuestionsEdit] = useState(valueAttmodeCatEdit);
+    const [updatedQuestionsEdit, setUpdatedQuestionsEdit] = useState(valueAttmodeCatEdit);
+
+    useEffect(() => {
+      setUpdatedQuestionsEdit(valueAttmodeCatEdit);
+      setValueAttmodeCatEdit(valueAttmodeCatEdit); // Keep valueAttmodeCatEdit in sync
+    }, [valueAttmodeCatEdit]);
+
+    const moveQuestion = (fromIndex, toIndex) => {
+      // const updatedQuestionsCopy = [...orderedQuestionsEdit];
+      const updatedQuestionsCopy = [...valueAttmodeCatEdit];
+      const [movedQuestion] = updatedQuestionsCopy.splice(fromIndex, 1);
+      updatedQuestionsCopy.splice(toIndex, 0, movedQuestion);
+      setValueAttmodeCatEdit(updatedQuestionsCopy);
+      setUpdatedQuestionsEdit(updatedQuestionsCopy); // update local
+    };
+
+    return (
+      <div>
+        {updatedQuestionsEdit &&
+          updatedQuestionsEdit.map((valueAttmodeCatEdit, index) => {
+            const roundName = roundNames[index] || `Round ${index + 1}`; // Default to Round 1, 2, 3... if exceeds predefined names
+
+            return (
+              <div
+                key={index}
+                style={{
+                  marginBottom: '8px', // Add spacing between each round
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  backgroundColor: '#f9f9f9',
+                }}
+              >
+                {/* Serial Number and Default Round Name */}
+                <Typography variant="h6">
+                  {index + 1}. {roundName}
+                </Typography>
+
+                {/* Your DraggableQuestion component */}
+                <DraggableQuestionEdit key={index} valueAttmodeCatEdit={valueAttmodeCatEdit} index={index} moveQuestion={moveQuestion} updatedQuestionsEdit={updatedQuestionsEdit} setUpdatedQuestionsEdit={setUpdatedQuestionsEdit} selectedOptionsAttmodeEdit={selectedOptionsAttmodeEdit} />
+              </div>
+            );
+          })}
+      </div>
+    );
+  };
+
+  // drag and drop code line end Edit
+
   const [selectedRowsCount, setSelectedRowsCount] = useState(0);
 
   const overallBulkdelete = async (ids) => {
     setPageName(!pageName);
     try {
-      let overallcheck = await axios.post(
-        `${SERVICE.DEPARTMENTOVERALLBULKCHECK}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-          id: ids,
-        }
-      );
+      let overallcheck = await axios.post(`${SERVICE.DEPARTMENTOVERALLBULKCHECK}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        id: ids,
+      });
       setSelectedRows(overallcheck?.data?.result);
-      setSelectedRowsCount(overallcheck?.data?.count)
+      setSelectedRowsCount(overallcheck?.data?.count);
       handleClickOpencheckbox(true);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -296,15 +532,12 @@ function Department() {
 
   const handleCloseModalert = () => {
     setIsDeleteOpenalert(false);
-
   };
-
 
   //Delete model
   const [isDeleteOpencheckbox, setIsDeleteOpencheckbox] = useState(false);
 
   const handleClickOpencheckbox = () => {
-
     setIsDeleteOpencheckbox(true);
   };
   const handleCloseModcheckbox = () => {
@@ -313,7 +546,7 @@ function Department() {
 
   // Manage Columns
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const handleOpenManageColumns = (event) => {
     setAnchorEl(event.currentTarget);
@@ -321,19 +554,18 @@ function Department() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("")
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  // Show All Columns & Manage Columns 
-
+  // Show All Columns & Manage Columns
 
   const sendRequest = async () => {
     setBtmSubmit(true);
 
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let req = await axios.post(SERVICE.DEPARTMENT_CREATE, {
         headers: {
@@ -349,51 +581,57 @@ function Department() {
         allowance: Boolean(depart.allowance),
         target: Boolean(depart.target),
         tax: Boolean(depart.tax),
+        attendancemode: [...valueAttmodeCat],
         addedby: [
           {
             name: String(isUserRoleAccess?.companyname),
-            date: String(new Date()),
+            date: String(isServerCurrentdatetime?.currentNewDate),
           },
         ],
       });
       await fetchDepartments();
       setDepart(req.data);
       setDepart({
-        deptname: "",
-        company: "",
-        descrip: "",
+        deptname: '',
+        company: '',
+        descrip: '',
         deduction: false,
-        era: false, allowance: false,
+        era: false,
+        allowance: false,
         penalty: false,
         prod: false,
         target: false,
         tax: false,
       });
+      setValueAttmodeCat([]);
+      setSelectedOptionsAttmode([]);
       setBtmSubmit(false);
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { setBtmSubmit(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setBtmSubmit(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //submit option for saving
   const handleSubmit = (e) => {
-
     e.preventDefault();
     const isNameMatch = department.some((item) => item.deptname.toLowerCase() === depart.deptname.toLowerCase());
 
-    if (depart.deptname === "") {
-      setPopupContentMalert("Please Enter Name");
-      setPopupSeverityMalert("info");
+    if (depart.deptname === '') {
+      setPopupContentMalert('Please Enter Name');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-
-
+    } else if (selectedOptionsAttmode.length === 0) {
+      setPopupContentMalert('Please Select Attendance Mode!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data already exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data already exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-
-
     } else {
       sendRequest();
     }
@@ -402,27 +640,29 @@ function Department() {
   const handleClear = (e) => {
     e.preventDefault();
     setDepart({
-      deptname: "",
-      company: "",
-      descrip: "",
+      deptname: '',
+      company: '',
+      descrip: '',
       deduction: false,
-      era: false, allowance: false,
+      era: false,
+      allowance: false,
       penalty: false,
       prod: false,
       target: false,
       tax: false,
     });
     fetchDepartments();
-    setSearchQuery("")
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setValueAttmodeCat([]);
+    setSelectedOptionsAttmode([]);
+    setSearchQuery('');
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
-
   };
 
   //fetching departments whole list
   const fetchDepartments = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let dep = await axios.get(SERVICE.DEPARTMENT, {
         headers: {
@@ -430,22 +670,30 @@ function Department() {
         },
       });
 
-      setDeparttment(dep?.data?.departmentdetails?.map((item, index) => ({
-        ...item, serialNumber: index + 1, deduction: item.deduction ? "YES" : "NO",
-        era: item.era ? "YES" : "NO",
-        penalty: item.penalty ? "YES" : "NO",
-        prod: item.prod ? "YES" : "NO",
-        allowance: item.allowance ? "YES" : "NO",
-        target: item.target ? "YES" : "NO",
-        tax: item.tax ? "YES" : "NO",
-      })));
+      setDeparttment(
+        dep?.data?.departmentdetails?.map((item, index) => ({
+          ...item,
+          serialNumber: index + 1,
+          deduction: item.deduction ? 'YES' : 'NO',
+          era: item.era ? 'YES' : 'NO',
+          penalty: item.penalty ? 'YES' : 'NO',
+          prod: item.prod ? 'YES' : 'NO',
+          allowance: item.allowance ? 'YES' : 'NO',
+          target: item.target ? 'YES' : 'NO',
+          tax: item.tax ? 'YES' : 'NO',
+          attendancemode: item.attendancemode,
+        }))
+      );
       setIsDept(true);
-    } catch (err) { setIsDept(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setIsDept(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //fetching departments whole list
   const fetchDepartmentsAll = async (ids) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let dep = await axios.get(SERVICE.DEPARTMENT, {
         headers: {
@@ -453,7 +701,9 @@ function Department() {
         },
       });
       setDeparttmentalledit(dep?.data?.departmentdetails.filter((item) => item._id !== ids));
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //------------------------------------------------------
@@ -470,13 +720,13 @@ function Department() {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("xl");
+  const [fileFormat, setFormat] = useState('xl');
   // Print
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Department",
-    pageStyle: "print",
+    documentTitle: 'Department',
+    pageStyle: 'print',
   });
 
   //set function to get particular row delete
@@ -485,7 +735,7 @@ function Department() {
   const [checkUser, setCheckUser] = useState();
   //set function to get particular row
   const rowData = async (id, deptname) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const [res, resdev, resuser, resDep] = await Promise.all([
         axios.get(`${SERVICE.DEPARTMENT_SINGLE}/${id}`, {
@@ -510,24 +760,26 @@ function Department() {
             Authorization: `Bearer ${auth.APIToken}`,
           },
           department: String(deptname),
-        })
-      ])
+        }),
+      ]);
       setDeletebranch(res?.data?.sdepartmentdetails);
       setCheckTeam(resDep?.data?.count);
       setCheckUser(resuser?.data?.users);
       if (resDep?.data?.count > 0) {
         setPopupContentMalert(
-          <span style={{ fontWeight: "700", color: "#777" }}>
+          <span style={{ fontWeight: '700', color: '#777' }}>
             {`${deptname}`}
-            <span style={{ fontWeight: "bold", color: "black" }}> was linked</span>
+            <span style={{ fontWeight: 'bold', color: 'black' }}> was linked</span>
           </span>
         );
-        setPopupSeverityMalert("info");
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else {
         handleClickOpen();
       }
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   // Edit model
@@ -536,18 +788,18 @@ function Department() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
     setBtmSubmitEdit(false);
   };
 
   //Edit functiona --->> getCode, sendEditRequest , editSubmit
 
-  const [oldBranchName, setOldBranchName] = useState("");
+  const [oldBranchName, setOldBranchName] = useState('');
 
   //get single row to edit
   const getCode = async (e, name) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.DEPARTMENT_SINGLE}/${e}`, {
         headers: {
@@ -556,17 +808,30 @@ function Department() {
       });
       setLangid(res?.data?.sdepartmentdetails);
       setRowGetid(res?.data?.sdepartmentdetails);
+
+      const attendanceModes = res?.data?.sdepartmentdetails?.attendancemode || [];
+
+      const formattedModes = attendanceModes.map((mode) => ({
+        attendancemode: mode,
+        label: mode,
+        value: mode,
+      }));
+
+      setSelectedOptionsAttmodeEdit(formattedModes);
+      setValueAttmodeCatEdit(formattedModes);
+
       setOvProj(name);
-      setOldBranchName(name)
+      setOldBranchName(name);
       getOverallEditSection(name);
       handleClickOpenEdit();
-
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   // get single row to view....
   const getviewCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.DEPARTMENT_SINGLE}/${e}`, {
         headers: {
@@ -574,14 +839,25 @@ function Department() {
         },
       });
       setLangid(res?.data?.sdepartmentdetails);
-      handleClickOpenview();
+      const attendanceModes = res?.data?.sdepartmentdetails?.attendancemode || [];
 
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      const formattedModes = attendanceModes.map((mode) => ({
+        attendancemode: mode,
+        label: mode,
+        value: mode,
+      }));
+
+      setSelectedOptionsAttmodeEdit(formattedModes);
+      setValueAttmodeCatEdit(formattedModes);
+      handleClickOpenview();
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   // get single row to view....
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.DEPARTMENT_SINGLE}/${e}`, {
         headers: {
@@ -590,52 +866,47 @@ function Department() {
       });
       setLangid(res?.data?.sdepartmentdetails);
       handleClickOpeninfo();
-
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   let deptid = getrowid?._id;
 
   const LoadingDialog = ({ open, onClose, progress }) => {
     const dialogStyles = {
-      padding: "24px",
-      textAlign: "center",
+      padding: '24px',
+      textAlign: 'center',
     };
 
     const dialogTitleStyles = {
-      fontWeight: "bold",
-      fontSize: "1.5rem",
-      color: "#3f51b5", // Primary color
+      fontWeight: 'bold',
+      fontSize: '1.5rem',
+      color: '#3f51b5', // Primary color
     };
 
     const dialogContentStyles = {
-      padding: "16px",
+      padding: '16px',
     };
 
     const progressStyles = {
-      marginTop: "16px",
-      height: "10px",
-      borderRadius: "5px",
+      marginTop: '16px',
+      height: '10px',
+      borderRadius: '5px',
     };
 
     const progressTextStyles = {
-      marginTop: "8px",
-      fontWeight: "bold",
-      color: "#4caf50", // Success color
+      marginTop: '8px',
+      fontWeight: 'bold',
+      color: '#4caf50', // Success color
     };
 
     return (
       <Dialog open={open} onClose={onClose}>
         <DialogTitle style={dialogTitleStyles}>Updating...</DialogTitle>
         <DialogContent style={dialogContentStyles}>
-          <Typography>
-            Please wait while we update the employee names across all pages.
-          </Typography>
-          <LinearProgress
-            style={progressStyles}
-            variant="determinate"
-            value={progress}
-          />
+          <Typography>Please wait while we update the employee names across all pages.</Typography>
+          <LinearProgress style={progressStyles} variant="determinate" value={progress} />
           <Typography style={progressTextStyles}>{progress}%</Typography>
         </DialogContent>
         <DialogActions></DialogActions>
@@ -649,12 +920,11 @@ function Department() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [openPopupUpload, setOpenPopupUpload] = useState(false);
 
-
   const handleUploadProgress = (progressEvent) => {
     if (progressEvent.event.lengthComputable) {
       updateTotalProgress(progressEvent.loaded, progressEvent.total);
     } else {
-      console.log("Unable to compute progress information.");
+      console.log('Unable to compute progress information.');
     }
   };
 
@@ -665,10 +935,9 @@ function Department() {
       const percentCompleted = Math.round((totalLoaded * 100) / totalSize);
       setUploadProgress(percentCompleted);
     } else {
-      console.log("Total size is zero, unable to compute progress.");
+      console.log('Total size is zero, unable to compute progress.');
     }
   };
-
 
   //department updateby edit page...
   let updateby = langid?.updatedby;
@@ -677,7 +946,7 @@ function Department() {
   //editing the single data
   const sendEditRequest = async () => {
     setBtmSubmitEdit(true);
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.put(`${SERVICE.DEPARTMENT_SINGLE}/${deptid}`, {
         headers: {
@@ -693,24 +962,31 @@ function Department() {
         prod: Boolean(langid.prod),
         target: Boolean(langid.target),
         tax: Boolean(langid.tax),
+        attendancemode: valueAttmodeCatEdit.map((item) => item.label),
         updatedby: [
           ...updateby,
           {
             name: String(isUserRoleAccess?.companyname),
-            date: String(new Date()),
+            date: String(isServerCurrentdatetime?.currentNewDate),
           },
         ],
       });
 
+     let resusers =  await axios.post(`${SERVICE.DEPARTMENT_USERS_UPDATE_ATTMODE}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        deptname: String(langid.deptname),
+        attendancemode: valueAttmodeCatEdit.map((item) => item.label),
+        // companyname:isUserRoleAccess.companyname,
+      });
+
+
       const performUploads = async () => {
-        setPageName(!pageName)
+        setPageName(!pageName);
         try {
           // Check and perform employee name update
-          if (
-            langid.deptname?.toLowerCase() !==
-            oldBranchName?.toLowerCase()
-
-          ) {
+          if (langid.deptname?.toLowerCase() !== oldBranchName?.toLowerCase()) {
             await axios.put(
               `${SERVICE.DEPARTMENTOVERALLUPDATE}`,
               {
@@ -725,27 +1001,28 @@ function Department() {
               }
             );
           }
-
         } catch (error) {
-          console.log(error)
-          console.error("Error during upload:", error);
+          console.log(error);
+          console.error('Error during upload:', error);
         } finally {
           setOpenPopupUpload(false); // Close the popup after all uploads are completed
-          console.log("ended");
+          console.log('ended');
         }
       };
 
-      await performUploads()
+      await performUploads();
 
       await fetchDepartments();
       setLangid(res.data);
       handleCloseModEdit();
       setBtmSubmitEdit(false);
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-
-    } catch (err) { setBtmSubmitEdit(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setBtmSubmitEdit(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //update button
 
@@ -754,28 +1031,30 @@ function Department() {
 
     const isNameMatch = departmentalledit.some((item) => item.deptname.toLowerCase() === langid.deptname.toLowerCase());
 
-    if (langid.deptname === "") {
-      setPopupContentMalert("Please Enter Name");
-      setPopupSeverityMalert("info");
+    if (langid.deptname === '') {
+      setPopupContentMalert('Please Enter Name');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (selectedOptionsAttmodeEdit.length === 0) {
+      setPopupContentMalert('Please Select Attendance Mode!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data already exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data already exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (langid.deptname != ovProj && ovProjCount > 0) {
+    } else if (langid.deptname != ovProj && ovProjCount > 0) {
       setShowAlertpop(getOverAllCount);
       // setPopupSeverityMalert("info");
       handleClickOpenerrpop();
-    }
-    else {
+    } else {
       sendEditRequest();
     }
   };
 
   //overall edit section for all pages
   const getOverallEditSection = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.post(SERVICE.DEPARTMENTOVERALLCHECK, {
         headers: {
@@ -787,13 +1066,15 @@ function Department() {
       setOvProjCount(res?.data?.count);
       setGetOverallCount(`The ${e} is linked
     whether you want to do changes ..??`);
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   // Alert delete popup
   let branchid = deletebranch?._id;
   const delDepartment = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       await axios.delete(`${SERVICE.DEPARTMENT_SINGLE}/${branchid}`, {
         headers: {
@@ -804,22 +1085,22 @@ function Department() {
       setSelectedRows([]);
       setPage(1);
       handleCloseMod();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-
-
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const delDepartmentcheckbox = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const deletePromises = selectedRows?.map((item) => {
         return axios.delete(`${SERVICE.DEPARTMENT_SINGLE}/${item}`, {
           headers: {
-            'Authorization': `Bearer ${auth.APIToken}`
-          }
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
         });
       });
 
@@ -827,11 +1108,9 @@ function Department() {
       await Promise.all(deletePromises);
       setIsHandleChange(false);
 
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-
-
 
       handleCloseModcheckbox();
       setSelectedRows([]);
@@ -839,10 +1118,10 @@ function Department() {
       setPage(1);
 
       await fetchDepartments();
-
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
-
 
   useEffect(() => {
     fetchDepartments();
@@ -863,33 +1142,29 @@ function Department() {
     addSerialNumber(department);
   }, [department]);
 
-
   //Datatable
   const handlePageChange = (newPage) => {
     setPage(newPage);
     setSelectedRows([]);
-    setSelectAllChecked(false)
+    setSelectAllChecked(false);
   };
 
   const handlePageSizeChange = (event) => {
     setPageSize(Number(event.target.value));
     setSelectedRows([]);
-    setSelectAllChecked(false)
+    setSelectAllChecked(false);
     setPage(1);
   };
-
 
   //datatable....
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
   const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
@@ -911,21 +1186,16 @@ function Department() {
 
   const CheckboxHeader = ({ selectAllChecked, onSelectAll }) => (
     <div>
-      <Checkbox
-        checked={selectAllChecked}
-        onChange={onSelectAll}
-      />
+      <Checkbox checked={selectAllChecked} onChange={onSelectAll} />
     </div>
   );
 
-
   const columnDataTable = [
-
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
       headerCheckboxSelection: true,
@@ -935,69 +1205,91 @@ function Department() {
       width: 60,
 
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header"
+      headerClassName: 'bold-header',
     },
     {
-      field: "serialNumber", headerName: "SNo",
-      flex: 0, width: 90, hide: !columnVisibility.serialNumber, headerClassName: "bold-header", pinned: 'left',
+      field: 'serialNumber',
+      headerName: 'SNo',
+      flex: 0,
+      width: 90,
+      hide: !columnVisibility.serialNumber,
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
-    { field: "deptname", headerName: "Name", flex: 0, width: 100, hide: !columnVisibility.deptname, headerClassName: "bold-header", pinned: 'left', },
-    { field: "descrip", headerName: "Decription", flex: 0, width: 100, hide: !columnVisibility.descrip, headerClassName: "bold-header" },
-    { field: "deduction", headerName: "Deduction", flex: 0, width: 100, hide: !columnVisibility.deduction, headerClassName: "bold-header" },
-    { field: "era", headerName: "ERA", flex: 0, width: 100, hide: !columnVisibility.era, headerClassName: "bold-header" },
-    { field: "penalty", headerName: "Penalty", flex: 0, width: 100, hide: !columnVisibility.penalty, headerClassName: "bold-header" },
-    { field: "prod", headerName: "Prod", flex: 0, width: 100, hide: !columnVisibility.prod, headerClassName: "bold-header" },
-    { field: "allowance", headerName: "Allowance", flex: 0, width: 100, hide: !columnVisibility.allowance, headerClassName: "bold-header" },
-    { field: "target", headerName: "Target", flex: 0, width: 100, hide: !columnVisibility.target, headerClassName: "bold-header" },
-    { field: "tax", headerName: "Tax", flex: 0, width: 100, hide: !columnVisibility.tax, headerClassName: "bold-header" },
+    { field: 'deptname', headerName: 'Name', flex: 0, width: 100, hide: !columnVisibility.deptname, headerClassName: 'bold-header', pinned: 'left' },
+    { field: 'descrip', headerName: 'Decription', flex: 0, width: 100, hide: !columnVisibility.descrip, headerClassName: 'bold-header' },
+    { field: 'deduction', headerName: 'Deduction', flex: 0, width: 100, hide: !columnVisibility.deduction, headerClassName: 'bold-header' },
+    { field: 'era', headerName: 'ERA', flex: 0, width: 100, hide: !columnVisibility.era, headerClassName: 'bold-header' },
+    { field: 'penalty', headerName: 'Penalty', flex: 0, width: 100, hide: !columnVisibility.penalty, headerClassName: 'bold-header' },
+    { field: 'prod', headerName: 'Prod', flex: 0, width: 100, hide: !columnVisibility.prod, headerClassName: 'bold-header' },
+    { field: 'allowance', headerName: 'Allowance', flex: 0, width: 100, hide: !columnVisibility.allowance, headerClassName: 'bold-header' },
+    { field: 'target', headerName: 'Target', flex: 0, width: 100, hide: !columnVisibility.target, headerClassName: 'bold-header' },
+    { field: 'tax', headerName: 'Tax', flex: 0, width: 100, hide: !columnVisibility.tax, headerClassName: 'bold-header' },
+    {
+      field: 'attendancemode',
+      headerName: 'Attendance Mode',
+      flex: 0,
+      width: 350,
+      hide: !columnVisibility.attendancemode,
+      headerClassName: 'bold-header',
+    },
 
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
       minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <Grid sx={{ display: 'flex' }}>
-          {isUserRoleCompare?.includes("edepartment") && (
-            <Button sx={userStyle.buttonedit} onClick={() => {
-              getCode(params.data.id, params.data.deptname);
-              fetchDepartmentsAll(params.data.id);
-            }}><EditOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonedit} /></Button>
+          {isUserRoleCompare?.includes('edepartment') && (
+            <Button
+              sx={userStyle.buttonedit}
+              onClick={() => {
+                getCode(params.data.id, params.data.deptname);
+                fetchDepartmentsAll(params.data.id);
+              }}
+            >
+              <EditOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonedit} />
+            </Button>
           )}
-          {isUserRoleCompare?.includes("ddepartment") && (
-            <Button sx={userStyle.buttondelete}
+          {isUserRoleCompare?.includes('ddepartment') && (
+            <Button
+              sx={userStyle.buttondelete}
               onClick={(e) => {
-                rowData(params.data.id, params.data.deptname)
-              }}><DeleteOutlineOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttondelete} /></Button>
+                rowData(params.data.id, params.data.deptname);
+              }}
+            >
+              <DeleteOutlineOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttondelete} />
+            </Button>
           )}
-          {isUserRoleCompare?.includes("vdepartment") && (
+          {isUserRoleCompare?.includes('vdepartment') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getviewCode(params.data.id);
               }}
             >
-              <VisibilityOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonview} />
+              <VisibilityOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("idepartment") && (
+          {isUserRoleCompare?.includes('idepartment') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getinfoCode(params.data.id);
               }}
             >
-              <InfoOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttoninfo} />
+              <InfoOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttoninfo} />
             </Button>
           )}
         </Grid>
       ),
     },
-  ]
+  ];
 
   const rowDataTable = filteredData.map((item, index) => {
     return {
@@ -1013,7 +1305,8 @@ function Department() {
       allowance: item.allowance,
       target: item.target,
       tax: item.tax,
-    }
+      attendancemode: item.attendancemode,
+    };
   });
 
   const rowsWithCheckboxes = rowDataTable.map((row) => ({
@@ -1032,23 +1325,19 @@ function Department() {
   };
 
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
 
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
-
     setColumnVisibility((prevVisibility) => ({
       ...prevVisibility,
       [field]: !prevVisibility[field],
     }));
-
   };
 
   // JSX for the "Manage Columns" popover content
   const manageColumnsContent = (
-    <Box style={{ padding: "10px", minWidth: "325px", '& .MuiDialogContent-root': { padding: '10px 0' } }} >
+    <Box style={{ padding: '10px', minWidth: '325px', '& .MuiDialogContent-root': { padding: '10px 0' } }}>
       <Typography variant="h6">Manage Columns</Typography>
       <IconButton
         aria-label="close"
@@ -1063,28 +1352,19 @@ function Department() {
         <CloseIcon />
       </IconButton>
       <Box sx={{ position: 'relative', margin: '10px' }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: 'absolute', }}
-        />
-      </Box><br /><br />
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
+      </Box>
+      <br />
+      <br />
       <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
-        <List sx={{ overflow: 'auto', height: '100%', }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText sx={{ display: 'flex' }}
-                primary={
-                  <Switch sx={{ marginTop: "-5px" }} size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={(column.field === "checkbox") ? "Checkbox" : column.headerName}
-              // secondary={column.headerName }
+              <ListItemText
+                sx={{ display: 'flex' }}
+                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
+                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
+                // secondary={column.headerName }
               />
             </ListItem>
           ))}
@@ -1093,11 +1373,7 @@ function Department() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: 'none', }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -1113,42 +1389,29 @@ function Department() {
                 });
                 setColumnVisibility(newColumnVisibility);
               }}
-
             >
               Hide All
             </Button>
-
           </Grid>
         </Grid>
       </DialogActions>
     </Box>
   );
 
-
-
-
-
   return (
     <Box>
-      <Headtitle title={"DEPARTMENT"} />
+      <Headtitle title={'DEPARTMENT'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="Department"
-        modulename="Human Resources"
-        submodulename="HR"
-        mainpagename="HR Setup"
-        subpagename="Department"
-        subsubpagename=""
-      />
-      {isUserRoleCompare?.includes("adepartment") && (
-        <Box sx={userStyle.container}>
+      <PageHeading title="Department" modulename="Human Resources" submodulename="HR" mainpagename="HR Setup" subpagename="Department" subsubpagename="" />
+      {isUserRoleCompare?.includes('adepartment') && (
+        <Box sx={userStyle.selectcontainer}>
           <Typography sx={userStyle.SubHeaderText}>Add Department </Typography>
           <br /> <br />
           <>
             <Grid container spacing={2}>
               <Grid item md={4} sx={12}>
                 <Typography>
-                  Name <b style={{ color: "red" }}>*</b>
+                  Name <b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <FormControl fullWidth size="small">
                   <OutlinedInput
@@ -1213,6 +1476,36 @@ function Department() {
                   <FormControlLabel control={<Checkbox checked={depart.tax} onChange={(e) => setDepart({ ...depart, tax: !depart.tax })} />} label="Tax" />
                 </FormGroup>
               </Grid>
+
+              <Grid item md={4} xs={12} sm={6}>
+                <Typography>
+                  {' '}
+                  Attendance Mode<b style={{ color: 'red' }}>*</b>
+                </Typography>
+                <FormControl fullWidth size="small">
+                  <MultiSelect
+                    options={attModeOptions}
+                    value={selectedOptionsAttmode}
+                    onChange={(e) => {
+                      handleAttmodeChange(e);
+                    }}
+                    valueRenderer={customValueRendererAttmode}
+                    labelledBy="Please Select AttendanceMode"
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item md={4} xs={12} sm={12}>
+                <DndProvider backend={HTML5Backend}>
+                  <DragDropList valueAttmodeCat={valueAttmodeCat} 
+                  selectedOptionsAttmode={selectedOptionsAttmode}
+                   setValueAttmodeCat={setValueAttmodeCat}
+                    />
+                </DndProvider>
+              </Grid>
+            </Grid>
+            <br />
+            <br />
+            <Grid container spacing={2}>
               <Grid item md={3}>
                 <Grid container spacing={2}>
                   <Grid item md={2.5} xs={12} sm={6}>
@@ -1233,16 +1526,26 @@ function Department() {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid container spacing={2}>
-
-            </Grid>
-
           </>
         </Box>
       )}
       <Box>
         {/* ALERT DIALOG */}
-        <Dialog open={isEditOpen} onClose={handleCloseModEdit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <Dialog
+          open={isEditOpen}
+          onClose={handleCloseModEdit}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          // fullWidth={true}
+          maxWidth="md"
+          sx={{
+            // overflow: "visible",
+            // "& .MuiPaper-root": {
+            //   overflow: "visible",
+            // },
+            marginTop: '50px',
+          }}
+        >
           <Box sx={userStyle.dialogbox}>
             <>
               <Typography sx={userStyle.HeaderText}>Edit Department</Typography>
@@ -1250,7 +1553,7 @@ function Department() {
               <Grid container spacing={2}>
                 <Grid item md={12} xs={12} sm={12}>
                   <Typography>
-                    Name <b style={{ color: "red" }}>*</b>
+                    Name <b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <FormControl fullWidth size="small">
                     <OutlinedInput
@@ -1328,18 +1631,41 @@ function Department() {
                     <FormControlLabel control={<Checkbox checked={Boolean(langid.tax)} onChange={(e) => setLangid({ ...langid, tax: !langid.tax })} />} label="Tax" />
                   </FormGroup>
                 </Grid>
+
+                <Grid item md={4} xs={12} sm={6}>
+                  <Typography>
+                    {' '}
+                    Attendance Mode<b style={{ color: 'red' }}>*</b>
+                  </Typography>
+                  <FormControl fullWidth size="small">
+                    <MultiSelect
+                      options={attModeOptions}
+                      value={selectedOptionsAttmodeEdit}
+                      onChange={(e) => {
+                        handleAttmodeChangeEdit(e);
+                      }}
+                      valueRenderer={customValueRendererAttmodeEdit}
+                      labelledBy="Please Select AttendanceMode"
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item md={4} xs={12} sm={6}>
+                  <DndProvider backend={HTML5Backend}>
+                    <DragDropListEdit valueAttmodeCatEdit={valueAttmodeCatEdit} selectedOptionsAttmodeEdit={selectedOptionsAttmodeEdit} setValueAttmodeCatEdit={setValueAttmodeCatEdit} />
+                  </DndProvider>
+                </Grid>
               </Grid>
               <br />
               <Grid container spacing={2}>
                 <Grid item lg={4} md={4} xs={4} sm={4}>
                   <LoadingButton variant="contained" loading={btnSubmitEdit} onClick={editSubmit} sx={buttonStyles.buttonsubmit}>
-                    {" "}
+                    {' '}
                     Update
                   </LoadingButton>
                 </Grid>
                 <Grid item lg={4} md={4} xs={4} sm={4}>
-                  <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit} >
-                    {" "}
+                  <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
+                    {' '}
                     Cancel
                   </Button>
                 </Grid>
@@ -1350,21 +1676,21 @@ function Department() {
       </Box>
       <br />
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("ldepartment") && (
+      {isUserRoleCompare?.includes('ldepartment') && (
         <>
           <Box sx={userStyle.container}>
-            { /* ******************************************************EXPORT Buttons****************************************************** */}
+            {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
               <Typography sx={userStyle.importheadtext}>Department List</Typography>
             </Grid>
-
             <br />
-
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
               <Grid item md={2} xs={12} sm={12}>
                 <Box>
-                  <label >Show entries:</label>
-                  <Select id="pageSizeSelect" value={pageSize}
+                  <label>Show entries:</label>
+                  <Select
+                    id="pageSizeSelect"
+                    value={pageSize}
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -1373,25 +1699,27 @@ function Department() {
                         },
                       },
                     }}
-                    onChange={handlePageSizeChange} sx={{ width: "77px" }}>
+                    onChange={handlePageSizeChange}
+                    sx={{ width: '77px' }}
+                  >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
                     <MenuItem value={10}>10</MenuItem>
                     <MenuItem value={25}>25</MenuItem>
                     <MenuItem value={50}>50</MenuItem>
                     <MenuItem value={100}>100</MenuItem>
-                    <MenuItem value={(department?.length)}>All</MenuItem>
+                    <MenuItem value={department?.length}>All</MenuItem>
                   </Select>
                 </Box>
               </Grid>
               <Grid item md={8} xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Box >
-                  {isUserRoleCompare?.includes("exceldepartment") && (
+                <Box>
+                  {isUserRoleCompare?.includes('exceldepartment') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
-                          setFormat("xl");
+                          setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -1400,27 +1728,30 @@ function Department() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvdepartment") && (
+                  {isUserRoleCompare?.includes('csvdepartment') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
-                          setFormat("csv");
+                          setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
                       >
                         <FaFileCsv />
                         &ensp;Export to CSV&ensp;
                       </Button>
-
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printdepartment") && (
+                  {isUserRoleCompare?.includes('printdepartment') && (
                     <>
-                      <Button sx={userStyle.buttongrp} onClick={handleprint}>&ensp;<FaPrint />&ensp;Print&ensp;</Button>
+                      <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                        &ensp;
+                        <FaPrint />
+                        &ensp;Print&ensp;
+                      </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfdepartment") && (
+                  {isUserRoleCompare?.includes('pdfdepartment') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
@@ -1433,10 +1764,13 @@ function Department() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imagedepartment") && (
-                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}> <ImageIcon sx={{ fontSize: "15px" }} />  &ensp;Image&ensp; </Button>
+                  {isUserRoleCompare?.includes('imagedepartment') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                    </Button>
                   )}
-                </Box >
+                </Box>
               </Grid>
               <Grid item md={2} xs={6} sm={6}>
                 <AggregatedSearchBar
@@ -1449,34 +1783,32 @@ function Department() {
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
                   paginated={false}
-                // totalDatas={userShifts} 
+                  // totalDatas={userShifts}
                 />
               </Grid>
             </Grid>
-
-            <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>Show All Columns</Button>&ensp;
-            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>Manage Columns</Button>&ensp;
-            {isUserRoleCompare?.includes("bddepartment") && (
-              <Button variant="contained" color="error" onClick={handleClickOpenalert} sx={buttonStyles.buttonbulkdelete}>Bulk Delete</Button>)}
-
-
-            <br /><br />
-            {!isDept ?
+            <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
+              Show All Columns
+            </Button>
+            &ensp;
+            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
+              Manage Columns
+            </Button>
+            &ensp;
+            {isUserRoleCompare?.includes('bddepartment') && (
+              <Button variant="contained" color="error" onClick={handleClickOpenalert} sx={buttonStyles.buttonbulkdelete}>
+                Bulk Delete
+              </Button>
+            )}
+            <br />
+            <br />
+            {!isDept ? (
               <>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
-              :
+            ) : (
               <>
                 <AggridTable
                   rowDataTable={rowDataTable}
@@ -1501,7 +1833,8 @@ function Department() {
                   filteredChanges={filteredChanges}
                   gridRefTableImg={gridRefTableImg}
                 />
-              </>}
+              </>
+            )}
           </Box>
         </>
       )}
@@ -1523,9 +1856,9 @@ function Department() {
       <Box>
         {/* ALERT DIALOG */}
         <Dialog open={isDeleteOpen} onClose={handleCloseMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-            <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: "orange" }} />
-            <Typography variant="h5" sx={{ color: "red", textAlign: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+            <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
               Are you sure?
             </Typography>
           </DialogContent>
@@ -1534,16 +1867,16 @@ function Department() {
               Cancel
             </Button>
             <Button autoFocus variant="contained" color="error" onClick={(e) => delDepartment(branchid)}>
-              {" "}
-              OK{" "}
+              {' '}
+              OK{' '}
             </Button>
           </DialogActions>
         </Dialog>
       </Box>
 
       {/* view model */}
-      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <Box sx={{ width: "550px", padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" sx={{ marginTop: '50px' }} maxWidth="lg">
+        <Box sx={{ width: '650px', padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}> View Department</Typography>
             <br /> <br />
@@ -1563,51 +1896,87 @@ function Department() {
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Deduction</Typography>
-                  <Typography>{langid.deduction === true ? "YES" : "NO"}</Typography>
+                  <Typography>{langid.deduction === true ? 'YES' : 'NO'}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Penalty</Typography>
-                  <Typography>{langid.penalty === true ? "YES" : "NO"}</Typography>
+                  <Typography>{langid.penalty === true ? 'YES' : 'NO'}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">ERA</Typography>
-                  <Typography>{langid.era === true ? "YES" : "NO"}</Typography>
+                  <Typography>{langid.era === true ? 'YES' : 'NO'}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Production</Typography>
-                  <Typography>{langid.prod === true ? "YES" : "NO"}</Typography>
+                  <Typography>{langid.prod === true ? 'YES' : 'NO'}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Allowance</Typography>
-                  <Typography>{langid.allowance === true ? "YES" : "NO"}</Typography>
+                  <Typography>{langid.allowance === true ? 'YES' : 'NO'}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Target</Typography>
-                  <Typography>{langid.target === true ? "YES" : "NO"}</Typography>
+                  <Typography>{langid.target === true ? 'YES' : 'NO'}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Tax</Typography>
-                  <Typography>{langid.tax === true ? "YES" : "NO"}</Typography>
+                  <Typography>{langid.tax === true ? 'YES' : 'NO'}</Typography>
+                </FormControl>
+              </Grid>
+              <Grid item md={6} xs={12} sm={6}>
+                <FormControl fullWidth size="small">
+                  <Typography variant="h6">Attendance Mode</Typography>
+                  <div>
+                    {Array.isArray(langid?.attendancemode) &&
+                      langid?.attendancemode.map((roundItem, index) => {
+                        const item = valueAttmodeCatEdit.find((interviewItem) => interviewItem.attendancemode === roundItem);
+
+                        const roundName = roundNames[index] || `Round ${index + 1}`; // Default to Round 1, 2, 3... if exceeds predefined names
+
+                        return item ? (
+                          <div
+                            key={index}
+                            style={{
+                              marginBottom: '8px', // Add spacing between each round
+                              padding: '8px',
+                              border: '1px solid #ccc',
+                              borderRadius: '4px',
+                              backgroundColor: '#f9f9f9',
+                            }}
+                          >
+                            {/* Serial Number and Default Round Name */}
+                            <Typography variant="h6" style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                              {index + 1}. {roundName}
+                            </Typography>
+
+                            {/* Round Name */}
+                            <Typography variant="body1" style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                              {item.label}
+                            </Typography>
+                          </div>
+                        ) : null;
+                      })}
+                  </div>
                 </FormControl>
               </Grid>
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
               <Button variant="contained" color="primary" onClick={handleCloseview} sx={buttonStyles.btncancel}>
-                {" "}
-                Back{" "}
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
@@ -1620,23 +1989,23 @@ function Department() {
           <Box>
             {/* ALERT DIALOG */}
             <Dialog open={isCheckOpen} onClose={handleCloseCheck} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-              <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-                <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: "orange" }} />
+              <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+                <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
 
-                <Typography variant="h6" sx={{ color: "black", textAlign: "center" }}>
+                <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
                   {checkTeam > 0 ? (
                     <>
-                      <span style={{ fontWeight: "700", color: "#777" }}>{`${deletebranch?.deptname} `}</span>was linked
+                      <span style={{ fontWeight: '700', color: '#777' }}>{`${deletebranch?.deptname} `}</span>was linked
                     </>
                   ) : (
-                    ""
+                    ''
                   )}
                 </Typography>
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleCloseCheck} autoFocus variant="contained" color="error">
-                  {" "}
-                  OK{" "}
+                  {' '}
+                  OK{' '}
                 </Button>
               </DialogActions>
             </Dialog>
@@ -1647,25 +2016,21 @@ function Department() {
       {/* print layout */}
 
       {/* ALERT DIALOG */}
-      <Box >
+      <Box>
         <Dialog open={isErrorOpenpop} onClose={handleCloseerrpop} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
           <DialogContent>
             <DialogContentText
               id="alert-dialog-description"
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "20px",
-                width: "350px"
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '20px',
+                width: '350px',
               }}
             >
-              <InfoOutlinedIcon style={{ fontSize: "3.5rem", color: "teal" }} />              <Typography
-                sx={{ fontSize: "1.4rem", fontWeight: "600", color: "black", textAlign: "center" }}
-              >
-                {showAlertpop}
-              </Typography>
+              <InfoOutlinedIcon style={{ fontSize: '3.5rem', color: 'teal' }} /> <Typography sx={{ fontSize: '1.4rem', fontWeight: '600', color: 'black', textAlign: 'center' }}>{showAlertpop}</Typography>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -1679,11 +2044,7 @@ function Department() {
             >
               ok
             </Button>
-            <Button
-              sx={buttonStyles.btncancel}
-
-              onClick={handleCloseerrpop}
-            >
+            <Button sx={buttonStyles.btncancel} onClick={handleCloseerrpop}>
               Cancel
             </Button>
           </DialogActions>
@@ -1691,41 +2052,38 @@ function Department() {
       </Box>
 
       <Box>
-        <Dialog
-          open={isDeleteOpencheckbox}
-          onClose={handleCloseModcheckbox}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
+        <Dialog open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
           <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
-            <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: 'orange' }} />
-            <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>Are you sure?</Typography>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+            <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
+              Are you sure?
+            </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseModcheckbox} sx={userStyle.btncancel}>Cancel</Button>
-            <Button autoFocus variant="contained" color='error'
-              onClick={(e) => delDepartmentcheckbox(e)}
-            > OK </Button>
+            <Button onClick={handleCloseModcheckbox} sx={userStyle.btncancel}>
+              Cancel
+            </Button>
+            <Button autoFocus variant="contained" color="error" onClick={(e) => delDepartmentcheckbox(e)}>
+              {' '}
+              OK{' '}
+            </Button>
           </DialogActions>
         </Dialog>
-
       </Box>
       <Box>
         {/* ALERT DIALOG */}
-        <Dialog
-          open={isDeleteOpenalert}
-          onClose={handleCloseModalert}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
+        <Dialog open={isDeleteOpenalert} onClose={handleCloseModalert} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
           <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
-            <ErrorOutlineOutlinedIcon sx={{ fontSize: "70px", color: 'orange' }} />
-            <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>Please Select any Row</Typography>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '70px', color: 'orange' }} />
+            <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
+              Please Select any Row
+            </Typography>
           </DialogContent>
           <DialogActions>
-            <Button autoFocus variant="contained" color='error'
-              onClick={handleCloseModalert}
-            > OK </Button>
+            <Button autoFocus variant="contained" color="error" onClick={handleCloseModalert}>
+              {' '}
+              OK{' '}
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>
@@ -1733,7 +2091,7 @@ function Department() {
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
@@ -1744,35 +2102,37 @@ function Department() {
         </Dialog>
       </Box>
       <Box>
-        <Dialog
-          open={isDeleteOpencheckbox}
-          onClose={handleCloseModcheckbox}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
+        <Dialog open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
           <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
-            <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: 'orange' }} />
-            {selectedRowsCount > 0 ?
-              <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>Some of the Data's are Linked in other pages. Do You want to Delete the Remaining.?</Typography>
-              :
-              <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>This Data is Linked in Some pages</Typography>
-
-            }
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+            {selectedRowsCount > 0 ? (
+              <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
+                Some of the Data's are Linked in other pages. Do You want to Delete the Remaining.?
+              </Typography>
+            ) : (
+              <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
+                This Data is Linked in Some pages
+              </Typography>
+            )}
           </DialogContent>
           <DialogActions>
-            {selectedRowsCount > 0 ?
+            {selectedRowsCount > 0 ? (
               <>
-                <Button onClick={handleCloseModcheckbox} sx={buttonStyles.btncancel}>Cancel</Button>
-                <Button sx={buttonStyles.buttonsubmit}
-                  onClick={(e) => delDepartmentcheckbox(e)}
-                > OK </Button>
+                <Button onClick={handleCloseModcheckbox} sx={buttonStyles.btncancel}>
+                  Cancel
+                </Button>
+                <Button sx={buttonStyles.buttonsubmit} onClick={(e) => delDepartmentcheckbox(e)}>
+                  {' '}
+                  OK{' '}
+                </Button>
               </>
-              :
-              <Button sx={buttonStyles.buttonsubmit} onClick={handleCloseModcheckbox} >Ok</Button>
-            }
+            ) : (
+              <Button sx={buttonStyles.buttonsubmit} onClick={handleCloseModcheckbox}>
+                Ok
+              </Button>
+            )}
           </DialogActions>
         </Dialog>
-
       </Box>
       <ExportData
         isFilterOpen={isFilterOpen}
@@ -1784,36 +2144,16 @@ function Department() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={department ?? []}
-        filename={"Department"}
+        filename={'Department'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
-      <LoadingDialog
-        open={openPopupUpload}
-        onClose={() => setOpenPopupUpload(false)}
-        progress={uploadProgress}
-      />
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <LoadingDialog open={openPopupUpload} onClose={() => setOpenPopupUpload(false)} progress={uploadProgress} />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Department Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Department Info" addedby={addedby} updateby={updateby} />
     </Box>
   );
 }

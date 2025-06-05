@@ -2,13 +2,14 @@ const express = require("express");
 const hrmoduleRoute = express.Router();
 
 // connect Department controller
-const { getAllAddlDepartmentLimit, getAllDepartmentDetails, addDepartmentDetails, updateDepartmentDetails, getSingleDepartmentDetails, deleteDepartmentDetails, getOverallDepartmentDetails } = require("../controller/modules/department");
+const { getAllAddlDepartmentLimit, getAllDepartmentDetails,getAllDepartmentDetailsForUpdateUsersAttendancemodelog, addDepartmentDetails, updateDepartmentDetails, getSingleDepartmentDetails, deleteDepartmentDetails, getOverallDepartmentDetails } = require("../controller/modules/department");
 
 hrmoduleRoute.route("/departments").get(getAllDepartmentDetails);
 hrmoduleRoute.route("/departmentslimit").get(getAllAddlDepartmentLimit);
 hrmoduleRoute.route("/department/new").post(addDepartmentDetails);
 hrmoduleRoute.route("/department/:id").get(getSingleDepartmentDetails).put(updateDepartmentDetails).delete(deleteDepartmentDetails);
 hrmoduleRoute.route("/getoveralldepartments").post(getOverallDepartmentDetails);
+hrmoduleRoute.route("/getmatcheddepartmentsforupdateusersattendancemodelog").post(getAllDepartmentDetailsForUpdateUsersAttendancemodelog);
 
 const { addLead, getAllLead, deleteLead, getSingleLead, updateLead } = require("../controller/modules/lead");
 hrmoduleRoute.route("/leads").get(getAllLead);

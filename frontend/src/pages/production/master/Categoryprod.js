@@ -1,48 +1,48 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import { Box, Typography,Autocomplete, FormGroup, FormControlLabel, OutlinedInput, Dialog, Select, MenuItem, DialogContent, DialogActions, FormControl, Grid, Button, List, ListItem, ListItemText, Popover, Checkbox, TextField, IconButton } from "@mui/material";
-import { userStyle, colourStyles } from "../../../pageStyle.js";
-import { FaPrint, FaFilePdf, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { SERVICE } from "../../../services/Baseservice.js";
-import StyledDataGrid from "../../../components/TableStyle.js";
-import axios from "axios";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { useReactToPrint } from "react-to-print";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { UserRoleAccessContext, AuthContext } from "../../../context/Appcontext.js";
-import { handleApiError } from "../../../components/Errorhandling.js";
-import Headtitle from "../../../components/Headtitle.js";
-import Selects from "react-select";
-import { saveAs } from "file-saver";
-import Switch from "@mui/material/Switch";
-import CloseIcon from "@mui/icons-material/Close";
-import html2canvas from "html2canvas";
-import ImageIcon from "@mui/icons-material/Image";
-import { styled } from "@mui/system";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import { MultiSelect } from "react-multi-select-component";
-import { FaFileExcel, FaFileCsv } from "react-icons/fa";
-import Pagination from "../../../components/Pagination.js";
-import ExportData from "../../../components/ExportData.js";
-import AlertDialog from "../../../components/Alert.js";
-import MessageAlert from "../../../components/MessageAlert.js";
-import InfoPopup from "../../../components/InfoPopup.js";
-import { DeleteConfirmation, PleaseSelectRow } from "../../../components/DeleteConfirmation.js";
-import PageHeading from "../../../components/PageHeading.js";
-import { ThreeDots } from "react-loader-spinner";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { Box, Typography, Autocomplete, FormGroup, FormControlLabel, OutlinedInput, Dialog, Select, MenuItem, DialogContent, DialogActions, FormControl, Grid, Button, List, ListItem, ListItemText, Popover, Checkbox, TextField, IconButton } from '@mui/material';
+import { userStyle, colourStyles } from '../../../pageStyle.js';
+import { FaPrint, FaFilePdf, FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import { SERVICE } from '../../../services/Baseservice.js';
+import StyledDataGrid from '../../../components/TableStyle.js';
+import axios from '../../../axiosInstance';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { useReactToPrint } from 'react-to-print';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { UserRoleAccessContext, AuthContext } from '../../../context/Appcontext.js';
+import { handleApiError } from '../../../components/Errorhandling.js';
+import Headtitle from '../../../components/Headtitle.js';
+import Selects from 'react-select';
+import { saveAs } from 'file-saver';
+import Switch from '@mui/material/Switch';
+import CloseIcon from '@mui/icons-material/Close';
+import html2canvas from 'html2canvas';
+import ImageIcon from '@mui/icons-material/Image';
+import { styled } from '@mui/system';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import { MultiSelect } from 'react-multi-select-component';
+import { FaFileExcel, FaFileCsv } from 'react-icons/fa';
+import Pagination from '../../../components/Pagination.js';
+import ExportData from '../../../components/ExportData.js';
+import AlertDialog from '../../../components/Alert.js';
+import MessageAlert from '../../../components/MessageAlert.js';
+import InfoPopup from '../../../components/InfoPopup.js';
+import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
+import PageHeading from '../../../components/PageHeading.js';
+import { ThreeDots } from 'react-loader-spinner';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import Chip from '@mui/material/Chip';
 
 function CategoryMaster() {
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -50,8 +50,8 @@ function CategoryMaster() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -59,375 +59,368 @@ function CategoryMaster() {
     setOpenPopup(false);
   };
 
-//   const defaultSelectedPrimary = ["Primary", "First", ];
-//   const defaultSelectedSecondary = ["Secondary", "Second",];
-//   const defaultSelectedReconcile = ["Reconcile", "Reconcililation",];
-//   const [inputValue, setInputValue] = useState("");
-//   const [inputValueS, setInputValueS] = useState("");
-//   const [inputValueR, setInputValueR] = useState("");
+  //   const defaultSelectedPrimary = ["Primary", "First", ];
+  //   const defaultSelectedSecondary = ["Secondary", "Second",];
+  //   const defaultSelectedReconcile = ["Reconcile", "Reconcililation",];
+  //   const [inputValue, setInputValue] = useState("");
+  //   const [inputValueS, setInputValueS] = useState("");
+  //   const [inputValueR, setInputValueR] = useState("");
 
   // const [selectedValuesPrimary, setSelectedValuesPrimary] = useState("");
-//   const [allOptionsPrimary, setAllOptionsPrimary] = useState(
-//     ["Primary", "First",].filter(
-//       (option) => !defaultSelectedPrimary.includes(option) // Remove defaults from options
-//     )
-//   );
+  //   const [allOptionsPrimary, setAllOptionsPrimary] = useState(
+  //     ["Primary", "First",].filter(
+  //       (option) => !defaultSelectedPrimary.includes(option) // Remove defaults from options
+  //     )
+  //   );
 
   // const [selectedValuesSecondary, setSelectedValuesSecondary] = useState("");
-//   const [allOptionsSecondary, setAllOptionsSecondary] = useState(
-//     ["Secondary", "Second",].filter(
-//       (option) => !defaultSelectedSecondary.includes(option) // Remove defaults from options
-//     )
-//   );
+  //   const [allOptionsSecondary, setAllOptionsSecondary] = useState(
+  //     ["Secondary", "Second",].filter(
+  //       (option) => !defaultSelectedSecondary.includes(option) // Remove defaults from options
+  //     )
+  //   );
 
   // const [selectedValuesReconcile, setSelectedValuesReconcile] = useState("");
-//   const [allOptionsReconcile, setAllOptionsReconcile] = useState(
-//     ["Reconcile", "Reconcililation",].filter(
-//       (option) => !defaultSelectedReconcile.includes(option) // Remove defaults from options
-//     )
-//   );
-// // Primary ONchange
-//   const handleChangePrimary = (event, newValues) => {
-//     setSelectedValuesPrimary(newValues);
-//     // Filter out selected values from the dropdown options
-//     const updatedOptions = allOptionsPrimary.filter((option) => !newValues.includes(option));
-//     setAllOptionsPrimary(updatedOptions);
-//   }; 
-//   const handleKeyDownPrimary = (event) => {
-//     if (event.key === "Enter") {
-//       event.preventDefault(); // Prevent form submission or default behavior
+  //   const [allOptionsReconcile, setAllOptionsReconcile] = useState(
+  //     ["Reconcile", "Reconcililation",].filter(
+  //       (option) => !defaultSelectedReconcile.includes(option) // Remove defaults from options
+  //     )
+  //   );
+  // // Primary ONchange
+  //   const handleChangePrimary = (event, newValues) => {
+  //     setSelectedValuesPrimary(newValues);
+  //     // Filter out selected values from the dropdown options
+  //     const updatedOptions = allOptionsPrimary.filter((option) => !newValues.includes(option));
+  //     setAllOptionsPrimary(updatedOptions);
+  //   };
+  //   const handleKeyDownPrimary = (event) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault(); // Prevent form submission or default behavior
 
-//       const trimmedValue = inputValue.trim();
-//       if (trimmedValue && !selectedValuesPrimary.includes(trimmedValue)) {
-//         setSelectedValuesPrimary([...selectedValuesPrimary, trimmedValue]); // Add new value
-//         setInputValue(""); // Reset input field
-//       }else{
-//         setPopupContentMalert("Duplicate Value");
-//         setPopupSeverityMalert("warning");
-//         handleClickOpenPopupMalert();
-//       }
-//     }
-//   };
-//   const handleDeletePrimary = (valueToRemove) => {
-//     setSelectedValuesPrimary((prev) => prev.filter((val) => val !== valueToRemove));
-//     setAllOptionsPrimary((prev) => [...prev, valueToRemove]); // Add back to options
-//   };
-// //SECONDARY ONCHANGES
-//   const handleChangeSecondary = (event, newValues) => {
-//     setSelectedValuesSecondary(newValues);
-//     // Filter out selected values from the dropdown options
-//     const updatedOptions = allOptionsSecondary.filter((option) => !newValues.includes(option));
-//     setAllOptionsSecondary(updatedOptions);
-//   };
-//   const handleDeleteSecondary = (valueToRemove) => {
-//     setSelectedValuesSecondary((prev) => prev.filter((val) => val !== valueToRemove));
-//     setAllOptionsSecondary((prev) => [...prev, valueToRemove]); // Add back to options
-//   };
-//   const handleKeyDownSecondary = (event) => {
-//     if (event.key === "Enter") {
-//       event.preventDefault(); // Prevent form submission or default behavior
-  
-//       const trimmedValue = inputValueS.trim();
-//       if (trimmedValue && !selectedValuesSecondary.includes(trimmedValue)) {
-//         setSelectedValuesSecondary([...selectedValuesSecondary, trimmedValue]); // Add new value
-//         setInputValueS(""); // Reset input field
-//       }else{
-//         setPopupContentMalert("Duplicate Value");
-//         setPopupSeverityMalert("warning");
-//         handleClickOpenPopupMalert();
-//       }
-//     }
-//   };
+  //       const trimmedValue = inputValue.trim();
+  //       if (trimmedValue && !selectedValuesPrimary.includes(trimmedValue)) {
+  //         setSelectedValuesPrimary([...selectedValuesPrimary, trimmedValue]); // Add new value
+  //         setInputValue(""); // Reset input field
+  //       }else{
+  //         setPopupContentMalert("Duplicate Value");
+  //         setPopupSeverityMalert("warning");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     }
+  //   };
+  //   const handleDeletePrimary = (valueToRemove) => {
+  //     setSelectedValuesPrimary((prev) => prev.filter((val) => val !== valueToRemove));
+  //     setAllOptionsPrimary((prev) => [...prev, valueToRemove]); // Add back to options
+  //   };
+  // //SECONDARY ONCHANGES
+  //   const handleChangeSecondary = (event, newValues) => {
+  //     setSelectedValuesSecondary(newValues);
+  //     // Filter out selected values from the dropdown options
+  //     const updatedOptions = allOptionsSecondary.filter((option) => !newValues.includes(option));
+  //     setAllOptionsSecondary(updatedOptions);
+  //   };
+  //   const handleDeleteSecondary = (valueToRemove) => {
+  //     setSelectedValuesSecondary((prev) => prev.filter((val) => val !== valueToRemove));
+  //     setAllOptionsSecondary((prev) => [...prev, valueToRemove]); // Add back to options
+  //   };
+  //   const handleKeyDownSecondary = (event) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault(); // Prevent form submission or default behavior
 
-//   // RECONCILE ONCHANGE
-//   const handleChangeReconcile = (event, newValues) => {
-//     setSelectedValuesReconcile(newValues);
-//     // Filter out selected values from the dropdown options
-//     const updatedOptions = allOptionsReconcile.filter((option) => !newValues.includes(option));
-//     setAllOptionsReconcile(updatedOptions);
-//   };
-//   const handleDeleteReconcile = (valueToRemove) => {
-//     setSelectedValuesReconcile((prev) => prev.filter((val) => val !== valueToRemove));
-//     setAllOptionsReconcile((prev) => [...prev, valueToRemove]); // Add back to options
-//   };
-//   const handleKeyDownReconcile = (event) => {
-//     if (event.key === "Enter") {
-//       event.preventDefault(); // Prevent form submission or default behavior
-  
-//       const trimmedValue = inputValueR.trim();
-//       if (trimmedValue && !selectedValuesReconcile.includes(trimmedValue)) {
-//         setSelectedValuesReconcile([...selectedValuesReconcile, trimmedValue]); // Add new value
-//         setInputValueR(""); // Reset input field
-//       }else{
-//         setPopupContentMalert("Duplicate Value");
-//         setPopupSeverityMalert("warning");
-//         handleClickOpenPopupMalert();
-//       }
-//     }
-//   };
+  //       const trimmedValue = inputValueS.trim();
+  //       if (trimmedValue && !selectedValuesSecondary.includes(trimmedValue)) {
+  //         setSelectedValuesSecondary([...selectedValuesSecondary, trimmedValue]); // Add new value
+  //         setInputValueS(""); // Reset input field
+  //       }else{
+  //         setPopupContentMalert("Duplicate Value");
+  //         setPopupSeverityMalert("warning");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     }
+  //   };
 
-//   const [allOptionsPrimaryEdit, setAllOptionsPrimaryEdit] = useState([]);
-//   const [allOptionsSecondaryEdit, setAllOptionsSecondaryEdit] = useState([]);
-//   const [allOptionsReconcileEdit, setAllOptionsReconcileEdit] = useState([]);
-  
-//   const [selectedValuesPrimaryEdit, setSelectedValuesPrimaryEdit] = useState(["Primary", "First", "Main"]);
-//   const [selectedValuesSecondaryEdit, setSelectedValuesSecondaryEdit] = useState(["Secondary", "Second", ]);
-//   const [selectedValuesReconcileEdit, setSelectedValuesReconcileEdit] = useState(["Reconciliation", "Reconcile", ]);
-//   const [inputValuePE, setInputValuePE] = useState("");
-//   const [inputValueSE, setInputValueSE] = useState("");
-//   const [inputValueRE, setInputValueRE] = useState("");
+  //   // RECONCILE ONCHANGE
+  //   const handleChangeReconcile = (event, newValues) => {
+  //     setSelectedValuesReconcile(newValues);
+  //     // Filter out selected values from the dropdown options
+  //     const updatedOptions = allOptionsReconcile.filter((option) => !newValues.includes(option));
+  //     setAllOptionsReconcile(updatedOptions);
+  //   };
+  //   const handleDeleteReconcile = (valueToRemove) => {
+  //     setSelectedValuesReconcile((prev) => prev.filter((val) => val !== valueToRemove));
+  //     setAllOptionsReconcile((prev) => [...prev, valueToRemove]); // Add back to options
+  //   };
+  //   const handleKeyDownReconcile = (event) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault(); // Prevent form submission or default behavior
 
-//   const handleChangePrimaryEdit = (event, newValues) => {
-//     setSelectedValuesPrimaryEdit(newValues);
-//     // Filter out selected values from the dropdown options
-//     const updatedOptions = allOptionsPrimaryEdit.filter((option) => !newValues.includes(option));
-//     setAllOptionsPrimaryEdit(updatedOptions);
-//   };
-//   const handleDeletePrimaryEdit = (valueToRemove) => {
-//     setSelectedValuesPrimaryEdit((prev) => prev.filter((val) => val !== valueToRemove));
-//     setAllOptionsPrimaryEdit((prev) => [...prev, valueToRemove]); // Add back to options
-//   };
-//   const handleKeyDownPrimaryEdit = (event) => {
-//     if (event.key === "Enter") {
-//       event.preventDefault(); // Prevent form submission or default behavior
+  //       const trimmedValue = inputValueR.trim();
+  //       if (trimmedValue && !selectedValuesReconcile.includes(trimmedValue)) {
+  //         setSelectedValuesReconcile([...selectedValuesReconcile, trimmedValue]); // Add new value
+  //         setInputValueR(""); // Reset input field
+  //       }else{
+  //         setPopupContentMalert("Duplicate Value");
+  //         setPopupSeverityMalert("warning");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     }
+  //   };
 
-//       const trimmedValue = inputValuePE.trim();
-//       if (trimmedValue && !selectedValuesPrimary.includes(trimmedValue)) {
-//         setSelectedValuesPrimary([...selectedValuesPrimary, trimmedValue]); // Add new value
-//         setInputValuePE(""); // Reset input field
-//       }else{
-//         setPopupContentMalert("Duplicate Value");
-//         setPopupSeverityMalert("warning");
-//         handleClickOpenPopupMalert();
-//       }
-//     }
-//   };
+  //   const [allOptionsPrimaryEdit, setAllOptionsPrimaryEdit] = useState([]);
+  //   const [allOptionsSecondaryEdit, setAllOptionsSecondaryEdit] = useState([]);
+  //   const [allOptionsReconcileEdit, setAllOptionsReconcileEdit] = useState([]);
 
-//   const handleChangeSecondaryEdit = (event, newValues) => {
-//     setSelectedValuesSecondaryEdit(newValues);
-//     // Filter out selected values from the dropdown options
-//     const updatedOptions = allOptionsSecondaryEdit.filter((option) => !newValues.includes(option));
-//     setAllOptionsSecondaryEdit(updatedOptions);
-//   };
-//   const handleDeleteSecondaryEdit = (valueToRemove) => {
-//     setSelectedValuesSecondaryEdit((prev) => prev.filter((val) => val !== valueToRemove));
-//     setAllOptionsSecondaryEdit((prev) => [...prev, valueToRemove]); // Add back to options
-//   };
-//   const handleKeyDownSecondaryEdit = (event) => {
-//     if (event.key === "Enter") {
-//       event.preventDefault(); // Prevent form submission or default behavior
-  
-//       const trimmedValue = inputValueSE.trim();
-//       if (trimmedValue && !selectedValuesSecondaryEdit.includes(trimmedValue)) {
-//         setSelectedValuesSecondaryEdit([...selectedValuesSecondaryEdit, trimmedValue]); // Add new value
-//         setInputValueSE(""); // Reset input field
-//       }else{
-//         setPopupContentMalert("Duplicate Value");
-//         setPopupSeverityMalert("warning");
-//         handleClickOpenPopupMalert();
-//       }
-//     }
-//   };
+  //   const [selectedValuesPrimaryEdit, setSelectedValuesPrimaryEdit] = useState(["Primary", "First", "Main"]);
+  //   const [selectedValuesSecondaryEdit, setSelectedValuesSecondaryEdit] = useState(["Secondary", "Second", ]);
+  //   const [selectedValuesReconcileEdit, setSelectedValuesReconcileEdit] = useState(["Reconciliation", "Reconcile", ]);
+  //   const [inputValuePE, setInputValuePE] = useState("");
+  //   const [inputValueSE, setInputValueSE] = useState("");
+  //   const [inputValueRE, setInputValueRE] = useState("");
 
-//   // ReconcileEdit ONCHANGE
-//   const handleChangeReconcileEdit = (event, newValues) => {
-//     setSelectedValuesReconcileEdit(newValues);
-//     // Filter out selected values from the dropdown options
-//     const updatedOptions = allOptionsReconcileEdit.filter((option) => !newValues.includes(option));
-//     setAllOptionsReconcileEdit(updatedOptions);
-//   };
-//   const handleDeleteReconcileEdit = (valueToRemove) => {
-//     setSelectedValuesReconcileEdit((prev) => prev.filter((val) => val !== valueToRemove));
-//     setAllOptionsReconcileEdit((prev) => [...prev, valueToRemove]); // Add back to options
-//   };  
-//   const handleKeyDownReconcileEdit = (event) => {
-//     if (event.key === "Enter") {
-//       event.preventDefault(); // Prevent form submission or default behavior
-  
-//       const trimmedValue = inputValueRE.trim();
-//       if (trimmedValue && !selectedValuesReconcileEdit.includes(trimmedValue)) {
-//         setSelectedValuesReconcileEdit([...selectedValuesReconcileEdit, trimmedValue]); // Add new value
-//         setInputValueRE(""); // Reset input field
-//       }else{
-//         setPopupContentMalert("Duplicate Value");
-//         setPopupSeverityMalert("warning");
-//         handleClickOpenPopupMalert();
-//       }
-//     }
-//   };
+  //   const handleChangePrimaryEdit = (event, newValues) => {
+  //     setSelectedValuesPrimaryEdit(newValues);
+  //     // Filter out selected values from the dropdown options
+  //     const updatedOptions = allOptionsPrimaryEdit.filter((option) => !newValues.includes(option));
+  //     setAllOptionsPrimaryEdit(updatedOptions);
+  //   };
+  //   const handleDeletePrimaryEdit = (valueToRemove) => {
+  //     setSelectedValuesPrimaryEdit((prev) => prev.filter((val) => val !== valueToRemove));
+  //     setAllOptionsPrimaryEdit((prev) => [...prev, valueToRemove]); // Add back to options
+  //   };
+  //   const handleKeyDownPrimaryEdit = (event) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault(); // Prevent form submission or default behavior
 
+  //       const trimmedValue = inputValuePE.trim();
+  //       if (trimmedValue && !selectedValuesPrimary.includes(trimmedValue)) {
+  //         setSelectedValuesPrimary([...selectedValuesPrimary, trimmedValue]); // Add new value
+  //         setInputValuePE(""); // Reset input field
+  //       }else{
+  //         setPopupContentMalert("Duplicate Value");
+  //         setPopupSeverityMalert("warning");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     }
+  //   };
 
-//   const [inputValueBulkP, setInputValueBulkP] = useState("");
-//   const [inputValueBulkS, setInputValueBulkS] = useState("");
-//   const [inputValueBulkR, setInputValueBulkR] = useState("");
+  //   const handleChangeSecondaryEdit = (event, newValues) => {
+  //     setSelectedValuesSecondaryEdit(newValues);
+  //     // Filter out selected values from the dropdown options
+  //     const updatedOptions = allOptionsSecondaryEdit.filter((option) => !newValues.includes(option));
+  //     setAllOptionsSecondaryEdit(updatedOptions);
+  //   };
+  //   const handleDeleteSecondaryEdit = (valueToRemove) => {
+  //     setSelectedValuesSecondaryEdit((prev) => prev.filter((val) => val !== valueToRemove));
+  //     setAllOptionsSecondaryEdit((prev) => [...prev, valueToRemove]); // Add back to options
+  //   };
+  //   const handleKeyDownSecondaryEdit = (event) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault(); // Prevent form submission or default behavior
 
-//   const [selectedValuesPrimaryBulk, setSelectedValuesPrimaryBulk] = useState(defaultSelectedPrimary);
-//   const [allOptionsPrimaryBulk, setAllOptionsPrimaryBulk] = useState(
-//     ["Primary", "First",].filter(
-//       (option) => !defaultSelectedPrimary.includes(option) // Remove defaults from options
-//     )
-//   );
-  
-//   const [selectedValuesSecondaryBulk, setSelectedValuesSecondaryBulk] = useState(defaultSelectedSecondary);
-//   const [allOptionsSecondaryBulk, setAllOptionsSecondaryBulk] = useState(
-//     ["Secondary", "Second",].filter(
-//       (option) => !defaultSelectedSecondary.includes(option) // Remove defaults from options
-//     )
-//   );
-  
-//   const [selectedValuesReconcileBulk, setSelectedValuesReconcileBulk] = useState(defaultSelectedReconcile);
-//   const [allOptionsReconcileBulk, setAllOptionsReconcileBulk] = useState(
-//     ["Reconcile", "Reconcililation",].filter(
-//       (option) => !defaultSelectedReconcile.includes(option) // Remove defaults from options
-//     )
-//   );
+  //       const trimmedValue = inputValueSE.trim();
+  //       if (trimmedValue && !selectedValuesSecondaryEdit.includes(trimmedValue)) {
+  //         setSelectedValuesSecondaryEdit([...selectedValuesSecondaryEdit, trimmedValue]); // Add new value
+  //         setInputValueSE(""); // Reset input field
+  //       }else{
+  //         setPopupContentMalert("Duplicate Value");
+  //         setPopupSeverityMalert("warning");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     }
+  //   };
 
+  //   // ReconcileEdit ONCHANGE
+  //   const handleChangeReconcileEdit = (event, newValues) => {
+  //     setSelectedValuesReconcileEdit(newValues);
+  //     // Filter out selected values from the dropdown options
+  //     const updatedOptions = allOptionsReconcileEdit.filter((option) => !newValues.includes(option));
+  //     setAllOptionsReconcileEdit(updatedOptions);
+  //   };
+  //   const handleDeleteReconcileEdit = (valueToRemove) => {
+  //     setSelectedValuesReconcileEdit((prev) => prev.filter((val) => val !== valueToRemove));
+  //     setAllOptionsReconcileEdit((prev) => [...prev, valueToRemove]); // Add back to options
+  //   };
+  //   const handleKeyDownReconcileEdit = (event) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault(); // Prevent form submission or default behavior
 
+  //       const trimmedValue = inputValueRE.trim();
+  //       if (trimmedValue && !selectedValuesReconcileEdit.includes(trimmedValue)) {
+  //         setSelectedValuesReconcileEdit([...selectedValuesReconcileEdit, trimmedValue]); // Add new value
+  //         setInputValueRE(""); // Reset input field
+  //       }else{
+  //         setPopupContentMalert("Duplicate Value");
+  //         setPopupSeverityMalert("warning");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     }
+  //   };
 
-//   const handleChangePrimaryBulk = (event, newValues) => {
-//     setSelectedValuesPrimaryBulk(newValues);
-//     // Filter out selected values from the dropdown options
-//     const updatedOptions = allOptionsPrimaryBulk.filter((option) => !newValues.includes(option));
-//     setAllOptionsPrimaryBulk(updatedOptions);
-//   };
-//   const handleDeletePrimaryBulk = (valueToRemove) => {
-//     setSelectedValuesPrimaryBulk((prev) => prev.filter((val) => val !== valueToRemove));
-//     setAllOptionsPrimaryBulk((prev) => [...prev, valueToRemove]); // Add back to options
-//   };
-//   const handleKeyDownPrimaryBulk = (event) => {
-//     if (event.key === "Enter") {
-//       event.preventDefault(); // Prevent form submission or default behavior
-  
-//       const trimmedValue = inputValueBulkP.trim();
-//       if (trimmedValue && !selectedValuesPrimary.includes(trimmedValue)) {
-//         setSelectedValuesPrimary([...selectedValuesPrimary, trimmedValue]); // Add new value
-//         setInputValueBulkP(""); // Reset input field
-//       }else{
-//         setPopupContentMalert("Duplicate Value");
-//         setPopupSeverityMalert("warning");
-//         handleClickOpenPopupMalert();
-//       }
-//     }
-//   };
-  
-//   const handleChangeSecondaryBulk = (event, newValues) => {
-//     setSelectedValuesSecondaryBulk(newValues);
-//     // Filter out selected values from the dropdown options
-//     const updatedOptions = allOptionsSecondaryBulk.filter((option) => !newValues.includes(option));
-//     setAllOptionsSecondaryBulk(updatedOptions);
-//   };
-//   const handleDeleteSecondaryBulk = (valueToRemove) => {
-//     setSelectedValuesSecondaryBulk((prev) => prev.filter((val) => val !== valueToRemove));
-//     setAllOptionsSecondaryBulk((prev) => [...prev, valueToRemove]); // Add back to options
-//   };
-//   const handleKeyDownSecondaryBulk = (event) => {
-//     if (event.key === "Enter") {
-//       event.preventDefault(); // Prevent form submission or default behavior
-  
-//       const trimmedValue = inputValueBulkS.trim();
-//       if (trimmedValue && !selectedValuesSecondaryBulk.includes(trimmedValue)) {
-//         setSelectedValuesSecondaryBulk([...selectedValuesSecondaryBulk, trimmedValue]); // Add new value
-//         setInputValueBulkS(""); // Reset input field
-//       }else{
-//         setPopupContentMalert("Duplicate Value");
-//         setPopupSeverityMalert("warning");
-//         handleClickOpenPopupMalert();
-//       }
-//     }
-//   };
-  
-//   // ReconcileBulk ONCHANGE
-//   const handleChangeReconcileBulk = (event, newValues) => {
-//     setSelectedValuesReconcileBulk(newValues);
-//     // Filter out selected values from the dropdown options
-//     const updatedOptions = allOptionsReconcileBulk.filter((option) => !newValues.includes(option));
-//     setAllOptionsReconcileBulk(updatedOptions);
-//   };
-//   const handleDeleteReconcileBulk = (valueToRemove) => {
-//     setSelectedValuesReconcileBulk((prev) => prev.filter((val) => val !== valueToRemove));
-//     setAllOptionsReconcileBulk((prev) => [...prev, valueToRemove]); // Add back to options
-//   };  
-//   const handleKeyDownReconcileBulk = (event) => {
-//     if (event.key === "Enter") {
-//       event.preventDefault(); // Prevent form submission or default behavior
-  
-//       const trimmedValue = inputValueBulkR.trim();
-//       if (trimmedValue && !selectedValuesReconcileBulk.includes(trimmedValue)) {
-//         setSelectedValuesReconcileBulk([...selectedValuesReconcileBulk, trimmedValue]); // Add new value
-//         setInputValueBulkR(""); // Reset input field
-//       }else{
-//         setPopupContentMalert("Duplicate Value");
-//         setPopupSeverityMalert("warning");
-//         handleClickOpenPopupMalert();
-//       }
-//     }
-//   };
-//PRIMARY KEYWORDMRATE TODO
-const [primary, setPrimary] = useState([]);
-const [editingIndexPrimary, setEditingIndexPrimary] = useState(-1);
-const [newKeywordPrimaryEdit, setNewKeywordPrimaryEdit] = useState("");
-const [newMratePrimaryEdit, setNewMratePrimaryEdit] = useState("");
-const [newMatchCasePrimaryEdit, setNewMatchCasePrimaryEdit] = useState("");
-const [errormsgeditcheckPrimary, seterrormsgeditcheckPrimary] = useState("");
-const [errormsgeditcheckmratePrimary, seterrormsgeditcheckmratePrimary] = useState("");
-const [errormsgeditPrimary, seterrormsgeditPrimary] = useState("");
+  //   const [inputValueBulkP, setInputValueBulkP] = useState("");
+  //   const [inputValueBulkS, setInputValueBulkS] = useState("");
+  //   const [inputValueBulkR, setInputValueBulkR] = useState("");
 
-const handleCreatePrimary = () => {
-  
-  if (category.matchcase !== "Default" &&  category.keywordprimary == "" && (category.mrateprimary == "" ||category.mrateprimary == 0)) {
-    seterrormsgeditcheckPrimary("Please Enter Keyword");
-    seterrormsgeditcheckmratePrimary("Please Enter Mrate")
-  }else if (category.matchcase !== "Default" && category.keywordprimary == "") {
-    seterrormsgeditcheckPrimary("Please Enter Keyword");
-  }else if ((category.mrateprimary == "" ||category.mrateprimary == 0)) {
-    seterrormsgeditcheckmratePrimary("Please Enter Mrate")
-  }else if (isNaN(category.mrateprimary )) {
-    seterrormsgeditcheckmratePrimary("Please Enter Valid Mrate")
-  }else if (Number(category.mrateprimary ) < 0) {
-    seterrormsgeditcheckmratePrimary("Please Enter Valid Mrate")
-  }
-  else{
-    const isDuplicate = primary.some((todo) => todo.keyword.toLowerCase() === category.keywordprimary.toLowerCase());
-    const isDupedafulat = primary.some((todo) =>( todo.matchcase === "Default" && category.matchcase=== "Default" ))
+  //   const [selectedValuesPrimaryBulk, setSelectedValuesPrimaryBulk] = useState(defaultSelectedPrimary);
+  //   const [allOptionsPrimaryBulk, setAllOptionsPrimaryBulk] = useState(
+  //     ["Primary", "First",].filter(
+  //       (option) => !defaultSelectedPrimary.includes(option) // Remove defaults from options
+  //     )
+  //   );
 
-    if (!isDuplicate) {
-      const newcheckTodocheck = {
-        keyword: category.keywordprimary,
-        mrate: category.mrateprimary,
-        matchcase: category.matchcase,
-      };
-      setPrimary([...primary, newcheckTodocheck]);
-      setCategory({ ...category, keywordprimary: "",mrateprimary:""});
-      seterrormsgeditcheckPrimary("");
-      seterrormsgeditcheckmratePrimary("")
-      seterrormsgeditPrimary("");
+  //   const [selectedValuesSecondaryBulk, setSelectedValuesSecondaryBulk] = useState(defaultSelectedSecondary);
+  //   const [allOptionsSecondaryBulk, setAllOptionsSecondaryBulk] = useState(
+  //     ["Secondary", "Second",].filter(
+  //       (option) => !defaultSelectedSecondary.includes(option) // Remove defaults from options
+  //     )
+  //   );
+
+  //   const [selectedValuesReconcileBulk, setSelectedValuesReconcileBulk] = useState(defaultSelectedReconcile);
+  //   const [allOptionsReconcileBulk, setAllOptionsReconcileBulk] = useState(
+  //     ["Reconcile", "Reconcililation",].filter(
+  //       (option) => !defaultSelectedReconcile.includes(option) // Remove defaults from options
+  //     )
+  //   );
+
+  //   const handleChangePrimaryBulk = (event, newValues) => {
+  //     setSelectedValuesPrimaryBulk(newValues);
+  //     // Filter out selected values from the dropdown options
+  //     const updatedOptions = allOptionsPrimaryBulk.filter((option) => !newValues.includes(option));
+  //     setAllOptionsPrimaryBulk(updatedOptions);
+  //   };
+  //   const handleDeletePrimaryBulk = (valueToRemove) => {
+  //     setSelectedValuesPrimaryBulk((prev) => prev.filter((val) => val !== valueToRemove));
+  //     setAllOptionsPrimaryBulk((prev) => [...prev, valueToRemove]); // Add back to options
+  //   };
+  //   const handleKeyDownPrimaryBulk = (event) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault(); // Prevent form submission or default behavior
+
+  //       const trimmedValue = inputValueBulkP.trim();
+  //       if (trimmedValue && !selectedValuesPrimary.includes(trimmedValue)) {
+  //         setSelectedValuesPrimary([...selectedValuesPrimary, trimmedValue]); // Add new value
+  //         setInputValueBulkP(""); // Reset input field
+  //       }else{
+  //         setPopupContentMalert("Duplicate Value");
+  //         setPopupSeverityMalert("warning");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     }
+  //   };
+
+  //   const handleChangeSecondaryBulk = (event, newValues) => {
+  //     setSelectedValuesSecondaryBulk(newValues);
+  //     // Filter out selected values from the dropdown options
+  //     const updatedOptions = allOptionsSecondaryBulk.filter((option) => !newValues.includes(option));
+  //     setAllOptionsSecondaryBulk(updatedOptions);
+  //   };
+  //   const handleDeleteSecondaryBulk = (valueToRemove) => {
+  //     setSelectedValuesSecondaryBulk((prev) => prev.filter((val) => val !== valueToRemove));
+  //     setAllOptionsSecondaryBulk((prev) => [...prev, valueToRemove]); // Add back to options
+  //   };
+  //   const handleKeyDownSecondaryBulk = (event) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault(); // Prevent form submission or default behavior
+
+  //       const trimmedValue = inputValueBulkS.trim();
+  //       if (trimmedValue && !selectedValuesSecondaryBulk.includes(trimmedValue)) {
+  //         setSelectedValuesSecondaryBulk([...selectedValuesSecondaryBulk, trimmedValue]); // Add new value
+  //         setInputValueBulkS(""); // Reset input field
+  //       }else{
+  //         setPopupContentMalert("Duplicate Value");
+  //         setPopupSeverityMalert("warning");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     }
+  //   };
+
+  //   // ReconcileBulk ONCHANGE
+  //   const handleChangeReconcileBulk = (event, newValues) => {
+  //     setSelectedValuesReconcileBulk(newValues);
+  //     // Filter out selected values from the dropdown options
+  //     const updatedOptions = allOptionsReconcileBulk.filter((option) => !newValues.includes(option));
+  //     setAllOptionsReconcileBulk(updatedOptions);
+  //   };
+  //   const handleDeleteReconcileBulk = (valueToRemove) => {
+  //     setSelectedValuesReconcileBulk((prev) => prev.filter((val) => val !== valueToRemove));
+  //     setAllOptionsReconcileBulk((prev) => [...prev, valueToRemove]); // Add back to options
+  //   };
+  //   const handleKeyDownReconcileBulk = (event) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault(); // Prevent form submission or default behavior
+
+  //       const trimmedValue = inputValueBulkR.trim();
+  //       if (trimmedValue && !selectedValuesReconcileBulk.includes(trimmedValue)) {
+  //         setSelectedValuesReconcileBulk([...selectedValuesReconcileBulk, trimmedValue]); // Add new value
+  //         setInputValueBulkR(""); // Reset input field
+  //       }else{
+  //         setPopupContentMalert("Duplicate Value");
+  //         setPopupSeverityMalert("warning");
+  //         handleClickOpenPopupMalert();
+  //       }
+  //     }
+  //   };
+  //PRIMARY KEYWORDMRATE TODO
+  const [primary, setPrimary] = useState([]);
+  const [editingIndexPrimary, setEditingIndexPrimary] = useState(-1);
+  const [newKeywordPrimaryEdit, setNewKeywordPrimaryEdit] = useState('');
+  const [newMratePrimaryEdit, setNewMratePrimaryEdit] = useState('');
+  const [newMatchCasePrimaryEdit, setNewMatchCasePrimaryEdit] = useState('');
+  const [errormsgeditcheckPrimary, seterrormsgeditcheckPrimary] = useState('');
+  const [errormsgeditcheckmratePrimary, seterrormsgeditcheckmratePrimary] = useState('');
+  const [errormsgeditPrimary, seterrormsgeditPrimary] = useState('');
+
+  const handleCreatePrimary = () => {
+    if (category.matchcase !== 'Default' && category.keywordprimary == '' && (category.mrateprimary == '' || category.mrateprimary == 0)) {
+      seterrormsgeditcheckPrimary('Please Enter Keyword');
+      seterrormsgeditcheckmratePrimary('Please Enter Mrate');
+    } else if (category.matchcase !== 'Default' && category.keywordprimary == '') {
+      seterrormsgeditcheckPrimary('Please Enter Keyword');
+    } else if (category.mrateprimary == '' || category.mrateprimary == 0) {
+      seterrormsgeditcheckmratePrimary('Please Enter Mrate');
+    } else if (isNaN(category.mrateprimary)) {
+      seterrormsgeditcheckmratePrimary('Please Enter Valid Mrate');
+    } else if (Number(category.mrateprimary) < 0) {
+      seterrormsgeditcheckmratePrimary('Please Enter Valid Mrate');
     } else {
-      seterrormsgeditcheckPrimary(isDupedafulat ? "Already Default value added" : "Already this keyword added");
+      const isDuplicate = primary.some((todo) => todo.keyword.toLowerCase() === category.keywordprimary.toLowerCase());
+      const isDupedafulat = primary.some((todo) => todo.matchcase === 'Default' && category.matchcase === 'Default');
+
+      if (!isDuplicate) {
+        const newcheckTodocheck = {
+          keyword: category.keywordprimary,
+          mrate: category.mrateprimary,
+          matchcase: category.matchcase,
+        };
+        setPrimary([...primary, newcheckTodocheck]);
+        setCategory({ ...category, keywordprimary: '', mrateprimary: '' });
+        seterrormsgeditcheckPrimary('');
+        seterrormsgeditcheckmratePrimary('');
+        seterrormsgeditPrimary('');
+      } else {
+        seterrormsgeditcheckPrimary(isDupedafulat ? 'Already Default value added' : 'Already this keyword added');
+      }
     }
-  } 
-};
+  };
 
-const handleEditPrimary = (index) => {
-  setEditingIndexPrimary(index);
-  setNewKeywordPrimaryEdit(primary[index].keyword);
-  setNewMratePrimaryEdit(primary[index].mrate);
-  setNewMatchCasePrimaryEdit(primary[index].matchcase);
-};
+  const handleEditPrimary = (index) => {
+    setEditingIndexPrimary(index);
+    setNewKeywordPrimaryEdit(primary[index].keyword);
+    setNewMratePrimaryEdit(primary[index].mrate);
+    setNewMatchCasePrimaryEdit(primary[index].matchcase);
+  };
 
-const handleUpdatePrimary = () => {
- 
-   
-    if (newKeywordPrimaryEdit === "" ) {
-      seterrormsgeditPrimary("Please Enter Keyword");
-    }else if (newMratePrimaryEdit === "" ) {
-      seterrormsgeditPrimary("Please Enter Mrate");
+  const handleUpdatePrimary = () => {
+    if (newKeywordPrimaryEdit === '') {
+      seterrormsgeditPrimary('Please Enter Keyword');
+    } else if (newMratePrimaryEdit === '') {
+      seterrormsgeditPrimary('Please Enter Mrate');
     } else if (primary.find((todo, index) => index !== editingIndexPrimary && todo.keyword.toLowerCase() === newKeywordPrimaryEdit.toLowerCase())) {
-      seterrormsgeditPrimary("Already this keyword added");
-    }  else  if (isNaN(newMratePrimaryEdit) ) {
-      seterrormsgeditPrimary("Please Enter Valid Mrate");
-    } else  if (Number(newMratePrimaryEdit) < 0 ) {
-      seterrormsgeditPrimary("Please Enter Valid Mrate");
-    }  else {  
+      seterrormsgeditPrimary('Already this keyword added');
+    } else if (isNaN(newMratePrimaryEdit)) {
+      seterrormsgeditPrimary('Please Enter Valid Mrate');
+    } else if (Number(newMratePrimaryEdit) < 0) {
+      seterrormsgeditPrimary('Please Enter Valid Mrate');
+    } else {
       const keyword = newKeywordPrimaryEdit;
       const mrate = newMratePrimaryEdit;
       const matchcase = newMatchCasePrimaryEdit;
@@ -437,85 +430,80 @@ const handleUpdatePrimary = () => {
       newTodoscheck[editingIndexPrimary].matchcase = matchcase;
       setPrimary(newTodoscheck);
       setEditingIndexPrimary(-1);
-      seterrormsgeditPrimary("");
-      setNewKeywordPrimaryEdit("");
-      setNewMratePrimaryEdit("")
-      setNewMatchCasePrimaryEdit("")
+      seterrormsgeditPrimary('');
+      setNewKeywordPrimaryEdit('');
+      setNewMratePrimaryEdit('');
+      setNewMatchCasePrimaryEdit('');
     }
- 
-};
+  };
 
-const handleDeletePrimary = (index) => {
-  const newcheckPrimary = [...primary];
-  newcheckPrimary.splice(index, 1);
-  setPrimary(newcheckPrimary);
-};
+  const handleDeletePrimary = (index) => {
+    const newcheckPrimary = [...primary];
+    newcheckPrimary.splice(index, 1);
+    setPrimary(newcheckPrimary);
+  };
 
-// PRIMARY EDIT
-const [primaryEdit, setPrimaryEdit] = useState([]);
-const [editingIndexPrimaryEdit, setEditingIndexPrimaryEdit] = useState(-1);
-const [newKeywordPrimaryEditEdit, setNewKeywordPrimaryEditEdit] = useState("");
-const [newMratePrimaryEditEdit, setNewMratePrimaryEditEdit] = useState("");
-const [newMatchCasePrimaryEditEdit, setNewMatchCasePrimaryEditEdit] = useState("");
-const [errormsgeditcheckPrimaryEdit, seterrormsgeditcheckPrimaryEdit] = useState("");
-const [errormsgeditcheckmratePrimaryEdit, seterrormsgeditcheckmratePrimaryEdit] = useState("");
-const [errormsgeditPrimaryEdit, seterrormsgeditPrimaryEdit] = useState("");
+  // PRIMARY EDIT
+  const [primaryEdit, setPrimaryEdit] = useState([]);
+  const [editingIndexPrimaryEdit, setEditingIndexPrimaryEdit] = useState(-1);
+  const [newKeywordPrimaryEditEdit, setNewKeywordPrimaryEditEdit] = useState('');
+  const [newMratePrimaryEditEdit, setNewMratePrimaryEditEdit] = useState('');
+  const [newMatchCasePrimaryEditEdit, setNewMatchCasePrimaryEditEdit] = useState('');
+  const [errormsgeditcheckPrimaryEdit, seterrormsgeditcheckPrimaryEdit] = useState('');
+  const [errormsgeditcheckmratePrimaryEdit, seterrormsgeditcheckmratePrimaryEdit] = useState('');
+  const [errormsgeditPrimaryEdit, seterrormsgeditPrimaryEdit] = useState('');
 
-const handleCreatePrimaryEdit = () => {
-  
-  if (categoryid.matchcase !== "Default" && categoryid.keywordprimary == "" && (categoryid.mrateprimary== "" ||categoryid.mrateprimary == 0)) {
-    seterrormsgeditcheckPrimaryEdit("Please Enter Keyword");
-    seterrormsgeditcheckmratePrimaryEdit("Please Enter Mrate")
-  }else if (categoryid.matchcase !== "Default" && categoryid.keywordprimary == "") {
-    seterrormsgeditcheckPrimaryEdit("Please Enter Keyword");
-  }else if ((categoryid.mrateprimary == "" ||categoryid.mrateprimary == 0)) {
-    seterrormsgeditcheckmratePrimaryEdit("Please Enter Mrate")
-  }else if (isNaN(categoryid.mrateprimary )) {
-    seterrormsgeditcheckmratePrimaryEdit("Please Enter Valid Mrate")
-  }else if (Number(categoryid.mrateprimary ) < 0) {
-    seterrormsgeditcheckmratePrimaryEdit("Please Enter Valid Mrate")
-  }
-  else{
-    const isDuplicate = primaryEdit.some((todo) =>( todo.matchcase === "Default" && categoryid.matchcase=== "Default" )|| todo.keyword?.toLowerCase() === categoryid.keywordprimary?.toLowerCase());
-    const isDupedafulat = primaryEdit.some((todo) =>( todo.matchcase === "Default" && categoryid.matchcase=== "Default" ))
-    if (!isDuplicate) {
-      const newcheckTodocheck = {
-        keyword: categoryid.keywordprimary,
-        mrate: categoryid.mrateprimary,
-        matchcase: categoryid.matchcase,
-      };
-      setPrimaryEdit([...primaryEdit, newcheckTodocheck]);
-      setCategoryid({ ...categoryid, keywordprimary: "",mrateprimary:"" });
-      seterrormsgeditcheckPrimaryEdit("");
-      seterrormsgeditcheckmratePrimaryEdit("")
-      seterrormsgeditPrimaryEdit("");
+  const handleCreatePrimaryEdit = () => {
+    if (categoryid.matchcase !== 'Default' && categoryid.keywordprimary == '' && (categoryid.mrateprimary == '' || categoryid.mrateprimary == 0)) {
+      seterrormsgeditcheckPrimaryEdit('Please Enter Keyword');
+      seterrormsgeditcheckmratePrimaryEdit('Please Enter Mrate');
+    } else if (categoryid.matchcase !== 'Default' && categoryid.keywordprimary == '') {
+      seterrormsgeditcheckPrimaryEdit('Please Enter Keyword');
+    } else if (categoryid.mrateprimary == '' || categoryid.mrateprimary == 0) {
+      seterrormsgeditcheckmratePrimaryEdit('Please Enter Mrate');
+    } else if (isNaN(categoryid.mrateprimary)) {
+      seterrormsgeditcheckmratePrimaryEdit('Please Enter Valid Mrate');
+    } else if (Number(categoryid.mrateprimary) < 0) {
+      seterrormsgeditcheckmratePrimaryEdit('Please Enter Valid Mrate');
     } else {
-      seterrormsgeditcheckPrimaryEdit(isDupedafulat ? "Already Default value added" : "Already this keyword added");
+      const isDuplicate = primaryEdit.some((todo) => (todo.matchcase === 'Default' && categoryid.matchcase === 'Default') || todo.keyword?.toLowerCase() === categoryid.keywordprimary?.toLowerCase());
+      const isDupedafulat = primaryEdit.some((todo) => todo.matchcase === 'Default' && categoryid.matchcase === 'Default');
+      if (!isDuplicate) {
+        const newcheckTodocheck = {
+          keyword: categoryid.keywordprimary,
+          mrate: categoryid.mrateprimary,
+          matchcase: categoryid.matchcase,
+        };
+        setPrimaryEdit([...primaryEdit, newcheckTodocheck]);
+        setCategoryid({ ...categoryid, keywordprimary: '', mrateprimary: '' });
+        seterrormsgeditcheckPrimaryEdit('');
+        seterrormsgeditcheckmratePrimaryEdit('');
+        seterrormsgeditPrimaryEdit('');
+      } else {
+        seterrormsgeditcheckPrimaryEdit(isDupedafulat ? 'Already Default value added' : 'Already this keyword added');
+      }
     }
-  } 
-};
+  };
 
-const handleEditPrimaryEdit = (index) => {
-  setEditingIndexPrimaryEdit(index);
-  setNewKeywordPrimaryEditEdit(primaryEdit[index].keyword);
-  setNewMratePrimaryEditEdit(primaryEdit[index].mrate);
-  setNewMatchCasePrimaryEditEdit(primaryEdit[index].matchcase);
-};
+  const handleEditPrimaryEdit = (index) => {
+    setEditingIndexPrimaryEdit(index);
+    setNewKeywordPrimaryEditEdit(primaryEdit[index].keyword);
+    setNewMratePrimaryEditEdit(primaryEdit[index].mrate);
+    setNewMatchCasePrimaryEditEdit(primaryEdit[index].matchcase);
+  };
 
-const handleUpdatePrimaryEdit = () => {
- 
-   
-    if (newKeywordPrimaryEditEdit === "" ) {
-      seterrormsgeditPrimaryEdit("Please Enter Keyword");
-    }else if (newMratePrimaryEditEdit === "" ) {
-      seterrormsgeditPrimaryEdit("Please Enter Mrate");
+  const handleUpdatePrimaryEdit = () => {
+    if (newKeywordPrimaryEditEdit === '') {
+      seterrormsgeditPrimaryEdit('Please Enter Keyword');
+    } else if (newMratePrimaryEditEdit === '') {
+      seterrormsgeditPrimaryEdit('Please Enter Mrate');
     } else if (primaryEdit.find((todo, index) => index !== editingIndexPrimaryEdit && todo.keyword.toLowerCase() === newKeywordPrimaryEditEdit.toLowerCase())) {
-      seterrormsgeditPrimaryEdit("Already this keyword added");
-    }  else  if (isNaN(newMratePrimaryEditEdit) ) {
-      seterrormsgeditPrimaryEdit("Please Enter Valid Mrate");
-    } else  if (Number(newMratePrimaryEditEdit) < 0 ) {
-      seterrormsgeditPrimaryEdit("Please Enter Valid Mrate");
-    }  else {  
+      seterrormsgeditPrimaryEdit('Already this keyword added');
+    } else if (isNaN(newMratePrimaryEditEdit)) {
+      seterrormsgeditPrimaryEdit('Please Enter Valid Mrate');
+    } else if (Number(newMratePrimaryEditEdit) < 0) {
+      seterrormsgeditPrimaryEdit('Please Enter Valid Mrate');
+    } else {
       const keyword = newKeywordPrimaryEditEdit;
       const mrate = newMratePrimaryEditEdit;
       const matchcase = newMatchCasePrimaryEditEdit;
@@ -525,229 +513,222 @@ const handleUpdatePrimaryEdit = () => {
       newTodoscheck[editingIndexPrimaryEdit].matchcase = matchcase;
       setPrimaryEdit(newTodoscheck);
       setEditingIndexPrimaryEdit(-1);
-      seterrormsgeditPrimaryEdit("");
-      setNewKeywordPrimaryEditEdit("");
-      setNewMratePrimaryEditEdit("")
-      setNewMatchCasePrimaryEditEdit("")
+      seterrormsgeditPrimaryEdit('');
+      setNewKeywordPrimaryEditEdit('');
+      setNewMratePrimaryEditEdit('');
+      setNewMatchCasePrimaryEditEdit('');
     }
- 
-};
+  };
 
-const handleDeletePrimaryEdit = (index) => {
-  const newcheckPrimaryEdit = [...primaryEdit];
-  newcheckPrimaryEdit.splice(index, 1);
-  setPrimaryEdit(newcheckPrimaryEdit);
-};
+  const handleDeletePrimaryEdit = (index) => {
+    const newcheckPrimaryEdit = [...primaryEdit];
+    newcheckPrimaryEdit.splice(index, 1);
+    setPrimaryEdit(newcheckPrimaryEdit);
+  };
 
-// const [secondary, setSecondary] = useState([]);
-// const [editingIndexSecondary, setEditingIndexSecondary] = useState(-1);
-// const [newKeywordSecondaryEdit, setNewKeywordSecondaryEdit] = useState("");
-// const [newMrateSecondaryEdit, setNewMrateSecondaryEdit] = useState("");
-// const [errormsgeditcheckSecondary, seterrormsgeditcheckSecondary] = useState("");
-// const [errormsgeditcheckmrateSecondary, seterrormsgeditcheckmrateSecondary] = useState("");
-// const [errormsgeditSecondary, seterrormsgeditSecondary] = useState("");
+  // const [secondary, setSecondary] = useState([]);
+  // const [editingIndexSecondary, setEditingIndexSecondary] = useState(-1);
+  // const [newKeywordSecondaryEdit, setNewKeywordSecondaryEdit] = useState("");
+  // const [newMrateSecondaryEdit, setNewMrateSecondaryEdit] = useState("");
+  // const [errormsgeditcheckSecondary, seterrormsgeditcheckSecondary] = useState("");
+  // const [errormsgeditcheckmrateSecondary, seterrormsgeditcheckmrateSecondary] = useState("");
+  // const [errormsgeditSecondary, seterrormsgeditSecondary] = useState("");
 
-// const handleCreateSecondary = () => {
-  
-//   if (category.keywordsecondary == "" && (category.mratesecondary == "" ||category.mratesecondary == 0)) {
-//     seterrormsgeditcheckSecondary("Please Enter Keyword");
-//     seterrormsgeditcheckmrateSecondary("Please Enter Mrate")
-//   }else if (category.keywordsecondary == "") {
-//     seterrormsgeditcheckSecondary("Please Enter Keyword");
-//   }else if ((category.mratesecondary == "" ||category.mratesecondary == 0)) {
-//     seterrormsgeditcheckmrateSecondary("Please Enter Mrate")
-//   }else if (isNaN(category.mratesecondary )) {
-//     seterrormsgeditcheckmrateSecondary("Please Enter Valid Mrate")
-//   }else if (Number(category.mratesecondary ) < 0) {
-//     seterrormsgeditcheckmrateSecondary("Please Enter Valid Mrate")
-//   }
-//   else{
-//     const isDuplicate = secondary.some((todo) => todo.keyword.toLowerCase() === category.keywordsecondary.toLowerCase());
+  // const handleCreateSecondary = () => {
 
-//     if (!isDuplicate) {
-//       const newcheckTodocheck = {
-//         keyword: category.keywordsecondary,
-//         mrate: category.mratesecondary,
-//       };
-//       setSecondary([...secondary, newcheckTodocheck]);
-//       setCategory({ ...category, keywordsecondary: "",mratesecondary:"" });
-//       seterrormsgeditcheckSecondary("");
-//       seterrormsgeditcheckmrateSecondary("")
-//       seterrormsgeditSecondary("");
-//     } else {
-//       seterrormsgeditcheckSecondary("Already this keyword added");
-//     }
-//   } 
-// };
+  //   if (category.keywordsecondary == "" && (category.mratesecondary == "" ||category.mratesecondary == 0)) {
+  //     seterrormsgeditcheckSecondary("Please Enter Keyword");
+  //     seterrormsgeditcheckmrateSecondary("Please Enter Mrate")
+  //   }else if (category.keywordsecondary == "") {
+  //     seterrormsgeditcheckSecondary("Please Enter Keyword");
+  //   }else if ((category.mratesecondary == "" ||category.mratesecondary == 0)) {
+  //     seterrormsgeditcheckmrateSecondary("Please Enter Mrate")
+  //   }else if (isNaN(category.mratesecondary )) {
+  //     seterrormsgeditcheckmrateSecondary("Please Enter Valid Mrate")
+  //   }else if (Number(category.mratesecondary ) < 0) {
+  //     seterrormsgeditcheckmrateSecondary("Please Enter Valid Mrate")
+  //   }
+  //   else{
+  //     const isDuplicate = secondary.some((todo) => todo.keyword.toLowerCase() === category.keywordsecondary.toLowerCase());
 
-// const handleEditSecondary = (index) => {
-//   setEditingIndexSecondary(index);
-//   setNewKeywordSecondaryEdit(secondary[index].keyword);
-//   setNewMrateSecondaryEdit(secondary[index].mrate);
-// };
+  //     if (!isDuplicate) {
+  //       const newcheckTodocheck = {
+  //         keyword: category.keywordsecondary,
+  //         mrate: category.mratesecondary,
+  //       };
+  //       setSecondary([...secondary, newcheckTodocheck]);
+  //       setCategory({ ...category, keywordsecondary: "",mratesecondary:"" });
+  //       seterrormsgeditcheckSecondary("");
+  //       seterrormsgeditcheckmrateSecondary("")
+  //       seterrormsgeditSecondary("");
+  //     } else {
+  //       seterrormsgeditcheckSecondary("Already this keyword added");
+  //     }
+  //   }
+  // };
 
-// const handleUpdateSecondary = () => {
- 
-   
-//     if (newKeywordSecondaryEdit === "" ) {
-//       seterrormsgeditSecondary("Please Enter Keyword");
-//     }else if (newMrateSecondaryEdit === "" ) {
-//       seterrormsgeditSecondary("Please Enter Mrate");
-//     } else if (secondary.find((todo, index) => index !== editingIndexSecondary && todo.keyword.toLowerCase() === newKeywordSecondaryEdit.toLowerCase())) {
-//       seterrormsgeditSecondary("Already this keyword added");
-//     }  else  if (isNaN(newMrateSecondaryEdit) ) {
-//       seterrormsgeditSecondary("Please Enter Valid Mrate");
-//     } else  if (Number(newMrateSecondaryEdit) < 0 ) {
-//       seterrormsgeditSecondary("Please Enter Valid Mrate");
-//     }  else {  
-//       const keyword = newKeywordSecondaryEdit;
-//       const mrate = newMrateSecondaryEdit;
-//       const newTodoscheck = [...secondary];
-//       newTodoscheck[editingIndexSecondary].keyword = keyword;
-//       newTodoscheck[editingIndexSecondary].mrate = mrate;
-//       setSecondary(newTodoscheck);
-//       setEditingIndexSecondary(-1);
-//       seterrormsgeditSecondary("");
-//       setNewKeywordSecondaryEdit("");
-//       setNewMrateSecondaryEdit("")
-//     }
- 
-// };
+  // const handleEditSecondary = (index) => {
+  //   setEditingIndexSecondary(index);
+  //   setNewKeywordSecondaryEdit(secondary[index].keyword);
+  //   setNewMrateSecondaryEdit(secondary[index].mrate);
+  // };
 
-// const handleDeleteSecondary = (index) => {
-//   const newcheckSecondary = [...secondary];
-//   newcheckSecondary.splice(index, 1);
-//   setSecondary(newcheckSecondary);
-// };
+  // const handleUpdateSecondary = () => {
 
+  //     if (newKeywordSecondaryEdit === "" ) {
+  //       seterrormsgeditSecondary("Please Enter Keyword");
+  //     }else if (newMrateSecondaryEdit === "" ) {
+  //       seterrormsgeditSecondary("Please Enter Mrate");
+  //     } else if (secondary.find((todo, index) => index !== editingIndexSecondary && todo.keyword.toLowerCase() === newKeywordSecondaryEdit.toLowerCase())) {
+  //       seterrormsgeditSecondary("Already this keyword added");
+  //     }  else  if (isNaN(newMrateSecondaryEdit) ) {
+  //       seterrormsgeditSecondary("Please Enter Valid Mrate");
+  //     } else  if (Number(newMrateSecondaryEdit) < 0 ) {
+  //       seterrormsgeditSecondary("Please Enter Valid Mrate");
+  //     }  else {
+  //       const keyword = newKeywordSecondaryEdit;
+  //       const mrate = newMrateSecondaryEdit;
+  //       const newTodoscheck = [...secondary];
+  //       newTodoscheck[editingIndexSecondary].keyword = keyword;
+  //       newTodoscheck[editingIndexSecondary].mrate = mrate;
+  //       setSecondary(newTodoscheck);
+  //       setEditingIndexSecondary(-1);
+  //       seterrormsgeditSecondary("");
+  //       setNewKeywordSecondaryEdit("");
+  //       setNewMrateSecondaryEdit("")
+  //     }
 
-// const [reconcile, setReconcile] = useState([]);
-// const [editingIndexReconcile, setEditingIndexReconcile] = useState(-1);
-// const [newKeywordReconcileEdit, setNewKeywordReconcileEdit] = useState("");
-// const [newMrateReconcileEdit, setNewMrateReconcileEdit] = useState("");
-// const [errormsgeditcheckReconcile, seterrormsgeditcheckReconcile] = useState("");
-// const [errormsgeditcheckmrateReconcile, seterrormsgeditcheckmrateReconcile] = useState("");
-// const [errormsgeditReconcile, seterrormsgeditReconcile] = useState("");
+  // };
 
-// const handleCreateReconcile = () => {
-  
-//   if (category.keywordreconcile == "" && (category.mratereconcile == "" ||category.mratereconcile == 0)) {
-//     seterrormsgeditcheckReconcile("Please Enter Keyword");
-//     seterrormsgeditcheckmrateReconcile("Please Enter Mrate")
-//   }else if (category.keywordreconcile == "") {
-//     seterrormsgeditcheckReconcile("Please Enter Keyword");
-//   }else if ((category.mratereconcile == "" ||category.mratereconcile == 0)) {
-//     seterrormsgeditcheckmrateReconcile("Please Enter Mrate")
-//   }else if (isNaN(category.mratereconcile )) {
-//     seterrormsgeditcheckmrateReconcile("Please Enter Valid Mrate")
-//   }else if (Number(category.mratereconcile ) < 0) {
-//     seterrormsgeditcheckmrateReconcile("Please Enter Valid Mrate")
-//   }
-//   else{
-//     const isDuplicate = reconcile.some((todo) => todo.keyword.toLowerCase() === category.keywordreconcile.toLowerCase());
+  // const handleDeleteSecondary = (index) => {
+  //   const newcheckSecondary = [...secondary];
+  //   newcheckSecondary.splice(index, 1);
+  //   setSecondary(newcheckSecondary);
+  // };
 
-//     if (!isDuplicate) {
-//       const newcheckTodocheck = {
-//         keyword: category.keywordreconcile,
-//         mrate: category.mratereconcile,
-//       };
-//       setReconcile([...reconcile, newcheckTodocheck]);
-//       setCategory({ ...category, keywordreconcile: "",mratereconcile:"" });
-//       seterrormsgeditcheckReconcile("");
-//       seterrormsgeditcheckmrateReconcile("")
-//       seterrormsgeditReconcile("");
-//     } else {
-//       seterrormsgeditcheckReconcile("Already this keyword added");
-//     }
-//   } 
-// };
+  // const [reconcile, setReconcile] = useState([]);
+  // const [editingIndexReconcile, setEditingIndexReconcile] = useState(-1);
+  // const [newKeywordReconcileEdit, setNewKeywordReconcileEdit] = useState("");
+  // const [newMrateReconcileEdit, setNewMrateReconcileEdit] = useState("");
+  // const [errormsgeditcheckReconcile, seterrormsgeditcheckReconcile] = useState("");
+  // const [errormsgeditcheckmrateReconcile, seterrormsgeditcheckmrateReconcile] = useState("");
+  // const [errormsgeditReconcile, seterrormsgeditReconcile] = useState("");
 
-// const handleEditReconcile = (index) => {
-//   setEditingIndexReconcile(index);
-//   setNewKeywordReconcileEdit(reconcile[index].keyword);
-//   setNewMrateReconcileEdit(reconcile[index].mrate);
-// };
+  // const handleCreateReconcile = () => {
 
-// const handleUpdateReconcile = () => {
- 
-   
-//     if (newKeywordReconcileEdit === "" ) {
-//       seterrormsgeditReconcile("Please Enter Keyword");
-//     }else if (newMrateReconcileEdit === "" ) {
-//       seterrormsgeditReconcile("Please Enter Mrate");
-//     } else if (reconcile.find((todo, index) => index !== editingIndexReconcile && todo.keyword.toLowerCase() === newKeywordReconcileEdit.toLowerCase())) {
-//       seterrormsgeditReconcile("Already this keyword added");
-//     }  else  if (isNaN(newMrateReconcileEdit) ) {
-//       seterrormsgeditReconcile("Please Enter Valid Mrate");
-//     } else  if (Number(newMrateReconcileEdit) < 0 ) {
-//       seterrormsgeditReconcile("Please Enter Valid Mrate");
-//     }  else {  
-//       const keyword = newKeywordReconcileEdit;
-//       const mrate = newMrateReconcileEdit;
-//       const newTodoscheck = [...reconcile];
-//       newTodoscheck[editingIndexReconcile].keyword = keyword;
-//       newTodoscheck[editingIndexReconcile].mrate = mrate;
-//       setReconcile(newTodoscheck);
-//       setEditingIndexReconcile(-1);
-//       seterrormsgeditReconcile("");
-//       setNewKeywordReconcileEdit("");
-//       setNewMrateReconcileEdit("")
-//     }
- 
-// };
+  //   if (category.keywordreconcile == "" && (category.mratereconcile == "" ||category.mratereconcile == 0)) {
+  //     seterrormsgeditcheckReconcile("Please Enter Keyword");
+  //     seterrormsgeditcheckmrateReconcile("Please Enter Mrate")
+  //   }else if (category.keywordreconcile == "") {
+  //     seterrormsgeditcheckReconcile("Please Enter Keyword");
+  //   }else if ((category.mratereconcile == "" ||category.mratereconcile == 0)) {
+  //     seterrormsgeditcheckmrateReconcile("Please Enter Mrate")
+  //   }else if (isNaN(category.mratereconcile )) {
+  //     seterrormsgeditcheckmrateReconcile("Please Enter Valid Mrate")
+  //   }else if (Number(category.mratereconcile ) < 0) {
+  //     seterrormsgeditcheckmrateReconcile("Please Enter Valid Mrate")
+  //   }
+  //   else{
+  //     const isDuplicate = reconcile.some((todo) => todo.keyword.toLowerCase() === category.keywordreconcile.toLowerCase());
 
-// const handleDeleteReconcile = (index) => {
-//   const newcheckReconcile = [...reconcile];
-//   newcheckReconcile.splice(index, 1);
-//   setReconcile(newcheckReconcile);
-// };
+  //     if (!isDuplicate) {
+  //       const newcheckTodocheck = {
+  //         keyword: category.keywordreconcile,
+  //         mrate: category.mratereconcile,
+  //       };
+  //       setReconcile([...reconcile, newcheckTodocheck]);
+  //       setCategory({ ...category, keywordreconcile: "",mratereconcile:"" });
+  //       seterrormsgeditcheckReconcile("");
+  //       seterrormsgeditcheckmrateReconcile("")
+  //       seterrormsgeditReconcile("");
+  //     } else {
+  //       seterrormsgeditcheckReconcile("Already this keyword added");
+  //     }
+  //   }
+  // };
 
+  // const handleEditReconcile = (index) => {
+  //   setEditingIndexReconcile(index);
+  //   setNewKeywordReconcileEdit(reconcile[index].keyword);
+  //   setNewMrateReconcileEdit(reconcile[index].mrate);
+  // };
 
+  // const handleUpdateReconcile = () => {
 
+  //     if (newKeywordReconcileEdit === "" ) {
+  //       seterrormsgeditReconcile("Please Enter Keyword");
+  //     }else if (newMrateReconcileEdit === "" ) {
+  //       seterrormsgeditReconcile("Please Enter Mrate");
+  //     } else if (reconcile.find((todo, index) => index !== editingIndexReconcile && todo.keyword.toLowerCase() === newKeywordReconcileEdit.toLowerCase())) {
+  //       seterrormsgeditReconcile("Already this keyword added");
+  //     }  else  if (isNaN(newMrateReconcileEdit) ) {
+  //       seterrormsgeditReconcile("Please Enter Valid Mrate");
+  //     } else  if (Number(newMrateReconcileEdit) < 0 ) {
+  //       seterrormsgeditReconcile("Please Enter Valid Mrate");
+  //     }  else {
+  //       const keyword = newKeywordReconcileEdit;
+  //       const mrate = newMrateReconcileEdit;
+  //       const newTodoscheck = [...reconcile];
+  //       newTodoscheck[editingIndexReconcile].keyword = keyword;
+  //       newTodoscheck[editingIndexReconcile].mrate = mrate;
+  //       setReconcile(newTodoscheck);
+  //       setEditingIndexReconcile(-1);
+  //       seterrormsgeditReconcile("");
+  //       setNewKeywordReconcileEdit("");
+  //       setNewMrateReconcileEdit("")
+  //     }
 
-  let exportColumnNames = ["Project Name", "Name", "Flag Status", "Enable Page", "Flag Status Org", "Flag Calc Manual Org", "Flag Status Temp", "Flag Calc Manual Temp", "KeyWwords"];
-  let exportRowValues = ["project", "name", "flagstatus", "enablepage", "flagstatusorg", "flagmanualcalcorg", "flagstatustemp", "flagmanualcalctemp", "keyword"];
+  // };
+
+  // const handleDeleteReconcile = (index) => {
+  //   const newcheckReconcile = [...reconcile];
+  //   newcheckReconcile.splice(index, 1);
+  //   setReconcile(newcheckReconcile);
+  // };
+
+  let exportColumnNames = ['Project Name', 'Name', 'Flag Status', 'Enable Page', 'Flag Status Org', 'Flag Calc Manual Org', 'Flag Status Temp', 'Flag Calc Manual Temp', 'KeyWwords'];
+  let exportRowValues = ['project', 'name', 'flagstatus', 'enablepage', 'flagstatusorg', 'flagmanualcalcorg', 'flagstatustemp', 'flagmanualcalctemp', 'keyword'];
 
   const gridRef = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowsCate, setSelectedRowsCate] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [category, setCategory] = useState({
-    name: "",
-    keyword: "",
-    project: "",
-    flagmanualcalctemp: "",
-    flagmanualcalcorg: "",
-    mrateprimary:0,
-    mratesecondary:0,
-    mratereconcile:0,
+    name: '',
+    keyword: '',
+    project: '',
+    flagmanualcalctemp: '',
+    flagmanualcalcorg: '',
+    mrateprimary: 0,
+    mratesecondary: 0,
+    mratereconcile: 0,
     enablepage: false,
-    matchcase:"Contains"
+    matchcase: 'Contains',
   });
-  const [categoryid, setCategoryid] = useState({ name: "", project: "", flagmanualcalctemp: "", flagmanualcalcorg: "", enablepage: false , matchcase:"Contains"});
+  const [categoryid, setCategoryid] = useState({ name: '', project: '', flagmanualcalctemp: '', flagmanualcalcorg: '', enablepage: false, matchcase: 'Contains' });
   const [categories, setCategories] = useState([]);
-  const [selectedProject, setSelectedProject] = useState("Please Select Project");
-  const [selectedProjectedit, setSelectedProjectedit] = useState("");
+  const [selectedProject, setSelectedProject] = useState('Please Select Project');
+  const [selectedProjectedit, setSelectedProjectedit] = useState('');
   const [allModuleedit, setAllModuleedit] = useState([]);
   const [projects, setProjects] = useState([]);
   const [isBtn, setIsBtn] = useState(false);
 
-  const [selectedFlag, setSelectedFlag] = useState("No");
-  const [selectedFlagOrg, setSelectedFlagOrg] = useState("No");
-  const [selectedFlagTemp, setSelectedFlagTemp] = useState("No");
+  const [selectedFlag, setSelectedFlag] = useState('No');
+  const [selectedFlagOrg, setSelectedFlagOrg] = useState('No');
+  const [selectedFlagTemp, setSelectedFlagTemp] = useState('No');
 
-  const [selectedFlagEdit, setSelectedFlagEdit] = useState("");
-  const [selectedFlagEditOrg, setSelectedFlagEditOrg] = useState("");
-  const [selectedFlagEditTemp, setSelectedFlagEditTemp] = useState("");
+  const [selectedFlagEdit, setSelectedFlagEdit] = useState('');
+  const [selectedFlagEditOrg, setSelectedFlagEditOrg] = useState('');
+  const [selectedFlagEditTemp, setSelectedFlagEditTemp] = useState('');
 
   const { isUserRoleCompare, isUserRoleAccess, isAssignBranch, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
-  const [copiedData, setCopiedData] = useState("");
+  const [copiedData, setCopiedData] = useState('');
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
 
-  const [categoryBulk, setCategoryBulk] = useState({mrateprimary:"",mratesecondary:"",mratereconcile:"" })
+  const [categoryBulk, setCategoryBulk] = useState({ mrateprimary: '', mratesecondary: '', mratereconcile: '' });
 
   // page refersh reload
   const handleCloseFilterMod = () => {
@@ -757,13 +738,12 @@ const handleDeletePrimaryEdit = (index) => {
     setIsPdfFilterOpen(false);
   };
 
-
   //image
   const handleCaptureImage = () => {
     if (gridRef.current) {
       html2canvas(gridRef.current).then((canvas) => {
         canvas.toBlob((blob) => {
-          saveAs(blob, "Production Category.png");
+          saveAs(blob, 'Production Category.png');
         });
       });
     }
@@ -774,34 +754,34 @@ const handleDeletePrimaryEdit = (index) => {
   };
 
   const CustomStyledDataGrid = styled(StyledDataGrid)(({ theme }) => ({
-    "& .MuiDataGrid-columnHeaderTitle": {
-      fontSize: "14px",
-      fontWeight: "bold !important",
-      lineHeight: "15px",
-      whiteSpace: "normal", // Wrap text within the available space
-      overflow: "visible", // Allow overflowed text to be visible
-      minWidth: "20px",
+    '& .MuiDataGrid-columnHeaderTitle': {
+      fontSize: '14px',
+      fontWeight: 'bold !important',
+      lineHeight: '15px',
+      whiteSpace: 'normal', // Wrap text within the available space
+      overflow: 'visible', // Allow overflowed text to be visible
+      minWidth: '20px',
     },
-    "& .MuiDataGrid-columnHeaders": {
-      minHeight: "55px !important",
+    '& .MuiDataGrid-columnHeaders': {
+      minHeight: '55px !important',
       // background: "#b7b3b347",
-      maxHeight: "55px",
+      maxHeight: '55px',
     },
-    "& .MuiDataGrid-row": {
-      fontSize: "12px", // Change the font size for row data
-      minWidth: "20px",
-      color: "#444",
+    '& .MuiDataGrid-row': {
+      fontSize: '12px', // Change the font size for row data
+      minWidth: '20px',
+      color: '#444',
     },
-    "& .MuiDataGrid-cell": {
-      whiteSpace: "normal !important",
-      wordWrap: "break-word !important",
-      lineHeight: "1.2 !important", // Optional: Adjusts line height for better readability
+    '& .MuiDataGrid-cell': {
+      whiteSpace: 'normal !important',
+      wordWrap: 'break-word !important',
+      lineHeight: '1.2 !important', // Optional: Adjusts line height for better readability
     },
   }));
 
   const flags = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" },
+    { label: 'Yes', value: 'Yes' },
+    { label: 'No', value: 'No' },
   ];
 
   //OVERALL EDIT FUNCTIONALITY
@@ -911,26 +891,26 @@ const handleDeletePrimaryEdit = (index) => {
         const areCategoriesLinked = subcategorylinks.length === unitratelinks.length && subcategorylinks.every((item) => unitratelinks.includes(item)) && unitratelinks.every((item) => subcategorylinks.includes(item));
 
         if (areCategoriesLinked) {
-          const Cates = subcategorylinks.length === 1 ? `This ${subcategorylinks.join(", ")} Category linked in Subcategory and Unitrate` : `These ${subcategorylinks.join(", ")} Categories linked in Subcategory and Unitrate`;
+          const Cates = subcategorylinks.length === 1 ? `This ${subcategorylinks.join(', ')} Category linked in Subcategory and Unitrate` : `These ${subcategorylinks.join(', ')} Categories linked in Subcategory and Unitrate`;
 
           if (nonDupeSelectedCategories.length > 0) {
             setShowAlert(`${Cates},  Do you want Delete Others ?`);
             handleClickBulkNotLinkedOpen(nonDupeSelectedCategories);
           } else {
             setPopupContentMalert(Cates);
-            setPopupSeverityMalert("warning");
+            setPopupSeverityMalert('warning');
             handleClickOpenPopupMalert();
           }
         } else {
-          const SubCates = subcategorylinks.length === 1 ? `This ${subcategorylinks.join(", ")} Category linked in Subcategory` : `These ${subcategorylinks.join(", ")} Categories linked in Subcategory`;
+          const SubCates = subcategorylinks.length === 1 ? `This ${subcategorylinks.join(', ')} Category linked in Subcategory` : `These ${subcategorylinks.join(', ')} Categories linked in Subcategory`;
 
-          const unitrates = unitratelinks.length === 1 ? `This ${unitratelinks.join(", ")} Category linked in Unitrate` : `These ${unitratelinks.join(", ")} Categories linked in Unitrate`;
+          const unitrates = unitratelinks.length === 1 ? `This ${unitratelinks.join(', ')} Category linked in Unitrate` : `These ${unitratelinks.join(', ')} Categories linked in Unitrate`;
           if (nonDupeSelectedCategories.length > 0) {
             setShowAlert(`${SubCates} ${unitrates} Do you want Delete Others ?`);
             handleClickBulkNotLinkedOpen();
           } else {
             setPopupContentMalert(`${SubCates} ${unitrates}`);
-            setPopupSeverityMalert("warning");
+            setPopupSeverityMalert('warning');
             handleClickOpenPopupMalert();
           }
         }
@@ -951,7 +931,7 @@ const handleDeletePrimaryEdit = (index) => {
   const [deletemodule, setDeletemodule] = useState({});
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   // Manage Columns
@@ -964,17 +944,17 @@ const handleDeletePrimaryEdit = (index) => {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   // Show All Columns & Manage Columns
@@ -1024,8 +1004,8 @@ const handleDeletePrimaryEdit = (index) => {
           handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
         }
       } else {
-        setPopupContentMalert(`This ${name} Category linked in ` + (res.data.subcategorycount > 0 && res.data.unitratecount > 0 ? "Subcategory and Unitrate" : res.data.subcategorycount > 0 ? "Subcategory" : "Unitrate"));
-        setPopupSeverityMalert("warning");
+        setPopupContentMalert(`This ${name} Category linked in ` + (res.data.subcategorycount > 0 && res.data.unitratecount > 0 ? 'Subcategory and Unitrate' : res.data.subcategorycount > 0 ? 'Subcategory' : 'Unitrate'));
+        setPopupSeverityMalert('warning');
         handleClickOpenPopupMalert();
       }
     } catch (err) {
@@ -1070,8 +1050,8 @@ const handleDeletePrimaryEdit = (index) => {
       setSelectedRows([]);
       setSelectedRowsCate([]);
       handleCloseMod();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -1097,8 +1077,8 @@ const handleDeletePrimaryEdit = (index) => {
       setSelectedRowsCate([]);
       setSelectAllChecked(false);
       setPage(1);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -1123,7 +1103,7 @@ const handleDeletePrimaryEdit = (index) => {
         flagmanualcalctemp: String(category.flagmanualcalctemp),
         flagmanualcalcorg: String(category.flagmanualcalcorg),
         keyword: [...todoscheckall.map((item) => item.keyword)],
-        mrateprimary:primary,
+        mrateprimary: primary,
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
@@ -1137,12 +1117,12 @@ const handleDeletePrimaryEdit = (index) => {
         },
         project: String(selectedProject),
         category: String(category.name),
-        subcategory: String("ALL"),
-        time: String("00:00:00"),
+        subcategory: String('ALL'),
+        time: String('00:00:00'),
         rate: Number(0),
-        ratetopoints: Number("8.333333333333333").toFixed(14),
+        ratetopoints: Number('8.333333333333333').toFixed(14),
         points: Number(0),
-        state: String("ALL"),
+        state: String('ALL'),
         flagcount: Number(1).toFixed(3),
         addedby: [
           {
@@ -1154,22 +1134,22 @@ const handleDeletePrimaryEdit = (index) => {
       await fetchEmployee();
       await fetchAllCategory();
       setCategory({
-        name: "",
-        keyword: "",
-        flagmanualcalctemp: "",
-        flagmanualcalcorg: "",
+        name: '',
+        keyword: '',
+        flagmanualcalctemp: '',
+        flagmanualcalcorg: '',
         enablepage: false,
-        mrateprimary:0,
-        mratesecondary:0,
-        mratereconcile:0,
+        mrateprimary: 0,
+        mratesecondary: 0,
+        mratereconcile: 0,
       });
-      setPrimary([])
-      setSelectedFlag("No");
-      setSelectedFlagOrg("No");
-      setSelectedFlagTemp("No");
+      setPrimary([]);
+      setSelectedFlag('No');
+      setSelectedFlagOrg('No');
+      setSelectedFlagTemp('No');
       setTodoscheckall([]);
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       setIsBtn(false);
     } catch (err) {
@@ -1180,12 +1160,12 @@ const handleDeletePrimaryEdit = (index) => {
 
   const [todoscheckall, setTodoscheckall] = useState([]);
   const [editingIndexcheckall, setEditingIndexcheckall] = useState(-1);
-  const [newcheckKeyEdit, setNewcheckKeyEdit] = useState("");
-  const [errormsgeditcheck, seterrormsgeditcheck] = useState("");
-  const [errormsgeditcheckall, seterrormsgeditcheckall] = useState("");
+  const [newcheckKeyEdit, setNewcheckKeyEdit] = useState('');
+  const [errormsgeditcheck, seterrormsgeditcheck] = useState('');
+  const [errormsgeditcheckall, seterrormsgeditcheckall] = useState('');
 
   const handleCreateTodocheckeditall = () => {
-    if (category.keyword !== "") {
+    if (category.keyword !== '') {
       const isDuplicate = todoscheckall.some((todo) => todo.keyword.toLowerCase() === category.keyword.toLowerCase());
 
       if (!isDuplicate) {
@@ -1193,17 +1173,17 @@ const handleDeletePrimaryEdit = (index) => {
           keyword: category.keyword,
         };
         setTodoscheckall([...todoscheckall, newcheckTodocheck]);
-        setCategory({ ...category, keyword: "" });
-        seterrormsgeditcheck("");
-        seterrormsgeditcheckall("");
+        setCategory({ ...category, keyword: '' });
+        seterrormsgeditcheck('');
+        seterrormsgeditcheckall('');
       } else {
-        setPopupContentMalert("Already this keyword added");
-        setPopupSeverityMalert("warning");
+        setPopupContentMalert('Already this keyword added');
+        setPopupSeverityMalert('warning');
         handleClickOpenPopupMalert();
         // seterrormsgeditcheck("Already this keyword added");
       }
     } else {
-      seterrormsgeditcheck("Please Enter Keyword");
+      seterrormsgeditcheck('Please Enter Keyword');
     }
   };
 
@@ -1213,23 +1193,23 @@ const handleDeletePrimaryEdit = (index) => {
   };
 
   const handleUpdateTodocheckall = () => {
-    if (newcheckKeyEdit !== "") {
+    if (newcheckKeyEdit !== '') {
       const keyword = newcheckKeyEdit;
       if (!todoscheckall.find((todo, index) => index !== editingIndexcheckall && todo.keyword.toLowerCase() === newcheckKeyEdit.toLowerCase())) {
         const newTodoscheck = [...todoscheckall];
         newTodoscheck[editingIndexcheckall].keyword = keyword;
         setTodoscheckall(newTodoscheck);
         setEditingIndexcheckall(-1);
-        seterrormsgeditcheckall("");
-        setNewcheckKeyEdit("");
+        seterrormsgeditcheckall('');
+        setNewcheckKeyEdit('');
       } else {
-        setPopupContentMalert("Already this keyword added");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Already this keyword added');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
         // seterrormsgeditcheckall("Already this keyword added");
       }
     } else {
-      seterrormsgeditcheckall("Please Enter Keyword");
+      seterrormsgeditcheckall('Please Enter Keyword');
     }
   };
 
@@ -1241,12 +1221,12 @@ const handleDeletePrimaryEdit = (index) => {
 
   const [todoscheckallEdit, setTodoscheckallEdit] = useState([]);
   const [editingIndexcheckallEdit, setEditingIndexcheckallEdit] = useState(-1);
-  const [newcheckKeyEditPop, setNewcheckKeyEditPop] = useState("");
-  const [errormsgeditcheckEdit, seterrormsgeditcheckEdit] = useState("");
-  const [errormsgeditcheckallEdit, seterrormsgeditcheckallEdit] = useState("");
+  const [newcheckKeyEditPop, setNewcheckKeyEditPop] = useState('');
+  const [errormsgeditcheckEdit, seterrormsgeditcheckEdit] = useState('');
+  const [errormsgeditcheckallEdit, seterrormsgeditcheckallEdit] = useState('');
 
   const handleCreateTodocheckeditallEdit = () => {
-    if (categoryid.keyword !== "") {
+    if (categoryid.keyword !== '') {
       const isDuplicate = todoscheckallEdit.some((todo) => todo.keyword.toLowerCase() === categoryid.keyword.toLowerCase());
 
       if (!isDuplicate) {
@@ -1254,17 +1234,17 @@ const handleDeletePrimaryEdit = (index) => {
           keyword: categoryid.keyword,
         };
         setTodoscheckallEdit([...todoscheckallEdit, newcheckTodocheck]);
-        setCategoryid({ ...categoryid, keyword: "" });
-        seterrormsgeditcheckEdit("");
-        seterrormsgeditcheckallEdit("");
+        setCategoryid({ ...categoryid, keyword: '' });
+        seterrormsgeditcheckEdit('');
+        seterrormsgeditcheckallEdit('');
       } else {
-        setPopupContentMalert("Already this keyword added");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Already this keyword added');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
         // seterrormsgeditcheckEdit("Already this keyword added");
       }
     } else {
-      seterrormsgeditcheckEdit("Please Enter Keyword");
+      seterrormsgeditcheckEdit('Please Enter Keyword');
     }
   };
 
@@ -1274,24 +1254,24 @@ const handleDeletePrimaryEdit = (index) => {
   };
 
   const handleUpdateTodocheckallEdit = () => {
-    if (newcheckKeyEditPop !== "") {
+    if (newcheckKeyEditPop !== '') {
       const keyword = newcheckKeyEditPop;
       if (!todoscheckallEdit.find((todo, index) => index !== editingIndexcheckallEdit && todo.keyword.toLowerCase() === newcheckKeyEditPop.toLowerCase())) {
         const newTodoscheck = [...todoscheckallEdit];
         newTodoscheck[editingIndexcheckallEdit].keyword = keyword;
         setTodoscheckallEdit(newTodoscheck);
         setEditingIndexcheckallEdit(-1);
-        seterrormsgeditcheckEdit("");
-        seterrormsgeditcheckallEdit("");
-        setNewcheckKeyEditPop("");
+        seterrormsgeditcheckEdit('');
+        seterrormsgeditcheckallEdit('');
+        setNewcheckKeyEditPop('');
       } else {
-        setPopupContentMalert("Already this keyword added");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Already this keyword added');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
         // seterrormsgeditcheckallEdit("Already this keyword added");
       }
     } else {
-      seterrormsgeditcheckallEdit("Please Enter Keyword");
+      seterrormsgeditcheckallEdit('Please Enter Keyword');
     }
   };
 
@@ -1306,74 +1286,71 @@ const handleDeletePrimaryEdit = (index) => {
     e.preventDefault();
     const isNameMatch = categoriesDup?.some((item) => item?.name?.toLowerCase() === category?.name?.toLowerCase() && item.project?.toLowerCase() === selectedProject?.toLowerCase());
 
-    if (selectedProject === "" || selectedProject === "Please Select Project") {
-      setPopupContentMalert("Please Select Project");
-      setPopupSeverityMalert("warning");
+    if (selectedProject === '' || selectedProject === 'Please Select Project') {
+      setPopupContentMalert('Please Select Project');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (category.name === "") {
-      setPopupContentMalert("Please Enter Category Name");
-      setPopupSeverityMalert("warning");
+    } else if (category.name === '') {
+      setPopupContentMalert('Please Enter Category Name');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (selectedFlag === "Please Select Flagstatus") {
-      setPopupContentMalert("Please Select Flagstatus");
-      setPopupSeverityMalert("warning");
+    } else if (selectedFlag === 'Please Select Flagstatus') {
+      setPopupContentMalert('Please Select Flagstatus');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (category.keyword !== "") {
-      setPopupContentMalert("Please Add Keyword");
-      setPopupSeverityMalert("warning");
+    } else if (category.keyword !== '') {
+      setPopupContentMalert('Please Add Keyword');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (selectedFlagOrg === "Yes" && category.flagmanualcalcorg === "") {
-      setPopupContentMalert("Please Enter Flag Manual orginal calculaton value");
-      setPopupSeverityMalert("warning");
+    } else if (selectedFlagOrg === 'Yes' && category.flagmanualcalcorg === '') {
+      setPopupContentMalert('Please Enter Flag Manual orginal calculaton value');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (selectedFlagOrg === "No" && category.flagmanualcalcorg !== "") {
+    } else if (selectedFlagOrg === 'No' && category.flagmanualcalcorg !== '') {
       setPopupContentMalert("Please select 'Yes' for the Flag Status (Manual Org) before entering a value for the Flag Calc Org.");
-      setPopupSeverityMalert("warning");
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (selectedFlagTemp === "Yes" && category.flagmanualcalctemp === "") {
-      setPopupContentMalert("Please Enter Flag Manual Temp calculaton value");
-      setPopupSeverityMalert("warning");
+    } else if (selectedFlagTemp === 'Yes' && category.flagmanualcalctemp === '') {
+      setPopupContentMalert('Please Enter Flag Manual Temp calculaton value');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (selectedFlagTemp === "No" && category.flagmanualcalctemp !== "") {
+    } else if (selectedFlagTemp === 'No' && category.flagmanualcalctemp !== '') {
       setPopupContentMalert("Please select 'Yes' for the Flag Status (Manual Temp) before entering a value for the Flag Calc Temp.");
-      setPopupSeverityMalert("warning");
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (!primary.some((d) => d.matchcase == "Default")) {
-      setPopupContentMalert("Default value missing in mrate keywords");
-      setPopupSeverityMalert("warning");
+    } else if (!primary.some((d) => d.matchcase == 'Default')) {
+      setPopupContentMalert('Default value missing in mrate keywords');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    }
-    else if (isNameMatch) {
-      setPopupContentMalert("Data Already Exists!");
-      setPopupSeverityMalert("warning");
+    } else if (isNameMatch) {
+      setPopupContentMalert('Data Already Exists!');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } 
- 
-    else {
+    } else {
       sendRequest();
     }
   };
 
   const handleclear = (e) => {
     e.preventDefault();
-    setSelectedProject("Please Select Project");
+    setSelectedProject('Please Select Project');
     setCategory({
-      name: "",
-      flagstatus: "No",
-      flagstatusorg: "No",
-      flagmanualcalctemp: "",
-      flagmanualcalcorg: "",
-      keyword: "",
+      name: '',
+      flagstatus: 'No',
+      flagstatusorg: 'No',
+      flagmanualcalctemp: '',
+      flagmanualcalcorg: '',
+      keyword: '',
     });
     setTodoscheckall([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
 
-  const [selectPrimaryChecked, setSelectPrimaryChecked] = useState(false)
-  const [selectSecondaryChecked, setSelectSecondaryChecked] = useState(false)
-  const [selectReconcileChecked, setSelectReconcileChecked] = useState(false)
+  const [selectPrimaryChecked, setSelectPrimaryChecked] = useState(false);
+  const [selectSecondaryChecked, setSelectSecondaryChecked] = useState(false);
+  const [selectReconcileChecked, setSelectReconcileChecked] = useState(false);
 
   // const handleBulkUpdateKeywords = async () => {
   //   try{
@@ -1426,7 +1403,7 @@ const handleDeletePrimaryEdit = (index) => {
   //     });
   //     setPopupContent("Updated Successfully");
   //     setPopupSeverity("success");
- 
+
   //     handleClickOpenPopup();
   //     handleBulkUpdateKeywordsClose();
   //   }
@@ -1437,22 +1414,20 @@ const handleDeletePrimaryEdit = (index) => {
   // }
 
   const handleSubmitBulkKeyword = () => {
-
-    if(selectedRows.length === 0 ){
-      setPopupContentMalert("Please Select Row");
-      setPopupSeverityMalert("warning");
+    if (selectedRows.length === 0) {
+      setPopupContentMalert('Please Select Row');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    }  else{
-      handleBulkUpdateKeywordsOpen()
+    } else {
+      handleBulkUpdateKeywordsOpen();
     }
-
-  }
+  };
   const [isBulkKeywordUpdate, setisBulkKeywordUpdate] = useState(false);
   const handleBulkUpdateKeywordsOpen = () => {
     setisBulkKeywordUpdate(true);
   };
   const handleBulkUpdateKeywordsClose = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setisBulkKeywordUpdate(false);
   };
 
@@ -1462,12 +1437,12 @@ const handleDeletePrimaryEdit = (index) => {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
     setEditingIndexcheckallEdit(-1);
   };
-  const [oldname, setOldname] = useState("");
-  const [oldproject, setOldProject] = useState("");
+  const [oldname, setOldname] = useState('');
+  const [oldproject, setOldProject] = useState('');
   //get single row to edit....
   const getCode = async (e, name, project) => {
     setOldname(name);
@@ -1484,9 +1459,9 @@ const handleDeletePrimaryEdit = (index) => {
           keyword: d,
         }))
       );
-      setCategoryid({ ...res?.data?.scategoryprod,mrateprimary:"",matchcase:"Contains",  keyword: "", enablepage: res?.data?.scategoryprod.enablepage ? res?.data?.scategoryprod.enablepage : false });
+      setCategoryid({ ...res?.data?.scategoryprod, mrateprimary: '', matchcase: 'Contains', keyword: '', enablepage: res?.data?.scategoryprod.enablepage ? res?.data?.scategoryprod.enablepage : false });
       setSelectedProjectedit(res?.data?.scategoryprod.project);
-      setPrimaryEdit(res?.data?.scategoryprod.mrateprimary)
+      setPrimaryEdit(res?.data?.scategoryprod.mrateprimary);
       handleClickOpenEdit();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -1502,7 +1477,7 @@ const handleDeletePrimaryEdit = (index) => {
         },
       });
       handleClickOpenview();
-      const updatedCategoryProd = { ...res?.data?.scategoryprod, enablepage: enable }; 
+      const updatedCategoryProd = { ...res?.data?.scategoryprod, enablepage: enable };
       setCategoryid(updatedCategoryProd);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -1556,7 +1531,7 @@ const handleDeletePrimaryEdit = (index) => {
           flagmanualcalctemp: String(categoryid.flagmanualcalctemp),
           flagmanualcalcorg: String(categoryid.flagmanualcalcorg),
           keyword: todoscheckallEdit.map((d) => d.keyword),
-          mrateprimary:primaryEdit,
+          mrateprimary: primaryEdit,
           updatedby: [
             ...updateby,
             {
@@ -1568,8 +1543,8 @@ const handleDeletePrimaryEdit = (index) => {
         await fetchEmployee();
         await fetchAllCategory();
         handleCloseModEdit();
-        setPopupContent("Updated Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Updated Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
       } catch (err) {
         handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -1579,74 +1554,72 @@ const handleDeletePrimaryEdit = (index) => {
     }
   };
 
-  const editSubmit = async (e) => { 
-    try{
-
-      let checkOverallDupe= await axios.post(SERVICE.CATEGORY_DUPECHECK, {
+  const editSubmit = async (e) => {
+    try {
+      let checkOverallDupe = await axios.post(SERVICE.CATEGORY_DUPECHECK, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
         project: selectedProjectedit,
         category: categoryid.name,
       });
-    
+
       // const isNameMatch = allModuleedit?.some((item) => item?.name?.toLowerCase() === categoryid?.name?.toLowerCase() && item.project === selectedProjectedit);
-      if (selectedProjectedit === "") {
-        setPopupContentMalert("Please Select Project");
-        setPopupSeverityMalert("info");
+      if (selectedProjectedit === '') {
+        setPopupContentMalert('Please Select Project');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (categoryid.name === "") {
-        setPopupContentMalert("Please Enter  Name");
-        setPopupSeverityMalert("info");
+      } else if (categoryid.name === '') {
+        setPopupContentMalert('Please Enter  Name');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (selectedFlagEdit === "Please Select") {
-        setPopupContentMalert("Please Select Flagstatus");
-        setPopupSeverityMalert("info");
+      } else if (selectedFlagEdit === 'Please Select') {
+        setPopupContentMalert('Please Select Flagstatus');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (selectedFlagEditOrg === "Please Select") {
-        setPopupContentMalert("Please Select Flagstatus Original");
-        setPopupSeverityMalert("info");
+      } else if (selectedFlagEditOrg === 'Please Select') {
+        setPopupContentMalert('Please Select Flagstatus Original');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (selectedFlagEditTemp === "Please Select") {
-        setPopupContentMalert("Please Select Flagstatus Temp");
-        setPopupSeverityMalert("info");
+      } else if (selectedFlagEditTemp === 'Please Select') {
+        setPopupContentMalert('Please Select Flagstatus Temp');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (selectedFlagEditOrg === "Yes" && categoryid.flagmanualcalcorg === "") {
-        setPopupContentMalert("Please Enter Flag Manual orginal calculaton value");
-        setPopupSeverityMalert("info");
+      } else if (selectedFlagEditOrg === 'Yes' && categoryid.flagmanualcalcorg === '') {
+        setPopupContentMalert('Please Enter Flag Manual orginal calculaton value');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (selectedFlagEditTemp === "Yes" && categoryid.flagmanualcalctemp === "") {
-        setPopupContentMalert("Please Enter Flag Manual Temp calculaton value");
-        setPopupSeverityMalert("info");
+      } else if (selectedFlagEditTemp === 'Yes' && categoryid.flagmanualcalctemp === '') {
+        setPopupContentMalert('Please Enter Flag Manual Temp calculaton value');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (selectedFlagEditOrg === "No" && categoryid.flagmanualcalcorg !== "") {
+      } else if (selectedFlagEditOrg === 'No' && categoryid.flagmanualcalcorg !== '') {
         setPopupContentMalert("Please select 'Yes' for the Flag Status (Manual Org) before entering a value for the Flag Calc Org.");
-        setPopupSeverityMalert("info");
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (selectedFlagEditTemp === "No" && categoryid.flagmanualcalctemp !== "") {
+      } else if (selectedFlagEditTemp === 'No' && categoryid.flagmanualcalctemp !== '') {
         setPopupContentMalert("Please select 'Yes' for the Flag Status (Manual Temp) before entering a value for the Flag Calc Temp.");
-        setPopupSeverityMalert("info");
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (!primaryEdit.some((d) => d.matchcase == "Default")) {
-        setPopupContentMalert("Default value missing in mrate keywords");
-        setPopupSeverityMalert("warning");
+      } else if (!primaryEdit.some((d) => d.matchcase == 'Default')) {
+        setPopupContentMalert('Default value missing in mrate keywords');
+        setPopupSeverityMalert('warning');
         handleClickOpenPopupMalert();
-      }
-      else if (checkOverallDupe.data.categoryprod > 0) {
-        setPopupContentMalert("Data Already Exists!");
-        setPopupSeverityMalert("info");
+      } else if (checkOverallDupe.data.categoryprod > 0) {
+        setPopupContentMalert('Data Already Exists!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else {
         sendEditRequest();
       }
-    }catch(err){
-      console.log(err,'err')
+    } catch (err) {
+      console.log(err, 'err');
     }
   };
 
   const bulkNotLinkedUpdate = async (data) => {
     try {
-      console.log(data, "data");
+      console.log(data, 'data');
 
       let checkOverallDel = await axios.post(SERVICE.CATEGORY_OVERALL_NONLINK_BULKDELETE, {
         headers: {
@@ -1657,8 +1630,8 @@ const handleDeletePrimaryEdit = (index) => {
       handleCloseBulkNotLinkedClose();
       setSelectedRows([]);
       setSelectedRowsCate([]);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       await fetchEmployee();
     } catch (err) {
@@ -1692,7 +1665,7 @@ const handleDeletePrimaryEdit = (index) => {
         flagmanualcalctemp: String(categoryid.flagmanualcalctemp),
         flagmanualcalcorg: String(categoryid.flagmanualcalcorg),
         keyword: todoscheckallEdit.map((d) => d.keyword),
-     
+
         updatedby: [
           ...updateby,
           {
@@ -1703,8 +1676,8 @@ const handleDeletePrimaryEdit = (index) => {
       });
       await fetchEmployee();
 
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
       handleCloseModEdit();
       handleCloseBulkEditMod();
@@ -1759,12 +1732,12 @@ const handleDeletePrimaryEdit = (index) => {
   const handleFlagChangeOrg = (e) => {
     const selctedvalue = e.value;
     setSelectedFlagOrg(selctedvalue);
-    setCategory({ ...category, flagmanualcalcorg: "" });
+    setCategory({ ...category, flagmanualcalcorg: '' });
   };
   const handleFlagChangeTemp = (e) => {
     const selctedvalue = e.value;
     setSelectedFlagTemp(selctedvalue);
-    setCategory({ ...category, flagmanualcalctemp: "" });
+    setCategory({ ...category, flagmanualcalctemp: '' });
   };
 
   const handleFlagChangeEdit = (e) => {
@@ -1774,20 +1747,20 @@ const handleDeletePrimaryEdit = (index) => {
   const handleFlagChangeEditOrg = (e) => {
     const selctedvalue = e.value;
     setSelectedFlagEditOrg(selctedvalue);
-    setCategoryid({ ...categoryid, flagmanualcalcorg: "" });
+    setCategoryid({ ...categoryid, flagmanualcalcorg: '' });
   };
   const handleFlagChangeEditTemp = (e) => {
     const selctedvalue = e.value;
     setSelectedFlagEditTemp(selctedvalue);
-    setCategoryid({ ...categoryid, flagmanualcalctemp: "" });
+    setCategoryid({ ...categoryid, flagmanualcalctemp: '' });
   };
 
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Production Category ",
-    pageStyle: "print",
+    documentTitle: 'Production Category ',
+    pageStyle: 'print',
   });
 
   const [categoriesFilterArray, setCategoriesFilterArray] = useState([]);
@@ -1814,18 +1787,21 @@ const handleDeletePrimaryEdit = (index) => {
           return false;
         });
       }
-      setCategoriesFilterArray(uniquesubRates?.map((item, index) => {
-        return {
-          ...item,
-          id: item._id,
-          serialNumber: item.serialNumber,
-          project: item.project,
-          name: item.name,
-          flagstatus: item.flagstatus,
-          flagstatusorg: item.flagstatusorg,
-          keyword: item.keyword,
-          enablepage: item.enablepage === true ? "Yes" : "No",
-        }}));
+      setCategoriesFilterArray(
+        uniquesubRates?.map((item, index) => {
+          return {
+            ...item,
+            id: item._id,
+            serialNumber: item.serialNumber,
+            project: item.project,
+            name: item.name,
+            flagstatus: item.flagstatus,
+            flagstatusorg: item.flagstatusorg,
+            keyword: item.keyword,
+            enablepage: item.enablepage === true ? 'Yes' : 'No',
+          };
+        })
+      );
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -1878,7 +1854,7 @@ const handleDeletePrimaryEdit = (index) => {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Production Category"),
+      pagename: String('Production Category'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -1894,22 +1870,21 @@ const handleDeletePrimaryEdit = (index) => {
   useEffect(() => {
     getapi();
     fetchEmployee();
-  
+
     fetchProjectDropdowns();
     fetchVendor();
     fetchAllCategory();
   }, []);
 
   useEffect(() => {
-   
     fetchProjectDropdowns();
   }, [isEditOpen, categoryid]);
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -1944,10 +1919,10 @@ const handleDeletePrimaryEdit = (index) => {
   };
 
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = overallFilterdata?.filter((item) => {
-    return searchTerms.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
   const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
@@ -1976,10 +1951,10 @@ const handleDeletePrimaryEdit = (index) => {
   );
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
       renderHeader: (params) => (
@@ -2030,81 +2005,81 @@ const handleDeletePrimaryEdit = (index) => {
       width: 70,
 
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 70,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
-    { field: "project", headerName: "Project Name", flex: 0, width: 130, hide: !columnVisibility.project, headerClassName: "bold-header" },
-    { field: "name", headerName: "Name", flex: 0, width: 370, hide: !columnVisibility.name, headerClassName: "bold-header" },
-    { field: "flagstatus", headerName: "Flag Status", flex: 0, width: 80, hide: !columnVisibility.flagstatus, headerClassName: "bold-header" },
-    { field: "enablepage", headerName: "Enable Page", flex: 0, width: 80, hide: !columnVisibility.enablepage, headerClassName: "bold-header" },
+    { field: 'project', headerName: 'Project Name', flex: 0, width: 130, hide: !columnVisibility.project, headerClassName: 'bold-header' },
+    { field: 'name', headerName: 'Name', flex: 0, width: 370, hide: !columnVisibility.name, headerClassName: 'bold-header' },
+    { field: 'flagstatus', headerName: 'Flag Status', flex: 0, width: 80, hide: !columnVisibility.flagstatus, headerClassName: 'bold-header' },
+    { field: 'enablepage', headerName: 'Enable Page', flex: 0, width: 80, hide: !columnVisibility.enablepage, headerClassName: 'bold-header' },
 
-    { field: "flagstatusorg", headerName: "Flag Status Org", flex: 0, width: 90, hide: !columnVisibility.flagstatusorg, headerClassName: "bold-header" },
-    { field: "flagmanualcalcorg", headerName: "Flag Calc Manual Org", flex: 0, width: 80, hide: !columnVisibility.flagmanualcalcorg, headerClassName: "bold-header" },
+    { field: 'flagstatusorg', headerName: 'Flag Status Org', flex: 0, width: 90, hide: !columnVisibility.flagstatusorg, headerClassName: 'bold-header' },
+    { field: 'flagmanualcalcorg', headerName: 'Flag Calc Manual Org', flex: 0, width: 80, hide: !columnVisibility.flagmanualcalcorg, headerClassName: 'bold-header' },
 
-    { field: "flagstatustemp", headerName: "Flag Status Temp", flex: 0, width: 90, hide: !columnVisibility.flagstatustemp, headerClassName: "bold-header" },
-    { field: "flagmanualcalctemp", headerName: "Flag Calc Manual Temp", flex: 0, width: 80, hide: !columnVisibility.flagmanualcalctemp, headerClassName: "bold-header" },
+    { field: 'flagstatustemp', headerName: 'Flag Status Temp', flex: 0, width: 90, hide: !columnVisibility.flagstatustemp, headerClassName: 'bold-header' },
+    { field: 'flagmanualcalctemp', headerName: 'Flag Calc Manual Temp', flex: 0, width: 80, hide: !columnVisibility.flagmanualcalctemp, headerClassName: 'bold-header' },
 
-    { field: "keyword", headerName: "KeyWwords", flex: 0, width: 110, hide: !columnVisibility.keyword, headerClassName: "bold-header" },
+    { field: 'keyword', headerName: 'KeyWwords', flex: 0, width: 110, hide: !columnVisibility.keyword, headerClassName: 'bold-header' },
     // { field: "mismatchmode", headerName: "Mismatch Mode", flex: 0, width: 380, hide: !columnVisibility.mismatchmode, headerClassName: "bold-header" },
     // { field: "mrateprimary", headerName: "Mrate Primary", flex: 0, width: 100, hide: !columnVisibility.mrateprimary, headerClassName: "bold-header" },
     // { field: "mratesecondary", headerName: "Mrate Secondary", flex: 0, width: 100, hide: !columnVisibility.mratesecondary, headerClassName: "bold-header" },
-    // { field: "mratereconcile", headerName: "Mrate Reconcile", flex: 0, width: 100, hide: !columnVisibility.mratereconcile, headerClassName: "bold-header" },  
+    // { field: "mratereconcile", headerName: "Mrate Reconcile", flex: 0, width: 100, hide: !columnVisibility.mratereconcile, headerClassName: "bold-header" },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       renderCell: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("eproductioncategory") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('eproductioncategory') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getCode(params.row.id, params.row.name, params.row.project);
               }}
             >
-              <EditOutlinedIcon sx={buttonStyles.buttonedit} />{" "}
+              <EditOutlinedIcon sx={buttonStyles.buttonedit} />{' '}
             </Button>
           )}
-          {isUserRoleCompare?.includes("dproductioncategory") && (
+          {isUserRoleCompare?.includes('dproductioncategory') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
                 rowData(params.row.id, params.row.name, params.row.project);
               }}
             >
-              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />{" "}
+              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />{' '}
             </Button>
           )}
-          {isUserRoleCompare?.includes("vproductioncategory") && (
+          {isUserRoleCompare?.includes('vproductioncategory') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getviewCode(params.row.id, params.row.enablepage);
               }}
             >
-              <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />{" "}
+              <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />{' '}
             </Button>
           )}
-          {isUserRoleCompare?.includes("iproductioncategory") && (
+          {isUserRoleCompare?.includes('iproductioncategory') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getinfoCode(params.row.id);
               }}
             >
-              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />{" "}
+              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />{' '}
             </Button>
           )}
         </Grid>
@@ -2122,7 +2097,7 @@ const handleDeletePrimaryEdit = (index) => {
       flagstatus: item.flagstatus,
       flagstatusorg: item.flagstatusorg,
       keyword: item.keyword,
-      enablepage: item.enablepage === true ? "Yes" : "No",
+      enablepage: item.enablepage === true ? 'Yes' : 'No',
     };
   });
 
@@ -2153,13 +2128,13 @@ const handleDeletePrimaryEdit = (index) => {
 
   // JSX for the "Manage Columns" popover content
   const manageColumnsContent = (
-    <Box style={{ padding: "10px", minWidth: "325px", "& .MuiDialogContent-root": { padding: "10px 0" } }}>
+    <Box style={{ padding: '10px', minWidth: '325px', '& .MuiDialogContent-root': { padding: '10px 0' } }}>
       <Typography variant="h6">Manage Columns</Typography>
       <IconButton
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -2167,20 +2142,20 @@ const handleDeletePrimaryEdit = (index) => {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: "absolute" }} />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent sx={{ minWidth: "auto", height: "200px", position: "relative" }}>
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
               <ListItemText
-                sx={{ display: "flex" }}
-                primary={<Switch sx={{ marginTop: "-5px" }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
-                secondary={column.field === "checkbox" ? "Checkbox" : column.headerName}
-              // secondary={column.headerName }
+                sx={{ display: 'flex' }}
+                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
+                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
+                // secondary={column.headerName }
               />
             </ListItem>
           ))}
@@ -2189,7 +2164,7 @@ const handleDeletePrimaryEdit = (index) => {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button variant="text" sx={{ textTransform: "none" }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -2197,7 +2172,7 @@ const handleDeletePrimaryEdit = (index) => {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -2214,15 +2189,14 @@ const handleDeletePrimaryEdit = (index) => {
     </Box>
   );
 
-  const [fileFormat, setFormat] = useState("");
+  const [fileFormat, setFormat] = useState('');
 
- 
   return (
     <Box>
-      <Headtitle title={"CATEGORY PRODUCTION"} />
+      <Headtitle title={'CATEGORY PRODUCTION'} />
       {/* ****** Header Content ****** */}
       <PageHeading title="Production Category" modulename="Production" submodulename="Report SetUp" mainpagename="Production Category" subpagename="" subsubpagename="" />
-      {isUserRoleCompare?.includes("aproductioncategory") && (
+      {isUserRoleCompare?.includes('aproductioncategory') && (
         <Box sx={userStyle.dialogbox}>
           <>
             <Grid container spacing={2}>
@@ -2234,7 +2208,7 @@ const handleDeletePrimaryEdit = (index) => {
             <Grid container spacing={2}>
               <Grid item md={4} xs={12} sm={12}>
                 <Typography>
-                  Project <b style={{ color: "red" }}>*</b>
+                  Project <b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <FormControl size="small" fullWidth>
                   <Selects options={projects} styles={colourStyles} value={{ label: selectedProject, value: selectedProject }} onChange={handleProjectChange} />
@@ -2243,7 +2217,7 @@ const handleDeletePrimaryEdit = (index) => {
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography>
-                    Name <b style={{ color: "red" }}>*</b>
+                    Name <b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <OutlinedInput
                     id="component-outlined"
@@ -2259,7 +2233,7 @@ const handleDeletePrimaryEdit = (index) => {
               <Grid item md={2} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography>
-                    Flag Status<b style={{ color: "red" }}>*</b>
+                    Flag Status<b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <Selects options={flags} styles={colourStyles} value={{ label: selectedFlag, value: selectedFlag }} onChange={handleFlagChange} />
                 </FormControl>
@@ -2277,7 +2251,7 @@ const handleDeletePrimaryEdit = (index) => {
                   <OutlinedInput
                     id="component-outlined"
                     type="text"
-                    disabled={selectedFlagOrg === "No"}
+                    disabled={selectedFlagOrg === 'No'}
                     placeholder="Please Enter Flag Calc Org"
                     value={category.flagmanualcalcorg}
                     onChange={(e) => {
@@ -2298,7 +2272,7 @@ const handleDeletePrimaryEdit = (index) => {
                   <OutlinedInput
                     id="component-outlined"
                     type="text"
-                    disabled={selectedFlagTemp === "No"}
+                    disabled={selectedFlagTemp === 'No'}
                     placeholder="Please Enter Flag Calc Temp"
                     value={category.flagmanualcalctemp}
                     onChange={(e) => {
@@ -2307,7 +2281,7 @@ const handleDeletePrimaryEdit = (index) => {
                   />
                 </FormControl>
               </Grid>
-              <Grid item md={3.2} xs={12} sm={12} marginTop={{ md: 3 }} sx={{ display: { md: "flex" }, justifyContent: { md: "center" } }}>
+              <Grid item md={3.2} xs={12} sm={12} marginTop={{ md: 3 }} sx={{ display: { md: 'flex' }, justifyContent: { md: 'center' } }}>
                 <FormGroup>
                   <FormControlLabel
                     control={<Checkbox checked={category.enablepage} />}
@@ -2322,263 +2296,260 @@ const handleDeletePrimaryEdit = (index) => {
                 </FormGroup>
               </Grid>
               <Grid item md={6} xs={12} sm={3}>
-                 <Grid container spacing={1}>
-                 <Grid item md={3} xs={3} sm={3}>
-                      <FormControl fullWidth size="small">
-                        <Typography>Match Case</Typography>
-                        <Selects options={[
-                          {label:"Equals to", value:"Equals to"},
-                          {label:"Contains", value:"Contains"},
-                          {label:"Default", value:"Default"},
-                          ]
-                        } 
-                        styles={colourStyles} 
+                <Grid container spacing={1}>
+                  <Grid item md={3} xs={3} sm={3}>
+                    <FormControl fullWidth size="small">
+                      <Typography>Match Case</Typography>
+                      <Selects
+                        options={[
+                          { label: 'Equals to', value: 'Equals to' },
+                          { label: 'Contains', value: 'Contains' },
+                          { label: 'Default', value: 'Default' },
+                        ]}
+                        styles={colourStyles}
                         value={{ label: category.matchcase, value: category.matchcase }}
                         onChange={(e) => {
                           setCategory({ ...category, matchcase: e.value });
                         }}
-                        />
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item md={5} xs={5} sm={5}>
+                    <FormControl fullWidth size="small">
+                      <Typography>Mrate Keywords</Typography>
+                      <OutlinedInput
+                        id="component-outlined"
+                        type="text"
+                        disabled={category.matchcase === 'Default'}
+                        placeholder="Please Enter Keyword"
+                        value={category.keywordprimary}
+                        onChange={(e) => {
+                          setCategory({ ...category, keywordprimary: e.target.value });
+                        }}
+                      />
+                    </FormControl>
+                    <Typography color="error">{errormsgeditcheckPrimary}</Typography>
+                  </Grid>
 
-                      </FormControl>
-                    
-                    </Grid>
-                    <Grid item md={5} xs={5} sm={5}>
-                      <FormControl fullWidth size="small">
-                        <Typography>Mrate Keywords</Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="text"
-                          disabled={category.matchcase === "Default"}
-                          placeholder="Please Enter Keyword"
-                          value={category.keywordprimary}
-                          onChange={(e) => {
-                            setCategory({ ...category, keywordprimary: e.target.value });
-                          }}
-                        />
-                      </FormControl>
-                      <Typography color="error">{errormsgeditcheckPrimary}</Typography>
-                    </Grid>
-                
-                    <Grid item md={3} xs={3} sm={3}>
-                      <FormControl fullWidth size="small">
-                        <Typography>Mrate</Typography>
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="text"
-                          placeholder="Please Enter Mrate"
-                          value={category.mrateprimary}
-                          onChange={(e) => {
-                            setCategory({ ...category, mrateprimary: e.target.value });
-                          }}
-                        />
-                      </FormControl>
-                      <Typography color="error">{errormsgeditcheckmratePrimary}</Typography>
-                    </Grid>
-                    <Grid item md={1} sm={1} xs={1} marginTop={3}>
-                      <Button variant="contained" color="success" sx={{ minWidth: "40px", height: "37px" }} onClick={handleCreatePrimary}>
-                        <FaPlus sx={{ color: "white" }} />
-                      </Button>
-                    </Grid>
-                  
-                    <Grid item md={12} xs={12} sm={12} marginTop={1}>
-                        {primary?.map((item, i) => (
-                          <div >
-                            {editingIndexPrimary === i ? (
-                              <>
-                              <Grid container spacing={2} key={i}>
-                                <Grid item md={0.5} sm={0.5} xs={0.5} sx={{display:"flex", alignItems:"center", }}>
-                                  {i + 1}. &ensp;
-                                </Grid>
-                                <Grid item md={5} sm={5} xs={5}>
-                                  <FormControl fullWidth size="small">
-                                    <OutlinedInput
-                                      id="component-outlined"
-                                      type="text"
-                                      size="small"
-                                      placeholder="Please Enter Keyword"
-                                      value={newKeywordPrimaryEdit}
-                                      onChange={(e) => {
-                                        setNewKeywordPrimaryEdit(e.target.value);
-                                      }}
-                                    />
-                                  </FormControl>
-                                </Grid>
-                                <Grid item md={2.5} sm={2.5} xs={2.5}>
-                                   <FormControl fullWidth size="small">                                 
-                                      <Selects options={[
-                                        {label:"Equals to", value:"Equals to"},
-                                        {label:"Contains", value:"Contains"},
-                                     
-                                        ]
-                                      } 
-                                      styles={colourStyles} 
-                                      value={{ label: newMatchCasePrimaryEdit, value: newMatchCasePrimaryEdit }}
-                                      onChange={(e) => {
-                                        setNewMatchCasePrimaryEdit(e.value);
-                                      }}
-                                      />
-                                    </FormControl>
-                                </Grid>
-                                <Grid item md={2} sm={2} xs={2}>
-                                  <FormControl fullWidth size="small">
-                                    <OutlinedInput
-                                      id="component-outlined"
-                                      type="text"
-                                      size="small"
-                                      placeholder="Please Enter Mrate"
-                                      value={newMratePrimaryEdit}
-                                      onChange={(e) => {
-                                        setNewMratePrimaryEdit(e.target.value);
-                                      }}
-                                    />
-                                  </FormControl>
-                                </Grid>
-                                <Grid item md={1} sm={1} xs={1} sx={{display:"flex", justifyContent:"flex-start", alignItems:"center"}}>
-                                  <Button
-                                    variant="contained"
-                                    style={{
-                                      minWidth: "20px",
-                                      padding:"10px",
-                                      background: "transparent",
-                                      boxShadow: "none",
-                                      marginTop: "-3px !important",
-                                      "&:hover": {
-                                        background: "#f4f4f4",
-                                        borderRadius: "50%",
-                                        minWidth: "20px",
-                                        boxShadow: "none",
-                                      },
-                                    }}
-                                    onClick={handleUpdatePrimary}
-                                  >
-                                    <CheckCircleIcon
-                                      style={{
-                                        color: "#216d21",
-                                        fontSize: "1.5rem",
-                                      }}
-                                    />
-                                  </Button>
-                                </Grid>
-                                <Grid item md={1} sm={1} xs={1} sx={{display:"flex", justifyContent:"end", alignItems:"center"}}>
-                                  <Button
-                                    variant="contained"
-                                    style={{
-                                      minWidth: "20px",
-                                      minHeight: "41px",
-                                      background: "transparent",
-                                      boxShadow: "none",
-                                      marginTop: "-3px !important",
-                                      "&:hover": {
-                                        background: "#f4f4f4",
-                                        borderRadius: "50%",
-                                        minHeight: "41px",
-                                        minWidth: "20px",
-                                        boxShadow: "none",
-                                      },
-                                    }}
-                                    onClick={() => setEditingIndexPrimary(-1)}
-                                  >
-                                    <CancelIcon
-                                      style={{
-                                        color: "#b92525",
-                                        fontSize: "1.5rem",
-                                      }}
-                                    />
-                                  </Button>
-                                </Grid>
+                  <Grid item md={3} xs={3} sm={3}>
+                    <FormControl fullWidth size="small">
+                      <Typography>Mrate</Typography>
+                      <OutlinedInput
+                        id="component-outlined"
+                        type="text"
+                        placeholder="Please Enter Mrate"
+                        value={category.mrateprimary}
+                        onChange={(e) => {
+                          setCategory({ ...category, mrateprimary: e.target.value });
+                        }}
+                      />
+                    </FormControl>
+                    <Typography color="error">{errormsgeditcheckmratePrimary}</Typography>
+                  </Grid>
+                  <Grid item md={1} sm={1} xs={1} marginTop={3}>
+                    <Button variant="contained" color="success" sx={{ minWidth: '40px', height: '37px' }} onClick={handleCreatePrimary}>
+                      <FaPlus sx={{ color: 'white' }} />
+                    </Button>
+                  </Grid>
+
+                  <Grid item md={12} xs={12} sm={12} marginTop={1}>
+                    {primary?.map((item, i) => (
+                      <div>
+                        {editingIndexPrimary === i ? (
+                          <>
+                            <Grid container spacing={2} key={i}>
+                              <Grid item md={0.5} sm={0.5} xs={0.5} sx={{ display: 'flex', alignItems: 'center' }}>
+                                {i + 1}. &ensp;
                               </Grid>
-                              <Grid container spacing={2}>
-                                <Grid item md={12} sm={12} xs={12}>
-                                  <Typography color="error">{errormsgeditPrimary}</Typography>
-                                </Grid>
+                              <Grid item md={5} sm={5} xs={5}>
+                                <FormControl fullWidth size="small">
+                                  <OutlinedInput
+                                    id="component-outlined"
+                                    type="text"
+                                    size="small"
+                                    placeholder="Please Enter Keyword"
+                                    value={newKeywordPrimaryEdit}
+                                    onChange={(e) => {
+                                      setNewKeywordPrimaryEdit(e.target.value);
+                                    }}
+                                  />
+                                </FormControl>
                               </Grid>
-                              </>
-                            ) : (
-                              <>
-                                <Grid container spacing={2} key={i}>
-                                  <Grid item md={0.5} sm={0.5} xs={0.5} sx={{display:"flex", alignItems:"center", }}>
-                                  <Typography > {i + 1}. </Typography>  
-                                  </Grid>
-                                  <Grid item md={5} sm={5} xs={5} sx={{display:"flex", alignItems:"center",  whiteSpace: "normal", wordBreak: "break-all" }}>
-                                  <Typography > {item.keyword} </Typography> 
-                                  </Grid>
-                                  <Grid item md={2.5} sm={2.5} xs={2.5} sx={{display:"flex", alignItems:"center", whiteSpace: "normal", wordBreak: "break-all" }}>
-                                  <Typography >   {item.matchcase}</Typography> 
-                                  </Grid>
-                                  <Grid item md={2} sm={2} xs={2} sx={{display:"flex", alignItems:"center", whiteSpace: "normal", wordBreak: "break-all" }}>
-                                  <Typography >   {item.mrate}</Typography> 
-                                  </Grid>
-                                  <Grid item md={1} sm={1} xs={1} sx={{display:"flex", justifyContent:"flex-start", alignItems:"center"}}>
-                                    <Button
-                                      variant="contained"
-                                      disabled={item.matchcase === "Default"}
-                                      style={{
-                                        minWidth: "30px",
-                                        minHeight: "30px",
-                                        padding:"6px",
-                                        background: "transparent",
-                                        boxShadow: "none",
-                                        marginTop: "-3px !important",
-                                        "&:hover": {
-                                          background: "#1976d22e",
-                                          borderRadius: "50%",
-                                          minWidth: "30px",
-                                          minHeight: "30px",
-                                          padding:"6px",
+                              <Grid item md={2.5} sm={2.5} xs={2.5}>
+                                <FormControl fullWidth size="small">
+                                  <Selects
+                                    options={[
+                                      { label: 'Equals to', value: 'Equals to' },
+                                      { label: 'Contains', value: 'Contains' },
+                                    ]}
+                                    styles={colourStyles}
+                                    value={{ label: newMatchCasePrimaryEdit, value: newMatchCasePrimaryEdit }}
+                                    onChange={(e) => {
+                                      setNewMatchCasePrimaryEdit(e.value);
+                                    }}
+                                  />
+                                </FormControl>
+                              </Grid>
+                              <Grid item md={2} sm={2} xs={2}>
+                                <FormControl fullWidth size="small">
+                                  <OutlinedInput
+                                    id="component-outlined"
+                                    type="text"
+                                    size="small"
+                                    placeholder="Please Enter Mrate"
+                                    value={newMratePrimaryEdit}
+                                    onChange={(e) => {
+                                      setNewMratePrimaryEdit(e.target.value);
+                                    }}
+                                  />
+                                </FormControl>
+                              </Grid>
+                              <Grid item md={1} sm={1} xs={1} sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                <Button
+                                  variant="contained"
+                                  style={{
+                                    minWidth: '20px',
+                                    padding: '10px',
+                                    background: 'transparent',
+                                    boxShadow: 'none',
+                                    marginTop: '-3px !important',
+                                    '&:hover': {
+                                      background: '#f4f4f4',
+                                      borderRadius: '50%',
+                                      minWidth: '20px',
+                                      boxShadow: 'none',
+                                    },
+                                  }}
+                                  onClick={handleUpdatePrimary}
+                                >
+                                  <CheckCircleIcon
+                                    style={{
+                                      color: '#216d21',
+                                      fontSize: '1.5rem',
+                                    }}
+                                  />
+                                </Button>
+                              </Grid>
+                              <Grid item md={1} sm={1} xs={1} sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+                                <Button
+                                  variant="contained"
+                                  style={{
+                                    minWidth: '20px',
+                                    minHeight: '41px',
+                                    background: 'transparent',
+                                    boxShadow: 'none',
+                                    marginTop: '-3px !important',
+                                    '&:hover': {
+                                      background: '#f4f4f4',
+                                      borderRadius: '50%',
+                                      minHeight: '41px',
+                                      minWidth: '20px',
+                                      boxShadow: 'none',
+                                    },
+                                  }}
+                                  onClick={() => setEditingIndexPrimary(-1)}
+                                >
+                                  <CancelIcon
+                                    style={{
+                                      color: '#b92525',
+                                      fontSize: '1.5rem',
+                                    }}
+                                  />
+                                </Button>
+                              </Grid>
+                            </Grid>
+                            <Grid container spacing={2}>
+                              <Grid item md={12} sm={12} xs={12}>
+                                <Typography color="error">{errormsgeditPrimary}</Typography>
+                              </Grid>
+                            </Grid>
+                          </>
+                        ) : (
+                          <>
+                            <Grid container spacing={2} key={i}>
+                              <Grid item md={0.5} sm={0.5} xs={0.5} sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Typography> {i + 1}. </Typography>
+                              </Grid>
+                              <Grid item md={5} sm={5} xs={5} sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'normal', wordBreak: 'break-all' }}>
+                                <Typography> {item.keyword} </Typography>
+                              </Grid>
+                              <Grid item md={2.5} sm={2.5} xs={2.5} sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'normal', wordBreak: 'break-all' }}>
+                                <Typography> {item.matchcase}</Typography>
+                              </Grid>
+                              <Grid item md={2} sm={2} xs={2} sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'normal', wordBreak: 'break-all' }}>
+                                <Typography> {item.mrate}</Typography>
+                              </Grid>
+                              <Grid item md={1} sm={1} xs={1} sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                <Button
+                                  variant="contained"
+                                  disabled={item.matchcase === 'Default'}
+                                  style={{
+                                    minWidth: '30px',
+                                    minHeight: '30px',
+                                    padding: '6px',
+                                    background: 'transparent',
+                                    boxShadow: 'none',
+                                    marginTop: '-3px !important',
+                                    '&:hover': {
+                                      background: '#1976d22e',
+                                      borderRadius: '50%',
+                                      minWidth: '30px',
+                                      minHeight: '30px',
+                                      padding: '6px',
 
-                                          boxShadow: "none",
-                                        },
-                                      }}
-                                      onClick={() => handleEditPrimary(i)}
-                                    >
-                                      <FaEdit
-                                        style={{
-                                          color: item.matchcase === "Default" ? "lightgrey" : "#1976d2" ,
+                                      boxShadow: 'none',
+                                    },
+                                  }}
+                                  onClick={() => handleEditPrimary(i)}
+                                >
+                                  <FaEdit
+                                    style={{
+                                      color: item.matchcase === 'Default' ? 'lightgrey' : '#1976d2',
 
-                                          fontSize: "1.2rem",
-                                        }}
-                                      />
-                                    </Button>
-                                  </Grid>
-                                  <Grid item md={1} sm={1} xs={1} sx={{display:"flex", justifyContent:"end", alignItems:"center"}}>
-                                    <Button onClick={(e) => handleDeletePrimary(i)} 
-                                      style={{
-                                        minWidth: "30px",
-                                        minHeight: "30px",
-                                        padding:"6px",
-                                        background: "transparent",
-                                        boxShadow: "none",
-                                        marginTop: "-3px !important",
-                                        "&:hover": {
-                                          background: "#e7afb745",
-                                          borderRadius: "50%",
-                                          minWidth: "30px",
-                                          minHeight: "30px",
-                                          padding:"6px",
-                                          boxShadow: "none",
-                                        },
-                                      }}
-                                      >
-                                      <FaTrash
-                                        style={{
-                                          color: "#b92525",
-                                          fontSize: "1rem",
-                                        }}
-                                      />
-                                    </Button>
-                                  </Grid>
-                                </Grid>
-                                {/* <br />
+                                      fontSize: '1.2rem',
+                                    }}
+                                  />
+                                </Button>
+                              </Grid>
+                              <Grid item md={1} sm={1} xs={1} sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+                                <Button
+                                  onClick={(e) => handleDeletePrimary(i)}
+                                  style={{
+                                    minWidth: '30px',
+                                    minHeight: '30px',
+                                    padding: '6px',
+                                    background: 'transparent',
+                                    boxShadow: 'none',
+                                    marginTop: '-3px !important',
+                                    '&:hover': {
+                                      background: '#e7afb745',
+                                      borderRadius: '50%',
+                                      minWidth: '30px',
+                                      minHeight: '30px',
+                                      padding: '6px',
+                                      boxShadow: 'none',
+                                    },
+                                  }}
+                                >
+                                  <FaTrash
+                                    style={{
+                                      color: '#b92525',
+                                      fontSize: '1rem',
+                                    }}
+                                  />
+                                </Button>
+                              </Grid>
+                            </Grid>
+                            {/* <br />
                                 <Grid container>
                                   <Typography color="error">{errormsgeditPrimary}</Typography>
                                 </Grid> */}
-                              </>
-                            )}
-                          </div>
-                        ))}
-                    </Grid>              
-                 </Grid>  
-
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </Grid>
+                </Grid>
               </Grid>
               {/* <Grid item md={4} xs={12} sm={3}>
                  <Grid container spacing={1}>
@@ -3159,31 +3130,31 @@ const handleDeletePrimaryEdit = (index) => {
                   />  
                   </Box> 
                   </Grid> 
-                     */}  
-                </Grid>
-                <br />
-              <Grid container spacing={1}>
-                <Grid item md={3.4} xs={10.2} sm={10.2}>
-                  <FormControl fullWidth size="small">
-                    <Typography>Keywords</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      placeholder="Please Enter Keyword"
-                      value={category.keyword}
-                      onChange={(e) => {
-                        setCategory({ ...category, keyword: e.target.value });
-                      }}
-                    />
-                  </FormControl>
-                  <Typography color="error">{errormsgeditcheck}</Typography>
-                </Grid>
-                <Grid item md={0.6} sm={1.3} xs={1.3} marginTop={3}>
-                  <Button variant="contained" color="info" sx={{ minWidth: "40px", height: "37px" }} onClick={handleCreateTodocheckeditall}>
-                    <FaPlus sx={{ color: "white" }} />
-                  </Button>
-                </Grid>
-                <Grid item md={12} xs={12} sm={12} marginTop={1}>
+                     */}
+            </Grid>
+            <br />
+            <Grid container spacing={1}>
+              <Grid item md={3.4} xs={10.2} sm={10.2}>
+                <FormControl fullWidth size="small">
+                  <Typography>Keywords</Typography>
+                  <OutlinedInput
+                    id="component-outlined"
+                    type="text"
+                    placeholder="Please Enter Keyword"
+                    value={category.keyword}
+                    onChange={(e) => {
+                      setCategory({ ...category, keyword: e.target.value });
+                    }}
+                  />
+                </FormControl>
+                <Typography color="error">{errormsgeditcheck}</Typography>
+              </Grid>
+              <Grid item md={0.6} sm={1.3} xs={1.3} marginTop={3}>
+                <Button variant="contained" color="info" sx={{ minWidth: '40px', height: '37px' }} onClick={handleCreateTodocheckeditall}>
+                  <FaPlus sx={{ color: 'white' }} />
+                </Button>
+              </Grid>
+              <Grid item md={12} xs={12} sm={12} marginTop={1}>
                 {todoscheckall?.map((item, i) => (
                   <div key={i}>
                     {editingIndexcheckall === i ? (
@@ -3209,25 +3180,25 @@ const handleDeletePrimaryEdit = (index) => {
                           <Button
                             variant="contained"
                             style={{
-                              minWidth: "20px",
-                              minHeight: "41px",
-                              background: "transparent",
-                              boxShadow: "none",
-                              marginTop: "-3px !important",
-                              "&:hover": {
-                                background: "#f4f4f4",
-                                borderRadius: "50%",
-                                minHeight: "41px",
-                                minWidth: "20px",
-                                boxShadow: "none",
+                              minWidth: '20px',
+                              minHeight: '41px',
+                              background: 'transparent',
+                              boxShadow: 'none',
+                              marginTop: '-3px !important',
+                              '&:hover': {
+                                background: '#f4f4f4',
+                                borderRadius: '50%',
+                                minHeight: '41px',
+                                minWidth: '20px',
+                                boxShadow: 'none',
                               },
                             }}
                             onClick={handleUpdateTodocheckall}
                           >
                             <CheckCircleIcon
                               style={{
-                                color: "#216d21",
-                                fontSize: "1.5rem",
+                                color: '#216d21',
+                                fontSize: '1.5rem',
                               }}
                             />
                           </Button>
@@ -3236,25 +3207,25 @@ const handleDeletePrimaryEdit = (index) => {
                           <Button
                             variant="contained"
                             style={{
-                              minWidth: "20px",
-                              minHeight: "41px",
-                              background: "transparent",
-                              boxShadow: "none",
-                              marginTop: "-3px !important",
-                              "&:hover": {
-                                background: "#f4f4f4",
-                                borderRadius: "50%",
-                                minHeight: "41px",
-                                minWidth: "20px",
-                                boxShadow: "none",
+                              minWidth: '20px',
+                              minHeight: '41px',
+                              background: 'transparent',
+                              boxShadow: 'none',
+                              marginTop: '-3px !important',
+                              '&:hover': {
+                                background: '#f4f4f4',
+                                borderRadius: '50%',
+                                minHeight: '41px',
+                                minWidth: '20px',
+                                boxShadow: 'none',
                               },
                             }}
                             onClick={() => setEditingIndexcheckall(-1)}
                           >
                             <CancelIcon
                               style={{
-                                color: "#b92525",
-                                fontSize: "1.5rem",
+                                color: '#b92525',
+                                fontSize: '1.5rem',
                               }}
                             />
                           </Button>
@@ -3266,7 +3237,7 @@ const handleDeletePrimaryEdit = (index) => {
                           <Grid item md={0.2} sm={0.5} xs={0.5}>
                             {i + 1}. &ensp;
                           </Grid>
-                          <Grid item md={2.8} sm={9} xs={9} sx={{ whiteSpace: "normal", wordBreak: "break-all" }}>
+                          <Grid item md={2.8} sm={9} xs={9} sx={{ whiteSpace: 'normal', wordBreak: 'break-all' }}>
                             {item.keyword}
                           </Grid>
 
@@ -3274,35 +3245,35 @@ const handleDeletePrimaryEdit = (index) => {
                             <Button
                               variant="contained"
                               style={{
-                                minWidth: "20px",
-                                minHeight: "41px",
-                                background: "transparent",
-                                boxShadow: "none",
-                                marginTop: "-13px",
-                                "&:hover": {
-                                  background: "#f4f4f4",
-                                  borderRadius: "50%",
-                                  minHeight: "41px",
-                                  minWidth: "20px",
-                                  boxShadow: "none",
+                                minWidth: '20px',
+                                minHeight: '41px',
+                                background: 'transparent',
+                                boxShadow: 'none',
+                                marginTop: '-13px',
+                                '&:hover': {
+                                  background: '#f4f4f4',
+                                  borderRadius: '50%',
+                                  minHeight: '41px',
+                                  minWidth: '20px',
+                                  boxShadow: 'none',
                                 },
                               }}
                               onClick={() => handleEditTodocheckall(i)}
                             >
                               <FaEdit
                                 style={{
-                                  color: "#1976d2",
-                                  fontSize: "1.2rem",
+                                  color: '#1976d2',
+                                  fontSize: '1.2rem',
                                 }}
                               />
                             </Button>
                           </Grid>
                           <Grid item md={0.5} sm={1} xs={1}>
-                            <Button onClick={(e) => handleDeleteTodocheckeditall(i)} sx={{ borderRadius: "50%", minWidth: "35px", minHeight: "35px", marginTop: "-8px" }}>
+                            <Button onClick={(e) => handleDeleteTodocheckeditall(i)} sx={{ borderRadius: '50%', minWidth: '35px', minHeight: '35px', marginTop: '-8px' }}>
                               <FaTrash
                                 style={{
-                                  color: "#b92525",
-                                  fontSize: "0.9rem",
+                                  color: '#b92525',
+                                  fontSize: '0.9rem',
                                 }}
                               />
                             </Button>
@@ -3318,8 +3289,8 @@ const handleDeletePrimaryEdit = (index) => {
                 ))}
               </Grid>
             </Grid>
-            <br /> 
-            <Grid container spacing={2} sx={{ display: "flex", justifyContent: "center" }}>
+            <br />
+            <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center' }}>
               <Button sx={buttonStyles.buttonsubmit} onClick={handleSubmit} disabled={isBtn}>
                 SUBMIT
               </Button>
@@ -3345,10 +3316,10 @@ const handleDeletePrimaryEdit = (index) => {
             // "& .MuiPaper-root": {
             //   overflow: "visible",
             // },
-            marginTop: "50px",
+            marginTop: '50px',
           }}
         >
-          <Box sx={{ padding: "20px 30px" }}>
+          <Box sx={{ padding: '20px 30px' }}>
             <>
               <Grid container spacing={2}>
                 <Grid item md={12} xs={12} sm={12}>
@@ -3359,7 +3330,7 @@ const handleDeletePrimaryEdit = (index) => {
               <Grid container spacing={2}>
                 <Grid item md={4} xs={12} sm={12}>
                   <Typography>
-                    Project <b style={{ color: "red" }}>*</b>
+                    Project <b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <FormControl fullWidth size="small">
                     <Selects options={projects} styles={colourStyles} value={{ label: selectedProjectedit, value: selectedProjectedit }} onChange={(e) => setSelectedProjectedit(e.value)} />
@@ -3368,7 +3339,7 @@ const handleDeletePrimaryEdit = (index) => {
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Name <b style={{ color: "red" }}>*</b>
+                      Name <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -3383,7 +3354,7 @@ const handleDeletePrimaryEdit = (index) => {
                 <Grid item md={2} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Flag Status<b style={{ color: "red" }}>*</b>
+                      Flag Status<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects options={flags} styles={colourStyles} value={{ label: selectedFlagEdit, value: selectedFlagEdit }} onChange={handleFlagChangeEdit} />
                   </FormControl>
@@ -3401,7 +3372,7 @@ const handleDeletePrimaryEdit = (index) => {
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={selectedFlagEditOrg === "No"}
+                      disabled={selectedFlagEditOrg === 'No'}
                       placeholder="Please Enter Flag Calc Org"
                       value={categoryid.flagmanualcalcorg}
                       onChange={(e) => {
@@ -3422,7 +3393,7 @@ const handleDeletePrimaryEdit = (index) => {
                     <OutlinedInput
                       id="component-outlined"
                       type="text"
-                      disabled={selectedFlagEditTemp === "No"}
+                      disabled={selectedFlagEditTemp === 'No'}
                       placeholder="Please Enter Flag Calc Temp"
                       value={categoryid.flagmanualcalctemp}
                       onChange={(e) => {
@@ -3446,33 +3417,31 @@ const handleDeletePrimaryEdit = (index) => {
                   </FormGroup>
                 </Grid>
                 <Grid item md={6} xs={12} sm={3}>
-                 <Grid container spacing={1}>
-                 <Grid item md={3} xs={3} sm={3}>
+                  <Grid container spacing={1}>
+                    <Grid item md={3} xs={3} sm={3}>
                       <FormControl fullWidth size="small">
                         <Typography>Match Case</Typography>
-                        <Selects options={[
-                          {label:"Equals to", value:"Equals to"},
-                          {label:"Contains", value:"Contains"},
-                          {label:"Default", value:"Default"},
-                          ]
-                        } 
-                        styles={colourStyles} 
-                        value={{ label: categoryid.matchcase, value: categoryid.matchcase }}
-                        onChange={(e) => {
-                          setCategoryid({ ...categoryid, matchcase: e.value, keywordprimary:"" });
-                        }}
+                        <Selects
+                          options={[
+                            { label: 'Equals to', value: 'Equals to' },
+                            { label: 'Contains', value: 'Contains' },
+                            { label: 'Default', value: 'Default' },
+                          ]}
+                          styles={colourStyles}
+                          value={{ label: categoryid.matchcase, value: categoryid.matchcase }}
+                          onChange={(e) => {
+                            setCategoryid({ ...categoryid, matchcase: e.value, keywordprimary: '' });
+                          }}
                         />
-
                       </FormControl>
-                    
                     </Grid>
-                 <Grid item md={5} xs={5} sm={5}>
+                    <Grid item md={5} xs={5} sm={5}>
                       <FormControl fullWidth size="small">
                         <Typography>Mrate Keywords</Typography>
                         <OutlinedInput
                           id="component-outlined"
                           type="text"
-                          disabled={categoryid.matchcase === "Default"}
+                          disabled={categoryid.matchcase === 'Default'}
                           placeholder="Please Enter Keyword"
                           value={categoryid.keywordprimary}
                           onChange={(e) => {
@@ -3482,7 +3451,7 @@ const handleDeletePrimaryEdit = (index) => {
                       </FormControl>
                       <Typography color="error">{errormsgeditcheckPrimaryEdit}</Typography>
                     </Grid>
-                  
+
                     <Grid item md={3} xs={3} sm={3}>
                       <FormControl fullWidth size="small">
                         <Typography>Mrate</Typography>
@@ -3499,18 +3468,18 @@ const handleDeletePrimaryEdit = (index) => {
                       <Typography color="error">{errormsgeditcheckmratePrimaryEdit}</Typography>
                     </Grid>
                     <Grid item md={1} sm={1} xs={1} marginTop={3}>
-                      <Button variant="contained" color="success" sx={{ minWidth: "40px", height: "37px" }} onClick={handleCreatePrimaryEdit}>
-                        <FaPlus sx={{ color: "white" }} />
+                      <Button variant="contained" color="success" sx={{ minWidth: '40px', height: '37px' }} onClick={handleCreatePrimaryEdit}>
+                        <FaPlus sx={{ color: 'white' }} />
                       </Button>
                     </Grid>
-                  
+
                     <Grid item md={12} xs={12} sm={12} marginTop={1}>
-                        {primaryEdit?.map((item, i) => (
-                          <div >
-                            {editingIndexPrimaryEdit === i ? (
-                              <>
+                      {primaryEdit?.map((item, i) => (
+                        <div>
+                          {editingIndexPrimaryEdit === i ? (
+                            <>
                               <Grid container spacing={2} key={i}>
-                                <Grid item md={0.5} sm={0.5} xs={0.5} sx={{display:"flex", alignItems:"center", }}>
+                                <Grid item md={0.5} sm={0.5} xs={0.5} sx={{ display: 'flex', alignItems: 'center' }}>
                                   {i + 1}. &ensp;
                                 </Grid>
                                 <Grid item md={5} sm={5} xs={5}>
@@ -3528,19 +3497,19 @@ const handleDeletePrimaryEdit = (index) => {
                                   </FormControl>
                                 </Grid>
                                 <Grid item md={2.5} sm={2.5} xs={2.5}>
-                                   <FormControl fullWidth size="small">                                 
-                                      <Selects options={[
-                                        {label:"Equals to", value:"Equals to"},
-                                        {label:"Contains", value:"Contains"},
-                                        ]
-                                      } 
-                                      styles={colourStyles} 
+                                  <FormControl fullWidth size="small">
+                                    <Selects
+                                      options={[
+                                        { label: 'Equals to', value: 'Equals to' },
+                                        { label: 'Contains', value: 'Contains' },
+                                      ]}
+                                      styles={colourStyles}
                                       value={{ label: newMatchCasePrimaryEditEdit, value: newMatchCasePrimaryEditEdit }}
                                       onChange={(e) => {
                                         setNewMatchCasePrimaryEditEdit(e.value);
                                       }}
-                                      />
-                                    </FormControl>
+                                    />
+                                  </FormControl>
                                 </Grid>
                                 <Grid item md={2} sm={2} xs={2}>
                                   <FormControl fullWidth size="small">
@@ -3556,55 +3525,55 @@ const handleDeletePrimaryEdit = (index) => {
                                     />
                                   </FormControl>
                                 </Grid>
-                                <Grid item md={1.5} sm={1.5} xs={1.5} sx={{display:"flex", justifyContent:"flex-start", alignItems:"center"}}>
+                                <Grid item md={1.5} sm={1.5} xs={1.5} sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                                   <Button
                                     variant="contained"
                                     style={{
-                                      minWidth: "20px",
-                                      padding:"10px",
-                                      background: "transparent",
-                                      boxShadow: "none",
-                                      marginTop: "-3px !important",
-                                      "&:hover": {
-                                        background: "#f4f4f4",
-                                        borderRadius: "50%",
-                                        minWidth: "20px",
-                                        boxShadow: "none",
+                                      minWidth: '20px',
+                                      padding: '10px',
+                                      background: 'transparent',
+                                      boxShadow: 'none',
+                                      marginTop: '-3px !important',
+                                      '&:hover': {
+                                        background: '#f4f4f4',
+                                        borderRadius: '50%',
+                                        minWidth: '20px',
+                                        boxShadow: 'none',
                                       },
                                     }}
                                     onClick={handleUpdatePrimaryEdit}
                                   >
                                     <CheckCircleIcon
                                       style={{
-                                        color: "#216d21",
-                                        fontSize: "1.5rem",
+                                        color: '#216d21',
+                                        fontSize: '1.5rem',
                                       }}
                                     />
                                   </Button>
                                 </Grid>
-                                <Grid item md={1} sm={1} xs={1} sx={{display:"flex", justifyContent:"end", alignItems:"center"}}>
+                                <Grid item md={1} sm={1} xs={1} sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
                                   <Button
                                     variant="contained"
                                     style={{
-                                      minWidth: "20px",
-                                      minHeight: "41px",
-                                      background: "transparent",
-                                      boxShadow: "none",
-                                      marginTop: "-3px !important",
-                                      "&:hover": {
-                                        background: "#f4f4f4",
-                                        borderRadius: "50%",
-                                        minHeight: "41px",
-                                        minWidth: "20px",
-                                        boxShadow: "none",
+                                      minWidth: '20px',
+                                      minHeight: '41px',
+                                      background: 'transparent',
+                                      boxShadow: 'none',
+                                      marginTop: '-3px !important',
+                                      '&:hover': {
+                                        background: '#f4f4f4',
+                                        borderRadius: '50%',
+                                        minHeight: '41px',
+                                        minWidth: '20px',
+                                        boxShadow: 'none',
                                       },
                                     }}
                                     onClick={() => setEditingIndexPrimaryEdit(-1)}
                                   >
                                     <CancelIcon
                                       style={{
-                                        color: "#b92525",
-                                        fontSize: "1.5rem",
+                                        color: '#b92525',
+                                        fontSize: '1.5rem',
                                       }}
                                     />
                                   </Button>
@@ -3615,90 +3584,89 @@ const handleDeletePrimaryEdit = (index) => {
                                   <Typography color="error">{errormsgeditPrimaryEdit}</Typography>
                                 </Grid>
                               </Grid>
-                              </>
-                            ) : (
-                              <>
-                                <Grid container spacing={2} key={i}>
-                                  <Grid item md={0.5} sm={0.5} xs={0.5} sx={{display:"flex", alignItems:"center", }}>
-                                  <Typography > {i + 1}. </Typography>  
-                                  </Grid>
-                                  <Grid item md={5} sm={5} xs={5} sx={{display:"flex", alignItems:"center",  whiteSpace: "normal", wordBreak: "break-all" }}>
-                                  <Typography > {item.keyword} </Typography> 
-                                  </Grid>
-                                  <Grid item md={2.5} sm={2.5} xs={2.5} sx={{display:"flex", alignItems:"center", whiteSpace: "normal", wordBreak: "break-all" }}>
-                                  <Typography >   {item.matchcase}</Typography> 
-                                  </Grid>
-                                  <Grid item md={2} sm={2} xs={2} sx={{display:"flex", alignItems:"center", whiteSpace: "normal", wordBreak: "break-all" }}>
-                                  <Typography >   {item.mrate}</Typography> 
-                                  </Grid>
-                                  <Grid item md={1} sm={1} xs={1} sx={{display:"flex", justifyContent:"flex-start", alignItems:"center"}}>
-                                    <Button
-                                      variant="contained"
-                                      disabled={item.matchcase === "Default"}
-                                      style={{
-                                        minWidth: "30px",
-                                        minHeight: "30px",
-                                        padding:"6px",
-                                        background: "transparent",
-                                        boxShadow: "none",
-                                        marginTop: "-3px !important",
-                                        "&:hover": {
-                                          background: "#1976d22e",
-                                          borderRadius: "50%",
-                                          minWidth: "30px",
-                                          minHeight: "30px",
-                                          padding:"6px",
-
-                                          boxShadow: "none",
-                                        },
-                                      }}
-                                      onClick={() => handleEditPrimaryEdit(i)}
-                                    >
-                                      <FaEdit
-                                       
-                                        style={{
-                                          color: item.matchcase === "Default" ? "lightgrey" : "#1976d2" ,
-                                          fontSize: "1.2rem",
-                                        }}
-                                      />
-                                    </Button>
-                                  </Grid>
-                                  <Grid item md={1} sm={1} xs={1} sx={{display:"flex", justifyContent:"end", alignItems:"center"}}>
-                                    <Button onClick={(e) => handleDeletePrimaryEdit(i)} 
-                                      style={{
-                                        minWidth: "30px",
-                                        minHeight: "30px",
-                                        padding:"6px",
-                                        background: "transparent",
-                                        boxShadow: "none",
-                                        marginTop: "-3px !important",
-                                        "&:hover": {
-                                          background: "#e7afb745",
-                                          borderRadius: "50%",
-                                          minWidth: "30px",
-                                          minHeight: "30px",
-                                          padding:"6px",
-                                          boxShadow: "none",
-                                        },
-                                      }}
-                                      >
-                                      <FaTrash
-                                        style={{
-                                          color: "#b92525",
-                                          fontSize: "1rem",
-                                        }}
-                                      />
-                                    </Button>
-                                  </Grid>
+                            </>
+                          ) : (
+                            <>
+                              <Grid container spacing={2} key={i}>
+                                <Grid item md={0.5} sm={0.5} xs={0.5} sx={{ display: 'flex', alignItems: 'center' }}>
+                                  <Typography> {i + 1}. </Typography>
                                 </Grid>
-                              </>
-                            )}
-                          </div>
-                        ))}
-                    </Grid>              
-                 </Grid>  
+                                <Grid item md={5} sm={5} xs={5} sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'normal', wordBreak: 'break-all' }}>
+                                  <Typography> {item.keyword} </Typography>
+                                </Grid>
+                                <Grid item md={2.5} sm={2.5} xs={2.5} sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'normal', wordBreak: 'break-all' }}>
+                                  <Typography> {item.matchcase}</Typography>
+                                </Grid>
+                                <Grid item md={2} sm={2} xs={2} sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'normal', wordBreak: 'break-all' }}>
+                                  <Typography> {item.mrate}</Typography>
+                                </Grid>
+                                <Grid item md={1} sm={1} xs={1} sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                  <Button
+                                    variant="contained"
+                                    disabled={item.matchcase === 'Default'}
+                                    style={{
+                                      minWidth: '30px',
+                                      minHeight: '30px',
+                                      padding: '6px',
+                                      background: 'transparent',
+                                      boxShadow: 'none',
+                                      marginTop: '-3px !important',
+                                      '&:hover': {
+                                        background: '#1976d22e',
+                                        borderRadius: '50%',
+                                        minWidth: '30px',
+                                        minHeight: '30px',
+                                        padding: '6px',
 
-              </Grid>
+                                        boxShadow: 'none',
+                                      },
+                                    }}
+                                    onClick={() => handleEditPrimaryEdit(i)}
+                                  >
+                                    <FaEdit
+                                      style={{
+                                        color: item.matchcase === 'Default' ? 'lightgrey' : '#1976d2',
+                                        fontSize: '1.2rem',
+                                      }}
+                                    />
+                                  </Button>
+                                </Grid>
+                                <Grid item md={1} sm={1} xs={1} sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+                                  <Button
+                                    onClick={(e) => handleDeletePrimaryEdit(i)}
+                                    style={{
+                                      minWidth: '30px',
+                                      minHeight: '30px',
+                                      padding: '6px',
+                                      background: 'transparent',
+                                      boxShadow: 'none',
+                                      marginTop: '-3px !important',
+                                      '&:hover': {
+                                        background: '#e7afb745',
+                                        borderRadius: '50%',
+                                        minWidth: '30px',
+                                        minHeight: '30px',
+                                        padding: '6px',
+                                        boxShadow: 'none',
+                                      },
+                                    }}
+                                  >
+                                    <FaTrash
+                                      style={{
+                                        color: '#b92525',
+                                        fontSize: '1rem',
+                                      }}
+                                    />
+                                  </Button>
+                                </Grid>
+                              </Grid>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </Grid>
+                  </Grid>
+                </Grid>
                 {/* <Grid item md={1.5} xs={12} sm={3}>
                  <FormControl fullWidth size="small"> 
                     <Typography>Mrate Primary</Typography>
@@ -3849,13 +3817,10 @@ const handleDeletePrimaryEdit = (index) => {
                   />  
                   </Box> 
                   </Grid>  */}
-
-               
-
               </Grid>
               <br />
               <Grid container spacing={2}>
-              <Grid item md={5} xs={10} sm={10}>
+                <Grid item md={5} xs={10} sm={10}>
                   <FormControl fullWidth size="small">
                     <Typography>Keywords</Typography>
                     <OutlinedInput
@@ -3871,157 +3836,157 @@ const handleDeletePrimaryEdit = (index) => {
                   <Typography color="error">{errormsgeditcheckEdit}</Typography>
                 </Grid>
                 <Grid item md={1} sm={2} xs={2} marginTop={3}>
-                  <Button variant="contained" color="primary" sx={{ minWidth: "40px", height: "37px" }} onClick={handleCreateTodocheckeditallEdit}>
-                    <FaPlus sx={{ color: "white" }} />
+                  <Button variant="contained" color="primary" sx={{ minWidth: '40px', height: '37px' }} onClick={handleCreateTodocheckeditallEdit}>
+                    <FaPlus sx={{ color: 'white' }} />
                   </Button>
                 </Grid>
-              <Grid item md={12} xs={12} sm={12}>
-              {todoscheckallEdit?.map((item, i) => (
-                <div>
-                  {editingIndexcheckallEdit === i ? (
-                    <Grid container spacing={2}  key={i}>
-                      <Grid item md={0.3} sm={0.5} xs={0.5}>
-                        {i + 1}. &ensp;
-                      </Grid>
-                      <Grid item md={3.8} sm={9} xs={9}>
-                        <FormControl fullWidth size="small">
-                          <OutlinedInput
-                            id="component-outlined"
-                            type="text"
-                            size="small"
-                            placeholder="Please Enter Keyword"
-                            value={newcheckKeyEditPop}
-                            onChange={(e) => {
-                              setNewcheckKeyEditPop(e.target.value);
-                            }}
-                          />
-                        </FormControl>
-                        <Typography color="error">{errormsgeditcheckallEdit}</Typography>
-                      </Grid>
+                <Grid item md={12} xs={12} sm={12}>
+                  {todoscheckallEdit?.map((item, i) => (
+                    <div>
+                      {editingIndexcheckallEdit === i ? (
+                        <Grid container spacing={2} key={i}>
+                          <Grid item md={0.3} sm={0.5} xs={0.5}>
+                            {i + 1}. &ensp;
+                          </Grid>
+                          <Grid item md={3.8} sm={9} xs={9}>
+                            <FormControl fullWidth size="small">
+                              <OutlinedInput
+                                id="component-outlined"
+                                type="text"
+                                size="small"
+                                placeholder="Please Enter Keyword"
+                                value={newcheckKeyEditPop}
+                                onChange={(e) => {
+                                  setNewcheckKeyEditPop(e.target.value);
+                                }}
+                              />
+                            </FormControl>
+                            <Typography color="error">{errormsgeditcheckallEdit}</Typography>
+                          </Grid>
 
-                      <Grid item md={1} sm={1.5} xs={1.5}>
-                        <Button
-                          variant="contained"
-                          style={{
-                            minWidth: "20px",
-                            minHeight: "41px",
-                            background: "transparent",
-                            boxShadow: "none",
-                            marginTop: "-3px !important",
-                            "&:hover": {
-                              background: "#f4f4f4",
-                              borderRadius: "50%",
-                              minHeight: "41px",
-                              minWidth: "20px",
-                              boxShadow: "none",
-                            },
-                          }}
-                          onClick={handleUpdateTodocheckallEdit}
-                        >
-                          <CheckCircleIcon
-                            style={{
-                              color: "#216d21",
-                              fontSize: "1.5rem",
-                            }}
-                          />
-                        </Button>
-                      </Grid>
-                      <Grid item md={1} sm={1} xs={1}>
-                        <Button
-                          variant="contained"
-                          style={{
-                            minWidth: "20px",
-                            minHeight: "41px",
-                            background: "transparent",
-                            boxShadow: "none",
-                            marginTop: "-3px !important",
-                            "&:hover": {
-                              background: "#f4f4f4",
-                              borderRadius: "50%",
-                              minHeight: "41px",
-                              minWidth: "20px",
-                              boxShadow: "none",
-                            },
-                          }}
-                          onClick={() => setEditingIndexcheckallEdit(-1)}
-                        >
-                          <CancelIcon
-                            style={{
-                              color: "#b92525",
-                              fontSize: "1.5rem",
-                            }}
-                          />
-                        </Button>
-                      </Grid>
-                      <br />
-                    </Grid>
-                  ) : (
-                    <>
-                      <Grid container spacing={2} key={i}>
-                        <Grid item md={0.3} sm={0.5} xs={0.5}>
-                          {i + 1}. &ensp;
+                          <Grid item md={1} sm={1.5} xs={1.5}>
+                            <Button
+                              variant="contained"
+                              style={{
+                                minWidth: '20px',
+                                minHeight: '41px',
+                                background: 'transparent',
+                                boxShadow: 'none',
+                                marginTop: '-3px !important',
+                                '&:hover': {
+                                  background: '#f4f4f4',
+                                  borderRadius: '50%',
+                                  minHeight: '41px',
+                                  minWidth: '20px',
+                                  boxShadow: 'none',
+                                },
+                              }}
+                              onClick={handleUpdateTodocheckallEdit}
+                            >
+                              <CheckCircleIcon
+                                style={{
+                                  color: '#216d21',
+                                  fontSize: '1.5rem',
+                                }}
+                              />
+                            </Button>
+                          </Grid>
+                          <Grid item md={1} sm={1} xs={1}>
+                            <Button
+                              variant="contained"
+                              style={{
+                                minWidth: '20px',
+                                minHeight: '41px',
+                                background: 'transparent',
+                                boxShadow: 'none',
+                                marginTop: '-3px !important',
+                                '&:hover': {
+                                  background: '#f4f4f4',
+                                  borderRadius: '50%',
+                                  minHeight: '41px',
+                                  minWidth: '20px',
+                                  boxShadow: 'none',
+                                },
+                              }}
+                              onClick={() => setEditingIndexcheckallEdit(-1)}
+                            >
+                              <CancelIcon
+                                style={{
+                                  color: '#b92525',
+                                  fontSize: '1.5rem',
+                                }}
+                              />
+                            </Button>
+                          </Grid>
+                          <br />
                         </Grid>
-                        <Grid item md={3.8} sm={9} xs={9} sx={{ whiteSpace: "normal", wordBreak: "break-all" }}>
-                          {item.keyword}
-                        </Grid>
+                      ) : (
+                        <>
+                          <Grid container spacing={2} key={i}>
+                            <Grid item md={0.3} sm={0.5} xs={0.5}>
+                              {i + 1}. &ensp;
+                            </Grid>
+                            <Grid item md={3.8} sm={9} xs={9} sx={{ whiteSpace: 'normal', wordBreak: 'break-all' }}>
+                              {item.keyword}
+                            </Grid>
 
-                        <Grid item md={1} sm={1.5} xs={1.5}>
-                          <Button
-                            variant="contained"
-                            style={{
-                              minWidth: "20px",
-                              minHeight: "41px",
-                              background: "transparent",
-                              boxShadow: "none",
-                              marginTop: "-13px",
-                              "&:hover": {
-                                background: "#f4f4f4",
-                                borderRadius: "50%",
-                                minHeight: "41px",
-                                minWidth: "20px",
-                                boxShadow: "none",
-                              },
-                            }}
-                            onClick={() => handleEditTodocheckallEdit(i)}
-                          >
-                            <FaEdit
-                              style={{
-                                color: "#1976d2",
-                                fontSize: "1.2rem",
-                              }}
-                            />
-                          </Button>
-                        </Grid>
-                        <Grid item md={1} sm={1} xs={1}>
-                          <Button onClick={(e) => handleDeleteTodocheckeditallEdit(i)} sx={{ borderRadius: "50%", minWidth: "35px", minHeight: "35px", marginTop: "-8px" }}>
-                            <FaTrash
-                              style={{
-                                color: "#b92525",
-                                fontSize: "0.9rem",
-                              }}
-                            />
-                          </Button>
-                        </Grid>
-                        <br />
-                      </Grid>
-                    </>
-                  )}
-                </div>
-              ))}
-            </Grid>
-            </Grid>
+                            <Grid item md={1} sm={1.5} xs={1.5}>
+                              <Button
+                                variant="contained"
+                                style={{
+                                  minWidth: '20px',
+                                  minHeight: '41px',
+                                  background: 'transparent',
+                                  boxShadow: 'none',
+                                  marginTop: '-13px',
+                                  '&:hover': {
+                                    background: '#f4f4f4',
+                                    borderRadius: '50%',
+                                    minHeight: '41px',
+                                    minWidth: '20px',
+                                    boxShadow: 'none',
+                                  },
+                                }}
+                                onClick={() => handleEditTodocheckallEdit(i)}
+                              >
+                                <FaEdit
+                                  style={{
+                                    color: '#1976d2',
+                                    fontSize: '1.2rem',
+                                  }}
+                                />
+                              </Button>
+                            </Grid>
+                            <Grid item md={1} sm={1} xs={1}>
+                              <Button onClick={(e) => handleDeleteTodocheckeditallEdit(i)} sx={{ borderRadius: '50%', minWidth: '35px', minHeight: '35px', marginTop: '-8px' }}>
+                                <FaTrash
+                                  style={{
+                                    color: '#b92525',
+                                    fontSize: '0.9rem',
+                                  }}
+                                />
+                              </Button>
+                            </Grid>
+                            <br />
+                          </Grid>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </Grid>
+              </Grid>
               <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={6}>
                   <Button sx={buttonStyles.buttonsubmit} onClick={() => editSubmit()}>
-                    {" "}
+                    {' '}
                     Update
                   </Button>
                 </Grid>
                 <Grid item md={6} xs={12} sm={6}>
                   <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
-                    {" "}
-                    Cancel{" "}
+                    {' '}
+                    Cancel{' '}
                   </Button>
                 </Grid>
               </Grid>
@@ -4031,7 +3996,7 @@ const handleDeletePrimaryEdit = (index) => {
       </Box>
       <br />
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lproductioncategory") && (
+      {isUserRoleCompare?.includes('lproductioncategory') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
@@ -4057,7 +4022,7 @@ const handleDeletePrimaryEdit = (index) => {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -4068,15 +4033,15 @@ const handleDeletePrimaryEdit = (index) => {
                   </Select>
                 </Box>
               </Grid>
-              <Grid item md={8} xs={12} sm={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <Grid item md={8} xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Box>
-                  {isUserRoleCompare?.includes("excelproductioncategory") && (
+                  {isUserRoleCompare?.includes('excelproductioncategory') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
                           fetchAllCategoryArray();
-                          setFormat("xl");
+                          setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -4085,13 +4050,13 @@ const handleDeletePrimaryEdit = (index) => {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvproductioncategory") && (
+                  {isUserRoleCompare?.includes('csvproductioncategory') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
                           fetchAllCategoryArray();
-                          setFormat("csv");
+                          setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -4100,7 +4065,7 @@ const handleDeletePrimaryEdit = (index) => {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printproductioncategory") && (
+                  {isUserRoleCompare?.includes('printproductioncategory') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
@@ -4109,7 +4074,7 @@ const handleDeletePrimaryEdit = (index) => {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfproductioncategory") && (
+                  {isUserRoleCompare?.includes('pdfproductioncategory') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
@@ -4123,11 +4088,11 @@ const handleDeletePrimaryEdit = (index) => {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imageproductioncategory") && (
+                  {isUserRoleCompare?.includes('imageproductioncategory') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                        {" "}
-                        <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
+                        {' '}
+                        <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                       </Button>
                     </>
                   )}
@@ -4151,14 +4116,14 @@ const handleDeletePrimaryEdit = (index) => {
               Manage Columns
             </Button>
             &ensp;
-            {isUserRoleCompare?.includes("bdproductioncategory") && (
+            {isUserRoleCompare?.includes('bdproductioncategory') && (
               <Button sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
                 Bulk Delete
               </Button>
             )}
-             &ensp;
-            {isUserRoleCompare?.includes("bdproductioncategory") && (
-              <Button sx={{...buttonStyles.buttonsubmit, textTransform:"capitalize"}} variant="contained" onClick={handleSubmitBulkKeyword}>
+            &ensp;
+            {isUserRoleCompare?.includes('bdproductioncategory') && (
+              <Button sx={{ ...buttonStyles.buttonsubmit, textTransform: 'capitalize' }} variant="contained" onClick={handleSubmitBulkKeyword}>
                 Bulk Update Keywords
               </Button>
             )}
@@ -4166,9 +4131,9 @@ const handleDeletePrimaryEdit = (index) => {
             {!tableLoading ? (
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  minHeight: "350px",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  minHeight: '350px',
                 }}
               >
                 <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
@@ -4177,8 +4142,8 @@ const handleDeletePrimaryEdit = (index) => {
               <>
                 <Box
                   style={{
-                    width: "100%",
-                    overflowY: "hidden", // Hide the y-axis scrollbar
+                    width: '100%',
+                    overflowY: 'hidden', // Hide the y-axis scrollbar
                   }}
                 >
                   <CustomStyledDataGrid
@@ -4217,7 +4182,7 @@ const handleDeletePrimaryEdit = (index) => {
                       <NavigateBeforeIcon />
                     </Button>
                     {pageNumbers?.map((pageNumber) => (
-                      <Button key={pageNumber} sx={userStyle.paginationbtn} onClick={() => handlePageChange(pageNumber)} className={page === pageNumber ? "active" : ""} disabled={page === pageNumber}>
+                      <Button key={pageNumber} sx={userStyle.paginationbtn} onClick={() => handlePageChange(pageNumber)} className={page === pageNumber ? 'active' : ''} disabled={page === pageNumber}>
                         {pageNumber}
                       </Button>
                     ))}
@@ -4242,15 +4207,15 @@ const handleDeletePrimaryEdit = (index) => {
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
       </Popover>
       {/* view model */}
-      <Dialog open={openview} onClose={handleCloseview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="sm" fullWidth={true} sx={{ marginTop: "80px" }}>
-        <Box sx={{ padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleCloseview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="sm" fullWidth={true} sx={{ marginTop: '80px' }}>
+        <Box sx={{ padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}> View Production Category</Typography>
             <br />
@@ -4319,8 +4284,8 @@ const handleDeletePrimaryEdit = (index) => {
             <br /> <br />
             <Grid container spacing={2}>
               <Button sx={buttonStyles.btncancel} onClick={handleCloseview}>
-                {" "}
-                Back{" "}
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
@@ -4329,7 +4294,7 @@ const handleDeletePrimaryEdit = (index) => {
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
@@ -4341,14 +4306,14 @@ const handleDeletePrimaryEdit = (index) => {
       </Box>
 
       <Dialog open={isEditBulkOpen.open} onClose={handleCloseBulkEditMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-          <ErrorOutlineOutlinedIcon sx={{ fontSize: "100px", color: "orange" }} />
+        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
           <Typography variant="h6">
             {isEditBulkOpen.data.subcategorycount > 0 && isEditBulkOpen.data.unitratecount > 0
               ? `This ${oldname} category linked in Subcategory and Unitrate`
               : isEditBulkOpen.data.subcategorycount > 0
-                ? `This ${oldname} category linked in Subcategory`
-                : `This ${oldname} category linked in Unitrate`}
+              ? `This ${oldname} category linked in Subcategory`
+              : `This ${oldname} category linked in Unitrate`}
             Do you want to update?
           </Typography>
         </DialogContent>
@@ -4363,7 +4328,7 @@ const handleDeletePrimaryEdit = (index) => {
       </Dialog>
 
       <Dialog open={isDeleteBulkNotLinkedOpen.open} onClose={handleCloseBulkNotLinkedClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
           <Typography variant="h6">{showAlert}</Typography>
         </DialogContent>
         <DialogActions>
@@ -4573,7 +4538,7 @@ const handleDeletePrimaryEdit = (index) => {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={rowDataTable ?? []}
         itemsTwo={categoriesFilterArray ?? []}
-        filename={"Production Category"}
+        filename={'Production Category'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}

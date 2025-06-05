@@ -482,6 +482,12 @@ export const menuItems = [
                     url: "/updatepages/assignedrole",
                     access: true,
                   },
+                     {
+                    title: 'Attendance Mode Update',
+                    dbname: 'menuattendancemodeupdate',
+                    url: '/updatepages/attendancemode',
+                    access: true,
+                  },
                   {
                     title: "Assign Experience",
                     dbname: "menuassignexperience",

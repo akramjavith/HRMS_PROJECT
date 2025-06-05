@@ -1,90 +1,122 @@
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { Box, Button, Checkbox, Dialog, InputAdornment, DialogActions, DialogContent, FormControl, Grid, Tooltip, IconButton, List, ListItem, ListItemText, MenuItem, RadioGroup, FormControlLabel, Divider, Table, TableHead, TableBody, Radio, OutlinedInput, Popover, Select, TextField, Typography, TableContainer, Paper, TableRow, TableCell } from "@mui/material";
-import Switch from "@mui/material/Switch";
-import { styled } from "@mui/system";
-import axios from "axios";
-import * as FileSaver from "file-saver";
-import { saveAs } from "file-saver";
-import { CsvBuilder } from "filefy";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaDownload, FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaTrash } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import { MultiSelect } from "react-multi-select-component";
-import Resizable from "react-resizable";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import * as XLSX from "xlsx";
-import AggregatedSearchBar from "../../../components/AggregatedSearchBar";
-import AggridTable from "../../../components/AggridTable";
-import { DeleteConfirmation, PleaseSelectRow } from "../../../components/DeleteConfirmation.js";
-import { handleApiError } from "../../../components/Errorhandling";
-import Headtitle from "../../../components/Headtitle";
-import InfoPopup from "../../../components/InfoPopup.js";
-import AlertDialog from "../../../components/Alert.js";
-import ExportData from "../../../components/ExportData.js";
-import MessageAlert from "../../../components/MessageAlert.js";
-import PageHeading from "../../../components/PageHeading";
-import { StyledTableCell, StyledTableRow } from "../../../components/Table";
-import StyledDataGrid from "../../../components/TableStyle";
-import { AuthContext, UserRoleAccessContext } from "../../../context/Appcontext";
-import { userStyle } from "../../../pageStyle";
-import { SERVICE } from "../../../services/Baseservice";
-import SendToServer from "../../sendtoserver";
-import domtoimage from "dom-to-image";
-import AggridTableForPaginationTable from "../../../components/AggridTableForPaginationTable.js";
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import LoadingButton from '@mui/lab/LoadingButton';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  InputAdornment,
+  DialogActions,
+  DialogContent,
+  FormControl,
+  Grid,
+  Tooltip,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  MenuItem,
+  RadioGroup,
+  FormControlLabel,
+  Divider,
+  Table,
+  TableHead,
+  TableBody,
+  Radio,
+  OutlinedInput,
+  Popover,
+  Select,
+  TextField,
+  Typography,
+  TableContainer,
+  Paper,
+  TableRow,
+  TableCell,
+} from '@mui/material';
+import Switch from '@mui/material/Switch';
+import { styled } from '@mui/system';
+import axios from '../../../axiosInstance';
+import * as FileSaver from 'file-saver';
+import { saveAs } from 'file-saver';
+import { CsvBuilder } from 'filefy';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaDownload, FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaTrash } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import { MultiSelect } from 'react-multi-select-component';
+import Resizable from 'react-resizable';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import * as XLSX from 'xlsx';
+import AggregatedSearchBar from '../../../components/AggregatedSearchBar';
+import AggridTable from '../../../components/AggridTable';
+import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
+import { handleApiError } from '../../../components/Errorhandling';
+import Headtitle from '../../../components/Headtitle';
+import InfoPopup from '../../../components/InfoPopup.js';
+import AlertDialog from '../../../components/Alert.js';
+import ExportData from '../../../components/ExportData.js';
+import MessageAlert from '../../../components/MessageAlert.js';
+import PageHeading from '../../../components/PageHeading';
+import { StyledTableCell, StyledTableRow } from '../../../components/Table';
+import StyledDataGrid from '../../../components/TableStyle';
+import { AuthContext, UserRoleAccessContext } from '../../../context/Appcontext';
+import { userStyle } from '../../../pageStyle';
+import { SERVICE } from '../../../services/Baseservice';
+import SendToServer from '../../sendtoserver';
+import domtoimage from 'dom-to-image';
+import AggridTableForPaginationTable from '../../../components/AggridTableForPaginationTable.js';
 
 function CategoryProcessMap() {
   const [advancedFilter, setAdvancedFilter] = useState(null);
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = ["Contains", "Does Not Contain", "Equals", "Does Not Equal", "Begins With", "Ends With", "Blank", "Not Blank"]; // AgGrid-like conditions
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [logicOperator, setLogicOperator] = useState("AND");
-  const [filterValue, setFilterValue] = useState("");
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [logicOperator, setLogicOperator] = useState('AND');
+  const [filterValue, setFilterValue] = useState('');
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
 
   const [categoryprocess, setCategoryprocess] = useState({
-    company: "",
-    branch: "",
-    project: "",
-    categoryname: "",
-    subcategoryname: "",
-    processtypes: "Primary",
+    company: '',
+    branch: '',
+    project: '',
+    categoryname: '',
+    subcategoryname: '',
+    processtypes: 'Primary',
   });
 
   const [categoryprocessEdit, setCategroyprocessEdit] = useState({
-    company: "",
-    branch: "",
-    project: "",
-    categoryname: "",
-    subcategoryname: "",
-    processtypes: "Primary",
+    company: '',
+    branch: '',
+    project: '',
+    categoryname: '',
+    subcategoryname: '',
+    processtypes: 'Primary',
   });
   const [updateSheet, setUpdatesheet] = useState([]);
   const [categoryprocessmaps, setCategoryprocessmaps] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [allCategoryprocessEdit, setAllCategoryprocessEdit] = useState([]);
   const { isUserRoleCompare, isUserRoleAccess, isAssignBranch, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
 
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
         branch: data.branch,
         company: data.company,
@@ -119,8 +151,8 @@ function CategoryProcessMap() {
   const [loading, setLoading] = useState(false);
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -128,8 +160,8 @@ function CategoryProcessMap() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -138,12 +170,12 @@ function CategoryProcessMap() {
   };
 
   // excelupload
-  const [fileUploadName, setFileUploadName] = useState("");
-  const [dataupdated, setDataupdated] = useState("");
+  const [fileUploadName, setFileUploadName] = useState('');
+  const [dataupdated, setDataupdated] = useState('');
 
   const [splitArray, setSplitArray] = useState([]);
   const [sheets, setSheets] = useState([]);
-  const [selectedSheet, setSelectedSheet] = useState("Please Select Sheet");
+  const [selectedSheet, setSelectedSheet] = useState('Please Select Sheet');
   const [selectedSheetindex, setSelectedSheetindex] = useState();
 
   const [categoryprocessCheck, setCategoryprocesscheck] = useState(false);
@@ -154,11 +186,11 @@ function CategoryProcessMap() {
   const gridRefFilename = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
 
-  const [copiedData, setCopiedData] = useState("");
-  const [processtypes, setProcesstypes] = useState("Primary");
-  const [processtypesEdit, setProcesstypesEdit] = useState("Primary");
+  const [copiedData, setCopiedData] = useState('');
+  const [processtypes, setProcesstypes] = useState('Primary');
+  const [processtypesEdit, setProcesstypesEdit] = useState('Primary');
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
@@ -185,11 +217,11 @@ function CategoryProcessMap() {
 
   // This is create multi select
   // company
-  const [selectedOptionsCom, setSelectedOptionsCom] = useState("Please Select Company");
+  const [selectedOptionsCom, setSelectedOptionsCom] = useState('Please Select Company');
 
   // branch
   const [selectedOptionsBran, setSelectedOptionsBran] = useState([]);
-  let [valueBran, setValueBran] = useState("");
+  let [valueBran, setValueBran] = useState('');
 
   const handleBranchChange = (options) => {
     setValueBran(
@@ -201,12 +233,12 @@ function CategoryProcessMap() {
   };
 
   const customValueRendererBran = (valueBran, _branchs) => {
-    return valueBran.length ? valueBran.map(({ label }) => label).join(", ") : "Please Select Branch";
+    return valueBran.length ? valueBran.map(({ label }) => label).join(', ') : 'Please Select Branch';
   };
 
   // Project
   const [selectedOptionsProj, setSelectedOptionsProj] = useState([]);
-  let [valueProj, setValueProj] = useState("");
+  let [valueProj, setValueProj] = useState('');
 
   const handleProjectChange = (options) => {
     setValueProj(
@@ -215,18 +247,18 @@ function CategoryProcessMap() {
       })
     );
     setSelectedOptionsProj(options);
-    setSelectedOptionsCate([])
-    setSelectedOptionsSubCate([])
-    setSubcategorys([])
+    setSelectedOptionsCate([]);
+    setSelectedOptionsSubCate([]);
+    setSubcategorys([]);
   };
 
   const customValueRendererProj = (valueProj, _projects) => {
-    return valueProj.length ? valueProj.map(({ label }) => label).join(", ") : "Please Select Project";
+    return valueProj.length ? valueProj.map(({ label }) => label).join(', ') : 'Please Select Project';
   };
 
   // Process
   const [selectedOptionsPro, setSelectedOptionsPro] = useState([]);
-  let [valuePro, setValuePro] = useState("");
+  let [valuePro, setValuePro] = useState('');
 
   const handleProcessChange = (options) => {
     setValuePro(
@@ -238,20 +270,20 @@ function CategoryProcessMap() {
   };
 
   const customValueRendererPro = (valuePro, _processs) => {
-    return valuePro.length ? valuePro.map(({ label }) => label).join(", ") : "Please Select Process";
+    return valuePro.length ? valuePro.map(({ label }) => label).join(', ') : 'Please Select Process';
   };
 
   // This line edit functionality
   // company
-  const [selectedOptionsComEdit, setSelectedOptionsComEdit] = useState("");
+  const [selectedOptionsComEdit, setSelectedOptionsComEdit] = useState('');
   // branch
-  const [selectedOptionsBranEdit, setSelectedOptionsBranEdit] = useState("");
+  const [selectedOptionsBranEdit, setSelectedOptionsBranEdit] = useState('');
 
   // Project
-  const [selectedOptionsProjEdit, setSelectedOptionsProjEdit] = useState("");
+  const [selectedOptionsProjEdit, setSelectedOptionsProjEdit] = useState('');
 
   // Process
-  const [selectedOptionsProEdit, setSelectedOptionsProEdit] = useState("");
+  const [selectedOptionsProEdit, setSelectedOptionsProEdit] = useState('');
 
   const gridRefTableImg = useRef(null);
 
@@ -262,7 +294,7 @@ function CategoryProcessMap() {
       domtoimage
         .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Category Process Map List.png");
+          saveAs(blob, 'Category Process Map List.png');
         })
         .catch((err) => {
           handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -272,7 +304,7 @@ function CategoryProcessMap() {
 
   // Category, Subcatgeory
   const [selectedOptionsCate, setSelectedOptionsCate] = useState([]);
-  let [valueCate, setValueCate] = useState("");
+  let [valueCate, setValueCate] = useState('');
 
   const handleCategoryChange = (options) => {
     setValueCate(
@@ -284,15 +316,15 @@ function CategoryProcessMap() {
   };
 
   const customValueRendererCate = (valueCate, _categorys) => {
-    return valueCate.length ? valueCate.map(({ label }) => label).join(", ") : "Please Select Category";
+    return valueCate.length ? valueCate.map(({ label }) => label).join(', ') : 'Please Select Category';
   };
 
   // Edit functionlity
-  const [selectedOptionsCateEdit, setSelectedOptionsCateEdit] = useState("");
+  const [selectedOptionsCateEdit, setSelectedOptionsCateEdit] = useState('');
 
   // Subcategroy multi select
   const [selectedOptionsSubCate, setSelectedOptionsSubCate] = useState([]);
-  let [valueSubCate, setValueSubCate] = useState("");
+  let [valueSubCate, setValueSubCate] = useState('');
 
   const handleSubCategoryChange = (options) => {
     // setValueSubCate(
@@ -304,12 +336,12 @@ function CategoryProcessMap() {
   };
 
   const customValueRendererSubCate = (valueSubCate, _subcategorys) => {
-    return valueSubCate.length ? valueSubCate.map(({ label }) => label).join(", ") : "Please Select Subcategory";
+    return valueSubCate.length ? valueSubCate.map(({ label }) => label).join(', ') : 'Please Select Subcategory';
   };
 
   // Edit functionlity
-  const [selectedOptionsSubCateEdit, setSelectedOptionsSubCateEdit] = useState("");
-  let [valueSubCateEdit, setValueSubCateEdit] = useState("");
+  const [selectedOptionsSubCateEdit, setSelectedOptionsSubCateEdit] = useState('');
+  let [valueSubCateEdit, setValueSubCateEdit] = useState('');
 
   //Datatable
   const [page, setPage] = useState(1);
@@ -400,11 +432,11 @@ function CategoryProcessMap() {
   const [pageSizeFilename, setPageSizeFilename] = useState(10);
   const [itemsFilename, setItemsFilename] = useState([]);
   const [selectedRowsFilename, setSelectedRowsFilename] = useState([]);
-  const [searchQueryFilename, setSearchQueryFilename] = useState("");
+  const [searchQueryFilename, setSearchQueryFilename] = useState('');
   const [isManageColumnsOpenFilename, setManageColumnsOpenFilename] = useState(false);
   const [anchorElFilename, setAnchorElFilename] = useState(null);
   const [selectAllCheckedFilename, setSelectAllCheckedFilename] = useState(false);
-  const [searchQueryManageFilename, setSearchQueryManageFilename] = useState("");
+  const [searchQueryManageFilename, setSearchQueryManageFilename] = useState('');
   const [minimumPointDataFilename, setMinimumPointDataFilename] = useState([]);
 
   //SECOND TABLE FDATA AND FUNCTIONS
@@ -478,8 +510,8 @@ function CategoryProcessMap() {
           setPage(1);
           handleCloseModFilename();
 
-          setPopupContent("Deleted Successfully");
-          setPopupSeverity("success");
+          setPopupContent('Deleted Successfully');
+          setPopupSeverity('success');
           handleClickOpenPopup();
         } else {
           setCategoryprocesscheck(true);
@@ -491,8 +523,8 @@ function CategoryProcessMap() {
           await fetchEmployee();
         }
       } else {
-        setPopupContentMalert("No Data to Delete");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('No Data to Delete');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     } catch (err) {
@@ -508,7 +540,7 @@ function CategoryProcessMap() {
   };
   const handleCloseManageColumnsFilename = () => {
     setManageColumnsOpenFilename(false);
-    setSearchQueryManageFilename("");
+    setSearchQueryManageFilename('');
   };
 
   // Show All Columns & Manage Columns
@@ -525,12 +557,12 @@ function CategoryProcessMap() {
 
   useEffect(() => {
     // Save column visibility to localStorage whenever it changes
-    localStorage.setItem("columnVisibilityFilename", JSON.stringify(columnVisibilityFilename));
+    localStorage.setItem('columnVisibilityFilename', JSON.stringify(columnVisibilityFilename));
   }, [columnVisibilityFilename]);
 
   useEffect(() => {
     // Retrieve column visibility from localStorage (if available)
-    const savedVisibility = localStorage.getItem("columnVisibilityFilename");
+    const savedVisibility = localStorage.getItem('columnVisibilityFilename');
     if (savedVisibility) {
       setColumnVisibilityFilename(JSON.parse(savedVisibility));
     }
@@ -545,7 +577,7 @@ function CategoryProcessMap() {
     if (gridRefFilename.current) {
       html2canvas(gridRefFilename.current).then((canvas) => {
         canvas.toBlob((blob) => {
-          saveAs(blob, "Upload File List.png");
+          saveAs(blob, 'Upload File List.png');
         });
       });
     }
@@ -553,30 +585,30 @@ function CategoryProcessMap() {
 
   // pdf.....
   const columnsFilename = [
-    { title: "Company", field: "company" },
-    { title: "Branch", field: "branch" },
-    { title: "File Name", field: "filename" },
+    { title: 'Company', field: 'company' },
+    { title: 'Branch', field: 'branch' },
+    { title: 'File Name', field: 'filename' },
   ];
   //  pdf download functionality
   const downloadPdfFilename = () => {
     const doc = new jsPDF();
     doc.autoTable({
-      theme: "grid",
+      theme: 'grid',
       columns: columnsFilename.map((col) => ({ ...col, dataKey: col.field })),
       body: rowDataTableFilename,
     });
-    doc.save("Category_Process_Map_File_Name.pdf");
+    doc.save('Category_Process_Map_File_Name.pdf');
   };
 
   // Excel
-  const fileNames = "Category_Process_Map_File_Name";
+  const fileNames = 'Category_Process_Map_File_Name';
 
   //print...
   const componentRefFilename = useRef();
   const handleprintFilename = useReactToPrint({
     content: () => componentRefFilename.current,
-    documentTitle: "Upload File List",
-    pageStyle: "print",
+    documentTitle: 'Upload File List',
+    pageStyle: 'print',
   });
   //serial no for listing itemsFilename
   const addSerialNumberFilename = () => {
@@ -610,11 +642,11 @@ function CategoryProcessMap() {
   };
 
   // Split the search query into individual terms
-  const searchTermsFilename = searchQueryFilename.toLowerCase().split(" ");
+  const searchTermsFilename = searchQueryFilename.toLowerCase().split(' ');
 
   // Modify the filtering logic to check each term
   const filteredDatasFilename = itemsFilename?.filter((item) => {
-    return searchTermsFilename.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTermsFilename.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
   const FilenameFilename = filteredDatasFilename?.slice((pageFilename - 1) * pageSizeFilename, pageFilename * pageSizeFilename);
@@ -635,10 +667,10 @@ function CategoryProcessMap() {
   );
   const columnDataTableFilename = [
     {
-      field: "checkbox",
-      headerName: "Checkbox",
+      field: 'checkbox',
+      headerName: 'Checkbox',
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
       renderHeader: (params) => (
@@ -679,59 +711,59 @@ function CategoryProcessMap() {
       sortable: false, // Optionally, you can make this column not sortable
       width: 90,
       hide: !columnVisibilityFilename.checkbox,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 100,
       hide: !columnVisibilityFilename.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 180,
       hide: !columnVisibilityFilename.company,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 180,
       hide: !columnVisibilityFilename.branch,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "filename",
-      headerName: "File Name",
+      field: 'filename',
+      headerName: 'File Name',
       flex: 0,
       width: 350,
       hide: !columnVisibilityFilename.filename,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibilityFilename.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       renderCell: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("dcategoryprocessmap") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('dcategoryprocessmap') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
                 rowDatafileNameDelete(params.row.filename);
               }}
             >
-              <DeleteOutlineOutlinedIcon style={{ fontsize: "large" }} />
+              <DeleteOutlineOutlinedIcon style={{ fontsize: 'large' }} />
             </Button>
           )}
         </Grid>
@@ -775,9 +807,9 @@ function CategoryProcessMap() {
   const manageColumnsContentFilename = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -785,7 +817,7 @@ function CategoryProcessMap() {
         aria-label="close"
         onClick={handleCloseManageColumnsFilename}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -793,16 +825,16 @@ function CategoryProcessMap() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManageFilename} onChange={(e) => setSearchQueryManageFilename(e.target.value)} sx={{ marginBottom: 5, position: "absolute" }} />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManageFilename} onChange={(e) => setSearchQueryManageFilename(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent sx={{ minWidth: "auto", height: "200px", position: "relative" }}>
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumnsFilename.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText sx={{ display: "flex" }} primary={<Switch sx={{ marginTop: "-5px" }} size="small" checked={columnVisibilityFilename[column.field]} onChange={() => toggleColumnVisibilityFilename(column.field)} />} secondary={column.field === "checkbox" ? "Checkbox" : column.headerName} />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibilityFilename[column.field]} onChange={() => toggleColumnVisibilityFilename(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -810,8 +842,8 @@ function CategoryProcessMap() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button variant="text" sx={{ textTransform: "none" }} onClick={() => setColumnVisibilityFilename(initialColumnVisibilityFilename)}>
-              {" "}
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibilityFilename(initialColumnVisibilityFilename)}>
+              {' '}
               Show All
             </Button>
           </Grid>
@@ -819,7 +851,7 @@ function CategoryProcessMap() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTableFilename.forEach((column) => {
@@ -828,7 +860,7 @@ function CategoryProcessMap() {
                 setColumnVisibilityFilename(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -843,11 +875,11 @@ function CategoryProcessMap() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   // Styles for the resizable column
   const ResizableColumn = styled(Resizable)`
@@ -863,9 +895,9 @@ function CategoryProcessMap() {
 
   const getRowClassName = (params) => {
     if (selectedRowsFilename.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   // Show All Columns & Manage Columns
@@ -887,10 +919,10 @@ function CategoryProcessMap() {
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
-  const [deleteCategoryprocess, setDeleteCategoryprocess] = useState("");
+  const [deleteCategoryprocess, setDeleteCategoryprocess] = useState('');
 
   const rowData = async (id, name) => {
     setPageName(!pageName);
@@ -920,8 +952,8 @@ function CategoryProcessMap() {
         setSelectedRows([]);
         setPage(1);
 
-        setPopupContent("Deleted Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Deleted Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
       }
     } catch (err) {
@@ -950,8 +982,8 @@ function CategoryProcessMap() {
         setSelectAllChecked(false);
         setPage(1);
 
-        setPopupContent("Deleted Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Deleted Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
       } else {
         setCategoryprocesscheck(true);
@@ -1138,7 +1170,7 @@ function CategoryProcessMap() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Category Process Map"),
+      pagename: String('Category Process Map'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -1171,10 +1203,10 @@ function CategoryProcessMap() {
           branch: String(item.branch),
           process: String(item.process),
           categoryname: String(item.category),
-          subcategoryname: String("ALL"),
+          subcategoryname: String('ALL'),
           project: String(item.project),
           processtypes: String(item.processtype),
-          filename: "nonexcel",
+          filename: 'nonexcel',
           addedby: [
             {
               name: String(isUserRoleAccess.companyname),
@@ -1188,8 +1220,8 @@ function CategoryProcessMap() {
 
       setCategoryprocess({ ...categoryprocess });
 
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -1206,16 +1238,23 @@ function CategoryProcessMap() {
     let subcategoryies = selectedOptionsSubCate.map((item) => item.value);
     e.preventDefault();
 
-    const isNameMatch = categoryprocessmaps.some((item) => item.processtypes === processtypes && item.company === selectedOptionsCom && branchs.includes(item.branch) && processs.includes(item.process) && projects.includes(item.project) && categorys.includes(item.categoryname) && "ALL" === item.subcategoryname);
+    const isNameMatch = categoryprocessmaps.some(
+      (item) => item.processtypes === processtypes && item.company === selectedOptionsCom && branchs.includes(item.branch) && processs.includes(item.process) && projects.includes(item.project) && categorys.includes(item.categoryname) && 'ALL' === item.subcategoryname
+    );
 
-    const isNameMatchWithProCType = processtypes === "Primary" ? categoryprocessmaps.filter((item) => item.company === selectedOptionsCom && item.processtypes === "Primary" && branchs.includes(item.branch) && slicedProcesss.includes(item.process.slice(-4)) && projects.includes(item.project) && categorys.includes(item.categoryname) && "ALL" === item.subcategoryname) : [];
+    const isNameMatchWithProCType =
+      processtypes === 'Primary'
+        ? categoryprocessmaps.filter(
+            (item) => item.company === selectedOptionsCom && item.processtypes === 'Primary' && branchs.includes(item.branch) && slicedProcesss.includes(item.process.slice(-4)) && projects.includes(item.project) && categorys.includes(item.categoryname) && 'ALL' === item.subcategoryname
+          )
+        : [];
 
     // const isNameMatchWithProCType/ = processtypes === "Primary" ?  categoryprocessmaps.filter((item) => item.company === selectedOptionsCom && item.processtypes === "Primary" && branchs.includes(item.branch) && slicedProcesss.includes(item.process.slice(-4)) && projects.includes(item.project) && categorys.includes(item.categoryname) && subcategoryies.includes(item.subcategoryname)) : [];
 
     const result_mappeddata = [];
     // Iterate through categories
     categorys.forEach((cat) => {
-      result_mappeddata.push({ category: cat, company: selectedOptionsCom, processtype: processtypes, subcategory: "ALL" });
+      result_mappeddata.push({ category: cat, company: selectedOptionsCom, processtype: processtypes, subcategory: 'ALL' });
     });
 
     // Map projects and combine with existing items
@@ -1233,33 +1272,33 @@ function CategoryProcessMap() {
       return branchs.map((branch) => ({ ...item, branch: branch }));
     });
 
-    if (selectedOptionsCom === "Please Select Company") {
-      setPopupContentMalert("Please Select Company");
-      setPopupSeverityMalert("info");
+    if (selectedOptionsCom === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (selectedOptionsBran.length === 0) {
-      setPopupContentMalert("Please Select Branch");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Branch');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (selectedOptionsPro.length === 0) {
-      setPopupContentMalert("Please Select Process");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Process');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (selectedOptionsProj.length === 0) {
-      setPopupContentMalert("Please Select Project");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Project');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (selectedOptionsCate.length === 0) {
-      setPopupContentMalert("Please Select Category");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Category');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data already exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data already exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (processtypes === "Primary" && isNameMatchWithProCType.length > 0) {
+    } else if (processtypes === 'Primary' && isNameMatchWithProCType.length > 0) {
       setPopupContentMalert(`${isNameMatchWithProCType.map((item) => item.process)} These Process already added for this category, subcategory and branch!`);
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequest(withBranches);
@@ -1268,8 +1307,8 @@ function CategoryProcessMap() {
 
   const handleClear = (e) => {
     e.preventDefault();
-    setCategoryprocess({ processtypes: "Primary" });
-    setProcesstypes("Primary");
+    setCategoryprocess({ processtypes: 'Primary' });
+    setProcesstypes('Primary');
     // setValueComp([]);
     setValueBran([]);
     setValuePro([]);
@@ -1278,20 +1317,20 @@ function CategoryProcessMap() {
     setValueSubCate([]);
     setSelectedOptionsCate([]);
     setSelectedOptionsBran([]);
-    setSelectedOptionsCom("Please Select Company");
+    setSelectedOptionsCom('Please Select Company');
     setSelectedOptionsPro([]);
     setSelectedOptionsProj([]);
     setSubcategorys([]);
     setProcesss([]);
     setSelectedOptionsSubCate([]);
 
-    setFileUploadName("");
+    setFileUploadName('');
     setSplitArray([]);
-    setDataupdated("");
+    setDataupdated('');
     setSheets([]);
-    setSelectedSheet("Please Select Sheet");
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setSelectedSheet('Please Select Sheet');
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
 
@@ -1301,7 +1340,7 @@ function CategoryProcessMap() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
   };
   // info model
@@ -1401,8 +1440,8 @@ function CategoryProcessMap() {
       fetchEmployee();
       handleCloseModEdit();
 
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -1413,43 +1452,64 @@ function CategoryProcessMap() {
     e.preventDefault();
     let resdata = await fetchCategoryProcessMapAll();
 
-    const isNameMatch = resdata.some((item) => item.processtypes === processtypesEdit && item.company === selectedOptionsComEdit && item.branch === selectedOptionsBranEdit && item.process === selectedOptionsProEdit && item.project === selectedOptionsProjEdit && item.categoryname === selectedOptionsCateEdit && item.subcategoryname === selectedOptionsSubCateEdit);
+    const isNameMatch = resdata.some(
+      (item) =>
+        item.processtypes === processtypesEdit &&
+        item.company === selectedOptionsComEdit &&
+        item.branch === selectedOptionsBranEdit &&
+        item.process === selectedOptionsProEdit &&
+        item.project === selectedOptionsProjEdit &&
+        item.categoryname === selectedOptionsCateEdit &&
+        item.subcategoryname === selectedOptionsSubCateEdit
+    );
 
     // const isNameMatch = categoryprocessmaps.some((item) => item.processtypes === processtypes && item.company === selectedOptionsCom && branchs.includes(item.branch) && processs.includes(item.process) && projects.includes(item.project) && categorys.includes(item.categoryname) && subcategoryies.includes(item.subcategoryname));
 
-    const isNameMatchWithProCType = processtypesEdit === "Primary" ? allCategoryprocessEdit.filter((item) => item.company === selectedOptionsComEdit && item.processtypes === "Primary" && selectedOptionsBranEdit === item.branch && selectedOptionsProEdit.slice(-4) === item.process.slice(-4) && selectedOptionsProjEdit === item.project && selectedOptionsCateEdit === item.categoryname && selectedOptionsSubCateEdit === item.subcategoryname) : [];
+    const isNameMatchWithProCType =
+      processtypesEdit === 'Primary'
+        ? allCategoryprocessEdit.filter(
+            (item) =>
+              item.company === selectedOptionsComEdit &&
+              item.processtypes === 'Primary' &&
+              selectedOptionsBranEdit === item.branch &&
+              selectedOptionsProEdit.slice(-4) === item.process.slice(-4) &&
+              selectedOptionsProjEdit === item.project &&
+              selectedOptionsCateEdit === item.categoryname &&
+              selectedOptionsSubCateEdit === item.subcategoryname
+          )
+        : [];
 
-    if (selectedOptionsComEdit === "Please Select Company") {
-      setPopupContentMalert("Please Select Company");
-      setPopupSeverityMalert("info");
+    if (selectedOptionsComEdit === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (selectedOptionsBranEdit === "Please Select Branch") {
-      setPopupContentMalert("Please Select Branch");
-      setPopupSeverityMalert("info");
+    } else if (selectedOptionsBranEdit === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (selectedOptionsProEdit === "Please Select Process") {
-      setPopupContentMalert("Please Select Process");
-      setPopupSeverityMalert("info");
+    } else if (selectedOptionsProEdit === 'Please Select Process') {
+      setPopupContentMalert('Please Select Process');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (selectedOptionsProjEdit === "Please Select Project") {
-      setPopupContentMalert("Please Select Project");
-      setPopupSeverityMalert("info");
+    } else if (selectedOptionsProjEdit === 'Please Select Project') {
+      setPopupContentMalert('Please Select Project');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (selectedOptionsCateEdit === "Please Select Category") {
-      setPopupContentMalert("Please Select Category");
-      setPopupSeverityMalert("info");
+    } else if (selectedOptionsCateEdit === 'Please Select Category') {
+      setPopupContentMalert('Please Select Category');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (selectedOptionsSubCateEdit === "Please Select  Subcategory") {
-      setPopupContentMalert("Please Select  Subcategory");
-      setPopupSeverityMalert("info");
+    } else if (selectedOptionsSubCateEdit === 'Please Select  Subcategory') {
+      setPopupContentMalert('Please Select  Subcategory');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data already exits!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data already exits!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (processtypesEdit === "Primary" && isNameMatchWithProCType.length > 0) {
+    } else if (processtypesEdit === 'Primary' && isNameMatchWithProCType.length > 0) {
       setPopupContentMalert(`${isNameMatchWithProCType.map((item) => item.process)} These Process already added for this category, subcategory and branch!`);
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequest();
@@ -1477,7 +1537,7 @@ function CategoryProcessMap() {
       setCategoryprocesscheck(true);
       setCategoryprocessmapsArray(res_vendor?.data?.categoryprocessmaps);
 
-      let getFilenames = res_vendor?.data?.categoryprocessmaps.filter((item) => item.filename !== "nonexcel");
+      let getFilenames = res_vendor?.data?.categoryprocessmaps.filter((item) => item.filename !== 'nonexcel');
       const uniqueArray = Array.from(new Set(getFilenames.map((obj) => obj.filename))).map((filename) => {
         return getFilenames.find((obj) => obj.filename === filename);
       });
@@ -1509,7 +1569,7 @@ function CategoryProcessMap() {
 
     const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
 
-    if (allFilters.length > 0 && selectedColumn !== "") {
+    if (allFilters.length > 0 && selectedColumn !== '') {
       queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
@@ -1532,7 +1592,7 @@ function CategoryProcessMap() {
 
       const ansFilename = res_employee?.data?.totalProjectsOverall?.length > 0 ? res_employee?.data?.totalProjectsOverall : [];
 
-      let getFilenames = ansFilename.filter((item) => item.filename !== "nonexcel");
+      let getFilenames = ansFilename.filter((item) => item.filename !== 'nonexcel');
       const uniqueArray = Array.from(new Set(getFilenames.map((obj) => obj.filename))).map((filename) => {
         return getFilenames.find((obj) => obj.filename === filename);
       });
@@ -1570,22 +1630,22 @@ function CategoryProcessMap() {
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
-  const idSearch = openSearch ? "simple-popover" : undefined;
+  const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if ((selectedColumn && filterValue) || ["Blank", "Not Blank"].includes(selectedCondition)) {
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
       setAdditionalFilters([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
@@ -1596,7 +1656,7 @@ function CategoryProcessMap() {
           let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
           return `${showname} ${filter.condition} "${filter.value}"`;
         })
-        .join(" " + (advancedFilter.length > 1 ? advancedFilter[1].condition : "") + " ");
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
@@ -1605,12 +1665,12 @@ function CategoryProcessMap() {
     setPageName(!pageName);
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
@@ -1622,7 +1682,7 @@ function CategoryProcessMap() {
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
+    if (allFilters.length > 0 && selectedColumn !== '') {
       queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
@@ -1645,7 +1705,7 @@ function CategoryProcessMap() {
 
       const ansFilename = res_employee?.data?.totalProjectsOverall?.length > 0 ? res_employee?.data?.totalProjectsOverall : [];
 
-      let getFilenames = ansFilename.filter((item) => item.filename !== "nonexcel");
+      let getFilenames = ansFilename.filter((item) => item.filename !== 'nonexcel');
       const uniqueArray = Array.from(new Set(getFilenames.map((obj) => obj.filename))).map((filename) => {
         return getFilenames.find((obj) => obj.filename === filename);
       });
@@ -1698,18 +1758,18 @@ function CategoryProcessMap() {
     }
   };
 
-  let exportColumnNames = ["Company", "Branch", "Process", "Project", "Category", "Subcategory", "Mode"];
-  let exportRowValues = ["company", "branch", "process", "project", "categoryname", "subcategoryname", "processtypes"];
+  let exportColumnNames = ['Company', 'Branch', 'Process', 'Project', 'Category', 'Subcategory', 'Mode'];
+  let exportRowValues = ['company', 'branch', 'process', 'project', 'categoryname', 'subcategoryname', 'processtypes'];
 
   // pdf.....
   const columns = [
-    { title: "Company", field: "company" },
-    { title: "Branch", field: "branch" },
-    { title: "Process", field: "process" },
-    { title: "Project", field: "project" },
-    { title: "Category", field: "categoryname" },
-    { title: "Subcategory", field: "subcategoryname" },
-    { title: "Mode", field: "processtypes" },
+    { title: 'Company', field: 'company' },
+    { title: 'Branch', field: 'branch' },
+    { title: 'Process', field: 'process' },
+    { title: 'Project', field: 'project' },
+    { title: 'Category', field: 'categoryname' },
+    { title: 'Subcategory', field: 'subcategoryname' },
+    { title: 'Mode', field: 'processtypes' },
   ];
 
   const downloadPdf = (isfilter) => {
@@ -1717,32 +1777,32 @@ function CategoryProcessMap() {
 
     let serialNumberCounter = 1;
 
-    const columnsWithSerial = [{ title: "SNo", dataKey: "serialNumber" }, ...columnsFilename.map((col) => ({ ...col, dataKey: col.field }))];
+    const columnsWithSerial = [{ title: 'SNo', dataKey: 'serialNumber' }, ...columnsFilename.map((col) => ({ ...col, dataKey: col.field }))];
 
-    const dataWithSerial = isfilter === "filtered" ? rowDataTableFilename.map((row) => ({ ...row, serialNumber: serialNumberCounter++ })) : minimumPointFilenameArray.map((row) => ({ ...row, serialNumber: serialNumberCounter++ }));
+    const dataWithSerial = isfilter === 'filtered' ? rowDataTableFilename.map((row) => ({ ...row, serialNumber: serialNumberCounter++ })) : minimumPointFilenameArray.map((row) => ({ ...row, serialNumber: serialNumberCounter++ }));
 
     doc.autoTable({
-      theme: "grid",
+      theme: 'grid',
       styles: {
         fontSize: 4,
-        cellWidth: "auto",
+        cellWidth: 'auto',
       },
       columns: columnsWithSerial,
       body: dataWithSerial,
     });
 
-    doc.save("Upload File List.pdf");
+    doc.save('Upload File List.pdf');
   };
 
   // Excel
-  const fileName = "Upload File List";
+  const fileName = 'Upload File List';
 
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Category Process Map List",
-    pageStyle: "print",
+    documentTitle: 'Category Process Map List',
+    pageStyle: 'print',
   });
 
   useEffect(() => {
@@ -1752,9 +1812,9 @@ function CategoryProcessMap() {
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -1786,7 +1846,7 @@ function CategoryProcessMap() {
     setPage(1);
   };
 
-  const [searchedString, setSearchedString] = useState("");
+  const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTable = useRef(null);
 
@@ -1800,20 +1860,20 @@ function CategoryProcessMap() {
   }, [overallFilterdata]);
 
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = itemsoverall?.filter((item) => {
-    return searchTerms.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
   const [selectAllChecked, setSelectAllChecked] = useState(false);
 
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -1822,90 +1882,90 @@ function CategoryProcessMap() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 80,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 120,
       hide: !columnVisibility.company,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 160,
       hide: !columnVisibility.branch,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
     {
-      field: "process",
-      headerName: "Process",
+      field: 'process',
+      headerName: 'Process',
       flex: 0,
       width: 130,
       hide: !columnVisibility.process,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "project",
-      headerName: "Project",
+      field: 'project',
+      headerName: 'Project',
       flex: 0,
       width: 130,
       hide: !columnVisibility.project,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "categoryname",
-      headerName: "Category",
+      field: 'categoryname',
+      headerName: 'Category',
       flex: 0,
       width: 250,
       hide: !columnVisibility.categoryname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "subcategoryname",
-      headerName: "Subcategory",
+      field: 'subcategoryname',
+      headerName: 'Subcategory',
       flex: 0,
       width: 150,
       hide: !columnVisibility.subcategoryname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "processtypes",
-      headerName: "Modes",
+      field: 'processtypes',
+      headerName: 'Modes',
       flex: 0,
       width: 90,
       hide: !columnVisibility.processtypes,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 270,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("ecategoryprocessmap") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('ecategoryprocessmap') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -1913,20 +1973,20 @@ function CategoryProcessMap() {
                 getCode(params.data.id, params.data.name);
               }}
             >
-              <EditOutlinedIcon sx={buttonStyles.buttonedit} />{" "}
+              <EditOutlinedIcon sx={buttonStyles.buttonedit} />{' '}
             </Button>
           )}
-          {isUserRoleCompare?.includes("dcategoryprocessmap") && (
+          {isUserRoleCompare?.includes('dcategoryprocessmap') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
                 rowData(params.data.id, params.data.name);
               }}
             >
-              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />{" "}
+              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />{' '}
             </Button>
           )}
-          {isUserRoleCompare?.includes("vcategoryprocessmap") && (
+          {isUserRoleCompare?.includes('vcategoryprocessmap') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -1934,10 +1994,10 @@ function CategoryProcessMap() {
                 getviewCode(params.data.id);
               }}
             >
-              <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />{" "}
+              <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />{' '}
             </Button>
           )}
-          {isUserRoleCompare?.includes("icategoryprocessmap") && (
+          {isUserRoleCompare?.includes('icategoryprocessmap') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -1945,7 +2005,7 @@ function CategoryProcessMap() {
                 getinfoCode(params.data.id);
               }}
             >
-              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />{" "}
+              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />{' '}
             </Button>
           )}
         </Grid>
@@ -1960,7 +2020,7 @@ function CategoryProcessMap() {
 
       fileReader.onload = (e) => {
         const bufferArray = e.target.result;
-        const wb = XLSX.read(bufferArray, { type: "buffer" });
+        const wb = XLSX.read(bufferArray, { type: 'buffer' });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
 
@@ -1975,23 +2035,23 @@ function CategoryProcessMap() {
     });
     //  Datefield
     var today = new Date();
-    var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
-    today = dd + "-" + mm + "-" + yyyy;
+    today = dd + '-' + mm + '-' + yyyy;
 
     promise.then((d) => {
       let uniqueArray = d.filter(
         (item) =>
           !categoryprocessmaps.some(
             (tp) =>
-              tp.company === (item.company?.includes("\r\n") ? item.company.replace(/\r\n/g, "") : item.company) &&
-              tp.branch === (item.branch?.includes("\r\n") ? item.branch.replace(/\r\n/g, "") : item.branch) &&
-              tp.process === (item.process?.includes("\r\n") ? item.process.replace(/\r\n/g, "") : item.process) &&
-              tp.project === (item.project?.includes("\r\n") ? item.project.replace(/\r\n/g, "") : item.project) &&
-              tp.categoryname === (item.category?.includes("\r\n") ? item.category.replace(/\r\n/g, "") : item.category) &&
-              tp.subcategoryname === (item.subcategory?.includes("\r\n") ? item.subcategory.replace(/\r\n/g, "") : item.subcategory) &&
-              tp.processtypes === (item.processtype?.includes("\r\n") ? item.processtype.replace(/\r\n/g, "") : item.processtype)
+              tp.company === (item.company?.includes('\r\n') ? item.company.replace(/\r\n/g, '') : item.company) &&
+              tp.branch === (item.branch?.includes('\r\n') ? item.branch.replace(/\r\n/g, '') : item.branch) &&
+              tp.process === (item.process?.includes('\r\n') ? item.process.replace(/\r\n/g, '') : item.process) &&
+              tp.project === (item.project?.includes('\r\n') ? item.project.replace(/\r\n/g, '') : item.project) &&
+              tp.categoryname === (item.category?.includes('\r\n') ? item.category.replace(/\r\n/g, '') : item.category) &&
+              tp.subcategoryname === (item.subcategory?.includes('\r\n') ? item.subcategory.replace(/\r\n/g, '') : item.subcategory) &&
+              tp.processtypes === (item.processtype?.includes('\r\n') ? item.processtype.replace(/\r\n/g, '') : item.processtype)
           )
       );
 
@@ -1999,13 +2059,13 @@ function CategoryProcessMap() {
 
       const dataArray = uniqueArray.map((item) => ({
         filename: file.name,
-        company: item.company?.includes("\r\n") ? item.company.replace(/\r\n/g, "") : item.company,
-        branch: item.branch?.includes("\r\n") ? item.branch.replace(/\r\n/g, "") : item.branch,
-        process: item.process?.includes("\r\n") ? item.process.replace(/\r\n/g, "") : item.process,
-        project: item.project?.includes("\r\n") ? item.project.replace(/\r\n/g, "") : item.project,
-        categoryname: item.category?.includes("\r\n") ? item.category.replace(/\r\n/g, "") : item.category,
-        subcategoryname: item.subcategory?.includes("\r\n") ? item.subcategory.replace(/\r\n/g, "") : item.subcategory,
-        processtypes: item.processtype?.includes("\r\n") ? item.processtype.replace(/\r\n/g, "") : item.processtype,
+        company: item.company?.includes('\r\n') ? item.company.replace(/\r\n/g, '') : item.company,
+        branch: item.branch?.includes('\r\n') ? item.branch.replace(/\r\n/g, '') : item.branch,
+        process: item.process?.includes('\r\n') ? item.process.replace(/\r\n/g, '') : item.process,
+        project: item.project?.includes('\r\n') ? item.project.replace(/\r\n/g, '') : item.project,
+        categoryname: item.category?.includes('\r\n') ? item.category.replace(/\r\n/g, '') : item.category,
+        subcategoryname: item.subcategory?.includes('\r\n') ? item.subcategory.replace(/\r\n/g, '') : item.subcategory,
+        processtypes: item.processtype?.includes('\r\n') ? item.processtype.replace(/\r\n/g, '') : item.processtype,
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
@@ -2016,19 +2076,28 @@ function CategoryProcessMap() {
 
       setUpdatesheet([]);
 
-      let dataaryywithprimary = dataArray.filter((item) => item.processtypes === "Primary");
-      let dataaryywitsecondary = dataArray.filter((item) => item.processtypes !== "Primary");
+      let dataaryywithprimary = dataArray.filter((item) => item.processtypes === 'Primary');
+      let dataaryywitsecondary = dataArray.filter((item) => item.processtypes !== 'Primary');
 
       let duplicatefilter = dataaryywithprimary.filter((data) => {
-        const isNameMatchWithProCType = categoryprocessmaps.filter((d) => d.processtypes === "Primary").some((item) => data.processtypes === "Primary" && item.company === data.company && data.branch === item.branch && data.process.slice(-4) === item.process.slice(-4) && data.project === item.project && data.categoryname === item.categoryname && data.subcategoryname === item.subcategoryname);
+        const isNameMatchWithProCType = categoryprocessmaps
+          .filter((d) => d.processtypes === 'Primary')
+          .some(
+            (item) => data.processtypes === 'Primary' && item.company === data.company && data.branch === item.branch && data.process.slice(-4) === item.process.slice(-4) && data.project === item.project && data.categoryname === item.categoryname && data.subcategoryname === item.subcategoryname
+          );
         return !isNameMatchWithProCType;
       });
 
-      let duplicatefilterwithown = duplicatefilter.filter((item, index, self) => index === self.findIndex((t) => t.company === item.company && t.branch === item.branch && t.process.slice(-4) === item.process.slice(-4) && t.project === item.project && t.categoryname === item.categoryname && t.subcategoryname === item.subcategoryname));
+      let duplicatefilterwithown = duplicatefilter.filter(
+        (item, index, self) => index === self.findIndex((t) => t.company === item.company && t.branch === item.branch && t.process.slice(-4) === item.process.slice(-4) && t.project === item.project && t.categoryname === item.categoryname && t.subcategoryname === item.subcategoryname)
+      );
 
       let overalldata = [...duplicatefilterwithown, ...dataaryywitsecondary];
       let uniqueDataArray = overalldata
-        .filter((item, index, self) => index === self.findIndex((t) => t.company === item.company && t.branch === item.branch && t.process === item.process && t.project === item.project && t.categoryname === item.categoryname && t.subcategoryname === item.subcategoryname && t.processtypes === item.processtypes))
+        .filter(
+          (item, index, self) =>
+            index === self.findIndex((t) => t.company === item.company && t.branch === item.branch && t.process === item.process && t.project === item.project && t.categoryname === item.categoryname && t.subcategoryname === item.subcategoryname && t.processtypes === item.processtypes)
+        )
         .map((item) => ({
           filename: file.name,
           company: item.company,
@@ -2047,18 +2116,32 @@ function CategoryProcessMap() {
         }));
 
       if (uniqueDataArray.length !== d.length) {
-        setPopupContentMalert(uniqueDataArray.length !== d.length && uniqueArray.length === 0 ? "No Data to Upload" : uniqueDataArray.length !== d.length ? `Duplicate datas are Removed` : "");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert(uniqueDataArray.length !== d.length && uniqueArray.length === 0 ? 'No Data to Upload' : uniqueDataArray.length !== d.length ? `Duplicate datas are Removed` : '');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
 
-      if (duplicatefilter.some((data) => data.subcategoryname !== "ALL")) {
+      if (duplicatefilter.some((data) => data.subcategoryname !== 'ALL')) {
         setPopupContentMalert(`Please Update "ALL" in Subcategory field`);
-        setPopupSeverityMalert("info");
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-      } else if (duplicatefilter.some((item) => item.subcategoryname === "" || item.categoryname === "" || item.branch === "" || item.company === "" || item.processtypes === "" || item.subcategoryname === undefined || item.categoryname === undefined || item.branch === undefined || item.company === undefined || item.processtypes === undefined)) {
-        setPopupContentMalert("Please Update value in all fields");
-        setPopupSeverityMalert("info");
+      } else if (
+        duplicatefilter.some(
+          (item) =>
+            item.subcategoryname === '' ||
+            item.categoryname === '' ||
+            item.branch === '' ||
+            item.company === '' ||
+            item.processtypes === '' ||
+            item.subcategoryname === undefined ||
+            item.categoryname === undefined ||
+            item.branch === undefined ||
+            item.company === undefined ||
+            item.processtypes === undefined
+        )
+      ) {
+        setPopupContentMalert('Please Update value in all fields');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else {
         const subarraySize = 1000;
@@ -2075,14 +2158,14 @@ function CategoryProcessMap() {
   };
 
   const getSheetExcel = () => {
-    if (!Array.isArray(splitArray) || (splitArray.length === 0 && fileUploadName === "")) {
-      setPopupContentMalert("Please Upload a file");
-      setPopupSeverityMalert("info");
+    if (!Array.isArray(splitArray) || (splitArray.length === 0 && fileUploadName === '')) {
+      setPopupContentMalert('Please Upload a file');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       let getsheets = splitArray.map((d, index) => ({
-        label: "Sheet" + (index + 1),
-        value: "Sheet" + (index + 1),
+        label: 'Sheet' + (index + 1),
+        value: 'Sheet' + (index + 1),
         index: index,
       }));
 
@@ -2092,12 +2175,14 @@ function CategoryProcessMap() {
 
   const sendJSON = async () => {
     let uploadExceldata = splitArray[selectedSheetindex];
-    let uniqueArray = uploadExceldata.filter((item) => !categoryprocessmaps.some((tp) => tp.company === item.company && tp.branch === item.branch && tp.process === item.process && tp.project == item.project && tp.categoryname === item.categoryname && tp.subcategoryname === item.subcategoryname && tp.processtypes == item.processtypes));
+    let uniqueArray = uploadExceldata.filter(
+      (item) => !categoryprocessmaps.some((tp) => tp.company === item.company && tp.branch === item.branch && tp.process === item.process && tp.project == item.project && tp.categoryname === item.categoryname && tp.subcategoryname === item.subcategoryname && tp.processtypes == item.processtypes)
+    );
 
     // Ensure that items is an array of objects before sending
-    if (fileUploadName === "" || !Array.isArray(uniqueArray) || uniqueArray.length === 0 || selectedSheet === "Please Select Sheet") {
-      setPopupContentMalert(fileUploadName === "" ? "Please Upload File" : selectedSheet === "Please Select Sheet" ? "Please Select Sheet" : "No data to upload");
-      setPopupSeverityMalert("info");
+    if (fileUploadName === '' || !Array.isArray(uniqueArray) || uniqueArray.length === 0 || selectedSheet === 'Please Select Sheet') {
+      setPopupContentMalert(fileUploadName === '' ? 'Please Upload File' : selectedSheet === 'Please Select Sheet' ? 'Please Select Sheet' : 'No data to upload');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       var xmlhttp = new XMLHttpRequest();
@@ -2109,8 +2194,8 @@ function CategoryProcessMap() {
       setPageName(!pageName);
       try {
         setLoading(true); // Set loading to true when starting the upload
-        xmlhttp.open("POST", SERVICE.CATEGORYPROCESSMAP_CREATE);
-        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlhttp.open('POST', SERVICE.CATEGORYPROCESSMAP_CREATE);
+        xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
         xmlhttp.send(JSON.stringify(uniqueArray));
         // await fetchCategoryProcessMap();
         await fetchEmployee();
@@ -2119,10 +2204,10 @@ function CategoryProcessMap() {
       } finally {
         setLoading(false); // Set loading back to false when the upload is complete
 
-        setPopupContent("Uploaded Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Uploaded Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
-        setSelectedSheet("Please Select Sheet");
+        setSelectedSheet('Please Select Sheet');
         setUpdatesheet((prev) => [...prev, selectedSheetindex]);
         // await fetchCategoryProcessMap();
         await fetchEmployee();
@@ -2130,29 +2215,29 @@ function CategoryProcessMap() {
     }
   };
   const clearFileSelection = () => {
-    setFileUploadName("");
+    setFileUploadName('');
     setSplitArray([]);
     // readExcel([]);
     setUpdatesheet([]);
-    setDataupdated("");
+    setDataupdated('');
     setSheets([]);
-    setSelectedSheet("Please Select Sheet");
+    setSelectedSheet('Please Select Sheet');
   };
 
   //  Datefield
   var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();
-  today = dd + "-" + mm + "-" + yyyy;
+  today = dd + '-' + mm + '-' + yyyy;
 
   const ExportsHead = () => {
-    let fileDownloadName = "Filename_Category_Process_Map" + "_" + today;
+    let fileDownloadName = 'Filename_Category_Process_Map' + '_' + today;
 
-    new CsvBuilder(fileDownloadName).setColumns(["sno", "company", "branch", "process", "project", "category", "subcategory", "processtype"]).exportFile();
+    new CsvBuilder(fileDownloadName).setColumns(['sno', 'company', 'branch', 'process', 'project', 'category', 'subcategory', 'processtype']).exportFile();
   };
 
-  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== "checkbox" && data.field !== "actions" && data.field !== "serialNumber");
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = filteredDatas.map((item, index) => {
     return {
@@ -2198,9 +2283,9 @@ function CategoryProcessMap() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -2208,7 +2293,7 @@ function CategoryProcessMap() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -2216,19 +2301,19 @@ function CategoryProcessMap() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: "absolute" }} />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent sx={{ minWidth: "auto", height: "200px", position: "relative" }}>
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
               <ListItemText
-                sx={{ display: "flex" }}
-                primary={<Switch sx={{ marginTop: "-5px" }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
-                secondary={column.field === "checkbox" ? "Checkbox" : column.headerName}
+                sx={{ display: 'flex' }}
+                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
+                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
                 // secondary={column.headerName }
               />
             </ListItem>
@@ -2238,7 +2323,7 @@ function CategoryProcessMap() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button variant="text" sx={{ textTransform: "none" }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -2246,7 +2331,7 @@ function CategoryProcessMap() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -2263,19 +2348,19 @@ function CategoryProcessMap() {
     </Box>
   );
 
-  const [fileFormat, setFormat] = useState("");
-  const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = fileFormat === "xl" ? ".xlsx" : ".csv";
+  const [fileFormat, setFormat] = useState('');
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+  const fileExtension = fileFormat === 'xl' ? '.xlsx' : '.csv';
   const exportToCSV = (csvData, fileName) => {
     const ws = XLSX.utils.json_to_sheet(csvData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
     FileSaver.saveAs(data, fileName + fileExtension);
   };
 
   const handleExportXL = (isfilter) => {
-    if (isfilter === "filtered") {
+    if (isfilter === 'filtered') {
       exportToCSV(
         rowDataTableFilename?.map((t, index) => ({
           Sno: index + 1,
@@ -2285,7 +2370,7 @@ function CategoryProcessMap() {
         })),
         fileName
       );
-    } else if (isfilter === "overall") {
+    } else if (isfilter === 'overall') {
       exportToCSV(
         minimumPointFilenameArray.map((t, index) => ({
           Sno: index + 1,
@@ -2302,11 +2387,11 @@ function CategoryProcessMap() {
 
   return (
     <Box>
-      <Headtitle title={"Category Process Map"} />
+      <Headtitle title={'Category Process Map'} />
       {/* ****** Header Content ****** */}
       <PageHeading title="Category Process Map" modulename="Production" submodulename="Report SetUp" mainpagename="Category Process Map" subpagename="" subsubpagename="" />
       <Typography sx={userStyle.HeaderText}></Typography>
-      {isUserRoleCompare?.includes("acategoryprocessmap") && (
+      {isUserRoleCompare?.includes('acategoryprocessmap') && (
         <>
           <Box sx={userStyle.dialogbox}>
             <>
@@ -2317,14 +2402,14 @@ function CategoryProcessMap() {
               </Grid>
               <br />
               <Grid container spacing={2}>
-                <Grid item md={3} sm={12} xs={12} sx={{ display: "flex" }}>
+                <Grid item md={3} sm={12} xs={12} sx={{ display: 'flex' }}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Company <b style={{ color: "red" }}>*</b>
+                      Company <b style={{ color: 'red' }}>*</b>
                     </Typography>
 
                     <Selects
-                      isDisabled={fileUploadName !== "" && splitArray.length > 0}
+                      isDisabled={fileUploadName !== '' && splitArray.length > 0}
                       options={accessbranch
                         ?.map((data) => ({
                           label: data.company,
@@ -2342,10 +2427,10 @@ function CategoryProcessMap() {
                     />
                   </FormControl>
                 </Grid>
-                <Grid item md={3} sm={12} xs={12} sx={{ display: "flex" }}>
+                <Grid item md={3} sm={12} xs={12} sx={{ display: 'flex' }}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Branch <b style={{ color: "red" }}>*</b>
+                      Branch <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <MultiSelect
                       options={accessbranch
@@ -2358,7 +2443,7 @@ function CategoryProcessMap() {
                           return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                         })}
                       value={selectedOptionsBran}
-                      disabled={fileUploadName !== "" && splitArray.length > 0}
+                      disabled={fileUploadName !== '' && splitArray.length > 0}
                       onChange={(e) => {
                         handleBranchChange(e);
                         fetchProcessDropdowns(e);
@@ -2370,10 +2455,10 @@ function CategoryProcessMap() {
                   </FormControl>
                 </Grid>
 
-                <Grid item md={3} sm={12} xs={12} sx={{ display: "flex" }}>
+                <Grid item md={3} sm={12} xs={12} sx={{ display: 'flex' }}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Process <b style={{ color: "red" }}>*</b>
+                      Process <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <MultiSelect
                       options={processs}
@@ -2381,16 +2466,16 @@ function CategoryProcessMap() {
                       onChange={(e) => {
                         handleProcessChange(e);
                       }}
-                      disabled={fileUploadName !== "" && splitArray.length > 0}
+                      disabled={fileUploadName !== '' && splitArray.length > 0}
                       valueRenderer={customValueRendererPro}
                       labelledBy="Please Select Process"
                     />
                   </FormControl>
                 </Grid>
-                <Grid item md={3} sm={12} xs={12} sx={{ display: "flex" }}>
+                <Grid item md={3} sm={12} xs={12} sx={{ display: 'flex' }}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Project <b style={{ color: "red" }}>*</b>
+                      Project <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <MultiSelect
                       options={projects}
@@ -2398,17 +2483,17 @@ function CategoryProcessMap() {
                       onChange={(e) => {
                         handleProjectChange(e);
                       }}
-                      disabled={fileUploadName !== "" && splitArray.length > 0}
+                      disabled={fileUploadName !== '' && splitArray.length > 0}
                       valueRenderer={customValueRendererProj}
                       labelledBy="Please Select Project"
                     />
                   </FormControl>
                 </Grid>
 
-                <Grid item md={3} sm={12} xs={12} sx={{ display: "flex" }}>
+                <Grid item md={3} sm={12} xs={12} sx={{ display: 'flex' }}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Category <b style={{ color: "red" }}>*</b>
+                      Category <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <MultiSelect
                       options={categorys
@@ -2428,16 +2513,16 @@ function CategoryProcessMap() {
                       }}
                       valueRenderer={customValueRendererCate}
                       labelledBy="Please Select Category"
-                      disabled={fileUploadName !== "" && splitArray.length > 0}
+                      disabled={fileUploadName !== '' && splitArray.length > 0}
                     />
                   </FormControl>
                 </Grid>
-                <Grid item md={3} sm={12} xs={12} sx={{ display: "flex" }}>
+                <Grid item md={3} sm={12} xs={12} sx={{ display: 'flex' }}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Sub Category <b style={{ color: "red" }}>*</b>
+                      Sub Category <b style={{ color: 'red' }}>*</b>
                     </Typography>
-                    <MultiSelect options={subcategorys} value={selectedOptionsSubCate} onChange={handleSubCategoryChange} valueRenderer={customValueRendererSubCate} labelledBy="Please Select Subcategory" disabled={fileUploadName !== "" && splitArray.length > 0} />
+                    <MultiSelect options={subcategorys} value={selectedOptionsSubCate} onChange={handleSubCategoryChange} valueRenderer={customValueRendererSubCate} labelledBy="Please Select Subcategory" disabled={fileUploadName !== '' && splitArray.length > 0} />
                   </FormControl>
                 </Grid>
 
@@ -2448,7 +2533,7 @@ function CategoryProcessMap() {
                       fullWidth
                       labelId="demo-select-small"
                       id="demo-select-small"
-                      disabled={fileUploadName != "" && splitArray.length > 0}
+                      disabled={fileUploadName != '' && splitArray.length > 0}
                       MenuProps={{
                         PaperProps: {
                           style: {
@@ -2462,10 +2547,10 @@ function CategoryProcessMap() {
                         setProcesstypes(e.target.value);
                       }}
                       displayEmpty
-                      inputProps={{ "aria-label": "Without label" }}
+                      inputProps={{ 'aria-label': 'Without label' }}
                     >
-                      <MenuItem value="Primary"> {"Primary"} </MenuItem>
-                      <MenuItem value="Secondary"> {"Secondary"} </MenuItem>
+                      <MenuItem value="Primary"> {'Primary'} </MenuItem>
+                      <MenuItem value="Secondary"> {'Secondary'} </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -2482,7 +2567,13 @@ function CategoryProcessMap() {
                 <Grid item md={2} xs={12} sm={6} marginTop={1}>
                   <Typography>&nbsp;</Typography>
 
-                  <Button variant="contained" color="success" sx={{ textTransform: "Capitalize" }} onClick={(e) => ExportsHead()} disabled={selectedOptionsCom !== "Please Select Company" || selectedOptionsBran.length !== 0 || selectedOptionsPro.length !== 0 || selectedOptionsCate.length !== 0 || selectedOptionsSubCate.length !== 0}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    sx={{ textTransform: 'Capitalize' }}
+                    onClick={(e) => ExportsHead()}
+                    disabled={selectedOptionsCom !== 'Please Select Company' || selectedOptionsBran.length !== 0 || selectedOptionsPro.length !== 0 || selectedOptionsCate.length !== 0 || selectedOptionsSubCate.length !== 0}
+                  >
                     <FaDownload />
                     &ensp;Download template file
                   </Button>
@@ -2492,7 +2583,7 @@ function CategoryProcessMap() {
                     <Grid item md={4}>
                       <Typography>&nbsp;</Typography>
 
-                      <Button variant="contained" component="label" sx={{ textTransform: "capitalize" }}>
+                      <Button variant="contained" component="label" sx={{ textTransform: 'capitalize' }}>
                         Choose File
                         <input
                           hidden
@@ -2500,25 +2591,25 @@ function CategoryProcessMap() {
                           accept=".xlsx, .xls , .csv"
                           onChange={(e) => {
                             const file = e.target.files[0];
-                            setDataupdated("uploaded");
+                            setDataupdated('uploaded');
                             readExcel(file);
                             setFileUploadName(file.name);
                             e.target.value = null;
 
                             setSplitArray([]);
                             setSheets([]);
-                            setSelectedSheet("Please Select Sheet");
+                            setSelectedSheet('Please Select Sheet');
                           }}
-                          disabled={selectedOptionsCom !== "Please Select Company" || selectedOptionsBran.length !== 0 || selectedOptionsPro.length !== 0 || selectedOptionsCate.length !== 0 || selectedOptionsSubCate.length !== 0}
+                          disabled={selectedOptionsCom !== 'Please Select Company' || selectedOptionsBran.length !== 0 || selectedOptionsPro.length !== 0 || selectedOptionsCate.length !== 0 || selectedOptionsSubCate.length !== 0}
                         />
                       </Button>
                     </Grid>
                     <Grid item md={7}>
-                      {fileUploadName != "" && splitArray.length > 0 ? (
-                        <Box sx={{ display: "flex", justifyContent: "left" }}>
+                      {fileUploadName != '' && splitArray.length > 0 ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                           <p>{fileUploadName}</p>
-                          <Button sx={{ minWidth: "36px", borderRadius: "50%" }} onClick={() => clearFileSelection()}>
-                            <FaTrash style={{ color: "red" }} />
+                          <Button sx={{ minWidth: '36px', borderRadius: '50%' }} onClick={() => clearFileSelection()}>
+                            <FaTrash style={{ color: 'red' }} />
                           </Button>
                         </Box>
                       ) : null}
@@ -2536,7 +2627,7 @@ function CategoryProcessMap() {
                         setSelectedSheet(e.value);
                         setSelectedSheetindex(e.index);
                       }}
-                      disabled={selectedOptionsCom !== "Please Select Company" || selectedOptionsBran.length !== 0 || selectedOptionsPro.length !== 0 || selectedOptionsCate.length !== 0 || selectedOptionsSubCate.length !== 0}
+                      disabled={selectedOptionsCom !== 'Please Select Company' || selectedOptionsBran.length !== 0 || selectedOptionsPro.length !== 0 || selectedOptionsCate.length !== 0 || selectedOptionsSubCate.length !== 0}
                     />
                   </FormControl>
                 </Grid>
@@ -2544,7 +2635,12 @@ function CategoryProcessMap() {
                   <Grid container>
                     <Grid item md={12} xs={12} sm={8}>
                       <Typography>&nbsp;</Typography>
-                      <Button variant="contained" color="primary" onClick={() => getSheetExcel()} disabled={selectedOptionsCom !== "Please Select Company" || selectedOptionsBran.length !== 0 || selectedOptionsPro.length !== 0 || selectedOptionsCate.length !== 0 || selectedOptionsSubCate.length !== 0}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => getSheetExcel()}
+                        disabled={selectedOptionsCom !== 'Please Select Company' || selectedOptionsBran.length !== 0 || selectedOptionsPro.length !== 0 || selectedOptionsCate.length !== 0 || selectedOptionsSubCate.length !== 0}
+                      >
                         Get Sheet
                       </Button>
                     </Grid>
@@ -2555,13 +2651,13 @@ function CategoryProcessMap() {
 
                   <Grid
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      gap: "15px",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: '15px',
                     }}
                   >
                     {!loading ? (
-                      fileUploadName != "" && splitArray.length > 0 ? (
+                      fileUploadName != '' && splitArray.length > 0 ? (
                         <>
                           <div readExcel={readExcel}>
                             <SendToServer sendJSON={sendJSON} />
@@ -2603,13 +2699,13 @@ function CategoryProcessMap() {
           fullWidth={true}
           maxWidth="md"
           sx={{
-            overflow: "visible",
-            "& .MuiPaper-root": {
-              overflow: "visible",
+            overflow: 'visible',
+            '& .MuiPaper-root': {
+              overflow: 'visible',
             },
           }}
         >
-          <Box sx={{ padding: "20px" }}>
+          <Box sx={{ padding: '20px' }}>
             <>
               <form onSubmit={editSubmit}>
                 {/* <DialogContent sx={{ width: '550px', padding: '20px' }}> */}
@@ -2623,7 +2719,7 @@ function CategoryProcessMap() {
                   <Grid item md={4} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Company <b style={{ color: "red" }}>*</b>
+                        Company <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={accessbranch
@@ -2637,8 +2733,8 @@ function CategoryProcessMap() {
                         value={{ label: selectedOptionsComEdit, value: selectedOptionsComEdit }}
                         onChange={(e) => {
                           setSelectedOptionsComEdit(e.value);
-                          setSelectedOptionsBranEdit("Please Select Branch");
-                          setSelectedOptionsProEdit("Please Select Process");
+                          setSelectedOptionsBranEdit('Please Select Branch');
+                          setSelectedOptionsProEdit('Please Select Process');
                         }}
                       />
                     </FormControl>
@@ -2646,7 +2742,7 @@ function CategoryProcessMap() {
                   <Grid item md={4} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Branch <b style={{ color: "red" }}>*</b>
+                        Branch <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={accessbranch
@@ -2663,7 +2759,7 @@ function CategoryProcessMap() {
                           setSelectedOptionsBranEdit(e.value);
                           fetchProcessDropdownsEdit(selectedOptionsComEdit, e.value);
 
-                          setSelectedOptionsProEdit("Please Select Process");
+                          setSelectedOptionsProEdit('Please Select Process');
                         }}
                       />
                     </FormControl>
@@ -2672,7 +2768,7 @@ function CategoryProcessMap() {
                   <Grid item md={4} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Process <b style={{ color: "red" }}>*</b>
+                        Process <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={processsEdit}
@@ -2686,14 +2782,14 @@ function CategoryProcessMap() {
                   <Grid item md={4} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Project <b style={{ color: "red" }}>*</b>
+                        Project <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={projectsEdit}
                         value={{ label: selectedOptionsProjEdit, value: selectedOptionsProjEdit }}
                         onChange={(e) => {
                           setSelectedOptionsProjEdit(e.value);
-                          setSelectedOptionsCateEdit("Please Select Category");
+                          setSelectedOptionsCateEdit('Please Select Category');
                         }}
                       />
                     </FormControl>
@@ -2702,7 +2798,7 @@ function CategoryProcessMap() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Category <b style={{ color: "red" }}>*</b>
+                        Category <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={categorysEdit
@@ -2718,7 +2814,7 @@ function CategoryProcessMap() {
                         onChange={(e) => {
                           setSelectedOptionsCateEdit(e.value);
                           fetchCategoryBasedEdit(e.value, selectedOptionsProjEdit);
-                          setSelectedOptionsSubCateEdit("ALL");
+                          setSelectedOptionsSubCateEdit('ALL');
                         }}
                       />
                     </FormControl>
@@ -2726,7 +2822,7 @@ function CategoryProcessMap() {
                   <Grid item md={4} sm={12} xs={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Sub Category <b style={{ color: "red" }}>*</b>
+                        Sub Category <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={subcategorysEdit}
@@ -2758,10 +2854,10 @@ function CategoryProcessMap() {
                           setProcesstypesEdit(e.target.value);
                         }}
                         displayEmpty
-                        inputProps={{ "aria-label": "Without label" }}
+                        inputProps={{ 'aria-label': 'Without label' }}
                       >
-                        <MenuItem value="Primary"> {"Primary"} </MenuItem>
-                        <MenuItem value="Secondary"> {"Secondary"} </MenuItem>
+                        <MenuItem value="Primary"> {'Primary'} </MenuItem>
+                        <MenuItem value="Secondary"> {'Secondary'} </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -2791,7 +2887,7 @@ function CategoryProcessMap() {
       <br />
 
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lcategoryprocessmap") && (
+      {isUserRoleCompare?.includes('lcategoryprocessmap') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
@@ -2815,7 +2911,7 @@ function CategoryProcessMap() {
                       },
                     }}
                     onChange={handlePageSizeChangeFilename}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -2832,19 +2928,19 @@ function CategoryProcessMap() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelcategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('excelcategoryprocessmap') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
                           fetchCategoryProcessMapArray();
-                          setFormat("xl");
+                          setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -2853,13 +2949,13 @@ function CategoryProcessMap() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvcategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('csvcategoryprocessmap') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
                           fetchCategoryProcessMapArray();
-                          setFormat("csv");
+                          setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -2868,7 +2964,7 @@ function CategoryProcessMap() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printcategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('printcategoryprocessmap') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprintFilename}>
                         &ensp;
@@ -2877,7 +2973,7 @@ function CategoryProcessMap() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfcategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('pdfcategoryprocessmap') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
@@ -2891,9 +2987,9 @@ function CategoryProcessMap() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imagecategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('imagecategoryprocessmap') && (
                     <Button sx={userStyle.buttongrp} onClick={handleCaptureImageFilename}>
-                      <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
@@ -2921,8 +3017,8 @@ function CategoryProcessMap() {
               anchorElFilename={anchorElFilename}
               onClose={handleCloseManageColumnsFilename}
               anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
+                vertical: 'bottom',
+                horizontal: 'left',
               }}
             >
               {manageColumnsContentFilename}
@@ -2935,7 +3031,7 @@ function CategoryProcessMap() {
             <br />
             {!categoryprocessCheck ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
@@ -2943,11 +3039,23 @@ function CategoryProcessMap() {
               <>
                 <Box
                   style={{
-                    width: "100%",
-                    overflowY: "hidden", // Hide the y-axis scrollbar
+                    width: '100%',
+                    overflowY: 'hidden', // Hide the y-axis scrollbar
                   }}
                 >
-                  <StyledDataGrid onClipboardCopy={(copiedString) => setCopiedData(copiedString)} rows={rowsWithCheckboxesFilename} columns={columnDataTableFilename.filter((column) => columnVisibilityFilename[column.field])} onSelectionModelChange={handleSelectionChangeFilename} selectionModel={selectedRowsFilename} autoHeight={true} ref={gridRefFilename} density="compact" hideFooter getRowClassName={getRowClassName} disableRowSelectionOnClick />
+                  <StyledDataGrid
+                    onClipboardCopy={(copiedString) => setCopiedData(copiedString)}
+                    rows={rowsWithCheckboxesFilename}
+                    columns={columnDataTableFilename.filter((column) => columnVisibilityFilename[column.field])}
+                    onSelectionModelChange={handleSelectionChangeFilename}
+                    selectionModel={selectedRowsFilename}
+                    autoHeight={true}
+                    ref={gridRefFilename}
+                    density="compact"
+                    hideFooter
+                    getRowClassName={getRowClassName}
+                    disableRowSelectionOnClick
+                  />
                 </Box>
                 <Box style={userStyle.dataTablestyle}>
                   <Box>
@@ -2961,7 +3069,7 @@ function CategoryProcessMap() {
                       <NavigateBeforeIcon />
                     </Button>
                     {pageNumbersFilename?.map((pageNumber) => (
-                      <Button key={pageNumber} sx={userStyle.paginationbtn} onClick={() => handlePageChangeFilename(pageNumber)} className={pageFilename === pageNumber ? "active" : ""} disabled={pageFilename === pageNumber}>
+                      <Button key={pageNumber} sx={userStyle.paginationbtn} onClick={() => handlePageChangeFilename(pageNumber)} className={pageFilename === pageNumber ? 'active' : ''} disabled={pageFilename === pageNumber}>
                         {pageNumber}
                       </Button>
                     ))}
@@ -2984,7 +3092,7 @@ function CategoryProcessMap() {
 
       <br />
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lcategoryprocessmap") && (
+      {isUserRoleCompare?.includes('lcategoryprocessmap') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
@@ -3008,7 +3116,7 @@ function CategoryProcessMap() {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -3026,19 +3134,19 @@ function CategoryProcessMap() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelcategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('excelcategoryprocessmap') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen2(true);
                           fetchCategoryProcessMapArray();
-                          setFormat("xl");
+                          setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -3047,13 +3155,13 @@ function CategoryProcessMap() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvcategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('csvcategoryprocessmap') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen2(true);
                           fetchCategoryProcessMapArray();
-                          setFormat("csv");
+                          setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -3062,7 +3170,7 @@ function CategoryProcessMap() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printcategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('printcategoryprocessmap') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
@@ -3071,7 +3179,7 @@ function CategoryProcessMap() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfcategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('pdfcategoryprocessmap') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
@@ -3085,15 +3193,26 @@ function CategoryProcessMap() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imagecategoryprocessmap") && (
+                  {isUserRoleCompare?.includes('imagecategoryprocessmap') && (
                     <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                      <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
               </Grid>
               <Grid item md={2} xs={6} sm={6}>
-                <AggregatedSearchBar columnDataTable={columnDataTable} setItems={setItemsoverall} addSerialNumber={addSerialNumberOverall} setPage={setPage} maindatas={overallFilterdata} setSearchedString={setSearchedString} searchQuery={searchQuery} setSearchQuery={setSearchQuery} paginated={true} totalDatas={overallFilterdataforsearch} />
+                <AggregatedSearchBar
+                  columnDataTable={columnDataTable}
+                  setItems={setItemsoverall}
+                  addSerialNumber={addSerialNumberOverall}
+                  setPage={setPage}
+                  maindatas={overallFilterdata}
+                  setSearchedString={setSearchedString}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  paginated={true}
+                  totalDatas={overallFilterdataforsearch}
+                />
               </Grid>
             </Grid>
             <br />
@@ -3105,16 +3224,16 @@ function CategoryProcessMap() {
               Manage Columns
             </Button>
             &ensp;
-            {isUserRoleCompare?.includes("bdcategoryprocessmap") && (
-            <Button sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
-              Bulk Delete
-            </Button>
+            {isUserRoleCompare?.includes('bdcategoryprocessmap') && (
+              <Button sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
+                Bulk Delete
+              </Button>
             )}
             <br />
             <br />
             {!categoryprocessCheck ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
@@ -3165,14 +3284,14 @@ function CategoryProcessMap() {
                   itemsList={overallFilterdataforsearch}
 
                 /> */}
-                <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
-                  <Box style={{ padding: "10px", maxWidth: "450px" }}>
+                <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                  <Box style={{ padding: '10px', maxWidth: '450px' }}>
                     <Typography variant="h6">Advance Search</Typography>
                     <IconButton
                       aria-label="close"
                       onClick={handleCloseSearch}
                       sx={{
-                        position: "absolute",
+                        position: 'absolute',
                         right: 8,
                         top: 8,
                         color: (theme) => theme.palette.grey[500],
@@ -3180,19 +3299,19 @@ function CategoryProcessMap() {
                     >
                       <CloseIcon />
                     </IconButton>
-                    <DialogContent sx={{ width: "100%" }}>
+                    <DialogContent sx={{ width: '100%' }}>
                       <Box
                         sx={{
-                          width: "350px",
-                          maxHeight: "400px",
-                          overflow: "hidden",
-                          position: "relative",
+                          width: '350px',
+                          maxHeight: '400px',
+                          overflow: 'hidden',
+                          position: 'relative',
                         }}
                       >
                         <Box
                           sx={{
-                            maxHeight: "300px",
-                            overflowY: "auto",
+                            maxHeight: '300px',
+                            overflowY: 'auto',
                             // paddingRight: '5px'
                           }}
                         >
@@ -3206,7 +3325,7 @@ function CategoryProcessMap() {
                                   PaperProps: {
                                     style: {
                                       maxHeight: 200,
-                                      width: "auto",
+                                      width: 'auto',
                                     },
                                   },
                                 }}
@@ -3234,7 +3353,7 @@ function CategoryProcessMap() {
                                   PaperProps: {
                                     style: {
                                       maxHeight: 200,
-                                      width: "auto",
+                                      width: 'auto',
                                     },
                                   },
                                 }}
@@ -3255,16 +3374,16 @@ function CategoryProcessMap() {
                               <TextField
                                 fullWidth
                                 size="small"
-                                value={["Blank", "Not Blank"].includes(selectedCondition) ? "" : filterValue}
+                                value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
                                 onChange={(e) => setFilterValue(e.target.value)}
-                                disabled={["Blank", "Not Blank"].includes(selectedCondition)}
-                                placeholder={["Blank", "Not Blank"].includes(selectedCondition) ? "Disabled" : "Enter value"}
+                                disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                                placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
                                 sx={{
-                                  "& .MuiOutlinedInput-root.Mui-disabled": {
-                                    backgroundColor: "rgb(0 0 0 / 26%)",
+                                  '& .MuiOutlinedInput-root.Mui-disabled': {
+                                    backgroundColor: 'rgb(0 0 0 / 26%)',
                                   },
-                                  "& .MuiOutlinedInput-input.Mui-disabled": {
-                                    cursor: "not-allowed",
+                                  '& .MuiOutlinedInput-input.Mui-disabled': {
+                                    cursor: 'not-allowed',
                                   },
                                 }}
                               />
@@ -3281,7 +3400,7 @@ function CategoryProcessMap() {
                             )}
                             {additionalFilters.length === 0 && (
                               <Grid item md={4} sm={12} xs={12}>
-                                <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                                <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
                                   Add Filter
                                 </Button>
                               </Grid>
@@ -3295,8 +3414,8 @@ function CategoryProcessMap() {
                                   setIsSearchActive(true);
                                   setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
                                 }}
-                                sx={{ textTransform: "capitalize" }}
-                                disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
+                                sx={{ textTransform: 'capitalize' }}
+                                disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
                               >
                                 Search
                               </Button>
@@ -3320,8 +3439,8 @@ function CategoryProcessMap() {
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
@@ -3331,9 +3450,9 @@ function CategoryProcessMap() {
       <Box>
         {/* ALERT DIALOG */}
         <Dialog open={isDeleteOpen} onClose={handleCloseMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-            <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: "orange" }} />
-            <Typography variant="h5" sx={{ color: "red", textAlign: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+            <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
               Are you sure?
             </Typography>
           </DialogContent>
@@ -3342,8 +3461,8 @@ function CategoryProcessMap() {
               Cancel
             </Button>
             <Button autoFocus variant="contained" color="error" onClick={(e) => delCategoryProcess()}>
-              {" "}
-              OK{" "}
+              {' '}
+              OK{' '}
             </Button>
           </DialogActions>
         </Dialog>
@@ -3477,7 +3596,7 @@ function CategoryProcessMap() {
 
       {/* view model */}
       <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="lg">
-        <Box sx={{ width: "auto", padding: "20px 50px" }}>
+        <Box sx={{ width: 'auto', padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}> View Category Process Map</Typography>
             <br /> <br />
@@ -3528,8 +3647,8 @@ function CategoryProcessMap() {
             <br /> <br /> <br />
             <Grid container spacing={2}>
               <Button sx={buttonStyles.btncancel} onClick={handleCloseview}>
-                {" "}
-                Back{" "}
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
@@ -3539,16 +3658,16 @@ function CategoryProcessMap() {
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpenpop} onClose={handleCloseerrpop} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlertpop}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={() => {
                 sendEditRequest();
@@ -3559,15 +3678,15 @@ function CategoryProcessMap() {
             </Button>
             <Button
               style={{
-                backgroundColor: "#f4f4f4",
-                color: "#444",
-                boxShadow: "none",
-                borderRadius: "3px",
-                padding: "7px 13px",
-                border: "1px solid #0000006b",
-                "&:hover": {
-                  "& .css-bluauu-MuiButtonBase-root-MuiButton-root": {
-                    backgroundColor: "#f4f4f4",
+                backgroundColor: '#f4f4f4',
+                color: '#444',
+                boxShadow: 'none',
+                borderRadius: '3px',
+                padding: '7px 13px',
+                border: '1px solid #0000006b',
+                '&:hover': {
+                  '& .css-bluauu-MuiButtonBase-root-MuiButton-root': {
+                    backgroundColor: '#f4f4f4',
                   },
                 },
               }}
@@ -3582,16 +3701,16 @@ function CategoryProcessMap() {
       <Box>
         {/* ALERT DIALOG */}
         <Dialog open={isDeleteOpenalert} onClose={handleCloseModalert} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-            <ErrorOutlineOutlinedIcon sx={{ fontSize: "70px", color: "orange" }} />
-            <Typography variant="h6" sx={{ color: "black", textAlign: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '70px', color: 'orange' }} />
+            <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
               Please Select any Row
             </Typography>
           </DialogContent>
           <DialogActions>
             <Button autoFocus variant="contained" color="error" onClick={handleCloseModalert}>
-              {" "}
-              OK{" "}
+              {' '}
+              OK{' '}
             </Button>
           </DialogActions>
         </Dialog>
@@ -3600,7 +3719,7 @@ function CategoryProcessMap() {
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             {/* <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: 'orange' }} /> */}
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
@@ -3614,12 +3733,12 @@ function CategoryProcessMap() {
 
       {/*Export XL Data  */}
       <Dialog open={isFilterOpen} onClose={handleCloseFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ textAlign: "center", alignItems: "center", justifyContent: "center" }}>
+        <DialogContent sx={{ textAlign: 'center', alignItems: 'center', justifyContent: 'center' }}>
           <IconButton
             aria-label="close"
             onClick={handleCloseFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -3628,8 +3747,8 @@ function CategoryProcessMap() {
             <CloseIcon />
           </IconButton>
 
-          {fileFormat === "xl" ? <FaFileExcel style={{ fontSize: "70px", color: "green" }} /> : <FaFileCsv style={{ fontSize: "70px", color: "green" }} />}
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          {fileFormat === 'xl' ? <FaFileExcel style={{ fontSize: '70px', color: 'green' }} /> : <FaFileCsv style={{ fontSize: '70px', color: 'green' }} />}
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -3638,7 +3757,7 @@ function CategoryProcessMap() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              handleExportXL("filtered");
+              handleExportXL('filtered');
             }}
           >
             Export Filtered Data
@@ -3647,7 +3766,7 @@ function CategoryProcessMap() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              handleExportXL("overall");
+              handleExportXL('overall');
               fetchCategoryProcessMapArray();
             }}
           >
@@ -3657,12 +3776,12 @@ function CategoryProcessMap() {
       </Dialog>
       {/*Export pdf Data  */}
       <Dialog open={isPdfFilterOpen} onClose={handleClosePdfFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ textAlign: "center", alignItems: "center", justifyContent: "center" }}>
+        <DialogContent sx={{ textAlign: 'center', alignItems: 'center', justifyContent: 'center' }}>
           <IconButton
             aria-label="close"
             onClick={handleClosePdfFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -3671,8 +3790,8 @@ function CategoryProcessMap() {
             <CloseIcon />
           </IconButton>
 
-          <PictureAsPdfIcon sx={{ fontSize: "80px", color: "red" }} />
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          <PictureAsPdfIcon sx={{ fontSize: '80px', color: 'red' }} />
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -3680,7 +3799,7 @@ function CategoryProcessMap() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdf("filtered");
+              downloadPdf('filtered');
               setIsPdfFilterOpen(false);
             }}
           >
@@ -3689,7 +3808,7 @@ function CategoryProcessMap() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdf("overall");
+              downloadPdf('overall');
               setIsPdfFilterOpen(false);
             }}
           >
@@ -3700,9 +3819,9 @@ function CategoryProcessMap() {
 
       {/*DELETE ALERT DIALOG */}
       <Dialog open={isDeleteOpenFilename} onClose={handleCloseModFilename} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-          <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: "orange" }} />
-          <Typography variant="h5" sx={{ color: "red", textAlign: "center" }}>
+        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+          <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
             Are you sure?
           </Typography>
         </DialogContent>
@@ -3710,14 +3829,14 @@ function CategoryProcessMap() {
           <Button
             onClick={handleCloseModFilename}
             style={{
-              backgroundColor: "#f4f4f4",
-              color: "#444",
-              boxShadow: "none",
-              borderRadius: "3px",
-              border: "1px solid #0000006b",
-              "&:hover": {
-                "& .css-bluauu-MuiButtonBase-root-MuiButton-root": {
-                  backgroundColor: "#f4f4f4",
+              backgroundColor: '#f4f4f4',
+              color: '#444',
+              boxShadow: 'none',
+              borderRadius: '3px',
+              border: '1px solid #0000006b',
+              '&:hover': {
+                '& .css-bluauu-MuiButtonBase-root-MuiButton-root': {
+                  backgroundColor: '#f4f4f4',
                 },
               },
             }}
@@ -3741,7 +3860,7 @@ function CategoryProcessMap() {
         handleClosePdfFilterMod={handleClosePdfFilterMod2}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={overallCategoryProcess ?? []}
-        filename={"Category Process Map List"}
+        filename={'Category Process Map List'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}

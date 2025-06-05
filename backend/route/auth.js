@@ -26,9 +26,10 @@ const {
   getAllUserEnquiryLive, getAllUsersVisitorRegister, getAllUserClockinAndClockoutStatusDocumentPreparation, getAllUserClockinAndClockoutStatusForMontLopCalFilterDocPrep, getAllUserClockinAndClockoutStatusForMontLopCalFilterFinalSalary,
   updateUserPwdReset, getAllUserClockinAndClockoutStatusLogin, getAllusersLimitedFinalsalary, deleteUserLogObjects, getAllUserClockinAndClockoutStatusIndividualHierarchyFilter, getAllUsersPayrunexceldataFinal, getAllUserAttMonthCountFilterPayRunMaster,
   getAllUserClockinAndClockoutStatusIndividual, getAllUserHomeCountNotClockInList, getAllShiftToUserOverAllBulkDelete, getAllUserHomeCountNotClockIn, getAllUserHomeCountReleive, getUserWithStatusHomeCount, getHierarchyBasedEmployeeWorkstation, getHierarchyBasedEmployeeWorkstationhira, authenticateUser, duplicateFaceDetector, getAllUsersPayrunexceldata, getAllUserClockinAndClockoutStatusFilterDateWise, getAllUserClockinAndClockoutStatusIndividualFilter, getAllUserTotalShiftDays,
-  getAllEmployeesForAttendanceFilterForAccessbranchWiseList } = require("../controller/login/auth");
+  getAllEmployeesForAttendanceFilterForAccessbranchWiseList,getCurrentServerTime,getAllDepartmentUsersUpdateAttendanceMode } = require("../controller/login/auth");
 
-
+authRoute.route('/getcurrentservertime').get(getCurrentServerTime);
+authRoute.route('/departmentusersupdateattmode').post(getAllDepartmentUsersUpdateAttendanceMode);
 authRoute.route("/teamleaveshifthierarchy").post(getAllTeamShiftHierarchyList);
 authRoute.route("/teamleaveshifthierarchynotificationcount").post(getAllTeamShiftHierarchyListNotificationCount);
 authRoute.route("/salaryslabrevenuebycode").post(getAllSalaryRevenueByCode);

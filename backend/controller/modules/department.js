@@ -138,3 +138,17 @@ exports.deleteDepartmentDetails = catchAsyncErrors(async (req, res, next) => {
 
   return res.status(200).json({ message: "Deleted successfully" });
 });
+
+exports.getAllDepartmentDetailsForUpdateUsersAttendancemodelog = catchAsyncErrors(async (req, res, next) => {
+  let departmentdetails;
+
+  try {
+    departmentdetails = await Department.find({ deptname: req.body.department }, { deptname: 1, attendancemode: 1 });
+  } catch (err) {
+    console.log(err,"errdepa")
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+
+
+  return res.status(200).json({ departmentdetails, });
+});

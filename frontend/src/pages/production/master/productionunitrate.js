@@ -1,48 +1,44 @@
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import ViewHeadlineOutlinedIcon from "@mui/icons-material/ViewHeadlineOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, Table, TableBody, TableHead, TextField, Typography } from "@mui/material";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import moment from "moment-timezone";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ViewHeadlineOutlinedIcon from '@mui/icons-material/ViewHeadlineOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, Table, TableBody, TableHead, TextField, Typography } from '@mui/material';
+import Switch from '@mui/material/Switch';
+import axios from '../../../axiosInstance';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import moment from 'moment-timezone';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
 import AggregatedSearchBar from '../../../components/AggregatedSearchBar';
-import AggridTable from "../../../components/AggridTable";
-import AlertDialog from "../../../components/Alert.js";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../../components/DeleteConfirmation.js";
-import { handleApiError } from "../../../components/Errorhandling.js";
-import ExportData from "../../../components/ExportData.js";
-import Headtitle from "../../../components/Headtitle.js";
-import InfoPopup from "../../../components/InfoPopup.js";
-import MessageAlert from "../../../components/MessageAlert.js";
-import PageHeading from "../../../components/PageHeading.js";
-import { StyledTableCell, StyledTableRow } from "../../../components/Table.js";
-import { AuthContext, UserRoleAccessContext } from "../../../context/Appcontext.js";
-import { userStyle } from "../../../pageStyle.js";
-import { SERVICE } from "../../../services/Baseservice.js";
+import AggridTable from '../../../components/AggridTable';
+import AlertDialog from '../../../components/Alert.js';
+import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
+import { handleApiError } from '../../../components/Errorhandling.js';
+import ExportData from '../../../components/ExportData.js';
+import Headtitle from '../../../components/Headtitle.js';
+import InfoPopup from '../../../components/InfoPopup.js';
+import MessageAlert from '../../../components/MessageAlert.js';
+import PageHeading from '../../../components/PageHeading.js';
+import { StyledTableCell, StyledTableRow } from '../../../components/Table.js';
+import { AuthContext, UserRoleAccessContext } from '../../../context/Appcontext.js';
+import { userStyle } from '../../../pageStyle.js';
+import { SERVICE } from '../../../services/Baseservice.js';
 import domtoimage from 'dom-to-image';
 
 function Productionunitrate() {
-
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -50,8 +46,8 @@ function Productionunitrate() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -60,13 +56,13 @@ function Productionunitrate() {
   };
 
   let exportColumnNames = ['Project', 'Category', 'SubCategory', 'O-Rate', 'T-Rate', 'M-Rate', 'Conversion', 'Points', 'Flagcount', 'FlagStatus'];
-  let exportRowValues = ['project', 'category', 'subcategory', 'orate', 'trate', 'mrate', 'conversion', 'points', 'flagcount', 'flagstatus']
+  let exportRowValues = ['project', 'category', 'subcategory', 'orate', 'trate', 'mrate', 'conversion', 'points', 'flagcount', 'flagstatus'];
 
   const gridRef = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [unitRate, setUnitRate] = useState({ project: "Please Select Project", category: "Please Select Category", subcategory: "Please Select Subcategory", orate: 0, mrate: 0, conversion: "8.333333333333333", points: "0.0000", flagcount: 1 });
-  const [unitRateEdit, setUnitRateEdit] = useState({ project: "", category: "", subcategory: "", orate: "", mrate: "", conversion: "", points: "", flagcount: "" });
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [unitRate, setUnitRate] = useState({ project: 'Please Select Project', category: 'Please Select Category', subcategory: 'Please Select Subcategory', orate: 0, mrate: 0, conversion: '8.333333333333333', points: '0.0000', flagcount: 1 });
+  const [unitRateEdit, setUnitRateEdit] = useState({ project: '', category: '', subcategory: '', orate: '', mrate: '', conversion: '', points: '', flagcount: '' });
   const [unitRateArray, setUnitRateArray] = useState([]);
   const [categoryOption, setCategoryOption] = useState([]);
   const [subCategoryOption, setSubCategoryOption] = useState([]);
@@ -76,7 +72,7 @@ function Productionunitrate() {
   //Datatable
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [searchedString, setSearchedString] = useState("")
+  const [searchedString, setSearchedString] = useState('');
   const gridRefTable = useRef(null);
   const [isHandleChange, setIsHandleChange] = useState(false);
 
@@ -88,8 +84,8 @@ function Productionunitrate() {
   const [deleteUnitRate, setDeleteUnitRate] = useState({});
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [items, setItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [copiedData, setCopiedData] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedData, setCopiedData] = useState('');
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [projects, setProjects] = useState([]);
@@ -105,7 +101,7 @@ function Productionunitrate() {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("");
+  const [fileFormat, setFormat] = useState('');
 
   // Show All Columns & Manage Columns
   const initialColumnVisibility = {
@@ -128,9 +124,9 @@ function Productionunitrate() {
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -169,7 +165,7 @@ function Productionunitrate() {
   // page refersh reload
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
   const username = isUserRoleAccess.username;
 
@@ -180,7 +176,7 @@ function Productionunitrate() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
   //Delete model
   const [isDeleteOpencheckbox, setIsDeleteOpencheckbox] = useState(false);
@@ -204,16 +200,16 @@ function Productionunitrate() {
     setIsDeleteOpenalert(false);
   };
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   const fetchProject = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_project = await axios.get(SERVICE.VENDORMASTER, {
         headers: {
@@ -222,7 +218,7 @@ function Productionunitrate() {
       });
       let result = res_project?.data?.vendormaster.filter((item, index) => {
         // Check if the index of the current item is equal to the index of the first occurrence of the item
-        return index === res_project?.data?.vendormaster.findIndex((obj) => obj["projectname"] === item["projectname"]);
+        return index === res_project?.data?.vendormaster.findIndex((obj) => obj['projectname'] === item['projectname']);
       });
       const projall = [
         ...result.map((d) => ({
@@ -233,11 +229,13 @@ function Productionunitrate() {
       ];
 
       setProjects(projall);
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const fetchCategory = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_category = await axios.get(SERVICE.CATEGORYPROD, {
         headers: {
@@ -245,11 +243,13 @@ function Productionunitrate() {
         },
       });
       setCategoryOption(res_category?.data?.categoryprod);
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const fetchSubCategory = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_subcategory = await axios.get(SERVICE.SUBCATEGORYPROD, {
         headers: {
@@ -257,7 +257,9 @@ function Productionunitrate() {
         },
       });
       setSubCategoryOption(res_subcategory?.data?.subcategoryprod);
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //set function to get particular row
@@ -270,12 +272,14 @@ function Productionunitrate() {
       });
       setDeleteUnitRate(res?.data?.sunitsrate);
       handleClickOpen();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   // Alert delete popup
   let proid = deleteUnitRate._id;
   const delProcess = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       await axios.delete(`${SERVICE.PRODUCTION_UNITRATE_SINGLE}/${proid}`, {
         headers: {
@@ -286,15 +290,17 @@ function Productionunitrate() {
       handleCloseMod();
       setSelectedRows([]);
       setPage(1);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //add function
   const sendRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       await axios.post(SERVICE.PRODUCTION_UNITRATE_CREATE, {
         headers: {
@@ -316,10 +322,12 @@ function Productionunitrate() {
         ],
       });
       await fetchUnitRate();
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   // useEffect(() => {
@@ -333,7 +341,7 @@ function Productionunitrate() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Production Unit Rate"),
+      pagename: String('Production Unit Rate'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -344,12 +352,10 @@ function Productionunitrate() {
         },
       ],
     });
-
-  }
-
+  };
 
   useEffect(() => {
-    getapi()
+    getapi();
     fetchUnitRate();
   }, []);
 
@@ -367,7 +373,7 @@ function Productionunitrate() {
     const inputValue = e.target.value;
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setUnitRateEdit({ ...unitRateEdit, mrate: inputValue });
     }
@@ -380,7 +386,7 @@ function Productionunitrate() {
 
     const inputValue = e.target.value;
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setUnitRateEdit({ ...unitRateEdit, flagcount: inputValue });
     }
@@ -392,7 +398,7 @@ function Productionunitrate() {
     // const regex = /^\d*\.?\d*$/;
 
     const inputValue = e.target.value;
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setUnitRate({ ...unitRate, mrate: inputValue });
     }
@@ -406,7 +412,7 @@ function Productionunitrate() {
     const inputValue = e.target.value;
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setUnitRate({ ...unitRate, flagcount: 1, orate: inputValue, mrate: inputValue, points: (inputValue / unitRate.conversion).toFixed(4) });
     }
@@ -420,7 +426,7 @@ function Productionunitrate() {
     const inputValue = e.target.value;
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setUnitRate({ ...unitRate, conversion: inputValue });
     }
@@ -434,7 +440,7 @@ function Productionunitrate() {
     const inputValue = e.target.value;
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setUnitRate({ ...unitRate, points: inputValue, orate: inputValue * unitRate.conversion });
     }
@@ -447,7 +453,7 @@ function Productionunitrate() {
     const inputValue = e.target.value;
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setUnitRate({ ...unitRate, flagcount: inputValue });
     }
@@ -455,62 +461,56 @@ function Productionunitrate() {
 
   //submit option for saving
   const handleSubmit = (e) => {
-
-    const IsExists = unitRateArray?.some((item) =>
-      item?.project?.toLowerCase() === unitRate.project?.toLowerCase() &&
-      item?.category?.toLowerCase() === unitRate.category?.toLowerCase() &&
-      item?.subcategory?.toLowerCase() === unitRate.subcategory?.toLowerCase()
-    )
+    const IsExists = unitRateArray?.some((item) => item?.project?.toLowerCase() === unitRate.project?.toLowerCase() && item?.category?.toLowerCase() === unitRate.category?.toLowerCase() && item?.subcategory?.toLowerCase() === unitRate.subcategory?.toLowerCase());
 
     e.preventDefault();
-    if (unitRate.project === "Please Select Project") {
-      setPopupContentMalert("Please Select Project");
-      setPopupSeverityMalert("info");
+    if (unitRate.project === 'Please Select Project') {
+      setPopupContentMalert('Please Select Project');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRate.category === "Please Select Category") {
-      setPopupContentMalert("Please Select Category");
-      setPopupSeverityMalert("info");
+    } else if (unitRate.category === 'Please Select Category') {
+      setPopupContentMalert('Please Select Category');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRate.subcategory === "Please Select Subcategory") {
-      setPopupContentMalert("Please Select Subcategory");
-      setPopupSeverityMalert("info");
+    } else if (unitRate.subcategory === 'Please Select Subcategory') {
+      setPopupContentMalert('Please Select Subcategory');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRate.orate === "") {
-      setPopupContentMalert("Please Enter O-Rate");
-      setPopupSeverityMalert("info");
+    } else if (unitRate.orate === '') {
+      setPopupContentMalert('Please Enter O-Rate');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRate.mrate === "") {
-      setPopupContentMalert("Please Enter M-Rate");
-      setPopupSeverityMalert("info");
+    } else if (unitRate.mrate === '') {
+      setPopupContentMalert('Please Enter M-Rate');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRate.conversion === "") {
-      setPopupContentMalert("Please Enter Conversion");
-      setPopupSeverityMalert("info");
+    } else if (unitRate.conversion === '') {
+      setPopupContentMalert('Please Enter Conversion');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRate.points === "") {
-      setPopupContentMalert("Please Enter Points");
-      setPopupSeverityMalert("info");
+    } else if (unitRate.points === '') {
+      setPopupContentMalert('Please Enter Points');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRate.flagcount === "") {
-      setPopupContentMalert("Please Enter Flagcount");
-      setPopupSeverityMalert("info");
+    } else if (unitRate.flagcount === '') {
+      setPopupContentMalert('Please Enter Flagcount');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (IsExists) {
-      setPopupContentMalert("Data Already Exists");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already Exists');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else {
+    } else {
       sendRequest();
     }
   };
 
   const handleclear = (e) => {
     e.preventDefault();
-    setSearchQuery("");
-    setUnitRate({ ...unitRate, project: "Please Select Project", category: "Please Select Category", subcategory: "Please Select Subcategory", orate: "", mrate: "", conversion: "8.333333333333333", points: "", flagcount: "" });
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setSearchQuery('');
+    setUnitRate({ ...unitRate, project: 'Please Select Project', category: 'Please Select Category', subcategory: 'Please Select Subcategory', orate: '', mrate: '', conversion: '8.333333333333333', points: '', flagcount: '' });
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
   //Edit model...
@@ -518,7 +518,7 @@ function Productionunitrate() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
   };
 
@@ -528,13 +528,13 @@ function Productionunitrate() {
     setIsLogOpen(true);
   };
   const handleCloseModLog = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsLogOpen(false);
   };
 
   //get single row to edit....
   const getCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.PRODUCTION_UNITRATE_SINGLE}/${e}`, {
         headers: {
@@ -543,12 +543,14 @@ function Productionunitrate() {
       });
       setUnitRateEdit(res?.data?.sunitsrate);
       handleClickOpenEdit();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   // get single row to view....
   const getviewCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.PRODUCTION_UNITRATE_SINGLE}/${e}`, {
         headers: {
@@ -557,12 +559,14 @@ function Productionunitrate() {
       });
       setUnitRateEdit(res?.data?.sunitsrate);
       handleClickOpenview();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   // get single row to view....
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.PRODUCTION_UNITRATE_SINGLE}/${e}`, {
         headers: {
@@ -571,14 +575,16 @@ function Productionunitrate() {
       });
       setUnitRateEdit(res?.data?.sunitsrate);
       handleClickOpeninfo();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const [lograte, setlograte] = useState([]);
 
   //get single row to edit....
   const getratelogdata = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.PRODUCTION_UNITRATE_SINGLE}/${e}`, {
         headers: {
@@ -587,7 +593,9 @@ function Productionunitrate() {
       });
       setlograte(res?.data?.sunitsrate);
       handleClickOpenLog();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   let updateby = unitRateEdit.updatedby;
@@ -596,7 +604,7 @@ function Productionunitrate() {
 
   //editing the single data...
   const sendEditRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.put(`${SERVICE.PRODUCTION_UNITRATE_SINGLE}/${taskgroupingId}`, {
         headers: {
@@ -614,28 +622,30 @@ function Productionunitrate() {
       });
       await fetchUnitRate();
       handleCloseModEdit();
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   const editSubmit = (e) => {
     e.preventDefault();
-    if (unitRateEdit.project === "Please Select Project") {
-      setPopupContentMalert("Please Select Project");
-      setPopupSeverityMalert("info");
+    if (unitRateEdit.project === 'Please Select Project') {
+      setPopupContentMalert('Please Select Project');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRateEdit.category === "Please Select Category") {
-      setPopupContentMalert("Please Select Category");
-      setPopupSeverityMalert("info");
+    } else if (unitRateEdit.category === 'Please Select Category') {
+      setPopupContentMalert('Please Select Category');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRateEdit.subcategory === "Please Select Subcategory") {
-      setPopupContentMalert("Please Select Subcategory");
-      setPopupSeverityMalert("info");
+    } else if (unitRateEdit.subcategory === 'Please Select Subcategory') {
+      setPopupContentMalert('Please Select Subcategory');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (unitRateEdit.mrate === "Please Enter M-Rate") {
-      setPopupContentMalert("Please Select M-Rate");
-      setPopupSeverityMalert("info");
+    } else if (unitRateEdit.mrate === 'Please Enter M-Rate') {
+      setPopupContentMalert('Please Select M-Rate');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequest();
@@ -644,7 +654,7 @@ function Productionunitrate() {
 
   //get all Unit Rate.
   const fetchUnitRate = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_freq = await axios.get(SERVICE.PRODUCTION_UNITRATE, {
         headers: {
@@ -662,16 +672,21 @@ function Productionunitrate() {
         if (a.subcategory > b.subcategory) return 1;
         return 0;
       });
-      setUnitRateArray(sorted?.map((item, index) => ({
-        ...item,
-        serialNumber: index + 1,
-      })));
+      setUnitRateArray(
+        sorted?.map((item, index) => ({
+          ...item,
+          serialNumber: index + 1,
+        }))
+      );
       setLoader(true);
-    } catch (err) { setLoader(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setLoader(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const bulkdeletefunction = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const deletePromises = selectedRows?.map((item) => {
         return axios.delete(`${SERVICE.PRODUCTION_UNITRATE_SINGLE}/${item}`, {
@@ -688,22 +703,25 @@ function Productionunitrate() {
       setSelectAllChecked(false);
       setPage(1);
       await fetchUnitRate();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   const gridRefTableImg = useRef(null);
   // image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Production Unit Rate.png");
+          saveAs(blob, 'Production Unit Rate.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -712,8 +730,8 @@ function Productionunitrate() {
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Unit Rate",
-    pageStyle: "print",
+    documentTitle: 'Unit Rate',
+    pageStyle: 'print',
   });
 
   const addSerialNumber = (datas) => {
@@ -742,11 +760,11 @@ function Productionunitrate() {
   };
 
   // Split the search query into individual terms
-  const searchTerms = searchQuery?.toLowerCase().split(" ");
+  const searchTerms = searchQuery?.toLowerCase().split(' ');
 
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
   const filteredData = filteredDatas?.slice((page - 1) * pageSize, page * pageSize);
@@ -767,10 +785,10 @@ function Productionunitrate() {
   );
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -779,158 +797,163 @@ function Productionunitrate() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
 
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 80,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
-      pinned: 'left', 
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
     {
-      field: "project",
-      headerName: "Project",
+      field: 'project',
+      headerName: 'Project',
       flex: 0,
       width: 150,
       hide: !columnVisibility.project,
-      headerClassName: "bold-header",
-      pinned: 'left', 
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
     {
-      field: "category",
-      headerName: "Category",
+      field: 'category',
+      headerName: 'Category',
       flex: 0,
       width: 350,
       hide: !columnVisibility.category,
-      headerClassName: "bold-header",
-      pinned: 'left', 
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
     {
-      field: "subcategory",
-      headerName: "SubCategory",
+      field: 'subcategory',
+      headerName: 'SubCategory',
       flex: 0,
       width: 390,
       hide: !columnVisibility.subcategory,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "orate",
-      headerName: "O-Rate",
+      field: 'orate',
+      headerName: 'O-Rate',
       flex: 0,
       width: 90,
       hide: !columnVisibility.orate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "trate",
-      headerName: "T-Rate",
+      field: 'trate',
+      headerName: 'T-Rate',
       flex: 0,
       width: 90,
       hide: !columnVisibility.trate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "mrate",
-      headerName: "M-Rate",
+      field: 'mrate',
+      headerName: 'M-Rate',
       flex: 0,
       width: 90,
       hide: !columnVisibility.mrate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "conversion",
-      headerName: "Conversion",
+      field: 'conversion',
+      headerName: 'Conversion',
       flex: 0,
       width: 150,
       hide: !columnVisibility.conversion,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "points",
-      headerName: "Points",
+      field: 'points',
+      headerName: 'Points',
       flex: 0,
       width: 90,
       hide: !columnVisibility.points,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "flagcount",
-      headerName: "Flagcount",
+      field: 'flagcount',
+      headerName: 'Flagcount',
       flex: 0,
       width: 100,
       hide: !columnVisibility.flagcount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "flagstatus",
-      headerName: "FlagStatus",
+      field: 'flagstatus',
+      headerName: 'FlagStatus',
       flex: 0,
       width: 100,
       hide: !columnVisibility.flagstatus,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 270,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("iproductionunitrate") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('iproductionunitrate') && (
             <Button
-              sx={{ minWidth: "50px", padding: "6px 8px" }}
+              sx={{ minWidth: '50px', padding: '6px 8px' }}
               onClick={() => {
                 getratelogdata(params.data.id);
               }}
             >
-              <ViewHeadlineOutlinedIcon style={{ fontsize: "large" }} />
+              <ViewHeadlineOutlinedIcon style={{ fontsize: 'large' }} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("eproductionunitrate") && (
+          {isUserRoleCompare?.includes('eproductionunitrate') && (
             <Button
-              sx={{ minWidth: "50px", padding: "6px 8px" }}
+              sx={{ minWidth: '50px', padding: '6px 8px' }}
               onClick={() => {
                 getCode(params.data.id);
               }}
             >
-              <EditOutlinedIcon sx={buttonStyles.buttonedit} />            </Button>
+              <EditOutlinedIcon sx={buttonStyles.buttonedit} />{' '}
+            </Button>
           )}
-          {isUserRoleCompare?.includes("dproductionunitrate") && (
+          {isUserRoleCompare?.includes('dproductionunitrate') && (
             <Button
-              sx={{ minWidth: "50px", padding: "6px 8px" }}
+              sx={{ minWidth: '50px', padding: '6px 8px' }}
               onClick={(e) => {
                 rowData(params.data.id);
               }}
             >
-              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />            </Button>
+              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />{' '}
+            </Button>
           )}
-          {isUserRoleCompare?.includes("vproductionunitrate") && (
+          {isUserRoleCompare?.includes('vproductionunitrate') && (
             <Button
-              sx={{ minWidth: "50px", padding: "6px 8px" }}
+              sx={{ minWidth: '50px', padding: '6px 8px' }}
               onClick={() => {
                 getviewCode(params.data.id);
               }}
             >
-              <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />            </Button>
+              <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />{' '}
+            </Button>
           )}
 
-          {isUserRoleCompare?.includes("iproductionunitrate") && (
+          {isUserRoleCompare?.includes('iproductionunitrate') && (
             <Button
-              sx={{ minWidth: "50px", padding: "6px 8px" }}
+              sx={{ minWidth: '50px', padding: '6px 8px' }}
               onClick={() => {
                 getinfoCode(params.data.id);
               }}
             >
-              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />            </Button>
+              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />{' '}
+            </Button>
           )}
         </Grid>
       ),
@@ -979,9 +1002,9 @@ function Productionunitrate() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -989,7 +1012,7 @@ function Productionunitrate() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -997,16 +1020,16 @@ function Productionunitrate() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: "absolute" }} />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent sx={{ minWidth: "auto", height: "200px", position: "relative" }}>
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText sx={{ display: "flex" }} primary={<Switch sx={{ marginTop: "-5px" }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === "checkbox" ? "Checkbox" : column.headerName} />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -1014,8 +1037,8 @@ function Productionunitrate() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button variant="text" sx={{ textTransform: "none" }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
-              {" "}
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
+              {' '}
               Show All
             </Button>
           </Grid>
@@ -1023,7 +1046,7 @@ function Productionunitrate() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -1032,7 +1055,7 @@ function Productionunitrate() {
                 setColumnVisibility(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -1042,25 +1065,18 @@ function Productionunitrate() {
   );
   return (
     <Box>
-      <Headtitle title={"PRODUCTION UNIT RATE"} />
+      <Headtitle title={'PRODUCTION UNIT RATE'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="Production Unit Rate"
-        modulename="Production"
-        submodulename="Report SetUp"
-        mainpagename="Production Unit Rate"
-        subpagename=""
-        subsubpagename=""
-      />
+      <PageHeading title="Production Unit Rate" modulename="Production" submodulename="Report SetUp" mainpagename="Production Unit Rate" subpagename="" subsubpagename="" />
 
       <Typography sx={userStyle.HeaderText}></Typography>
       <>
-        {isUserRoleCompare?.includes("aproductionunitrate") && (
+        {isUserRoleCompare?.includes('aproductionunitrate') && (
           <Box sx={userStyle.selectcontainer}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext} style={{ fontWeight: "600" }}>
+                  <Typography sx={userStyle.importheadtext} style={{ fontWeight: '600' }}>
                     Add Production Unit Rate
                   </Typography>
                 </Grid>
@@ -1070,7 +1086,7 @@ function Productionunitrate() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Project<b style={{ color: "red" }}>*</b>
+                      Project<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
@@ -1081,8 +1097,8 @@ function Productionunitrate() {
                         setUnitRate({
                           ...unitRate,
                           project: e.value,
-                          category: "Please Select Category",
-                          subcategory: "Please Select Subcategory",
+                          category: 'Please Select Category',
+                          subcategory: 'Please Select Subcategory',
                         });
                       }}
                     />
@@ -1091,7 +1107,7 @@ function Productionunitrate() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Category<b style={{ color: "red" }}>*</b>
+                      Category<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
@@ -1105,7 +1121,7 @@ function Productionunitrate() {
                         setUnitRate({
                           ...unitRate,
                           category: e.value,
-                          subcategory: "Please Select Subcategory",
+                          subcategory: 'Please Select Subcategory',
                         });
                       }}
                     />
@@ -1114,7 +1130,7 @@ function Productionunitrate() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Sub Category<b style={{ color: "red" }}>*</b>
+                      Sub Category<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
@@ -1138,7 +1154,7 @@ function Productionunitrate() {
                 <Grid item md={3} xs={12} sm={12} lg={3}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      O-Rate<b style={{ color: "red" }}>*</b>
+                      O-Rate<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput id="component-outlined" type="Number" sx={userStyle.hideArrows} value={unitRate.orate} onChange={handleChangeorate} />
                   </FormControl>
@@ -1146,7 +1162,7 @@ function Productionunitrate() {
                 <Grid item md={3} xs={12} sm={12} lg={3}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      M-Rate<b style={{ color: "red" }}>*</b>
+                      M-Rate<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput id="component-outlined" type="Number" sx={userStyle.hideArrows} value={unitRate.mrate} onChange={handleChangemrate} />
                   </FormControl>
@@ -1154,7 +1170,7 @@ function Productionunitrate() {
                 <Grid item md={3} xs={12} sm={12} lg={3}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Conversion<b style={{ color: "red" }}>*</b>
+                      Conversion<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput id="component-outlined" type="Number" sx={userStyle.hideArrows} value={unitRate.conversion} onChange={handleChangeconversion} />
                   </FormControl>
@@ -1162,7 +1178,7 @@ function Productionunitrate() {
                 <Grid item md={3} xs={12} sm={12} lg={3}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Points<b style={{ color: "red" }}>*</b>
+                      Points<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput id="component-outlined" type="number" sx={userStyle.hideArrows} value={unitRate.points} onChange={handleChangepoints} />
                   </FormControl>
@@ -1170,7 +1186,7 @@ function Productionunitrate() {
                 <Grid item md={3} xs={12} sm={12} lg={3}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      FlagCount<b style={{ color: "red" }}>*</b>
+                      FlagCount<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput id="component-outlined" type="Number" sx={userStyle.hideArrows} value={unitRate.flagcount} onChange={handleChangeflagcount} />
                   </FormControl>
@@ -1178,7 +1194,7 @@ function Productionunitrate() {
               </Grid>
               <Grid item md={12} sm={12} xs={12}>
                 <Typography>&nbsp;</Typography>
-                <Grid sx={{ display: "flex", justifyContent: "center", gap: "15px" }}>
+                <Grid sx={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
                   <Button sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
                     Submit
                   </Button>
@@ -1195,13 +1211,13 @@ function Productionunitrate() {
       {/* ****** Table Start ****** */}
       {!loader ? (
         <Box sx={userStyle.container}>
-          <Box sx={{ display: "flex", justifyContent: "center", minHeight: "350px" }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', minHeight: '350px' }}>
             <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
           </Box>
         </Box>
       ) : (
         <>
-          {isUserRoleCompare?.includes("lproductionunitrate") && (
+          {isUserRoleCompare?.includes('lproductionunitrate') && (
             <Box sx={userStyle.container}>
               {/* ******************************************************EXPORT Buttons****************************************************** */}
               <Grid item xs={8}>
@@ -1224,7 +1240,7 @@ function Productionunitrate() {
                         },
                       }}
                       onChange={handlePageSizeChange}
-                      sx={{ width: "77px" }}
+                      sx={{ width: '77px' }}
                     >
                       <MenuItem value={1}>1</MenuItem>
                       <MenuItem value={5}>5</MenuItem>
@@ -1242,19 +1258,19 @@ function Productionunitrate() {
                   xs={12}
                   sm={12}
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                 >
                   <Box>
-                    {isUserRoleCompare?.includes("excelproductionunitrate") && (
+                    {isUserRoleCompare?.includes('excelproductionunitrate') && (
                       <>
                         <Button
                           onClick={(e) => {
                             setIsFilterOpen(true);
                             fetchUnitRate();
-                            setFormat("xl");
+                            setFormat('xl');
                           }}
                           sx={userStyle.buttongrp}
                         >
@@ -1263,13 +1279,13 @@ function Productionunitrate() {
                         </Button>
                       </>
                     )}
-                    {isUserRoleCompare?.includes("csvproductionunitrate") && (
+                    {isUserRoleCompare?.includes('csvproductionunitrate') && (
                       <>
                         <Button
                           onClick={(e) => {
                             setIsFilterOpen(true);
                             fetchUnitRate();
-                            setFormat("csv");
+                            setFormat('csv');
                           }}
                           sx={userStyle.buttongrp}
                         >
@@ -1278,7 +1294,7 @@ function Productionunitrate() {
                         </Button>
                       </>
                     )}
-                    {isUserRoleCompare?.includes("printproductionunitrate") && (
+                    {isUserRoleCompare?.includes('printproductionunitrate') && (
                       <>
                         <Button sx={userStyle.buttongrp} onClick={handleprint}>
                           &ensp;
@@ -1287,7 +1303,7 @@ function Productionunitrate() {
                         </Button>
                       </>
                     )}
-                    {isUserRoleCompare?.includes("pdfproductionunitrate") && (
+                    {isUserRoleCompare?.includes('pdfproductionunitrate') && (
                       <>
                         <Button
                           sx={userStyle.buttongrp}
@@ -1301,21 +1317,15 @@ function Productionunitrate() {
                         </Button>
                       </>
                     )}
-                    {isUserRoleCompare?.includes("imageproductionunitrate") && (
-                      <Button
-                        sx={userStyle.buttongrp}
-                        onClick={handleCaptureImage}
-                      >
-                        {" "}
-                        <ImageIcon
-                          sx={{ fontSize: "15px" }}
-                        /> &ensp;Image&ensp;{" "}
+                    {isUserRoleCompare?.includes('imageproductionunitrate') && (
+                      <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                        {' '}
+                        <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                       </Button>
                     )}
                   </Box>
                 </Grid>
                 <Grid item md={2} xs={6} sm={6}>
-
                   <AggregatedSearchBar
                     columnDataTable={columnDataTable}
                     setItems={setItems}
@@ -1339,7 +1349,7 @@ function Productionunitrate() {
                 Manage Columns
               </Button>
               &ensp;
-              {isUserRoleCompare?.includes("bdproductionunitrate") && (
+              {isUserRoleCompare?.includes('bdproductionunitrate') && (
                 <Button sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
                   Bulk Delete
                 </Button>
@@ -1385,15 +1395,15 @@ function Productionunitrate() {
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
       </Popover>
       {/* this is info view details */}
       <Dialog open={isLogOpen} onClose={handleCloseModLog} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="1600px">
-        <Box sx={{ padding: "20px 30px" }}>
+        <Box sx={{ padding: '20px 30px' }}>
           <>
             <Typography sx={userStyle.HeaderText}>Unit Rate Log</Typography>
             <br />
@@ -1404,29 +1414,29 @@ function Productionunitrate() {
                   <br />
                   <Table>
                     <TableHead>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"SNO"}.</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"Name"}</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"Vendor"}</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"File From"}</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"O-Rate"}</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"T-Rate"}</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"Filename"}</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}>{"File Date"}</StyledTableCell>
-                      <StyledTableCell sx={{ padding: "5px 10px !important" }}> {"Updated Date"}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'SNO'}.</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'Name'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'Vendor'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'File From'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'O-Rate'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'T-Rate'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'Filename'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}>{'File Date'}</StyledTableCell>
+                      <StyledTableCell sx={{ padding: '5px 10px !important' }}> {'Updated Date'}</StyledTableCell>
                     </TableHead>
                     <TableBody>
                       {lograte?.oratelog?.map((item, i) => {
                         return (
                           <StyledTableRow>
-                            <StyledTableCell sx={{ padding: "5px 10px !important" }}>{i + 1}.</StyledTableCell>
-                            <StyledTableCell sx={{ padding: "5px 10px !important" }}> {item.name}</StyledTableCell>
-                            <StyledTableCell sx={{ padding: "5px 10px !important" }}> {item.vendor}</StyledTableCell>
-                            <StyledTableCell sx={{ padding: "5px 10px !important" }}> {item.filefrom}</StyledTableCell>
-                            <StyledTableCell sx={{ padding: "5px 10px !important" }}> {item.orate}</StyledTableCell>
-                            <StyledTableCell sx={{ padding: "5px 10px !important" }}> {item.trate}</StyledTableCell>
-                            <StyledTableCell sx={{ padding: "5px 10px !important" }}> {item.filename}</StyledTableCell>
-                            <StyledTableCell sx={{ padding: "5px 10px !important" }}> {item.dateval}</StyledTableCell>
-                            <StyledTableCell sx={{ padding: "5px 10px !important" }}> {moment(item.date).format("DD-MM-YYYY hh:mm:ss a")}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '5px 10px !important' }}>{i + 1}.</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.name}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.vendor}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.filefrom}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.orate}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.trate}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.filename}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '5px 10px !important' }}> {item.dateval}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '5px 10px !important' }}> {moment(item.date).format('DD-MM-YYYY hh:mm:ss a')}</StyledTableCell>
                           </StyledTableRow>
                         );
                       })}
@@ -1445,11 +1455,9 @@ function Productionunitrate() {
         </Box>
       </Dialog>
 
-
       {/* view model */}
-      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth={true}
-        sx={{ marginTop: "80px" }}>
-        <Box sx={{ padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth={true} sx={{ marginTop: '80px' }}>
+        <Box sx={{ padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}>Production Unit Rate View</Typography>
             <br /> <br />
@@ -1457,7 +1465,7 @@ function Productionunitrate() {
               <Grid item md={6} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6" sx={{ fontWeight: 400 }}>
-                    {" "}
+                    {' '}
                     Project
                   </Typography>
                   <Typography>{unitRateEdit.project}</Typography>
@@ -1491,7 +1499,7 @@ function Productionunitrate() {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6" sx={{ fontWeight: 400 }}>
-                    {" "}
+                    {' '}
                     T-Rate
                   </Typography>
                   <Typography>{unitRateEdit.trate}</Typography>
@@ -1500,7 +1508,7 @@ function Productionunitrate() {
               <Grid item md={4} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6" sx={{ fontWeight: 400 }}>
-                    {" "}
+                    {' '}
                     M-Rate
                   </Typography>
                   <Typography>{unitRateEdit.mrate}</Typography>
@@ -1550,10 +1558,10 @@ function Productionunitrate() {
           maxWidth="md"
           fullWidth={true}
           sx={{
-            marginTop: "80px"
+            marginTop: '80px',
           }}
         >
-          <Box sx={{ padding: "20px 50px" }}>
+          <Box sx={{ padding: '20px 50px' }}>
             <>
               <Grid container spacing={2}>
                 <Typography sx={userStyle.HeaderText}>Production Unit Rate Edit</Typography>
@@ -1563,23 +1571,16 @@ function Productionunitrate() {
                   <FormControl fullWidth size="small">
                     <Typography>
                       Project
-                      <b style={{ color: "red" }}>*</b>
+                      <b style={{ color: 'red' }}>*</b>
                     </Typography>
-                    <Selects
-                      maxMenuHeight={250}
-                      options={projects}
-                      isDisabled
-                      placeholder="Please Select Project"
-                      value={{ label: unitRateEdit.project, value: unitRateEdit.project }}
-                      readOnly
-                    />
+                    <Selects maxMenuHeight={250} options={projects} isDisabled placeholder="Please Select Project" value={{ label: unitRateEdit.project, value: unitRateEdit.project }} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
                       Category
-                      <b style={{ color: "red" }}>*</b>
+                      <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
@@ -1598,7 +1599,7 @@ function Productionunitrate() {
                   <FormControl fullWidth size="small">
                     <Typography>
                       Sub Category
-                      <b style={{ color: "red" }}>*</b>
+                      <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
@@ -1618,108 +1619,53 @@ function Productionunitrate() {
                 </Grid>
                 <Grid item md={6} xs={12} sm={12} lg={6}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      O-Rate
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      value={unitRateEdit.orate}
-                      readOnly
-                      disabled
-                    />
+                    <Typography>O-Rate</Typography>
+                    <OutlinedInput id="component-outlined" type="text" value={unitRateEdit.orate} readOnly disabled />
                   </FormControl>
                 </Grid>
                 <Grid item md={6} xs={12} sm={12} lg={6}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      M-Rate
-
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="number"
-                      value={unitRateEdit.mrate}
-                      sx={userStyle.hideArrows}
-                      onChange={(e) => handleChangemrateedit(e)}
-                    />
+                    <Typography>M-Rate</Typography>
+                    <OutlinedInput id="component-outlined" type="number" value={unitRateEdit.mrate} sx={userStyle.hideArrows} onChange={(e) => handleChangemrateedit(e)} />
                   </FormControl>
                 </Grid>
                 <Grid item md={6} xs={12} sm={12} lg={6}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      T-Rate
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      value={unitRateEdit.trate}
-                      readOnly
-                      disabled
-                    />
+                    <Typography>T-Rate</Typography>
+                    <OutlinedInput id="component-outlined" type="text" value={unitRateEdit.trate} readOnly disabled />
                   </FormControl>
                 </Grid>
                 <Grid item md={6} xs={12} sm={12} lg={6}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      Conversion
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      disabled
-                      value={unitRateEdit.conversion}
-                      readOnly
-                    />
+                    <Typography>Conversion</Typography>
+                    <OutlinedInput id="component-outlined" type="text" disabled value={unitRateEdit.conversion} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={6} xs={12} sm={12} lg={6}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      Points
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      disabled
-                      value={unitRateEdit.points}
-                      readOnly
-                    />
+                    <Typography>Points</Typography>
+                    <OutlinedInput id="component-outlined" type="text" disabled value={unitRateEdit.points} readOnly />
                   </FormControl>
                 </Grid>
                 <Grid item md={6} xs={12} sm={12} lg={6}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      FlagCount
-                    </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      value={unitRateEdit.flagcount}
-                      placeholder="Please Enter Flagcount"
-                      onChange={(e) => handleChangeflagcountedit(e)}
-
-                    />
+                    <Typography>FlagCount</Typography>
+                    <OutlinedInput id="component-outlined" type="text" value={unitRateEdit.flagcount} placeholder="Please Enter Flagcount" onChange={(e) => handleChangeflagcountedit(e)} />
                   </FormControl>
                 </Grid>
                 <br /> <br />
                 <Grid item md={12} xs={12} sm={12}>
-
                   <Button sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
-                    {" "}
+                    {' '}
                     Update
                   </Button>
-                  &nbsp;
-                  &nbsp;
+                  &nbsp; &nbsp;
                   <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
-                    {" "}
-                    Cancel{" "}
+                    {' '}
+                    Cancel{' '}
                   </Button>
-
                 </Grid>
               </Grid>
-
-
             </>
           </Box>
         </Dialog>
@@ -1727,19 +1673,9 @@ function Productionunitrate() {
       <br />
       {/* EXTERNAL COMPONENTS -------------- START */}
       {/* VALIDATION */}
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
         isFilterOpen={isFilterOpen}
@@ -1751,48 +1687,21 @@ function Productionunitrate() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={unitRateArray ?? []}
-        filename={"Production Unit Rate"}
+        filename={'Production Unit Rate'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
       {/* INFO */}
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Production Rate Unit Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Production Rate Unit Info" addedby={addedby} updateby={updateby} />
       {/*SINGLE DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={delProcess}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delProcess} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/*BULK DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={bulkdeletefunction}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={bulkdeletefunction} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/* PLEASE SELECT ANY ROW */}
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
       {/* EXTERNAL COMPONENTS -------------- END */}
       <br />
-
     </Box>
   );
 }

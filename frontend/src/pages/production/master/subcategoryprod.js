@@ -6,7 +6,7 @@ import { SERVICE } from '../../../services/Baseservice.js';
 import { FaFileExcel, FaFileCsv } from 'react-icons/fa';
 import StyledDataGrid from '../../../components/TableStyle.js';
 import { handleApiError } from '../../../components/Errorhandling.js';
-import axios from 'axios';
+import axios from '../../../axiosInstance';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -25,7 +25,7 @@ import Switch from '@mui/material/Switch';
 import CloseIcon from '@mui/icons-material/Close';
 import html2canvas from 'html2canvas';
 import ImageIcon from '@mui/icons-material/Image';
-import LoadingButton from "@mui/lab/LoadingButton";
+import LoadingButton from '@mui/lab/LoadingButton';
 import ExportData from '../../../components/ExportData.js';
 import AlertDialog from '../../../components/Alert.js';
 import MessageAlert from '../../../components/MessageAlert.js';
@@ -507,27 +507,27 @@ function SubCategoryMaster() {
   const [defaultMrates, setDefaultMrates] = useState([]);
 
   const fetchDefaultMrate = async (value) => {
-    setSelectedCategory(value)
+    setSelectedCategory(value);
     try {
       let resSub = await axios.post(SERVICE.GET_DEFAULT_MRATE_CATEGORY, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
-        project:selectedProject,
+        project: selectedProject,
         category: String(value),
       });
-      setDefaultMrates(resSub.data.categoryprod.mrateprimary)
-    }catch(err){
-      console.log(err,'err')
+      setDefaultMrates(resSub.data.categoryprod.mrateprimary);
+    } catch (err) {
+      console.log(err, 'err');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
-  }
-const [loadingSubmit, setLoadingSubmit] = useState(false)
+  };
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   //submit option for saving
   const handleSubmit = async (e) => {
-    setLoadingSubmit(true)
+    setLoadingSubmit(true);
     setPageName(!pageName);
- 
+
     try {
       let resSub = await axios.post(SERVICE.CHECKSUBCATEGORY_MANUAL_CREATION, {
         headers: {
@@ -542,101 +542,96 @@ const [loadingSubmit, setLoadingSubmit] = useState(false)
         setPopupContentMalert('Please Select Project');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-        setLoadingSubmit(false)
+        setLoadingSubmit(false);
       } else if (selectedCategory === '' || selectedCategory == 'Please Select Category') {
         setPopupContentMalert('Please Select Category');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-        setLoadingSubmit(false)
+        setLoadingSubmit(false);
       } else if (subcategory.name === '') {
         setPopupContentMalert('Please Enter Subcategory Name');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-        setLoadingSubmit(false)
+        setLoadingSubmit(false);
       } else if (mismatchMode.length === 0) {
         setPopupContentMalert('Please Select Mismatch Mode');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-        setLoadingSubmit(false)
+        setLoadingSubmit(false);
       } else if (isNameMatch > 0) {
         setPopupContentMalert('Data already exist!');
         setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
-        setLoadingSubmit(false)
+        setLoadingSubmit(false);
       } else {
-       
         // const getMrateValue = (name) => {
         //   const lowerName = name.toLowerCase(); // Case-insensitive comparison
         //   const rate = defaultMrates || {mrateprimary:[]}; // Ensure rate is an object
-        
+
         //   // Safely access arrays to prevent errors
         //   const primaryRates = rate.mrateprimary || [];
         //   const primaryRatesContains = rate.mrateprimary.filter(d => d.matchcase == "Contains") || [];
-        
+
         //   // Check mrateprimary
         //   let findValue = primaryRates.find((d) => d.matchcase === "Contains" ?  lowerName.includes(d.keyword.toLowerCase()) : lowerName === (d.keyword.toLowerCase())  );
-        //   if (findValue) return findValue.mrate;        
-        
+        //   if (findValue) return findValue.mrate;
+
         //   // Fallback: Return the first available mrate from any list
         //   return (
         //     primaryRatesContains[0]?.mrate ||
         //     0
         //   );
         // };
-        
-        
-        
+
         // setUnitrateApproval((Number(getMrateValue(subcategory.name))*8.333333333333333).toFixed(4))
         // const getMrateValue = (name) => {
 
         //   const lowerName = name.toLowerCase(); // Case-insensitive comparison
         //   const rate = defaultMrates || [] ; // Ensure rate is an object
-        
+
         //   // Safely access arrays to prevent errors
         //   const primaryRates = rate || [];
         //   const primaryRatesContains = primaryRates.filter(d => d.matchcase === "Contains") || [];
-        
+
         //   // Check mrateprimary
         //   let findValue = primaryRates.find((d) =>
         //     d.matchcase === "Contains" ? lowerName.includes(d.keyword.toLowerCase()) : lowerName === d.keyword.toLowerCase()
         //   );
         //   if (findValue) return findValue.mrate;
-        
+
         //   // Fallback: Return the first available mrate from any list
         //   return primaryRatesContains[0]?.mrate || 0;
         // };
-        
+
         // // Only set the value if getMrateValue does not return an empty string
         // const mrateValue =defaultMrates.length > 0 ? Number(Number(getMrateValue(subcategory.name)) * 8.333333333333333).toFixed(4) : "";
-          
-      const getMrateValue = (name) => {
 
-        const lowerName = name.toLowerCase(); // Case-insensitive comparison
-        const rate = defaultMrates || [] ; // Ensure rate is an object
-      
-        // Safely access arrays to prevent errors
-        const primaryRates = rate.filter(d => d.matchcase !== "Default") || [];
-        const primaryRatesDefault = rate.filter(d => d.matchcase === "Default") || [];
-      
-        // Check mrateprimary
-        let findValue = primaryRates.find((d) =>
-          d.matchcase === "Contains" ? lowerName.includes(d.keyword.toLowerCase()) : lowerName === d.keyword.toLowerCase()
-        );console.log(findValue,'findValue')
-        if (findValue) return findValue.mrate;
-        
-        // Fallback: Return the first available mrate from any list
-        return primaryRatesDefault[0]?.mrate || 0;
-      };
-      
-        const mrateValue =defaultMrates.length > 0 ? Number(Number(getMrateValue(subcategory.name))  * 8.333333333333333 ).toFixed(4): "";
-      
+        const getMrateValue = (name) => {
+          const lowerName = name.toLowerCase(); // Case-insensitive comparison
+          const rate = defaultMrates || []; // Ensure rate is an object
+
+          // Safely access arrays to prevent errors
+          const primaryRates = rate.filter((d) => d.matchcase !== 'Default') || [];
+          const primaryRatesDefault = rate.filter((d) => d.matchcase === 'Default') || [];
+
+          // Check mrateprimary
+          let findValue = primaryRates.find((d) => (d.matchcase === 'Contains' ? lowerName.includes(d.keyword.toLowerCase()) : lowerName === d.keyword.toLowerCase()));
+          console.log(findValue, 'findValue');
+          if (findValue) return findValue.mrate;
+
+          // Fallback: Return the first available mrate from any list
+          return primaryRatesDefault[0]?.mrate || 0;
+        };
+
+        const mrateValue = defaultMrates.length > 0 ? Number(Number(getMrateValue(subcategory.name)) * 8.333333333333333).toFixed(4) : '';
+
         setUnitrateApproval(mrateValue);
-        
+
         handleClickUnitApprovalOpenerr();
-        setLoadingSubmit(false)
+        setLoadingSubmit(false);
       }
     } catch (err) {
-      setLoadingSubmit(false)
+      setLoadingSubmit(false);
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
@@ -1409,7 +1404,9 @@ const [loadingSubmit, setLoadingSubmit] = useState(false)
                       value: name,
                     }))}
                     value={{ label: selectedCategory, value: selectedCategory }}
-                    onChange={(e) => { fetchDefaultMrate(e.value); }}
+                    onChange={(e) => {
+                      fetchDefaultMrate(e.value);
+                    }}
                   />
                 </FormControl>
               </Grid>

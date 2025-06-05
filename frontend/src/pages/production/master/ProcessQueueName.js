@@ -1,66 +1,68 @@
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import {
-  Box, Button, Checkbox, Dialog, InputAdornment,
-  DialogActions, DialogContent, FormControl, Grid, Tooltip,
-  IconButton, List, ListItem, ListItemText, MenuItem, RadioGroup,
-  FormControlLabel,
-  Radio, OutlinedInput, Popover, Select, TextField, Typography
-} from "@mui/material";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import moment from "moment-timezone";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import { MultiSelect } from "react-multi-select-component";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, Button, Checkbox, Dialog, InputAdornment, DialogActions, DialogContent, FormControl, Grid, Tooltip, IconButton, List, ListItem, ListItemText, MenuItem, RadioGroup, FormControlLabel, Radio, OutlinedInput, Popover, Select, TextField, Typography } from '@mui/material';
+import Switch from '@mui/material/Switch';
+import axios from '../../../axiosInstance';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import moment from 'moment-timezone';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import { MultiSelect } from 'react-multi-select-component';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
 import AggregatedSearchBar from '../../../components/AggregatedSearchBar';
-import AggridTable from "../../../components/AggridTable";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../../components/DeleteConfirmation.js";
-import { handleApiError } from "../../../components/Errorhandling.js";
-import InfoPopup from "../../../components/InfoPopup.js";
-import AlertDialog from "../../../components/Alert.js";
-import ExportData from "../../../components/ExportData.js";
-import MessageAlert from "../../../components/MessageAlert.js";
-import Headtitle from "../../../components/Headtitle.js";
-import PageHeading from "../../../components/PageHeading.js";
-import { AuthContext, UserRoleAccessContext } from "../../../context/Appcontext.js";
-import { userStyle } from "../../../pageStyle.js";
-import { SERVICE } from "../../../services/Baseservice.js";
+import AggridTable from '../../../components/AggridTable';
+import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
+import { handleApiError } from '../../../components/Errorhandling.js';
+import InfoPopup from '../../../components/InfoPopup.js';
+import AlertDialog from '../../../components/Alert.js';
+import ExportData from '../../../components/ExportData.js';
+import MessageAlert from '../../../components/MessageAlert.js';
+import Headtitle from '../../../components/Headtitle.js';
+import PageHeading from '../../../components/PageHeading.js';
+import { AuthContext, UserRoleAccessContext } from '../../../context/Appcontext.js';
+import { userStyle } from '../../../pageStyle.js';
+import { SERVICE } from '../../../services/Baseservice.js';
 import domtoimage from 'dom-to-image';
-import AggridTableForPaginationTable from "../../../components/AggridTableForPaginationTable.js";
-import { MdClose } from "react-icons/md";
-import { IoMdOptions } from "react-icons/io";
+import AggridTableForPaginationTable from '../../../components/AggridTableForPaginationTable.js';
+import { MdClose } from 'react-icons/md';
+import { IoMdOptions } from 'react-icons/io';
+import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
 
 
 function ProcessQueueName() {
+  const [serverTime, setServerTime] = useState(null);
+    useEffect(() => {
+      const fetchTime = async () => {
+        const time = await getCurrentServerTime();
+        setServerTime(time);
+      };
+  
+      fetchTime();
+    }, []);
+  
+
 
   const [advancedFilter, setAdvancedFilter] = useState(null);
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = ["Contains", "Does Not Contain", "Equals", "Does Not Equal", "Begins With", "Ends With", "Blank", "Not Blank"]; // AgGrid-like conditions
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [logicOperator, setLogicOperator] = useState("AND");
-  const [filterValue, setFilterValue] = useState("");
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [logicOperator, setLogicOperator] = useState('AND');
+  const [filterValue, setFilterValue] = useState('');
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
 
-
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -68,8 +70,8 @@ function ProcessQueueName() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -81,65 +83,44 @@ function ProcessQueueName() {
   let exportRowValues = ['company', 'branch', 'name', 'code'];
   const gridRef = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [processQueue, setProcessQueue] = useState({ company: "Please Select Company", branch: "Please Select Branch", name: "", code: "" });
-  const [processQueueEdit, setProcessQueueEdit] = useState({ company: "Please Select Company", branch: "Please Select Branch", name: "", code: "" });
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [processQueue, setProcessQueue] = useState({ company: 'Please Select Company', branch: 'Please Select Branch', name: '', code: '' });
+  const [processQueueEdit, setProcessQueueEdit] = useState({ company: 'Please Select Company', branch: 'Please Select Branch', name: '', code: '' });
   const [processQueueArray, setProcessQueueArray] = useState([]);
   const [branchOption, setBranchOption] = useState([]);
   const { isUserRoleCompare, isUserRoleAccess, isAssignBranch, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        const remove = [
-          window.location.pathname?.substring(1),
-          window.location.pathname,
-        ];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
 
-  const [searchedString, setSearchedString] = useState("")
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+        }));
+
+  const [searchedString, setSearchedString] = useState('');
   const gridRefTable = useRef(null);
   const [isHandleChange, setIsHandleChange] = useState(false);
 
@@ -155,9 +136,9 @@ function ProcessQueueName() {
   const [deleteProcessQueue, setDeleteProcessQueue] = useState({});
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [items, setItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [allProcessQueueEdit, setAllProcessQueueEdit] = useState([]);
-  const [copiedData, setCopiedData] = useState("");
+  const [copiedData, setCopiedData] = useState('');
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   // Show All Columns & Manage Columns
@@ -174,7 +155,7 @@ function ProcessQueueName() {
 
   // This line muliti select designation
   const [selectedOptionsDesig, setSelectedOptionsDesig] = useState([]);
-  let [valueDesig, setValueDesig] = useState("");
+  let [valueDesig, setValueDesig] = useState('');
 
   const handleDesignationChange = (options) => {
     setValueDesig(
@@ -186,7 +167,7 @@ function ProcessQueueName() {
   };
 
   const customValueRendererDesig = (valueDesig, _branchs) => {
-    return valueDesig.length ? valueDesig.map(({ label }) => label).join(", ") : "Please Select Branch";
+    return valueDesig.length ? valueDesig.map(({ label }) => label).join(', ') : 'Please Select Branch';
   };
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -211,19 +192,18 @@ function ProcessQueueName() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Process Queue Name"),
+      pagename: String('Process Queue Name'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(new Date()),
+      date: String(new Date(serverTime)),
 
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(new Date()),
+          date: String(new Date(serverTime)),
         },
       ],
     });
-
-  }
+  };
 
   //useEffect
 
@@ -242,12 +222,11 @@ function ProcessQueueName() {
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
-
 
   const handleSelectionChange = (newSelection) => {
     setSelectedRows(newSelection.selectionModel);
@@ -260,7 +239,6 @@ function ProcessQueueName() {
   const handleCloseview = () => {
     setOpenview(false);
   };
-
 
   // info model
   const handleClickOpeninfo = () => {
@@ -279,7 +257,7 @@ function ProcessQueueName() {
   // page refersh reload
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
   const username = isUserRoleAccess.companyname;
   // Manage Columns
@@ -289,7 +267,7 @@ function ProcessQueueName() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
   //Delete model
   const [isDeleteOpencheckbox, setIsDeleteOpencheckbox] = useState(false);
@@ -313,33 +291,36 @@ function ProcessQueueName() {
     setIsDeleteOpenalert(false);
   };
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   const fetchBranch = (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      setBranchOption(accessbranch?.filter(
-        (comp) =>
-          e.value === comp.company
-      )?.map(data => ({
-        label: data.branch,
-        value: data.branch,
-      })).filter((item, index, self) => {
-        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-      }))
-
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setBranchOption(
+        accessbranch
+          ?.filter((comp) => e.value === comp.company)
+          ?.map((data) => ({
+            label: data.branch,
+            value: data.branch,
+          }))
+          .filter((item, index, self) => {
+            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+          })
+      );
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //set function to get particular row
   const rowData = async (id) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.SINGLE_PROCESSQUEUENAME}/${id}`, {
         headers: {
@@ -348,12 +329,14 @@ function ProcessQueueName() {
       });
       setDeleteProcessQueue(res?.data?.sprocessqueuename);
       handleClickOpen();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   // Alert delete popup
   let brandid = deleteProcessQueue._id;
   const delBrand = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       await axios.delete(`${SERVICE.SINGLE_PROCESSQUEUENAME}/${brandid}`, {
         headers: {
@@ -365,23 +348,25 @@ function ProcessQueueName() {
       handleCloseMod();
       setSelectedRows([]);
       setPage(1);
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
-  const [isBtn, setIsBtn] = useState(false)
+  const [isBtn, setIsBtn] = useState(false);
 
   //add function
   const sendRequest = async () => {
-    setIsBtn(true)
-    setPageName(!pageName)
+    setIsBtn(true);
+    setPageName(!pageName);
     try {
       valueDesig.forEach((data, index) => {
         axios.post(SERVICE.CREATE_PROCESSQUEUENAME, {
           headers: {
-            'Authorization': `Bearer ${auth.APIToken}`
+            Authorization: `Bearer ${auth.APIToken}`,
           },
           company: String(processQueue.company),
           branch: String(data),
@@ -390,49 +375,49 @@ function ProcessQueueName() {
           addedby: [
             {
               name: String(username),
-              date: String(new Date()),
+              date: String(new Date(serverTime)),
             },
           ],
         });
-      })
+      });
       await fetchEmployee();
-      await fetchProcessQueue(); fetchProcessQueueAll();
-      setProcessQueue({ ...processQueue, name: "", code: "" });
-      setSearchQuery("")
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      await fetchProcessQueue();
+      fetchProcessQueueAll();
+      setProcessQueue({ ...processQueue, name: '', code: '' });
+      setSearchQuery('');
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-      setIsBtn(false)
-    } catch (err) { setIsBtn(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setIsBtn(false);
+    } catch (err) {
+      setIsBtn(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //submit option for saving
   const handleSubmit = (e) => {
     e.preventDefault();
-    const isNameMatch = processQueueArrayDup?.some((item) =>
-      item.company?.toLowerCase() == processQueue.company?.toLowerCase() &&
-      selectedOptionsDesig.some((bran) => bran.value.toLowerCase() == item.branch?.toLowerCase()) &&
-      item.name?.toLowerCase() == processQueue.name?.toLowerCase());
-    if (processQueue.company === "Please Select Company") {
-      setPopupContentMalert("Please Select Company");
-      setPopupSeverityMalert("info");
+    const isNameMatch = processQueueArrayDup?.some((item) => item.company?.toLowerCase() == processQueue.company?.toLowerCase() && selectedOptionsDesig.some((bran) => bran.value.toLowerCase() == item.branch?.toLowerCase()) && item.name?.toLowerCase() == processQueue.name?.toLowerCase());
+    if (processQueue.company === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (valueDesig.length === 0) {
-      setPopupContentMalert("Please Select Branch");
-      setPopupSeverityMalert("info");
+    } else if (valueDesig.length === 0) {
+      setPopupContentMalert('Please Select Branch');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (processQueue.name === "") {
-      setPopupContentMalert("Please Enter Name");
-      setPopupSeverityMalert("info");
+    } else if (processQueue.name === '') {
+      setPopupContentMalert('Please Enter Name');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (processQueue.code === "") {
-      setPopupContentMalert("Please Enter Code");
-      setPopupSeverityMalert("info");
+    } else if (processQueue.code === '') {
+      setPopupContentMalert('Please Enter Code');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data Already exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data Already exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendRequest();
@@ -441,13 +426,13 @@ function ProcessQueueName() {
 
   const handleclear = (e) => {
     e.preventDefault();
-    setProcessQueue({ company: "Please Select Company", branch: "Please Select Branch", name: "", code: "" });
+    setProcessQueue({ company: 'Please Select Company', branch: 'Please Select Branch', name: '', code: '' });
     setBranchOption([]);
     setSelectedOptionsDesig([]);
     setValueDesig([]);
-    setSearchQuery("")
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setSearchQuery('');
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
   //Edit model...
@@ -455,13 +440,13 @@ function ProcessQueueName() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
     setBranchOption([]);
   };
   //get single row to edit....
   const getCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.SINGLE_PROCESSQUEUENAME}/${e}`, {
         headers: {
@@ -469,22 +454,26 @@ function ProcessQueueName() {
         },
       });
       setProcessQueueEdit(res?.data?.sprocessqueuename);
-      setBranchOption(accessbranch?.filter(
-        (comp) =>
-          res.data.sprocessqueuename.company === comp.company
-      )?.map(data => ({
-        label: data.branch,
-        value: data.branch,
-      })).filter((item, index, self) => {
-        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-      }))
+      setBranchOption(
+        accessbranch
+          ?.filter((comp) => res.data.sprocessqueuename.company === comp.company)
+          ?.map((data) => ({
+            label: data.branch,
+            value: data.branch,
+          }))
+          .filter((item, index, self) => {
+            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+          })
+      );
       handleClickOpenEdit();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   // get single row to view....
   const getviewCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.SINGLE_PROCESSQUEUENAME}/${e}`, {
         headers: {
@@ -493,11 +482,13 @@ function ProcessQueueName() {
       });
       setProcessQueueEdit(res?.data?.sprocessqueuename);
       handleClickOpenview();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   // get single row to view....
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.SINGLE_PROCESSQUEUENAME}/${e}`, {
         headers: {
@@ -506,7 +497,9 @@ function ProcessQueueName() {
       });
       setProcessQueueEdit(res?.data?.sprocessqueuename);
       handleClickOpeninfo();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //frequency master name updateby edit page...
   let updateby = processQueueEdit.updatedby;
@@ -514,7 +507,7 @@ function ProcessQueueName() {
   let frequencyId = processQueueEdit._id;
   //editing the single data...
   const sendEditRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.put(`${SERVICE.SINGLE_PROCESSQUEUENAME}/${frequencyId}`, {
         headers: {
@@ -528,63 +521,61 @@ function ProcessQueueName() {
           ...updateby,
           {
             name: String(username),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
-      await fetchEmployee(); fetchProcessQueue();
+      await fetchEmployee();
+      fetchProcessQueue();
       handleCloseModEdit();
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   const editSubmit = (e) => {
     e.preventDefault();
     fetchProcessQueueAll();
-    const isNameMatch =
-      allProcessQueueEdit?.some((item) =>
-        item.company?.toLowerCase() == processQueueEdit.company?.toLowerCase() &&
-        item.branch?.toLowerCase() == processQueueEdit.branch?.toLowerCase() &&
-        item.name?.toLowerCase() === processQueueEdit.name?.toLowerCase()
-        // && item.code?.toLowerCase() === processQueueEdit.code?.toLowerCase()
-      );
+    const isNameMatch = allProcessQueueEdit?.some(
+      (item) => item.company?.toLowerCase() == processQueueEdit.company?.toLowerCase() && item.branch?.toLowerCase() == processQueueEdit.branch?.toLowerCase() && item.name?.toLowerCase() === processQueueEdit.name?.toLowerCase()
+      // && item.code?.toLowerCase() === processQueueEdit.code?.toLowerCase()
+    );
     const isNameMatches = allProcessQueueEdit?.some((item) => item.branch === processQueueEdit.branch && item.name?.toLowerCase() === processQueueEdit.name?.toLowerCase());
-    if (processQueueEdit.company === "Please Select Company") {
-      setPopupContentMalert("Please Select Company");
-      setPopupSeverityMalert("info");
+    if (processQueueEdit.company === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (processQueueEdit.branch === "Please Select Branch") {
-      setPopupContentMalert("Please Select Branch");
-      setPopupSeverityMalert("info");
+    } else if (processQueueEdit.branch === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (processQueueEdit.name === "") {
-      setPopupContentMalert("Please Enter Name");
-      setPopupSeverityMalert("info");
+    } else if (processQueueEdit.name === '') {
+      setPopupContentMalert('Please Enter Name');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (processQueueEdit.code === "") {
-      setPopupContentMalert("Please Enter Code");
-      setPopupSeverityMalert("info");
+    } else if (processQueueEdit.code === '') {
+      setPopupContentMalert('Please Enter Code');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatch) {
-      setPopupContentMalert("Data already exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data already exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (isNameMatches) {
-      setPopupContentMalert("Data already exists!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Data already exists!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequest();
     }
   };
 
-  const [processQueueArrayDup, setProcessQueueArrayDup] = useState([])
+  const [processQueueArrayDup, setProcessQueueArrayDup] = useState([]);
   //get all client user id.
   const fetchProcessQueue = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_freq = await axios.get(SERVICE.ALL_PROCESSQUEUENAME, {
         headers: {
@@ -593,13 +584,16 @@ function ProcessQueueName() {
       });
       setLoader(true);
       setProcessQueueArrayDup(res_freq?.data?.processqueuename);
-    } catch (err) { setLoader(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setLoader(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
-  const [processQueueFilterArray, setProcessQueueFilterArray] = useState([])
+  const [processQueueFilterArray, setProcessQueueFilterArray] = useState([]);
 
   const fetchProcessQueueNameArray = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_freq = await axios.get(SERVICE.ALL_PROCESSQUEUENAME, {
         headers: {
@@ -608,40 +602,37 @@ function ProcessQueueName() {
       });
       setLoader(true);
       setProcessQueueFilterArray(res_freq?.data?.processqueuename);
-    } catch (err) { setLoader(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setLoader(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   useEffect(() => {
-    fetchProcessQueueNameArray()
-  }, [isFilterOpen])
-
+    fetchProcessQueueNameArray();
+  }, [isFilterOpen]);
 
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
   const fetchEmployee = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     const queryParams = {
       page: Number(page),
       pageSize: Number(pageSize),
       searchQuery: searchQuery,
-      assignbranch: accessbranch
+      assignbranch: accessbranch,
     };
 
+    const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
 
-    const allFilters = [
-      ...additionalFilters,
-      { column: selectedColumn, condition: selectedCondition, value: filterValue }
-    ];
-
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
       queryParams.searchQuery = searchQuery;
     }
-
 
     try {
       let res_employee = await axios.post(SERVICE.PROCESSQUEUENAME_SORT, queryParams, {
@@ -650,97 +641,100 @@ function ProcessQueueName() {
         },
       });
 
-      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
       const itemsWithSerialNumber = ans?.map((item, index) => ({
         ...item,
         serialNumber: (page - 1) * pageSize + index + 1,
-        date: moment(item.date).format("DD-MM-YYYY")
+        date: moment(item.date).format('DD-MM-YYYY'),
       }));
 
-      setProcessQueueArray(itemsWithSerialNumber)
-      setOverallFilterdata(res_employee?.data?.totalProjectsData?.length > 0 ?
-        res_employee?.data?.totalProjectsData?.map((item, index) => ({
-          ...item,
-          serialNumber: index + 1
-        })) : []);
+      setProcessQueueArray(itemsWithSerialNumber);
+      setOverallFilterdata(
+        res_employee?.data?.totalProjectsData?.length > 0
+          ? res_employee?.data?.totalProjectsData?.map((item, index) => ({
+              ...item,
+              serialNumber: index + 1,
+            }))
+          : []
+      );
 
       setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
       setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-      setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-      setPage((data) => { return ans?.length > 0 ? data : 1 });
+      setPageSize((data) => {
+        return ans?.length > 0 ? data : 10;
+      });
+      setPage((data) => {
+        return ans?.length > 0 ? data : 1;
+      });
       setLoader(true);
     } catch (err) {
-      setLoader(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+      setLoader(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
   const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if (selectedColumn && filterValue || ["Blank", "Not Blank"].includes(selectedCondition)) {
-      setAdditionalFilters([
-        ...additionalFilters,
-        { column: selectedColumn, condition: selectedCondition, value: filterValue }
-      ]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
+      setAdditionalFilters([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
-
   const getSearchDisplay = () => {
     if (advancedFilter && advancedFilter.length > 0) {
-      return advancedFilter.map((filter, index) => {
-        let showname = columnDataTable.find(col => col.field === filter.column)?.headerName;
-        return `${showname} ${filter.condition} "${filter.value}"`;
-      }).join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
+      return advancedFilter
+        .map((filter, index) => {
+          let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
+          return `${showname} ${filter.condition} "${filter.value}"`;
+        })
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
 
-
   const handleResetSearch = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
 
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
       page: Number(page),
       pageSize: Number(pageSize),
       searchQuery: searchQuery,
-      assignbranch: accessbranch
+      assignbranch: accessbranch,
     };
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
-      queryParams.searchQuery = searchQuery;  // Use searchQuery for regular search
+      queryParams.searchQuery = searchQuery; // Use searchQuery for regular search
     }
-
-
 
     try {
       let res_employee = await axios.post(SERVICE.PROCESSQUEUENAME_SORT, queryParams, {
@@ -749,26 +743,36 @@ function ProcessQueueName() {
         },
       });
 
-      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
       const itemsWithSerialNumber = ans?.map((item, index) => ({
         ...item,
         serialNumber: (page - 1) * pageSize + index + 1,
-        date: moment(item.date).format("DD-MM-YYYY")
+        date: moment(item.date).format('DD-MM-YYYY'),
       }));
 
-      setProcessQueueArray(itemsWithSerialNumber)
-      setOverallFilterdata(res_employee?.data?.totalProjectsData?.length > 0 ?
-        res_employee?.data?.totalProjectsData?.map((item, index) => ({
-          ...item,
-          serialNumber: index + 1
-        })) : []);
+      setProcessQueueArray(itemsWithSerialNumber);
+      setOverallFilterdata(
+        res_employee?.data?.totalProjectsData?.length > 0
+          ? res_employee?.data?.totalProjectsData?.map((item, index) => ({
+              ...item,
+              serialNumber: index + 1,
+            }))
+          : []
+      );
 
       setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
       setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-      setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-      setPage((data) => { return ans?.length > 0 ? data : 1 });
+      setPageSize((data) => {
+        return ans?.length > 0 ? data : 10;
+      });
+      setPage((data) => {
+        return ans?.length > 0 ? data : 1;
+      });
       setLoader(true);
-    } catch (err) { setLoader(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setLoader(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   useEffect(() => {
@@ -777,7 +781,7 @@ function ProcessQueueName() {
   }, [page, pageSize, searchQuery]);
 
   const delAreagrpcheckbox = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const deletePromises = selectedRows?.map((item) => {
         return axios.delete(`${SERVICE.SINGLE_PROCESSQUEUENAME}/${item}`, {
@@ -794,15 +798,19 @@ function ProcessQueueName() {
       setSelectAllChecked(false);
       setPage(1);
 
-      await fetchEmployee(); fetchProcessQueue(); fetchProcessQueueAll();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      await fetchEmployee();
+      fetchProcessQueue();
+      fetchProcessQueueAll();
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //get all Brand Type Name.
   const fetchProcessQueueAll = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_freq = await axios.get(SERVICE.ALL_PROCESSQUEUENAME, {
         headers: {
@@ -811,20 +819,22 @@ function ProcessQueueName() {
       });
       // setProcessQueueArray(res_freq?.data?.processqueuename);
       setAllProcessQueueEdit(res_freq?.data?.processqueuename.filter((item) => item._id !== processQueueEdit._id));
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
-
 
   const gridRefTableImg = useRef(null);
   // image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "ProcessQueueName.png");
+          saveAs(blob, 'ProcessQueueName.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -833,8 +843,8 @@ function ProcessQueueName() {
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Process Queue Name",
-    pageStyle: "print",
+    documentTitle: 'Process Queue Name',
+    pageStyle: 'print',
   });
 
   //Datatable
@@ -856,22 +866,21 @@ function ProcessQueueName() {
   };
 
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
 
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
-
 
   const [selectAllChecked, setSelectAllChecked] = useState(false);
 
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
@@ -880,105 +889,110 @@ function ProcessQueueName() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: 'left', lockPinned: true,
+      headerClassName: 'bold-header',
+      pinned: 'left',
+      lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 75,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 200,
       hide: !columnVisibility.company,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 200,
       hide: !columnVisibility.branch,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "name",
-      headerName: "Name",
+      field: 'name',
+      headerName: 'Name',
       flex: 0,
       width: 200,
       hide: !columnVisibility.name,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "code",
-      headerName: "Code",
+      field: 'code',
+      headerName: 'Code',
       flex: 0,
       width: 200,
       hide: !columnVisibility.code,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("eprocessqueuename") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('eprocessqueuename') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getCode(params.data.id);
               }}
             >
-              <EditOutlinedIcon sx={buttonStyles.buttonedit} />            </Button>
+              <EditOutlinedIcon sx={buttonStyles.buttonedit} />{' '}
+            </Button>
           )}
-          {isUserRoleCompare?.includes("dprocessqueuename") && (
+          {isUserRoleCompare?.includes('dprocessqueuename') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
                 rowData(params.data.id);
               }}
             >
-              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />            </Button>
+              <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />{' '}
+            </Button>
           )}
-          {isUserRoleCompare?.includes("vprocessqueuename") && (
+          {isUserRoleCompare?.includes('vprocessqueuename') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getviewCode(params.data.id);
               }}
             >
-              <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />            </Button>
+              <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />{' '}
+            </Button>
           )}
-          {isUserRoleCompare?.includes("iprocessqueuename") && (
+          {isUserRoleCompare?.includes('iprocessqueuename') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 getinfoCode(params.data.id);
               }}
             >
-              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />            </Button>
+              <InfoOutlinedIcon sx={buttonStyles.buttoninfo} />{' '}
+            </Button>
           )}
         </Grid>
       ),
     },
   ];
 
-  const filteredSelectedColumn = columnDataTable.filter(data => data.field !== 'checkbox' && data.field !== "actions" && data.field !== "serialNumber");
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = filteredDatas.map((item, index) => {
     return {
@@ -1016,9 +1030,9 @@ function ProcessQueueName() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1026,7 +1040,7 @@ function ProcessQueueName() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1034,16 +1048,16 @@ function ProcessQueueName() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: "absolute" }} />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent sx={{ minWidth: "auto", height: "200px", position: "relative" }}>
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText sx={{ display: "flex" }} primary={<Switch sx={{ marginTop: "-5px" }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === "checkbox" ? "Checkbox" : column.headerName} />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -1051,8 +1065,8 @@ function ProcessQueueName() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button variant="text" sx={{ textTransform: "none" }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
-              {" "}
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
+              {' '}
               Show All
             </Button>
           </Grid>
@@ -1060,7 +1074,7 @@ function ProcessQueueName() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -1069,7 +1083,7 @@ function ProcessQueueName() {
                 setColumnVisibility(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -1078,22 +1092,15 @@ function ProcessQueueName() {
     </Box>
   );
 
-  const [fileFormat, setFormat] = useState('')
+  const [fileFormat, setFormat] = useState('');
 
   return (
     <Box>
-      <Headtitle title={"PROCESS QUEUE NAME"} />
+      <Headtitle title={'PROCESS QUEUE NAME'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="Process Queue Name"
-        modulename="Production"
-        submodulename="Report SetUp"
-        mainpagename="Process Queue Name"
-        subpagename=""
-        subsubpagename=""
-      />
+      <PageHeading title="Process Queue Name" modulename="Production" submodulename="Report SetUp" mainpagename="Process Queue Name" subpagename="" subsubpagename="" />
       <>
-        {isUserRoleCompare?.includes("aprocessqueuename") && (
+        {isUserRoleCompare?.includes('aprocessqueuename') && (
           <Box sx={userStyle.selectcontainer}>
             <>
               <Grid container spacing={2}>
@@ -1103,22 +1110,33 @@ function ProcessQueueName() {
               </Grid>
               <Grid container spacing={2}>
                 <Grid item md={3} sm={6} xs={12}>
-                  <FormControl fullWidth size="small" >
-                    <Typography>Company <b style={{ color: "red" }}>*</b></Typography>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Company <b style={{ color: 'red' }}>*</b>
+                    </Typography>
                     <Selects
-                      options={accessbranch?.map(data => ({
-                        label: data.company,
-                        value: data.company,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
-                      onChange={(e) => { setProcessQueue({ ...processQueue, company: e.value, branch: "Please Select Branch", name: "", code: "" }); fetchBranch(e); setSelectedOptionsDesig([]); setValueDesig([]); }}
+                      options={accessbranch
+                        ?.map((data) => ({
+                          label: data.company,
+                          value: data.company,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
+                      onChange={(e) => {
+                        setProcessQueue({ ...processQueue, company: e.value, branch: 'Please Select Branch', name: '', code: '' });
+                        fetchBranch(e);
+                        setSelectedOptionsDesig([]);
+                        setValueDesig([]);
+                      }}
                       value={{ label: processQueue.company, value: processQueue.company }}
                     />
                   </FormControl>
                 </Grid>
-                <Grid item md={3} xs={12} sm={12}  >
-                  <Typography>Branch <b style={{ color: "red" }}>*</b></Typography>
+                <Grid item md={3} xs={12} sm={12}>
+                  <Typography>
+                    Branch <b style={{ color: 'red' }}>*</b>
+                  </Typography>
 
                   <FormControl fullWidth size="small">
                     <MultiSelect
@@ -1135,7 +1153,7 @@ function ProcessQueueName() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Name <b style={{ color: "red" }}>*</b>
+                      Name <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -1155,7 +1173,7 @@ function ProcessQueueName() {
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Code <b style={{ color: "red" }}>*</b>
+                      Code <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -1173,7 +1191,7 @@ function ProcessQueueName() {
                 </Grid>
               </Grid>
               <br />
-              <Grid container sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
+              <Grid container sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                 <Grid item md={1} xs={12} sm={6}>
                   <Button sx={buttonStyles.buttonsubmit} onClick={handleSubmit} disabled={isBtn}>
                     Submit
@@ -1191,108 +1209,119 @@ function ProcessQueueName() {
       </>
       <br />
       {/* ****** Table Start ****** */}
-      {
-        isUserRoleCompare?.includes("lprocessqueuename") && (
-          <>
-            <Box sx={userStyle.container}>
-              {/* ******************************************************EXPORT Buttons****************************************************** */}
-              <Grid item xs={8}>
-                <Typography sx={userStyle.importheadtext}>Process Queue Name List </Typography>
-              </Grid>
-              <Grid container spacing={2} style={userStyle.dataTablestyle}>
-                <Grid item md={2} xs={12} sm={12}>
-                  <Box>
-                    <Typography>&nbsp;</Typography>
-                    <label>Show entries:</label>
-                    <Select
-                      id="pageSizeSelect"
-                      value={pageSize}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 180,
-                            width: 80,
-                          },
+      {isUserRoleCompare?.includes('lprocessqueuename') && (
+        <>
+          <Box sx={userStyle.container}>
+            {/* ******************************************************EXPORT Buttons****************************************************** */}
+            <Grid item xs={8}>
+              <Typography sx={userStyle.importheadtext}>Process Queue Name List </Typography>
+            </Grid>
+            <Grid container spacing={2} style={userStyle.dataTablestyle}>
+              <Grid item md={2} xs={12} sm={12}>
+                <Box>
+                  <Typography>&nbsp;</Typography>
+                  <label>Show entries:</label>
+                  <Select
+                    id="pageSizeSelect"
+                    value={pageSize}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 180,
+                          width: 80,
                         },
-                      }}
-                      onChange={handlePageSizeChange}
-                      sx={{ width: "77px" }}
-                    >
-                      <MenuItem value={1}>1</MenuItem>
-                      <MenuItem value={5}>5</MenuItem>
-                      <MenuItem value={10}>10</MenuItem>
-                      <MenuItem value={25}>25</MenuItem>
-                      <MenuItem value={50}>50</MenuItem>
-                      <MenuItem value={100}>100</MenuItem>
-                      <MenuItem value={totalProjects}>All</MenuItem>
-                    </Select>
-                  </Box>
-                </Grid>
-                <Grid
-                  item
-                  md={8}
-                  xs={12}
-                  sm={12}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Box>
-                    {isUserRoleCompare?.includes("excelprocessqueuename") && (
-                      <>
-                        <Button onClick={(e) => {
-                          setIsFilterOpen(true)
-                          fetchProcessQueueNameArray()
-                          setFormat("xl")
-                        }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
-                      </>
-                    )}
-                    {isUserRoleCompare?.includes("csvprocessqueuename") && (
-                      <>
-                        <Button onClick={(e) => {
-                          setIsFilterOpen(true)
-                          fetchProcessQueueNameArray()
-                          setFormat("csv")
-                        }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
-                      </>
-                    )}
-                    {isUserRoleCompare?.includes("printprocessqueuename") && (
-                      <>
-                        <Button sx={userStyle.buttongrp} onClick={handleprint}>
-                          &ensp;
-                          <FaPrint />
-                          &ensp;Print&ensp;
-                        </Button>
-                      </>
-                    )}
-                    {isUserRoleCompare?.includes("pdfprocessqueuename") && (
-                      <>
-                        <Button sx={userStyle.buttongrp}
-                          onClick={() => {
-                            setIsPdfFilterOpen(true)
-                            fetchProcessQueueNameArray()
-                          }}
-                        >
-                          <FaFilePdf />
-                          &ensp;Export to PDF&ensp;
-                        </Button>
-                      </>
-                    )}
-                    {isUserRoleCompare?.includes("imageprocessqueuename") && (
-                      <>
-                        <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                          {" "}
-                          <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
-                        </Button>
-                      </>
-                    )}
-                  </Box>
-                </Grid>
-                <Grid item md={2} xs={6} sm={6}>
-
-                  {/* <AggregatedSearchBar
+                      },
+                    }}
+                    onChange={handlePageSizeChange}
+                    sx={{ width: '77px' }}
+                  >
+                    <MenuItem value={1}>1</MenuItem>
+                    <MenuItem value={5}>5</MenuItem>
+                    <MenuItem value={10}>10</MenuItem>
+                    <MenuItem value={25}>25</MenuItem>
+                    <MenuItem value={50}>50</MenuItem>
+                    <MenuItem value={100}>100</MenuItem>
+                    <MenuItem value={totalProjects}>All</MenuItem>
+                  </Select>
+                </Box>
+              </Grid>
+              <Grid
+                item
+                md={8}
+                xs={12}
+                sm={12}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Box>
+                  {isUserRoleCompare?.includes('excelprocessqueuename') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          fetchProcessQueueNameArray();
+                          setFormat('xl');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileExcel />
+                        &ensp;Export to Excel&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('csvprocessqueuename') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          fetchProcessQueueNameArray();
+                          setFormat('csv');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileCsv />
+                        &ensp;Export to CSV&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('printprocessqueuename') && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                        &ensp;
+                        <FaPrint />
+                        &ensp;Print&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('pdfprocessqueuename') && (
+                    <>
+                      <Button
+                        sx={userStyle.buttongrp}
+                        onClick={() => {
+                          setIsPdfFilterOpen(true);
+                          fetchProcessQueueNameArray();
+                        }}
+                      >
+                        <FaFilePdf />
+                        &ensp;Export to PDF&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('imageprocessqueuename') && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                        {' '}
+                        <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                      </Button>
+                    </>
+                  )}
+                </Box>
+              </Grid>
+              <Grid item md={2} xs={6} sm={6}>
+                {/* <AggregatedSearchBar
                     columnDataTable={columnDataTable}
                     setItems={setItems}
                     addSerialNumber={addSerialNumber}
@@ -1304,82 +1333,84 @@ function ProcessQueueName() {
                     paginated={true}
                     totalDatas={overallFilterdata}
                   /> */}
-                  <FormControl fullWidth size="small">
-                    <OutlinedInput size="small"
-                      id="outlined-adornment-weight"
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <FaSearch />
-                        </InputAdornment>
-                      }
-                      endAdornment={
-                        <InputAdornment position="end">
-                          {advancedFilter && (
-                            <IconButton onClick={handleResetSearch}>
-                              <MdClose />
-                            </IconButton>
-                          )}
-                          <Tooltip title="Show search options">
-                            <span>
-                              <IoMdOptions style={{ cursor: 'pointer', }} onClick={handleClickSearch} />
-                            </span>
-                          </Tooltip>
-                        </InputAdornment>}
-                      aria-describedby="outlined-weight-helper-text"
-                      inputProps={{ 'aria-label': 'weight', }}
-                      type="text"
-                      value={getSearchDisplay()}
-                      onChange={handleSearchChange}
-                      placeholder="Type to search..."
-                      disabled={!!advancedFilter}
-                    />
-                  </FormControl>
-                </Grid>
-              </Grid>
-              <br />
-              <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
-                Show All Columns
-              </Button>
-              &ensp;
-              <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
-                Manage Columns
-              </Button>
-              &ensp;
-              {isUserRoleCompare?.includes("bdprocessqueuename") && (
-                <>
-                  <Button sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
-                    Bulk Delete
-                  </Button>
-                </>
-              )}
-              <br />
-              <br />
-              {!loader ? (
-                <Box sx={{ display: "flex", justifyContent: "center", minHeight: "350px" }}>
-                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
-                </Box>
-              ) : (
-                <>
-                  <AggridTableForPaginationTable
-                    rowDataTable={rowDataTable}
-                    columnDataTable={columnDataTable}
-                    columnVisibility={columnVisibility}
-                    page={page}
-                    setPage={setPage}
-                    pageSize={pageSize}
-                    totalPages={totalPages}
-                    setColumnVisibility={setColumnVisibility}
-                    selectedRows={selectedRows}
-                    setSelectedRows={setSelectedRows}
-                    gridRefTable={gridRefTable}
-                    totalDatas={totalProjects}
-                    setFilteredRowData={setFilteredRowData}
-                    filteredRowData={filteredRowData}
-                    gridRefTableImg={gridRefTableImg}
-                    itemsList={overallFilterdata}
+                <FormControl fullWidth size="small">
+                  <OutlinedInput
+                    size="small"
+                    id="outlined-adornment-weight"
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <FaSearch />
+                      </InputAdornment>
+                    }
+                    endAdornment={
+                      <InputAdornment position="end">
+                        {advancedFilter && (
+                          <IconButton onClick={handleResetSearch}>
+                            <MdClose />
+                          </IconButton>
+                        )}
+                        <Tooltip title="Show search options">
+                          <span>
+                            <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
+                          </span>
+                        </Tooltip>
+                      </InputAdornment>
+                    }
+                    aria-describedby="outlined-weight-helper-text"
+                    inputProps={{ 'aria-label': 'weight' }}
+                    type="text"
+                    value={getSearchDisplay()}
+                    onChange={handleSearchChange}
+                    placeholder="Type to search..."
+                    disabled={!!advancedFilter}
                   />
+                </FormControl>
+              </Grid>
+            </Grid>
+            <br />
+            <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
+              Show All Columns
+            </Button>
+            &ensp;
+            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
+              Manage Columns
+            </Button>
+            &ensp;
+            {isUserRoleCompare?.includes('bdprocessqueuename') && (
+              <>
+                <Button sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
+                  Bulk Delete
+                </Button>
+              </>
+            )}
+            <br />
+            <br />
+            {!loader ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', minHeight: '350px' }}>
+                <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
+              </Box>
+            ) : (
+              <>
+                <AggridTableForPaginationTable
+                  rowDataTable={rowDataTable}
+                  columnDataTable={columnDataTable}
+                  columnVisibility={columnVisibility}
+                  page={page}
+                  setPage={setPage}
+                  pageSize={pageSize}
+                  totalPages={totalPages}
+                  setColumnVisibility={setColumnVisibility}
+                  selectedRows={selectedRows}
+                  setSelectedRows={setSelectedRows}
+                  gridRefTable={gridRefTable}
+                  totalDatas={totalProjects}
+                  setFilteredRowData={setFilteredRowData}
+                  filteredRowData={filteredRowData}
+                  gridRefTableImg={gridRefTableImg}
+                  itemsList={overallFilterdata}
+                />
 
-                  {/* <AggridTable
+                {/* <AggridTable
                     rowDataTable={rowDataTable}
                     columnDataTable={columnDataTable}
                     columnVisibility={columnVisibility}
@@ -1405,151 +1436,154 @@ function ProcessQueueName() {
                     gridRefTableImg={gridRefTableImg}
                     itemsList={overallFilterdata}
                   /> */}
-                  <Popover
-                    id={idSearch}
-                    open={openSearch}
-                    anchorEl={anchorElSearch}
-                    onClose={handleCloseSearch}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
-                  >
-                    <Box style={{ padding: "10px", maxWidth: '450px' }}>
-                      <Typography variant="h6">Advance Search</Typography>
-                      <IconButton
-                        aria-label="close"
-                        onClick={handleCloseSearch}
+                <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                  <Box style={{ padding: '10px', maxWidth: '450px' }}>
+                    <Typography variant="h6">Advance Search</Typography>
+                    <IconButton
+                      aria-label="close"
+                      onClick={handleCloseSearch}
+                      sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                      }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <DialogContent sx={{ width: '100%' }}>
+                      <Box
                         sx={{
-                          position: "absolute",
-                          right: 8,
-                          top: 8,
-                          color: (theme) => theme.palette.grey[500],
-                        }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                      <DialogContent sx={{ width: "100%" }}>
-                        <Box sx={{
                           width: '350px',
                           maxHeight: '400px',
                           overflow: 'hidden',
-                          position: 'relative'
-                        }}>
-                          <Box sx={{
+                          position: 'relative',
+                        }}
+                      >
+                        <Box
+                          sx={{
                             maxHeight: '300px',
                             overflowY: 'auto',
                             // paddingRight: '5px'
-                          }}>
-                            <Grid container spacing={1}>
-                              <Grid item md={12} sm={12} xs={12}>
-                                <Typography>Columns</Typography>
-                                <Select fullWidth size="small"
-                                  MenuProps={{
-                                    PaperProps: {
-                                      style: {
-                                        maxHeight: 200,
-                                        width: "auto",
-                                      },
+                          }}
+                        >
+                          <Grid container spacing={1}>
+                            <Grid item md={12} sm={12} xs={12}>
+                              <Typography>Columns</Typography>
+                              <Select
+                                fullWidth
+                                size="small"
+                                MenuProps={{
+                                  PaperProps: {
+                                    style: {
+                                      maxHeight: 200,
+                                      width: 'auto',
                                     },
-                                  }}
-                                  style={{ minWidth: 150 }}
-                                  value={selectedColumn}
-                                  onChange={(e) => setSelectedColumn(e.target.value)}
-                                  displayEmpty
-                                >
-                                  <MenuItem value="" disabled>Select Column</MenuItem>
-                                  {filteredSelectedColumn.map((col) => (
-                                    <MenuItem key={col.field} value={col.field}>
-                                      {col.headerName}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              </Grid>
-                              <Grid item md={12} sm={12} xs={12}>
-                                <Typography>Operator</Typography>
-                                <Select fullWidth size="small"
-                                  MenuProps={{
-                                    PaperProps: {
-                                      style: {
-                                        maxHeight: 200,
-                                        width: "auto",
-                                      },
+                                  },
+                                }}
+                                style={{ minWidth: 150 }}
+                                value={selectedColumn}
+                                onChange={(e) => setSelectedColumn(e.target.value)}
+                                displayEmpty
+                              >
+                                <MenuItem value="" disabled>
+                                  Select Column
+                                </MenuItem>
+                                {filteredSelectedColumn.map((col) => (
+                                  <MenuItem key={col.field} value={col.field}>
+                                    {col.headerName}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </Grid>
+                            <Grid item md={12} sm={12} xs={12}>
+                              <Typography>Operator</Typography>
+                              <Select
+                                fullWidth
+                                size="small"
+                                MenuProps={{
+                                  PaperProps: {
+                                    style: {
+                                      maxHeight: 200,
+                                      width: 'auto',
                                     },
-                                  }}
-                                  style={{ minWidth: 150 }}
-                                  value={selectedCondition}
-                                  onChange={(e) => setSelectedCondition(e.target.value)}
-                                  disabled={!selectedColumn}
-                                >
-                                  {conditions.map((condition) => (
-                                    <MenuItem key={condition} value={condition}>
-                                      {condition}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              </Grid>
-                              <Grid item md={12} sm={12} xs={12}>
-                                <Typography>Value</Typography>
-                                <TextField fullWidth size="small"
-                                  value={["Blank", "Not Blank"].includes(selectedCondition) ? "" : filterValue}
-                                  onChange={(e) => setFilterValue(e.target.value)}
-                                  disabled={["Blank", "Not Blank"].includes(selectedCondition)}
-                                  placeholder={["Blank", "Not Blank"].includes(selectedCondition) ? "Disabled" : "Enter value"}
-                                  sx={{
-                                    '& .MuiOutlinedInput-root.Mui-disabled': {
-                                      backgroundColor: 'rgb(0 0 0 / 26%)',
-                                    },
-                                    '& .MuiOutlinedInput-input.Mui-disabled': {
-                                      cursor: 'not-allowed',
-                                    },
-                                  }}
-                                />
-                              </Grid>
-                              {additionalFilters.length > 0 && (
-                                <>
-                                  <Grid item md={12} sm={12} xs={12}>
-                                    <RadioGroup
-                                      row
-                                      value={logicOperator}
-                                      onChange={(e) => setLogicOperator(e.target.value)}
-                                    >
-                                      <FormControlLabel value="AND" control={<Radio />} label="AND" />
-                                      <FormControlLabel value="OR" control={<Radio />} label="OR" />
-                                    </RadioGroup>
-                                  </Grid>
-                                </>
-                              )}
-                              {additionalFilters.length === 0 && (
-                                <Grid item md={4} sm={12} xs={12} >
-                                  <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
-                                    Add Filter
-                                  </Button>
+                                  },
+                                }}
+                                style={{ minWidth: 150 }}
+                                value={selectedCondition}
+                                onChange={(e) => setSelectedCondition(e.target.value)}
+                                disabled={!selectedColumn}
+                              >
+                                {conditions.map((condition) => (
+                                  <MenuItem key={condition} value={condition}>
+                                    {condition}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </Grid>
+                            <Grid item md={12} sm={12} xs={12}>
+                              <Typography>Value</Typography>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
+                                onChange={(e) => setFilterValue(e.target.value)}
+                                disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                                placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
+                                sx={{
+                                  '& .MuiOutlinedInput-root.Mui-disabled': {
+                                    backgroundColor: 'rgb(0 0 0 / 26%)',
+                                  },
+                                  '& .MuiOutlinedInput-input.Mui-disabled': {
+                                    cursor: 'not-allowed',
+                                  },
+                                }}
+                              />
+                            </Grid>
+                            {additionalFilters.length > 0 && (
+                              <>
+                                <Grid item md={12} sm={12} xs={12}>
+                                  <RadioGroup row value={logicOperator} onChange={(e) => setLogicOperator(e.target.value)}>
+                                    <FormControlLabel value="AND" control={<Radio />} label="AND" />
+                                    <FormControlLabel value="OR" control={<Radio />} label="OR" />
+                                  </RadioGroup>
                                 </Grid>
-                              )}
-
-                              <Grid item md={2} sm={12} xs={12}>
-                                <Button variant="contained" onClick={() => {
-                                  fetchEmployee();
-                                  setIsSearchActive(true);
-                                  setAdvancedFilter([
-                                    ...additionalFilters,
-                                    { column: selectedColumn, condition: selectedCondition, value: filterValue }
-                                  ])
-                                }} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
-                                  Search
+                              </>
+                            )}
+                            {additionalFilters.length === 0 && (
+                              <Grid item md={4} sm={12} xs={12}>
+                                <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                                  Add Filter
                                 </Button>
                               </Grid>
+                            )}
+
+                            <Grid item md={2} sm={12} xs={12}>
+                              <Button
+                                variant="contained"
+                                onClick={() => {
+                                  fetchEmployee();
+                                  setIsSearchActive(true);
+                                  setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+                                }}
+                                sx={{ textTransform: 'capitalize' }}
+                                disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
+                              >
+                                Search
+                              </Button>
                             </Grid>
-                          </Box>
+                          </Grid>
                         </Box>
-                      </DialogContent>
-                    </Box>
-                  </Popover>
-                </>
-              )}
-              {/* ****** Table End ****** */}
-            </Box>
-          </>
-        )
-      }
+                      </Box>
+                    </DialogContent>
+                  </Box>
+                </Popover>
+              </>
+            )}
+            {/* ****** Table End ****** */}
+          </Box>
+        </>
+      )}
       {/* ****** Table End ****** */}
       {/* Manage Column */}
       <Popover
@@ -1558,8 +1592,8 @@ function ProcessQueueName() {
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
@@ -1567,7 +1601,7 @@ function ProcessQueueName() {
 
       {/* view model */}
       <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <Box sx={{ width: "550px", padding: "20px 50px" }}>
+        <Box sx={{ width: '550px', padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}> View Process Queue Name</Typography>
             <br /> <br />
@@ -1610,7 +1644,7 @@ function ProcessQueueName() {
       {/* Edit DIALOG */}
       <Box>
         <Dialog open={isEditOpen} onClose={handleCloseModEdit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="sm" fullWidth={true}>
-          <Box sx={{ padding: "20px 50px" }}>
+          <Box sx={{ padding: '20px 50px' }}>
             <>
               <Grid container spacing={2}>
                 <Typography sx={userStyle.HeaderText}>Edit Process Queue Name</Typography>
@@ -1618,16 +1652,23 @@ function ProcessQueueName() {
               <br />
               <Grid container spacing={2}>
                 <Grid item md={6} sm={12} xs={12}>
-                  <FormControl fullWidth size="small" >
-                    <Typography>Company <b style={{ color: "red" }}>*</b></Typography>
+                  <FormControl fullWidth size="small">
+                    <Typography>
+                      Company <b style={{ color: 'red' }}>*</b>
+                    </Typography>
                     <Selects
-                      options={accessbranch?.map(data => ({
-                        label: data.company,
-                        value: data.company,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
-                      onChange={(e) => { setProcessQueueEdit({ ...processQueueEdit, company: e.value, branch: "Please Select Branch", name: "", code: "" }); fetchBranch(e) }}
+                      options={accessbranch
+                        ?.map((data) => ({
+                          label: data.company,
+                          value: data.company,
+                        }))
+                        .filter((item, index, self) => {
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                        })}
+                      onChange={(e) => {
+                        setProcessQueueEdit({ ...processQueueEdit, company: e.value, branch: 'Please Select Branch', name: '', code: '' });
+                        fetchBranch(e);
+                      }}
                       value={{ label: processQueueEdit.company, value: processQueueEdit.company }}
                     />
                   </FormControl>
@@ -1635,7 +1676,7 @@ function ProcessQueueName() {
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Branch <b style={{ color: "red" }}>*</b>
+                      Branch <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       maxMenuHeight={250}
@@ -1646,8 +1687,8 @@ function ProcessQueueName() {
                         setProcessQueueEdit({
                           ...processQueueEdit,
                           branch: e.value,
-                          name: "",
-                          code: "",
+                          name: '',
+                          code: '',
                         });
                       }}
                     />
@@ -1656,7 +1697,7 @@ function ProcessQueueName() {
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Name <b style={{ color: "red" }}>*</b>
+                      Name <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -1676,7 +1717,7 @@ function ProcessQueueName() {
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Code <b style={{ color: "red" }}>*</b>
+                      Code <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -1697,15 +1738,15 @@ function ProcessQueueName() {
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
                   <Button sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
-                    {" "}
+                    {' '}
                     Update
                   </Button>
                 </Grid>
                 <br />
                 <Grid item md={6} xs={12} sm={12}>
                   <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
-                    {" "}
-                    Cancel{" "}
+                    {' '}
+                    Cancel{' '}
                   </Button>
                 </Grid>
               </Grid>
@@ -1717,19 +1758,9 @@ function ProcessQueueName() {
       <br />
       {/* EXTERNAL COMPONENTS -------------- START */}
       {/* VALIDATION */}
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
         isFilterOpen={isFilterOpen}
@@ -1742,48 +1773,22 @@ function ProcessQueueName() {
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         // itemsTwo={processQueueArray ?? []}
         itemsTwo={processQueueFilterArray ?? []}
-        filename={"Process Queue Name"}
+        filename={'Process Queue Name'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
       {/* INFO */}
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Process Queue Name Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Process Queue Name Info" addedby={addedby} updateby={updateby} />
       {/*SINGLE DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={delBrand}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delBrand} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/*BULK DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={delAreagrpcheckbox}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delAreagrpcheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/* PLEASE SELECT ANY ROW */}
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
       {/* EXTERNAL COMPONENTS -------------- END */}
       <br />
-    </Box >
+    </Box>
   );
 }
 

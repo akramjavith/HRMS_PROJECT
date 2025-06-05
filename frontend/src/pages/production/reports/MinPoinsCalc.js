@@ -38,8 +38,19 @@ import {
 import ExportData from "../../../components/ExportData.js";
 import InfoPopup from "../../../components/InfoPopup.js";
 import MessageAlert from "../../../components/MessageAlert.js";
+import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
+
 
 function MinPointsCalc() {
+  const [serverTime, setServerTime] = useState(null);
+    useEffect(() => {
+      const fetchTime = async () => {
+        const time = await getCurrentServerTime();
+        setServerTime(time);
+      };
+  
+      fetchTime();
+    }, []);
   const [employees, setEmployees] = useState([]);
   const [monthSets, setMonthsets] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -128,7 +139,7 @@ function MinPointsCalc() {
   const { auth } = useContext(AuthContext);
 
   //  Datefield
-  var today = new Date();
+  var today = new Date(serverTime);
   var dd = String(today.getDate()).padStart(2, "0");
   var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
   var yyyy = today.getFullYear();

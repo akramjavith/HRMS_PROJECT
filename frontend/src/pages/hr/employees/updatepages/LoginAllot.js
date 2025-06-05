@@ -1,72 +1,54 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import {
-  Box,
-  Typography,
-  OutlinedInput,
-  TableBody,
-  TableRow,
-  TableCell,
-  Select,
-  MenuItem,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  Grid,
-  Paper,
-  Table,
-  TableHead,
-  TableContainer,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  Popover,
-  Checkbox,
-  TextField,
-  IconButton,
-} from "@mui/material";
-import { userStyle } from "../../../../pageStyle";
-import { FaPrint, FaFilePdf, FaEdit } from "react-icons/fa";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import axios from "axios";
-import { SERVICE } from "../../../../services/Baseservice";
-import { handleApiError } from "../../../../components/Errorhandling";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import { useReactToPrint } from "react-to-print";
-import moment from "moment-timezone";
-import {
-  UserRoleAccessContext,
-  AuthContext,
-} from "../../../../context/Appcontext";
-import Headtitle from "../../../../components/Headtitle";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { MultiSelect } from "react-multi-select-component";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import StyledDataGrid from "../../../../components/TableStyle";
-import { saveAs } from "file-saver";
-import Switch from "@mui/material/Switch";
-import CloseIcon from "@mui/icons-material/Close";
-import html2canvas from "html2canvas";
-import ImageIcon from "@mui/icons-material/Image";
-import LoginAllotedList from "./LoginNotAllot";
-
-import * as FileSaver from "file-saver";
-import * as XLSX from "xlsx";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import { FaFileExcel, FaFileCsv } from "react-icons/fa";
-import MenuIcon from "@mui/icons-material/Menu";
-import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { Box, Typography, OutlinedInput, TableBody, TableRow, TableCell, Select, MenuItem, Dialog, DialogContent, DialogActions, FormControl, Grid, Paper, Table, TableHead, TableContainer, Button, List, ListItem, ListItemText, Popover, Checkbox, TextField, IconButton } from '@mui/material';
+import { userStyle } from '../../../../pageStyle';
+import { FaPrint, FaFilePdf, FaEdit } from 'react-icons/fa';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import axios from '../../../../axiosInstance';
+import { SERVICE } from '../../../../services/Baseservice';
+import { handleApiError } from '../../../../components/Errorhandling';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import { useReactToPrint } from 'react-to-print';
+import moment from 'moment-timezone';
+import { UserRoleAccessContext, AuthContext } from '../../../../context/Appcontext';
+import Headtitle from '../../../../components/Headtitle';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { MultiSelect } from 'react-multi-select-component';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import StyledDataGrid from '../../../../components/TableStyle';
+import { saveAs } from 'file-saver';
+import Switch from '@mui/material/Switch';
+import CloseIcon from '@mui/icons-material/Close';
+import html2canvas from 'html2canvas';
+import ImageIcon from '@mui/icons-material/Image';
+import LoginAllotedList from './LoginNotAllot';
+import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { FaFileExcel, FaFileCsv } from 'react-icons/fa';
+import MenuIcon from '@mui/icons-material/Menu';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 
 function LoginAllot() {
+  const [serverTime, setServerTime] = useState(null);
+    useEffect(() => {
+      const fetchTime = async () => {
+        const time = await getCurrentServerTime();
+        setServerTime(time);
+      };
+  
+      fetchTime();
+    }, []);
+
+
   const [loginAllotFilter, setLoginAllotFilter] = useState([]);
   const [loader, setLoader] = useState(false);
-  const [allottedListLoad, setAllottedListLoad] = useState("");
+  const [allottedListLoad, setAllottedListLoad] = useState('');
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
@@ -79,36 +61,35 @@ function LoginAllot() {
   const handleClosePdfFilterMod = () => {
     setIsPdfFilterOpen(false);
   };
-  const [fileFormat, setFormat] = useState("");
-  const fileType =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = fileFormat === "xl" ? ".xlsx" : ".csv";
+  const [fileFormat, setFormat] = useState('');
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+  const fileExtension = fileFormat === 'xl' ? '.xlsx' : '.csv';
   const exportToCSV = (csvData, fileName) => {
     const ws = XLSX.utils.json_to_sheet(csvData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
     FileSaver.saveAs(data, fileName + fileExtension);
   };
 
   const handleExportXL = (isfilter) => {
-    if (isfilter === "filtered") {
+    if (isfilter === 'filtered') {
       exportToCSV(
         rowDataTable?.map((t, index) => ({
           Sno: index + 1,
-          "User ID": t.userid,
+          'User ID': t.userid,
           Password: t.password,
-          "Project Vendor": t.projectvendor,
+          'Project Vendor': t.projectvendor,
         })),
         fileName
       );
-    } else if (isfilter === "overall") {
+    } else if (isfilter === 'overall') {
       exportToCSV(
         items?.map((t, index) => ({
           Sno: index + 1,
-          "User ID": t.userid,
+          'User ID': t.userid,
           Password: t.password,
-          "Project Vendor": t.projectvendor,
+          'Project Vendor': t.projectvendor,
         })),
         fileName
       );
@@ -118,22 +99,22 @@ function LoginAllot() {
 
   //  PDF
   const columns = [
-    { title: "User ID", field: "userid" },
-    { title: "Password", field: "password" },
-    { title: "Project Vendor", field: "projectvendor" },
+    { title: 'User ID', field: 'userid' },
+    { title: 'Password', field: 'password' },
+    { title: 'Project Vendor', field: 'projectvendor' },
   ];
 
   const downloadPdf = (isfilter) => {
     const doc = new jsPDF();
     // Modify columns to include serial number column
     const columnsWithSerial = [
-      { title: "SNo", dataKey: "serialNumber" }, // Serial number column
+      { title: 'SNo', dataKey: 'serialNumber' }, // Serial number column
       ...columns.map((col) => ({ ...col, dataKey: col.field })),
     ];
 
     // Modify row data to include serial number
     const dataWithSerial =
-      isfilter === "filtered"
+      isfilter === 'filtered'
         ? rowDataTable?.map((t, index) => ({
             serialNumber: index + 1,
             userid: t.userid,
@@ -149,20 +130,20 @@ function LoginAllot() {
 
     // Generate PDF
     doc.autoTable({
-      theme: "grid",
+      theme: 'grid',
       columns: columnsWithSerial,
       body: dataWithSerial,
-      styles: { fontSize: "5" },
+      styles: { fontSize: '5' },
     });
 
     doc.save(`LoginNotAlloted.pdf`);
   };
 
-  let today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  let today = new Date(serverTime);
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
   var yyyy = today.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
 
   const [filteredBranchOptions, setFilteredBranchOptions] = useState([]);
   const [vendorMaster, setVendorMaster] = useState([]);
@@ -171,31 +152,26 @@ function LoginAllot() {
   const [filteredTeamOptions, setFilteredTeamOptions] = useState([]);
   const [employeenames, setEmployeenames] = useState([]);
   const [loginNotAllot, setLoginNotAllot] = useState({
-    company: "Please Select Company",
-    userId: "",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    team: "Please Select Team",
-    empname: "Please Select Person",
-    time: "HH:MM",
+    company: 'Please Select Company',
+    userId: '',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    team: 'Please Select Team',
+    empname: 'Please Select Person',
+    time: 'HH:MM',
     date: formattedDate,
-    empcode: "",
+    empcode: '',
   });
   const [excelData, setExcelData] = useState([]);
-  const [loginNotAllotEdit, setLoginNotAllotEdit] = useState({ name: "" });
+  const [loginNotAllotEdit, setLoginNotAllotEdit] = useState({ name: '' });
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const {
-    isUserRoleCompare,
-    isUserRoleAccess,
-    isAssignBranch,
-    allTeam,
-  } = useContext(UserRoleAccessContext);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { isUserRoleCompare, isUserRoleAccess, isAssignBranch, allTeam } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
   const gridRef = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [copiedData, setCopiedData] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [copiedData, setCopiedData] = useState('');
   const [openviewalert, setOpenviewalert] = useState(false);
 
   // view model
@@ -212,7 +188,7 @@ function LoginAllot() {
     if (gridRef.current) {
       html2canvas(gridRef.current).then((canvas) => {
         canvas.toBlob((blob) => {
-          saveAs(blob, "loginNotAllotList.png");
+          saveAs(blob, 'loginNotAllotList.png');
         });
       });
     }
@@ -280,16 +256,16 @@ function LoginAllot() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   // Show All Columns & Manage Columns
@@ -302,14 +278,12 @@ function LoginAllot() {
     actions: true,
   };
 
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   const delGroupcheckbox = async () => {
@@ -346,8 +320,8 @@ function LoginAllot() {
       setVendorMaster(
         res?.data?.vendormaster.map((data) => ({
           ...data,
-          label: data.projectname + "-" + data.name,
-          value: data.projectname + "-" + data.name,
+          label: data.projectname + '-' + data.name,
+          value: data.projectname + '-' + data.name,
         }))
       );
     } catch (err) {
@@ -358,7 +332,7 @@ function LoginAllot() {
   const filterBranch = async (e) => {
     try {
       let branchall;
-      if (e === "ALL") {
+      if (e === 'ALL') {
         branchall = isAssignBranch
           .map((u, index) => ({
             ...u,
@@ -366,16 +340,8 @@ function LoginAllot() {
             value: u.branch,
             index: index,
           }))
-          .filter(
-            (item, index, arr) =>
-              index === arr.findIndex((el) => el.branch === item.branch)
-          );
-        setFilteredBranchOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...branchall,
-        ]);
+          .filter((item, index, arr) => index === arr.findIndex((el) => el.branch === item.branch));
+        setFilteredBranchOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...branchall]);
       } else {
         branchall = isAssignBranch
           ?.filter((u) => u.company === e)
@@ -385,16 +351,8 @@ function LoginAllot() {
             value: u.branch,
             index: index,
           }))
-          .filter(
-            (item, index, arr) =>
-              index === arr.findIndex((el) => el.branch === item.branch)
-          );
-        setFilteredBranchOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...branchall,
-        ]);
+          .filter((item, index, arr) => index === arr.findIndex((el) => el.branch === item.branch));
+        setFilteredBranchOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...branchall]);
       }
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -404,31 +362,21 @@ function LoginAllot() {
   const filterUnit = async (company, e) => {
     try {
       let unitall;
-      if (company === "ALL" && e === "ALL") {
+      if (company === 'ALL' && e === 'ALL') {
         unitall = isAssignBranch.map((u) => ({
           ...u,
           label: u.unit,
           value: u.unit,
         }));
-        setFilteredUnitOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...unitall,
-        ]);
-      } else if (company !== "ALL" && e === "ALL") {
+        setFilteredUnitOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...unitall]);
+      } else if (company !== 'ALL' && e === 'ALL') {
         unitall = isAssignBranch.map((u) => ({
           ...u,
           label: u.unit,
           value: u.unit,
         }));
-        setFilteredUnitOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...unitall,
-        ]);
-      } else if (company === "ALL" && e !== "ALL") {
+        setFilteredUnitOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...unitall]);
+      } else if (company === 'ALL' && e !== 'ALL') {
         unitall = isAssignBranch
           ?.filter((u) => u.branch === e)
           .map((u) => ({
@@ -436,13 +384,8 @@ function LoginAllot() {
             label: u.unit,
             value: u.unit,
           }));
-        setFilteredUnitOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...unitall,
-        ]);
-      } else if (company !== "ALL" && e !== "ALL") {
+        setFilteredUnitOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...unitall]);
+      } else if (company !== 'ALL' && e !== 'ALL') {
         unitall = isAssignBranch
           ?.filter((u) => u.branch === e)
           .map((u) => ({
@@ -450,12 +393,7 @@ function LoginAllot() {
             label: u.unit,
             value: u.unit,
           }));
-        setFilteredUnitOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...unitall,
-        ]);
+        setFilteredUnitOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...unitall]);
       }
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -465,19 +403,14 @@ function LoginAllot() {
   const filterTeam = async (company, branch, e) => {
     try {
       let teamall;
-      if (company === "ALL" && branch === "ALL" && e === "ALL") {
+      if (company === 'ALL' && branch === 'ALL' && e === 'ALL') {
         teamall = allTeam.map((u) => ({
           ...u,
           label: u.teamname,
           value: u.teamname,
         }));
-        setFilteredTeamOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...teamall,
-        ]);
-      } else if (company !== "ALL" && branch === "ALL" && e === "ALL") {
+        setFilteredTeamOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...teamall]);
+      } else if (company !== 'ALL' && branch === 'ALL' && e === 'ALL') {
         teamall = allTeam
           ?.filter((u) => u.company === company)
           .map((u) => ({
@@ -485,13 +418,8 @@ function LoginAllot() {
             label: u.teamname,
             value: u.teamname,
           }));
-        setFilteredTeamOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...teamall,
-        ]);
-      } else if (company !== "ALL" && branch === "ALL" && e !== "ALL") {
+        setFilteredTeamOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...teamall]);
+      } else if (company !== 'ALL' && branch === 'ALL' && e !== 'ALL') {
         teamall = allTeam
           ?.filter((u) => u.company === company && u.unit === e)
           .map((u) => ({
@@ -499,13 +427,8 @@ function LoginAllot() {
             label: u.teamname,
             value: u.teamname,
           }));
-        setFilteredTeamOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...teamall,
-        ]);
-      } else if (company !== "ALL" && branch !== "ALL" && e === "ALL") {
+        setFilteredTeamOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...teamall]);
+      } else if (company !== 'ALL' && branch !== 'ALL' && e === 'ALL') {
         teamall = allTeam
           ?.filter((u) => u.company === company && u.branch === branch)
           .map((u) => ({
@@ -513,13 +436,8 @@ function LoginAllot() {
             label: u.teamname,
             value: u.teamname,
           }));
-        setFilteredTeamOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...teamall,
-        ]);
-      } else if (company === "ALL" && branch !== "ALL" && e !== "ALL") {
+        setFilteredTeamOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...teamall]);
+      } else if (company === 'ALL' && branch !== 'ALL' && e !== 'ALL') {
         teamall = allTeam
           ?.filter((u) => u.branch === branch && u.unit === e)
           .map((u) => ({
@@ -527,13 +445,8 @@ function LoginAllot() {
             label: u.teamname,
             value: u.teamname,
           }));
-        setFilteredTeamOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...teamall,
-        ]);
-      } else if (company === "ALL" && branch !== "ALL" && e === "ALL") {
+        setFilteredTeamOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...teamall]);
+      } else if (company === 'ALL' && branch !== 'ALL' && e === 'ALL') {
         teamall = allTeam
           ?.filter((u) => u.branch === branch)
           .map((u) => ({
@@ -541,13 +454,8 @@ function LoginAllot() {
             label: u.teamname,
             value: u.teamname,
           }));
-        setFilteredTeamOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...teamall,
-        ]);
-      } else if (company === "ALL" && branch === "ALL" && e !== "ALL") {
+        setFilteredTeamOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...teamall]);
+      } else if (company === 'ALL' && branch === 'ALL' && e !== 'ALL') {
         teamall = allTeam
           ?.filter((u) => u.unit === e)
           .map((u) => ({
@@ -555,28 +463,16 @@ function LoginAllot() {
             label: u.teamname,
             value: u.teamname,
           }));
-        setFilteredTeamOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...teamall,
-        ]);
+        setFilteredTeamOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...teamall]);
       } else {
         teamall = allTeam
-          ?.filter(
-            (u) => u.company === company && u.branch === branch && u.unit === e
-          )
+          ?.filter((u) => u.company === company && u.branch === branch && u.unit === e)
           .map((u) => ({
             ...u,
             label: u.teamname,
             value: u.teamname,
           }));
-        setFilteredTeamOptions([
-          ...(isUserRoleAccess?.role?.includes("Manager")
-            ? [{ label: "ALL", value: "ALL" }]
-            : []),
-          ...teamall,
-        ]);
+        setFilteredTeamOptions([...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []), ...teamall]);
       }
     } catch (err) {
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -622,11 +518,7 @@ function LoginAllot() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const answer = grpcreate.data.clientuserid.filter(
-        (item) =>
-          isProjectvendor.includes(item.projectvendor) &&
-          item.allotted === "unallotted"
-      );
+      const answer = grpcreate.data.clientuserid.filter((item) => isProjectvendor.includes(item.projectvendor) && item.allotted === 'unallotted');
       setLoginAllotFilter(answer);
       setLoader(false);
     } catch (err) {
@@ -641,12 +533,8 @@ function LoginAllot() {
     if (vendorMasterValue?.length === 0) {
       setShowAlert(
         <>
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "100px", color: "orange" }}
-          />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>
-            {"Please Select Project Vendor"}
-          </p>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{'Please Select Project Vendor'}</p>
         </>
       );
       handleClickOpenerr();
@@ -667,17 +555,17 @@ function LoginAllot() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
     setLoginNotAllot({
-      company: "Please Select Company",
+      company: 'Please Select Company',
       date: formattedDate,
-      userId: "",
-      branch: "Please Select Branch",
-      unit: "Please Select Unit",
-      team: "Please Select Team",
-      empname: "Please Select Person",
-      time: "HH:MM",
+      userId: '',
+      branch: 'Please Select Branch',
+      unit: 'Please Select Unit',
+      team: 'Please Select Team',
+      empname: 'Please Select Person',
+      time: 'HH:MM',
     });
     setFilteredBranchOptions([]);
     setFilteredUnitOptions([]);
@@ -708,57 +596,54 @@ function LoginAllot() {
   //editing the single data...
   const sendEditRequest = async () => {
     try {
-      setAllottedListLoad("BeforeChanges");
-      let res = await axios.put(
-        `${SERVICE.SINGLE_CLIENTUSERID}/${projectsid}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-          company: String(loginNotAllot.company),
-          branch: String(loginNotAllot.branch),
-          unit: String(loginNotAllot.unit),
-          team: String(loginNotAllot.team),
-          empname: String(loginNotAllot.empname),
-          empcode: String(loginNotAllot.empcode),
-          date: String(loginNotAllot.date),
-          time: String(moment().format("HH:mm")),
-          allotted: "allotted",
-          loginallotlog: [
-            {
-              company: String(loginNotAllot.company),
-              branch: String(loginNotAllot.branch),
-              unit: String(loginNotAllot.unit),
-              team: String(loginNotAllot.team),
-              empname: String(loginNotAllot.empname),
+      setAllottedListLoad('BeforeChanges');
+      let res = await axios.put(`${SERVICE.SINGLE_CLIENTUSERID}/${projectsid}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        company: String(loginNotAllot.company),
+        branch: String(loginNotAllot.branch),
+        unit: String(loginNotAllot.unit),
+        team: String(loginNotAllot.team),
+        empname: String(loginNotAllot.empname),
+        empcode: String(loginNotAllot.empcode),
+        date: String(loginNotAllot.date),
+        time: String(moment().format('HH:mm')),
+        allotted: 'allotted',
+        loginallotlog: [
+          {
+            company: String(loginNotAllot.company),
+            branch: String(loginNotAllot.branch),
+            unit: String(loginNotAllot.unit),
+            team: String(loginNotAllot.team),
+            empname: String(loginNotAllot.empname),
 
-              empcode: String(loginNotAllot.empcode),
-              date: String(loginNotAllot.date),
-              time: String(moment().format("HH:mm")),
-              userid: loginNotAllotEdit.userid, // Fixed the field names
-            },
-          ],
-          updatedby: [
-            ...updateby,
-            {
-              name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
-            },
-          ],
-        }
-      );
+            empcode: String(loginNotAllot.empcode),
+            date: String(loginNotAllot.date),
+            time: String(moment().format('HH:mm')),
+            userid: loginNotAllotEdit.userid, // Fixed the field names
+          },
+        ],
+        updatedby: [
+          ...updateby,
+          {
+            name: String(isUserRoleAccess.companyname),
+            date: String(new Date(serverTime)),
+          },
+        ],
+      });
       setLoginNotAllot({
-        company: "Please Select Company",
+        company: 'Please Select Company',
         date: formattedDate,
-        userId: "",
-        branch: "Please Select Branch",
-        unit: "Please Select Unit",
-        team: "Please Select Team",
-        empname: "Please Select Person",
-        time: "HH:MM",
+        userId: '',
+        branch: 'Please Select Branch',
+        unit: 'Please Select Unit',
+        team: 'Please Select Team',
+        empname: 'Please Select Person',
+        time: 'HH:MM',
       });
       await sendRequest();
-      setAllottedListLoad("Changes");
+      setAllottedListLoad('Changes');
       setFilteredBranchOptions([]);
       setFilteredUnitOptions([]);
       setFilteredTeamOptions([]);
@@ -766,10 +651,8 @@ function LoginAllot() {
       handleCloseModEdit();
       setShowAlert(
         <>
-          <CheckCircleOutline sx={{ fontSize: "100px", color: "orange" }} />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>
-            {"Updated Successfully"}
-          </p>
+          <CheckCircleOutline sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{'Updated Successfully'}</p>
         </>
       );
       handleClickOpenerr();
@@ -780,87 +663,51 @@ function LoginAllot() {
 
   const editSubmit = (e) => {
     e.preventDefault();
-    if (
-      loginNotAllot.company === "Please Select Company" ||
-      loginNotAllot.company === ""
-    ) {
+    if (loginNotAllot.company === 'Please Select Company' || loginNotAllot.company === '') {
       setShowAlert(
         <>
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "100px", color: "orange" }}
-          />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>
-            {"Please Select Company"}
-          </p>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{'Please Select Company'}</p>
         </>
       );
       handleClickOpenerr();
-    } else if (loginNotAllot.branch === "Please Select Branch") {
+    } else if (loginNotAllot.branch === 'Please Select Branch') {
       setShowAlert(
         <>
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "100px", color: "orange" }}
-          />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>
-            {"Please Select Branch"}
-          </p>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{'Please Select Branch'}</p>
         </>
       );
       handleClickOpenerr();
-    } else if (
-      loginNotAllot.unit === "Please Select Unit" ||
-      loginNotAllot.unit === ""
-    ) {
+    } else if (loginNotAllot.unit === 'Please Select Unit' || loginNotAllot.unit === '') {
       setShowAlert(
         <>
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "100px", color: "orange" }}
-          />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>
-            {"Please Select Unit"}
-          </p>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{'Please Select Unit'}</p>
         </>
       );
       handleClickOpenerr();
-    } else if (
-      loginNotAllot.team === "Please Select Team" ||
-      loginNotAllot.team === ""
-    ) {
+    } else if (loginNotAllot.team === 'Please Select Team' || loginNotAllot.team === '') {
       setShowAlert(
         <>
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "100px", color: "orange" }}
-          />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>
-            {"Please Select Team"}
-          </p>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{'Please Select Team'}</p>
         </>
       );
       handleClickOpenerr();
-    } else if (
-      loginNotAllot.empname === "Please Select Person" ||
-      loginNotAllot.empname === ""
-    ) {
+    } else if (loginNotAllot.empname === 'Please Select Person' || loginNotAllot.empname === '') {
       setShowAlert(
         <>
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "100px", color: "orange" }}
-          />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>
-            {"Please Select Person"}
-          </p>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{'Please Select Person'}</p>
         </>
       );
       handleClickOpenerr();
-    } else if (loginNotAllot.date === "") {
+    } else if (loginNotAllot.date === '') {
       setShowAlert(
         <>
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "100px", color: "orange" }}
-          />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>
-            {"Please Select Date"}
-          </p>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{'Please Select Date'}</p>
         </>
       );
       handleClickOpenerr();
@@ -870,15 +717,15 @@ function LoginAllot() {
   };
 
   // Excel
-  const fileName = "LoginNotAlloted";
+  const fileName = 'LoginNotAlloted';
   // get particular columns for export excel
   const getexcelDatas = async () => {
     try {
       var data = loginAllotFilter.map((t, i) => ({
         Sno: i + 1,
-        "User ID": t.userid,
+        'User ID': t.userid,
         Password: t.password,
-        "Project Vendor": t.projectvendor,
+        'Project Vendor': t.projectvendor,
       }));
       setExcelData(data);
     } catch (err) {
@@ -897,17 +744,15 @@ function LoginAllot() {
   };
 
   const customValueRendererCate = (valueCate) => {
-    return valueCate.length
-      ? valueCate.map(({ label }) => label).join(", ")
-      : "Please Select Project Vendor";
+    return valueCate.length ? valueCate.map(({ label }) => label).join(', ') : 'Please Select Project Vendor';
   };
 
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Login_Not_Allot_List",
-    pageStyle: "print",
+    documentTitle: 'Login_Not_Allot_List',
+    pageStyle: 'print',
   });
 
   useEffect(() => {
@@ -916,9 +761,9 @@ function LoginAllot() {
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
@@ -937,12 +782,12 @@ function LoginAllot() {
   }, [loginAllotFilter]);
 
   //table sorting
-  const [sorting, setSorting] = useState({ column: "", direction: "" });
+  const [sorting, setSorting] = useState({ column: '', direction: '' });
 
   items.sort((a, b) => {
-    if (sorting.direction === "asc") {
+    if (sorting.direction === 'asc') {
       return a[sorting.column] > b[sorting.column] ? 1 : -1;
-    } else if (sorting.direction === "desc") {
+    } else if (sorting.direction === 'desc') {
       return a[sorting.column] < b[sorting.column] ? 1 : -1;
     }
     return 0;
@@ -967,28 +812,20 @@ function LoginAllot() {
     setSearchQuery(event.target.value);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
-  const filteredData = filteredDatas.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas.slice((page - 1) * pageSize, page * pageSize);
 
   const totalPages = Math.ceil(filteredDatas.length / pageSize);
 
   const visiblePages = Math.min(totalPages, 3);
 
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
 
   const pageNumbers = [];
 
@@ -1009,10 +846,10 @@ function LoginAllot() {
 
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox", // Default header name
+      field: 'checkbox',
+      headerName: 'Checkbox', // Default header name
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
       renderHeader: (params) => (
@@ -1040,9 +877,7 @@ function LoginAllot() {
           onChange={() => {
             let updatedSelectedRows;
             if (selectedRows.includes(params.row.id)) {
-              updatedSelectedRows = selectedRows.filter(
-                (selectedId) => selectedId !== params.row.id
-              );
+              updatedSelectedRows = selectedRows.filter((selectedId) => selectedId !== params.row.id);
             } else {
               updatedSelectedRows = [...selectedRows, params.row.id];
             }
@@ -1050,9 +885,7 @@ function LoginAllot() {
             setSelectedRows(updatedSelectedRows);
 
             // Update the "Select All" checkbox based on whether all rows are selected
-            setSelectAllChecked(
-              updatedSelectedRows.length === filteredData.length
-            );
+            setSelectAllChecked(updatedSelectedRows.length === filteredData.length);
           }}
         />
       ),
@@ -1060,82 +893,79 @@ function LoginAllot() {
       width: 90,
 
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 100,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "userid",
-      headerName: "User Id",
+      field: 'userid',
+      headerName: 'User Id',
       flex: 0,
       width: 250,
       hide: !columnVisibility.userid,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "password",
-      headerName: "Password",
+      field: 'password',
+      headerName: 'Password',
       flex: 0,
       width: 250,
       hide: !columnVisibility.password,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "projectvendor",
-      headerName: "Project Vendor",
+      field: 'projectvendor',
+      headerName: 'Project Vendor',
       flex: 0,
       width: 250,
       hide: !columnVisibility.projectvendor,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       renderCell: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("vloginallot") &&
-            params?.row?.loginallotlog && (
-              <Button
-                variant="contained"
-                sx={{
-                  minWidth: "15px",
-                  padding: "6px 5px",
-                }}
-                onClick={() => {
-                  window.open(
-                    `/updatepages/loginnotallotedlist/${params.row.id}`
-                  );
-                }}
-              >
-                <MenuIcon style={{ fontsize: "small" }} />
-              </Button>
-            )}
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('vloginallot') && params?.row?.loginallotlog && (
+            <Button
+              variant="contained"
+              sx={{
+                minWidth: '15px',
+                padding: '6px 5px',
+              }}
+              onClick={() => {
+                window.open(`/updatepages/loginnotallotedlist/${params.row.id}`);
+              }}
+            >
+              <MenuIcon style={{ fontsize: 'small' }} />
+            </Button>
+          )}
           &ensp;
-          {isUserRoleCompare?.includes("eloginallot") && (
+          {isUserRoleCompare?.includes('eloginallot') && (
             <Button
               style={{
-                backgroundColor: "red",
-                minWidth: "15px",
-                padding: "6px 5px",
+                backgroundColor: 'red',
+                minWidth: '15px',
+                padding: '6px 5px',
               }}
               onClick={(e) => {
                 handleClickOpenEdit();
                 getCode(params.row.id, params.row.name);
               }}
             >
-              <FaEdit style={{ color: "white", fontSize: "18px" }} />
+              <FaEdit style={{ color: 'white', fontSize: '18px' }} />
             </Button>
           )}
         </Grid>
@@ -1166,9 +996,7 @@ function LoginAllot() {
   };
 
   // // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
 
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
@@ -1182,9 +1010,9 @@ function LoginAllot() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1192,7 +1020,7 @@ function LoginAllot() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1200,37 +1028,19 @@ function LoginAllot() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
               <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
+                sx={{ display: 'flex' }}
+                primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />}
+                secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName}
                 // secondary={column.headerName }
               />
             </ListItem>
@@ -1240,11 +1050,7 @@ function LoginAllot() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -1252,7 +1058,7 @@ function LoginAllot() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -1270,9 +1076,9 @@ function LoginAllot() {
   );
   return (
     <Box>
-      <Headtitle title={"Login Allot"} />
+      <Headtitle title={'Login Allot'} />
       {/* ****** Header Content ****** */}
-      {isUserRoleCompare?.includes("aloginallot") && (
+      {isUserRoleCompare?.includes('aloginallot') && (
         <>
           <Typography sx={userStyle.HeaderText}> Login Allot </Typography>
           <Box sx={userStyle.dialogbox}>
@@ -1281,18 +1087,11 @@ function LoginAllot() {
               <br />
               <Grid container spacing={2}>
                 <Grid item md={1.5} xs={12} sm={6}>
-                  <Typography sx={userStyle.importheadtext}>
-                    Project Vendor
-                  </Typography>
+                  <Typography sx={userStyle.importheadtext}>Project Vendor</Typography>
                 </Grid>
                 <Grid item md={4} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
-                    <MultiSelect
-                      options={vendorMaster}
-                      value={vendorMasterValue}
-                      valueRenderer={customValueRendererCate}
-                      onChange={hsndlechangeProject}
-                    />
+                    <MultiSelect options={vendorMaster} value={vendorMasterValue} valueRenderer={customValueRendererCate} onChange={hsndlechangeProject} />
                   </FormControl>
                 </Grid>
                 <Grid item md={2} xs={12} sm={6}>
@@ -1320,30 +1119,25 @@ function LoginAllot() {
           fullWidth={true}
           maxWidth="lg"
           sx={{
-            overflow: "visible",
-            "& .MuiPaper-root": {
-              overflow: "visible",
+            overflow: 'visible',
+            '& .MuiPaper-root': {
+              overflow: 'visible',
             },
           }}
         >
-          <Box sx={{ padding: "20px" }}>
+          <Box sx={{ padding: '20px' }}>
             {/* <DialogContent sx={{ padding: "20px" }}> */}
             <Typography sx={userStyle.HeaderText}>Login Allot Entry</Typography>
             <Grid container spacing={2}>
               <Grid item md={3} xs={12} sm={12}>
                 <Typography>User Id</Typography>
                 <FormControl fullWidth size="small">
-                  <OutlinedInput
-                    id="component-outlined"
-                    type="text"
-                    placeholder="User Id"
-                    value={loginNotAllotEdit.userid}
-                  />
+                  <OutlinedInput id="component-outlined" type="text" placeholder="User Id" value={loginNotAllotEdit.userid} />
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <Typography>
-                  Date<b style={{ color: "red" }}>*</b>
+                  Date<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <FormControl fullWidth size="small">
                   <OutlinedInput
@@ -1355,11 +1149,11 @@ function LoginAllot() {
                       setLoginNotAllot({
                         ...loginNotAllot,
                         date: e.target.value,
-                        company: "Please Select Company",
-                        branch: "Please Select Branch",
-                        unit: "Please Select Unit",
-                        team: "Please Select Team",
-                        empname: "Please Select Person",
+                        company: 'Please Select Company',
+                        branch: 'Please Select Branch',
+                        unit: 'Please Select Unit',
+                        team: 'Please Select Team',
+                        empname: 'Please Select Person',
                       });
 
                       setEmployeenames([]);
@@ -1371,26 +1165,19 @@ function LoginAllot() {
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <Typography>
-                  Company<b style={{ color: "red" }}>*</b>
+                  Company<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <FormControl fullWidth size="small">
                   <Selects
                     options={[
-                      ...(isUserRoleAccess?.role?.includes("Manager")
-                        ? [{ label: "ALL", value: "ALL" }]
-                        : []),
+                      ...(isUserRoleAccess?.role?.includes('Manager') ? [{ label: 'ALL', value: 'ALL' }] : []),
                       ...isAssignBranch
                         ?.map((data) => ({
                           label: data.company,
                           value: data.company,
                         }))
                         .filter((item, index, self) => {
-                          return (
-                            self.findIndex(
-                              (i) =>
-                                i.label === item.label && i.value === item.value
-                            ) === index
-                          );
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                         }),
                     ]}
                     value={{
@@ -1401,10 +1188,10 @@ function LoginAllot() {
                       setLoginNotAllot({
                         ...loginNotAllot,
                         company: e.value,
-                        branch: "Please Select Branch",
-                        unit: "Please Select Unit",
-                        team: "Please Select Team",
-                        empname: "Please Select Person",
+                        branch: 'Please Select Branch',
+                        unit: 'Please Select Unit',
+                        team: 'Please Select Team',
+                        empname: 'Please Select Person',
                       });
                       filterBranch(e.value);
                       setEmployeenames([]);
@@ -1416,7 +1203,7 @@ function LoginAllot() {
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <Typography>
-                  Branch<b style={{ color: "red" }}>*</b>
+                  Branch<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <FormControl fullWidth size="small">
                   <Selects
@@ -1429,9 +1216,9 @@ function LoginAllot() {
                       setLoginNotAllot({
                         ...loginNotAllot,
                         branch: e.value,
-                        unit: "Please Select Unit",
-                        team: "Please Select Team",
-                        empname: "Please Select Person",
+                        unit: 'Please Select Unit',
+                        team: 'Please Select Team',
+                        empname: 'Please Select Person',
                       });
                       setEmployeenames([]);
                       filterUnit(loginNotAllot.company, e.value);
@@ -1442,7 +1229,7 @@ function LoginAllot() {
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <Typography>
-                  Unit<b style={{ color: "red" }}>*</b>
+                  Unit<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <FormControl fullWidth size="small">
                   <Selects
@@ -1455,14 +1242,10 @@ function LoginAllot() {
                       setLoginNotAllot({
                         ...loginNotAllot,
                         unit: e.value,
-                        team: "Please Select Team",
-                        empname: "Please Select Person",
+                        team: 'Please Select Team',
+                        empname: 'Please Select Person',
                       });
-                      filterTeam(
-                        loginNotAllot.company,
-                        loginNotAllot.branch,
-                        e.value
-                      );
+                      filterTeam(loginNotAllot.company, loginNotAllot.branch, e.value);
                       setEmployeenames([]);
                     }}
                   />
@@ -1470,7 +1253,7 @@ function LoginAllot() {
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <Typography>
-                  Team<b style={{ color: "red" }}>*</b>
+                  Team<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <FormControl fullWidth size="small">
                   <Selects
@@ -1483,7 +1266,7 @@ function LoginAllot() {
                       setLoginNotAllot({
                         ...loginNotAllot,
                         team: e.value,
-                        empname: "Please Select Person",
+                        empname: 'Please Select Person',
                       });
                       fetchAllEmployee(e);
                     }}
@@ -1492,7 +1275,7 @@ function LoginAllot() {
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <Typography>
-                  Employee Name<b style={{ color: "red" }}>*</b>
+                  Employee Name<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <FormControl fullWidth size="small">
                   <Selects
@@ -1522,9 +1305,9 @@ function LoginAllot() {
                 <Button
                   variant="contained"
                   style={{
-                    padding: "7px 13px",
-                    color: "white",
-                    background: "rgb(25, 118, 210)",
+                    padding: '7px 13px',
+                    color: 'white',
+                    background: 'rgb(25, 118, 210)',
                   }}
                   onClick={editSubmit}
                 >
@@ -1543,14 +1326,12 @@ function LoginAllot() {
       </Box>
       <br />
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lloginallot") && (
+      {isUserRoleCompare?.includes('lloginallot') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
-              <Typography sx={userStyle.importheadtext}>
-                Login Not Allot List
-              </Typography>
+              <Typography sx={userStyle.importheadtext}>Login Not Allot List</Typography>
             </Grid>
             <br />
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
@@ -1569,7 +1350,7 @@ function LoginAllot() {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -1587,18 +1368,18 @@ function LoginAllot() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelloginallot") && (
+                  {isUserRoleCompare?.includes('excelloginallot') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
-                          setFormat("xl");
+                          setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -1607,12 +1388,12 @@ function LoginAllot() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvloginallot") && (
+                  {isUserRoleCompare?.includes('csvloginallot') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
-                          setFormat("csv");
+                          setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -1621,7 +1402,7 @@ function LoginAllot() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printloginallot") && (
+                  {isUserRoleCompare?.includes('printloginallot') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
@@ -1630,7 +1411,7 @@ function LoginAllot() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfloginallot") && (
+                  {isUserRoleCompare?.includes('pdfloginallot') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
@@ -1643,13 +1424,10 @@ function LoginAllot() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imageloginallot") && (
+                  {isUserRoleCompare?.includes('imageloginallot') && (
                     <>
-                      <Button
-                        sx={userStyle.buttongrp}
-                        onClick={handleCaptureImage}
-                      >
-                        <ImageIcon sx={{ fontSize: "15px" }} />
+                      <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                        <ImageIcon sx={{ fontSize: '15px' }} />
                         &ensp;Image&ensp;
                       </Button>
                     </>
@@ -1660,12 +1438,7 @@ function LoginAllot() {
                 <Box>
                   <FormControl fullWidth size="small">
                     <Typography>Search</Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                    />
+                    <OutlinedInput id="component-outlined" type="text" value={searchQuery} onChange={handleSearchChange} />
                   </FormControl>
                 </Box>
               </Grid>
@@ -1682,35 +1455,22 @@ function LoginAllot() {
             <br />
             {loader ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
             ) : (
               <>
                 <Box
                   style={{
-                    width: "100%",
-                    overflowY: "hidden", // Hide the y-axis scrollbar
+                    width: '100%',
+                    overflowY: 'hidden', // Hide the y-axis scrollbar
                   }}
                 >
                   <StyledDataGrid
-                    onClipboardCopy={(copiedString) =>
-                      setCopiedData(copiedString)
-                    }
+                    onClipboardCopy={(copiedString) => setCopiedData(copiedString)}
                     rows={rowsWithCheckboxes}
-                    columns={columnDataTable.filter(
-                      (column) => columnVisibility[column.field]
-                    )}
+                    columns={columnDataTable.filter((column) => columnVisibility[column.field])}
                     onSelectionModelChange={handleSelectionChange}
                     selectionModel={selectedRows}
                     autoHeight={true}
@@ -1723,50 +1483,25 @@ function LoginAllot() {
                 </Box>
                 <Box style={userStyle.dataTablestyle}>
                   <Box>
-                    Showing{" "}
-                    {filteredData.length > 0 ? (page - 1) * pageSize + 1 : 0} to{" "}
-                    {Math.min(page * pageSize, filteredDatas.length)} of{" "}
-                    {filteredDatas.length} entries
+                    Showing {filteredData.length > 0 ? (page - 1) * pageSize + 1 : 0} to {Math.min(page * pageSize, filteredDatas.length)} of {filteredDatas.length} entries
                   </Box>
                   <Box>
-                    <Button
-                      onClick={() => setPage(1)}
-                      disabled={page === 1}
-                      sx={userStyle.paginationbtn}
-                    >
+                    <Button onClick={() => setPage(1)} disabled={page === 1} sx={userStyle.paginationbtn}>
                       <FirstPageIcon />
                     </Button>
-                    <Button
-                      onClick={() => handlePageChange(page - 1)}
-                      disabled={page === 1}
-                      sx={userStyle.paginationbtn}
-                    >
+                    <Button onClick={() => handlePageChange(page - 1)} disabled={page === 1} sx={userStyle.paginationbtn}>
                       <NavigateBeforeIcon />
                     </Button>
                     {pageNumbers?.map((pageNumber) => (
-                      <Button
-                        key={pageNumber}
-                        sx={userStyle.paginationbtn}
-                        onClick={() => handlePageChange(pageNumber)}
-                        className={page === pageNumber ? "active" : ""}
-                        disabled={page === pageNumber}
-                      >
+                      <Button key={pageNumber} sx={userStyle.paginationbtn} onClick={() => handlePageChange(pageNumber)} className={page === pageNumber ? 'active' : ''} disabled={page === pageNumber}>
                         {pageNumber}
                       </Button>
                     ))}
                     {lastVisiblePage < totalPages && <span>...</span>}
-                    <Button
-                      onClick={() => handlePageChange(page + 1)}
-                      disabled={page === totalPages}
-                      sx={userStyle.paginationbtn}
-                    >
+                    <Button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
                       <NavigateNextIcon />
                     </Button>
-                    <Button
-                      onClick={() => setPage(totalPages)}
-                      disabled={page === totalPages}
-                      sx={userStyle.paginationbtn}
-                    >
+                    <Button onClick={() => setPage(totalPages)} disabled={page === totalPages} sx={userStyle.paginationbtn}>
                       <LastPageIcon />
                     </Button>
                   </Box>
@@ -1787,8 +1522,8 @@ function LoginAllot() {
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
@@ -1799,12 +1534,7 @@ function LoginAllot() {
         {/* print layout */}
 
         <TableContainer component={Paper} sx={userStyle.printcls}>
-          <Table
-            sx={{ minWidth: 700 }}
-            aria-label="customized table"
-            id="usertable"
-            ref={componentRef}
-          >
+          <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable" ref={componentRef}>
             <TableHead>
               <TableRow>
                 <TableCell> SI.No</TableCell>
@@ -1830,24 +1560,17 @@ function LoginAllot() {
 
       {/* ALERT DIALOG */}
       <Box>
-        <Dialog
-          open={isErrorOpenpop}
-          onClose={handleCloseerrpop}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
+        <Dialog open={isErrorOpenpop} onClose={handleCloseerrpop} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlertpop}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={() => {
                 sendEditRequest();
@@ -1858,15 +1581,15 @@ function LoginAllot() {
             </Button>
             <Button
               style={{
-                backgroundColor: "#f4f4f4",
-                color: "#444",
-                boxShadow: "none",
-                borderRadius: "3px",
-                padding: "7px 13px",
-                border: "1px solid #0000006b",
-                "&:hover": {
-                  "& .css-bluauu-MuiButtonBase-root-MuiButton-root": {
-                    backgroundColor: "#f4f4f4",
+                backgroundColor: '#f4f4f4',
+                color: '#444',
+                boxShadow: 'none',
+                borderRadius: '3px',
+                padding: '7px 13px',
+                border: '1px solid #0000006b',
+                '&:hover': {
+                  '& .css-bluauu-MuiButtonBase-root-MuiButton-root': {
+                    backgroundColor: '#f4f4f4',
                   },
                 },
               }}
@@ -1879,19 +1602,10 @@ function LoginAllot() {
       </Box>
 
       <Box>
-        <Dialog
-          open={isDeleteOpencheckbox}
-          onClose={handleCloseModcheckbox}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
-            <ErrorOutlineOutlinedIcon
-              sx={{ fontSize: "80px", color: "orange" }}
-            />
-            <Typography variant="h5" sx={{ color: "red", textAlign: "center" }}>
+        <Dialog open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+            <Typography variant="h5" sx={{ color: 'red', textAlign: 'center' }}>
               Are you sure?
             </Typography>
           </DialogContent>
@@ -1899,61 +1613,34 @@ function LoginAllot() {
             <Button onClick={handleCloseModcheckbox} sx={userStyle.btncancel}>
               Cancel
             </Button>
-            <Button
-              autoFocus
-              variant="contained"
-              color="error"
-              onClick={(e) => delGroupcheckbox(e)}
-            >
-              {" "}
-              OK{" "}
+            <Button autoFocus variant="contained" color="error" onClick={(e) => delGroupcheckbox(e)}>
+              {' '}
+              OK{' '}
             </Button>
           </DialogActions>
         </Dialog>
       </Box>
       <Box>
         {/* ALERT DIALOG */}
-        <Dialog
-          open={isDeleteOpenalert}
-          onClose={handleCloseModalert}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
-            <ErrorOutlineOutlinedIcon
-              sx={{ fontSize: "70px", color: "orange" }}
-            />
-            <Typography
-              variant="h6"
-              sx={{ color: "black", textAlign: "center" }}
-            >
+        <Dialog open={isDeleteOpenalert} onClose={handleCloseModalert} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '70px', color: 'orange' }} />
+            <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
               Please Select any Row
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button
-              autoFocus
-              variant="contained"
-              color="error"
-              onClick={handleCloseModalert}
-            >
-              {" "}
-              OK{" "}
+            <Button autoFocus variant="contained" color="error" onClick={handleCloseModalert}>
+              {' '}
+              OK{' '}
             </Button>
           </DialogActions>
         </Dialog>
       </Box>
 
       {/* Reason of Leaving  */}
-      <Dialog
-        open={openviewalert}
-        onClose={handleClickOpenviewalert}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <Box sx={{ width: "550px", padding: "20px 50px" }}>
+      <Dialog open={openviewalert} onClose={handleClickOpenviewalert} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <Box sx={{ width: '550px', padding: '20px 50px' }}>
           <>
             <Typography sx={userStyle.HeaderText}> </Typography>
             <br /> <br />
@@ -1984,23 +1671,15 @@ function LoginAllot() {
             <br /> <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={2} xs={12} sm={12}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleCloseviewalert}
-                >
+                <Button variant="contained" color="primary" onClick={handleCloseviewalert}>
                   Save
                 </Button>
               </Grid>
 
               <Grid item md={0.2} xs={12} sm={12}></Grid>
               <Grid item md={2} xs={12} sm={12}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleCloseviewalert}
-                >
-                  {" "}
+                <Button variant="contained" color="primary" onClick={handleCloseviewalert}>
+                  {' '}
                   Cancel
                 </Button>
               </Grid>
@@ -2011,15 +1690,8 @@ function LoginAllot() {
 
       {/* ALERT DIALOG */}
       <Box>
-        <Dialog
-          open={isErrorOpen}
-          onClose={handleCloseerr}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
+        <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             {/* <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: 'orange' }} /> */}
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
@@ -2032,25 +1704,20 @@ function LoginAllot() {
       </Box>
 
       {/*Export XL Data  */}
-      <Dialog
-        open={isFilterOpen}
-        onClose={handleCloseFilterMod}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={isFilterOpen} onClose={handleCloseFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent
           sx={{
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
           }}
         >
           <IconButton
             aria-label="close"
             onClick={handleCloseFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2058,13 +1725,9 @@ function LoginAllot() {
           >
             <CloseIcon />
           </IconButton>
-          {fileFormat === "csv" ? (
-            <FaFileCsv style={{ fontSize: "80px", color: "green" }} />
-          ) : (
-            <FaFileExcel style={{ fontSize: "80px", color: "green" }} />
-          )}
+          {fileFormat === 'csv' ? <FaFileCsv style={{ fontSize: '80px', color: 'green' }} /> : <FaFileExcel style={{ fontSize: '80px', color: 'green' }} />}
 
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2073,7 +1736,7 @@ function LoginAllot() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              handleExportXL("filtered");
+              handleExportXL('filtered');
             }}
           >
             Export Filtered Data
@@ -2082,7 +1745,7 @@ function LoginAllot() {
             autoFocus
             variant="contained"
             onClick={(e) => {
-              handleExportXL("overall");
+              handleExportXL('overall');
             }}
           >
             Export Over All Data
@@ -2090,25 +1753,20 @@ function LoginAllot() {
         </DialogActions>
       </Dialog>
       {/*Export pdf Data  */}
-      <Dialog
-        open={isPdfFilterOpen}
-        onClose={handleClosePdfFilterMod}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={isPdfFilterOpen} onClose={handleClosePdfFilterMod} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent
           sx={{
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
           }}
         >
           <IconButton
             aria-label="close"
             onClick={handleClosePdfFilterMod}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -2116,8 +1774,8 @@ function LoginAllot() {
           >
             <CloseIcon />
           </IconButton>
-          <PictureAsPdfIcon sx={{ fontSize: "80px", color: "red" }} />
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
+          <PictureAsPdfIcon sx={{ fontSize: '80px', color: 'red' }} />
+          <Typography variant="h5" sx={{ textAlign: 'center' }}>
             Choose Export
           </Typography>
         </DialogContent>
@@ -2125,7 +1783,7 @@ function LoginAllot() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdf("filtered");
+              downloadPdf('filtered');
               setIsPdfFilterOpen(false);
             }}
           >
@@ -2134,7 +1792,7 @@ function LoginAllot() {
           <Button
             variant="contained"
             onClick={(e) => {
-              downloadPdf("overall");
+              downloadPdf('overall');
               setIsPdfFilterOpen(false);
             }}
           >

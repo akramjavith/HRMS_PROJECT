@@ -9,7 +9,7 @@ const { getAllApplyleave, getSingleApplyleave, getActiveApplyleave, getAllApprov
   getAllApplyleaveApprovedForUserShiftRoaster, getAllApplyleaveFilter, deleteApplyleave, getAllApplyleaveFilterHome } = require("../controller/modules/leave/applyleave");
 leaveRoute.route("/applyleaves").get(getAllApplyleave);
 leaveRoute.route("/applyleaveshome").post(getAllApplyleaveHome);
-leaveRoute.route("/applyleaveshomelist").get(getAllApplyleaveHomeList);
+leaveRoute.route("/applyleaveshomelist").post(getAllApplyleaveHomeList);
 leaveRoute.route("/applyleave/new").post(addApplyleave);
 leaveRoute.route("/applyleavesfilter").get(getAllApplyleaveFilter);
 leaveRoute.route("/applyleavesfilterhomecount").post(getAllApplyleaveFilterHome);

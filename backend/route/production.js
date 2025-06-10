@@ -571,19 +571,22 @@ const {
   getAllPenaltyMonthAmountConsolidatedViewIndividual,
   deletePenaltyAmountConsolidated,
   getAllPenaltyAmountConsolidated,
+  getAllPenaltyAmountConsolidatedList,
   getSinglePenaltyAmountConsolidated,
   updatePenaltyAmountConsolidated,
   getFilterPenaltyAmountConsolidated,
+  getAllPenaltyAmountConsolidatedDateBasedRestriction
 } = require("../controller/modules/penalty/penaltyamountconsolidate");
-productionRoute
-  .route("/allpenaltyamountconsolidate")
-  .get(getAllPenaltyAmountConsolidated);
-productionRoute
-  .route("/penaltyamountconsolidate/new")
-  .post(addPenaltyAmountConsolidated);
+productionRoute.route("/penaltyamountconsolidatedlist").get(getAllPenaltyAmountConsolidatedList);
+
+
+
+productionRoute.route("/allpenaltyamountconsolidate").get(getAllPenaltyAmountConsolidated);
+productionRoute.route("/penaltyamountconsolidate/new").post(addPenaltyAmountConsolidated);
 productionRoute.route("/filterpenaltyamountconsolidated").post(getFilterPenaltyAmountConsolidated);
 productionRoute.route("/filterpenaltyamountconsolidatedmonthview").post(getAllPenaltyAmountConsolidatedMonthView);
 productionRoute.route("/filterpenaltyamountconsolidatedmonthviewindividual").post(getAllPenaltyMonthAmountConsolidatedViewIndividual);
+productionRoute.route("/getallpenaltyamountdatebasedrestriction").post(getAllPenaltyAmountConsolidatedDateBasedRestriction);
 productionRoute
   .route("/penaltyamountconsolidate/:id")
   .delete(deletePenaltyAmountConsolidated)

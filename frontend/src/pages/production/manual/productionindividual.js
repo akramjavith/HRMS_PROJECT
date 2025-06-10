@@ -1,53 +1,79 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Box, Typography, OutlinedInput, TextareaAutosize, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, Grid, Button } from "@mui/material";
-import { userStyle, colourStyles } from "../../../pageStyle";
-import "jspdf-autotable";
-import axios from "axios";
-import Selects from "react-select";
-import { SERVICE } from "../../../services/Baseservice";
-import { handleApiError } from "../../../components/Errorhandling";
-import { UserRoleAccessContext } from "../../../context/Appcontext";
-import { AuthContext } from "../../../context/Appcontext";
-import Headtitle from "../../../components/Headtitle";
-import PageHeading from "../../../components/PageHeading";
-import AlertDialog from "../../../components/Alert";
-import MessageAlert from "../../../components/MessageAlert";
-import csvIcon from "../../../components/Assets/CSV.png";
-import excelIcon from "../../../components/Assets/excel-icon.png";
-import fileIcon from "../../../components/Assets/file-icons.png";
-import pdfIcon from "../../../components/Assets/pdf-icon.png";
-import wordIcon from "../../../components/Assets/word-icon.png";
-import Webcamimage from "../../asset/Webcameimageasset";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { FaTrash } from "react-icons/fa";
-import dayjs from "dayjs";
-import { Space, TimePicker } from "antd";
-import { makeStyles } from "@material-ui/core";
+import React, { useState, useEffect, useContext } from 'react';
+import { Box, Typography, OutlinedInput, TextareaAutosize, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, Grid, Button } from '@mui/material';
+import { userStyle, colourStyles } from '../../../pageStyle';
+import 'jspdf-autotable';
+import axios from '../../../axiosInstance';
+import Selects from 'react-select';
+import { SERVICE } from '../../../services/Baseservice';
+import { handleApiError } from '../../../components/Errorhandling';
+import { UserRoleAccessContext } from '../../../context/Appcontext';
+import { AuthContext } from '../../../context/Appcontext';
+import Headtitle from '../../../components/Headtitle';
+import PageHeading from '../../../components/PageHeading';
+import AlertDialog from '../../../components/Alert';
+import MessageAlert from '../../../components/MessageAlert';
+import csvIcon from '../../../components/Assets/CSV.png';
+import excelIcon from '../../../components/Assets/excel-icon.png';
+import fileIcon from '../../../components/Assets/file-icons.png';
+import pdfIcon from '../../../components/Assets/pdf-icon.png';
+import wordIcon from '../../../components/Assets/word-icon.png';
+import Webcamimage from '../../asset/Webcameimageasset';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { FaTrash } from 'react-icons/fa';
+import dayjs from 'dayjs';
+import { Space, TimePicker } from 'antd';
+import { makeStyles } from '@material-ui/core';
+import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
+import moment from 'moment';
+
 
 const useStyles = makeStyles((theme) => ({
   inputs: {
-    display: "none",
+    display: 'none',
   },
   preview: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     marginTop: theme.spacing(2),
-    "& > *": {
+    '& > *': {
       margin: theme.spacing(1),
     },
   },
 }));
 
 function ProductionIndividual() {
+  const [serverTime, setServerTime] = useState(null);
+  useEffect(() => {
+    const fetchTime = async () => {
+      const time = await getCurrentServerTime();
+      setServerTime(time);
+    };
+
+    fetchTime();
+  }, []);
+
+
+
+  useEffect(() => {
+    getCurrentServerTime();
+
+    const interval = setInterval(() => {
+      setServerTime((prevTime) => moment(prevTime).add(1, 'second'));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+
   const classes = useStyles();
-  let name = "create";
+  let name = 'create';
   let allUploadedFiles = [];
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -55,8 +81,8 @@ function ProductionIndividual() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -64,12 +90,14 @@ function ProductionIndividual() {
     setOpenPopup(false);
   };
   //    today date fetching
-  let today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  let today = new Date(serverTime);
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
   var yyyy = today.getFullYear();
   // today = yyyy + "-" + mm + "-" + dd;
   const formattedToday = `${yyyy}-${mm}-${dd}`;
+
+  console.log(formattedToday, "formattedToday")
 
   const [projectmaster, setProjectMaster] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -88,102 +116,107 @@ function ProductionIndividual() {
   let now = new Date();
 
   let hours = now.getHours();
-  let minutes = String(now.getMinutes()).padStart(2, "0");
-  let seconds = String(now.getSeconds()).padStart(2, "0");
+  let minutes = String(now.getMinutes()).padStart(2, '0');
+  let seconds = String(now.getSeconds()).padStart(2, '0');
 
   // Determine AM or PM
-  let ampm = hours >= 12 ? "PM" : "AM";
+  let ampm = hours >= 12 ? 'PM' : 'AM';
 
   // Convert 24-hour format to 12-hour format
   hours = hours % 12;
   hours = hours ? hours : 12; // If hours is 0, set it to 12 (midnight or noon)
-  hours = String(hours).padStart(2, "0");
+  hours = String(hours).padStart(2, '0');
 
   let currtime = `${hours}:${minutes}:${seconds} ${ampm}`;
 
   const [ProducionIndividual, setProducionIndividual] = useState({
-    vendor: "Please Select Vendor",
+    vendor: 'Please Select Vendor',
     fromdate: formattedToday,
 
-    fromtime24Hrs: dayjs(currtime, "h:mm:ss A"),
+    fromtime24Hrs: dayjs(moment(serverTime).format('hh:mm:ss A'), 'h:mm:ss A'),
 
-    time: dayjs(currtime, "h:mm:ss A").format("HH:mm:ss"),
+    time: dayjs(moment(serverTime).format('hh:mm:ss A'), 'h:mm:ss A').format('HH:mm:ss'),
 
-    starttime24Hrs: dayjs(currtime, "h:mm:ss A"),
-    starttime: dayjs(currtime, "h:mm:ss A").format("HH:mm:ss"),
+    starttime24Hrs: dayjs(moment(serverTime).format('hh:mm:ss A'), 'h:mm:ss A'),
+    starttime: dayjs(moment(serverTime).format('hh:mm:ss A'), 'h:mm:ss A').format('HH:mm:ss'),
 
-    enddatemode: "Auto",
-    datemode: "Auto",
-    datetimezone: "",
-    category: "Please Select Subcategory",
-    filename: "Please Select Category",
+    enddatemode: 'Auto',
+    datemode: 'Auto',
+    datetimezone: '',
+    category: 'Please Select Subcategory',
+    filename: 'Please Select Category',
     startbuttonstatus: false,
-    remarks: "",
-    creationstatus: "New",
-    unitid: "",
-    alllogin: "Please Select AllLogin",
-    user: "Please Select Loginid",
-    mode: "",
-    docnumber: "",
-    doclink: "",
+    remarks: '',
+    creationstatus: 'New',
+    unitid: '',
+    alllogin: 'Please Select AllLogin',
+    user: 'Please Select Loginid',
+    mode: '',
+    docnumber: '',
+    doclink: '',
 
-    statusmode: "Please Select Status",
+    statusmode: 'Please Select Status',
     flagcount: 0,
-    section: "1",
-    addedby: "",
-    updatedby: "",
-    pendingpages: "",
-    notes: "",
+    section: '1',
+    addedby: '',
+    updatedby: '',
+    pendingpages: '',
+    notes: '',
     totalpages: 0,
     completepages: 0,
-    startpage: "",
-    reason: "",
+    startpage: '',
+    reason: '',
     startdate: formattedToday,
-    startdatemode: "Auto",
+    startdatemode: 'Auto',
   });
 
   const status = [
-    { label: "Completed", value: "Completed" },
-    { label: "In Complete", value: "In Complete" },
-    { label: "Partial Complete", value: "Partial Complete" },
+    { label: 'Completed', value: 'Completed' },
+    { label: 'In Complete', value: 'In Complete' },
+    { label: 'Partial Complete', value: 'Partial Complete' },
   ];
 
   const [projmasterDup, setProjmasterDup] = useState([]);
 
   // Calculate the date two months ago
-  const twoMonthsAgo = new Date();
+  const twoMonthsAgo = new Date(serverTime);
   twoMonthsAgo.setMonth(today.getMonth() - 2);
-  const ddPast = String(twoMonthsAgo.getDate()).padStart(2, "0");
-  const mmPast = String(twoMonthsAgo.getMonth() + 1).padStart(2, "0");
+  const ddPast = String(twoMonthsAgo.getDate()).padStart(2, '0');
+  const mmPast = String(twoMonthsAgo.getMonth() + 1).padStart(2, '0');
   const yyyyPast = twoMonthsAgo.getFullYear();
   const formattedTwoMonthsAgo = `${yyyyPast}-${mmPast}-${ddPast}`;
 
+
+  console.log(formattedTwoMonthsAgo, "formattedTwoMonthsAgo")
+
+
+
   const handleTimeChange = (time, timeString) => {
     // Check if timeString is a valid time format
-    const isValidTime = dayjs(timeString, "h:mm:ss A").isValid();
+    const isValidTime = dayjs(timeString, 'h:mm:ss A').isValid();
 
     if (isValidTime) {
       setProducionIndividual({
         ...ProducionIndividual,
-        fromtime24Hrs: dayjs(timeString, "h:mm:ss A"),
-        time: dayjs(timeString, "h:mm:ss A").format("HH:mm:ss"),
+        fromtime24Hrs: dayjs(timeString, 'h:mm:ss A'),
+        time: dayjs(timeString, 'h:mm:ss A').format('HH:mm:ss'),
       });
-      if (projectmaster && ProducionIndividual.creationstatus === "Already Completed") {
+      if (projectmaster && ProducionIndividual.creationstatus === 'Already Completed') {
         // Compare end time with start time
         const { startdate, fromdate, starttime, time } = ProducionIndividual;
 
         let fromDatetime = `${startdate} ${starttime}`;
-        let endDatetime = `${fromdate} ${dayjs(timeString, "h:mm:ss A").format("HH:mm:ss")}`;
+        let endDatetime = `${fromdate} ${dayjs(timeString, 'h:mm:ss A').format('HH:mm:ss')}`;
 
         if (fromDatetime && endDatetime) {
           if (new Date(fromDatetime) > new Date(endDatetime)) {
-            setPopupContentMalert("End time cannot be earlier than start time!");
-            setPopupSeverityMalert("warning");
+            setPopupContentMalert('End time cannot be earlier than start time!');
+            setPopupSeverityMalert('warning');
             handleClickOpenPopupMalert();
             setProducionIndividual({
               ...ProducionIndividual,
-              fromtime24Hrs: "",
-              time: "",
+              fromtime24Hrs: '',
+              time: '',
             });
           }
         }
@@ -192,79 +225,79 @@ function ProductionIndividual() {
   };
 
   const handleBlurTimeChange = (time, timeString) => {
-    const isValidTime = dayjs(timeString, "h:mm:ss A").isValid();
+    const isValidTime = dayjs(timeString, 'h:mm:ss A').isValid();
     let fromDatetime = `${ProducionIndividual.startdate} ${ProducionIndividual.starttime}`;
-    let endDatetime = `${ProducionIndividual.fromdate} ${dayjs(timeString, "h:mm:ss A").format("HH:mm:ss")}`;
+    let endDatetime = `${ProducionIndividual.fromdate} ${dayjs(timeString, 'h:mm:ss A').format('HH:mm:ss')}`;
 
     if (isValidTime && new Date(fromDatetime) < new Date(endDatetime)) {
-      setPopupContentMalert("Please select end time correctly");
-      setPopupSeverityMalert("warning");
+      setPopupContentMalert('Please select end time correctly');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
     } else {
       setProducionIndividual({
         ...ProducionIndividual,
-        fromtime24Hrs: dayjs(timeString, "h:mm:ss A"),
-        time: dayjs(timeString, "h:mm:ss A").format("HH:mm:ss"),
+        fromtime24Hrs: dayjs(timeString, 'h:mm:ss A'),
+        time: dayjs(timeString, 'h:mm:ss A').format('HH:mm:ss'),
       });
     }
   };
 
   const handleModeChange = (value) => {
     // Check if timeString is a valid time format
-    let today = new Date();
-    var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth() + 1).padStart(2, "0");
+    let today = new Date(serverTime);
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
     var yyyy = today.getFullYear();
     // today = yyyy + "-" + mm + "-" + dd;
 
     const Today = `${yyyy}-${mm}-${dd}`;
 
-    let now = new Date();
+    let now = new Date(serverTime);
 
     let hours = now.getHours();
-    let minutes = String(now.getMinutes()).padStart(2, "0");
-    let seconds = String(now.getSeconds()).padStart(2, "0");
+    let minutes = String(now.getMinutes()).padStart(2, '0');
+    let seconds = String(now.getSeconds()).padStart(2, '0');
 
     // Determine AM or PM
-    let ampm = hours >= 12 ? "PM" : "AM";
+    let ampm = hours >= 12 ? 'PM' : 'AM';
 
     // Convert 24-hour format to 12-hour format
     hours = hours % 12;
     hours = hours ? hours : 12; // If hours is 0, set it to 12 (midnight or noon)
-    hours = String(hours).padStart(2, "0");
+    hours = String(hours).padStart(2, '0');
 
     let currTime = `${hours}:${minutes}:${seconds} ${ampm}`;
 
-    if (value === "Auto") {
+    if (value === 'Auto') {
       setProducionIndividual({
         ...ProducionIndividual,
         datemode: value,
         fromdate: Today,
-        fromtime24Hrs: dayjs(currTime, "h:mm:ss A"),
-        time: dayjs(currTime, "h:mm:ss A").format("HH:mm:ss"),
+        fromtime24Hrs: dayjs(currTime, 'h:mm:ss A'),
+        time: dayjs(currTime, 'h:mm:ss A').format('HH:mm:ss'),
       });
     } else {
       setProducionIndividual({
         ...ProducionIndividual,
         datemode: value,
-        fromdate: "",
-        fromtime24Hrs: "",
-        time: "",
+        fromdate: '',
+        fromtime24Hrs: '',
+        time: '',
       });
     }
   };
 
   const handleStartTimeChange = (time, timeString) => {
     // Check if timeString is a valid time format
-    const isValidTime = dayjs(timeString, "h:mm:ss A").isValid();
+    const isValidTime = dayjs(timeString, 'h:mm:ss A').isValid();
 
     if (isValidTime) {
       setProducionIndividual({
         ...ProducionIndividual,
-        starttime24Hrs: dayjs(timeString, "h:mm:ss A"),
-        starttime: dayjs(timeString, "h:mm:ss A").format("HH:mm:ss"),
-        fromtime24Hrs: dayjs(timeString, "h:mm:ss A"),
-        time: dayjs(timeString, "h:mm:ss A").format("HH:mm:ss"),
+        starttime24Hrs: dayjs(timeString, 'h:mm:ss A'),
+        starttime: dayjs(timeString, 'h:mm:ss A').format('HH:mm:ss'),
+        fromtime24Hrs: dayjs(timeString, 'h:mm:ss A'),
+        time: dayjs(timeString, 'h:mm:ss A').format('HH:mm:ss'),
         // totime24Hrs: dayjs(timeString, "h:mm:ss A"),
         // totime: dayjs(timeString, "h:mm:ss A").format("HH:mm:ss"),
       });
@@ -273,93 +306,93 @@ function ProductionIndividual() {
 
   const handleStartDateModeChange = (value) => {
     // Check if timeString is a valid time format
-    let today = new Date();
-    var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth() + 1).padStart(2, "0");
+    let today = new Date(serverTime);
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
     var yyyy = today.getFullYear();
     // today = yyyy + "-" + mm + "-" + dd;
 
     const Today = `${yyyy}-${mm}-${dd}`;
 
-    let now = new Date();
+    let now = new Date(serverTime);
 
     let hours = now.getHours();
-    let minutes = String(now.getMinutes()).padStart(2, "0");
-    let seconds = String(now.getSeconds()).padStart(2, "0");
+    let minutes = String(now.getMinutes()).padStart(2, '0');
+    let seconds = String(now.getSeconds()).padStart(2, '0');
 
     // Determine AM or PM
-    let ampm = hours >= 12 ? "PM" : "AM";
+    let ampm = hours >= 12 ? 'PM' : 'AM';
 
     // Convert 24-hour format to 12-hour format
     hours = hours % 12;
     hours = hours ? hours : 12; // If hours is 0, set it to 12 (midnight or noon)
-    hours = String(hours).padStart(2, "0");
+    hours = String(hours).padStart(2, '0');
 
     let currTime = `${hours}:${minutes}:${seconds} ${ampm}`;
-    if (value === "Auto") {
+    if (value === 'Auto') {
       setProducionIndividual({
         ...ProducionIndividual,
         startdatemode: value,
         fromdate: Today,
         startdate: Today,
-        fromtime24Hrs: dayjs(currTime, "h:mm:ss A"),
-        time: dayjs(currTime, "h:mm:ss A").format("HH:mm:ss"),
-        starttime24Hrs: dayjs(currTime, "h:mm:ss A"),
-        starttime: dayjs(currTime, "h:mm:ss A").format("HH:mm:ss"),
+        fromtime24Hrs: dayjs(currTime, 'h:mm:ss A'),
+        time: dayjs(currTime, 'h:mm:ss A').format('HH:mm:ss'),
+        starttime24Hrs: dayjs(currTime, 'h:mm:ss A'),
+        starttime: dayjs(currTime, 'h:mm:ss A').format('HH:mm:ss'),
       });
     } else {
       setProducionIndividual({
         ...ProducionIndividual,
         startdatemode: value,
-        fromdate: "",
-        startdate: "",
-        fromtime24Hrs: "",
-        time: "",
-        starttime24Hrs: "",
-        starttime: "",
+        fromdate: '',
+        startdate: '',
+        fromtime24Hrs: '',
+        time: '',
+        starttime24Hrs: '',
+        starttime: '',
       });
     }
   };
   const handleEndDateModeChange = (value) => {
     // Check if timeString is a valid time format
-    let today = new Date();
-    var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth() + 1).padStart(2, "0");
+    let today = new Date(serverTime);
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
     var yyyy = today.getFullYear();
     // today = yyyy + "-" + mm + "-" + dd;
 
     const Today = `${yyyy}-${mm}-${dd}`;
 
-    let now = new Date();
+    let now = new Date(serverTime);
 
     let hours = now.getHours();
-    let minutes = String(now.getMinutes()).padStart(2, "0");
-    let seconds = String(now.getSeconds()).padStart(2, "0");
+    let minutes = String(now.getMinutes()).padStart(2, '0');
+    let seconds = String(now.getSeconds()).padStart(2, '0');
 
     // Determine AM or PM
-    let ampm = hours >= 12 ? "PM" : "AM";
+    let ampm = hours >= 12 ? 'PM' : 'AM';
 
     // Convert 24-hour format to 12-hour format
     hours = hours % 12;
     hours = hours ? hours : 12; // If hours is 0, set it to 12 (midnight or noon)
-    hours = String(hours).padStart(2, "0");
+    hours = String(hours).padStart(2, '0');
 
     let currtime = `${hours}:${minutes}:${seconds} ${ampm}`;
-    if (value === "Auto") {
+    if (value === 'Auto') {
       setProducionIndividual({
         ...ProducionIndividual,
         enddatemode: value,
         fromdate: Today,
-        fromtime24Hrs: dayjs(currtime, "h:mm:ss A"),
-        time: dayjs(currtime, "h:mm:ss A").format("HH:mm:ss"),
+        fromtime24Hrs: dayjs(currtime, 'h:mm:ss A'),
+        time: dayjs(currtime, 'h:mm:ss A').format('HH:mm:ss'),
       });
     } else {
       setProducionIndividual({
         ...ProducionIndividual,
         enddatemode: value,
-        fromtime24Hrs: "",
-        time: "",
-        fromdate: "",
+        fromtime24Hrs: '',
+        time: '',
+        fromdate: '',
       });
     }
   };
@@ -369,12 +402,12 @@ function ProductionIndividual() {
     const minDate = new Date(formattedTwoMonthsAgo);
     const maxDate = new Date(formattedToday);
 
-    if (ProducionIndividual.datemode === "Manual") {
+    if (ProducionIndividual.datemode === 'Manual') {
       if (selectedDate >= minDate && selectedDate <= maxDate) {
         setProducionIndividual({ ...ProducionIndividual, fromdate: e.target.value });
       } else {
-        setPopupContentMalert("Please select a date within the past two months and not in the future");
-        setPopupSeverityMalert("warning");
+        setPopupContentMalert('Please select a date within the past two months and not in the future');
+        setPopupSeverityMalert('warning');
         handleClickOpenPopupMalert();
       }
     } else {
@@ -384,7 +417,7 @@ function ProductionIndividual() {
 
   const handleEndDateChange = (e) => {
     const selectedDate = new Date(e.target.value);
-    const currentDate = new Date(); // Current date and time
+    const currentDate = new Date(serverTime); // Current date and time
 
     // Ensure only date comparison without time
     const fromDate = new Date(ProducionIndividual.startdate || currentDate);
@@ -392,7 +425,7 @@ function ProductionIndividual() {
     selectedDate.setHours(0, 0, 0, 0); // Reset time portion to midnight
     currentDate.setHours(0, 0, 0, 0); // Reset time portion to midnight
 
-    setProducionIndividual({ ...ProducionIndividual, fromdate: e.target.value, time: "" });
+    setProducionIndividual({ ...ProducionIndividual, fromdate: e.target.value, time: '' });
   };
   const handleEndDateBlueChange = (e) => {
     // const selectedEndDate = new Date(e.target.value);
@@ -405,17 +438,17 @@ function ProductionIndividual() {
 
     if (fromDatetime && endDatetime) {
       if (new Date(fromDatetime) > new Date(endDatetime)) {
-        setPopupContentMalert("End Date cannot be earlier than start Date!");
-        setPopupSeverityMalert("warning");
+        setPopupContentMalert('End Date cannot be earlier than start Date!');
+        setPopupSeverityMalert('warning');
         handleClickOpenPopupMalert();
         setProducionIndividual({
           ...ProducionIndividual,
-          fromtime24Hrs: "",
-          time: "",
+          fromtime24Hrs: '',
+          time: '',
         });
-        setProducionIndividual({ ...ProducionIndividual, fromdate: "", time: "" });
+        setProducionIndividual({ ...ProducionIndividual, fromdate: '', time: '' });
       } else {
-        setProducionIndividual({ ...ProducionIndividual, fromdate: e.target.value, time: "" });
+        setProducionIndividual({ ...ProducionIndividual, fromdate: e.target.value, time: '' });
       }
     }
   };
@@ -425,12 +458,12 @@ function ProductionIndividual() {
     const minDate = new Date(formattedTwoMonthsAgo);
     const maxDate = new Date(formattedToday);
 
-    if (ProducionIndividual.datemode === "Manual") {
+    if (ProducionIndividual.datemode === 'Manual') {
       if (selectedDate >= minDate && selectedDate <= maxDate) {
         setProducionIndividual({ ...ProducionIndividual, startdate: e.target.value });
       } else {
-        setPopupContentMalert("Please select a date within the past two months and not in the future");
-        setPopupSeverityMalert("warning");
+        setPopupContentMalert('Please select a date within the past two months and not in the future');
+        setPopupSeverityMalert('warning');
         handleClickOpenPopupMalert();
       }
     } else {
@@ -483,7 +516,7 @@ function ProductionIndividual() {
     const inputValue = e.target.value;
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       setProducionIndividual({ ...ProducionIndividual, section: inputValue });
     }
@@ -496,7 +529,7 @@ function ProductionIndividual() {
     const inputValue = e.target.value;
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Check if the input value exceeds totalpages
 
       // Update the state with the valid numeric value
@@ -511,7 +544,7 @@ function ProductionIndividual() {
     const inputValue = e.target.value;
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       let difference = Number(ProducionIndividual.totalpages) - Number(inputValue);
 
       const getstpage = Array.from({ length: inputValue - 0 }, (_, index) => {
@@ -520,8 +553,8 @@ function ProductionIndividual() {
       });
       // Check if the input value exceeds totalpages
       if (parseInt(inputValue) > parseInt(ProducionIndividual.totalpages)) {
-        setPopupContentMalert("Completed pages cannot be greater than total pages");
-        setPopupSeverityMalert("warning");
+        setPopupContentMalert('Completed pages cannot be greater than total pages');
+        setPopupSeverityMalert('warning');
         handleClickOpenPopupMalert();
       } else {
         // Update the state with the valid numeric value
@@ -538,7 +571,7 @@ function ProductionIndividual() {
     const inputValue = e.target.value;
 
     // Check if the input value matches the regex or if it's empty (allowing backspace)
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       // Update the state with the valid numeric value
       let difference = Number(inputValue) - Number(0);
       const getstpage = Array.from({ length: inputValue - 0 }, (_, index) => {
@@ -550,21 +583,16 @@ function ProductionIndividual() {
   };
 
   let datemodes =
-    isUserRoleCompare.includes("lproductionindividualusers") ||
-    isUserRoleAccess.role.includes("Manager") ||
-    isUserRoleAccess.role.includes("Director") ||
-    isUserRoleAccess.role.includes("Admin") ||
-    isUserRoleAccess.role.includes("SuperAdmin") ||
-    isUserRoleAccess.role.includes("ADMIN")
+    isUserRoleCompare.includes('lproductionindividualusers') || isUserRoleAccess.role.includes('Manager') || isUserRoleAccess.role.includes('Director') || isUserRoleAccess.role.includes('Admin') || isUserRoleAccess.role.includes('SuperAdmin') || isUserRoleAccess.role.includes('ADMIN')
       ? [
-          { label: "Auto", value: "Auto" },
-          { label: "Manual", value: "Manual" },
-        ]
-      : [{ label: "Auto", value: "Auto" }];
+        { label: 'Auto', value: 'Auto' },
+        { label: 'Manual', value: 'Manual' },
+      ]
+      : [{ label: 'Auto', value: 'Auto' }];
 
   const creationmode = [
-    { label: "New", value: "New" },
-    { label: "Already Completed", value: "Already Completed" },
+    { label: 'New', value: 'New' },
+    { label: 'Already Completed', value: 'Already Completed' },
   ];
 
   // Error Popup model
@@ -595,60 +623,60 @@ function ProductionIndividual() {
         category: String(ProducionIndividual.category),
         unitid: String(ProducionIndividual.unitid),
         user: String(ProducionIndividual.user),
-        creationstatus: projectmaster ? String(ProducionIndividual.creationstatus) : "",
+        creationstatus: projectmaster ? String(ProducionIndividual.creationstatus) : '',
         remarks: String(ProducionIndividual.remarks),
-        startbuttonstatus: projectmaster ? (ProducionIndividual.creationstatus === "New" ? true : false) : false,
+        startbuttonstatus: projectmaster ? (ProducionIndividual.creationstatus === 'New' ? true : false) : false,
         enddatemode: String(ProducionIndividual.enddatemode),
-        mode: "Manual",
+        mode: 'Manual',
         section: String(ProducionIndividual.section),
         flagcount: String(ProducionIndividual.flagcount),
         alllogin: String(ProducionIndividual.alllogin),
         docnumber: String(ProducionIndividual.docnumber),
         doclink: String(ProducionIndividual.doclink),
-        startmode: projectmaster ? String(ProducionIndividual.startdatemode) : "",
+        startmode: projectmaster ? String(ProducionIndividual.startdatemode) : '',
         startdate: String(ProducionIndividual.startdate),
         starttime: String(ProducionIndividual.starttime),
-        statusmode: projectmaster ? (ProducionIndividual.creationstatus === "New" ? "Started" : String(ProducionIndividual.statusmode)) : String(ProducionIndividual.statusmode),
+        statusmode: projectmaster ? (ProducionIndividual.creationstatus === 'New' ? 'Started' : String(ProducionIndividual.statusmode)) : String(ProducionIndividual.statusmode),
         totalpages: String(ProducionIndividual.totalpages),
         pendingpages: Number(ProducionIndividual.pendingpages),
         startpage: String(ProducionIndividual.startpage),
         reason: String(ProducionIndividual.reason),
         notes: String(ProducionIndividual.notes),
-        approvalstatus: "",
-        approvaldate: "",
-        lateentrystatus: new Date() > fromDatePlus48Hours ? "Late Entry" : "On Entry",
+        approvalstatus: '',
+        approvaldate: '',
+        lateentrystatus: new Date(serverTime) > fromDatePlus48Hours ? 'Late Entry' : 'On Entry',
         files: allUploadedFiles.concat(refImage, refImageDrag, capturedImages),
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
       setProducionIndividual({
         ...ProducionIndividual,
-        remarks: "",
+        remarks: '',
         startbuttonstatus: false,
-        enddatemode: "Auto",
+        enddatemode: 'Auto',
         fromdate: formattedToday,
         time: currtime,
-        datetimezone: "",
-        unitid: "",
-        docnumber: "",
-        creationstatus: "New",
-        doclink: "",
+        datetimezone: '',
+        unitid: '',
+        docnumber: '',
+        creationstatus: 'New',
+        doclink: '',
         section: 1,
-        datemode: "Auto",
+        datemode: 'Auto',
         flagcount: 1,
       });
-      setPopupContent(projectmaster && ProducionIndividual?.creationstatus === "New" ? "Started Successfully" : "Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent(projectmaster && ProducionIndividual?.creationstatus === 'New' ? 'Started Successfully' : 'Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
+  console.log(ProducionIndividual.fromdate, "ddd")
   //submit option for saving
   const handleSubmit = async (e) => {
     setPageName(!pageName);
@@ -677,114 +705,114 @@ function ProductionIndividual() {
     });
     let checkDupe = res_Dupe?.data?.productionIndividual;
 
-    if (ProducionIndividual.vendor === "Please Select Vendor") {
-      setPopupContentMalert("Please Select Vendor!");
-      setPopupSeverityMalert("warning");
+    if (ProducionIndividual.vendor === 'Please Select Vendor') {
+      setPopupContentMalert('Please Select Vendor!');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (ProducionIndividual.filename === "Please Select Category") {
-      setPopupContentMalert("Please Select Category !");
-      setPopupSeverityMalert("warning");
+    } else if (ProducionIndividual.filename === 'Please Select Category') {
+      setPopupContentMalert('Please Select Category !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (ProducionIndividual.category === "Please Select Subcategory") {
-      setPopupContentMalert("Please Select SubCategory !");
-      setPopupSeverityMalert("warning");
+    } else if (ProducionIndividual.category === 'Please Select Subcategory') {
+      setPopupContentMalert('Please Select SubCategory !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (ProducionIndividual.datemode === "") {
-      setPopupContentMalert("Please Select Date Mode!");
-      setPopupSeverityMalert("warning");
+    } else if (ProducionIndividual.datemode === '') {
+      setPopupContentMalert('Please Select Date Mode!');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (ProducionIndividual.datemode === "Manual" && ProducionIndividual.fromdate === "") {
-      setPopupContentMalert("Please Select Date!");
-      setPopupSeverityMalert("warning");
+    } else if (ProducionIndividual.datemode === 'Manual' && ProducionIndividual.fromdate === '') {
+      setPopupContentMalert('Please Select Date!');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (ProducionIndividual.datemode === "Manual" && ProducionIndividual.time === "") {
-      setPopupContentMalert("Please Select Time!");
-      setPopupSeverityMalert("warning");
+    } else if (ProducionIndividual.datemode === 'Manual' && ProducionIndividual.time === '') {
+      setPopupContentMalert('Please Select Time!');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (!projectmaster && (ProducionIndividual.flagcount === "" || ProducionIndividual.flagcount === 0)) {
-      setPopupContentMalert("Please Enter FlagCount !");
-      setPopupSeverityMalert("warning");
+    } else if (!projectmaster && (ProducionIndividual.flagcount === '' || ProducionIndividual.flagcount === 0)) {
+      setPopupContentMalert('Please Enter FlagCount !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (ProducionIndividual.unitid === "") {
-      setPopupContentMalert("Please Enter Identifier !");
-      setPopupSeverityMalert("warning");
+    } else if (ProducionIndividual.unitid === '') {
+      setPopupContentMalert('Please Enter Identifier !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (ProducionIndividual.user === "Please Select Loginid") {
-      setPopupContentMalert("Please Select Login Id !");
-      setPopupSeverityMalert("warning");
+    } else if (ProducionIndividual.user === 'Please Select Loginid') {
+      setPopupContentMalert('Please Select Login Id !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (ProducionIndividual.section === "") {
-      setPopupContentMalert("Please Enter Section !");
-      setPopupSeverityMalert("warning");
+    } else if (ProducionIndividual.section === '') {
+      setPopupContentMalert('Please Enter Section !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
     }
     ///NEW
-    else if (projectmaster && ProducionIndividual.startdatemode === "Manual" && ProducionIndividual.startdate === "") {
-      setPopupContentMalert("Please Select Start Date !");
-      setPopupSeverityMalert("warning");
+    else if (projectmaster && ProducionIndividual.startdatemode === 'Manual' && ProducionIndividual.startdate === '') {
+      setPopupContentMalert('Please Select Start Date !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual.startdatemode === "Manual" && ProducionIndividual.starttime === "") {
-      setPopupContentMalert("Please Select Start Time !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual.startdatemode === 'Manual' && ProducionIndividual.starttime === '') {
+      setPopupContentMalert('Please Select Start Time !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
     }
 
     //alreadycompleted
-    else if (projectmaster && ProducionIndividual.enddatemode === "Manual" && ProducionIndividual?.creationstatus === "Already Completed" && ProducionIndividual.fromdate === "") {
-      setPopupContentMalert("Please Select End Date !");
-      setPopupSeverityMalert("warning");
+    else if (projectmaster && ProducionIndividual.enddatemode === 'Manual' && ProducionIndividual?.creationstatus === 'Already Completed' && ProducionIndividual.fromdate === '') {
+      setPopupContentMalert('Please Select End Date !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual.enddatemode === "Manual" && ProducionIndividual?.creationstatus === "Already Completed" && ProducionIndividual.time === "") {
-      setPopupContentMalert("Please Select End Time !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual.enddatemode === 'Manual' && ProducionIndividual?.creationstatus === 'Already Completed' && ProducionIndividual.time === '') {
+      setPopupContentMalert('Please Select End Time !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && (ProducionIndividual.totalpages === "" || ProducionIndividual.totalpages === 0)) {
-      setPopupContentMalert("Please Enter Total Pages !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && (ProducionIndividual.totalpages === '' || ProducionIndividual.totalpages === 0)) {
+      setPopupContentMalert('Please Enter Total Pages !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual?.creationstatus === "Already Completed" && (ProducionIndividual.flagcount === "" || ProducionIndividual.flagcount === 0)) {
-      setPopupContentMalert("Please Enter Completed Pages !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' && (ProducionIndividual.flagcount === '' || ProducionIndividual.flagcount === 0)) {
+      setPopupContentMalert('Please Enter Completed Pages !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual?.creationstatus === "Already Completed" && ProducionIndividual.flagcount !== ProducionIndividual.totalpages) {
+    } else if (projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' && ProducionIndividual.flagcount !== ProducionIndividual.totalpages) {
       setPopupContentMalert("Completed Pages and Total pages count didn't match!");
-      setPopupSeverityMalert("warning");
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual?.creationstatus === "Already Completed" && ProducionIndividual.pendingpages === "") {
-      setPopupContentMalert("Please Enter Pending Pages !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' && ProducionIndividual.pendingpages === '') {
+      setPopupContentMalert('Please Enter Pending Pages !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual?.creationstatus === "Already Completed" && ProducionIndividual.statusmode === "Please Select Status") {
-      setPopupContentMalert("Please Select Status !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' && ProducionIndividual.statusmode === 'Please Select Status') {
+      setPopupContentMalert('Please Select Status !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual?.creationstatus === "Already Completed" && new Date(ProducionIndividual.startdate) > new Date(ProducionIndividual.fromdate)) {
-      setPopupContentMalert("End Date should be after or equal to Start Date!");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' && new Date(ProducionIndividual.startdate) > new Date(ProducionIndividual.fromdate)) {
+      setPopupContentMalert('End Date should be after or equal to Start Date!');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual.startdatemode === "") {
-      setPopupContentMalert("Please Select Start Date Mode !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual.startdatemode === '') {
+      setPopupContentMalert('Please Select Start Date Mode !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual.enddatemode === "Manual" && ProducionIndividual?.creationstatus === "Already Completed" && ProducionIndividual.fromdate === "") {
-      setPopupContentMalert("Please Select End Date !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual.enddatemode === 'Manual' && ProducionIndividual?.creationstatus === 'Already Completed' && ProducionIndividual.fromdate === '') {
+      setPopupContentMalert('Please Select End Date !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual.enddatemode === "Manual" && ProducionIndividual?.creationstatus === "Already Completed" && ProducionIndividual.time === "") {
-      setPopupContentMalert("Please Enter End Time !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual.enddatemode === 'Manual' && ProducionIndividual?.creationstatus === 'Already Completed' && ProducionIndividual.time === '') {
+      setPopupContentMalert('Please Enter End Time !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual?.creationstatus === "Already Completed" && ProducionIndividual.pendingpages > 0 && ProducionIndividual.startpage === "") {
-      setPopupContentMalert("Please Enter Start Page !");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' && ProducionIndividual.pendingpages > 0 && ProducionIndividual.startpage === '') {
+      setPopupContentMalert('Please Enter Start Page !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
     } else if (checkDupe > 0) {
-      setPopupContentMalert("Data Already Exist !");
-      setPopupSeverityMalert("warning");
+      setPopupContentMalert('Data Already Exist !');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
-    } else if (projectmaster && ProducionIndividual?.creationstatus === "Already Completed" && ProducionIndividual?.startdatemode === "Auto" && ProducionIndividual.enddatemode === "Auto") {
-      setPopupContentMalert("End Date/Time End Date must be greater than Start Date/Time!");
-      setPopupSeverityMalert("warning");
+    } else if (projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' && ProducionIndividual?.startdatemode === 'Auto' && ProducionIndividual.enddatemode === 'Auto') {
+      setPopupContentMalert('End Date/Time End Date must be greater than Start Date/Time!');
+      setPopupSeverityMalert('warning');
       handleClickOpenPopupMalert();
     } else {
       sendRequest();
@@ -793,76 +821,90 @@ function ProductionIndividual() {
 
   const handleclear = (e) => {
     // e.preventDefault();
-    let now = new Date();
+    let now = new Date(serverTime);
 
     let hours = now.getHours();
-    let minutes = String(now.getMinutes()).padStart(2, "0");
-    let seconds = String(now.getSeconds()).padStart(2, "0");
+    let minutes = String(now.getMinutes()).padStart(2, '0');
+    let seconds = String(now.getSeconds()).padStart(2, '0');
 
     // Determine AM or PM
-    let ampm = hours >= 12 ? "PM" : "AM";
+    let ampm = hours >= 12 ? 'PM' : 'AM';
 
     // Convert 24-hour format to 12-hour format
     hours = hours % 12;
     hours = hours ? hours : 12; // If hours is 0, set it to 12 (midnight or noon)
-    hours = String(hours).padStart(2, "0");
+    hours = String(hours).padStart(2, '0');
 
     let currtime = `${hours}:${minutes}:${seconds} ${ampm}`;
 
-    let today = new Date();
-    var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth() + 1).padStart(2, "0");
-    var yyyy = today.getFullYear();
-    // today = yyyy + "-" + mm + "-" + dd;
-    const formattedToday = `${yyyy}-${mm}-${dd}`;
+    // let today = new Date(serverTime);
+    // var dd = String(today.getDate()).padStart(2, '0');
+    // var mm = String(today.getMonth() + 1).padStart(2, '0');
+    // var yyyy = today.getFullYear();
+    // // today = yyyy + "-" + mm + "-" + dd;
+    // const formattedToday = `${yyyy}-${mm}-${dd}`;
 
     setProducionIndividual({
-      vendor: "Please Select Vendor",
+      vendor: 'Please Select Vendor',
       fromdate: formattedToday,
 
-      fromtime24Hrs: dayjs(currtime, "h:mm:ss A"),
+      fromtime24Hrs: dayjs(currtime, 'h:mm:ss A'),
 
-      time: dayjs(currtime, "h:mm:ss A").format("HH:mm:ss"),
+      time: dayjs(currtime, 'h:mm:ss A').format('HH:mm:ss'),
 
-      starttime24Hrs: dayjs(currtime, "h:mm:ss A"),
-      starttime: dayjs(currtime, "h:mm:ss A").format("HH:mm:ss"),
+      starttime24Hrs: dayjs(currtime, 'h:mm:ss A'),
+      starttime: dayjs(currtime, 'h:mm:ss A').format('HH:mm:ss'),
 
-      enddatemode: "Auto",
-      datemode: "Auto",
-      datetimezone: "",
-      category: "Please Select Subcategory",
-      filename: "Please Select Category",
+      enddatemode: 'Auto',
+      datemode: 'Auto',
+      datetimezone: '',
+      category: 'Please Select Subcategory',
+      filename: 'Please Select Category',
       startbuttonstatus: false,
-      remarks: "",
-      creationstatus: "New",
-      unitid: "",
-      alllogin: "Please Select AllLogin",
-      user: "Please Select Loginid",
-      mode: "",
-      docnumber: "",
-      doclink: "",
+      remarks: '',
+      creationstatus: 'New',
+      unitid: '',
+      alllogin: 'Please Select AllLogin',
+      user: 'Please Select Loginid',
+      mode: '',
+      docnumber: '',
+      doclink: '',
 
-      statusmode: "Please Select Status",
+      statusmode: 'Please Select Status',
       flagcount: 0,
-      section: "1",
-      addedby: "",
-      updatedby: "",
-      pendingpages: "",
-      notes: "",
+      section: '1',
+      addedby: '',
+      updatedby: '',
+      pendingpages: '',
+      notes: '',
       totalpages: 0,
       completepages: 0,
-      startpage: "",
-      reason: "",
+      startpage: '',
+      reason: '',
       startdate: formattedToday,
-      startdatemode: "Auto",
+      startdatemode: 'Auto',
     });
     setSubcategories([]);
     setCategories([]);
     setClientUserIDArray([]);
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
+
+  useEffect(() => {
+    setProducionIndividual({
+      ...ProducionIndividual,
+      fromdate: formattedToday,
+      fromtime24Hrs: dayjs(moment(serverTime).format('hh:mm:ss A'), 'h:mm:ss A'),
+
+      time: dayjs(moment(serverTime).format('hh:mm:ss A'), 'h:mm:ss A').format('HH:mm:ss'),
+
+      starttime24Hrs: dayjs(moment(serverTime).format('hh:mm:ss A'), 'h:mm:ss A'),
+      starttime: dayjs(moment(serverTime).format('hh:mm:ss A'), 'h:mm:ss A').format('HH:mm:ss'),
+
+    });
+  }, [formattedToday])
 
   //get all project.
   const fetchProductionIndividual = async () => {
@@ -895,8 +937,8 @@ function ProductionIndividual() {
 
       let vendorall = res_vendor?.data?.vendormaster.map((d) => ({
         ...d,
-        label: d.projectname + "-" + d.name,
-        value: d.projectname + "-" + d.name,
+        label: d.projectname + '-' + d.name,
+        value: d.projectname + '-' + d.name,
       }));
 
       setVendors(vendorall);
@@ -911,7 +953,7 @@ function ProductionIndividual() {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
-        project: project.split("-")[0],
+        project: project.split('-')[0],
         category: cate,
         subcategory: sub,
         // name: e.split("-")[0],
@@ -972,7 +1014,7 @@ function ProductionIndividual() {
   //   }
   // };
   const fetchAllCategory = async (provendoe) => {
-    setProducionIndividual({ ...ProducionIndividual, user: "Please Select Loginid", vendor: provendoe, alllogin: "Please Select AllLogin", filename: "Please Select Category", category: "Please Select Subcategory" });
+    setProducionIndividual({ ...ProducionIndividual, user: 'Please Select Loginid', vendor: provendoe, alllogin: 'Please Select AllLogin', filename: 'Please Select Category', category: 'Please Select Subcategory' });
 
     try {
       let res_vendor = await axios.post(SERVICE.CATEGORY_PROD_LIMITED_NAMEONLY, {
@@ -1067,7 +1109,7 @@ function ProductionIndividual() {
   //get all Sub vendormasters.
   const fetchAllLogins = async () => {
     try {
-      if (ProducionIndividual.fromdate !== "") {
+      if (ProducionIndividual.fromdate !== '') {
         let res_vendor = await axios.post(SERVICE.CLIENTUSERID_LIMITED_BYCOMPNYNAME, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
@@ -1102,7 +1144,7 @@ function ProductionIndividual() {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
-        project:e
+        project: e,
       });
 
       let result = res_vendor?.data?.clientuserid;
@@ -1132,14 +1174,14 @@ function ProductionIndividual() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Production Manual Entry"),
+      pagename: String('Production Manual Entry'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(new Date()),
+      date: String(new Date(serverTime)),
 
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(new Date()),
+          date: String(new Date(serverTime)),
         },
       ],
     });
@@ -1163,12 +1205,12 @@ function ProductionIndividual() {
   };
   const webcamClose = () => {
     setIsWebcamOpen(false);
-    setGetImg("");
+    setGetImg('');
   };
   const webcamDataStore = () => {
     setIsWebcamCapture(true);
     webcamClose();
-    setGetImg("");
+    setGetImg('');
   };
   const showWebcam = () => {
     webcamOpen();
@@ -1180,24 +1222,24 @@ function ProductionIndividual() {
   };
   const handleUploadPopupClose = () => {
     setUploadPopupOpen(false);
-    setGetImg("");
+    setGetImg('');
     setRefImage([]);
     setPreviewURL(null);
     setRefImageDrag([]);
     setCapturedImages([]);
   };
   const getFileIcon = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -1212,7 +1254,7 @@ function ProductionIndividual() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -1220,14 +1262,14 @@ function ProductionIndividual() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImage(newSelectedFiles);
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("warning");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('warning');
         handleClickOpenPopupMalert();
       }
     }
@@ -1241,9 +1283,9 @@ function ProductionIndividual() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
   const removeCapturedImage = (index) => {
     const newCapturedImages = [...capturedImages];
@@ -1251,7 +1293,7 @@ function ProductionIndividual() {
     setCapturedImages(newCapturedImages);
   };
   const resetImage = () => {
-    setGetImg("");
+    setGetImg('');
     setRefImage([]);
     setPreviewURL(null);
     setRefImageDrag([]);
@@ -1267,7 +1309,7 @@ function ProductionIndividual() {
     let newSelectedFilesDrag = [...refImageDrag];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFilesDrag.push({
@@ -1275,14 +1317,14 @@ function ProductionIndividual() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImageDrag(newSelectedFilesDrag);
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("warning");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('warning');
         handleClickOpenPopupMalert();
       }
     }
@@ -1306,23 +1348,23 @@ function ProductionIndividual() {
   };
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
   return (
     <Box>
-      <Headtitle title={"Production Manual Entry"} />
+      <Headtitle title={'Production Manual Entry'} />
       {/* ****** Header Content ****** */}
       <PageHeading title="Production Manual Entry" modulename="Production" submodulename="Manual Entry" mainpagename="Production Manual Entry" subpagename="" subsubpagename="" />
-      {isUserRoleCompare?.includes("aproductionmanualentry") && (
+      {isUserRoleCompare?.includes('aproductionmanualentry') && (
         <>
           <Box sx={userStyle.selectcontainer}>
             <>
@@ -1333,18 +1375,18 @@ function ProductionIndividual() {
               </Grid>
               <br />
               <Grid container spacing={2}>
-              <Grid item md={3} xs={12} sm={6}>
+                <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Vendor <b style={{ color: "red" }}>*</b>
+                      Vendor <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={vendors}
                       styles={colourStyles}
                       value={{ label: ProducionIndividual.vendor, value: ProducionIndividual.vendor }}
                       onChange={(e) => {
-                        fetchAllCategory(e.value); fetchClientUserID(e.value);
-                      
+                        fetchAllCategory(e.value);
+                        fetchClientUserID(e.value);
                       }}
                     />
                   </FormControl>
@@ -1352,14 +1394,14 @@ function ProductionIndividual() {
                 <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Category <b style={{ color: "red" }}>*</b>
+                      Category <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={categories}
                       styles={colourStyles}
                       value={{ label: ProducionIndividual.filename, value: ProducionIndividual.filename }}
                       onChange={(e) => {
-                        setProducionIndividual({ ...ProducionIndividual, filename: e.value, category: "Please Select Subcategory" });
+                        setProducionIndividual({ ...ProducionIndividual, filename: e.value, category: 'Please Select Subcategory' });
                         fetchAllSubCategory(ProducionIndividual.vendor, e.value);
                         setSubcategories([]);
                       }}
@@ -1369,7 +1411,7 @@ function ProductionIndividual() {
                 <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Sub Category <b style={{ color: "red" }}>*</b>
+                      Sub Category <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={subcategories}
@@ -1389,7 +1431,7 @@ function ProductionIndividual() {
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Date Mode <b style={{ color: "red" }}>*</b>
+                          Date Mode <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           options={datemodes}
@@ -1412,20 +1454,20 @@ function ProductionIndividual() {
                         <Grid item md={6} sm={6} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>
-                              Date <b style={{ color: "red" }}>*</b>
+                              Date <b style={{ color: 'red' }}>*</b>
                             </Typography>
                             <OutlinedInput
                               id="component-outlinedname"
                               type="date"
-                              disabled={ProducionIndividual.datemode === "Auto"}
+                              disabled={ProducionIndividual.datemode === 'Auto'}
                               value={ProducionIndividual.fromdate}
                               // onChange={(e) => {
                               //     setProducionIndividual({ ...ProducionIndividual, fromdate: e.target.value });
                               // }}
                               onChange={handleDateChange}
                               inputProps={{
-                                max: ProducionIndividual.datemode === "Manual" ? formattedToday : undefined,
-                                min: ProducionIndividual.datemode === "Manual" ? formattedTwoMonthsAgo : undefined,
+                                max: ProducionIndividual.datemode === 'Manual' ? formattedToday : undefined,
+                                min: ProducionIndividual.datemode === 'Manual' ? formattedTwoMonthsAgo : undefined,
                               }}
                             />
                           </FormControl>
@@ -1433,7 +1475,7 @@ function ProductionIndividual() {
                         <Grid item md={6} sm={6} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>
-                              Time <b style={{ color: "red" }}>*</b>
+                              Time <b style={{ color: 'red' }}>*</b>
                             </Typography>
                             {/* <OutlinedInput
                               id="component-outlinedname"
@@ -1446,9 +1488,9 @@ function ProductionIndividual() {
                             /> */}
                             <Space wrap>
                               <TimePicker
-                                style={{ width: "100%" }}
+                                style={{ width: '100%' }}
                                 className="custom-timepicker-bulkmanual"
-                                disabled={ProducionIndividual.datemode === "Auto"}
+                                disabled={ProducionIndividual.datemode === 'Auto'}
                                 fullWidth
                                 use12Hours
                                 format="h:mm:ss A"
@@ -1470,7 +1512,7 @@ function ProductionIndividual() {
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Creation Status <b style={{ color: "red" }}>*</b>
+                          Creation Status <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           options={creationmode}
@@ -1479,7 +1521,7 @@ function ProductionIndividual() {
                             setProducionIndividual({
                               ...ProducionIndividual,
                               creationstatus: e.value,
-                              statusmode: "Completed",
+                              statusmode: 'Completed',
                             });
                           }}
                         ></Selects>
@@ -1489,7 +1531,7 @@ function ProductionIndividual() {
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Start Date Mode <b style={{ color: "red" }}>*</b>
+                          Start Date Mode <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           options={datemodes}
@@ -1512,17 +1554,17 @@ function ProductionIndividual() {
                         <Grid item md={6} sm={6} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>
-                              Start Date <b style={{ color: "red" }}>*</b>
+                              Start Date <b style={{ color: 'red' }}>*</b>
                             </Typography>
                             <OutlinedInput
                               id="component-outlinedname"
                               type="date"
-                              disabled={ProducionIndividual.startdatemode === "Auto"}
+                              disabled={ProducionIndividual.startdatemode === 'Auto'}
                               value={ProducionIndividual.startdate}
                               onChange={handleDateChangeStart}
                               inputProps={{
-                                max: ProducionIndividual.startdatemode === "Manual" ? formattedToday : undefined,
-                                min: ProducionIndividual.startdatemode === "Manual" ? formattedTwoMonthsAgo : undefined,
+                                max: ProducionIndividual.startdatemode === 'Manual' ? formattedToday : undefined,
+                                min: ProducionIndividual.startdatemode === 'Manual' ? formattedTwoMonthsAgo : undefined,
                               }}
                             />
                           </FormControl>
@@ -1530,7 +1572,7 @@ function ProductionIndividual() {
                         <Grid item md={6} sm={6} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>
-                              Start Time <b style={{ color: "red" }}>*</b>
+                              Start Time <b style={{ color: 'red' }}>*</b>
                             </Typography>
                             {/* <OutlinedInput
                               id="component-outlinedname"
@@ -1543,9 +1585,9 @@ function ProductionIndividual() {
                             /> */}
                             <Space wrap>
                               <TimePicker
-                                style={{ width: "100%" }}
+                                style={{ width: '100%' }}
                                 className="custom-timepicker-bulkmanual"
-                                disabled={ProducionIndividual.startdatemode === "Auto"}
+                                disabled={ProducionIndividual.startdatemode === 'Auto'}
                                 fullWidth
                                 use12Hours
                                 format="h:mm:ss A"
@@ -1566,7 +1608,7 @@ function ProductionIndividual() {
                 <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Identifier <b style={{ color: "red" }}>*</b>
+                      Identifier <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlinedname"
@@ -1582,7 +1624,7 @@ function ProductionIndividual() {
                 <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Login Id <b style={{ color: "red" }}>*</b>
+                      Login Id <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={loginAllotFilter}
@@ -1597,7 +1639,7 @@ function ProductionIndividual() {
                 <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      All Login <b style={{ color: "red" }}>*</b>
+                      All Login <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <Selects
                       options={clientUserIDArray}
@@ -1615,7 +1657,7 @@ function ProductionIndividual() {
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Flag Count<b style={{ color: "red" }}>*</b>
+                          Flag Count<b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput id="component-outlinedname" type="text" placeholder="Please Enter Completed Pages" value={ProducionIndividual.flagcount} onChange={(e) => handleChangephonenumberflag(e)} />
                       </FormControl>
@@ -1628,7 +1670,7 @@ function ProductionIndividual() {
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Total Pages <b style={{ color: "red" }}>*</b>
+                          Total Pages <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput id="component-outlinedname" type="text" placeholder="Please Enter Total Pages" value={ProducionIndividual.totalpages} onChange={(e) => handleChangephonenumbertotal(e)} />
                       </FormControl>
@@ -1638,17 +1680,17 @@ function ProductionIndividual() {
                 <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Section <b style={{ color: "red" }}>*</b>
+                      Section <b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput id="component-outlinedname" type="text" placeholder="Please Enter Section" value={ProducionIndividual.section} onChange={(e) => handleChangephonenumber(e)} />
                   </FormControl>
                 </Grid>
-                {projectmaster && ProducionIndividual?.creationstatus === "Already Completed" && (
+                {projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' && (
                   <>
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Completed Pages <b style={{ color: "red" }}>*</b>
+                          Completed Pages <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput id="component-outlinedname" type="text" placeholder="Please Enter Completed Pages" value={ProducionIndividual.flagcount} onChange={(e) => handleChangephonenumberflagCompleted(e)} />
                       </FormControl>
@@ -1656,7 +1698,7 @@ function ProductionIndividual() {
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Pending Pages <b style={{ color: "red" }}>*</b>
+                          Pending Pages <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput id="component-outlinedname" type="text" value={ProducionIndividual.pendingpages} />
                       </FormControl>
@@ -1665,7 +1707,7 @@ function ProductionIndividual() {
                       <FormControl fullWidth size="small">
                         <Typography>
                           Start Page
-                          <b style={{ color: "red" }}>*</b>
+                          <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput id="component-outlinedname" type="text" value={ProducionIndividual.startpage} />
                         {/* <Selects
@@ -1691,7 +1733,7 @@ function ProductionIndividual() {
                   </>
                 )}
 
-                {projectmaster && ProducionIndividual?.creationstatus === "Already Completed" ? (
+                {projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' ? (
                   <>
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
@@ -1722,8 +1764,8 @@ function ProductionIndividual() {
                       </FormControl>
                     </Grid>
                   </>
-                ) : projectmaster && ProducionIndividual?.creationstatus === "New" ? (
-                  ""
+                ) : projectmaster && ProducionIndividual?.creationstatus === 'New' ? (
+                  ''
                 ) : (
                   <>
                     <Grid item md={3} xs={12} sm={6}>
@@ -1757,12 +1799,12 @@ function ProductionIndividual() {
                   </>
                 )}
 
-                {projectmaster && ProducionIndividual?.creationstatus === "Already Completed" && (
+                {projectmaster && ProducionIndividual?.creationstatus === 'Already Completed' && (
                   <>
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          Status <b style={{ color: "red" }}>*</b>
+                          Status <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <OutlinedInput id="component-outlinedname" type="text" value={ProducionIndividual.statusmode} />
                         {/* <Selects
@@ -1778,7 +1820,7 @@ function ProductionIndividual() {
                     <Grid item md={3} xs={12} sm={6}>
                       <FormControl fullWidth size="small">
                         <Typography>
-                          End Date Mode <b style={{ color: "red" }}>*</b>
+                          End Date Mode <b style={{ color: 'red' }}>*</b>
                         </Typography>
                         <Selects
                           options={datemodes}
@@ -1800,33 +1842,33 @@ function ProductionIndividual() {
                         <Grid item md={6} sm={6} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>
-                              End Date <b style={{ color: "red" }}>*</b>
+                              End Date <b style={{ color: 'red' }}>*</b>
                             </Typography>
                             <OutlinedInput
                               id="component-outlinedname"
                               type="date"
-                              disabled={ProducionIndividual.enddatemode === "Auto"}
+                              disabled={ProducionIndividual.enddatemode === 'Auto'}
                               value={ProducionIndividual.fromdate}
                               onChange={handleEndDateChange}
                               onBlur={handleEndDateBlueChange}
-                              // inputProps={{
-                              //     max: ProducionIndividual.enddatemode === 'Manual' ? formattedToday : undefined,
-                              //     // min: ProducionIndividual.enddatemode === 'Manual' ? formattedTwoMonthsAgo : undefined
-                              // }}
+                            // inputProps={{
+                            //     max: ProducionIndividual.enddatemode === 'Manual' ? formattedToday : undefined,
+                            //     // min: ProducionIndividual.enddatemode === 'Manual' ? formattedTwoMonthsAgo : undefined
+                            // }}
                             />
                           </FormControl>
                         </Grid>
                         <Grid item md={6} sm={6} xs={12}>
                           <FormControl fullWidth size="small">
                             <Typography>
-                              End Time <b style={{ color: "red" }}>*</b>
+                              End Time <b style={{ color: 'red' }}>*</b>
                             </Typography>
 
                             <Space wrap>
                               <TimePicker
-                                style={{ width: "100%" }}
+                                style={{ width: '100%' }}
                                 className="custom-timepicker-bulkmanual"
-                                disabled={ProducionIndividual.enddatemode === "Auto"}
+                                disabled={ProducionIndividual.enddatemode === 'Auto'}
                                 fullWidth
                                 use12Hours
                                 format="h:mm:ss A"
@@ -1869,7 +1911,7 @@ function ProductionIndividual() {
                     </Grid>
                     <Grid item md={3} xs={12} sm={6}>
                       <Typography>Attachment</Typography>
-                      <Box sx={{ display: "flex", justifyContent: "left" }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
                         <Button variant="contained" onClick={handleClickUploadPopupOpen}>
                           Upload
                         </Button>
@@ -1882,7 +1924,7 @@ function ProductionIndividual() {
               <Grid container>
                 <Grid item md={3} xs={12} sm={6}>
                   <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
-                    {projectmaster && ProducionIndividual?.creationstatus === "New" ? "Start" : "Submit"}
+                    {projectmaster && ProducionIndividual?.creationstatus === 'New' ? 'Start' : 'Submit'}
                   </Button>
                 </Grid>
                 <Grid item md={3} xs={12} sm={6}>
@@ -1901,16 +1943,16 @@ function ProductionIndividual() {
       {/* ALERT DIALOG */}
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={handleCloseerr}
             >
@@ -1921,14 +1963,14 @@ function ProductionIndividual() {
       </Box>
 
       {/* UPLOAD IMAGE DIALOG */}
-      <Dialog open={uploadPopupOpen} onClose={handleUploadPopupClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: "95px" }}>
-        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}>
+      <Dialog open={uploadPopupOpen} onClose={handleUploadPopupClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
-              <Typography variant="body2" style={{ marginTop: "5px" }}>
+              <Typography variant="body2" style={{ marginTop: '5px' }}>
                 {/* Max File size: 5MB */}
               </Typography>
               <div onDragOver={handleDragOver} onDrop={handleDrop}>
@@ -1940,12 +1982,12 @@ function ProductionIndividual() {
                           src={file.preview}
                           alt={file.name}
                           style={{
-                            maxWidth: "70px",
-                            maxHeight: "70px",
-                            marginTop: "10px",
+                            maxWidth: '70px',
+                            maxHeight: '70px',
+                            marginTop: '10px',
                           }}
                         />
-                        <Button onClick={() => handleRemoveFile(index)} style={{ marginTop: "0px", color: "red" }}>
+                        <Button onClick={() => handleRemoveFile(index)} style={{ marginTop: '0px', color: 'red' }}>
                           X
                         </Button>
                       </>
@@ -1954,18 +1996,18 @@ function ProductionIndividual() {
                 ) : (
                   <div
                     style={{
-                      marginTop: "10px",
-                      marginLeft: "0px",
-                      border: "1px dashed #ccc",
-                      padding: "0px",
-                      width: "100%",
-                      height: "150px",
-                      display: "flex",
-                      alignContent: "center",
-                      textAlign: "center",
+                      marginTop: '10px',
+                      marginLeft: '0px',
+                      border: '1px dashed #ccc',
+                      padding: '0px',
+                      width: '100%',
+                      height: '150px',
+                      display: 'flex',
+                      alignContent: 'center',
+                      textAlign: 'center',
                     }}
                   >
-                    <div style={{ display: "flex", margin: "50px auto" }}>
+                    <div style={{ display: 'flex', margin: '50px auto' }}>
                       <ContentCopyIcon /> Drag and drop
                     </div>
                   </div>
@@ -1975,7 +2017,7 @@ function ProductionIndividual() {
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
+                <Grid sx={{ display: 'flex' }}>
                   <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
                     Upload
                     <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChange} />
@@ -1994,13 +2036,13 @@ function ProductionIndividual() {
                     <Grid item md={2} sm={2} xs={12}>
                       <Box
                         style={{
-                          isplay: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          marginLeft: "37px",
+                          isplay: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          marginLeft: '37px',
                         }}
                       >
-                        <img src={image.preview} alt={image.name} height={50} style={{ maxWidth: "-webkit-fill-available" }} />
+                        <img src={image.preview} alt={image.name} height={50} style={{ maxWidth: '-webkit-fill-available' }} />
                       </Box>
                     </Grid>
                     <Grid
@@ -2009,52 +2051,52 @@ function ProductionIndividual() {
                       sm={7}
                       xs={12}
                       sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
                       <Typography variant="subtitle2"> {image.name} </Typography>
                     </Grid>
                     <Grid item md={1} sm={1} xs={12}>
-                      <Grid sx={{ display: "flex" }}>
+                      <Grid sx={{ display: 'flex' }}>
                         <Button
                           sx={{
-                            marginTop: "15px !important",
-                            padding: "14px 14px",
-                            minWidth: "40px !important",
-                            borderRadius: "50% !important",
-                            ":hover": {
-                              backgroundColor: "#80808036", // theme.palette.primary.main
+                            marginTop: '15px !important',
+                            padding: '14px 14px',
+                            minWidth: '40px !important',
+                            borderRadius: '50% !important',
+                            ':hover': {
+                              backgroundColor: '#80808036', // theme.palette.primary.main
                             },
                           }}
                           onClick={() => renderFilePreview(image)}
                         >
                           <VisibilityOutlinedIcon
                             style={{
-                              fontsize: "12px",
-                              color: "#357AE8",
-                              marginTop: "35px !important",
+                              fontsize: '12px',
+                              color: '#357AE8',
+                              marginTop: '35px !important',
                             }}
                           />
                         </Button>
                         <Button
                           sx={{
-                            marginTop: "15px !important",
-                            padding: "14px 14px",
-                            minWidth: "40px !important",
-                            borderRadius: "50% !important",
-                            ":hover": {
-                              backgroundColor: "#80808036",
+                            marginTop: '15px !important',
+                            padding: '14px 14px',
+                            minWidth: '40px !important',
+                            borderRadius: '50% !important',
+                            ':hover': {
+                              backgroundColor: '#80808036',
                             },
                           }}
                           onClick={() => removeCapturedImage(index)}
                         >
                           <FaTrash
                             style={{
-                              color: "#a73131",
-                              fontSize: "12px",
-                              marginTop: "35px !important",
+                              color: '#a73131',
+                              fontSize: '12px',
+                              marginTop: '35px !important',
                             }}
                           />
                         </Button>
@@ -2067,18 +2109,18 @@ function ProductionIndividual() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
@@ -2092,40 +2134,40 @@ function ProductionIndividual() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreview(file)}
                       >
-                        <VisibilityOutlinedIcon style={{ fontsize: "12px", color: "#357AE8" }} />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFile(index)}
                       >
-                        <FaTrash style={{ color: "#a73131", fontSize: "12px" }} />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -2151,10 +2193,10 @@ function ProductionIndividual() {
       <Dialog open={isWebcamOpen} onClose={webcamClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="sm" fullWidth={true}>
         <DialogContent
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            textAlign: "center",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'center',
+            textAlign: 'center',
+            alignItems: 'center',
           }}
         >
           <Webcamimage name={name} getImg={getImg} setGetImg={setGetImg} valNum={valNum} setValNum={setValNum} capturedImages={capturedImages} setCapturedImages={setCapturedImages} setRefImage={setRefImage} setRefImageDrag={setRefImageDrag} />

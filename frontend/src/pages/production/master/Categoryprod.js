@@ -38,8 +38,19 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import Chip from '@mui/material/Chip';
+import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
+
 
 function CategoryMaster() {
+  const [serverTime, setServerTime] = useState(null);
+    useEffect(() => {
+      const fetchTime = async () => {
+        const time = await getCurrentServerTime();
+        setServerTime(time);
+      };
+  
+      fetchTime();
+    }, []);
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
   const [popupContentMalert, setPopupContentMalert] = useState('');
   const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
@@ -1107,7 +1118,7 @@ function CategoryMaster() {
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
@@ -1127,7 +1138,7 @@ function CategoryMaster() {
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
@@ -1536,7 +1547,7 @@ function CategoryMaster() {
             ...updateby,
             {
               name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
+              date: String(new Date(serverTime)),
             },
           ],
         });
@@ -1670,7 +1681,7 @@ function CategoryMaster() {
           ...updateby,
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
@@ -1856,12 +1867,12 @@ function CategoryMaster() {
       companyname: String(isUserRoleAccess?.companyname),
       pagename: String('Production Category'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(new Date()),
+      date: String(new Date(serverTime)),
 
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(new Date()),
+          date: String(new Date(serverTime)),
         },
       ],
     });

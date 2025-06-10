@@ -31,8 +31,19 @@ import { AuthContext, UserRoleAccessContext } from '../../../context/Appcontext.
 import { userStyle } from '../../../pageStyle.js';
 import { SERVICE } from '../../../services/Baseservice.js';
 import domtoimage from 'dom-to-image';
+import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
+
 
 function Productionunitrate() {
+  const [serverTime, setServerTime] = useState(null);
+    useEffect(() => {
+      const fetchTime = async () => {
+        const time = await getCurrentServerTime();
+        setServerTime(time);
+      };
+  
+      fetchTime();
+    }, []);
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
 
@@ -317,7 +328,7 @@ function Productionunitrate() {
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
@@ -343,12 +354,12 @@ function Productionunitrate() {
       companyname: String(isUserRoleAccess?.companyname),
       pagename: String('Production Unit Rate'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(new Date()),
+      date: String(new Date(serverTime)),
 
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(new Date()),
+          date: String(new Date(serverTime)),
         },
       ],
     });
@@ -616,7 +627,7 @@ function Productionunitrate() {
           ...updateby,
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });

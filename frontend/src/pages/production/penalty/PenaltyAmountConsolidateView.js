@@ -1,107 +1,211 @@
-import CloseIcon from "@mui/icons-material/Close";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import ImageIcon from "@mui/icons-material/Image";
+import CloseIcon from '@mui/icons-material/Close';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import ImageIcon from '@mui/icons-material/Image';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, Grid, IconButton, List, ListItem, ListItemText, MenuItem, Paper, Popover, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, Grid, IconButton, List, ListItem, ListItemText, MenuItem, Paper, Popover, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import Switch from '@mui/material/Switch';
+// import axios from "axios";
+import axios from '../../../axiosInstance';
+
 import * as FileSaver from 'file-saver';
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import { useParams, Link } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import { useParams, Link } from 'react-router-dom';
+import { useReactToPrint } from 'react-to-print';
 import * as XLSX from 'xlsx';
 import AggregatedSearchBar from '../../../components/AggregatedSearchBar';
-import AggridTable from "../../../components/AggridTable";
-import { handleApiError } from "../../../components/Errorhandling";
-import Headtitle from "../../../components/Headtitle";
-import { AuthContext, UserRoleAccessContext } from "../../../context/Appcontext";
-import { userStyle } from "../../../pageStyle";
-import { SERVICE } from "../../../services/Baseservice";
+import AggridTable from '../../../components/AggridTable';
+import { handleApiError } from '../../../components/Errorhandling';
+import Headtitle from '../../../components/Headtitle';
+import { AuthContext, UserRoleAccessContext } from '../../../context/Appcontext';
+import { userStyle } from '../../../pageStyle';
+import { SERVICE } from '../../../services/Baseservice';
 import domtoimage from 'dom-to-image';
-import ExportData from "../../../components/ExportData";
-import MessageAlert from "../../../components/MessageAlert";
-
+import ExportData from '../../../components/ExportData';
+import MessageAlert from '../../../components/MessageAlert';
 
 function PenaltyAmountConsolidateView() {
   let exportColumnNames = [
-    'Company', 'Branch', 'Unit',
-    'Team', 'Process Code', 'Name',
-    'Emp Code', 'From Date', 'To Date', 'Vendor Name',
-    'Process', 'Total Field', 'Auto Error',
-    'Manual Error', 'Upload Error', 'Moved',
-    'Not Upload', 'Penalty', 'Non Penalty',
-    'Bulk Upload', 'Bulk Keying', 'Edited1',
-    'Edited2', 'Edited3', 'Edited4',
-    'Reject1', 'Reject2', 'Reject3',
-    'Reject4', 'Not Validate', 'Validate Error',
-    'Waiver% Error', 'Net Error',
+    'Company',
+    'Branch',
+    'Unit',
+    'Team',
+    'Process Code',
+    'Name',
+    'Emp Code',
+    'From Date',
+    'To Date',
+    'Vendor Name',
+    'Process',
+    'Total Field',
+    'Auto Error',
+    'Manual Error',
+    'Upload Error',
+    'Moved',
+    'Not Upload',
+    'Penalty',
+    'Non Penalty',
+    'Bulk Upload',
+    'Bulk Keying',
+    'Edited1',
+    'Edited2',
+    'Edited3',
+    'Edited4',
+    'Reject1',
+    'Reject2',
+    'Reject3',
+    'Reject4',
+    'Not Validate',
+    'Validate Error',
+    'Waiver% Error',
+    'Net Error',
     // 'Per%',
-    'Percentage', 'Amount', 'Not Approved',
-    'Client Amount', 'Waiver Amount', 'Total Amount'
+    'Percentage',
+    'Amount',
+    'Not Approved',
+    'Client Amount',
+    'Waiver Amount',
+    'Total Amount',
   ];
   let exportRowValues = [
-    'company', 'branch', 'unit',
-    'team', 'processcode', 'name',
-    'empcode', 'fromdate', 'todate', 'vendorname',
-    'process', 'totalfield', 'autoerror',
-    'manualerror', 'uploaderror', 'moved',
-    'notupload', 'penalty', 'nonpenalty',
-    'bulkupload', 'bulkkeying', 'edited1',
-    'edited2', 'edited3', 'edited4',
-    'reject1', 'reject2', 'reject3',
-    'reject4', 'notvalidate', 'validateerror',
-    'waivererror', 'neterror',
+    'company',
+    'branch',
+    'unit',
+    'team',
+    'processcode',
+    'name',
+    'empcode',
+    'fromdate',
+    'todate',
+    'vendorname',
+    'process',
+    'totalfield',
+    'autoerror',
+    'manualerror',
+    'uploaderror',
+    'moved',
+    'notupload',
+    'penalty',
+    'nonpenalty',
+    'bulkupload',
+    'bulkkeying',
+    'edited1',
+    'edited2',
+    'edited3',
+    'edited4',
+    'reject1',
+    'reject2',
+    'reject3',
+    'reject4',
+    'notvalidate',
+    'validateerror',
+    'waivererror',
+    'neterror',
     // 'per',
-    'percentage', 'amount', 'notapproved',
-   'clientamount', 'waiveramount', 'totalamount'
+    'percentage',
+    'amount',
+    'notapprovedcount',
+    'clientamount',
+    'waiveramount',
+    'totalamount',
   ];
 
   let exportColumnNamesviewall = [
-    'Company', 'Branch', 'Unit',
-    'Team', 'Process Code', 'Name',
-    'Emp Code', 'From Date', 'Vendor Name',
-    'Process', 'Total Field', 'Auto Error',
-    'Manual Error', 'Upload Error', 'Moved',
-    'Not Upload', 'Penalty', 'Non Penalty',
-    'Bulk Upload', 'Bulk Keying', 'Edited1',
-    'Edited2', 'Edited3', 'Edited4',
-    'Reject1', 'Reject2', 'Reject3',
-    'Reject4', 'Not Validate', 'Validate Error',
-    'Waiver% Error', 'Net Error',
+    'Company',
+    'Branch',
+    'Unit',
+    'Team',
+    'Process Code',
+    'Name',
+    'Emp Code',
+    'From Date',
+    'Vendor Name',
+    'Process',
+    'Total Field',
+    'Auto Error',
+    'Manual Error',
+    'Upload Error',
+    'Moved',
+    'Not Upload',
+    'Penalty',
+    'Non Penalty',
+    'Bulk Upload',
+    'Bulk Keying',
+    'Edited1',
+    'Edited2',
+    'Edited3',
+    'Edited4',
+    'Reject1',
+    'Reject2',
+    'Reject3',
+    'Reject4',
+    'Not Validate',
+    'Validate Error',
+    'Waiver% Error',
+    'Net Error',
     //  'Per%',
-    'Percentage', 'Amount'
+    'Percentage',
+    'Amount',
+    'Not Approved',
+    'Client Amount',
+    'Waiver Amount',
+    'Total Amount',
   ];
   let exportRowValuesviewall = [
-    'company', 'branch', 'unit',
-    'team', 'processcode', 'name',
-    'empcode', 'date', 'vendorname',
-    'process', 'totalfield', 'autoerror',
-    'manualerror', 'uploaderror', 'moved',
-    'notupload', 'penalty', 'nonpenalty',
-    'bulkupload', 'bulkkeying', 'edited1',
-    'edited2', 'edited3', 'edited4',
-    'reject1', 'reject2', 'reject3',
-    'reject4', 'notvalidate', 'validateerror',
-    'waivererror', 'neterror',
+    'company',
+    'branch',
+    'unit',
+    'team',
+    'processcode',
+    'name',
+    'empcode',
+    'date',
+    'vendorname',
+    'process',
+    'totalfield',
+    'autoerror',
+    'manualerror',
+    'uploaderror',
+    'moved',
+    'notupload',
+    'penalty',
+    'nonpenalty',
+    'bulkupload',
+    'bulkkeying',
+    'edited1',
+    'edited2',
+    'edited3',
+    'edited4',
+    'reject1',
+    'reject2',
+    'reject3',
+    'reject4',
+    'notvalidate',
+    'validateerror',
+    'waivererror',
+    'neterror',
     // 'per',
-    'percentage', 'amount', 'notapproved',
-    'clientamount', 'netamount'
+    'percentage',
+    'amount',
+    'notapprovedcount',
+    'clientamount',
+    'waiveramount',
+    'totalamount',
   ];
-  const [clientUserIDFilterArray, setClientUserIDFilterArray] = useState([])
-  const [clientUserIDFilterArrayview, setClientUserIDFilterArrayview] = useState([])
-  const [clientUserIDFilterArrayviewcheck, setClientUserIDFilterArrayviewcheck] = useState(false)
+  const [clientUserIDFilterArray, setClientUserIDFilterArray] = useState([]);
+  const [clientUserIDFilterArrayview, setClientUserIDFilterArrayview] = useState([]);
+  const [clientUserIDFilterArrayviewcheck, setClientUserIDFilterArrayviewcheck] = useState(false);
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -116,29 +220,27 @@ function PenaltyAmountConsolidateView() {
 
   const gridRef = useRef(null);
   const [isHandleChange, setIsHandleChange] = useState(false);
-  const [searchedString, setSearchedString] = useState("")
+  const [searchedString, setSearchedString] = useState('');
 
   const [isHandleChangeviewall, setIsHandleChangeviewall] = useState(false);
-  const [searchedStringviewall, setSearchedStringviewall] = useState("")
-
+  const [searchedStringviewall, setSearchedStringviewall] = useState('');
 
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
-  const [searchQueryManageviewall, setSearchQueryManageviewall] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
+  const [searchQueryManageviewall, setSearchQueryManageviewall] = useState('');
   const [clientUserIDArray, setClientUserIDArray] = useState([]);
-  const { isUserRoleCompare, buttonStyles, isUserRoleAccess, pageName, setPageName, isAssignBranch } = useContext(
-    UserRoleAccessContext
-  ); const gridRefviewall = useRef(null);
+  const { isUserRoleCompare, buttonStyles, isUserRoleAccess, pageName, setPageName, isAssignBranch } = useContext(UserRoleAccessContext);
+  const gridRefviewall = useRef(null);
   const { auth } = useContext(AuthContext);
 
   const [openviewAll, setOpenviewAll] = useState(false);
   const handleClickOpenviewAll = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setOpenviewAll(true);
   };
   const handleCloseviewAll = () => {
     setOpenviewAll(false);
-    setSearchQueryviewall("");
+    setSearchQueryviewall('');
     setPageviewall(1);
     setColumnVisibilityviewall(initialColumnVisibilityviewall);
   };
@@ -161,12 +263,12 @@ function PenaltyAmountConsolidateView() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [itemsviewall, setItemsviewall] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchQueryviewall, setSearchQueryviewall] = useState("");
-  const [copiedData, setCopiedData] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQueryviewall, setSearchQueryviewall] = useState('');
+  const [copiedData, setCopiedData] = useState('');
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [copiedDataviewall, setCopiedDataviewall] = useState("");
+  const [copiedDataviewall, setCopiedDataviewall] = useState('');
   const [isManageColumnsOpenviewall, setManageColumnsOpenviewall] = useState(false);
   const [anchorElviewall, setAnchorElviewall] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -219,12 +321,10 @@ function PenaltyAmountConsolidateView() {
     clientamount: true,
     waiveramount: true,
     totalamount: true,
-    notapprovedcount:true,
+    notapprovedcount: true,
     actions: true,
   };
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
 
   const initialColumnVisibilityviewall = {
     serialNumber: true,
@@ -273,13 +373,10 @@ function PenaltyAmountConsolidateView() {
     clientamount: true,
     waiveramount: true,
     totalamount: true,
-    notapprovedcount:true,
+    notapprovedcount: true,
     actions: true,
   };
-  const [columnVisibilityviewall, setColumnVisibilityviewall] = useState(
-    initialColumnVisibilityviewall
-  );
-
+  const [columnVisibilityviewall, setColumnVisibilityviewall] = useState(initialColumnVisibilityviewall);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
@@ -305,7 +402,6 @@ function PenaltyAmountConsolidateView() {
     setIsPdfFilterOpenviewall(false);
   };
 
-
   //useEffect
   useEffect(() => {
     addSerialNumber(clientUserIDFilterArray);
@@ -315,21 +411,18 @@ function PenaltyAmountConsolidateView() {
     addSerialNumberviewall(clientUserIDFilterArrayview);
   }, [clientUserIDFilterArrayview]);
 
-
-
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
-
 
   // page refersh reload password
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
   const username = isUserRoleAccess.username;
   // Manage Columns
@@ -339,9 +432,8 @@ function PenaltyAmountConsolidateView() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
-
 
   // Manage Columns
   const handleOpenManageColumnsviewall = (event) => {
@@ -350,7 +442,7 @@ function PenaltyAmountConsolidateView() {
   };
   const handleCloseManageColumnsviewall = () => {
     setManageColumnsOpenviewall(false);
-    setSearchQueryManageviewall("");
+    setSearchQueryManageviewall('');
   };
 
   const [isDeleteOpenalert, setIsDeleteOpenalert] = useState(false);
@@ -359,16 +451,16 @@ function PenaltyAmountConsolidateView() {
     setIsDeleteOpenalert(false);
   };
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
 
   const openviewall = Boolean(anchorElviewall);
-  const idviewall = openviewall ? "simple-popover" : undefined;
+  const idviewall = openviewall ? 'simple-popover' : undefined;
 
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   //Edit model...
@@ -376,71 +468,49 @@ function PenaltyAmountConsolidateView() {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
   };
 
   const ids = useParams().id;
   //get all client user id.
   const [loading, setLoading] = useState(false);
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-
-        // Check if the pathname exists in the URL
-        return fetfinalurl?.includes(window.location.pathname);
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-      }));
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
 
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
 
-
-
+          // Check if the pathname exists in the URL
+          return fetfinalurl?.includes(window.location.pathname);
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+        }));
 
   const fetchProductionListsArray = async () => {
-    setLoading(true)
-    setPageName(!pageName)
+    setLoading(true);
+    setPageName(!pageName);
     try {
       const res_freq = await axios.get(`${SERVICE.PENALTYAMOUNTCONSOLIDATED_SINGLE}/${ids}`, {
         headers: {
@@ -448,80 +518,83 @@ function PenaltyAmountConsolidateView() {
         },
       });
 
-      const res = await axios.post(`${SERVICE.PENALTY_AMOUNT_CONSOLIDATED_VIEW}`, {
-        fromdate: res_freq.data.spenaltyamountconsolidate.fromdate,
-        todate: res_freq.data.spenaltyamountconsolidate.todate,
-
-      }, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
+      const res = await axios.post(
+        `${SERVICE.PENALTY_AMOUNT_CONSOLIDATED_VIEW}`,
+        {
+          fromdate: res_freq.data.spenaltyamountconsolidate.fromdate,
+          todate: res_freq.data.spenaltyamountconsolidate.todate,
         },
-      })
-
+        {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        }
+      );
 
       const final = res?.data?.penaltymonth?.map((item, index) => ({
         ...item,
         serialNumber: index + 1,
-        fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
-        todate: moment(item.todate).format("DD-MM-YYYY"),
+        fromdate: moment(item.fromdate).format('DD-MM-YYYY'),
+        todate: moment(item.todate).format('DD-MM-YYYY'),
         oldfromdate: item.fromdate,
         oldtodate: item.todate,
-        waiveramount: item.amountclient?.toFixed(2) || 0.00,
-        totalamount: (item.clientamount - item.amountclient).toFixed(2) || 0.00,
-      }))
+        waiveramount: item.amountclient?.toFixed(2) || 0.0,
+        totalamount: (item.clientamount - item.amountclient).toFixed(2) || 0.0,
+      }));
 
-      setClientUserIDFilterArray(final)
-      setLoading(false)
-    } catch (err) { handleApiError(err, setLoading(false), setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setClientUserIDFilterArray(final);
+      setLoading(false);
+    } catch (err) {
+      handleApiError(err, setLoading(false), setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   useEffect(() => {
-    fetchProductionListsArray()
-  }, [])
-
-
+    fetchProductionListsArray();
+  }, []);
 
   const gridRefTableImg = useRef(null);
   const gridRefTableImgviewall = useRef(null);
   // image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Penalty Amount Consolidated  View.png");
+          saveAs(blob, 'Penalty Amount Consolidated  View.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
 
   const handleCaptureImageviewall = () => {
     if (gridRefTableImgviewall.current) {
-      domtoimage.toBlob(gridRefTableImgviewall.current)
+      domtoimage
+        .toBlob(gridRefTableImgviewall.current)
         .then((blob) => {
-          saveAs(blob, "Penalty Amount Consolidated  View Individual.png");
+          saveAs(blob, 'Penalty Amount Consolidated  View Individual.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
-
 
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Penalty Amount Consolidated View",
-    pageStyle: "print",
+    documentTitle: 'Penalty Amount Consolidated View',
+    pageStyle: 'print',
   });
 
   const componentRefviewall = useRef();
   const handleprintviewall = useReactToPrint({
     content: () => componentRefviewall.current,
-    documentTitle: "Penalty Amount Consolidated View",
-    pageStyle: "print",
+    documentTitle: 'Penalty Amount Consolidated View',
+    pageStyle: 'print',
   });
 
   //serial no for listing items
@@ -553,26 +626,19 @@ function PenaltyAmountConsolidateView() {
     setPage(1);
   };
 
-
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
 
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
-  const filteredData = filteredDatas?.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas?.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.ceil(filteredDatas?.length / pageSize);
   const visiblePages = Math.min(totalPages, 3);
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
   const pageNumbers = [];
   for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
     pageNumbers.push(i);
@@ -603,278 +669,278 @@ function PenaltyAmountConsolidateView() {
     //     lockPinned: true,
     // },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 50,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 100,
       hide: !columnVisibility.company,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 120,
       hide: !columnVisibility.branch,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 120,
       hide: !columnVisibility.unit,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "team",
-      headerName: "Team",
+      field: 'team',
+      headerName: 'Team',
       flex: 0,
       width: 120,
       hide: !columnVisibility.team,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "processcode",
-      headerName: "Process Code",
+      field: 'processcode',
+      headerName: 'Process Code',
       flex: 0,
       width: 120,
       hide: !columnVisibility.processcode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "name",
-      headerName: "Name",
+      field: 'name',
+      headerName: 'Name',
       flex: 0,
       width: 120,
       hide: !columnVisibility.name,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "empcode",
-      headerName: "Emp Code",
+      field: 'empcode',
+      headerName: 'Emp Code',
       flex: 0,
       width: 120,
       hide: !columnVisibility.empcode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "fromdate",
-      headerName: "From Date",
+      field: 'fromdate',
+      headerName: 'From Date',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.fromdate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "todate",
-      headerName: "To Date",
+      field: 'todate',
+      headerName: 'To Date',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.todate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "vendorname",
-      headerName: "Vendor Name",
+      field: 'vendorname',
+      headerName: 'Vendor Name',
       flex: 0,
       width: 100,
       hide: !columnVisibility.vendorname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "process",
-      headerName: "Process",
+      field: 'process',
+      headerName: 'Process',
       flex: 0,
       width: 100,
       hide: !columnVisibility.process,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "totalfield",
-      headerName: "Total Field",
+      field: 'totalfield',
+      headerName: 'Total Field',
       flex: 0,
       width: 100,
       hide: !columnVisibility.totalfield,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "autoerror",
-      headerName: "Auto Error",
+      field: 'autoerror',
+      headerName: 'Auto Error',
       flex: 0,
       width: 100,
       hide: !columnVisibility.autoerror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "manualerror",
-      headerName: "Manual Error",
+      field: 'manualerror',
+      headerName: 'Manual Error',
       flex: 0,
       width: 100,
       hide: !columnVisibility.manualerror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "uploaderror",
-      headerName: "Upload Error",
+      field: 'uploaderror',
+      headerName: 'Upload Error',
       flex: 0,
       width: 100,
       hide: !columnVisibility.uploaderror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "moved",
-      headerName: "Moved",
+      field: 'moved',
+      headerName: 'Moved',
       flex: 0,
       width: 100,
       hide: !columnVisibility.moved,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "notupload",
-      headerName: "Not Upload",
+      field: 'notupload',
+      headerName: 'Not Upload',
       flex: 0,
       width: 100,
       hide: !columnVisibility.notupload,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "penalty",
-      headerName: "Penalty",
+      field: 'penalty',
+      headerName: 'Penalty',
       flex: 0,
       width: 100,
       hide: !columnVisibility.penalty,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "nonpenalty",
-      headerName: "Non Penalty",
+      field: 'nonpenalty',
+      headerName: 'Non Penalty',
       flex: 0,
       width: 100,
       hide: !columnVisibility.nonpenalty,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "bulkupload",
-      headerName: "Bulk Upload",
+      field: 'bulkupload',
+      headerName: 'Bulk Upload',
       flex: 0,
       width: 100,
       hide: !columnVisibility.bulkupload,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "bulkkeying",
-      headerName: "Bulk Keying",
+      field: 'bulkkeying',
+      headerName: 'Bulk Keying',
       flex: 0,
       width: 100,
       hide: !columnVisibility.bulkkeying,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "edited1",
-      headerName: "Edited1",
+      field: 'edited1',
+      headerName: 'Edited1',
       flex: 0,
       width: 100,
       hide: !columnVisibility.edited1,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "edited2",
-      headerName: "Edited2",
+      field: 'edited2',
+      headerName: 'Edited2',
       flex: 0,
       width: 100,
       hide: !columnVisibility.edited2,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "edited3",
-      headerName: "Edited3",
+      field: 'edited3',
+      headerName: 'Edited3',
       flex: 0,
       width: 100,
       hide: !columnVisibility.edited3,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "edited4",
-      headerName: "Edited4",
+      field: 'edited4',
+      headerName: 'Edited4',
       flex: 0,
       width: 100,
       hide: !columnVisibility.edited4,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "reject1",
-      headerName: "Reject1",
+      field: 'reject1',
+      headerName: 'Reject1',
       flex: 0,
       width: 100,
       hide: !columnVisibility.reject1,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "reject2",
-      headerName: "Reject2",
+      field: 'reject2',
+      headerName: 'Reject2',
       flex: 0,
       width: 100,
       hide: !columnVisibility.reject2,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "reject3",
-      headerName: "Reject3",
+      field: 'reject3',
+      headerName: 'Reject3',
       flex: 0,
       width: 100,
       hide: !columnVisibility.reject3,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "reject4",
-      headerName: "Reject4",
+      field: 'reject4',
+      headerName: 'Reject4',
       flex: 0,
       width: 100,
       hide: !columnVisibility.reject4,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "notvalidate",
-      headerName: "Not Validate",
+      field: 'notvalidate',
+      headerName: 'Not Validate',
       flex: 0,
       width: 100,
       hide: !columnVisibility.notvalidate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "validateerror",
-      headerName: "Validate Error",
+      field: 'validateerror',
+      headerName: 'Validate Error',
       flex: 0,
       width: 100,
       hide: !columnVisibility.validateerror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "waivererror",
-      headerName: "Waiver% Error",
+      field: 'waivererror',
+      headerName: 'Waiver% Error',
       flex: 0,
       width: 100,
       hide: !columnVisibility.waivererror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "neterror",
-      headerName: "Net Error",
+      field: 'neterror',
+      headerName: 'Net Error',
       flex: 0,
       width: 100,
       hide: !columnVisibility.neterror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     // {
     //     field: "per",
@@ -885,56 +951,53 @@ function PenaltyAmountConsolidateView() {
     //     headerClassName: "bold-header",
     // },
     {
-      field: "percentage",
-      headerName: "Percentage",
+      field: 'percentage',
+      headerName: 'Percentage',
       flex: 0,
       width: 100,
       hide: !columnVisibility.percentage,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "amount",
-      headerName: "Amount",
+      field: 'amount',
+      headerName: 'Amount',
       flex: 0,
       width: 100,
       hide: !columnVisibility.amount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "notapprovedcount",
-      headerName: "Not Approved",
+      field: 'notapprovedcount',
+      headerName: 'Not Approved',
       flex: 0,
       width: 120,
       hide: !columnVisibility.notapprovedcount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
-    { field: "clientamount", headerName: "Client Amount", flex: 0, width: 130, hide: !columnVisibility.clientamount, },
-        { field: "waiveramount", headerName: "Waiver Amount", flex: 0, width: 130, hide: !columnVisibility.waiveramount, },
-        { field: "totalamount", headerName: "Total Amount", flex: 0, width: 120, hide: !columnVisibility.totalamount, },
+    { field: 'clientamount', headerName: 'Client Amount', flex: 0, width: 130, hide: !columnVisibility.clientamount },
+    { field: 'waiveramount', headerName: 'Waiver Amount', flex: 0, width: 130, hide: !columnVisibility.waiveramount },
+    { field: 'totalamount', headerName: 'Total Amount', flex: 0, width: 120, hide: !columnVisibility.totalamount },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-
-
-          {isUserRoleCompare?.includes("vpenaltyamountconsolidate") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('vpenaltyamountconsolidate') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
                 rowdatasingleview(params.data.id, params.data);
               }}
             >
-              <VisibilityOutlinedIcon style={{ fontsize: "large" }} sx={buttonStyles.buttonview} />
+              <VisibilityOutlinedIcon style={{ fontsize: 'large' }} sx={buttonStyles.buttonview} />
             </Button>
           )}
-
         </Grid>
       ),
     },
@@ -1003,9 +1066,7 @@ function PenaltyAmountConsolidateView() {
     setColumnVisibility(updatedVisibility);
   };
   // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
     setColumnVisibility((prevVisibility) => ({
@@ -1017,9 +1078,9 @@ function PenaltyAmountConsolidateView() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1027,7 +1088,7 @@ function PenaltyAmountConsolidateView() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1035,38 +1096,16 @@ function PenaltyAmountConsolidateView() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -1074,12 +1113,8 @@ function PenaltyAmountConsolidateView() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
-              {" "}
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
+              {' '}
               Show All
             </Button>
           </Grid>
@@ -1087,7 +1122,7 @@ function PenaltyAmountConsolidateView() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -1096,7 +1131,7 @@ function PenaltyAmountConsolidateView() {
                 setColumnVisibility(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -1105,10 +1140,7 @@ function PenaltyAmountConsolidateView() {
     </Box>
   );
 
-
-  const [fileFormat, setFormat] = useState('')
-
-
+  const [fileFormat, setFormat] = useState('');
 
   //view alltable
   //Datatable
@@ -1129,27 +1161,20 @@ function PenaltyAmountConsolidateView() {
     setPageviewall(1);
   };
 
-
   // Split the search query into individual terms
-  const searchTermsviewall = searchQueryviewall.toLowerCase().split(" ");
+  const searchTermsviewall = searchQueryviewall.toLowerCase().split(' ');
 
   // Modify the filtering logic to check each term
   const filteredDatasviewall = itemsviewall?.filter((item) => {
-    return searchTermsviewall.every((term) => Object.values(item).join(" ").toLowerCase().includes(term));
+    return searchTermsviewall.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
 
-  const filteredDataviewall = filteredDatasviewall?.slice(
-    (pageviewall - 1) * pageSizeviewall,
-    pageviewall * pageSizeviewall
-  );
+  const filteredDataviewall = filteredDatasviewall?.slice((pageviewall - 1) * pageSizeviewall, pageviewall * pageSizeviewall);
   const totalPagesviewall = Math.ceil(filteredDatasviewall?.length / pageSizeviewall);
-  console.log(totalPagesviewall, "totalPagesviewall")
+  console.log(totalPagesviewall, 'totalPagesviewall');
   const visiblePagesviewall = Math.min(totalPagesviewall, 3);
   const firstVisiblePageviewall = Math.max(1, pageviewall - 1);
-  const lastVisiblePageviewall = Math.min(
-    firstVisiblePageviewall + visiblePagesviewall - 1,
-    totalPagesviewall
-  );
+  const lastVisiblePageviewall = Math.min(firstVisiblePageviewall + visiblePagesviewall - 1, totalPagesviewall);
   const pageNumbersviewall = [];
   for (let i = firstVisiblePageviewall; i <= lastVisiblePageviewall; i++) {
     pageNumbersviewall.push(i);
@@ -1180,271 +1205,271 @@ function PenaltyAmountConsolidateView() {
     //     lockPinned: true,
     // },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 80,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.company,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 120,
       hide: !columnVisibilityviewall.branch,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 120,
       hide: !columnVisibilityviewall.unit,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "team",
-      headerName: "Team",
+      field: 'team',
+      headerName: 'Team',
       flex: 0,
       width: 120,
       hide: !columnVisibilityviewall.team,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "processcode",
-      headerName: "Process Code",
+      field: 'processcode',
+      headerName: 'Process Code',
       flex: 0,
       width: 120,
       hide: !columnVisibilityviewall.processcode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "name",
-      headerName: "Name",
+      field: 'name',
+      headerName: 'Name',
       flex: 0,
       width: 120,
       hide: !columnVisibilityviewall.name,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "empcode",
-      headerName: "Emp Code",
+      field: 'empcode',
+      headerName: 'Emp Code',
       flex: 0,
       width: 120,
       hide: !columnVisibilityviewall.empcode,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "date",
-      headerName: "Date",
+      field: 'date',
+      headerName: 'Date',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.date,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
 
     {
-      field: "vendorname",
-      headerName: "Vendor Name",
+      field: 'vendorname',
+      headerName: 'Vendor Name',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.vendorname,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "process",
-      headerName: "Process",
+      field: 'process',
+      headerName: 'Process',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.process,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "totalfield",
-      headerName: "Total Field",
+      field: 'totalfield',
+      headerName: 'Total Field',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.totalfield,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "autoerror",
-      headerName: "Auto Error",
+      field: 'autoerror',
+      headerName: 'Auto Error',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.autoerror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "manualerror",
-      headerName: "Manual Error",
+      field: 'manualerror',
+      headerName: 'Manual Error',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.manualerror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "uploaderror",
-      headerName: "Upload Error",
+      field: 'uploaderror',
+      headerName: 'Upload Error',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.uploaderror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "moved",
-      headerName: "Moved",
+      field: 'moved',
+      headerName: 'Moved',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.moved,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "notupload",
-      headerName: "Not Upload",
+      field: 'notupload',
+      headerName: 'Not Upload',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.notupload,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "penalty",
-      headerName: "Penalty",
+      field: 'penalty',
+      headerName: 'Penalty',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.penalty,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "nonpenalty",
-      headerName: "Non Penalty",
+      field: 'nonpenalty',
+      headerName: 'Non Penalty',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.nonpenalty,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "bulkupload",
-      headerName: "Bulk Upload",
+      field: 'bulkupload',
+      headerName: 'Bulk Upload',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.bulkupload,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "bulkkeying",
-      headerName: "Bulk Keying",
+      field: 'bulkkeying',
+      headerName: 'Bulk Keying',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.bulkkeying,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "edited1",
-      headerName: "Edited1",
+      field: 'edited1',
+      headerName: 'Edited1',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.edited1,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "edited2",
-      headerName: "Edited2",
+      field: 'edited2',
+      headerName: 'Edited2',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.edited2,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "edited3",
-      headerName: "Edited3",
+      field: 'edited3',
+      headerName: 'Edited3',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.edited3,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "edited4",
-      headerName: "Edited4",
+      field: 'edited4',
+      headerName: 'Edited4',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.edited4,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "reject1",
-      headerName: "Reject1",
+      field: 'reject1',
+      headerName: 'Reject1',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.reject1,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "reject2",
-      headerName: "Reject2",
+      field: 'reject2',
+      headerName: 'Reject2',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.reject2,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "reject3",
-      headerName: "Reject3",
+      field: 'reject3',
+      headerName: 'Reject3',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.reject3,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "reject4",
-      headerName: "Reject4",
+      field: 'reject4',
+      headerName: 'Reject4',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.reject4,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "notvalidate",
-      headerName: "Not Validate",
+      field: 'notvalidate',
+      headerName: 'Not Validate',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.notvalidate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "validateerror",
-      headerName: "Validate Error",
+      field: 'validateerror',
+      headerName: 'Validate Error',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.validateerror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "waivererror",
-      headerName: "Waiver% Error",
+      field: 'waivererror',
+      headerName: 'Waiver% Error',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.waivererror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "neterror",
-      headerName: "Net Error",
+      field: 'neterror',
+      headerName: 'Net Error',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.neterror,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     // {
     //     field: "per",
@@ -1455,33 +1480,33 @@ function PenaltyAmountConsolidateView() {
     //     headerClassName: "bold-header",
     // },
     {
-      field: "percentage",
-      headerName: "Percentage",
+      field: 'percentage',
+      headerName: 'Percentage',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.percentage,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "amount",
-      headerName: "Amount",
+      field: 'amount',
+      headerName: 'Amount',
       flex: 0,
       width: 100,
       hide: !columnVisibilityviewall.amount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
-   
+
     {
-      field: "notapprovedcount",
-      headerName: "Not Approved",
+      field: 'notapprovedcount',
+      headerName: 'Not Approved',
       flex: 0,
       width: 120,
       hide: !columnVisibility.notapprovedcount,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
-    { field: "clientamount", headerName: "Client Amount", flex: 0, width: 130, hide: !columnVisibility.clientamount, },
-    { field: "waiveramount", headerName: "Waiver Amount", flex: 0, width: 130, hide: !columnVisibility.waiveramount, },
-    { field: "totalamount", headerName: "Total Amount", flex: 0, width: 120, hide: !columnVisibility.totalamount, },
+    { field: 'clientamount', headerName: 'Client Amount', flex: 0, width: 130, hide: !columnVisibility.clientamount },
+    { field: 'waiveramount', headerName: 'Waiver Amount', flex: 0, width: 130, hide: !columnVisibility.waiveramount },
+    { field: 'totalamount', headerName: 'Total Amount', flex: 0, width: 120, hide: !columnVisibility.totalamount },
   ];
 
   const rowDataTableviewall = filteredDataviewall.map((item, index) => {
@@ -1496,7 +1521,7 @@ function PenaltyAmountConsolidateView() {
       processcode: item.processcode,
       name: item.name,
       empcode: item.empcode,
-      date:item.date,
+      date: item.date,
       vendorname: item.vendorname,
       process: item.process,
       totalfield: item.totalfield,
@@ -1543,9 +1568,7 @@ function PenaltyAmountConsolidateView() {
     setColumnVisibilityviewall(updatedVisibilityviewall);
   };
   // Function to filter columns based on search query
-  const filteredColumnsviewall = columnDataTableviewall.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManageviewall.toLowerCase())
-  );
+  const filteredColumnsviewall = columnDataTableviewall.filter((column) => column.headerName.toLowerCase().includes(searchQueryManageviewall.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibilityviewall = (field) => {
     setColumnVisibilityviewall((prevVisibility) => ({
@@ -1557,9 +1580,9 @@ function PenaltyAmountConsolidateView() {
   const manageColumnsContentviewall = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -1567,7 +1590,7 @@ function PenaltyAmountConsolidateView() {
         aria-label="close"
         onClick={handleCloseManageColumnsviewall}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -1575,38 +1598,16 @@ function PenaltyAmountConsolidateView() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManageviewall}
-          onChange={(e) => setSearchQueryManageviewall(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManageviewall} onChange={(e) => setSearchQueryManageviewall(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumnsviewall.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibilityviewall[column.field]}
-                    onChange={() => toggleColumnVisibilityviewall(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibilityviewall[column.field]} onChange={() => toggleColumnVisibilityviewall(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -1614,12 +1615,8 @@ function PenaltyAmountConsolidateView() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibilityviewall(initialColumnVisibilityviewall)}
-            >
-              {" "}
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibilityviewall(initialColumnVisibilityviewall)}>
+              {' '}
               Show All
             </Button>
           </Grid>
@@ -1627,7 +1624,7 @@ function PenaltyAmountConsolidateView() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibilityviewall = {};
                 columnDataTableviewall.forEach((column) => {
@@ -1636,7 +1633,7 @@ function PenaltyAmountConsolidateView() {
                 setColumnVisibilityviewall(newColumnVisibilityviewall);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -1646,77 +1643,71 @@ function PenaltyAmountConsolidateView() {
   );
 
   const rowdatasingleview = async (id, data) => {
-    console.log(data, "data")
-    setPageName(!pageName)
-    setClientUserIDFilterArrayviewcheck(true)
+    console.log(data, 'data');
+    setPageName(!pageName);
+    setClientUserIDFilterArrayviewcheck(true);
     try {
-
-
-      const res = await axios.post(`${SERVICE.PENALTY_AMOUNT_CONSOLIDATED_VIEW_INDIVIDUAL}`, {
-        fromdate: data.oldfromdate,
-        todate: data.oldtodate,
-        name: data.name
-
-      }, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
+      const res = await axios.post(
+        `${SERVICE.PENALTY_AMOUNT_CONSOLIDATED_VIEW_INDIVIDUAL}`,
+        {
+          fromdate: data.oldfromdate,
+          todate: data.oldtodate,
+          name: data.name,
         },
-      })
+        {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        }
+      );
 
-      setClientUserIDFilterArrayview(res?.data?.penaltymonth?.map((item, index) => ({
-        ...item,
-        serialNumber: index + 1,
-        fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
-        todate: moment(item.todate).format("DD-MM-YYYY"),
-        date: moment(item.date).format('DD-MM-YYYY'),
-        waiveramount: item.amountclient?.toFixed(2) || 0.00,
-        totalamount: Number(item.clientamount - item.amountclient).toFixed(2) || 0.00,
-      })));
+      setClientUserIDFilterArrayview(
+        res?.data?.penaltymonth?.map((item, index) => ({
+          ...item,
+          serialNumber: index + 1,
+          fromdate: moment(item.fromdate).format('DD-MM-YYYY'),
+          todate: moment(item.todate).format('DD-MM-YYYY'),
+          date: moment(item.date).format('DD-MM-YYYY'),
+          waiveramount: Number(Number(item.amountclient)?.toFixed(2)) || 0.0,
+          totalamount: Number(Number(item.clientamount - item.amountclient).toFixed(2)) || 0.0,
+        }))
+      );
       handleClickOpenviewAll();
-      setClientUserIDFilterArrayviewcheck(false)
-    } catch (err) { handleApiError(err, setClientUserIDFilterArrayviewcheck(false), setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setClientUserIDFilterArrayviewcheck(false);
+    } catch (err) {
+      handleApiError(err, setClientUserIDFilterArrayviewcheck(false), setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
-console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
+  console.log(clientUserIDFilterArrayview, 'clientUserIDFilterArrayview');
   return (
     <Box>
-      <Headtitle title={"MANAGEPenalty Amount Consolidated VIEW"} />
+      <Headtitle title={'MANAGEPenalty Amount Consolidated VIEW'} />
       {/* ****** Header Content ****** */}
       <Typography sx={userStyle.HeaderText}>ManagePenalty Amount Consolidated View</Typography>
-      <br />   <br />
+      <br /> <br />
       {/* ****** Table Start ****** */}
-
       {!clientUserIDArray ? (
         <>
-          <Box sx={{ display: "flex", justifyContent: "center" }}>
-
-            <ThreeDots
-              height="80"
-              width="80"
-              radius="9"
-              color="#1976d2"
-              ariaLabel="three-dots-loading"
-              wrapperStyle={{}}
-              wrapperClassName=""
-              visible={true} />
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
           </Box>
         </>
       ) : (
         <>
-          {isUserRoleCompare?.includes("lpenaltyamountconsolidate") && (
+          {isUserRoleCompare?.includes('lpenaltyamountconsolidate') && (
             <>
               <Box sx={userStyle.container}>
                 {/* ******************************************************EXPORT Buttons****************************************************** */}
-                <Grid container >
+                <Grid container>
                   <Grid item xs={8}>
-                    <Typography sx={userStyle.importheadtext}>
-                      Penalty Amount Consolidated View List
-                    </Typography>
+                    <Typography sx={userStyle.importheadtext}>Penalty Amount Consolidated View List</Typography>
                   </Grid>
 
                   <Grid item md={2} xs={12} sm={12}>
-
                     <Link to={`/penalty/penaltyamountconsolidate`}>
-                      <Button variant="contained" color="primary">BACK</Button>
+                      <Button variant="contained" color="primary">
+                        BACK
+                      </Button>
                     </Link>
                   </Grid>
                 </Grid>
@@ -1736,7 +1727,7 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                           },
                         }}
                         onChange={handlePageSizeChange}
-                        sx={{ width: "77px" }}
+                        sx={{ width: '77px' }}
                       >
                         <MenuItem value={1}>1</MenuItem>
                         <MenuItem value={5}>5</MenuItem>
@@ -1744,9 +1735,7 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                         <MenuItem value={25}>25</MenuItem>
                         <MenuItem value={50}>50</MenuItem>
                         <MenuItem value={100}>100</MenuItem>
-                        <MenuItem value={clientUserIDArray?.length}>
-                          All
-                        </MenuItem>
+                        <MenuItem value={clientUserIDArray?.length}>All</MenuItem>
                       </Select>
                     </Box>
                   </Grid>
@@ -1756,29 +1745,41 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                     xs={12}
                     sm={12}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Box>
-                      {isUserRoleCompare?.includes("excelpenaltyamountconsolidate") && (
+                      {isUserRoleCompare?.includes('excelpenaltyamountconsolidate') && (
                         <>
-                          <Button onClick={(e) => {
-                            setIsFilterOpen(true)
-                            setFormat("xl")
-                          }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpen(true);
+                              setFormat('xl');
+                            }}
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileExcel />
+                            &ensp;Export to Excel&ensp;
+                          </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes("csvpenaltyamountconsolidate") && (
+                      {isUserRoleCompare?.includes('csvpenaltyamountconsolidate') && (
                         <>
-                          <Button onClick={(e) => {
-                            setIsFilterOpen(true)
-                            setFormat("csv")
-                          }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
+                          <Button
+                            onClick={(e) => {
+                              setIsFilterOpen(true);
+                              setFormat('csv');
+                            }}
+                            sx={userStyle.buttongrp}
+                          >
+                            <FaFileCsv />
+                            &ensp;Export to CSV&ensp;
+                          </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes("printpenaltyamountconsolidate") && (
+                      {isUserRoleCompare?.includes('printpenaltyamountconsolidate') && (
                         <>
                           <Button sx={userStyle.buttongrp} onClick={handleprint}>
                             &ensp;
@@ -1787,12 +1788,12 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                           </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes("pdfpenaltyamountconsolidate") && (
+                      {isUserRoleCompare?.includes('pdfpenaltyamountconsolidate') && (
                         <>
                           <Button
                             sx={userStyle.buttongrp}
                             onClick={() => {
-                              setIsPdfFilterOpen(true)
+                              setIsPdfFilterOpen(true);
                             }}
                           >
                             <FaFilePdf />
@@ -1800,18 +1801,22 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                           </Button>
                         </>
                       )}
-                      {isUserRoleCompare?.includes("imagepenaltyamountconsolidate") && (
+                      {isUserRoleCompare?.includes('imagepenaltyamountconsolidate') && (
                         <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                          {" "}
-                          <ImageIcon
-                            sx={{ fontSize: "15px" }}
-                          /> &ensp;Image&ensp;{" "}
+                          {' '}
+                          <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                         </Button>
                       )}
                     </Box>
                   </Grid>
                   <Grid item md={2} xs={12} sm={12}>
-                    <AggregatedSearchBar columnDataTable={columnDataTable} setItems={setItems} addSerialNumber={addSerialNumber} setPage={setPage} maindatas={clientUserIDFilterArray} setSearchedString={setSearchedString}
+                    <AggregatedSearchBar
+                      columnDataTable={columnDataTable}
+                      setItems={setItems}
+                      addSerialNumber={addSerialNumber}
+                      setPage={setPage}
+                      maindatas={clientUserIDFilterArray}
+                      setSearchedString={setSearchedString}
                       searchQuery={searchQuery}
                       setSearchQuery={setSearchQuery}
                       paginated={false}
@@ -1829,23 +1834,13 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                 </Button>
                 <br />
                 <br />
-                {loading ?
+                {loading ? (
                   <>
                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-
-                      <ThreeDots
-                        height="80"
-                        width="80"
-                        radius="9"
-                        color="#1976d2"
-                        ariaLabel="three-dots-loading"
-                        wrapperStyle={{}}
-                        wrapperClassName=""
-                        visible={true}
-                      />
+                      <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                     </Box>
                   </>
-                  :
+                ) : (
                   <>
                     <AggridTable
                       rowDataTable={rowDataTable}
@@ -1872,8 +1867,7 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                       itemsList={clientUserIDFilterArray}
                     />
                   </>
-                }
-
+                )}
               </Box>
             </>
           )}
@@ -1885,23 +1879,17 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
             anchorEl={anchorEl}
             onClose={handleCloseManageColumns}
             anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
+              vertical: 'bottom',
+              horizontal: 'left',
             }}
           >
             {manageColumnsContent}
           </Popover>
-
         </>
       )}
       {/* print layout */}
       <TableContainer component={Paper} sx={userStyle.printcls}>
-        <Table
-          sx={{ minWidth: 700 }}
-          aria-label="customized table"
-          id="usertable"
-          ref={componentRef}
-        >
+        <Table sx={{ minWidth: 700 }} aria-label="customized table" id="usertable" ref={componentRef}>
           <TableHead>
             <TableRow>
               <TableCell> SI.No</TableCell>
@@ -1985,19 +1973,10 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
           </TableBody>
         </Table>
       </TableContainer>
-
-      <Dialog
-        open={openviewAll}
-        onClose={handleClickOpenviewAll}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        fullWidth={true}
-        maxWidth="lg"
-        sx={{ marginTop: '50px' }}
-      >
+      <Dialog open={openviewAll} onClose={handleClickOpenviewAll} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" fullWidth={true} maxWidth="lg" sx={{ marginTop: '50px' }}>
         <DialogContent sx={{ marginTop: '70px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>{"Penalty Amount Consolidated Individual User"}</Typography>
+            <Typography sx={userStyle.HeaderText}>{'Penalty Amount Consolidated Individual User'}</Typography>
             {/* <br /> */}
             <Grid container style={userStyle.dataTablestyle}>
               <Grid item md={2} xs={12} sm={12}>
@@ -2016,7 +1995,7 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                       },
                     }}
                     onChange={handlePageSizeChangeviewall}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -2024,9 +2003,7 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                     <MenuItem value={25}>25</MenuItem>
                     <MenuItem value={50}>50</MenuItem>
                     <MenuItem value={100}>100</MenuItem>
-                    <MenuItem value={clientUserIDFilterArrayview?.length}>
-                      All
-                    </MenuItem>
+                    <MenuItem value={clientUserIDFilterArrayview?.length}>All</MenuItem>
                   </Select>
                 </Box>
               </Grid>
@@ -2036,46 +2013,55 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelpenaltyamountconsolidate") && (
-                    <>
-                      <Button onClick={(e) => {
-                        setIsFilterOpenviewall(true)
-                        setFormat("xl")
-                      }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes("csvpenaltyamountconsolidate") && (
-                    <>
-                      <Button onClick={(e) => {
-                        setIsFilterOpenviewall(true)
-                        setFormat("csv")
-                      }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
-                    </>
-                  )}
-                  {isUserRoleCompare?.includes("printpenaltyamountconsolidate") && (
+                  {isUserRoleCompare?.includes('excelpenaltyamountconsolidate') && (
                     <>
                       <Button
+                        onClick={(e) => {
+                          setIsFilterOpenviewall(true);
+                          setFormat('xl');
+                        }}
                         sx={userStyle.buttongrp}
-                        onClick={handleprintviewall}
                       >
+                        <FaFileExcel />
+                        &ensp;Export to Excel&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('csvpenaltyamountconsolidate') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpenviewall(true);
+                          setFormat('csv');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileCsv />
+                        &ensp;Export to CSV&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('printpenaltyamountconsolidate') && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleprintviewall}>
                         &ensp;
                         <FaPrint />
                         &ensp;Print&ensp;
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfpenaltyamountconsolidate") && (
+                  {isUserRoleCompare?.includes('pdfpenaltyamountconsolidate') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
                         onClick={() => {
-                          setIsPdfFilterOpenviewall(true)
+                          setIsPdfFilterOpenviewall(true);
                         }}
                       >
                         <FaFilePdf />
@@ -2083,15 +2069,10 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imagepenaltyamountconsolidate") && (
-                    <Button
-                      sx={userStyle.buttongrp}
-                      onClick={handleCaptureImageviewall}
-                    >
-                      {" "}
-                      <ImageIcon
-                        sx={{ fontSize: "15px" }}
-                      /> &ensp;Image&ensp;{" "}
+                  {isUserRoleCompare?.includes('imagepenaltyamountconsolidate') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImageviewall}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
@@ -2109,20 +2090,13 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                   paginated={false}
                   totalDatas={clientUserIDFilterArrayview}
                 />
-
               </Grid>
             </Grid>
-            <Button
-              sx={userStyle.buttongrp}
-              onClick={handleShowAllColumnsviewall}
-            >
+            <Button sx={userStyle.buttongrp} onClick={handleShowAllColumnsviewall}>
               Show All Columns
             </Button>
             &ensp;
-            <Button
-              sx={userStyle.buttongrp}
-              onClick={handleOpenManageColumnsviewall}
-            >
+            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumnsviewall}>
               Manage Columns
             </Button>
             <br />
@@ -2134,8 +2108,8 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
               anchorEl={anchorElviewall}
               onClose={handleCloseManageColumnsviewall}
               anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
+                vertical: 'bottom',
+                horizontal: 'left',
               }}
             >
               {manageColumnsContentviewall}
@@ -2143,16 +2117,8 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
             {/* <br /> */}
             {clientUserIDFilterArrayviewcheck ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true} />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
             ) : (
@@ -2181,24 +2147,16 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
                   gridRefTableImg={gridRefTableImgviewall}
                   itemsList={clientUserIDFilterArrayview}
                 />
-
               </>
             )}
           </>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCloseviewAll}
-            sx={buttonStyles.btncancel}
-          >
+          <Button variant="contained" color="primary" onClick={handleCloseviewAll} sx={buttonStyles.btncancel}>
             Back
           </Button>
         </DialogActions>
       </Dialog>
-
-
       <ExportData
         isFilterOpen={isFilterOpen}
         handleCloseFilterMod={handleCloseFilterMod}
@@ -2208,13 +2166,12 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
         setIsPdfFilterOpen={setIsPdfFilterOpen}
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
-        itemsTwo={clientUserIDArray ?? []}
-        filename={"Penalty Amount Consolidated View"}
+        itemsTwo={clientUserIDFilterArray ?? []}
+        filename={'Penalty Amount Consolidated View'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
-
       <ExportData
         isFilterOpen={isFilterOpenviewall}
         handleCloseFilterMod={handleCloseFilterModviewall}
@@ -2225,32 +2182,24 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
         handleClosePdfFilterMod={handleClosePdfFilterModviewall}
         filteredDataTwo={(filteredChangesviewall !== null ? filteredRowDataviewall : rowDataTableviewall) ?? []}
         itemsTwo={clientUserIDFilterArrayview ?? []}
-        filename={"Penalty Amount Consolidated View Individual Users"}
+        filename={'Penalty Amount Consolidated View Individual Users'}
         exportColumnNames={exportColumnNamesviewall}
         exportRowValues={exportRowValuesviewall}
         componentRef={componentRefviewall}
       />
-
       {/* ALERT DIALOG */}
       <Box>
-        <Dialog
-          open={isErrorOpen}
-          onClose={handleCloseerr}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
+        <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={handleCloseerr}
             >
@@ -2259,29 +2208,23 @@ console.log(clientUserIDFilterArrayview,"clientUserIDFilterArrayview")
           </DialogActions>
         </Dialog>
       </Box>
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* Bulk delete ALERT DIALOG */}
       <Dialog open={isDeleteOpenalert} onClose={handleCloseModalert} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-          <ErrorOutlineOutlinedIcon sx={{ fontSize: "70px", color: "orange" }} />
-          <Typography variant="h6" sx={{ color: "black", textAlign: "center" }}>
+        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '70px', color: 'orange' }} />
+          <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
             Please Select any Row
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button autoFocus variant="contained" color="error" onClick={handleCloseModalert}>
-            {" "}
-            OK{" "}
+            {' '}
+            OK{' '}
           </Button>
         </DialogActions>
       </Dialog>
-      <Box>
-      </Box>
+      <Box></Box>
       <br />
     </Box>
   );

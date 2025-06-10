@@ -1,57 +1,37 @@
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  FormControl,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Popover,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import axios from "axios";
-import "jspdf-autotable";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaFilePdf, FaPrint } from "react-icons/fa";
-import * as XLSX from "xlsx";
-import { handleApiError } from "../../../components/Errorhandling";
-import { userStyle } from "../../../pageStyle";
-import { SERVICE } from "../../../services/Baseservice";
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
+import { Box, Button, Checkbox,Chip, Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, TextField, Typography } from '@mui/material';
+// import axios from 'axios';
+import axios from '../../../axiosInstance';
 
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import ImageIcon from "@mui/icons-material/Image";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import Switch from "@mui/material/Switch";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import moment from "moment-timezone";
+import 'jspdf-autotable';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaFilePdf, FaPrint } from 'react-icons/fa';
+import * as XLSX from 'xlsx';
+import { handleApiError } from '../../../components/Errorhandling';
+import { userStyle } from '../../../pageStyle';
+import { SERVICE } from '../../../services/Baseservice';
+
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import ImageIcon from '@mui/icons-material/Image';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import Switch from '@mui/material/Switch';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import moment from 'moment-timezone';
 import { FaFileCsv, FaFileExcel } from 'react-icons/fa';
-import { ThreeDots } from "react-loader-spinner";
-import { Link } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
+import { ThreeDots } from 'react-loader-spinner';
+import { Link } from 'react-router-dom';
+import { useReactToPrint } from 'react-to-print';
 import AggregatedSearchBar from '../../../components/AggregatedSearchBar';
-import AggridTable from "../../../components/AggridTable";
-import AlertDialog from "../../../components/Alert";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../../components/DeleteConfirmation.js";
-import ExportData from "../../../components/ExportData";
-import Headtitle from "../../../components/Headtitle";
-import MessageAlert from "../../../components/MessageAlert";
-import PageHeading from "../../../components/PageHeading";
-import { AuthContext, UserRoleAccessContext } from "../../../context/Appcontext";
+import AggridTable from '../../../components/AggridTable';
+import AlertDialog from '../../../components/Alert';
+import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
+import ExportData from '../../../components/ExportData';
+import Headtitle from '../../../components/Headtitle';
+import MessageAlert from '../../../components/MessageAlert';
+import PageHeading from '../../../components/PageHeading';
+import { AuthContext, UserRoleAccessContext } from '../../../context/Appcontext';
 import domtoimage from 'dom-to-image';
 function PenaltyAmountConsolidate() {
   const [filteredRowData, setFilteredRowData] = useState([]);
@@ -59,7 +39,7 @@ function PenaltyAmountConsolidate() {
 
   const [overallItems, setOverallItems] = useState([]);
   const [isHandleChange, setIsHandleChange] = useState(false);
-  const [searchedString, setSearchedString] = useState("")
+  const [searchedString, setSearchedString] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
   // page refersh reload
@@ -70,8 +50,8 @@ function PenaltyAmountConsolidate() {
     setIsPdfFilterOpen(false);
   };
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -79,14 +59,14 @@ function PenaltyAmountConsolidate() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
   const handleClosePopup = () => {
     setOpenPopup(false);
-  }
+  };
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const handleClickOpen = () => {
     setIsDeleteOpen(true);
@@ -102,7 +82,7 @@ function PenaltyAmountConsolidate() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Penalty Amount Consolidate"),
+      pagename: String('Penalty Amount Consolidate'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -113,8 +93,7 @@ function PenaltyAmountConsolidate() {
         },
       ],
     });
-
-  }
+  };
 
   useEffect(() => {
     getapi();
@@ -122,22 +101,20 @@ function PenaltyAmountConsolidate() {
 
   const gridRef = useRef(null);
   let today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
   var yyyy = today.getFullYear();
-  let formattedDate = yyyy + "-" + mm + "-" + dd;
+  let formattedDate = yyyy + '-' + mm + '-' + dd;
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
   const [productionConsolidate, setProductionConsolidate] = useState({
     fromdate: formattedDate,
     todate: formattedDate,
-    name: "",
+    name: '',
   });
   const [clientUserIDArray, setClientUserIDArray] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, isAssignBranch, buttonStyles } = useContext(
-    UserRoleAccessContext
-  );
+  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, isAssignBranch, buttonStyles } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
   const [loader, setLoader] = useState(false);
   //Datatable
@@ -147,7 +124,7 @@ function PenaltyAmountConsolidate() {
   const [showAlert, setShowAlert] = useState();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [items, setItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [isRowDelete, setIsRowDelete] = useState({});
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -160,11 +137,11 @@ function PenaltyAmountConsolidate() {
     name: true,
     username: true,
     date: true,
+    matchpenalty:true,
+    matchclient:true,
     actions: true,
   };
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
   //useEffect
   useEffect(() => {
     addSerialNumber(clientUserIDArray);
@@ -174,9 +151,9 @@ function PenaltyAmountConsolidate() {
   }, []);
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
   const handleSelectionChange = (newSelection) => {
@@ -193,7 +170,7 @@ function PenaltyAmountConsolidate() {
   // page refersh reload password
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
   const username = isUserRoleAccess.username;
   // Manage Columns
@@ -203,7 +180,7 @@ function PenaltyAmountConsolidate() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
   //Delete model
   const [isDeleteOpencheckbox, setIsDeleteOpencheckbox] = useState(false);
@@ -226,25 +203,22 @@ function PenaltyAmountConsolidate() {
     setIsDeleteOpenalert(false);
   };
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
   const delReportcheckbox = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       const deletePromises = selectedRows?.map((item) => {
-        return axios.delete(
-          `${SERVICE.PENALTYAMOUNTCONSOLIDATED_SINGLE}/${item}`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-          }
-        );
+        return axios.delete(`${SERVICE.PENALTYAMOUNTCONSOLIDATED_SINGLE}/${item}`, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
       });
       // Wait for all delete requests to complete
       await Promise.all(deletePromises);
@@ -254,13 +228,15 @@ function PenaltyAmountConsolidate() {
       setSelectAllChecked(false);
       setPage(1);
       await fetchClientUserID();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   const delReport = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       if (isRowDelete?._id) {
         await axios.delete(`${SERVICE.PENALTYAMOUNTCONSOLIDATED_SINGLE}/${isRowDelete?._id}`, {
@@ -272,47 +248,48 @@ function PenaltyAmountConsolidate() {
         handleCloseMod();
         setSelectedRows([]);
         setPage(1);
-        setPopupContent("Deleted Successfully");
-        setPopupSeverity("success");
+        setPopupContent('Deleted Successfully');
+        setPopupSeverity('success');
         handleClickOpenPopup();
       }
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //add function
   const sendRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      let brandCreate = await axios.post(
-        SERVICE.PENALTYAMOUNTCONSOLIDATED_CREATE,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
+      let brandCreate = await axios.post(SERVICE.PENALTYAMOUNTCONSOLIDATED_CREATE, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        fromdate: String(productionConsolidate.fromdate),
+        todate: String(productionConsolidate.todate),
+        name: String(productionConsolidate.name),
+        username: String(isUserRoleAccess.companyname),
+        date: formattedDate,
+        addedby: [
+          {
+            name: String(isUserRoleAccess.companyname),
+            date: String(new Date()),
           },
-          fromdate: String(productionConsolidate.fromdate),
-          todate: String(productionConsolidate.todate),
-          name: String(productionConsolidate.name),
-          username: String(isUserRoleAccess.companyname),
-          date: formattedDate,
-          addedby: [
-            {
-              name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
-            },
-          ],
-        }
-      );
+        ],
+      });
       //   setProductionConsolidate(brandCreate.data);
       await fetchClientUserID();
       setProductionConsolidate({
         ...productionConsolidate,
         fromdate: formattedDate,
         todate: formattedDate,
-        name: "",
+        name: '',
       });
-      setPopupContent("Added Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Added Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //submit option for saving
   const handleSubmit = async (e) => {
@@ -326,6 +303,24 @@ function PenaltyAmountConsolidate() {
       todate: String(productionConsolidate.todate),
     });
 
+   let resdaterestrict = await axios.post(
+  `${SERVICE.PENALTY_AMOUNT_DATE_BASED_RESTRICTION}`,
+  {
+    fromdate: String(productionConsolidate.fromdate),
+    todate: String(productionConsolidate.todate),
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${auth.APIToken}`,
+    },
+  }
+);
+
+
+const isdatepenaltyMissing = resdaterestrict?.data?.penaltymonth === 0;
+const isdateclientMissing = resdaterestrict?.data?.clientamoutmonth === 0;
+const isdatebothMissing = isdatepenaltyMissing && isdateclientMissing;
+
     const givenDate = new Date(productionConsolidate.todate);
     const today = new Date();
     const diffInMs = today - givenDate;
@@ -338,38 +333,44 @@ function PenaltyAmountConsolidate() {
 
     const isPayrunGenerated = resPayrun.data.count > 0 && isMoreThan5Days;
 
-
-
-
-    const isNameMatch = clientUserIDArray?.some(
-      (item) =>
-        item.fromdate === moment(productionConsolidate.fromdate).format('DD-MM-YYYY') &&
-        item.todate === moment(productionConsolidate.todate).format('DD-MM-YYYY')
-    );
-    if (productionConsolidate.fromdate === "") {
-      setPopupContentMalert("Please Select From Date");
-      setPopupSeverityMalert("info");
+    const isNameMatch = clientUserIDArray?.some((item) => item.fromdate === moment(productionConsolidate.fromdate).format('DD-MM-YYYY') && item.todate === moment(productionConsolidate.todate).format('DD-MM-YYYY'));
+    if (productionConsolidate.fromdate === '') {
+      setPopupContentMalert('Please Select From Date');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (productionConsolidate.todate === "") {
-      setPopupContentMalert("Please Select To Date");
-      setPopupSeverityMalert("info");
+    } else if (productionConsolidate.todate === '') {
+      setPopupContentMalert('Please Select To Date');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (productionConsolidate.name === "") {
-      setPopupContentMalert("Please Enter Name");
-      setPopupSeverityMalert("info");
+    } else if (productionConsolidate.name === '') {
+      setPopupContentMalert('Please Enter Name');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (isPayrunGenerated) {
-      setPopupContentMalert("Payrun Already Generated for these dates!");
-      setPopupSeverityMalert("info");
+    } else if (isPayrunGenerated) {
+      setPopupContentMalert('Payrun Already Generated for these dates!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
+    } 
+    if (isdatebothMissing) {
+  setPopupContentMalert(`This ${productionConsolidate.fromdate} to ${productionConsolidate.todate} not added in penalty month and client error amount month`);
+  setPopupSeverityMalert('warning');
+  handleClickOpenPopupMalert();
+} else if (isdateclientMissing) {
+  setPopupContentMalert(`This ${productionConsolidate.fromdate} to ${productionConsolidate.todate} not added in client error amount month`);
+  setPopupSeverityMalert('warning');
+  handleClickOpenPopupMalert();
+} else if (isdatepenaltyMissing) {
+  setPopupContentMalert(`This ${productionConsolidate.fromdate} to ${productionConsolidate.todate} not added in penalty month`);
+  setPopupSeverityMalert('warning');
+  handleClickOpenPopupMalert();
+}
     else if (isNameMatch) {
-      setPopupContentMalert("Same From Date and To Date already exits!");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Same From Date and To Date already exits!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else {
-      setSearchQuery("")
+    }
+     else {
+      setSearchQuery('');
       sendRequest();
     }
   };
@@ -378,96 +379,110 @@ function PenaltyAmountConsolidate() {
     setProductionConsolidate({
       fromdate: formattedDate,
       todate: formattedDate,
-      name: "",
+      name: '',
     });
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
-    setSearchQuery("")
+    setSearchQuery('');
   };
   //Edit model...
   const handleClickOpenEdit = () => {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
   };
-  const [consolidateArray, setConsolidateArray] = useState([])
+  const [consolidateArray, setConsolidateArray] = useState([]);
   //get all client user id.
   const fetchConsolidateDateArray = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res_freq = await axios.get(SERVICE.PENALTYAMOUNTCONSOLIDATED, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setConsolidateArray(res_freq?.data?.penaltyamountconsolidate.map((t, index) => ({
-        ...t,
-        SNo: index + 1,
-        fromdate: moment(t.fromdate).format("DD-MM-YYYY"),
-        todate: moment(t.todate).format("DD-MM-YYYY"),
-        name: t.name,
-        username: t.username,
-        date: moment(t.date).format("DD-MM-YYYY"),
-      })));
+      setConsolidateArray(
+        res_freq?.data?.penaltyamountconsolidate.map((t, index) => ({
+          ...t,
+          SNo: index + 1,
+          fromdate: moment(t.fromdate).format('DD-MM-YYYY'),
+          todate: moment(t.todate).format('DD-MM-YYYY'),
+          name: t.name,
+          username: t.username,
+          date: moment(t.date).format('DD-MM-YYYY'),
+        }))
+      );
       setLoader(true);
-    } catch (err) { setLoader(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setLoader(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   useEffect(() => {
-    fetchConsolidateDateArray()
-  }, [isFilterOpen])
+    fetchConsolidateDateArray();
+  }, [isFilterOpen]);
   //get all client user id.
   const fetchClientUserID = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
 
     try {
-      let res_freq = await axios.get(SERVICE.PENALTYAMOUNTCONSOLIDATED, {
+      let res_freq = await axios.get(SERVICE.PENALTY_AMOUNT_CONSOLIDATED_LIST, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      setClientUserIDArray(res_freq?.data?.penaltyamountconsolidate?.map((item) => ({
-        ...item, fromdate: moment(item.fromdate).format("DD-MM-YYYY"),
-        todate: moment(item.todate).format("DD-MM-YYYY"),
-        date: moment(item.date).format("DD-MM-YYYY"),
-        fromdateold: item.fromdate,
-        todateold: item.todate,
+      setClientUserIDArray(
+        res_freq?.data?.penaltyamountconsolidate?.map((item, index) => ({
+          ...item,
+          serialNumber: index + 1,
 
-      })));
+          fromdate: moment(item.fromdate).format('DD-MM-YYYY'),
+          todate: moment(item.todate).format('DD-MM-YYYY'),
+          date: moment(item.date).format('DD-MM-YYYY'),
+          fromdateold: item.fromdate,
+          todateold: item.todate,
+        }))
+      );
       setLoading(true);
       setLoader(true);
-    } catch (err) { setLoader(true); setLoading(true); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      setLoader(true);
+      setLoading(true);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   const gridRefTableImg = useRef(null);
   // image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Penalty Amount Consolidated.png");
+          saveAs(blob, 'Penalty Amount Consolidated.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
   useEffect(() => {
     // Save column visibility to localStorage whenever it changes
-    localStorage.setItem("columnVisibility", JSON.stringify(columnVisibility));
+    localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
   }, [columnVisibility]);
   useEffect(() => {
     // Retrieve column visibility from localStorage (if available)
-    const savedVisibility = localStorage.getItem("columnVisibility");
+    const savedVisibility = localStorage.getItem('columnVisibility');
     if (savedVisibility) {
       setColumnVisibility(JSON.parse(savedVisibility));
     }
   }, []);
   // Excel
-  const fileName = "PenaltyAmountConsolidate";
+  const fileName = 'PenaltyAmountConsolidate';
   // Excel
-  const fileNameFilter = "Penalty_Amount_Consolidated_Filtered_Data";
+  const fileNameFilter = 'Penalty_Amount_Consolidated_Filtered_Data';
   // get particular columns for export excel
   const getExcelFilterDatas = (answer) => {
     var data = answer?.map((item, index) => ({
@@ -506,15 +521,16 @@ function PenaltyAmountConsolidate() {
       // per: item.per,
       percentage: item.percentage,
       amount: item.amount,
-      Notapproved: 0,
-      Clientamount: item.clientamount,
-      Netamount: item.totalamount,
+      notapprovedcount: item.notapprovedcount,
+      clientamount: item.clientamount,
+      waiveramount: Number(item.waiveramount),
+      totalamount: Number(item.totalamount),
     }));
     // Convert data to worksheet
     const ws = XLSX.utils.json_to_sheet(data);
     // Create a workbook with a single worksheet
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
     // Save the workbook as an Excel file
     XLSX.writeFile(wb, `${fileNameFilter}.xlsx`);
   };
@@ -522,16 +538,12 @@ function PenaltyAmountConsolidate() {
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Penalty Amount Consolidate",
-    pageStyle: "print",
+    documentTitle: 'Penalty Amount Consolidate',
+    pageStyle: 'print',
   });
   //serial no for listing items
   const addSerialNumber = (datas) => {
-    const itemsWithSerialNumber = datas?.map((item, index) => ({
-      ...item,
-      serialNumber: index + 1,
-
-    }));
+    const itemsWithSerialNumber = datas;
     setItems(itemsWithSerialNumber);
     setOverallItems(itemsWithSerialNumber);
   };
@@ -553,24 +565,16 @@ function PenaltyAmountConsolidate() {
     setPage(1);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
-  const filteredData = filteredDatas?.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas?.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.ceil(filteredDatas?.length / pageSize);
   const visiblePages = Math.min(totalPages, 3);
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
   const pageNumbers = [];
   for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
     pageNumbers.push(i);
@@ -583,7 +587,7 @@ function PenaltyAmountConsolidate() {
   );
   //get single row to edit....
   const getCode = async (e, data) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       // let res = await axios.post(
       //   `${SERVICE.FILTERED_PENALTYAMOUNTCONSOLIDATED}`,
@@ -595,102 +599,154 @@ function PenaltyAmountConsolidate() {
       //     assignbranch: isAssignBranch
       //   }
       // );
-      const res = await axios.post(`${SERVICE.PENALTY_AMOUNT_CONSOLIDATED_VIEW}`, {
-        fromdate: data.fromdateold,
-        todate: data.todateold,
-
-      }, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
+      const res = await axios.post(
+        `${SERVICE.PENALTY_AMOUNT_CONSOLIDATED_VIEW}`,
+        {
+          fromdate: data.fromdateold,
+          todate: data.todateold,
         },
-      })
+        {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        }
+      );
 
+      const final = res?.data?.penaltymonth?.map((item, index) => ({
+        ...item,
+        serialNumber: index + 1,
 
-      const final = res?.data?.penaltymonth
+        waiveramount: item.amountclient?.toFixed(2) || 0.0,
+        totalamount: (item.clientamount - item.amountclient).toFixed(2) || 0.0,
+      }));
       await getExcelFilterDatas(final);
       handleClickOpenEdit();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   const columnDataTable = [
     {
-      field: "checkbox",
-      headerName: "Checkbox",
+      field: 'checkbox',
+      headerName: 'Checkbox',
       headerStyle: {
-        fontWeight: "bold", // Apply the font-weight style to make the header text bold
+        fontWeight: 'bold', // Apply the font-weight style to make the header text bold
         // Add any other CSS styles as needed
       },
 
       sortable: false, // Optionally, you can make this column not sortable
       width: 60,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       headerCheckboxSelection: true,
       checkboxSelection: true,
       pinned: 'left',
       lockPinned: true,
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 80,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "fromdate",
-      headerName: "From Date",
+      field: 'fromdate',
+      headerName: 'From Date',
       flex: 0,
       width: 150,
       hide: !columnVisibility.fromdate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       pinned: 'left',
     },
     {
-      field: "todate",
-      headerName: "To Date",
+      field: 'todate',
+      headerName: 'To Date',
       flex: 0,
       width: 150,
       hide: !columnVisibility.todate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "name",
-      headerName: "Name",
+      field: 'name',
+      headerName: 'Name',
       flex: 0,
       width: 250,
       hide: !columnVisibility.name,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "username",
-      headerName: "User Name",
+      field: 'username',
+      headerName: 'User Name',
       flex: 0,
       width: 150,
       hide: !columnVisibility.username,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "date",
-      headerName: "Created Date",
+      field: 'date',
+      headerName: 'Created Date',
       flex: 0,
       width: 150,
       hide: !columnVisibility.date,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
+      {
+                        field: "matchpenalty",
+                        headerName: "Penalty Status",
+                        flex: 0,
+                        width: 300,
+                        minHeight: "40px !important",
+                        sortable: false,
+                        hide: !columnVisibility.matchpenalty,
+                        headerClassName: "bold-header",
+                        cellRenderer: (params) => (
+                            <>
+                                <Chip
+                                    sx={{ height: "25px", borderRadius: "0px" }}
+                                    color={params.data.matchpenalty === "Created" ? "success": "warning"}
+                                    variant="outlined"
+                                    label={params.data.matchpenalty}
+                                />
+                              
+                            </>
+                        )
+                    },
+                       {
+                        field: "matchclient",
+                        headerName: "Client Status",
+                        flex: 0,
+                        width: 300,
+                        minHeight: "40px !important",
+                        sortable: false,
+                        hide: !columnVisibility.matchclient,
+                        headerClassName: "bold-header",
+                        cellRenderer: (params) => (
+                            <>
+                                <Chip
+                                    sx={{ height: "25px", borderRadius: "0px" }}
+                                      color={params.data.matchclient === "Created" ? "success": "warning"}
+                                    variant="outlined"
+                                    label={params.data.matchclient}
+                                />
+                              
+                            </>
+                        )
+                    },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("epenaltyamountconsolidate") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('epenaltyamountconsolidate') && (
             <Button
               variant="contained"
               sx={userStyle.buttonedit}
@@ -702,18 +758,16 @@ function PenaltyAmountConsolidate() {
             </Button>
           )}
           &ensp;
-          {isUserRoleCompare?.includes("vpenaltyamountconsolidate") && (
+          {isUserRoleCompare?.includes('vpenaltyamountconsolidate') && (
             <>
-              <Link
-                to={`/penalty/penaltyamountconsolidateview/${params.data.id}`}
-              >
+              <Link to={`/penalty/penaltyamountconsolidateview/${params.data.id}`}>
                 <Button variant="contained" style={userStyle.buttonedit}>
                   <VisibilityOutlinedIcon />
                 </Button>
               </Link>
             </>
           )}
-          {isUserRoleCompare?.includes("dpenaltyamountconsolidate") && (
+          {isUserRoleCompare?.includes('dpenaltyamountconsolidate') && (
             <>
               <Button
                 variant="contained"
@@ -722,7 +776,7 @@ function PenaltyAmountConsolidate() {
                   rowData(params.data.id, params.data);
                 }}
               >
-                <DeleteOutlineOutlinedIcon style={{ fontsize: "large" }} />
+                <DeleteOutlineOutlinedIcon style={{ fontsize: 'large' }} />
               </Button>
             </>
           )}
@@ -731,7 +785,7 @@ function PenaltyAmountConsolidate() {
     },
   ];
   const rowData = async (id, data) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let resPayrun = await axios.post(`${SERVICE.CHECK_PAYRUN_ISCREATED_FROMTO}`, {
         headers: {
@@ -754,22 +808,21 @@ function PenaltyAmountConsolidate() {
       const isPayrunGenerated = resPayrun.data.count > 0 && isMoreThan5Days;
 
       if (isPayrunGenerated) {
-        setPopupContentMalert("Payrun Already Generated for these dates!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Payrun Already Generated for these dates!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       } else {
-        let res = await axios.get(
-          `${SERVICE.PENALTYAMOUNTCONSOLIDATED_SINGLE}/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-          }
-        );
+        let res = await axios.get(`${SERVICE.PENALTYAMOUNTCONSOLIDATED_SINGLE}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
         setIsRowDelete(res?.data?.spenaltyamountconsolidate);
         handleClickOpen();
       }
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   const rowDataTable = filteredData.map((item, index) => {
     return {
@@ -797,9 +850,7 @@ function PenaltyAmountConsolidate() {
     setColumnVisibility(updatedVisibility);
   };
   // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   // Manage Columns functionality
   const toggleColumnVisibility = (field) => {
     setColumnVisibility((prevVisibility) => ({
@@ -811,9 +862,9 @@ function PenaltyAmountConsolidate() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -821,7 +872,7 @@ function PenaltyAmountConsolidate() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -829,38 +880,16 @@ function PenaltyAmountConsolidate() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -868,12 +897,8 @@ function PenaltyAmountConsolidate() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
-              {" "}
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
+              {' '}
               Show All
             </Button>
           </Grid>
@@ -881,7 +906,7 @@ function PenaltyAmountConsolidate() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -890,7 +915,7 @@ function PenaltyAmountConsolidate() {
                 setColumnVisibility(newColumnVisibility);
               }}
             >
-              {" "}
+              {' '}
               Hide All
             </Button>
           </Grid>
@@ -898,56 +923,38 @@ function PenaltyAmountConsolidate() {
       </DialogActions>
     </Box>
   );
-  const [fileFormat, setFormat] = useState('')
-  let exportColumnNames = ["From Date", "To Date", "Name", "User Name", "Created Date"];
-  let exportRowValues = ["fromdate", "todate", "name", "username", "date"];
+  const [fileFormat, setFormat] = useState('');
+  let exportColumnNames = ['From Date', 'To Date', 'Name', 'User Name', 'Created Date', "Penalty Status",'Client Status'];
+  let exportRowValues = ['fromdate', 'todate', 'name', 'username', 'date',"matchpenalty","matchclient"];
   return (
     <Box>
-      <Headtitle title={"PENALTY AMOUNT CONSOLIDATE"} />
+      <Headtitle title={'PENALTY AMOUNT CONSOLIDATE'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="Manage Penalty Amount Consolidate"
-        modulename="Quality"
-        submodulename="Penalty"
-        mainpagename="Penalty Calculation"
-        subpagename="Penalty Amount Consolidate"
-        subsubpagename=""
-      />
+      <PageHeading title="Manage Penalty Amount Consolidate" modulename="Quality" submodulename="Penalty" mainpagename="Penalty Calculation" subpagename="Penalty Amount Consolidate" subsubpagename="" />
       {!clientUserIDArray ? (
         <Box sx={userStyle.container}>
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "center",
-              minHeight: "350px",
+              display: 'flex',
+              justifyContent: 'center',
+              minHeight: '350px',
             }}
           >
-            <ThreeDots
-              height="80"
-              width="80"
-              radius="9"
-              color="#1976d2"
-              ariaLabel="three-dots-loading"
-              wrapperStyle={{}}
-              wrapperClassName=""
-              visible={true}
-            />
+            <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
           </Box>
         </Box>
       ) : (
         <>
-          {isUserRoleCompare?.includes("apenaltyamountconsolidate") && (
+          {isUserRoleCompare?.includes('apenaltyamountconsolidate') && (
             <Box sx={userStyle.selectcontainer}>
               <>
-                <Typography sx={userStyle.importheadtext}>
-                  Add Penalty Amount Consolidated Creation
-                </Typography>
+                <Typography sx={userStyle.importheadtext}>Add Penalty Amount Consolidated Creation</Typography>
                 <br />
                 <Grid container spacing={2}>
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        From Date <b style={{ color: "red" }}>*</b>
+                        From Date <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -958,7 +965,7 @@ function PenaltyAmountConsolidate() {
                           setProductionConsolidate({
                             ...productionConsolidate,
                             fromdate: e.target.value,
-                            todate: "",
+                            todate: '',
                           });
                         }}
                       />
@@ -967,7 +974,7 @@ function PenaltyAmountConsolidate() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        To Date <b style={{ color: "red" }}>*</b>
+                        To Date <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -976,11 +983,7 @@ function PenaltyAmountConsolidate() {
                         onChange={(e) => {
                           setProductionConsolidate({
                             ...productionConsolidate,
-                            todate:
-                              new Date(e.target.value) >=
-                                new Date(productionConsolidate.fromdate)
-                                ? e.target.value
-                                : "",
+                            todate: new Date(e.target.value) >= new Date(productionConsolidate.fromdate) ? e.target.value : '',
                           });
                         }}
                       />
@@ -989,7 +992,7 @@ function PenaltyAmountConsolidate() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Name <b style={{ color: "red" }}>*</b>
+                        Name <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <OutlinedInput
                         id="component-outlined"
@@ -1011,12 +1014,7 @@ function PenaltyAmountConsolidate() {
                 <br />
                 <Grid container>
                   <Grid item md={3} xs={12} sm={6}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSubmit}
-                      sx={buttonStyles.buttonsubmit}
-                    >
+                    <Button variant="contained" color="primary" onClick={handleSubmit} sx={buttonStyles.buttonsubmit}>
                       Submit
                     </Button>
                   </Grid>
@@ -1033,14 +1031,12 @@ function PenaltyAmountConsolidate() {
       )}
       <br /> <br />
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lpenaltyamountconsolidate") && (
+      {isUserRoleCompare?.includes('lpenaltyamountconsolidate') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
-              <Typography sx={userStyle.HeaderText}>
-                All Consolidate List
-              </Typography>
+              <Typography sx={userStyle.HeaderText}>All Consolidate List</Typography>
             </Grid>
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
               <Grid item md={2} xs={12} sm={12}>
@@ -1058,7 +1054,7 @@ function PenaltyAmountConsolidate() {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -1076,78 +1072,81 @@ function PenaltyAmountConsolidate() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes(
-                    "excelpenaltyamountconsolidate"
-                  ) && (
-                      <>
-                        <Button onClick={(e) => {
-                          setIsFilterOpen(true)
-                          fetchConsolidateDateArray()
-                          setFormat("xl")
-                        }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
-                      </>
-                    )}
-                  {isUserRoleCompare?.includes(
-                    "csvpenaltyamountconsolidate"
-                  ) && (
-                      <>
-                        <Button onClick={(e) => {
-                          setIsFilterOpen(true)
-                          fetchConsolidateDateArray()
-                          setFormat("csv")
-                        }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
-                      </>
-                    )}
-                  {isUserRoleCompare?.includes(
-                    "printpenaltyamountconsolidate"
-                  ) && (
-                      <>
-                        <Button sx={userStyle.buttongrp} onClick={handleprint}>
-                          &ensp;
-                          <FaPrint />
-                          &ensp;Print&ensp;
-                        </Button>
-                      </>
-                    )}
-                  {isUserRoleCompare?.includes(
-                    "pdfpenaltyamountconsolidate"
-                  ) && (
-                      <>
-                        <Button
-                          sx={userStyle.buttongrp}
-                          onClick={() => {
-                            setIsPdfFilterOpen(true)
-                            fetchConsolidateDateArray()
-                          }}
-                        >
-                          <FaFilePdf />
-                          &ensp;Export to PDF&ensp;
-                        </Button>
-                      </>
-                    )}
-                  {isUserRoleCompare?.includes(
-                    "imagepenaltyamountconsolidate"
-                  ) && (
+                  {isUserRoleCompare?.includes('excelpenaltyamountconsolidate') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          fetchConsolidateDateArray();
+                          setFormat('xl');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileExcel />
+                        &ensp;Export to Excel&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('csvpenaltyamountconsolidate') && (
+                    <>
+                      <Button
+                        onClick={(e) => {
+                          setIsFilterOpen(true);
+                          fetchConsolidateDateArray();
+                          setFormat('csv');
+                        }}
+                        sx={userStyle.buttongrp}
+                      >
+                        <FaFileCsv />
+                        &ensp;Export to CSV&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('printpenaltyamountconsolidate') && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleprint}>
+                        &ensp;
+                        <FaPrint />
+                        &ensp;Print&ensp;
+                      </Button>
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('pdfpenaltyamountconsolidate') && (
+                    <>
                       <Button
                         sx={userStyle.buttongrp}
-                        onClick={handleCaptureImage}
+                        onClick={() => {
+                          setIsPdfFilterOpen(true);
+                          fetchConsolidateDateArray();
+                        }}
                       >
-                        {" "}
-                        <ImageIcon
-                          sx={{ fontSize: "15px" }}
-                        /> &ensp;Image&ensp;{" "}
+                        <FaFilePdf />
+                        &ensp;Export to PDF&ensp;
                       </Button>
-                    )}
+                    </>
+                  )}
+                  {isUserRoleCompare?.includes('imagepenaltyamountconsolidate') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
+                    </Button>
+                  )}
                 </Box>
               </Grid>
               <Grid item md={2} xs={12} sm={12}>
-                <AggregatedSearchBar columnDataTable={columnDataTable} setItems={setItems} addSerialNumber={addSerialNumber} setPage={setPage} maindatas={clientUserIDArray} setSearchedString={setSearchedString}
+                <AggregatedSearchBar
+                  columnDataTable={columnDataTable}
+                  setItems={setItems}
+                  addSerialNumber={addSerialNumber}
+                  setPage={setPage}
+                  maindatas={clientUserIDArray}
+                  setSearchedString={setSearchedString}
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
                   paginated={false}
@@ -1178,17 +1177,8 @@ function PenaltyAmountConsolidate() {
             <br />
             {!loading ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
             ) : (
@@ -1215,11 +1205,8 @@ function PenaltyAmountConsolidate() {
                 filteredChanges={filteredChanges}
                 gridRefTableImg={gridRefTableImg}
                 itemsList={overallItems}
-
               />
-            )
-            }
-
+            )}
             {/* ****** Table End ****** */}
           </Box>
         </>
@@ -1232,32 +1219,25 @@ function PenaltyAmountConsolidate() {
         anchorEl={anchorEl}
         onClose={handleCloseManageColumns}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
       >
         {manageColumnsContent}
       </Popover>
       {/* ALERT DIALOG */}
       <Box>
-        <Dialog
-          open={isErrorOpen}
-          onClose={handleCloseerr}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
+        <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={handleCloseerr}
             >
@@ -1266,19 +1246,9 @@ function PenaltyAmountConsolidate() {
           </DialogActions>
         </Dialog>
       </Box>
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* EXTERNAL COMPONENTS -------------- END */}
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
@@ -1291,34 +1261,14 @@ function PenaltyAmountConsolidate() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={consolidateArray ?? []}
-        filename={"Penalty Amount Consolidate"}
+        filename={'Penalty Amount Consolidate'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={delReport}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={delReportcheckbox}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delReport} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delReportcheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
     </Box>
   );
 }

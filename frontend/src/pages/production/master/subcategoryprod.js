@@ -34,8 +34,19 @@ import { MultiSelect } from 'react-multi-select-component';
 import { DeleteConfirmation, PleaseSelectRow } from '../../../components/DeleteConfirmation.js';
 import PageHeading from '../../../components/PageHeading.js';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
+
 
 function SubCategoryMaster() {
+  const [serverTime, setServerTime] = useState(null);
+    useEffect(() => {
+      const fetchTime = async () => {
+        const time = await getCurrentServerTime();
+        setServerTime(time);
+      };
+  
+      fetchTime();
+    }, []);
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
   const [popupContentMalert, setPopupContentMalert] = useState('');
   const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
@@ -469,7 +480,7 @@ function SubCategoryMaster() {
           addedby: [
             {
               name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
+              date: String(new Date(serverTime)),
               fileName: String(''),
             },
           ],
@@ -488,7 +499,7 @@ function SubCategoryMaster() {
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
@@ -770,7 +781,7 @@ function SubCategoryMaster() {
             ...updateby,
             {
               name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
+              date: String(new Date(serverTime)),
             },
           ],
         });
@@ -883,7 +894,7 @@ function SubCategoryMaster() {
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
             fileName: String(''),
           },
         ],
@@ -973,7 +984,7 @@ function SubCategoryMaster() {
           ...updateby,
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
@@ -1076,12 +1087,12 @@ function SubCategoryMaster() {
       companyname: String(isUserRoleAccess?.companyname),
       pagename: String('Production Subcategory'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(new Date()),
+      date: String(new Date(serverTime)),
 
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(new Date()),
+          date: String(new Date(serverTime)),
         },
       ],
     });

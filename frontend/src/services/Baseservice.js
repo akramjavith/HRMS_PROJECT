@@ -5791,6 +5791,8 @@ export const SERVICE = {
 
     
     DEPARTMENT_USERS_UPDATE_ATTMODE: `${BASE_URL}/api/departmentusersupdateattmode`,
+    PENALTY_AMOUNT_DATE_BASED_RESTRICTION: `${BASE_URL}/api/getallpenaltyamountdatebasedrestriction`,
+    PENALTY_AMOUNT_CONSOLIDATED_LIST: `${BASE_URL}/api/penaltyamountconsolidatedlist`,
 
 
 

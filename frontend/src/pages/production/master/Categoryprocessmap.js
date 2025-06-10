@@ -80,8 +80,22 @@ import { SERVICE } from '../../../services/Baseservice';
 import SendToServer from '../../sendtoserver';
 import domtoimage from 'dom-to-image';
 import AggridTableForPaginationTable from '../../../components/AggridTableForPaginationTable.js';
+import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
+
 
 function CategoryProcessMap() {
+
+  const [serverTime, setServerTime] = useState(null);
+    useEffect(() => {
+      const fetchTime = async () => {
+        const time = await getCurrentServerTime();
+        setServerTime(time);
+      };
+  
+      fetchTime();
+    }, []);
+  
+
   const [advancedFilter, setAdvancedFilter] = useState(null);
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -1172,12 +1186,12 @@ function CategoryProcessMap() {
       companyname: String(isUserRoleAccess?.companyname),
       pagename: String('Category Process Map'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(new Date()),
+      date: String(new Date(serverTime)),
 
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(new Date()),
+          date: String(new Date(serverTime)),
         },
       ],
     });
@@ -1210,7 +1224,7 @@ function CategoryProcessMap() {
           addedby: [
             {
               name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
+              date: String(new Date(serverTime)),
             },
           ],
         });
@@ -1432,7 +1446,7 @@ function CategoryProcessMap() {
           ...updateby,
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       });
@@ -2034,7 +2048,7 @@ function CategoryProcessMap() {
       };
     });
     //  Datefield
-    var today = new Date();
+    var today = new Date(serverTime);
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
@@ -2069,7 +2083,7 @@ function CategoryProcessMap() {
         addedby: [
           {
             name: String(isUserRoleAccess.companyname),
-            date: String(new Date()),
+            date: String(new Date(serverTime)),
           },
         ],
       }));
@@ -2110,7 +2124,7 @@ function CategoryProcessMap() {
           addedby: [
             {
               name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
+              date: String(new Date(serverTime)),
             },
           ],
         }));
@@ -2225,7 +2239,7 @@ function CategoryProcessMap() {
   };
 
   //  Datefield
-  var today = new Date();
+  var today = new Date(serverTime);
   var dd = String(today.getDate()).padStart(2, '0');
   var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
   var yyyy = today.getFullYear();

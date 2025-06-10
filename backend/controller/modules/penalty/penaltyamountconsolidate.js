@@ -7,12 +7,180 @@ const PenaltyClientError = require('../../../model/modules/penalty/penaltyclient
 const ProductionClientRate = require('../../../model/modules/production/productionclientrate');
 const ClientUserID = require("../../../model/modules/production/ClientUserIDModel");
 
+const Managepenaltymonth = require("../../../model/modules/penalty/penaltymonth");
+const ClientErrorMonthAmounts = require("../../../model/modules/penalty/clienterrormonthamount");
+
+
+
+exports.getAllPenaltyAmountConsolidatedDateBasedRestriction = catchAsyncErrors(
+  async (req, res, next) => {
+    let penaltymonth,clientamoutmonth;
+      const { fromdate,todate } = req.body;
+      // console.log(fromdate,todate,"Dats")
+    try {
+      penaltymonth = await Managepenaltymonth.countDocuments({fromdate:{$gte:fromdate},todate:{$lte:todate}});
+      clientamoutmonth = await ClientErrorMonthAmounts.countDocuments({fromdate:{$gte:fromdate},todate:{$lte:todate}});
+
+      // console.log( penaltymonth,clientamoutmonth,"new")
+    } catch (error) {
+      return next(new ErrorHandler("Records not found!", 404));
+    }
+  
+    return res.status(200).json({
+      // count: products.length,
+      penaltymonth,clientamoutmonth
+    });
+  }
+);
+
+
 // get All PenaltyAmountConsolidate Name => /api/allpenaltyamountconsolidate
 exports.getAllPenaltyAmountConsolidated = catchAsyncErrors(
   async (req, res, next) => {
     let penaltyamountconsolidate;
     try {
       penaltyamountconsolidate = await PenaltyAmountConsolidate.find().sort({ fromdate: -1 });
+    } catch (err) {
+      return next(new ErrorHandler("Records not found!", 404));
+    }
+    if (!penaltyamountconsolidate) {
+      return next(new ErrorHandler("Data  not found!", 404));
+    }
+    return res.status(200).json({
+      // count: products.length,
+      penaltyamountconsolidate,
+    });
+  }
+);
+
+exports.getAllPenaltyAmountConsolidatedList = catchAsyncErrors(
+  async (req, res, next) => {
+    let penaltyamountconsolidate;
+    try {
+// penaltyamountconsolidate = await PenaltyAmountConsolidate.aggregate([
+//   {
+//     $lookup: {
+//       from: "clienterrormonthamounts",
+//       let: { fromdate: "$fromdate", todate: "$todate" },
+//       pipeline: [
+//         {
+//           $match: {
+//             $expr: {
+//               $and: [
+//                 { $gte: ["$fromdate", "$$fromdate"] },
+//                 { $lte: ["$todate", "$$todate"] }
+//               ],
+//             },
+//           },
+//         },
+//       ],
+//       as: "matchedClient",
+//     },
+//   },
+//   {
+//     $lookup: {
+//       from: "managepenaltymonths",
+//       let: { fromdate: "$fromdate", todate: "$todate" },
+//       pipeline: [
+//         {
+//           $match: {
+//             $expr: {
+//               $and: [
+//                 { $gte: ["$fromdate", "$$fromdate"] },
+//                 { $lte: ["$todate", "$$todate"] }
+//               ],
+//             },
+//           },
+//         },
+//       ],
+//       as: "matchedPenalty",
+//     },
+//   },
+//   {
+//     $project: {
+//       fromdate: 1,
+//       todate: 1,
+//       username: 1,
+//       name: 1,
+//       date: 1,
+//       matchpenalty: {
+//         $cond: {
+//           if: { $gt: [{ $size: "$matchedPenalty" }, 0] },
+//           then: "Created",
+//           else: "Not Created",
+//         },
+//       },
+//       matchclient: {
+//         $cond: {
+//           if: { $gt: [{ $size: "$matchedClient" }, 0] },
+//           then: "Created",
+//           else: "Not Created",
+//         },
+//       },
+//     },
+//   }
+// ]);
+
+penaltyamountconsolidate = await PenaltyAmountConsolidate.aggregate([
+  {
+    $lookup: {
+      from: "clienterrormonthamounts",
+      let: { from: "$fromdate", to: "$todate" },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $lte: ["$fromdate", "$$from"] },
+                { $gte: ["$todate", "$$to"] }
+              ]
+            }
+          }
+        }
+      ],
+      as: "matchedClients"
+    }
+  },
+  {
+    $lookup: {
+      from: "managepenaltymonths",
+      let: { from: "$fromdate", to: "$todate" },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+             { $lte: ["$fromdate", "$$from"] },
+                { $gte: ["$todate", "$$to"] }
+              ]
+            }
+          }
+        }
+      ],
+      as: "matchedPenalties"
+    }
+  },
+  {
+    $addFields: {
+      matchclient: {
+        $cond: [{ $gt: [{ $size: "$matchedClients" }, 0] }, "Created", "Not Created"]
+      },
+      matchpenalty: {
+        $cond: [{ $gt: [{ $size: "$matchedPenalties" }, 0] }, "Created", "Not Created"]
+      }
+    }
+  },
+  {
+    $project: {
+      matchedClients: 0,
+      matchedPenalties: 0
+    }
+  },
+  {
+    $sort:{ fromdate: -1 }
+  }
+])
+
     } catch (err) {
       return next(new ErrorHandler("Records not found!", 404));
     }

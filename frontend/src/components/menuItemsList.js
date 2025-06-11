@@ -2610,6 +2610,105 @@ export const menuItems = [
           },
         ],
       },
+        {
+        title: 'Calculation',
+        dbname: 'menucalculation',
+        url: '',
+        submenu: [
+          {
+            title: 'Production Calculation',
+            dbname: 'menuproductioncalculation',
+            submenu: [
+              {
+                title: 'Production Time Log',
+                dbname: 'menuproductiontimelog',
+                url: '/production/productiontimelog',
+              },
+              {
+                title: 'Non Production Time Log',
+                dbname: 'menunonproductiontimelog',
+                url: '/production/nonproductiontimelog',
+              },
+              {
+                title: 'Idle Entry Time Log',
+                dbname: 'menuidleentrytimelog',
+                url: '/production/idleentrytimelog',
+              },
+              {
+                title: 'Zero Time Process',
+                dbname: 'menuzerotimeprocess',
+                url: '/production/zerotimeprocess',
+              },
+              {
+                title: 'Production Time Log Second Stage',
+                dbname: 'menuproductiontimelogsecondstage',
+                url: '/production/productiontimelogsecondstage',
+              },
+              {
+                title: 'Category Time Log',
+                dbname: 'menucategorytimelog',
+                url: '/production/categorytimelog',
+              },
+              {
+                title: 'Day Idle Hours Calculation',
+                dbname: 'menudayidlehourscalculation',
+                url: '/production/dayidlehourscalculation',
+              },
+              {
+                title: 'Month Idle Hours',
+                dbname: 'menumonthidlehours',
+                url: '/production/monthidlehours',
+              },
+            ],
+          },
+          {
+            title: 'Temp Calculation',
+            dbname: 'menutempcalculation',
+            submenu: [
+              {
+                title: 'Temp Production Time Log',
+                dbname: 'menutempproductiontimelog',
+                url: '/production/tempproductiontimelog',
+              },
+              {
+                title: 'Temp Non Production Time Log',
+                dbname: 'menutempnonproductiontimelog',
+                url: '/production/tempnonproductiontimelog',
+              },
+              {
+                title: 'Temp Idle Entry Time Log',
+                dbname: 'menutempidleentrytimelog',
+                url: '/production/tempidleentrytimelog',
+              },
+              {
+                title: 'Temp Zero Time Process',
+                dbname: 'menutempzerotimeprocess',
+                url: '/production/tempzerotimeprocess',
+              },
+              {
+                title: 'Temp Production Time Log Second Stage',
+                dbname: 'menutempproductiontimelogsecondstage',
+                url: '/production/tempproductiontimelogsecondstage',
+              },
+              {
+                title: 'Temp Category Time Log',
+                dbname: 'menutempcategorytimelog',
+                url: '/production/tempcategorytimelog',
+              },
+              {
+                title: 'Temp Day Idle Hours Calculation',
+                dbname: 'menutempdayidlehourscalculation',
+                url: '/production/tempdayidlehourscalculation',
+              },
+              {
+                title: 'Temp Month Idle Hours',
+                dbname: 'menutempmonthidlehours',
+                url: '/production/tempmonthidlehours',
+              },
+            ],
+          },
+        ],
+      },
       {
         title: "Non Production",
         dbname: "menunonproduction",

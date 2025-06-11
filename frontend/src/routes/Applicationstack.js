@@ -958,6 +958,25 @@ const PenaltyErrorExcel = React.lazy(() => import("../pages/production/penalty/p
 const BulkErrorExcel = React.lazy(() => import("../pages/production/penalty/bulkerroruploadexcel.js"));
 const Attendancemodeupdate = React.lazy(() => import('../pages/hr/employees/updatepages/Attendancemodeupdate'));
 
+const ProductionTimeLog = React.lazy(() => import('../pages/production/calculation/Productiontimelog.js'));
+const NonProductionTimeLog = React.lazy(() => import('../pages/production/calculation/Nonproductiontimelog.js'));
+const IdleEntryTimeLog = React.lazy(() => import('../pages/production/calculation/Idleentrytimelog.js'));
+const ZeroTimeProcess = React.lazy(() => import('../pages/production/calculation/Zerotimeprocess.js'));
+const ProductionTimeLogSecondStage = React.lazy(() => import('../pages/production/calculation/Productiontimelogsecondstage.js'));
+const CategoryTimeLog = React.lazy(() => import('../pages/production/calculation/Categorytimelog.js'));
+const CategoryTimeLogView = React.lazy(() => import('../pages/production/calculation/Categorytimelogview.js'));
+const DayIdleHoursCalculation = React.lazy(() => import('../pages/production/calculation/Dayidlehourscalculation.js'));
+const MonthIdleHours = React.lazy(() => import('../pages/production/calculation/Monthidlehours.js'));
+
+const TempProductionTimeLog = React.lazy(() => import('../pages/production/calculation/Tempproductiontimelog.js'));
+const TempNonProductionTimeLog = React.lazy(() => import('../pages/production/calculation/Tempnonproductiontimelog.js'));
+const TempIdleEntryTimeLog = React.lazy(() => import('../pages/production/calculation/Tempidleentrytimelog.js'));
+const TempZeroTimeProcess = React.lazy(() => import('../pages/production/calculation/Tempzerotimeprocess.js'));
+const TempProductionTimeLogSecondStage = React.lazy(() => import('../pages/production/calculation/Tempproductiontimelogsecondstage.js'));
+const TempCategoryTimeLog = React.lazy(() => import('../pages/production/calculation/Tempcategorytimelog.js'));
+const TempDayIdleHoursCalculation = React.lazy(() => import('../pages/production/calculation/Tempdayidlehourscalculation.js'));
+const TempMonthIdleHours = React.lazy(() => import('../pages/production/calculation/Tempmonthidlehours.js'));
+
 
 const App = () => {
   return (
@@ -1985,6 +2004,28 @@ const App = () => {
             <Route path="/penalty/penaltyerrorexcel" element={<PenaltyErrorExcel />} />
             <Route path="/penalty/bulkerrorexcel" element={<BulkErrorExcel />} />
            <Route path="/updatepages/attendancemode" element={<Attendancemodeupdate />} />
+
+
+             <Route path="production/productiontimelog" element={<ProductionTimeLog />} />
+            <Route path="production/nonproductiontimelog" element={<NonProductionTimeLog />} />
+            <Route path="production/idleentrytimelog" element={<IdleEntryTimeLog />} />
+            <Route path="production/zerotimeprocess" element={<ZeroTimeProcess />} />
+            <Route path="production/productiontimelogsecondstage" element={<ProductionTimeLogSecondStage />} />
+            <Route path="production/categorytimelog" element={<CategoryTimeLog />} />
+                        <Route path="production/categorytimelogview/:id" element={<CategoryTimeLogView />} />
+
+            <Route path="production/dayidlehourscalculation" element={<DayIdleHoursCalculation />} />
+            <Route path="production/monthidlehours" element={<MonthIdleHours />} />
+
+            <Route path="production/tempproductiontimelog" element={<TempProductionTimeLog />} />
+            <Route path="production/tempnonproductiontimelog" element={<TempNonProductionTimeLog />} />
+            <Route path="production/tempidleentrytimelog" element={<TempIdleEntryTimeLog />} />
+            <Route path="production/tempzerotimeprocess" element={<TempZeroTimeProcess />} />
+            <Route path="production/tempproductiontimelogsecondstage" element={<TempProductionTimeLogSecondStage />} />
+            <Route path="production/tempcategorytimelog" element={<TempCategoryTimeLog />} />
+            <Route path="production/tempdayidlehourscalculation" element={<TempDayIdleHoursCalculation />} />
+            <Route path="production/tempmonthidlehours" element={<TempMonthIdleHours />} />
+
 
             
             

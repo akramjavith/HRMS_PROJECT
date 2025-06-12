@@ -1032,17 +1032,19 @@ productionRoute.route("/bulkproductionorgupdatecategorysubcategoryother").post(b
 
 
 //Category Time Log controller
-const { addcategoryTimeLog, deletecategoryTimeLog, getAllcategoryTimeLog,  getSinglecategoryTimeLog, updatecategoryTimeLog } = require("../controller/modules/production/categorytimelog");
+const { addcategoryTimeLog, deletecategoryTimeLog, getAllcategoryTimeLog,CategoryTimelogCalculation,  getSinglecategoryTimeLog, updatecategoryTimeLog } = require("../controller/modules/production/categorytimelog");
 productionRoute.route("/categorytimelogs").get(getAllcategoryTimeLog);
 productionRoute.route("/categorytimelog/new").post(addcategoryTimeLog);
+productionRoute.route("/categorytimelogcalculation").post(CategoryTimelogCalculation);
 productionRoute.route("/categorytimelog/:id").delete(deletecategoryTimeLog).get(getSinglecategoryTimeLog).put(updatecategoryTimeLog);
 
 
 
 //Temp Category Time Log controller
-const { addTempcategoryTimeLog, deleteTempcategoryTimeLog, getAllTempcategoryTimeLog,  getSingleTempcategoryTimeLog, updateTempcategoryTimeLog } = require("../controller/modules/production/tempcategorytimelog");
+const { addTempcategoryTimeLog, deleteTempcategoryTimeLog, getAllTempcategoryTimeLog,TempCategoryTimelogCalculation,  getSingleTempcategoryTimeLog, updateTempcategoryTimeLog } = require("../controller/modules/production/tempcategorytimelog");
 productionRoute.route("/tempcategorytimelogs").get(getAllTempcategoryTimeLog);
 productionRoute.route("/tempcategorytimelog/new").post(addTempcategoryTimeLog);
+productionRoute.route("/tempcategorytimelogcalculation").post(TempCategoryTimelogCalculation);
 productionRoute.route("/tempcategorytimelog/:id").delete(deleteTempcategoryTimeLog).get(getSingleTempcategoryTimeLog).put(updateTempcategoryTimeLog);
 
 

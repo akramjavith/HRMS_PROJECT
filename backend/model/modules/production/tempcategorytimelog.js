@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const tempcategoryTimeLogSchema = new Schema({
-  fromdate: {
+ fromdate: {
     type: String,
     required: false,
   },
@@ -21,6 +21,40 @@ const tempcategoryTimeLogSchema = new Schema({
     type: String,
     required: false,
   },
+
+  data:[
+    {
+
+ fromdate: {
+    type: String,
+    required: false,
+  },
+  todate: {
+    type: String,
+    required: false,
+  },
+  empname: {
+    type: String,
+    required: false,
+  },
+  filename: {
+    type: String,
+    required: false,
+  },
+   category: {
+    type: String,
+    required: false,
+  },
+    count: {
+    type: String,
+    required: false,
+  },
+   allothours: {
+    type: String,
+    required: false,
+  },
+    }
+  ],
   addedby: [
     {
       name: {

@@ -98,34 +98,35 @@ function TempCategoryTimeLog() {
     const [copiedData, setCopiedData] = useState("");
 
 
-      const fetchCategoryTimeLog = async () => {
+    const fetchCategoryTimeLog = async () => {
         setPageName(!pageName);
-          setLoader(true);
+        setLoader(true);
         try {
-          let res_freq = await axios.get(SERVICE.GET_ALL_TEMP_CATEGORY_TIME_LOG, {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-          });
-          setProductions(
-            res_freq?.data?.tempcategorytimelog.map((t, index) => ({
-              ...t,
-              serialNumber: index + 1,
-                id: t._id,
-              fromdate: moment(t.fromdate).format('DD-MM-YYYY'),
-             
-            }))
-          );
-          setLoader(false);
-        } catch (err) {
-          setLoader(false);
-          handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-        }
-      };
+            let res_freq = await axios.get(SERVICE.GET_ALL_TEMP_CATEGORY_TIME_LOG, {
+                headers: {
+                    Authorization: `Bearer ${auth.APIToken}`,
+                },
+            });
+            setProductions(
+                res_freq?.data?.tempcategorytimelog.map((t, index) => ({
+                    ...t,
+                    serialNumber: index + 1,
+                    id: t._id,
+                    fromdate: moment(t.fromdate).format('DD-MM-YYYY'),
+                    oldfromdate: t.fromdate,
 
-      useEffect(() =>{
-fetchCategoryTimeLog()
-      },[])
+                }))
+            );
+            setLoader(false);
+        } catch (err) {
+            setLoader(false);
+            handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategoryTimeLog()
+    }, [])
 
     //image
     const handleCaptureImage = () => {
@@ -276,7 +277,7 @@ fetchCategoryTimeLog()
                     Authorization: `Bearer ${auth.APIToken}`,
                 },
             });
-           
+
             handleCloseMod();
             await fetchCategoryTimeLog();
             setFilteredRowData([])
@@ -311,7 +312,7 @@ fetchCategoryTimeLog()
             setPage(1);
             setFilteredRowData([])
             setFilteredChanges(null)
-           
+
             setPopupContent("Deleted Successfully");
             setPopupSeverity("success");
             handleClickOpenPopup();
@@ -324,27 +325,29 @@ fetchCategoryTimeLog()
     const sendRequest = async () => {
         setPageName(!pageName)
         try {
-                  selectedBranchFrom.map((item) =>
-           axios.post(SERVICE.CREATE_TEMP_CATEGORY_TIME_LOG_, {
+
+            const requ = await axios.post(SERVICE.TEMP_CATEGORY_TIME_LOG_CALCULATION, {
                 headers: {
                     Authorization: `Bearer ${auth.APIToken}`,
                 },
-                branch: item.value,
+                branch: selectedBranchFrom.map((item) => item.value),
                 fromdate: String(production.fromdate),
-               username: String(isUserRoleAccess.companyname),
-                addedby: [
-                    {
-                        name: String(isUserRoleAccess.companyname),
-                        // date: String(new Date()),
-                    },
-                ],
+                username: String(isUserRoleAccess.companyname),
             })
-        );
-          await fetchCategoryTimeLog();
-            setPopupContent("Added Successfully");
-            setPopupSeverity("success");
-            handleClickOpenPopup();
-            setloadingdeloverall(false);
+            console.log(requ.data.categorytimelog, "resa")
+            if (requ.data.count > 0) {
+                await fetchCategoryTimeLog();
+                setPopupContent("Added Successfully");
+                setPopupSeverity("success");
+                handleClickOpenPopup();
+                setloadingdeloverall(false);
+
+            } else {
+                setPopupContentMalert("No Data To Create");
+                setPopupSeverityMalert("warning");
+                handleClickOpenPopupMalert();
+            }
+
         } catch (err) {
             handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
         }
@@ -355,7 +358,8 @@ fetchCategoryTimeLog()
         setPageName(!pageName)
         e.preventDefault();
         setloadingdeloverall(true);
-       
+        const isNameMatch = productions.some((item) => item.oldfromdate === production.fromdate);
+
         if (selectedBranchFrom.length === 0) {
             setPopupContentMalert("Please Select Branch!");
             setPopupSeverityMalert("info");
@@ -366,6 +370,11 @@ fetchCategoryTimeLog()
             setPopupSeverityMalert("info");
             handleClickOpenPopupMalert();
         }
+        else if (isNameMatch) {
+            setPopupContentMalert('Date Already Exist!');
+            setPopupSeverityMalert('info');
+            handleClickOpenPopupMalert();
+        }
         else {
             sendRequest();
         }
@@ -373,7 +382,7 @@ fetchCategoryTimeLog()
 
     const handleClear = () => {
         setPageName(!pageName)
-        setProduction({fromdate: "" });
+        setProduction({ fromdate: "" });
         setSelectedBranchFrom([])
         setPopupContent("Cleared Successfully");
         setPopupSeverity("success");
@@ -435,7 +444,7 @@ fetchCategoryTimeLog()
     };
 
 
-  
+
 
 
 
@@ -448,7 +457,7 @@ fetchCategoryTimeLog()
         pageStyle: "print",
     });
 
- 
+
 
 
     useEffect(() => {
@@ -630,14 +639,14 @@ fetchCategoryTimeLog()
                     )}
                     {isUserRoleCompare?.includes("vtempcategorytimelog") && (
                         <>
-              <Link to={`/production/tempcategorytimelogview/${params.data.id}`}>
-                <Button variant="contained" style={userStyle.buttonedit}>
-                  <VisibilityOutlinedIcon />
-                </Button>
-              </Link>
-            </>
+                            <Link to={`/production/tempcategorytimelogview/${params.data.id}`}>
+                                <Button variant="contained" style={userStyle.buttonedit}>
+                                    <VisibilityOutlinedIcon />
+                                </Button>
+                            </Link>
+                        </>
                     )}
-                  
+
                 </Grid>
             ),
         },
@@ -648,7 +657,7 @@ fetchCategoryTimeLog()
             ...item,
             id: item.id,
             serialNumber: item.serialNumber,
-         
+
         };
     });
 
@@ -801,15 +810,15 @@ fetchCategoryTimeLog()
 
     const [selectedBranchFrom, setSelectedBranchFrom] = useState([]);
 
-      //branch multiselect dropdown changes
-  const handleBranchChangeFrom = (options) => {
-    setSelectedBranchFrom(options);
-  };
-  const customValueRendererBranchFrom = (valueCate, _employeename) => {
-    return valueCate.length
-      ? valueCate.map(({ label }) => label).join(", ")
-      : "Please select Branch";
-  };
+    //branch multiselect dropdown changes
+    const handleBranchChangeFrom = (options) => {
+        setSelectedBranchFrom(options);
+    };
+    const customValueRendererBranchFrom = (valueCate, _employeename) => {
+        return valueCate.length
+            ? valueCate.map(({ label }) => label).join(", ")
+            : "Please select Branch";
+    };
 
     return (
         <Box>
@@ -836,23 +845,23 @@ fetchCategoryTimeLog()
                             <br />
                             <Grid container spacing={2}>
                                 <Grid item md={4} xs={12} sm={12}>
-                                      <FormControl fullWidth size="small">
-                                                        <Typography>
-                                                          Branch<b style={{ color: "red" }}>*</b>
-                                                        </Typography>
-                                                        <MultiSelect
-                                                          options={isAssignBranch?.map(data => ({
-                        label: data.branch,
-                        value: data.branch,
-                      })).filter((item, index, self) => {
-                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
-                      })}
-                                                          value={selectedBranchFrom}
-                                                          onChange={handleBranchChangeFrom}
-                                                          valueRenderer={customValueRendererBranchFrom}
-                                                          labelledBy="Please Select Branch"
-                                                        />
-                                                      </FormControl>
+                                    <FormControl fullWidth size="small">
+                                        <Typography>
+                                            Branch<b style={{ color: "red" }}>*</b>
+                                        </Typography>
+                                        <MultiSelect
+                                            options={isAssignBranch?.map(data => ({
+                                                label: data.branch,
+                                                value: data.branch,
+                                            })).filter((item, index, self) => {
+                                                return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
+                                            })}
+                                            value={selectedBranchFrom}
+                                            onChange={handleBranchChangeFrom}
+                                            valueRenderer={customValueRendererBranchFrom}
+                                            labelledBy="Please Select Branch"
+                                        />
+                                    </FormControl>
                                 </Grid>
                                 <Grid item md={4} xs={12} sm={6}>
                                     <FormControl fullWidth size="small">
@@ -892,7 +901,7 @@ fetchCategoryTimeLog()
                     </Box>
                 </>
             )}
-          
+
             <br />
             {/* ****** Table Start ****** */}
             {isUserRoleCompare?.includes("ltempcategorytimelog") && (
@@ -1095,7 +1104,7 @@ fetchCategoryTimeLog()
                                     itemsList={productions}
                                 />
                             </>
-                      )}
+                        )}
                     </Box>
                 </>
 
@@ -1181,7 +1190,7 @@ fetchCategoryTimeLog()
                 exportRowValues={exportRowValues}
                 componentRef={componentRef}
             />
-         
+
             {/*SINGLE DELETE ALERT DIALOG ARE YOU SURE? */}
             <DeleteConfirmation
                 open={isDeleteOpen}

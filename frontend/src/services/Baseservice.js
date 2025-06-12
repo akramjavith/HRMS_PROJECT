@@ -5801,15 +5801,14 @@ export const SERVICE = {
     GET_ALL_CATEGORY_TIME_LOG: `${BASE_URL}/api/categorytimelogs`,
     CREATE_CATEGORY_TIME_LOG_: `${BASE_URL}/api/categorytimelog/new`,
     SINGLE_CATEGORY_TIME_LOG_: `${BASE_URL}/api/categorytimelog`,
+    CATEGORY_TIME_LOG_CALCULATION: `${BASE_URL}/api/categorytimelogcalculation`,
+
 
     
       //temp category time log
     GET_ALL_TEMP_CATEGORY_TIME_LOG: `${BASE_URL}/api/tempcategorytimelogs`,
     CREATE_TEMP_CATEGORY_TIME_LOG_: `${BASE_URL}/api/tempcategorytimelog/new`,
     SINGLE_TEMP_CATEGORY_TIME_LOG_: `${BASE_URL}/api/tempcategorytimelog`,
-
-
-
-
+    TEMP_CATEGORY_TIME_LOG_CALCULATION: `${BASE_URL}/api/tempcategorytimelogcalculation`,
     
 };

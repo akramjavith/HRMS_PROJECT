@@ -31,7 +31,7 @@ import domtoimage from 'dom-to-image';
 import ExportData from '../../../components/ExportData';
 import MessageAlert from '../../../components/MessageAlert';
 
-function CategoryTimeLogView() {
+function TempCategoryTimeLogView() {
   let exportColumnNames = [
     'Name',
     'Start Date',
@@ -409,14 +409,14 @@ function CategoryTimeLogView() {
     setLoading(true);
     setPageName(!pageName);
     try {
-      const res_freq = await axios.get(`${SERVICE.SINGLE_CATEGORY_TIME_LOG_}/${ids}`, {
+      const res_freq = await axios.get(`${SERVICE.SINGLE_TEMP_CATEGORY_TIME_LOG_}/${ids}`, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
 
 
-      const final = res_freq?.data?.scategorytimelog.data?.map((item, index) => ({
+      const final = res_freq?.data?.stempcategorytimelog.data?.map((item, index) => ({
         ...item,
         serialNumber: index + 1,
         fromdate: moment(item.fromdate).format('DD-MM-YYYY'),
@@ -443,7 +443,7 @@ function CategoryTimeLogView() {
       domtoimage
         .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, 'Category TimeLog View.png');
+          saveAs(blob, 'Temp CategoryTimeLog View.png');
         })
         .catch((error) => {
           console.error('dom-to-image error: ', error);
@@ -456,7 +456,7 @@ function CategoryTimeLogView() {
       domtoimage
         .toBlob(gridRefTableImgviewall.current)
         .then((blob) => {
-          saveAs(blob, 'Category TimeLog View Individual.png');
+          saveAs(blob, 'Temp CategoryTimeLog View Individual.png');
         })
         .catch((error) => {
           console.error('dom-to-image error: ', error);
@@ -1256,9 +1256,9 @@ function CategoryTimeLogView() {
   console.log(clientUserIDFilterArrayview, 'clientUserIDFilterArrayview');
   return (
     <Box>
-      <Headtitle title={'Category TimeLog View'} />
+      <Headtitle title={'Temp CategoryTimeLog View'} />
       {/* ****** Header Content ****** */}
-      <Typography sx={userStyle.HeaderText}>Category TimeLog View</Typography>
+      <Typography sx={userStyle.HeaderText}>Temp CategoryTimeLog View</Typography>
       <br /> <br />
       {/* ****** Table Start ****** */}
       {!clientUserIDArray ? (
@@ -1275,11 +1275,11 @@ function CategoryTimeLogView() {
                 {/* ******************************************************EXPORT Buttons****************************************************** */}
                 <Grid container>
                   <Grid item xs={8}>
-                    <Typography sx={userStyle.importheadtext}>Category TimeLog View List</Typography>
+                    <Typography sx={userStyle.importheadtext}>Temp CategoryTimeLog View List</Typography>
                   </Grid>
 
                   <Grid item md={2} xs={12} sm={12}>
-                    <Link to={`/production/categorytimelog`}>
+                    <Link to={`/production/tempcategorytimelog`}>
                       <Button variant="contained" color="primary">
                         BACK
                       </Button>
@@ -1805,4 +1805,4 @@ function CategoryTimeLogView() {
   );
 }
 
-export default CategoryTimeLogView;
+export default TempCategoryTimeLogView;

@@ -974,6 +974,7 @@ const TempIdleEntryTimeLog = React.lazy(() => import('../pages/production/calcul
 const TempZeroTimeProcess = React.lazy(() => import('../pages/production/calculation/Tempzerotimeprocess.js'));
 const TempProductionTimeLogSecondStage = React.lazy(() => import('../pages/production/calculation/Tempproductiontimelogsecondstage.js'));
 const TempCategoryTimeLog = React.lazy(() => import('../pages/production/calculation/Tempcategorytimelog.js'));
+const TempCategoryTimeLogView = React.lazy(() => import('../pages/production/calculation/Tempcategorytimelogview.js'));
 const TempDayIdleHoursCalculation = React.lazy(() => import('../pages/production/calculation/Tempdayidlehourscalculation.js'));
 const TempMonthIdleHours = React.lazy(() => import('../pages/production/calculation/Tempmonthidlehours.js'));
 
@@ -2013,6 +2014,7 @@ const App = () => {
             <Route path="production/productiontimelogsecondstage" element={<ProductionTimeLogSecondStage />} />
             <Route path="production/categorytimelog" element={<CategoryTimeLog />} />
                         <Route path="production/categorytimelogview/:id" element={<CategoryTimeLogView />} />
+                        <Route path="production/tempcategorytimelogview/:id" element={<TempCategoryTimeLogView />} />
 
             <Route path="production/dayidlehourscalculation" element={<DayIdleHoursCalculation />} />
             <Route path="production/monthidlehours" element={<MonthIdleHours />} />

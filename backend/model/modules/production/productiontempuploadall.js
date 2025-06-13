@@ -179,4 +179,5 @@ const ProductionTempUploadallSchema = new Schema({
     default: Date.now,
   },
 });
+ProductionTempUploadallSchema.index({ dateobjformatdate: 1, user: 1 });
 module.exports = mongoose.model("ProductionTempUploadall", ProductionTempUploadallSchema);  

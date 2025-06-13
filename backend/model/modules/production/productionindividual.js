@@ -255,4 +255,7 @@ const ProductionIndividualSchema = new Schema({
         default: Date.now,
     },
 });
+
+ProductionIndividualSchema.index({ fromdate: 1,time:1, user: 1 });
+
 module.exports = mongoose.model("ProductionIndividual", ProductionIndividualSchema);

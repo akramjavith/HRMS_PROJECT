@@ -182,6 +182,7 @@ const ProductionUploadSchema = new Schema({
 });
 ProductionUploadSchema.index({ vendor: 1, filenameupdated: 1, category: 1, formatteddate: 1 })
 ProductionUploadSchema.index({ fromdate: 1, vendor: 1, filenameupdated: 1, category: 1, todate: 1 });
+ProductionUploadSchema.index({ dateobjformatdate: 1, user: 1 });
 
 
 module.exports = mongoose.model("ProductionUpload", ProductionUploadSchema);

@@ -331,7 +331,7 @@ function TempCategoryTimeLog() {
                     Authorization: `Bearer ${auth.APIToken}`,
                 },
                 branch: selectedBranchFrom.map((item) => item.value),
-                fromdate: String(production.fromdate),
+                date: String(production.fromdate),
                 username: String(isUserRoleAccess.companyname),
             })
             console.log(requ.data.categorytimelog, "resa")

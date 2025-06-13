@@ -351,7 +351,7 @@ const isdatebothMissing = isdatepenaltyMissing && isdateclientMissing;
       setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } 
-    if (isdatebothMissing) {
+   else if (isdatebothMissing) {
   setPopupContentMalert(`This ${productionConsolidate.fromdate} to ${productionConsolidate.todate} not added in penalty month and client error amount month`);
   setPopupSeverityMalert('warning');
   handleClickOpenPopupMalert();

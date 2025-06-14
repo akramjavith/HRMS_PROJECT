@@ -1,52 +1,32 @@
-import CloseIcon from "@mui/icons-material/Close";
-import ImageIcon from "@mui/icons-material/Image";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  FormControl,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Popover,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import Switch from "@mui/material/Switch";
-import axios from "axios";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import "jspdf-autotable";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import { NotificationContainer, NotificationManager, } from "react-notifications";
-import { useReactToPrint } from "react-to-print";
+import CloseIcon from '@mui/icons-material/Close';
+import ImageIcon from '@mui/icons-material/Image';
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, FormControl, Grid, IconButton, List, ListItem, ListItemText, MenuItem, OutlinedInput, Popover, Select, TextField, Typography } from '@mui/material';
+import Switch from '@mui/material/Switch';
+import axios from '../../axiosInstance';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import 'jspdf-autotable';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { FaFileCsv, FaFileExcel, FaFilePdf, FaPrint } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
+import { useReactToPrint } from 'react-to-print';
 import AggregatedSearchBar from '../../components/AggregatedSearchBar';
-import AggridTable from "../../components/AggridTable";
-import AlertDialog from "../../components/Alert";
-import { handleApiError } from "../../components/Errorhandling";
-import ExportData from "../../components/ExportData";
-import Headtitle from "../../components/Headtitle";
-import MessageAlert from "../../components/MessageAlert";
-import PageHeading from "../../components/PageHeading";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
+import AggridTable from '../../components/AggridTable';
+import AlertDialog from '../../components/Alert';
+import { handleApiError } from '../../components/Errorhandling';
+import ExportData from '../../components/ExportData';
+import Headtitle from '../../components/Headtitle';
+import MessageAlert from '../../components/MessageAlert';
+import PageHeading from '../../components/PageHeading';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
 import domtoimage from 'dom-to-image';
-import { MultiSelect } from "react-multi-select-component";
-import Selects from "react-select";
-import LoadingButton from "@mui/lab/LoadingButton";
-
+import { MultiSelect } from 'react-multi-select-component';
+import Selects from 'react-select';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 function PasswordList() {
   const [btnLoading, setBtnLoading] = useState(false);
@@ -55,8 +35,8 @@ function PasswordList() {
   const [filteredChanges, setFilteredChanges] = useState(null);
 
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -64,16 +44,16 @@ function PasswordList() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
   const handleClosePopup = () => {
     setOpenPopup(false);
-  }
+  };
   const handleCopy = (message) => {
-    NotificationManager.success(`${message} 👍`, "", 2000);
+    NotificationManager.success(`${message} 👍`, '', 2000);
   };
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
@@ -84,84 +64,50 @@ function PasswordList() {
   const handleClosePdfFilterMod = () => {
     setIsPdfFilterOpen(false);
   };
-  const [fileFormat, setFormat] = useState("");
-  let exportColumnNames = ["Company", "Branch", "Unit",
-    "Team", "EmployeeCode",
-    "Name",
-    "Updated Date Time",
-    "Exp Date Time",
-    "UserName",
-    "Password"];
-  let exportRowValues = ["company", "branch", "unit", "team",
-    "empcode", "companyname",
-    "updatetimedate",
-    "expdatetime",
-    "username",
-    "originalpassword"];
+  const [fileFormat, setFormat] = useState('');
+  let exportColumnNames = ['Company', 'Branch', 'Unit', 'Team', 'EmployeeCode', 'Name', 'Updated Date Time', 'Exp Date Time', 'UserName', 'Password'];
+  let exportRowValues = ['company', 'branch', 'unit', 'team', 'empcode', 'companyname', 'updatetimedate', 'expdatetime', 'username', 'originalpassword'];
   const gridRef = useRef(null);
   const [documentsList, setDocumentsList] = useState([]);
   const [documentsListForFilter, setDocumentsListForFilter] = useState([]);
-  const { isUserRoleCompare, isUserRoleAccess, allUsersData, allTeam, buttonStyles, isAssignBranch, pageName, setPageName, } = useContext(
-    UserRoleAccessContext
-  );
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const { isUserRoleCompare, isUserRoleAccess, allUsersData, allTeam, buttonStyles, isAssignBranch, pageName, setPageName } = useContext(UserRoleAccessContext);
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
-      branch: data.branch,
-      company: data.company,
-      unit: data.unit,
-      branchaddress: data?.branchaddress,
-    }))
-    : isAssignBranch
-      ?.filter((data) => {
-        let fetfinalurl = [];
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)
-        ) {
-          fetfinalurl = data.submodulenameurl;
-        } else if (data?.modulenameurl?.length !== 0) {
-          fetfinalurl = data.modulenameurl;
-        } else {
-          fetfinalurl = [];
-        }
-        const remove = [
-          window.location.pathname?.substring(1),
-          window.location.pathname,
-        ];
-        return fetfinalurl?.some((item) => remove?.includes(item));
-      })
-      ?.map((data) => ({
         branch: data.branch,
         company: data.company,
         unit: data.unit,
-        branchaddress: data?.branchaddress
-      }));
+        branchaddress: data?.branchaddress,
+      }))
+    : isAssignBranch
+        ?.filter((data) => {
+          let fetfinalurl = [];
+          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subsubpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.subpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.mainpagenameurl;
+          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
+            fetfinalurl = data.submodulenameurl;
+          } else if (data?.modulenameurl?.length !== 0) {
+            fetfinalurl = data.modulenameurl;
+          } else {
+            fetfinalurl = [];
+          }
+          const remove = [window.location.pathname?.substring(1), window.location.pathname];
+          return fetfinalurl?.some((item) => remove?.includes(item));
+        })
+        ?.map((data) => ({
+          branch: data.branch,
+          company: data.company,
+          unit: data.unit,
+          branchaddress: data?.branchaddress,
+        }));
 
   const [singleDoc, setSingleDoc] = useState({});
   const [password, setPassword] = useState({
-    newpassword: "",
-    confirmpassword: "",
+    newpassword: '',
+    confirmpassword: '',
   });
   const { auth } = useContext(AuthContext);
   //Datatable
@@ -171,10 +117,10 @@ function PasswordList() {
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const [showAlert, setShowAlert] = useState();
   const [openInfo, setOpeninfo] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [isManageColumnsOpen, setManageColumnsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [viewInfo, setViewInfo] = useState([]);
@@ -197,9 +143,7 @@ function PasswordList() {
     expdatetime: true,
     // password: true,
   };
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
   const getapi = async () => {
     let userchecks = axios.post(`${SERVICE.CREATE_USERCHECKS}`, {
       headers: {
@@ -207,7 +151,7 @@ function PasswordList() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("PasswordList"),
+      pagename: String('PasswordList'),
       commonid: String(isUserRoleAccess?._id),
       date: String(new Date()),
 
@@ -218,23 +162,22 @@ function PasswordList() {
         },
       ],
     });
-
-  }
+  };
   //useEffect
   useEffect(() => {
     fetchAllApproveds();
-    getapi()
+    getapi();
   }, []);
   useEffect(() => {
     fetchAllApproveds();
   }, [editOpen]);
 
   useEffect(() => {
-    localStorage.setItem("columnVisibility", JSON.stringify(columnVisibility));
+    localStorage.setItem('columnVisibility', JSON.stringify(columnVisibility));
   }, [columnVisibility]);
 
   useEffect(() => {
-    const savedVisibility = localStorage.getItem("columnVisibility");
+    const savedVisibility = localStorage.getItem('columnVisibility');
     if (savedVisibility) {
       setColumnVisibility(JSON.parse(savedVisibility));
     }
@@ -242,13 +185,13 @@ function PasswordList() {
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
 
-  const [searchedString, setSearchedString] = useState("")
+  const [searchedString, setSearchedString] = useState('');
   const gridRefTable = useRef(null);
   const [isHandleChange, setIsHandleChange] = useState(false);
 
@@ -256,12 +199,13 @@ function PasswordList() {
   // image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Password List.png");
+          saveAs(blob, 'Password List.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
@@ -271,7 +215,7 @@ function PasswordList() {
   };
   const handleEditClose = () => {
     setEditOpen(false);
-    setPassword({ newpassword: "", confirmpassword: "" });
+    setPassword({ newpassword: '', confirmpassword: '' });
   };
   const handlViewClose = () => {
     setOpenView(false);
@@ -284,7 +228,7 @@ function PasswordList() {
     setManageColumnsOpen(false);
   };
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const handleSelectionChange = (newSelection) => {
     setSelectedRows(newSelection.selectionModel);
   };
@@ -304,17 +248,17 @@ function PasswordList() {
   const username = isUserRoleAccess.username;
   const editSubmit = async (e) => {
     e.preventDefault();
-    if (password.newpassword === "") {
-      setPopupContentMalert("Please Enter New Password");
-      setPopupSeverityMalert("info");
+    if (password.newpassword === '') {
+      setPopupContentMalert('Please Enter New Password');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (password.confirmpassword === "") {
-      setPopupContentMalert("Please Enter Confirm Password");
-      setPopupSeverityMalert("info");
+    } else if (password.confirmpassword === '') {
+      setPopupContentMalert('Please Enter Confirm Password');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (password.confirmpassword !== password.newpassword) {
       setPopupContentMalert("Password Didn't Match");
-      setPopupSeverityMalert("info");
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else {
       sendEditRequest();
@@ -322,19 +266,15 @@ function PasswordList() {
   };
 
   const sendEditRequest = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
+      let resSetting = await axios.get(`${SERVICE.GET_OVERALL_SETTINGS}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+      });
 
-      let resSetting = await axios.get(
-        `${SERVICE.GET_OVERALL_SETTINGS}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-        }
-      );
-
-      const paswordupdateday = resSetting?.data?.overallsettings?.[0]?.passwordupdatedays ?? "0";
+      const paswordupdateday = resSetting?.data?.overallsettings?.[0]?.passwordupdatedays ?? '0';
 
       await axios.put(`${SERVICE.SINGLE_USER_PASS}/${emp_id}`, {
         headers: {
@@ -343,10 +283,7 @@ function PasswordList() {
         password: String(password.newpassword),
         originalpassword: String(password.newpassword),
         passexpdate: new Date(new Date().setDate(new Date().getDate() + Number(paswordupdateday))),
-        updatedby: [
-          ...updateby,
-          { name: String(username), date: String(new Date()) },
-        ],
+        updatedby: [...updateby, { name: String(username), date: String(new Date()) }],
       });
 
       if (singleDoc?.rocketchatid) {
@@ -365,34 +302,29 @@ function PasswordList() {
         );
       }
 
-      let companyEmailArray = singleDoc?.companyemail?.split(",")
+      let companyEmailArray = singleDoc?.companyemail?.split(',');
       if (companyEmailArray?.length) {
         try {
-          let domainUpdate = await axios.post(
-            SERVICE.UPDATEDOMAINMAILUSERPASSWORD,
-            {
-              usernames: companyEmailArray,
-              password: String(password.originalpassword),
-            }
-          );
-          console.log("Password Changed Successfully in post fix")
-
+          let domainUpdate = await axios.post(SERVICE.UPDATEDOMAINMAILUSERPASSWORD, {
+            usernames: companyEmailArray,
+            password: String(password.originalpassword),
+          });
+          console.log('Password Changed Successfully in post fix');
         } catch (error) {
-          console.log(error, "Error Changing password in post fix")
+          console.log(error, 'Error Changing password in post fix');
         }
       }
 
-
-
-
       await fetchAllApproveds();
-      setPassword({ newpassword: "", confirmpassword: "" });
+      setPassword({ newpassword: '', confirmpassword: '' });
 
       handleEditClose();
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);; }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
 
   //Project updateby edit page...
@@ -400,15 +332,15 @@ function PasswordList() {
   let addedby = viewInfo.addedby;
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.row.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
   // Excel
-  const fileName = "Password List";
+  const fileName = 'Password List';
   // get particular columns for export excel
   const getinfoCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let res = await axios.get(`${SERVICE.SINGLE_USER_PASS}/${e}`, {
         headers: {
@@ -417,15 +349,16 @@ function PasswordList() {
       });
       setSingleDoc(res?.data?.suser);
       handleEditOpen();
-
-    } catch (err) { handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);; }
+    } catch (err) {
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Password List",
-    pageStyle: "print",
+    documentTitle: 'Password List',
+    pageStyle: 'print',
   });
   //Datatable
   const handlePageChange = (newPage) => {
@@ -450,26 +383,17 @@ function PasswordList() {
     addSerialNumber(documentsList);
   }, [documentsList]);
 
-
   // Split the search query into individual terms
-  const searchOverTerms = searchQuery?.toLowerCase()?.split(" ");
+  const searchOverTerms = searchQuery?.toLowerCase()?.split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchOverTerms.every((term) =>
-      Object.values(item)?.join(" ")?.toLowerCase()?.includes(term)
-    );
+    return searchOverTerms.every((term) => Object.values(item)?.join(' ')?.toLowerCase()?.includes(term));
   });
-  const filteredData = filteredDatas?.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas?.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.ceil(filteredDatas?.length / pageSize);
   const visiblePages = Math.min(totalPages, 3);
   const firstVisiblePage = Math.max(1, page - 1);
-  const lastVisiblePage = Math.min(
-    firstVisiblePage + visiblePages - 1,
-    totalPages
-  );
+  const lastVisiblePage = Math.min(firstVisiblePage + visiblePages - 1, totalPages);
   const pageNumbers = [];
   for (let i = firstVisiblePage; i <= lastVisiblePage; i++) {
     pageNumbers.push(i);
@@ -481,106 +405,104 @@ function PasswordList() {
   );
   const columnDataTable = [
     {
-      field: "serialNumber",
-      headerName: "S.No",
+      field: 'serialNumber',
+      headerName: 'S.No',
       flex: 0,
       width: 90,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.serialNumber,
-      pinned: 'left', lockPinned: true,
-
+      pinned: 'left',
+      lockPinned: true,
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 140,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.company,
       pinned: 'left',
-
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 140,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.branch,
       pinned: 'left',
-
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 140,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.unit,
     },
     {
-      field: "team",
-      headerName: "Team",
+      field: 'team',
+      headerName: 'Team',
       flex: 0,
       width: 140,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.team,
     },
     {
-      field: "empcode",
-      headerName: "Employee Code",
+      field: 'empcode',
+      headerName: 'Employee Code',
       flex: 0,
       width: 140,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.empcode,
     },
     {
-      field: "companyname",
-      headerName: "Name",
+      field: 'companyname',
+      headerName: 'Name',
       flex: 0,
       width: 190,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.companyname,
     },
     {
-      field: "updatetimedate",
-      headerName: "Updated Date Time",
+      field: 'updatetimedate',
+      headerName: 'Updated Date Time',
       flex: 0,
       width: 190,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.updatetimedate,
     },
     {
-      field: "expdatetime",
-      headerName: "Exp Date Time",
+      field: 'expdatetime',
+      headerName: 'Exp Date Time',
       flex: 0,
       width: 190,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.expdatetime,
     },
     {
-      field: "username",
-      headerName: "Username",
+      field: 'username',
+      headerName: 'Username',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.username,
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
+        <Grid sx={{ display: 'flex' }}>
           <ListItem
             sx={{
-              "&:hover": {
-                cursor: "pointer",
-                color: "blue",
-                textDecoration: "underline",
+              '&:hover': {
+                cursor: 'pointer',
+                color: 'blue',
+                textDecoration: 'underline',
               },
             }}
           >
             <CopyToClipboard
               onCopy={() => {
-                handleCopy("Copied UserName!");
+                handleCopy('Copied UserName!');
               }}
-              options={{ message: "Copied  UserName!" }}
+              options={{ message: 'Copied  UserName!' }}
               text={params?.data?.username}
             >
               <ListItemText primary={params?.data?.username} />
@@ -590,28 +512,28 @@ function PasswordList() {
       ),
     },
     {
-      field: "originalpassword",
-      headerName: "Password",
+      field: 'originalpassword',
+      headerName: 'Password',
       flex: 0,
       width: 180,
-      minHeight: "40px",
+      minHeight: '40px',
       hide: !columnVisibility.originalpassword,
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
+        <Grid sx={{ display: 'flex' }}>
           <ListItem
             sx={{
-              "&:hover": {
-                cursor: "pointer",
-                color: "blue",
-                textDecoration: "underline",
+              '&:hover': {
+                cursor: 'pointer',
+                color: 'blue',
+                textDecoration: 'underline',
               },
             }}
           >
             <CopyToClipboard
               onCopy={() => {
-                handleCopy("Copied password!");
+                handleCopy('Copied password!');
               }}
-              options={{ message: "Copied  password!" }}
+              options={{ message: 'Copied  password!' }}
               text={params?.data?.originalpassword}
             >
               <ListItemText primary={params?.data?.originalpassword} />
@@ -621,18 +543,18 @@ function PasswordList() {
       ),
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 250,
       sortable: false,
       hide: !columnVisibility.actions,
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
+        <Grid sx={{ display: 'flex' }}>
           {/* {isUserRoleCompare?.includes("epasswordlist") ?  */}
           <Button
             variant="contained"
-            sx={{ maxHeight: "30px" }}
+            sx={{ maxHeight: '30px' }}
             onClick={() => {
               getinfoCode(params.data.id);
             }}
@@ -681,18 +603,16 @@ function PasswordList() {
     }));
   };
   // Function to filter columns based on search query
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   // JSX for the "Manage Columns" popover content
   const manageColumnsContent = (
-    <div style={{ padding: "10px", minWidth: "325px" }}>
+    <div style={{ padding: '10px', minWidth: '325px' }}>
       <Typography variant="h6">Manage Columns</Typography>
       <IconButton
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -700,35 +620,16 @@ function PasswordList() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-10px" }}
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={column.headerName}
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-10px' }} checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -736,21 +637,13 @@ function PasswordList() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
           <Grid item md={4}></Grid>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility({})}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility({})}>
               Hide All
             </Button>
           </Grid>
@@ -760,20 +653,20 @@ function PasswordList() {
   );
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   const [filterState, setFilterState] = useState({
-    type: "Individual",
+    type: 'Individual',
   });
 
   const TypeOptions = [
-    { label: "Individual", value: "Individual" },
-    { label: "Department", value: "Department" },
-    { label: "Company", value: "Company" },
-    { label: "Branch", value: "Branch" },
-    { label: "Unit", value: "Unit" },
-    { label: "Team", value: "Team" },
+    { label: 'Individual', value: 'Individual' },
+    { label: 'Department', value: 'Department' },
+    { label: 'Company', value: 'Company' },
+    { label: 'Branch', value: 'Branch' },
+    { label: 'Unit', value: 'Unit' },
+    { label: 'Team', value: 'Team' },
   ];
   //company multiselect
   const [selectedOptionsCompany, setSelectedOptionsCompany] = useState([]);
@@ -799,9 +692,7 @@ function PasswordList() {
   };
 
   const customValueRendererCompany = (valueCompanyCat, _categoryname) => {
-    return valueCompanyCat?.length
-      ? valueCompanyCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Company";
+    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(', ') : 'Please Select Company';
   };
 
   //branch multiselect
@@ -826,9 +717,7 @@ function PasswordList() {
   };
 
   const customValueRendererBranch = (valueBranchCat, _categoryname) => {
-    return valueBranchCat?.length
-      ? valueBranchCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Branch";
+    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(', ') : 'Please Select Branch';
   };
 
   //unit multiselect
@@ -851,9 +740,7 @@ function PasswordList() {
   };
 
   const customValueRendererUnit = (valueUnitCat, _categoryname) => {
-    return valueUnitCat?.length
-      ? valueUnitCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Unit";
+    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(', ') : 'Please Select Unit';
   };
 
   //team multiselect
@@ -874,15 +761,11 @@ function PasswordList() {
   };
 
   const customValueRendererTeam = (valueTeamCat, _categoryname) => {
-    return valueTeamCat?.length
-      ? valueTeamCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Team";
+    return valueTeamCat?.length ? valueTeamCat.map(({ label }) => label)?.join(', ') : 'Please Select Team';
   };
 
   //department multiselect
-  const [selectedOptionsDepartment, setSelectedOptionsDepartment] = useState(
-    []
-  );
+  const [selectedOptionsDepartment, setSelectedOptionsDepartment] = useState([]);
   let [valueDepartmentCat, setValueDepartmentCat] = useState([]);
 
   const handleDepartmentChange = (options) => {
@@ -897,9 +780,7 @@ function PasswordList() {
   };
 
   const customValueRendererDepartment = (valueDepartmentCat, _categoryname) => {
-    return valueDepartmentCat?.length
-      ? valueDepartmentCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Department";
+    return valueDepartmentCat?.length ? valueDepartmentCat.map(({ label }) => label)?.join(', ') : 'Please Select Department';
   };
   //employee multiselect
   const [selectedOptionsEmployee, setSelectedOptionsEmployee] = useState([]);
@@ -915,9 +796,7 @@ function PasswordList() {
   };
 
   const customValueRendererEmployee = (valueEmployeeCat, _categoryname) => {
-    return valueEmployeeCat?.length
-      ? valueEmployeeCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Employee";
+    return valueEmployeeCat?.length ? valueEmployeeCat.map(({ label }) => label)?.join(', ') : 'Please Select Employee';
   };
 
   useEffect(() => {
@@ -943,86 +822,55 @@ function PasswordList() {
   };
 
   const TypeCompany = allUsersData
-    ?.filter(
-      (u) =>
-        valueCompanyCat?.includes(u.company)
-    )
+    ?.filter((u) => valueCompanyCat?.includes(u.company))
     .map((u) => ({
       ...u,
       label: u.companyname,
       value: u.companyname,
-    }))
+    }));
 
   const TypeBranch = allUsersData
-    ?.filter(
-      (u) =>
-        valueCompanyCat?.includes(u.company) &&
-        valueBranchCat?.includes(u.branch)
-    )
+    ?.filter((u) => valueCompanyCat?.includes(u.company) && valueBranchCat?.includes(u.branch))
     .map((u) => ({
       ...u,
       label: u.companyname,
       value: u.companyname,
-    }))
+    }));
 
   const TypeUnit = allUsersData
-    ?.filter(
-      (u) =>
-        valueCompanyCat?.includes(u.company) &&
-        valueBranchCat?.includes(u.branch) &&
-        valueUnitCat?.includes(u.unit)
-    )
+    ?.filter((u) => valueCompanyCat?.includes(u.company) && valueBranchCat?.includes(u.branch) && valueUnitCat?.includes(u.unit))
     .map((u) => ({
       ...u,
       label: u.companyname,
       value: u.companyname,
-    }))
+    }));
 
   const TypeTeam = allUsersData
-    ?.filter(
-      (u) =>
-        valueCompanyCat?.includes(u.company) &&
-        valueBranchCat?.includes(u.branch) &&
-        valueUnitCat?.includes(u.unit) &&
-        valueTeamCat?.includes(u.team)
-    )
+    ?.filter((u) => valueCompanyCat?.includes(u.company) && valueBranchCat?.includes(u.branch) && valueUnitCat?.includes(u.unit) && valueTeamCat?.includes(u.team))
     .map((u) => ({
       ...u,
       label: u.companyname,
       value: u.companyname,
-    }))
+    }));
 
   const TypeDepart = allUsersData
-    ?.filter(
-      (u) =>
-        valueCompanyCat?.includes(u.company) &&
-        valueDepartmentCat?.includes(u.department)
-    )
+    ?.filter((u) => valueCompanyCat?.includes(u.company) && valueDepartmentCat?.includes(u.department))
     .map((u) => ({
       ...u,
       label: u.companyname,
       value: u.companyname,
-    }))
+    }));
 
   const TypeEmployee = allUsersData
-    ?.filter(
-      (u) =>
-        valueCompanyCat?.includes(u.company) &&
-        valueBranchCat?.includes(u.branch) &&
-        valueUnitCat?.includes(u.unit) &&
-        valueTeamCat?.includes(u.team) &&
-        valueEmployeeCat?.includes(u.companyname)
-    )
+    ?.filter((u) => valueCompanyCat?.includes(u.company) && valueBranchCat?.includes(u.branch) && valueUnitCat?.includes(u.unit) && valueTeamCat?.includes(u.team) && valueEmployeeCat?.includes(u.companyname))
     .map((u) => ({
       ...u,
       label: u.companyname,
       value: u.companyname,
-    }))
+    }));
 
-  const filterEmployee = filterState?.type === "Individual" ?
-    TypeEmployee : filterState?.type === "Department" ? TypeDepart : filterState?.type === "Company" ?
-      TypeCompany : filterState?.type === "Branch" ? TypeBranch : filterState?.type === "Unit" ?
-        TypeUnit : filterState?.type === "Team" ? TypeTeam : []
+  const filterEmployee =
+    filterState?.type === 'Individual' ? TypeEmployee : filterState?.type === 'Department' ? TypeDepart : filterState?.type === 'Company' ? TypeCompany : filterState?.type === 'Branch' ? TypeBranch : filterState?.type === 'Unit' ? TypeUnit : filterState?.type === 'Team' ? TypeTeam : [];
 
   //auto select all dropdowns
   const [allAssignCompany, setAllAssignCompany] = useState([]);
@@ -1037,30 +885,15 @@ function PasswordList() {
           branch: data.branch,
           unit: data.unit,
         }))
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        );
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit));
       let selectedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         .map((a, index) => {
           return a.company;
         });
 
       let mappedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         ?.map((data) => ({
           label: data?.company,
           value: data?.company,
@@ -1070,25 +903,13 @@ function PasswordList() {
       setSelectedOptionsCompany(mappedCompany);
 
       let selectedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         .map((a, index) => {
           return a.branch;
         });
 
       let mappedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         ?.map((data) => ({
           label: data?.branch,
           value: data?.branch,
@@ -1098,31 +919,13 @@ function PasswordList() {
       setSelectedOptionsBranch(mappedBranch);
 
       let selectedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         .map((a, index) => {
           return a.unit;
         });
 
       let mappedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         ?.map((data) => ({
           label: data?.unit,
           value: data?.unit,
@@ -1132,48 +935,22 @@ function PasswordList() {
       setSelectedOptionsUnit(mappedUnit);
 
       let mappedTeam = allTeam
-        ?.filter(
-          (u) =>
-            selectedCompany?.includes(u.company) &&
-            selectedBranch?.includes(u.branch) &&
-            selectedUnit?.includes(u.unit)
-        )
+        ?.filter((u) => selectedCompany?.includes(u.company) && selectedBranch?.includes(u.branch) && selectedUnit?.includes(u.unit))
         .map((u) => ({
           label: u.teamname,
           value: u.teamname,
         }));
 
-      let selectedTeam = allTeam
-        ?.filter(
-          (u) =>
-            selectedCompany?.includes(u.company) &&
-            selectedBranch?.includes(u.branch) &&
-            selectedUnit?.includes(u.unit)
-        )
-        .map((u) => u.teamname);
+      let selectedTeam = allTeam?.filter((u) => selectedCompany?.includes(u.company) && selectedBranch?.includes(u.branch) && selectedUnit?.includes(u.unit)).map((u) => u.teamname);
 
       let mappedemployees = allUsersData
-        ?.filter(
-          (u) =>
-            selectedCompany?.includes(u.company) &&
-            selectedBranch?.includes(u.branch) &&
-            selectedUnit?.includes(u.unit) &&
-            selectedTeam?.includes(u.team)
-        )
+        ?.filter((u) => selectedCompany?.includes(u.company) && selectedBranch?.includes(u.branch) && selectedUnit?.includes(u.unit) && selectedTeam?.includes(u.team))
         .map((u) => ({
           label: u.companyname,
           value: u.companyname,
         }));
 
-      let employees = allUsersData
-        ?.filter(
-          (u) =>
-            selectedCompany?.includes(u.company) &&
-            selectedBranch?.includes(u.branch) &&
-            selectedUnit?.includes(u.unit) &&
-            selectedTeam?.includes(u.team)
-        )
-        .map((u) => u.companyname);
+      let employees = allUsersData?.filter((u) => selectedCompany?.includes(u.company) && selectedBranch?.includes(u.branch) && selectedUnit?.includes(u.unit) && selectedTeam?.includes(u.team)).map((u) => u.companyname);
       setValueTeamCat(selectedTeam);
       setSelectedOptionsTeam(mappedTeam);
       setAllAssignCompany(selectedCompany);
@@ -1185,12 +962,7 @@ function PasswordList() {
       setValueEmployeeCat(employees);
       setSelectedOptionsEmployee(mappedemployees);
     } catch (err) {
-      handleApiError(
-        err,
-        setPopupContentMalert,
-        setPopupSeverityMalert,
-        handleClickOpenPopupMalert
-      );
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1199,152 +971,102 @@ function PasswordList() {
   }, [isAssignBranch]);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const filterEmployee = filterState?.type === "Individual" ?
-      TypeEmployee : filterState?.type === "Department" ? TypeDepart : filterState?.type === "Company" ?
-        TypeCompany : filterState?.type === "Branch" ? TypeBranch : filterState?.type === "Unit" ?
-          TypeUnit : filterState?.type === "Team" ? TypeTeam : []
+    const filterEmployee =
+      filterState?.type === 'Individual' ? TypeEmployee : filterState?.type === 'Department' ? TypeDepart : filterState?.type === 'Company' ? TypeCompany : filterState?.type === 'Branch' ? TypeBranch : filterState?.type === 'Unit' ? TypeUnit : filterState?.type === 'Team' ? TypeTeam : [];
 
     if (selectedOptionsCompany?.length === 0) {
-      setPopupContentMalert("Please Select Company");
-      setPopupSeverityMalert("info");
+      setPopupContentMalert('Please Select Company');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      ["Individual", "Branch", "Unit", "Team"]?.includes(filterState?.type) &&
-      selectedOptionsBranch?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Branch");
-      setPopupSeverityMalert("info");
+    } else if (['Individual', 'Branch', 'Unit', 'Team']?.includes(filterState?.type) && selectedOptionsBranch?.length === 0) {
+      setPopupContentMalert('Please Select Branch');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      ["Individual", "Unit", "Team"]?.includes(filterState?.type) &&
-      selectedOptionsUnit?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Unit");
-      setPopupSeverityMalert("info");
+    } else if (['Individual', 'Unit', 'Team']?.includes(filterState?.type) && selectedOptionsUnit?.length === 0) {
+      setPopupContentMalert('Please Select Unit');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      ["Individual", "Team"]?.includes(filterState?.type) &&
-      selectedOptionsTeam?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Team");
-      setPopupSeverityMalert("info");
+    } else if (['Individual', 'Team']?.includes(filterState?.type) && selectedOptionsTeam?.length === 0) {
+      setPopupContentMalert('Please Select Team');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      filterState?.type === "Individual" &&
-      selectedOptionsEmployee?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Employee Names");
-      setPopupSeverityMalert("info");
+    } else if (filterState?.type === 'Individual' && selectedOptionsEmployee?.length === 0) {
+      setPopupContentMalert('Please Select Employee Names');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      filterState?.type === "Department" &&
-      selectedOptionsDepartment?.length === 0
-    ) {
-      setPopupContentMalert("Please Select Department!");
-      setPopupSeverityMalert("info");
+    } else if (filterState?.type === 'Department' && selectedOptionsDepartment?.length === 0) {
+      setPopupContentMalert('Please Select Department!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else {
-      const IsFilteredData = documentsListForFilter?.filter((item) =>
-        filterEmployee?.some((emp) =>
-          emp?.company === item?.company &&
-          emp?.branch === item?.branch &&
-          emp?.unit === item?.unit &&
-          emp?.team === item?.team &&
-          emp?.companyname === item?.companyname
-        )
+    } else {
+      const IsFilteredData = documentsListForFilter?.filter((item) => filterEmployee?.some((emp) => emp?.company === item?.company && emp?.branch === item?.branch && emp?.unit === item?.unit && emp?.team === item?.team && emp?.companyname === item?.companyname));
+
+      setDocumentsList(
+        IsFilteredData?.map((item, index) => {
+          const options = {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+          };
+
+          // Process `updatedby`
+          const lastUpdated = item.updatedby?.[item.updatedby.length - 1]?.date;
+          let dateUpd = lastUpdated ? new Date(lastUpdated) : null;
+          if (dateUpd && isNaN(dateUpd)) {
+            console.warn('Invalid lastUpdated format:', lastUpdated);
+            dateUpd = null;
+          }
+
+          // Process `passexpdate`
+          const Expdate = item.passexpdate;
+          let dateExp = Expdate ? new Date(Expdate) : null;
+          if (dateExp && isNaN(dateExp)) {
+            console.warn('Invalid Expdate format:', Expdate);
+            dateExp = null;
+          }
+
+          // Create formatted dates
+          const formattedExpDate = dateExp ? new Intl.DateTimeFormat('en-IN', options).format(dateExp) : null;
+
+          const formattedUpdDate = dateUpd ? new Intl.DateTimeFormat('en-IN', options).format(dateUpd) : null;
+
+          return {
+            ...item,
+            serialNumber: index + 1,
+            expdatetime: formattedExpDate,
+            updatetimedate: formattedUpdDate,
+          };
+        })
       );
-
-
-      setDocumentsList(IsFilteredData?.map((item, index) => {
-        const options = {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true,
-        };
-
-        // Process `updatedby`
-        const lastUpdated = item.updatedby?.[item.updatedby.length - 1]?.date;
-        let dateUpd = lastUpdated ? new Date(lastUpdated) : null;
-        if (dateUpd && isNaN(dateUpd)) {
-          console.warn('Invalid lastUpdated format:', lastUpdated);
-          dateUpd = null;
-        }
-
-        // Process `passexpdate`
-        const Expdate = item.passexpdate;
-        let dateExp = Expdate ? new Date(Expdate) : null;
-        if (dateExp && isNaN(dateExp)) {
-          console.warn('Invalid Expdate format:', Expdate);
-          dateExp = null;
-        }
-
-        // Create formatted dates
-        const formattedExpDate = dateExp
-          ? new Intl.DateTimeFormat('en-IN', options).format(dateExp)
-          : null;
-
-        const formattedUpdDate = dateUpd
-          ? new Intl.DateTimeFormat('en-IN', options).format(dateUpd)
-          : null;
-
-        return {
-          ...item,
-          serialNumber: index + 1,
-          expdatetime: formattedExpDate,
-          updatetimedate: formattedUpdDate,
-        };
-      }));
-
     }
-
-  }
+  };
 
   //get all project.
   const fetchAllApproveds = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
-      let res = await axios.post(SERVICE.ALL_USER_PASSASSIGNBRANCH, {
-        assignbranch: accessbranch
-      }, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
+      let res = await axios.post(
+        SERVICE.ALL_USER_PASSASSIGNBRANCH,
+        {
+          assignbranch: accessbranch,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        }
+      );
       setDocumentsListForFilter(res?.data?.users);
       if (rowDataTable?.length > 0) {
-        const filterEmployee = filterState?.type === "Individual"
-          ? TypeEmployee
-          : filterState?.type === "Department"
-            ? TypeDepart
-            : filterState?.type === "Company"
-              ? TypeCompany
-              : filterState?.type === "Branch"
-                ? TypeBranch
-                : filterState?.type === "Unit"
-                  ? TypeUnit
-                  : filterState?.type === "Team"
-                    ? TypeTeam
-                    : [];
+        const filterEmployee =
+          filterState?.type === 'Individual' ? TypeEmployee : filterState?.type === 'Department' ? TypeDepart : filterState?.type === 'Company' ? TypeCompany : filterState?.type === 'Branch' ? TypeBranch : filterState?.type === 'Unit' ? TypeUnit : filterState?.type === 'Team' ? TypeTeam : [];
 
-        const IsFilteredData = res?.data?.users?.filter((item) =>
-          filterEmployee?.some((emp) =>
-            emp?.company === item?.company &&
-            emp?.branch === item?.branch &&
-            emp?.unit === item?.unit &&
-            emp?.team === item?.team &&
-            emp?.companyname === item?.companyname
-          )
-        );
+        const IsFilteredData = res?.data?.users?.filter((item) => filterEmployee?.some((emp) => emp?.company === item?.company && emp?.branch === item?.branch && emp?.unit === item?.unit && emp?.team === item?.team && emp?.companyname === item?.companyname));
 
         setDocumentsList(
           IsFilteredData?.map((item, index) => {
@@ -1374,13 +1096,9 @@ function PasswordList() {
             }
 
             // Create formatted dates
-            const formattedExpDate = dateExp
-              ? new Intl.DateTimeFormat('en-IN', options).format(dateExp)
-              : null;
+            const formattedExpDate = dateExp ? new Intl.DateTimeFormat('en-IN', options).format(dateExp) : null;
 
-            const formattedUpdDate = dateUpd
-              ? new Intl.DateTimeFormat('en-IN', options).format(dateUpd)
-              : null;
+            const formattedUpdDate = dateUpd ? new Intl.DateTimeFormat('en-IN', options).format(dateUpd) : null;
 
             return {
               ...item,
@@ -1395,7 +1113,7 @@ function PasswordList() {
       setLoading(true);
     } catch (err) {
       setLoading(true);
-      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);;
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
@@ -1414,45 +1132,37 @@ function PasswordList() {
     setValueEmployeeCat([]);
     setSelectedOptionsEmployee([]);
     setSelectedOptionsEmployee([]);
-    setDocumentsList([])
+    setDocumentsList([]);
     setFilterState({
-      type: "Individual",
+      type: 'Individual',
     });
 
-    setPopupContent("Cleared Successfully");
-    setPopupSeverity("success");
+    setPopupContent('Cleared Successfully');
+    setPopupSeverity('success');
     handleClickOpenPopup();
   };
 
   return (
     <Box>
       <NotificationContainer />
-      <Headtitle title={"PASSWORD LIST"} />
+      <Headtitle title={'PASSWORD LIST'} />
       {/* ****** Header Content ****** */}
-      <PageHeading
-        title="Password List"
-        modulename="Settings"
-        submodulename="Password List"
-        mainpagename=""
-        subpagename=""
-        subsubpagename=""
-      />
-      {isUserRoleCompare?.includes("apasswordlist") && (
+      <PageHeading title="Password List" modulename="Settings" submodulename="Password List" mainpagename="" subpagename="" subsubpagename="" />
+      {isUserRoleCompare?.includes('apasswordlist') && (
         <Box sx={userStyle.selectcontainer}>
           <>
             <Grid container spacing={2}>
-
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography>
-                    Type<b style={{ color: "red" }}>*</b>
+                    Type<b style={{ color: 'red' }}>*</b>
                   </Typography>
                   <Selects
                     options={TypeOptions}
                     // styles={colourStyles}
                     value={{
-                      label: filterState.type ?? "Please Select Type",
-                      value: filterState.type ?? "Please Select Type",
+                      label: filterState.type ?? 'Please Select Type',
+                      value: filterState.type ?? 'Please Select Type',
                     }}
                     onChange={(e) => {
                       setFilterState((prev) => ({
@@ -1471,14 +1181,14 @@ function PasswordList() {
                       setSelectedOptionsDepartment([]);
                       setValueEmployeeCat([]);
                       setSelectedOptionsEmployee([]);
-                      setDocumentsList([])
+                      setDocumentsList([]);
                     }}
                   />
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
                 <Typography>
-                  Company<b style={{ color: "red" }}>*</b>
+                  Company<b style={{ color: 'red' }}>*</b>
                 </Typography>
                 <FormControl size="small" fullWidth>
                   <MultiSelect
@@ -1488,12 +1198,7 @@ function PasswordList() {
                         value: data.company,
                       }))
                       .filter((item, index, self) => {
-                        return (
-                          self.findIndex(
-                            (i) =>
-                              i.label === item.label && i.value === item.value
-                          ) === index
-                        );
+                        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                       })}
                     value={selectedOptionsCompany}
                     onChange={(e) => {
@@ -1504,32 +1209,24 @@ function PasswordList() {
                   />
                 </FormControl>
               </Grid>
-              {["Individual", "Team"]?.includes(filterState.type) ? (
+              {['Individual', 'Team']?.includes(filterState.type) ? (
                 <>
                   {/* Branch Unit Team */}
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        {" "}
-                        Branch <b style={{ color: "red" }}>*</b>
+                        {' '}
+                        Branch <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <MultiSelect
                         options={accessbranch
-                          ?.filter((comp) =>
-                            valueCompanyCat?.includes(comp.company)
-                          )
+                          ?.filter((comp) => valueCompanyCat?.includes(comp.company))
                           ?.map((data) => ({
                             label: data.branch,
                             value: data.branch,
                           }))
                           .filter((item, index, self) => {
-                            return (
-                              self.findIndex(
-                                (i) =>
-                                  i.label === item.label &&
-                                  i.value === item.value
-                              ) === index
-                            );
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                           })}
                         value={selectedOptionsBranch}
                         onChange={(e) => {
@@ -1543,28 +1240,18 @@ function PasswordList() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        {" "}
-                        Unit<b style={{ color: "red" }}>*</b>
+                        {' '}
+                        Unit<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <MultiSelect
                         options={accessbranch
-                          ?.filter(
-                            (comp) =>
-                              valueCompanyCat?.includes(comp.company) &&
-                              valueBranchCat?.includes(comp.branch)
-                          )
+                          ?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch))
                           ?.map((data) => ({
                             label: data.unit,
                             value: data.unit,
                           }))
                           .filter((item, index, self) => {
-                            return (
-                              self.findIndex(
-                                (i) =>
-                                  i.label === item.label &&
-                                  i.value === item.value
-                              ) === index
-                            );
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                           })}
                         value={selectedOptionsUnit}
                         onChange={(e) => {
@@ -1578,16 +1265,11 @@ function PasswordList() {
                   <Grid item md={3} xs={12} sm={6}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Team<b style={{ color: "red" }}>*</b>
+                        Team<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <MultiSelect
                         options={allTeam
-                          ?.filter(
-                            (u) =>
-                              valueCompanyCat?.includes(u.company) &&
-                              valueBranchCat?.includes(u.branch) &&
-                              valueUnitCat?.includes(u.unit)
-                          )
+                          ?.filter((u) => valueCompanyCat?.includes(u.company) && valueBranchCat?.includes(u.branch) && valueUnitCat?.includes(u.unit))
                           .map((u) => ({
                             ...u,
                             label: u.teamname,
@@ -1603,13 +1285,13 @@ function PasswordList() {
                     </FormControl>
                   </Grid>
                 </>
-              ) : ["Department"]?.includes(filterState.type) ? (
+              ) : ['Department']?.includes(filterState.type) ? (
                 <>
                   {/* Department */}
                   <Grid item md={3} xs={12} sm={6}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Department<b style={{ color: "red" }}>*</b>
+                        Department<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <MultiSelect
                         options={departmentOptions}
@@ -1623,31 +1305,23 @@ function PasswordList() {
                     </FormControl>
                   </Grid>
                 </>
-              ) : ["Branch"]?.includes(filterState.type) ? (
+              ) : ['Branch']?.includes(filterState.type) ? (
                 <>
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        {" "}
-                        Branch <b style={{ color: "red" }}>*</b>
+                        {' '}
+                        Branch <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <MultiSelect
                         options={accessbranch
-                          ?.filter((comp) =>
-                            valueCompanyCat?.includes(comp.company)
-                          )
+                          ?.filter((comp) => valueCompanyCat?.includes(comp.company))
                           ?.map((data) => ({
                             label: data.branch,
                             value: data.branch,
                           }))
                           .filter((item, index, self) => {
-                            return (
-                              self.findIndex(
-                                (i) =>
-                                  i.label === item.label &&
-                                  i.value === item.value
-                              ) === index
-                            );
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                           })}
                         value={selectedOptionsBranch}
                         onChange={(e) => {
@@ -1659,31 +1333,23 @@ function PasswordList() {
                     </FormControl>
                   </Grid>
                 </>
-              ) : ["Unit"]?.includes(filterState.type) ? (
+              ) : ['Unit']?.includes(filterState.type) ? (
                 <>
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        {" "}
-                        Branch<b style={{ color: "red" }}>*</b>
+                        {' '}
+                        Branch<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <MultiSelect
                         options={accessbranch
-                          ?.filter((comp) =>
-                            valueCompanyCat?.includes(comp.company)
-                          )
+                          ?.filter((comp) => valueCompanyCat?.includes(comp.company))
                           ?.map((data) => ({
                             label: data.branch,
                             value: data.branch,
                           }))
                           .filter((item, index, self) => {
-                            return (
-                              self.findIndex(
-                                (i) =>
-                                  i.label === item.label &&
-                                  i.value === item.value
-                              ) === index
-                            );
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                           })}
                         value={selectedOptionsBranch}
                         onChange={(e) => {
@@ -1697,28 +1363,18 @@ function PasswordList() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        {" "}
-                        Unit <b style={{ color: "red" }}>*</b>
+                        {' '}
+                        Unit <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <MultiSelect
                         options={accessbranch
-                          ?.filter(
-                            (comp) =>
-                              valueCompanyCat?.includes(comp.company) &&
-                              valueBranchCat?.includes(comp.branch)
-                          )
+                          ?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch))
                           ?.map((data) => ({
                             label: data.unit,
                             value: data.unit,
                           }))
                           .filter((item, index, self) => {
-                            return (
-                              self.findIndex(
-                                (i) =>
-                                  i.label === item.label &&
-                                  i.value === item.value
-                              ) === index
-                            );
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                           })}
                         value={selectedOptionsUnit}
                         onChange={(e) => {
@@ -1731,23 +1387,17 @@ function PasswordList() {
                   </Grid>
                 </>
               ) : (
-                ""
+                ''
               )}
-              {["Individual"]?.includes(filterState.type) && (
+              {['Individual']?.includes(filterState.type) && (
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Employee<b style={{ color: "red" }}>*</b>
+                      Employee<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <MultiSelect
                       options={allUsersData
-                        ?.filter(
-                          (u) =>
-                            valueCompanyCat?.includes(u.company) &&
-                            valueBranchCat?.includes(u.branch) &&
-                            valueUnitCat?.includes(u.unit) &&
-                            valueTeamCat?.includes(u.team)
-                        )
+                        ?.filter((u) => valueCompanyCat?.includes(u.company) && valueBranchCat?.includes(u.branch) && valueUnitCat?.includes(u.unit) && valueTeamCat?.includes(u.team))
                         .map((u) => ({
                           label: u.companyname,
                           value: u.companyname,
@@ -1763,50 +1413,45 @@ function PasswordList() {
                 </Grid>
               )}
 
-
-
-              <Grid item md={3} xs={12} sm={6}
+              <Grid
+                item
+                md={3}
+                xs={12}
+                sm={6}
                 sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignContent: "end",
-                  alignItems: "end"
-                }}>
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignContent: 'end',
+                  alignItems: 'end',
+                }}
+              >
                 <Grid>
-                  <LoadingButton
-                    loading={btnLoading}
-                    sx={buttonStyles.buttonsubmit}
-                    onClick={handleSubmit}
-                  >
+                  <LoadingButton loading={btnLoading} sx={buttonStyles.buttonsubmit} onClick={handleSubmit}>
                     Filter
                   </LoadingButton>
-                  &nbsp;
-                  &nbsp;
+                  &nbsp; &nbsp;
                   <Button sx={buttonStyles.btncancel} onClick={handleclear}>
-                    {" "}
-                    Clear{" "}
+                    {' '}
+                    Clear{' '}
                   </Button>
                 </Grid>
               </Grid>
               <br />
               <br />
               <br />
-
             </Grid>
           </>
         </Box>
       )}
       <br />
 
-      {isUserRoleCompare?.includes("lpasswordlist") && (
+      {isUserRoleCompare?.includes('lpasswordlist') && (
         <>
           <Box sx={userStyle.container}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid container spacing={2}>
               <Grid item xs={8}>
-                <Typography sx={userStyle.importheadtext}>
-                  Password List
-                </Typography>
+                <Typography sx={userStyle.importheadtext}>Password List</Typography>
               </Grid>
             </Grid>
             <Grid
@@ -1815,18 +1460,18 @@ function PasswordList() {
               xs={12}
               sm={12}
               sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
               <Grid>
-                {isUserRoleCompare?.includes("excelpasswordlist") && (
+                {isUserRoleCompare?.includes('excelpasswordlist') && (
                   <>
                     <Button
                       onClick={(e) => {
                         setIsFilterOpen(true);
-                        setFormat("xl");
+                        setFormat('xl');
                       }}
                       sx={userStyle.buttongrp}
                     >
@@ -1835,12 +1480,12 @@ function PasswordList() {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("csvpasswordlist") && (
+                {isUserRoleCompare?.includes('csvpasswordlist') && (
                   <>
                     <Button
                       onClick={(e) => {
                         setIsFilterOpen(true);
-                        setFormat("csv");
+                        setFormat('csv');
                       }}
                       sx={userStyle.buttongrp}
                     >
@@ -1849,7 +1494,7 @@ function PasswordList() {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("printpasswordlist") && (
+                {isUserRoleCompare?.includes('printpasswordlist') && (
                   <>
                     <Button sx={userStyle.buttongrp} onClick={handleprint}>
                       &ensp;
@@ -1858,7 +1503,7 @@ function PasswordList() {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("pdfpasswordlist") && (
+                {isUserRoleCompare?.includes('pdfpasswordlist') && (
                   <>
                     <Button
                       sx={userStyle.buttongrp}
@@ -1871,14 +1516,10 @@ function PasswordList() {
                     </Button>
                   </>
                 )}
-                {isUserRoleCompare?.includes("imagepasswordlist") && (
-                  <Button
-                    sx={userStyle.buttongrp}
-                    onClick={handleCaptureImage}
-                  >
-                    {" "}
-                    <ImageIcon sx={{ fontSize: "15px" }} />{" "}
-                    &ensp;Image&ensp;{" "}
+                {isUserRoleCompare?.includes('imagepasswordlist') && (
+                  <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                    {' '}
+                    <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                   </Button>
                 )}
               </Grid>
@@ -1899,7 +1540,7 @@ function PasswordList() {
                     },
                   }}
                   onChange={handlePageSizeChange}
-                  sx={{ width: "77px" }}
+                  sx={{ width: '77px' }}
                 >
                   <MenuItem value={1}>1</MenuItem>
                   <MenuItem value={5}>5</MenuItem>
@@ -1912,7 +1553,6 @@ function PasswordList() {
               </Box>
 
               <Grid item md={2} xs={6} sm={6}>
-
                 <AggregatedSearchBar
                   columnDataTable={columnDataTable}
                   setItems={setItems}
@@ -1924,7 +1564,6 @@ function PasswordList() {
                   setSearchQuery={setSearchQuery}
                   paginated={false}
                   totalDatas={documentsList}
-
                 />
               </Grid>
             </Grid>
@@ -1938,10 +1577,7 @@ function PasswordList() {
               Show All Columns
             </Button>
             &emsp;
-            <Button
-              sx={userStyle.buttongrp}
-              onClick={handleOpenManageColumns}
-            >
+            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
               Manage Columns
             </Button>
             <br />
@@ -1950,21 +1586,12 @@ function PasswordList() {
               <Box sx={userStyle.container}>
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    minHeight: "350px",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    minHeight: '350px',
                   }}
                 >
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </Box>
             ) : (
@@ -1994,7 +1621,6 @@ function PasswordList() {
                   filteredChanges={filteredChanges}
                   gridRefTableImg={gridRefTableImg}
                   itemsList={documentsList}
-
                 />
               </>
             )}
@@ -2007,28 +1633,19 @@ function PasswordList() {
             anchorEl={anchorEl}
             onClose={handleCloseManageColumns}
             anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
+              vertical: 'bottom',
+              horizontal: 'left',
             }}
           >
             {manageColumnsContent}
           </Popover>
-
         </>
       )}
       {/* view model */}
-      <Dialog
-        open={openView}
-        onClose={handlViewClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <Box sx={{ width: "500px", padding: "20px 50px" }}>
+      <Dialog open={openView} onClose={handlViewClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <Box sx={{ width: '500px', padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              View Password List
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> View Password List</Typography>
             <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={6} xs={12} sm={12}>
@@ -2046,11 +1663,7 @@ function PasswordList() {
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handlViewClose}
-              >
+              <Button variant="contained" color="primary" onClick={handlViewClose}>
                 Back
               </Button>
             </Grid>
@@ -2059,82 +1672,56 @@ function PasswordList() {
       </Dialog>
       {/* alert dialog */}
       <Box>
-        <Dialog
-          open={isErrorOpen}
-          onClose={handleCloseerr}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
+        <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={handleCloseerr}
             >
-              {" "}
-              ok{" "}
+              {' '}
+              ok{' '}
             </Button>
           </DialogActions>
         </Dialog>
       </Box>
       {/* Edit DIALOG */}
       <Box>
-        <Dialog
-          open={editOpen}
-          onClose={handleEditClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="sm"
-          fullWidth={true}
-        >
-          <Box sx={{ padding: "20px 50px" }}>
+        <Dialog open={editOpen} onClose={handleEditClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="sm" fullWidth={true}>
+          <Box sx={{ padding: '20px 50px' }}>
             <>
               <Grid container spacing={2}>
-                <Typography sx={userStyle.HeaderText}>
-                  Change Password
-                </Typography>
+                <Typography sx={userStyle.HeaderText}>Change Password</Typography>
               </Grid>
               <br />
               <Grid container spacing={2}>
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Username<b style={{ color: "red" }}>*</b>
+                      Username<b style={{ color: 'red' }}>*</b>
                     </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      placeholder="Please Enter Username"
-                      value={singleDoc.username}
-                    />
+                    <OutlinedInput id="component-outlined" type="text" placeholder="Please Enter Username" value={singleDoc.username} />
                   </FormControl>
                 </Grid>
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Old Password<b style={{ color: "red" }}>*</b>
+                      Old Password<b style={{ color: 'red' }}>*</b>
                     </Typography>
-                    <OutlinedInput
-                      id="component-outlined"
-                      type="text"
-                      placeholder="Please Enter Old Password"
-                      value={singleDoc.originalpassword}
-                    />
+                    <OutlinedInput id="component-outlined" type="text" placeholder="Please Enter Old Password" value={singleDoc.originalpassword} />
                   </FormControl>
                 </Grid>
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      New Password<b style={{ color: "red" }}>*</b>
+                      New Password<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -2153,7 +1740,7 @@ function PasswordList() {
                 <Grid item md={6} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Confirm Password<b style={{ color: "red" }}>*</b>
+                      Confirm Password<b style={{ color: 'red' }}>*</b>
                     </Typography>
                     <OutlinedInput
                       id="component-outlined"
@@ -2169,39 +1756,26 @@ function PasswordList() {
                     />
                   </FormControl>
                 </Grid>
-              </Grid>{" "}
+              </Grid>{' '}
               <br /> <br /> <br />
               <Grid container spacing={2}></Grid>
               <DialogActions>
-                <Button
-                  variant="contained"
-                  onClick={editSubmit}
-                  sx={buttonStyles.buttonsubmit}                >
-                  {" "}
+                <Button variant="contained" onClick={editSubmit} sx={buttonStyles.buttonsubmit}>
+                  {' '}
                   Update
                 </Button>
                 <Button sx={buttonStyles.btncancel} onClick={handleEditClose}>
-                  {" "}
-                  Cancel{" "}
+                  {' '}
+                  Cancel{' '}
                 </Button>
               </DialogActions>
             </>
           </Box>
         </Dialog>
       </Box>
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* EXTERNAL COMPONENTS -------------- END */}
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
@@ -2214,7 +1788,7 @@ function PasswordList() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={documentsList ?? []}
-        filename={"Password List"}
+        filename={'Password List'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}

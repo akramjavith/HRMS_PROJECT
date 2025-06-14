@@ -978,6 +978,9 @@ const TempCategoryTimeLogView = React.lazy(() => import('../pages/production/cal
 const TempDayIdleHoursCalculation = React.lazy(() => import('../pages/production/calculation/Tempdayidlehourscalculation.js'));
 const TempMonthIdleHours = React.lazy(() => import('../pages/production/calculation/Tempmonthidlehours.js'));
 
+const OverallProductionbaseattendance = React.lazy(() => import('../pages/production/reports/overallproductionbaseattendance.js'));
+const IndividualProductionbaseattendance = React.lazy(() => import('../pages/production/reports/individualproductionbaseattendance.js'));
+
 
 const App = () => {
   return (
@@ -2027,6 +2030,10 @@ const App = () => {
             <Route path="production/tempcategorytimelog" element={<TempCategoryTimeLog />} />
             <Route path="production/tempdayidlehourscalculation" element={<TempDayIdleHoursCalculation />} />
             <Route path="production/tempmonthidlehours" element={<TempMonthIdleHours />} />
+
+             <Route path="production/overallproductionbasedattendance" element={<OverallProductionbaseattendance />} />
+             <Route path="production/individualproductionbasedattendance" element={<IndividualProductionbaseattendance />} />
+
 
 
             

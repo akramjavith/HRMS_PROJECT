@@ -70,30 +70,36 @@ exports.updateSingleUserPassword = catchAsyncErrors(async (req, res, next) => {
 
 exports.getAllUsersForPasswordAssignbranch = catchAsyncErrors(async (req, res, next) => {
     const { assignbranch } = req.body;
-    
+
     // Validate assignbranch input
     if (!Array.isArray(assignbranch) || !assignbranch.every(item => item.company && item.branch && item.unit)) {
         return next(new ErrorHandler('Invalid assignbranch data', 400));
     }
 
     const query = {
-      $or: assignbranch.map(item => ({
-        company: item.company,
-        branch: item.branch,
-        unit: item.unit
-      })),
-      enquirystatus: { $nin: ["Enquiry Purpose"] },
-      resonablestatus: { $nin: ["Not Joined", "Postponed", "Rejected", "Closed", "Releave Employee", "Absconded", "Hold", "Terminate"] }
+        $or: assignbranch.map(item => ({
+            company: item.company,
+            branch: item.branch,
+            unit: item.unit
+        })),
+        enquirystatus: { $nin: ["Enquiry Purpose"] },
+        resonablestatus: { $nin: ["Not Joined", "Postponed", "Rejected", "Closed", "Releave Employee", "Absconded", "Hold", "Terminate"] }
     };
 
     try {
         const users = await User.find(query, {
-            resonablestatus: 1, 
-            empcode: 1, 
-            companyname: 1, 
-            username: 1, 
-            password: 1, 
-            originalpassword: 1 
+            resonablestatus: 1,
+            empcode: 1,
+            companyname: 1,
+            username: 1,
+            password: 1,
+            originalpassword: 1,
+            company: 1,
+            branch: 1,
+            unit: 1,
+            team: 1,
+            updatedby: 1,
+            passexpdate: 1,
         });
 
         if (users.length === 0) {

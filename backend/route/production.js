@@ -227,7 +227,9 @@ productionRoute.route("/productionoriginallastthree").get(productionOriginalLast
 // productionRoute.route("/productiontemplimiteduniqid").get(getAllProductionTempLimitedUniqid);
 
 //  production upload backend route
-const { getAllProductionUploadFilenames, productionDayCategoryIdFilter, bulkProductionOrgUpdateCategorySubcategory,
+const {
+  getOverallAttendanceBasedClaim,getAllProductionUploadFilterUsersFirstlastclaim,getIndividualAttendanceBasedClaim,
+  getAllProductionUploadFilenames, productionDayCategoryIdFilter, bulkProductionOrgUpdateCategorySubcategory,
   bulkDeleteUnitRateUnallot, updateBulkDatasUnitandFlag, updateBulkDatasUnitandSection, updateBulkDatasFlagOnly,
   updateBulkDatasUnitOnly, getProductionUploadDatasById, undoFieldName, productionUploadCheckMismatchPresentFilter,
   productionUploadCheckStatus, getMismatchUpdatedList, getAllProductionUnAllotFilterViewManual, getProductionSingleDayUser,
@@ -240,6 +242,10 @@ const { getAllProductionUploadFilenames, productionDayCategoryIdFilter, bulkProd
 }
   = require("../controller/modules/production/productionupload");
 productionRoute.route("/productionuploads").get(getAllProductionUpload);
+productionRoute.route("/overallattendancebasedclaim").post(getOverallAttendanceBasedClaim);
+productionRoute.route("/individualattendancebasedclaim").post(getIndividualAttendanceBasedClaim);
+productionRoute.route("/productionuploadfirstlastclaim").post(getAllProductionUploadFilterUsersFirstlastclaim);
+
 productionRoute.route("/productionuploadfilenameonlybulkdownload").post(getAllProductionUploadFilenamesonlyBulkDownload);
 productionRoute.route("/productionupload/new").post(addProductionUpload);
 productionRoute.route("/productionuploadqueuemasterfilter").post(getAllProductionUploadQueueMasterFilter);

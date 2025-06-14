@@ -9,6 +9,14 @@ const attendanceControlCriteriaSchema = new Schema({
     type: String,
     required: false,
   },
+    clockindifferencetime: {
+    type: String,
+    required: false,
+  },
+  clockoutdifferencetime: {
+    type: String,
+    required: false,
+  },
   gracetime: {
     type: String,
     required: false,

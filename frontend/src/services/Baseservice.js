@@ -5810,5 +5810,12 @@ export const SERVICE = {
     CREATE_TEMP_CATEGORY_TIME_LOG_: `${BASE_URL}/api/tempcategorytimelog/new`,
     SINGLE_TEMP_CATEGORY_TIME_LOG_: `${BASE_URL}/api/tempcategorytimelog`,
     TEMP_CATEGORY_TIME_LOG_CALCULATION: `${BASE_URL}/api/tempcategorytimelogcalculation`,
+
+
+    OVERALL_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/overallattendancebasedclaim`,
+    PRODUCTION_UPLOAD_FIRST_LAST_CLAIM: `${BASE_URL}/api/productionuploadfirstlastclaim`,
+    INDIVIDUAL_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/individualattendancebasedclaim`,
+
+    
     
 };

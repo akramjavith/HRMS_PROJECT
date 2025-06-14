@@ -2573,6 +2573,16 @@ export const menuItems = [
                 dbname: "menuteamloginallot",
                 url: "/updatepages/hierarchyallotlist",
               },
+                 {
+                title: "Overall Production Base Attendance",
+                dbname: "menuoverallproductionbaseattendance",
+                url: "/production/overallproductionbasedattendance",
+              },
+                {
+                title: "Individual Production Base Attendance",
+                dbname: "menuindividualproductionbaseattendance",
+                url: "/production/individualproductionbasedattendance",
+              },
             ],
           },
           {

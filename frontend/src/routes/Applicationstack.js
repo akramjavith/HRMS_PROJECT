@@ -980,6 +980,7 @@ const TempMonthIdleHours = React.lazy(() => import('../pages/production/calculat
 
 const OverallProductionbaseattendance = React.lazy(() => import('../pages/production/reports/overallproductionbaseattendance.js'));
 const IndividualProductionbaseattendance = React.lazy(() => import('../pages/production/reports/individualproductionbaseattendance.js'));
+const TeamProductionbaseattendance = React.lazy(() => import('../pages/production/reports/teamproductionbasedattenadance.js'));
 
 
 const App = () => {
@@ -2033,6 +2034,7 @@ const App = () => {
 
              <Route path="production/overallproductionbasedattendance" element={<OverallProductionbaseattendance />} />
              <Route path="production/individualproductionbasedattendance" element={<IndividualProductionbaseattendance />} />
+             <Route path="production/teamproductionbasedattendance" element={<TeamProductionbaseattendance />} />
 
 
 

@@ -332,6 +332,15 @@ if(res.data.users.length > 0){
             });
 
         }
+        if(res_project.data.isDayPointsCreated  === 0){
+     setPopupContentMalert("Please Create Production Day Points");
+        setPopupSeverityMalert("warning");
+        handleClickOpenPopupMalert();
+
+              setProjectCheck(false);
+
+        }else{
+
             const ans = res_project?.data?.mergedData
 
             const itemsWithSerialNumber = ans?.map((item, index) => {
@@ -347,9 +356,13 @@ if(res.data.users.length > 0){
             });
 
             setProjmaster(itemsWithSerialNumber);
+              setProjectCheck(false);
+        }
 
 
-            setProjectCheck(false);
+
+
+          
         } catch (err) { setProjectCheck(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
     };
 

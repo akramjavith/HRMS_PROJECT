@@ -5816,6 +5816,12 @@ export const SERVICE = {
     PRODUCTION_UPLOAD_FIRST_LAST_CLAIM: `${BASE_URL}/api/productionuploadfirstlastclaim`,
     INDIVIDUAL_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/individualattendancebasedclaim`,
 
+TEAM_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/teamattendancebasedclaim`,
+HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/hierarchyteamattendancebasedclaim`,
+
+
+    
+
     
     
 };

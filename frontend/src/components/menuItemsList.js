@@ -2583,6 +2583,11 @@ export const menuItems = [
                 dbname: "menuindividualproductionbaseattendance",
                 url: "/production/individualproductionbasedattendance",
               },
+                 {
+                title: "Team Production Base Attendance",
+                dbname: "menuteamproductionbaseattendance",
+                url: "/production/teamproductionbasedattendance",
+              },
             ],
           },
           {

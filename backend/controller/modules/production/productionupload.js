@@ -2,6 +2,7 @@ const ProductionUpload = require("../../../model/modules/production/productionup
 const ProductionTempUploadAll = require("../../../model/modules/production/productiontempuploadall");
 const QueueTypeMaster = require("../../../model/modules/production/queuetypemaster");
 const TypeMaster = require("../../../model/modules/production/typemaster");
+const DayPointsUpload = require("../../../model/modules/production/dayPointsUpload");
 
 const ClientUserid = require("../../../model/modules/production/ClientUserIDModel")
 const ProducionIndividual = require("../../../model/modules/production/productionindividual")
@@ -18,6 +19,8 @@ const ProductionuploadBulk = require('../../../model/modules/production/producti
 const fs = require("fs");
 const path = require("path");
 const DepartmentMonth = require("../../../model/modules/departmentmonthset");
+const Hirerarchi = require("../../../model/modules/setup/hierarchy");
+
 const moment = require("moment");
 
 const redis = require('redis');
@@ -6585,6 +6588,1158 @@ exports.getAllProductionUploadQueueMasterFilterUnAssigned = catchAsyncErrors(asy
   });
 });
 
+
+
+
+exports.getOverallAttendanceBasedClaimold = catchAsyncErrors(async (req, res, next) => {
+  let productionupload = [],
+    producionIndividual;
+  let finaluser = [];
+  let mergedDataall = [];
+  let mergedData = [];
+   let finalProductions = [];
+  try {
+   const { users } = req.body;
+    const dateObj = new Date(req.body.fromdate);
+    const date = req.body.fromdate;
+
+    // Extract day, month, and year components
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const year = dateObj.getFullYear();
+
+    // Format the date components into the desired format
+    const formattedDate = `${day}-${month}-${year}`;
+
+    let dateoneafter = new Date(req.body.fromdate);
+    dateoneafter.setDate(dateoneafter.getDate() + 1);
+    let newDateOnePlus = dateoneafter.toISOString().split('T')[0];
+
+    let datebefore = new Date(req.body.fromdate);
+    datebefore.setDate(datebefore.getDate() - 1);
+    let newDateOneMinus = datebefore.toISOString().split('T')[0];
+
+    let logidQuery = {
+      loginallotlog: { $exists: true, $ne: [] },
+    //  "loginallotlog.empname":"ABI.GNANAMOORTHY"
+    };
+   
+
+
+    let query = {};
+    let queryManual = {};
+
+    queryManual.status = 'Approved';
+
+  
+      queryManual.$or = [{ fromdate: { $eq: req.body.fromdate } }, { fromdate: { $eq: newDateOnePlus } }];
+
+    // console.log(users.length, 'USERLENGTHuplosadFILTER');
+
+    const { minStart, maxEnd } = users
+      .filter((d) => d.userShiftTimings.shiftFromTime && d.userShiftTimings.shiftFromTime !== '')
+      .reduce(
+        (acc, obj) => {
+          const startTime = new Date(obj.userShiftTimings.shiftFromTime);
+          const endTime = new Date(obj.userShiftTimings.shiftEndTime);
+
+          // console.log('Comparing:', startTime, endTime);
+
+          // Update minimum start time
+          if (!acc.minStart || startTime < acc.minStart) {
+            acc.minStart = startTime;
+          }
+
+          // Update maximum end time
+          if (!acc.maxEnd || endTime > acc.maxEnd) {
+            acc.maxEnd = endTime;
+          }
+
+          return acc;
+        },
+        { minStart: null, maxEnd: null } // Proper initialization
+      );
+
+    query.dateobjformatdate = { $gte: minStart, $lte: maxEnd };
+    // query.user ="TTSH0581"
+    // query.unitid = "HFIFORMID202506111397001"
+    console.log(query.dateobjformatdate, 'query');
+
+   const [loginids, producionIndividual, productionupload, attendances, attendenceControlCriteria] = await Promise.all([
+      ClientUserid.find(logidQuery, { empname: 1, userid: 1, projectvendor: 1, loginallotlog: 1 }).lean(),
+      ProducionIndividual.find(queryManual, {
+            user: 1,
+            fromdate: 1,
+            time: 1,
+            filename: 1,
+            vendor: 1,
+            mode: 1,
+            category: 1,
+            section: 1,
+            unitid: 1,
+            lateentrystatus: 1,
+            updatedunitrate: 1,
+            updatedflag: 1,
+            updatedsection: 1,
+            unallotcategory: 1,
+            unallotsubcategory: 1,
+          }),
+     
+       ProductionUpload.find(query, {
+            unitid: 1,
+            user: 1,
+            formatteddate: 1,
+            formattedtime: 1,
+            filenameupdated: 1,
+            category: 1,
+            flagcount: 1,
+            vendor: 1,
+            unitrate: 1,
+            updatedunitrate: 1,
+            updatedflag: 1,
+            unallotcategory: 1,
+            unallotsubcategory: 1,
+          })
+   ,
+      Attendances.find({ date: formattedDate
+        // , username: { $in: username } 
+      }, { clockintime: 1, date: 1, username: 1 }),
+         AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec(),
+    ]);
+    let allData = [...producionIndividual, ...productionupload];
+
+    console.log(allData.length, 'aalldata');
+
+    // Function to subtract hours and minutes from a date
+    function subtractTime(date, hours, minutes) {
+      // Subtract hours
+      date.setHours(date.getHours() - hours);
+      // Subtract minutes
+      date.setMinutes(date.getMinutes() - minutes);
+      return date;
+    }
+
+    // Format the result to "YYYY-MM-DD HH:MM:SS"
+    function formatDateCst(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    function compareDateTimes(dateT, shiftFrom, shiftEnd) {
+      // Parse the datetime strings into Date objects
+      const dateTimeObj = new Date(dateT);
+      const shiftFromTimeObj = new Date(shiftFrom);
+      const shiftEndTimeObj = new Date(shiftEnd);
+      // Perform the comparisons
+      const isWithinShift = dateTimeObj >= shiftFromTimeObj && dateTimeObj <= shiftEndTimeObj;
+
+      return isWithinShift;
+    }
+console.log(loginids.length,"loginids")
+    let logs = loginids.flatMap((user) =>
+      user.loginallotlog.map((log) => ({
+        userid: user.userid,
+        projectvendor: user.projectvendor,
+        date: log.date,
+        time: log.time,
+        empname: log.empname,
+        empcode: log.empcode,
+        enddate: log.enddate ? log.enddate : null,
+      }))
+    );
+
+    // Step 2: Sort logs by date and time (ascending order)
+    logs.sort((a, b) => {
+      if (a.date === b.date) {
+        return a.time.localeCompare(b.time);
+      }
+      return new Date(a.date) - new Date(b.date);
+    });
+
+    // Step 3: Calculate the enddate for each log (except the last log for each userid)
+    const userLogsMap = {};
+    logs.forEach((log) => {
+      if (!userLogsMap[log.userid]) {
+        userLogsMap[log.userid] = {};
+      }
+
+      if (!userLogsMap[log.userid][log.projectvendor]) {
+        userLogsMap[log.userid][log.projectvendor] = [];
+      }
+
+      userLogsMap[log.userid][log.projectvendor].push(log);
+    });
+
+    Object.values(userLogsMap).forEach((userLogs) => {
+      Object.values(userLogs).forEach((logsArray) => {
+        logsArray.forEach((log, idx) => {
+          if (idx < logsArray.length - 1) {
+            log.enddate = logsArray[idx + 1].date;
+          }
+        });
+      });
+    });
+    // Step 4: Filter logs based on input date
+    const filteredLogs = logs.filter((log) => {
+      return new Date(log.date) <= new Date(req.body.fromdate) && (!log.enddate || new Date(log.enddate) >= new Date(req.body.fromdate));
+    });
+
+    // Step 5: Sort the filtered logs by date and time (descending order)
+    filteredLogs.sort((a, b) => {
+      if (a.date === b.date) {
+        return b.time.localeCompare(a.time);
+      }
+      return new Date(b.date) - new Date(a.date);
+    });
+
+// console.log(filteredLogs,"filteredLogs")
+      try {
+        let mergedDataallfirst = allData.map((upload, index) => {
+          const loginInfo = filteredLogs.filter((login) => login.userid === upload.user && login.projectvendor === upload.vendor);
+//  console.log(loginInfo,"loginInfo")
+          let loginallot = loginInfo ? loginInfo : [];
+
+          let filteredDataDateTime = null;
+
+          if (loginallot.length > 0) {
+            const groupedByDateTime = {};
+
+            loginallot.forEach((item) => {
+              const dateTime = item.date + ' ' + item.time;
+              if (!groupedByDateTime[dateTime]) {
+                groupedByDateTime[dateTime] = [];
+              }
+              groupedByDateTime[dateTime].push(item);
+            });
+
+            // Extract the last item of each group
+            const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
+
+            // Sort the last items by date and time
+            lastItemsForEachDateTime.sort((a, b) => {
+              return new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time);
+            });
+
+            // Find the first item in the sorted array that meets the criteria
+            for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
+              const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
+              // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
+              let datevalsplitfinal = upload.mode == 'Manual' ? `${upload.fromdate}T${uploadtime}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`;
+              if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
+                filteredDataDateTime = lastItemsForEachDateTime[i];
+              } else {
+                break;
+              }
+            }
+          }
+
+          let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : '';
+          
+      // logininfoname &&    console.log(logininfoname,"logininfoname")
+          
+          // const filenamelistviewAll = upload.filename && upload.filename?.split(".x");
+          const comparedate = upload.mode == 'Manual' ? upload.fromdate : upload.formatteddate;
+          const comparetime = upload.mode == 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime;
+          // console.log(logininfoname,'logininfoname')
+
+          const dateTime = `${comparedate}T${comparetime}Z`;
+
+          // const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : '';
+          const userInfo = users.find((user) => logininfoname === user.companyname && new Date(dateTime) >= new Date(user.userShiftTimings.shiftFromTime) && new Date(dateTime) <= new Date(user.userShiftTimings.shiftEndTime));
+          //  console.log(userInfo,'userInfo')
+          let shiftEndTime = `${req.body.fromdate}T00:00:00.000Z`;
+          let shiftFromTime = `${req.body.fromdate}T00:00:00.000Z`;
+
+    
+          if (userInfo) {
+            userShiftTimings = userInfo.userShiftTimings;
+        //  logininfoname === "ABI.GNANAMOORTHY"    &&     console.log(userShiftTimings, 'sdfd')
+          } else {
+            userShiftTimings = { shiftFromTime: shiftFromTime, shiftEndTime: shiftEndTime, shiftsts: '' };
+          }
+
+          let getprocessCode = userInfo ? userInfo.process : '';
+
+          const finalcategory = upload.unallotcategory ? upload.unallotcategory : upload.mode == 'Manual' ? upload.filename : upload.filenameupdated;
+
+          const finalsubcategory = upload.unallotsubcategory ? upload.unallotsubcategory : upload.category;
+
+          let finalunitrate = upload.updatedunitrate ? Number(upload.updatedunitrate) : Number(upload.unitrate);
+          let finalflag = upload.updatedflag ? Number(upload.updatedflag) : Number(upload.flagcount);
+
+          let unitrateold = Number(upload.unitrate);
+          let flagold = Number(upload.flagcount);
+
+          let LateEntryPointsDeduct = upload.mode == 'Manual' && upload.lateentrystatus === 'Late Entry';
+
+          const istDate = new Date(`${comparedate}T${comparetime}Z`);
+
+          // Subtract 10 hours and 30 minutes
+          // const resultDate = subtractTime(istDate, 10, 30);
+          // const formattedResult = formatDateCst(resultDate);
+          const resultDate = addTimeBasedOnDST(`${comparedate} ${comparetime}`);
+          if (
+            compareDateTimes(dateTime, userShiftTimings.shiftFromTime, userShiftTimings.shiftEndTime) 
+            // &&
+            // (category.length === 0 || category.includes(finalcategory)) &&
+            // (subcategory.length === 0 || subcategory.includes(finalsubcategory)) &&
+            // (company.length === 0 || company.includes(userInfo?.company)) &&
+            // (branch.length === 0 || branch.includes(userInfo?.branch)) &&
+            // (unit.length === 0 || unit.includes(userInfo?.unit)) &&
+            // (team.length === 0 || team.includes(userInfo?.team)) &&
+            // (empname.length === 0 || empname.includes(userInfo?.companyname) )
+          ) {
+           return {
+          user: upload.user,
+          fromdate: upload.fromdate,
+          todate: upload.todate,
+          vendor: upload.vendor,
+          category: finalsubcategory,
+          dateval: upload.mode === 'Manual' ? `${upload.fromdate} ${convertTo24HourFormat(upload.time)}` : `${upload.formatteddate} ${upload.formattedtime}`,
+          olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
+          filename: finalcategory,
+          mode: upload.mode === 'Manual' ? 'Manual' : 'Production',
+          // section: upload.section,
+          // flagcount: upload.flagcount,
+          // unitrate: upload.unitrate,
+          // csection: upload.updatedsection ? upload.updatedsection : '',
+          // cflagcount: upload.updatedflag ? upload.updatedflag : '',
+          // cunitrate: upload.updatedflag ? upload.updatedflag : '',
+          // unitid: upload.unitid,
+          worktook: upload.worktook,
+          lateentry: LateEntryPointsDeduct,
+          // points: LateEntryPointsDeduct ? 0 : (unitrateold * 8.333333333333333).toFixed(3),
+          // cpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * 8.333333333333333).toFixed(3),
+          // totalpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * finalflag * 8.333333333333333).toFixed(3),
+          cstist: String(resultDate),
+          date: date,
+                //  date: upload.mode === 'Manual' ? upload.fromdate : upload.formatteddate,
+          time: upload.mode === 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime,
+          // olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
+         company: userInfo && userInfo.company,
+              unit: userInfo && userInfo.unit,
+              branch: userInfo && userInfo.branch,
+              team: userInfo && userInfo.team,
+          empname: userInfo && userInfo.companyname,
+          empcode: userInfo && userInfo.empcode,
+          shifttiming: userInfo && userInfo.shift,
+          shiftmode: userInfo && userInfo.shiftMode,
+          username: userInfo && userInfo.username,
+          userid: userInfo && userInfo.userid,
+          _id: upload._id,
+        };
+          }
+        });
+console.log(mergedDataallfirst.length,"mergedDataallfirst")
+       
+
+function getTimeDifference(start, end) {
+          // console.log(start, end, "startend");
+          if (start && end) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+
+            if (startDate > endDate) {
+              return '00:00:00';
+            } else {
+              const diff = new Date(endDate - startDate);
+              return diff.toISOString().substr(11, 8);
+            }
+          }
+        }
+
+     
+
+        mergedDataallfirst = mergedDataallfirst.filter((d) => d !== null && d !== undefined);
+console.log(mergedDataallfirst.length,"mergedDataallfirst2")
+
+
+        mergedDataall = mergedDataallfirst.sort((a, b) => {
+          // First sort by empname
+          if (a.empname < b.empname) return -1;
+          if (a.empname > b.empname) return 1;
+          // If empnames are equal, sort by dateval
+          //  return a.dateval.localeCompare(b.dateval);
+          return new Date(a.olddateval) - new Date(b.olddateval);
+        });
+
+        const empFirstLastIndex = {};
+            const mergedDataallFinal = [];
+    const lastTimes = {};
+
+
+        mergedDataall.forEach((item, idx) => {
+          if (!empFirstLastIndex[item.empname]) {
+            empFirstLastIndex[item.empname] = { first: idx, last: idx };
+          } else {
+            empFirstLastIndex[item.empname].last = idx;
+          }
+        });
+
+        mergedDataall.forEach((item, index) => {
+          const { first, last } = empFirstLastIndex[item.empname];
+          const originalDatetime = item.dateval;
+          // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+          const finddatevalue = originalDatetime && originalDatetime?.split(' ');
+          const findtime = finddatevalue && finddatevalue[1];
+          const finddate = finddatevalue && finddatevalue[0];
+
+          const formattedTimeshift = findtime;
+
+          const clockindate = attendances.find((d) => {
+            const [day, month, year] = d.date.split('-'); // Split the date string from the attendance record
+            const dateObject = new Date(year, month - 1, day); // Create a new Date object
+            const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')}`; // Format the date
+            //  console.log(formattedDateString, date , item.username == d.username)
+            return formattedDateString === date && item.username == d.username;
+          });
+
+          // const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
+          // const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
+          // let formattedHours = hours;
+          // if (ampm === 'PM' && hours < 12) {
+          //   formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
+          // } else if (ampm === 'AM' && hours === 12) {
+          //   formattedHours = 0; // Convert 12 AM to 0 hours
+          // }
+          const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : '';
+          //  `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          // return formattedTime;
+
+          if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+            if (item) {
+              if (!lastTimes.hasOwnProperty(item.empname)) {
+                lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+              }
+              item.claimstatus = 'first';
+              item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`);
+            }
+          } else if (item.empname == mergedDataall[index - 1].empname) {
+            // item.empname = loginInfo.empname;
+            item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
+            // lastTimes[loginInfo.empname] = findtime;
+            //  productionResult.push(item);
+            item.claimstatus = '';
+            if (index === last) {
+              item.claimstatus = 'last';
+            }
+          }
+        });
+
+            const clockinDiffMin = parseInt(attendenceControlCriteria.clockindifferencetime);
+    const clockoutDiffMin = parseInt(attendenceControlCriteria.clockoutdifferencetime);
+
+    const groupByEmpDate = {};
+
+    function timeToSeconds(timeStr) {
+      const [h, m, s] = timeStr.split(':').map(Number);
+      return h * 3600 + m * 60 + s;
+    }
+
+    // Group data by empname + date
+    mergedDataall.forEach((item) => {
+      const key = `${item.empname}_${item.date}`;
+      if (!groupByEmpDate[key]) groupByEmpDate[key] = [];
+      groupByEmpDate[key].push(item);
+    });
+console.log(mergedDataall.length,"mergedDataall")
+    // Iterate each emp-date group
+    for (const key in groupByEmpDate) {
+      const records = groupByEmpDate[key];
+      const firstRecord = records.find((item) => {
+        const seconds = timeToSeconds(item.worktook);
+        return seconds <= clockinDiffMin * 60;
+      });
+
+      const lastRecord = [...records].reverse().find((item) => {
+        const seconds = timeToSeconds(item.worktook);
+        return seconds <= clockoutDiffMin * 60;
+      });
+
+      if (firstRecord) {
+        mergedDataallFinal.push({
+          ...firstRecord,
+          claimstatus: 'first',
+        });
+      }
+
+      if (lastRecord && (!firstRecord || lastRecord.dateval !== firstRecord.dateval)) {
+        mergedDataallFinal.push({
+          ...lastRecord,
+          claimstatus: 'last',
+        });
+      }
+    }
+
+    // Get Production Data
+    // Step 1: Group events by username and date
+    const groupedProd = {};
+
+    mergedDataallFinal.forEach((prod) => {
+      const key = `${prod.username}_${prod.date}`;
+      if (!groupedProd[key]) {
+        groupedProd[key] = [];
+      }
+      groupedProd[key].push(prod);
+    });
+
+
+
+  console.log(groupedProd, 'groupedProd')
+    // Step 2: Build the final output
+     finalProductions = Object.entries(groupedProd).map(([key, prod]) => {
+      const [username, date] = key.split('_');
+      const loginData = prod.find((e) => e.claimstatus === 'first');
+      const loginDataLast = prod.find((e) => e.claimstatus === 'last');
+
+      const loginTimes = prod
+        .filter((e) => e.claimstatus === 'first')
+        .map((e) => e.time)
+        .sort(); // Ascending
+
+      const logoffTimes = prod
+        .filter((e) => e.claimstatus === 'last')
+        .map((e) => e.time)
+        .sort(); // Ascending
+
+      const combinedLogin = new Date(`${date}T${loginTimes[0] || null}`);
+      const formattedLoginTime = combinedLogin.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+
+      const combinedLogoff = new Date(`${date}T${logoffTimes[logoffTimes.length - 1] || null}`);
+      const formattedLogoffTime = combinedLogoff.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+
+      return {
+        shiftmode: (loginData && loginData.shiftmode) || null,
+        userid: (loginData && loginData.userid) || null,
+        shiftname: (loginData && loginData.shifttiming) || null,
+        company: (loginData && loginData.company) || null,
+        branch: (loginData && loginData.branch) || null,
+        unit: (loginData && loginData.unit) || null,
+        team: (loginData && loginData.team) || null,
+        empname: (loginData && loginData.empname) || null,
+        empcode: (loginData && loginData.empcode) || null,
+        date:date,
+        firstclaim: formattedLoginTime,
+         lastclaim: formattedLogoffTime,
+        clockouttime: formattedLogoffTime,
+        clockouttime: formattedLogoffTime,
+        firstworktook: loginData && loginData.worktook,
+        lastworktook: loginDataLast && loginDataLast.worktook,
+      };
+    });
+  console.log(finalProductions.length, 'finalProductions')
+
+      } catch (err) {
+        console.log(err, 'err');
+        // return next(new ErrorHandler("Records not found", 404));
+      }
+ 
+
+
+    mergedData = finalProductions.filter((item) => item != null);
+  } catch (err) {
+    console.log(err, 'err');
+    return next(new ErrorHandler('Records not found!', 404));
+  }
+
+  return res.status(200).json({
+    mergedData,
+  });
+});
+
+
+exports.getIndividualAttendanceBasedClaimold = catchAsyncErrors(async (req, res, next) => {
+
+    producionIndividual;
+  let finaluser = [];
+  let mergedDataall = [];
+  let mergedData = [];
+   let finalProductions = [];
+  try {
+   const { users } = req.body;
+    const dateObj = new Date(req.body.fromdate);
+    const date = req.body.fromdate;
+
+    // Extract day, month, and year components
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const year = dateObj.getFullYear();
+
+    // Format the date components into the desired format
+    const formattedDate = `${day}-${month}-${year}`;
+
+    let dateoneafter = new Date(req.body.fromdate);
+    dateoneafter.setDate(dateoneafter.getDate() + 1);
+    let newDateOnePlus = dateoneafter.toISOString().split('T')[0];
+
+    let datebefore = new Date(req.body.fromdate);
+    datebefore.setDate(datebefore.getDate() - 1);
+    let newDateOneMinus = datebefore.toISOString().split('T')[0];
+
+    let logidQuery = {
+      loginallotlog: { $exists: true, $ne: [] },
+    "loginallotlog.empname":req.body.companyname
+    };
+   
+
+
+    let query = {};
+    let queryManual = {};
+
+    queryManual.status = 'Approved';
+
+  
+      queryManual.$or = [{ fromdate: { $eq: req.body.fromdate } }, { fromdate: { $eq: newDateOnePlus } }];
+
+    // console.log(users.length, 'USERLENGTHuplosadFILTER');
+
+    const { minStart, maxEnd } = users
+      .filter((d) => d.userShiftTimings.shiftFromTime && d.userShiftTimings.shiftFromTime !== '')
+      .reduce(
+        (acc, obj) => {
+          const startTime = new Date(obj.userShiftTimings.shiftFromTime);
+          const endTime = new Date(obj.userShiftTimings.shiftEndTime);
+
+          // console.log('Comparing:', startTime, endTime);
+
+          // Update minimum start time
+          if (!acc.minStart || startTime < acc.minStart) {
+            acc.minStart = startTime;
+          }
+
+          // Update maximum end time
+          if (!acc.maxEnd || endTime > acc.maxEnd) {
+            acc.maxEnd = endTime;
+          }
+
+          return acc;
+        },
+        { minStart: null, maxEnd: null } // Proper initialization
+      );
+
+    query.dateobjformatdate = { $gte: minStart, $lte: maxEnd };
+    // query.user ="TTSH0581"
+    // query.unitid = "HFIFORMID202506111397001"
+    console.log(query.dateobjformatdate, 'query');
+
+   const [loginids, producionIndividual, productionupload, attendances, attendenceControlCriteria] = await Promise.all([
+      ClientUserid.find(logidQuery, { empname: 1, userid: 1, projectvendor: 1, loginallotlog: 1 }).lean(),
+      ProducionIndividual.find(queryManual, {
+            user: 1,
+            fromdate: 1,
+            time: 1,
+            filename: 1,
+            vendor: 1,
+            mode: 1,
+            category: 1,
+            section: 1,
+            unitid: 1,
+            lateentrystatus: 1,
+            updatedunitrate: 1,
+            updatedflag: 1,
+            updatedsection: 1,
+            unallotcategory: 1,
+            unallotsubcategory: 1,
+          }),
+     
+       ProductionUpload.find(query, {
+            unitid: 1,
+            user: 1,
+            formatteddate: 1,
+            formattedtime: 1,
+            filenameupdated: 1,
+            category: 1,
+            flagcount: 1,
+            vendor: 1,
+            unitrate: 1,
+            updatedunitrate: 1,
+            updatedflag: 1,
+            unallotcategory: 1,
+            unallotsubcategory: 1,
+          })
+   ,
+      Attendances.find({ date: formattedDate
+        // , username: { $in: username } 
+      }, { clockintime: 1, date: 1, username: 1 }),
+         AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec(),
+    ]);
+    let allData = [...producionIndividual, ...productionupload];
+
+    console.log(allData.length, 'aalldata');
+
+    // Function to subtract hours and minutes from a date
+    function subtractTime(date, hours, minutes) {
+      // Subtract hours
+      date.setHours(date.getHours() - hours);
+      // Subtract minutes
+      date.setMinutes(date.getMinutes() - minutes);
+      return date;
+    }
+
+    // Format the result to "YYYY-MM-DD HH:MM:SS"
+    function formatDateCst(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    function compareDateTimes(dateT, shiftFrom, shiftEnd) {
+      // Parse the datetime strings into Date objects
+      const dateTimeObj = new Date(dateT);
+      const shiftFromTimeObj = new Date(shiftFrom);
+      const shiftEndTimeObj = new Date(shiftEnd);
+      // Perform the comparisons
+      const isWithinShift = dateTimeObj >= shiftFromTimeObj && dateTimeObj <= shiftEndTimeObj;
+
+      return isWithinShift;
+    }
+console.log(loginids.length,"loginids")
+    let logs = loginids.flatMap((user) =>
+      user.loginallotlog.map((log) => ({
+        userid: user.userid,
+        projectvendor: user.projectvendor,
+        date: log.date,
+        time: log.time,
+        empname: log.empname,
+        empcode: log.empcode,
+        enddate: log.enddate ? log.enddate : null,
+      }))
+    );
+
+    // Step 2: Sort logs by date and time (ascending order)
+    logs.sort((a, b) => {
+      if (a.date === b.date) {
+        return a.time.localeCompare(b.time);
+      }
+      return new Date(a.date) - new Date(b.date);
+    });
+
+    // Step 3: Calculate the enddate for each log (except the last log for each userid)
+    const userLogsMap = {};
+    logs.forEach((log) => {
+      if (!userLogsMap[log.userid]) {
+        userLogsMap[log.userid] = {};
+      }
+
+      if (!userLogsMap[log.userid][log.projectvendor]) {
+        userLogsMap[log.userid][log.projectvendor] = [];
+      }
+
+      userLogsMap[log.userid][log.projectvendor].push(log);
+    });
+
+    Object.values(userLogsMap).forEach((userLogs) => {
+      Object.values(userLogs).forEach((logsArray) => {
+        logsArray.forEach((log, idx) => {
+          if (idx < logsArray.length - 1) {
+            log.enddate = logsArray[idx + 1].date;
+          }
+        });
+      });
+    });
+    // Step 4: Filter logs based on input date
+    const filteredLogs = logs.filter((log) => {
+      return new Date(log.date) <= new Date(date) && (!log.enddate || new Date(log.enddate) >= new Date(date));
+    });
+
+    // Step 5: Sort the filtered logs by date and time (descending order)
+    filteredLogs.sort((a, b) => {
+      if (a.date === b.date) {
+        return b.time.localeCompare(a.time);
+      }
+      return new Date(b.date) - new Date(a.date);
+    });
+
+// console.log(filteredLogs,"filteredLogs")
+      try {
+        let mergedDataallfirst = allData.map((upload, index) => {
+          const loginInfo = filteredLogs.filter((login) => login.userid === upload.user && login.projectvendor === upload.vendor);
+//  console.log(loginInfo,"loginInfo")
+          let loginallot = loginInfo ? loginInfo : [];
+
+          let filteredDataDateTime = null;
+
+          if (loginallot.length > 0) {
+            const groupedByDateTime = {};
+
+            loginallot.forEach((item) => {
+              const dateTime = item.date + ' ' + item.time;
+              if (!groupedByDateTime[dateTime]) {
+                groupedByDateTime[dateTime] = [];
+              }
+              groupedByDateTime[dateTime].push(item);
+            });
+
+            // Extract the last item of each group
+            const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
+
+            // Sort the last items by date and time
+            lastItemsForEachDateTime.sort((a, b) => {
+              return new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time);
+            });
+
+            // Find the first item in the sorted array that meets the criteria
+            for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
+              const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
+              // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
+              let datevalsplitfinal = upload.mode == 'Manual' ? `${upload.fromdate}T${uploadtime}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`;
+              if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
+                filteredDataDateTime = lastItemsForEachDateTime[i];
+              } else {
+                break;
+              }
+            }
+          }
+
+          let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : '';
+          
+      // logininfoname &&    console.log(logininfoname,"logininfoname")
+          
+          // const filenamelistviewAll = upload.filename && upload.filename?.split(".x");
+          const comparedate = upload.mode == 'Manual' ? upload.fromdate : upload.formatteddate;
+          const comparetime = upload.mode == 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime;
+          // console.log(logininfoname,'logininfoname')
+
+          const dateTime = `${comparedate}T${comparetime}Z`;
+
+          // const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : '';
+          const userInfo = users.find((user) => logininfoname === user.companyname && new Date(dateTime) >= new Date(user.userShiftTimings.shiftFromTime) && new Date(dateTime) <= new Date(user.userShiftTimings.shiftEndTime));
+          //  console.log(userInfo,'userInfo')
+          let shiftEndTime = `${req.body.fromdate}T00:00:00.000Z`;
+          let shiftFromTime = `${req.body.fromdate}T00:00:00.000Z`;
+
+    
+          if (userInfo) {
+            userShiftTimings = userInfo.userShiftTimings;
+        //  logininfoname === "ABI.GNANAMOORTHY"    &&     console.log(userShiftTimings, 'sdfd')
+          } else {
+            userShiftTimings = { shiftFromTime: shiftFromTime, shiftEndTime: shiftEndTime, shiftsts: '' };
+          }
+
+          let getprocessCode = userInfo ? userInfo.process : '';
+
+          const finalcategory = upload.unallotcategory ? upload.unallotcategory : upload.mode == 'Manual' ? upload.filename : upload.filenameupdated;
+
+          const finalsubcategory = upload.unallotsubcategory ? upload.unallotsubcategory : upload.category;
+
+          let finalunitrate = upload.updatedunitrate ? Number(upload.updatedunitrate) : Number(upload.unitrate);
+          let finalflag = upload.updatedflag ? Number(upload.updatedflag) : Number(upload.flagcount);
+
+          let unitrateold = Number(upload.unitrate);
+          let flagold = Number(upload.flagcount);
+
+          let LateEntryPointsDeduct = upload.mode == 'Manual' && upload.lateentrystatus === 'Late Entry';
+
+          const istDate = new Date(`${comparedate}T${comparetime}Z`);
+
+          // Subtract 10 hours and 30 minutes
+          // const resultDate = subtractTime(istDate, 10, 30);
+          // const formattedResult = formatDateCst(resultDate);
+          const resultDate = addTimeBasedOnDST(`${comparedate} ${comparetime}`);
+          if (
+            compareDateTimes(dateTime, userShiftTimings.shiftFromTime, userShiftTimings.shiftEndTime) 
+            // &&
+            // (category.length === 0 || category.includes(finalcategory)) &&
+            // (subcategory.length === 0 || subcategory.includes(finalsubcategory)) &&
+            // (company.length === 0 || company.includes(userInfo?.company)) &&
+            // (branch.length === 0 || branch.includes(userInfo?.branch)) &&
+            // (unit.length === 0 || unit.includes(userInfo?.unit)) &&
+            // (team.length === 0 || team.includes(userInfo?.team)) &&
+            // (empname.length === 0 || empname.includes(userInfo?.companyname) )
+          ) {
+           return {
+          user: upload.user,
+          fromdate: upload.fromdate,
+          todate: upload.todate,
+          vendor: upload.vendor,
+          category: finalsubcategory,
+          dateval: upload.mode === 'Manual' ? `${upload.fromdate} ${convertTo24HourFormat(upload.time)}` : `${upload.formatteddate} ${upload.formattedtime}`,
+          olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
+          filename: finalcategory,
+          mode: upload.mode === 'Manual' ? 'Manual' : 'Production',
+          // section: upload.section,
+          // flagcount: upload.flagcount,
+          // unitrate: upload.unitrate,
+          // csection: upload.updatedsection ? upload.updatedsection : '',
+          // cflagcount: upload.updatedflag ? upload.updatedflag : '',
+          // cunitrate: upload.updatedflag ? upload.updatedflag : '',
+          // unitid: upload.unitid,
+          worktook: upload.worktook,
+          lateentry: LateEntryPointsDeduct,
+          // points: LateEntryPointsDeduct ? 0 : (unitrateold * 8.333333333333333).toFixed(3),
+          // cpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * 8.333333333333333).toFixed(3),
+          // totalpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * finalflag * 8.333333333333333).toFixed(3),
+          cstist: String(resultDate),
+          date: date,
+                //  date: upload.mode === 'Manual' ? upload.fromdate : upload.formatteddate,
+          time: upload.mode === 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime,
+          // olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
+         company: userInfo && userInfo.company,
+              unit: userInfo && userInfo.unit,
+              branch: userInfo && userInfo.branch,
+              team: userInfo && userInfo.team,
+          empname: userInfo && userInfo.companyname,
+          empcode: userInfo && userInfo.empcode,
+          shifttiming: userInfo && userInfo.shift,
+          shiftmode: userInfo && userInfo.shiftMode,
+          username: userInfo && userInfo.username,
+          userid: userInfo && userInfo.userid,
+          _id: upload._id,
+        };
+          }
+        });
+console.log(mergedDataallfirst.length,"mergedDataallfirst")
+       
+
+function getTimeDifference(start, end) {
+          // console.log(start, end, "startend");
+          if (start && end) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+
+            if (startDate > endDate) {
+              return '00:00:00';
+            } else {
+              const diff = new Date(endDate - startDate);
+              return diff.toISOString().substr(11, 8);
+            }
+          }
+        }
+
+     
+
+        mergedDataallfirst = mergedDataallfirst.filter((d) => d !== null && d !== undefined);
+console.log(mergedDataallfirst.length,"mergedDataallfirst2")
+
+
+        mergedDataall = mergedDataallfirst.sort((a, b) => {
+          // First sort by empname
+          if (a.empname < b.empname) return -1;
+          if (a.empname > b.empname) return 1;
+          // If empnames are equal, sort by dateval
+          //  return a.dateval.localeCompare(b.dateval);
+          return new Date(a.olddateval) - new Date(b.olddateval);
+        });
+
+        const empFirstLastIndex = {};
+            const mergedDataallFinal = [];
+    const lastTimes = {};
+
+
+        mergedDataall.forEach((item, idx) => {
+          if (!empFirstLastIndex[item.empname]) {
+            empFirstLastIndex[item.empname] = { first: idx, last: idx };
+          } else {
+            empFirstLastIndex[item.empname].last = idx;
+          }
+        });
+
+        mergedDataall.forEach((item, index) => {
+          const { first, last } = empFirstLastIndex[item.empname];
+          const originalDatetime = item.dateval;
+          // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+          const finddatevalue = originalDatetime && originalDatetime?.split(' ');
+          const findtime = finddatevalue && finddatevalue[1];
+          const finddate = finddatevalue && finddatevalue[0];
+
+          const formattedTimeshift = findtime;
+
+          const clockindate = attendances.find((d) => {
+            const [day, month, year] = d.date.split('-'); // Split the date string from the attendance record
+            const dateObject = new Date(year, month - 1, day); // Create a new Date object
+            const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')}`; // Format the date
+            //  console.log(formattedDateString, date , item.username == d.username)
+            return formattedDateString === date && item.username == d.username;
+          });
+
+          // const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
+          // const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
+          // let formattedHours = hours;
+          // if (ampm === 'PM' && hours < 12) {
+          //   formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
+          // } else if (ampm === 'AM' && hours === 12) {
+          //   formattedHours = 0; // Convert 12 AM to 0 hours
+          // }
+          const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : '';
+          //  `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          // return formattedTime;
+
+          if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+            if (item) {
+              if (!lastTimes.hasOwnProperty(item.empname)) {
+                lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+              }
+              item.claimstatus = 'first';
+              item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`);
+            }
+          } else if (item.empname == mergedDataall[index - 1].empname) {
+            // item.empname = loginInfo.empname;
+            item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
+            // lastTimes[loginInfo.empname] = findtime;
+            //  productionResult.push(item);
+            item.claimstatus = '';
+            if (index === last) {
+              item.claimstatus = 'last';
+            }
+          }
+        });
+
+            const clockinDiffMin = parseInt(attendenceControlCriteria.clockindifferencetime);
+    const clockoutDiffMin = parseInt(attendenceControlCriteria.clockoutdifferencetime);
+
+    const groupByEmpDate = {};
+
+    function timeToSeconds(timeStr) {
+      const [h, m, s] = timeStr.split(':').map(Number);
+      return h * 3600 + m * 60 + s;
+    }
+
+    // Group data by empname + date
+    mergedDataall.forEach((item) => {
+      const key = `${item.empname}_${item.date}`;
+      if (!groupByEmpDate[key]) groupByEmpDate[key] = [];
+      groupByEmpDate[key].push(item);
+    });
+console.log(mergedDataall.length,"mergedDataall")
+    // Iterate each emp-date group
+    for (const key in groupByEmpDate) {
+      const records = groupByEmpDate[key];
+      const firstRecord = records.find((item) => {
+        const seconds = timeToSeconds(item.worktook);
+        return seconds <= clockinDiffMin * 60;
+      });
+
+      const lastRecord = [...records].reverse().find((item) => {
+        const seconds = timeToSeconds(item.worktook);
+        return seconds <= clockoutDiffMin * 60;
+      });
+
+      if (firstRecord) {
+        mergedDataallFinal.push({
+          ...firstRecord,
+          claimstatus: 'first',
+        });
+      }
+
+      if (lastRecord && (!firstRecord || lastRecord.dateval !== firstRecord.dateval)) {
+        mergedDataallFinal.push({
+          ...lastRecord,
+          claimstatus: 'last',
+        });
+      }
+    }
+
+    // Get Production Data
+    // Step 1: Group events by username and date
+    const groupedProd = {};
+
+    mergedDataallFinal.forEach((prod) => {
+      const key = `${prod.username}_${prod.date}`;
+      if (!groupedProd[key]) {
+        groupedProd[key] = [];
+      }
+      groupedProd[key].push(prod);
+    });
+
+
+
+  console.log(groupedProd, 'groupedProd')
+    // Step 2: Build the final output
+     finalProductions = Object.entries(groupedProd).map(([key, prod]) => {
+      const [username, date] = key.split('_');
+      const loginData = prod.find((e) => e.claimstatus === 'first');
+      const loginDataLast = prod.find((e) => e.claimstatus === 'last');
+
+      const loginTimes = prod
+        .filter((e) => e.claimstatus === 'first')
+        .map((e) => e.time)
+        .sort(); // Ascending
+
+      const logoffTimes = prod
+        .filter((e) => e.claimstatus === 'last')
+        .map((e) => e.time)
+        .sort(); // Ascending
+
+      const combinedLogin = new Date(`${date}T${loginTimes[0] || null}`);
+      const formattedLoginTime = combinedLogin.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+
+      const combinedLogoff = new Date(`${date}T${logoffTimes[logoffTimes.length - 1] || null}`);
+      const formattedLogoffTime = combinedLogoff.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+
+      return {
+        shiftmode: (loginData && loginData.shiftmode) || null,
+        userid: (loginData && loginData.userid) || null,
+        shiftname: (loginData && loginData.shifttiming) || null,
+        company: (loginData && loginData.company) || null,
+        branch: (loginData && loginData.branch) || null,
+        unit: (loginData && loginData.unit) || null,
+        team: (loginData && loginData.team) || null,
+        empname: (loginData && loginData.empname) || null,
+        empcode: (loginData && loginData.empcode) || null,
+        date:date,
+        firstclaim: formattedLoginTime,
+         lastclaim: formattedLogoffTime,
+        clockouttime: formattedLogoffTime,
+        clockouttime: formattedLogoffTime,
+        firstworktook: loginData && loginData.worktook,
+        lastworktook: loginDataLast && loginDataLast.worktook,
+      };
+    });
+  console.log(finalProductions.length, 'finalProductions')
+
+      } catch (err) {
+        console.log(err, 'err');
+        // return next(new ErrorHandler("Records not found", 404));
+      }
+ 
+
+
+    mergedData = finalProductions.filter((item) => item != null);
+  } catch (err) {
+    console.log(err, 'err');
+    return next(new ErrorHandler('Records not found!', 404));
+  }
+
+  return res.status(200).json({
+    mergedData,
+  });
+});
+
+
+
+
+
 exports.getAllProductionUploadFilterUsersFirstlastclaim = catchAsyncErrors(async (req, res, next) => {
   let productionupload, depMonthSet;
   let finaluser = [];
@@ -7453,58 +8608,46 @@ exports.getAllProductionUploadFilterUsersFirstlastclaim = catchAsyncErrors(async
 
 
 exports.getOverallAttendanceBasedClaim = catchAsyncErrors(async (req, res, next) => {
-  let productionupload = [],
-    producionIndividual;
-  let finaluser = [];
-  let mergedDataall = [];
-  let mergedData = [];
-   let finalProductions = [];
+  let finalProductions = [],isDayPointsCreated=0;
+    let mergedData = [];
   try {
-   const { users } = req.body;
-    const dateObj = new Date(req.body.fromdate);
-    const date = req.body.fromdate;
+  const  date  = req.body.fromdate;
+
+    const dateObj = new Date(date);
 
     // Extract day, month, and year components
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
     const year = dateObj.getFullYear();
 
     // Format the date components into the desired format
     const formattedDate = `${day}-${month}-${year}`;
 
-    let dateoneafter = new Date(req.body.fromdate);
-    dateoneafter.setDate(dateoneafter.getDate() + 1);
-    let newDateOnePlus = dateoneafter.toISOString().split('T')[0];
+    const prodDayPoints = await DayPointsUpload.findOne({ date: date }, { uploaddata: 1 });
+    isDayPointsCreated = await DayPointsUpload.countDocuments({ date: date });
+if(isDayPointsCreated > 0){
+    const filteredDaypoints = prodDayPoints ? prodDayPoints?.uploaddata.filter((d) => d.weekoff != "Week Off" && d.weekoff != "Not Allot" && d.weekoff != "Not Alloted") : [];
+    const userIds = [...new Set(filteredDaypoints.map((d) => d.users).flatMap((d) => d))];
 
-    let datebefore = new Date(req.body.fromdate);
-    datebefore.setDate(datebefore.getDate() - 1);
-    let newDateOneMinus = datebefore.toISOString().split('T')[0];
+    const userProdDayTimes = [...new Set(filteredDaypoints.map((d) => d.fromtodate))]
+      .map((d) => {
+        const fromdate = d.split("$")[0].split(".")[0];
+        const todate = d.split("$")[1].split(".")[0];
+        const checkfromtotimezero = fromdate === todate;
+        return {
+          fromdate: new Date(`${fromdate}Z`),
+          todate: new Date(`${todate}Z`),
+          checkfromtotimezero: checkfromtotimezero,
+        };
+      })
+      .filter((d) => d.checkfromtotimezero == false);
 
-    let logidQuery = {
-      loginallotlog: { $exists: true, $ne: [] },
-    //  "loginallotlog.empname":"ABI.GNANAMOORTHY"
-    };
-   
-
-
-    let query = {};
-    let queryManual = {};
-
-    queryManual.status = 'Approved';
-
-  
-      queryManual.$or = [{ fromdate: { $eq: req.body.fromdate } }, { fromdate: { $eq: newDateOnePlus } }];
-
-    // console.log(users.length, 'USERLENGTHuplosadFILTER');
-
-    const { minStart, maxEnd } = users
-      .filter((d) => d.userShiftTimings.shiftFromTime && d.userShiftTimings.shiftFromTime !== '')
+    const { minStart, maxEnd } = userProdDayTimes
+      .filter((d) => d.fromdate && d.todate)
       .reduce(
         (acc, obj) => {
-          const startTime = new Date(obj.userShiftTimings.shiftFromTime);
-          const endTime = new Date(obj.userShiftTimings.shiftEndTime);
-
-          // console.log('Comparing:', startTime, endTime);
+          const startTime = new Date(obj.fromdate);
+          const endTime = new Date(obj.todate);
 
           // Update minimum start time
           if (!acc.minStart || startTime < acc.minStart) {
@@ -7521,78 +8664,64 @@ exports.getOverallAttendanceBasedClaim = catchAsyncErrors(async (req, res, next)
         { minStart: null, maxEnd: null } // Proper initialization
       );
 
-    query.dateobjformatdate = { $gte: minStart, $lte: maxEnd };
-    // query.user ="TTSH0581"
-    // query.unitid = "HFIFORMID202506111397001"
-    console.log(query.dateobjformatdate, 'query');
+    const fromdate = String(minStart).split("0")[0].split("T")[0];
+    const fromtime = String(minStart).split("0")[0].split("T")[1];
 
-   const [loginids, producionIndividual, productionupload, attendances, attendenceControlCriteria] = await Promise.all([
-      ClientUserid.find(logidQuery, { empname: 1, userid: 1, projectvendor: 1, loginallotlog: 1 }).lean(),
-      ProducionIndividual.find(queryManual, {
-            user: 1,
-            fromdate: 1,
-            time: 1,
-            filename: 1,
-            vendor: 1,
-            mode: 1,
-            category: 1,
-            section: 1,
-            unitid: 1,
-            lateentrystatus: 1,
-            updatedunitrate: 1,
-            updatedflag: 1,
-            updatedsection: 1,
-            unallotcategory: 1,
-            unallotsubcategory: 1,
-          }),
-     
-       ProductionUpload.find(query, {
-            unitid: 1,
-            user: 1,
-            formatteddate: 1,
-            formattedtime: 1,
-            filenameupdated: 1,
-            category: 1,
-            flagcount: 1,
-            vendor: 1,
-            unitrate: 1,
-            updatedunitrate: 1,
-            updatedflag: 1,
-            unallotcategory: 1,
-            unallotsubcategory: 1,
-          })
-   ,
-      Attendances.find({ date: formattedDate
-        // , username: { $in: username } 
-      }, { clockintime: 1, date: 1, username: 1 }),
-         AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec(),
+    const enddate = String(maxEnd).split("0")[0].split("T")[0];
+    const endtime = String(maxEnd).split("0")[0].split("T")[1];
+
+    const prodIndQuery = {
+      status: "Approved",
+      fromdate: { $gte: fromdate, $lte: enddate },
+      time: { $gte: fromtime, $lte: endtime },
+      user: {
+        $in: userIds,
+        // ["HFF0662"],
+      },
+    };
+
+    const [users,  productionUploads, productionIndividuals, attendances,attendenceControlCriteria] = await Promise.all([
+      Users.find({}, { username: 1, companyname: 1 }),
+      // TimePoints.find({}, { category: 1, subcategory: 1, time: 1 }),
+      ProductionUpload.find(
+        {
+          dateobjformatdate: { $gte: minStart, $lte: maxEnd },
+          user: {
+            $in: userIds,
+            // ["HFF0662"],
+          },
+        },
+        {
+          filenameupdated: 1,
+          category: 1,
+          unallotcategory: 1,
+          user: 1,
+          unallotsubcategory: 1,
+          formatteddate: 1,
+          formattedtime: 1,
+          dateobjformatdate: 1,
+        }
+      ),
+      ProducionIndividual.find(prodIndQuery, {
+        filename: 1,
+        unallotcategory: 1,
+        user: 1,
+        unallotsubcategory: 1,
+        fromdate: 1,
+        time: 1,
+        category: 1,
+        mode: 1,
+      }),
+      Attendances.find({ date: formattedDate }, { clockintime: 1, date: 1, username: 1 }),
+            AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec(),
+
     ]);
-    let allData = [...producionIndividual, ...productionupload];
+    let allData = [...productionUploads, ...productionIndividuals];
+    console.log(allData.length);
 
-    console.log(allData.length, 'aalldata');
+    let productions = [];
 
-    // Function to subtract hours and minutes from a date
-    function subtractTime(date, hours, minutes) {
-      // Subtract hours
-      date.setHours(date.getHours() - hours);
-      // Subtract minutes
-      date.setMinutes(date.getMinutes() - minutes);
-      return date;
-    }
-
-    // Format the result to "YYYY-MM-DD HH:MM:SS"
-    function formatDateCst(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      const seconds = String(date.getSeconds()).padStart(2, '0');
-
-      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    }
-
-    function compareDateTimes(dateT, shiftFrom, shiftEnd) {
+     function compareDateTimes(dateT, shiftFrom, shiftEnd) {
       // Parse the datetime strings into Date objects
       const dateTimeObj = new Date(dateT);
       const shiftFromTimeObj = new Date(shiftFrom);
@@ -7602,304 +8731,201 @@ exports.getOverallAttendanceBasedClaim = catchAsyncErrors(async (req, res, next)
 
       return isWithinShift;
     }
-console.log(loginids.length,"loginids")
-    let logs = loginids.flatMap((user) =>
-      user.loginallotlog.map((log) => ({
-        userid: user.userid,
-        projectvendor: user.projectvendor,
-        date: log.date,
-        time: log.time,
-        empname: log.empname,
-        empcode: log.empcode,
-        enddate: log.enddate ? log.enddate : null,
-      }))
-    );
 
-    // Step 2: Sort logs by date and time (ascending order)
-    logs.sort((a, b) => {
-      if (a.date === b.date) {
-        return a.time.localeCompare(b.time);
-      }
-      return new Date(a.date) - new Date(b.date);
-    });
+    filteredDaypoints.forEach((d) => {
+      const totalshifttiming = d.fromtodate;
+      const shiftstart = totalshifttiming ? totalshifttiming.split("$")[0].split(".")[0] : "";
+      const shiftend = totalshifttiming ? totalshifttiming.split("$")[1].split(".")[0] : "";
 
-    // Step 3: Calculate the enddate for each log (except the last log for each userid)
-    const userLogsMap = {};
-    logs.forEach((log) => {
-      if (!userLogsMap[log.userid]) {
-        userLogsMap[log.userid] = {};
-      }
+      const shiftfromdatetime = shiftstart ? `${shiftstart}Z` : null;
+      const shifttodatetime = shiftend ? `${shiftend}Z` : null;
 
-      if (!userLogsMap[log.userid][log.projectvendor]) {
-        userLogsMap[log.userid][log.projectvendor] = [];
-      }
-
-      userLogsMap[log.userid][log.projectvendor].push(log);
-    });
-
-    Object.values(userLogsMap).forEach((userLogs) => {
-      Object.values(userLogs).forEach((logsArray) => {
-        logsArray.forEach((log, idx) => {
-          if (idx < logsArray.length - 1) {
-            log.enddate = logsArray[idx + 1].date;
-          }
-        });
-      });
-    });
-    // Step 4: Filter logs based on input date
-    const filteredLogs = logs.filter((log) => {
-      return new Date(log.date) <= new Date(date) && (!log.enddate || new Date(log.enddate) >= new Date(date));
-    });
-
-    // Step 5: Sort the filtered logs by date and time (descending order)
-    filteredLogs.sort((a, b) => {
-      if (a.date === b.date) {
-        return b.time.localeCompare(a.time);
-      }
-      return new Date(b.date) - new Date(a.date);
-    });
-
-// console.log(filteredLogs,"filteredLogs")
-      try {
-        let mergedDataallfirst = allData.map((upload, index) => {
-          const loginInfo = filteredLogs.filter((login) => login.userid === upload.user && login.projectvendor === upload.vendor);
-//  console.log(loginInfo,"loginInfo")
-          let loginallot = loginInfo ? loginInfo : [];
-
-          let filteredDataDateTime = null;
-
-          if (loginallot.length > 0) {
-            const groupedByDateTime = {};
-
-            loginallot.forEach((item) => {
-              const dateTime = item.date + ' ' + item.time;
-              if (!groupedByDateTime[dateTime]) {
-                groupedByDateTime[dateTime] = [];
-              }
-              groupedByDateTime[dateTime].push(item);
-            });
-
-            // Extract the last item of each group
-            const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
-
-            // Sort the last items by date and time
-            lastItemsForEachDateTime.sort((a, b) => {
-              return new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time);
-            });
-
-            // Find the first item in the sorted array that meets the criteria
-            for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
-              const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
-              // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
-              let datevalsplitfinal = upload.mode == 'Manual' ? `${upload.fromdate}T${uploadtime}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`;
-              if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
-                filteredDataDateTime = lastItemsForEachDateTime[i];
-              } else {
-                break;
-              }
-            }
-          }
-
-          let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : '';
-          
-      // logininfoname &&    console.log(logininfoname,"logininfoname")
-          
-          // const filenamelistviewAll = upload.filename && upload.filename?.split(".x");
-          const comparedate = upload.mode == 'Manual' ? upload.fromdate : upload.formatteddate;
-          const comparetime = upload.mode == 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime;
-          // console.log(logininfoname,'logininfoname')
-
+      const result = allData
+        .filter((item) => d.users.includes(item.user))
+        .map((item) => {
+          const finalcategory = item.unallotcategory || (item.mode === "Manual" ? item.filename : item.filenameupdated);
+          const finalsubcategory = item.unallotsubcategory || item.category;
+          const comparedate = item.mode === "Manual" ? item.fromdate : item.formatteddate;
+          const comparetime = item.mode === "Manual" ? convertTo24HourFormat(item.time) : item.formattedtime;
           const dateTime = `${comparedate}T${comparetime}Z`;
-
-          // const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : '';
-          const userInfo = users.find((user) => logininfoname === user.companyname && new Date(dateTime) >= new Date(user.userShiftTimings.shiftFromTime) && new Date(dateTime) <= new Date(user.userShiftTimings.shiftEndTime));
-          //  console.log(userInfo,'userInfo')
-          let shiftEndTime = `${req.body.fromdate}T00:00:00.000Z`;
-          let shiftFromTime = `${req.body.fromdate}T00:00:00.000Z`;
-
-    
-          if (userInfo) {
-            userShiftTimings = userInfo.userShiftTimings;
-        //  logininfoname === "ABI.GNANAMOORTHY"    &&     console.log(userShiftTimings, 'sdfd')
-          } else {
-            userShiftTimings = { shiftFromTime: shiftFromTime, shiftEndTime: shiftEndTime, shiftsts: '' };
+const username = users.find(data => data.companyname === d.name)?.username
+          if (compareDateTimes(dateTime, shiftfromdatetime, shifttodatetime)) {
+            return {
+              empname: d.name || "",
+              empcode: d.empcode || "",
+              branch: d.branch || "",
+              company: d.companyname || "",
+              username: username|| "",
+              team: d.team || "",
+              unit: d.unit || "",
+              date:comparedate,
+              time:comparetime,
+              filename: finalcategory,
+              category: finalsubcategory,
+              // olddateval: dateTime,
+              shifttiming: d.weekoff || "",
+           
+              dateval:  `${comparedate} ${comparetime}`,
+              olddateval: dateTime,
+            };
           }
+          return null;
+        })
+        .filter(Boolean); // remove nulls
 
-          let getprocessCode = userInfo ? userInfo.process : '';
+      productions.push(...result); // flatten into productions array
+    });
 
-          const finalcategory = upload.unallotcategory ? upload.unallotcategory : upload.mode == 'Manual' ? upload.filename : upload.filenameupdated;
+  // productions = productions.filter((d) => d !== null && d !== undefined);
 
-          const finalsubcategory = upload.unallotsubcategory ? upload.unallotsubcategory : upload.category;
+    function getTimeDifference(start, end) {
+      // console.log(start, end, "startend");
+      if (start && end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
 
-          let finalunitrate = upload.updatedunitrate ? Number(upload.updatedunitrate) : Number(upload.unitrate);
-          let finalflag = upload.updatedflag ? Number(upload.updatedflag) : Number(upload.flagcount);
-
-          let unitrateold = Number(upload.unitrate);
-          let flagold = Number(upload.flagcount);
-
-          let LateEntryPointsDeduct = upload.mode == 'Manual' && upload.lateentrystatus === 'Late Entry';
-
-          const istDate = new Date(`${comparedate}T${comparetime}Z`);
-
-          // Subtract 10 hours and 30 minutes
-          // const resultDate = subtractTime(istDate, 10, 30);
-          // const formattedResult = formatDateCst(resultDate);
-          const resultDate = addTimeBasedOnDST(`${comparedate} ${comparetime}`);
-          if (
-            compareDateTimes(dateTime, userShiftTimings.shiftFromTime, userShiftTimings.shiftEndTime) 
-            // &&
-            // (category.length === 0 || category.includes(finalcategory)) &&
-            // (subcategory.length === 0 || subcategory.includes(finalsubcategory)) &&
-            // (company.length === 0 || company.includes(userInfo?.company)) &&
-            // (branch.length === 0 || branch.includes(userInfo?.branch)) &&
-            // (unit.length === 0 || unit.includes(userInfo?.unit)) &&
-            // (team.length === 0 || team.includes(userInfo?.team)) &&
-            // (empname.length === 0 || empname.includes(userInfo?.companyname) )
-          ) {
-           return {
-          user: upload.user,
-          fromdate: upload.fromdate,
-          todate: upload.todate,
-          vendor: upload.vendor,
-          category: finalsubcategory,
-          dateval: upload.mode === 'Manual' ? `${upload.fromdate} ${convertTo24HourFormat(upload.time)}` : `${upload.formatteddate} ${upload.formattedtime}`,
-          olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
-          filename: finalcategory,
-          mode: upload.mode === 'Manual' ? 'Manual' : 'Production',
-          // section: upload.section,
-          // flagcount: upload.flagcount,
-          // unitrate: upload.unitrate,
-          // csection: upload.updatedsection ? upload.updatedsection : '',
-          // cflagcount: upload.updatedflag ? upload.updatedflag : '',
-          // cunitrate: upload.updatedflag ? upload.updatedflag : '',
-          // unitid: upload.unitid,
-          worktook: upload.worktook,
-          lateentry: LateEntryPointsDeduct,
-          // points: LateEntryPointsDeduct ? 0 : (unitrateold * 8.333333333333333).toFixed(3),
-          // cpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * 8.333333333333333).toFixed(3),
-          // totalpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * finalflag * 8.333333333333333).toFixed(3),
-          cstist: String(resultDate),
-          date: date,
-                //  date: upload.mode === 'Manual' ? upload.fromdate : upload.formatteddate,
-          time: upload.mode === 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime,
-          // olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
-         company: userInfo && userInfo.company,
-              unit: userInfo && userInfo.unit,
-              branch: userInfo && userInfo.branch,
-              team: userInfo && userInfo.team,
-          empname: userInfo && userInfo.companyname,
-          empcode: userInfo && userInfo.empcode,
-          shifttiming: userInfo && userInfo.shift,
-          shiftmode: userInfo && userInfo.shiftMode,
-          username: userInfo && userInfo.username,
-          userid: userInfo && userInfo.userid,
-          _id: upload._id,
-        };
-          }
-        });
-console.log(mergedDataallfirst.length,"mergedDataallfirst")
-       
-
-function getTimeDifference(start, end) {
-          // console.log(start, end, "startend");
-          if (start && end) {
-            const startDate = new Date(start);
-            const endDate = new Date(end);
-
-            if (startDate > endDate) {
-              return '00:00:00';
-            } else {
-              const diff = new Date(endDate - startDate);
-              return diff.toISOString().substr(11, 8);
-            }
-          }
+        if (startDate > endDate) {
+          return "00:00:00";
+        } else {
+          const diff = new Date(endDate - startDate);
+          return diff.toISOString().substr(11, 8);
         }
+      }
+    }
 
-     
+    let lastTimes = {};
 
-        mergedDataallfirst = mergedDataallfirst.filter((d) => d !== null && d !== undefined);
-console.log(mergedDataallfirst.length,"mergedDataallfirst2")
+    let mergedDataall = productions
+      .filter((d) => d !== null && d !== undefined)
+      .sort((a, b) => {
+        // First sort by empname
+        if (a.empname < b.empname) return -1;
+        if (a.empname > b.empname) return 1;
+        return new Date(a.olddateval) - new Date(b.olddateval);
+      });
+
+    // const empFirstLastIndex = {};
+    // const mergedDataallFinal = [];
+
+    // mergedDataall.forEach((item, idx) => {
+    //   if (!empFirstLastIndex[item.empname]) {
+    //     empFirstLastIndex[item.empname] = { first: idx, last: idx };
+    //   } else {
+    //     empFirstLastIndex[item.empname].last = idx;
+    //   }
+    // });
+
+    // mergedDataall.forEach((item, index) => {
+    //   const { first, last } = empFirstLastIndex[item.empname];
+    //   const originalDatetime = item.dateval;
+    //   // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+    //   const finddatevalue = originalDatetime && originalDatetime?.split(" ");
+    //   const findtime = finddatevalue && finddatevalue[1];
+    //   const finddate = finddatevalue && finddatevalue[0];
+
+    //   const formattedTimeshift = findtime;
+
+    //   const clockindate = attendances.find((d) => {
+    //     const [day, month, year] = d.date.split("-"); // Split the date string from the attendance record
+    //     const dateObject = new Date(year, month - 1, day); // Create a new Date object
+    //     const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`; // Format the date
+    //     //  console.log(formattedDateString, date , item.username == d.username)
+    //     return formattedDateString === date && item.username == d.username;
+    //   });
+
+    //   // const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
+    //   // const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
+    //   // let formattedHours = hours;
+    //   // if (ampm === 'PM' && hours < 12) {
+    //   //   formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
+    //   // } else if (ampm === 'AM' && hours === 12) {
+    //   //   formattedHours = 0; // Convert 12 AM to 0 hours
+    //   // }
+    //   const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : "";
+    //   //  `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    //   // return formattedTime;
+
+    //   if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+    //     if (item) {
+    //       if (!lastTimes.hasOwnProperty(item.empname)) {
+    //         lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+    //       }
+    //       item.claimstatus = "first";
+    //       item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`);
+    //     }
+    //   } else if (item.empname == mergedDataall[index - 1].empname) {
+    //     // item.empname = loginInfo.empname;
+    //     item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
+    //     // lastTimes[loginInfo.empname] = findtime;
+    //     //  productionResult.push(item);
+    //     item.claimstatus = "";
+    //     if (index === last) {
+    //       item.claimstatus = "last";
+    //     }
+    //   }
+    // });
+
+    const empFirstLastIndex = {};
+const mergedDataallFinal = [];
+
+mergedDataall.forEach((item, idx) => {
+  const key = `${item.empname}-${item.shifttimng}`;
+  if (!empFirstLastIndex[key]) {
+    empFirstLastIndex[key] = { first: idx, last: idx };
+  } else {
+    empFirstLastIndex[key].last = idx;
+  }
+});
+
+mergedDataall.forEach((item, index) => {
+  const key = `${item.empname}-${item.shifttimng}`;
+  const { first, last } = empFirstLastIndex[key];
+  const originalDatetime = item.dateval;
+  const finddatevalue = originalDatetime && originalDatetime?.split(" ");
+  const findtime = finddatevalue && finddatevalue[1];
+  const finddate = finddatevalue && finddatevalue[0];
+  const formattedTimeshift = findtime;
+
+  const clockindate = attendances.find((d) => {
+    const [day, month, year] = d.date.split("-");
+    const dateObject = new Date(year, month - 1, day);
+    const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`;
+    return formattedDateString === finddate && item.username == d.username;
+  });
+
+  const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : "";
+
+  if (
+    index == 0 ||
+    item.empname !== mergedDataall[index - 1].empname ||
+    item.shifttimng !== mergedDataall[index - 1].shifttimng
+  ) {
+    if (item) {
+      if (!lastTimes.hasOwnProperty(key)) {
+        lastTimes[key] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+      }
+      item.claimstatus = "first";
+      item.worktook = getTimeDifference(`${finddate}T${lastTimes[key]}Z`, `${finddate}T${findtime}Z`);
+    }
+  } else {
+    item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
+    item.claimstatus = "";
+    if (index === last) {
+      item.claimstatus = "last";
+    }
+  }
+});
 
 
-        mergedDataall = mergedDataallfirst.sort((a, b) => {
-          // First sort by empname
-          if (a.empname < b.empname) return -1;
-          if (a.empname > b.empname) return 1;
-          // If empnames are equal, sort by dateval
-          //  return a.dateval.localeCompare(b.dateval);
-          return new Date(a.olddateval) - new Date(b.olddateval);
-        });
-
-        const empFirstLastIndex = {};
-            const mergedDataallFinal = [];
-    const lastTimes = {};
-
-
-        mergedDataall.forEach((item, idx) => {
-          if (!empFirstLastIndex[item.empname]) {
-            empFirstLastIndex[item.empname] = { first: idx, last: idx };
-          } else {
-            empFirstLastIndex[item.empname].last = idx;
-          }
-        });
-
-        mergedDataall.forEach((item, index) => {
-          const { first, last } = empFirstLastIndex[item.empname];
-          const originalDatetime = item.dateval;
-          // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
-          const finddatevalue = originalDatetime && originalDatetime?.split(' ');
-          const findtime = finddatevalue && finddatevalue[1];
-          const finddate = finddatevalue && finddatevalue[0];
-
-          const formattedTimeshift = findtime;
-
-          const clockindate = attendances.find((d) => {
-            const [day, month, year] = d.date.split('-'); // Split the date string from the attendance record
-            const dateObject = new Date(year, month - 1, day); // Create a new Date object
-            const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')}`; // Format the date
-            //  console.log(formattedDateString, date , item.username == d.username)
-            return formattedDateString === date && item.username == d.username;
-          });
-
-          // const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
-          // const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
-          // let formattedHours = hours;
-          // if (ampm === 'PM' && hours < 12) {
-          //   formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
-          // } else if (ampm === 'AM' && hours === 12) {
-          //   formattedHours = 0; // Convert 12 AM to 0 hours
-          // }
-          const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : '';
-          //  `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-          // return formattedTime;
-
-          if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
-            if (item) {
-              if (!lastTimes.hasOwnProperty(item.empname)) {
-                lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
-              }
-              item.claimstatus = 'first';
-              item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`);
-            }
-          } else if (item.empname == mergedDataall[index - 1].empname) {
-            // item.empname = loginInfo.empname;
-            item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
-            // lastTimes[loginInfo.empname] = findtime;
-            //  productionResult.push(item);
-            item.claimstatus = '';
-            if (index === last) {
-              item.claimstatus = 'last';
-            }
-          }
-        });
-
-            const clockinDiffMin = parseInt(attendenceControlCriteria.clockindifferencetime);
+    const clockinDiffMin = parseInt(attendenceControlCriteria.clockindifferencetime);
     const clockoutDiffMin = parseInt(attendenceControlCriteria.clockoutdifferencetime);
 
     const groupByEmpDate = {};
 
     function timeToSeconds(timeStr) {
-      const [h, m, s] = timeStr.split(':').map(Number);
+      const [h, m, s] = timeStr.split(":").map(Number);
       return h * 3600 + m * 60 + s;
     }
 
@@ -7909,7 +8935,7 @@ console.log(mergedDataallfirst.length,"mergedDataallfirst2")
       if (!groupByEmpDate[key]) groupByEmpDate[key] = [];
       groupByEmpDate[key].push(item);
     });
-console.log(mergedDataall.length,"mergedDataall")
+    console.log(mergedDataall.length, "mergedDataall");
     // Iterate each emp-date group
     for (const key in groupByEmpDate) {
       const records = groupByEmpDate[key];
@@ -7926,14 +8952,14 @@ console.log(mergedDataall.length,"mergedDataall")
       if (firstRecord) {
         mergedDataallFinal.push({
           ...firstRecord,
-          claimstatus: 'first',
+          claimstatus: "first",
         });
       }
 
       if (lastRecord && (!firstRecord || lastRecord.dateval !== firstRecord.dateval)) {
         mergedDataallFinal.push({
           ...lastRecord,
-          claimstatus: 'last',
+          claimstatus: "last",
         });
       }
     }
@@ -7950,38 +8976,36 @@ console.log(mergedDataall.length,"mergedDataall")
       groupedProd[key].push(prod);
     });
 
-
-
-  console.log(groupedProd, 'groupedProd')
+    // console.log(groupedProd, "groupedProd");
     // Step 2: Build the final output
-     finalProductions = Object.entries(groupedProd).map(([key, prod]) => {
-      const [username, date] = key.split('_');
-      const loginData = prod.find((e) => e.claimstatus === 'first');
-      const loginDataLast = prod.find((e) => e.claimstatus === 'last');
-
+    finalProductions = Object.entries(groupedProd).map(([key, prod]) => {
+      const [username, date1] = key.split("_");
+      const loginData = prod.find((e) => e.claimstatus === "first");
+      const loginDataLast = prod.find((e) => e.claimstatus === "last");
+// console.log(prod,"prod")
       const loginTimes = prod
-        .filter((e) => e.claimstatus === 'first')
+        .filter((e) => e.claimstatus === "first")
         .map((e) => e.time)
         .sort(); // Ascending
 
       const logoffTimes = prod
-        .filter((e) => e.claimstatus === 'last')
+        .filter((e) => e.claimstatus === "last")
         .map((e) => e.time)
         .sort(); // Ascending
 
-      const combinedLogin = new Date(`${date}T${loginTimes[0] || null}`);
-      const formattedLoginTime = combinedLogin.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+      const combinedLogin = new Date(`${date1}T${loginTimes[0] || null}`);
+      const formattedLoginTime = combinedLogin.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
         hour12: true,
       });
 
-      const combinedLogoff = new Date(`${date}T${logoffTimes[logoffTimes.length - 1] || null}`);
-      const formattedLogoffTime = combinedLogoff.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+      const combinedLogoff = new Date(`${date1}T${logoffTimes[logoffTimes.length - 1] || null}`);
+      const formattedLogoffTime = combinedLogoff.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
         hour12: true,
       });
 
@@ -7995,92 +9019,69 @@ console.log(mergedDataall.length,"mergedDataall")
         team: (loginData && loginData.team) || null,
         empname: (loginData && loginData.empname) || null,
         empcode: (loginData && loginData.empcode) || null,
-        date:date,
+        date:  (loginData && loginData.date) || null,
         firstclaim: formattedLoginTime,
-         lastclaim: formattedLogoffTime,
+        lastclaim: formattedLogoffTime,
         clockouttime: formattedLogoffTime,
         clockouttime: formattedLogoffTime,
         firstworktook: loginData && loginData.worktook,
         lastworktook: loginDataLast && loginDataLast.worktook,
       };
     });
-  console.log(finalProductions.length, 'finalProductions')
-
-      } catch (err) {
-        console.log(err, 'err');
-        // return next(new ErrorHandler("Records not found", 404));
-      }
- 
-
-
-    mergedData = finalProductions.filter((item) => item != null);
-  } catch (err) {
-    console.log(err, 'err');
-    return next(new ErrorHandler('Records not found!', 404));
   }
-
-  return res.status(200).json({
-    mergedData,
+     mergedData = finalProductions.filter((item) => item != null && item.date == date);
+    // console.log(finalProductions.length, "finalProductions");
+     return res.status(200).json({
+    mergedData,isDayPointsCreated
   });
+  } catch (err) {
+    console.log(err, "err");
+    return next(new ErrorHandler("Records not found!", 404));
+  }
 });
-
-
-
 
 
 exports.getIndividualAttendanceBasedClaim = catchAsyncErrors(async (req, res, next) => {
-  let productionupload = [],
-    producionIndividual;
-  let finaluser = [];
-  let mergedDataall = [];
-  let mergedData = [];
-   let finalProductions = [];
+  let finalProductions = [],isDayPointsCreated=0;
+    let mergedData = [];
   try {
-   const { users } = req.body;
-    const dateObj = new Date(req.body.fromdate);
-    const date = req.body.fromdate;
+  const  date  = req.body.fromdate;
+
+    const dateObj = new Date(date);
 
     // Extract day, month, and year components
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
     const year = dateObj.getFullYear();
 
     // Format the date components into the desired format
     const formattedDate = `${day}-${month}-${year}`;
 
-    let dateoneafter = new Date(req.body.fromdate);
-    dateoneafter.setDate(dateoneafter.getDate() + 1);
-    let newDateOnePlus = dateoneafter.toISOString().split('T')[0];
+    const prodDayPoints = await DayPointsUpload.findOne({ date: date }, { uploaddata: 1 });
+    isDayPointsCreated = await DayPointsUpload.countDocuments({ date: date });
+if(isDayPointsCreated > 0){
+    const filteredDaypoints = prodDayPoints ? prodDayPoints?.uploaddata.filter((d) =>d.name === req.body.companyname && d.weekoff != "Week Off" && d.weekoff != "Not Allot" && d.weekoff != "Not Alloted") : [];
+    const userIds = [...new Set(filteredDaypoints.map((d) => d.users).flatMap((d) => d))];
 
-    let datebefore = new Date(req.body.fromdate);
-    datebefore.setDate(datebefore.getDate() - 1);
-    let newDateOneMinus = datebefore.toISOString().split('T')[0];
+    const userProdDayTimes = [...new Set(filteredDaypoints.map((d) => d.fromtodate))]
+      .map((d) => {
+        const fromdate = d.split("$")[0].split(".")[0];
+        const todate = d.split("$")[1].split(".")[0];
+        const checkfromtotimezero = fromdate === todate;
+        return {
+          fromdate: new Date(`${fromdate}Z`),
+          todate: new Date(`${todate}Z`),
+          checkfromtotimezero: checkfromtotimezero,
+        };
+      })
+      .filter((d) => d.checkfromtotimezero == false);
 
-    let logidQuery = {
-      loginallotlog: { $exists: true, $ne: [] },
-    "loginallotlog.empname":req.body.companyname
-    };
-   
-
-
-    let query = {};
-    let queryManual = {};
-
-    queryManual.status = 'Approved';
-
-  
-      queryManual.$or = [{ fromdate: { $eq: req.body.fromdate } }, { fromdate: { $eq: newDateOnePlus } }];
-
-    // console.log(users.length, 'USERLENGTHuplosadFILTER');
-
-    const { minStart, maxEnd } = users
-      .filter((d) => d.userShiftTimings.shiftFromTime && d.userShiftTimings.shiftFromTime !== '')
+    const { minStart, maxEnd } = userProdDayTimes
+      .filter((d) => d.fromdate && d.todate)
       .reduce(
         (acc, obj) => {
-          const startTime = new Date(obj.userShiftTimings.shiftFromTime);
-          const endTime = new Date(obj.userShiftTimings.shiftEndTime);
-
-          // console.log('Comparing:', startTime, endTime);
+          const startTime = new Date(obj.fromdate);
+          const endTime = new Date(obj.todate);
 
           // Update minimum start time
           if (!acc.minStart || startTime < acc.minStart) {
@@ -8097,78 +9098,64 @@ exports.getIndividualAttendanceBasedClaim = catchAsyncErrors(async (req, res, ne
         { minStart: null, maxEnd: null } // Proper initialization
       );
 
-    query.dateobjformatdate = { $gte: minStart, $lte: maxEnd };
-    // query.user ="TTSH0581"
-    // query.unitid = "HFIFORMID202506111397001"
-    console.log(query.dateobjformatdate, 'query');
+    const fromdate = String(minStart).split("0")[0].split("T")[0];
+    const fromtime = String(minStart).split("0")[0].split("T")[1];
 
-   const [loginids, producionIndividual, productionupload, attendances, attendenceControlCriteria] = await Promise.all([
-      ClientUserid.find(logidQuery, { empname: 1, userid: 1, projectvendor: 1, loginallotlog: 1 }).lean(),
-      ProducionIndividual.find(queryManual, {
-            user: 1,
-            fromdate: 1,
-            time: 1,
-            filename: 1,
-            vendor: 1,
-            mode: 1,
-            category: 1,
-            section: 1,
-            unitid: 1,
-            lateentrystatus: 1,
-            updatedunitrate: 1,
-            updatedflag: 1,
-            updatedsection: 1,
-            unallotcategory: 1,
-            unallotsubcategory: 1,
-          }),
-     
-       ProductionUpload.find(query, {
-            unitid: 1,
-            user: 1,
-            formatteddate: 1,
-            formattedtime: 1,
-            filenameupdated: 1,
-            category: 1,
-            flagcount: 1,
-            vendor: 1,
-            unitrate: 1,
-            updatedunitrate: 1,
-            updatedflag: 1,
-            unallotcategory: 1,
-            unallotsubcategory: 1,
-          })
-   ,
-      Attendances.find({ date: formattedDate
-        // , username: { $in: username } 
-      }, { clockintime: 1, date: 1, username: 1 }),
-         AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec(),
+    const enddate = String(maxEnd).split("0")[0].split("T")[0];
+    const endtime = String(maxEnd).split("0")[0].split("T")[1];
+
+    const prodIndQuery = {
+      status: "Approved",
+      fromdate: { $gte: fromdate, $lte: enddate },
+      time: { $gte: fromtime, $lte: endtime },
+      user: {
+        $in: userIds,
+        // ["HFF0662"],
+      },
+    };
+
+    const [users,  productionUploads, productionIndividuals, attendances,attendenceControlCriteria] = await Promise.all([
+      Users.find({}, { username: 1, companyname: 1 }),
+      // TimePoints.find({}, { category: 1, subcategory: 1, time: 1 }),
+      ProductionUpload.find(
+        {
+          dateobjformatdate: { $gte: minStart, $lte: maxEnd },
+          user: {
+            $in: userIds,
+            // ["HFF0662"],
+          },
+        },
+        {
+          filenameupdated: 1,
+          category: 1,
+          unallotcategory: 1,
+          user: 1,
+          unallotsubcategory: 1,
+          formatteddate: 1,
+          formattedtime: 1,
+          dateobjformatdate: 1,
+        }
+      ),
+      ProducionIndividual.find(prodIndQuery, {
+        filename: 1,
+        unallotcategory: 1,
+        user: 1,
+        unallotsubcategory: 1,
+        fromdate: 1,
+        time: 1,
+        category: 1,
+        mode: 1,
+      }),
+      Attendances.find({ date: formattedDate }, { clockintime: 1, date: 1, username: 1 }),
+            AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec(),
+
     ]);
-    let allData = [...producionIndividual, ...productionupload];
+    let allData = [...productionUploads, ...productionIndividuals];
+    console.log(allData.length);
 
-    console.log(allData.length, 'aalldata');
+    let productions = [];
 
-    // Function to subtract hours and minutes from a date
-    function subtractTime(date, hours, minutes) {
-      // Subtract hours
-      date.setHours(date.getHours() - hours);
-      // Subtract minutes
-      date.setMinutes(date.getMinutes() - minutes);
-      return date;
-    }
-
-    // Format the result to "YYYY-MM-DD HH:MM:SS"
-    function formatDateCst(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      const seconds = String(date.getSeconds()).padStart(2, '0');
-
-      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    }
-
-    function compareDateTimes(dateT, shiftFrom, shiftEnd) {
+     function compareDateTimes(dateT, shiftFrom, shiftEnd) {
       // Parse the datetime strings into Date objects
       const dateTimeObj = new Date(dateT);
       const shiftFromTimeObj = new Date(shiftFrom);
@@ -8178,304 +9165,201 @@ exports.getIndividualAttendanceBasedClaim = catchAsyncErrors(async (req, res, ne
 
       return isWithinShift;
     }
-console.log(loginids.length,"loginids")
-    let logs = loginids.flatMap((user) =>
-      user.loginallotlog.map((log) => ({
-        userid: user.userid,
-        projectvendor: user.projectvendor,
-        date: log.date,
-        time: log.time,
-        empname: log.empname,
-        empcode: log.empcode,
-        enddate: log.enddate ? log.enddate : null,
-      }))
-    );
 
-    // Step 2: Sort logs by date and time (ascending order)
-    logs.sort((a, b) => {
-      if (a.date === b.date) {
-        return a.time.localeCompare(b.time);
-      }
-      return new Date(a.date) - new Date(b.date);
-    });
+    filteredDaypoints.forEach((d) => {
+      const totalshifttiming = d.fromtodate;
+      const shiftstart = totalshifttiming ? totalshifttiming.split("$")[0].split(".")[0] : "";
+      const shiftend = totalshifttiming ? totalshifttiming.split("$")[1].split(".")[0] : "";
 
-    // Step 3: Calculate the enddate for each log (except the last log for each userid)
-    const userLogsMap = {};
-    logs.forEach((log) => {
-      if (!userLogsMap[log.userid]) {
-        userLogsMap[log.userid] = {};
-      }
+      const shiftfromdatetime = shiftstart ? `${shiftstart}Z` : null;
+      const shifttodatetime = shiftend ? `${shiftend}Z` : null;
 
-      if (!userLogsMap[log.userid][log.projectvendor]) {
-        userLogsMap[log.userid][log.projectvendor] = [];
-      }
-
-      userLogsMap[log.userid][log.projectvendor].push(log);
-    });
-
-    Object.values(userLogsMap).forEach((userLogs) => {
-      Object.values(userLogs).forEach((logsArray) => {
-        logsArray.forEach((log, idx) => {
-          if (idx < logsArray.length - 1) {
-            log.enddate = logsArray[idx + 1].date;
-          }
-        });
-      });
-    });
-    // Step 4: Filter logs based on input date
-    const filteredLogs = logs.filter((log) => {
-      return new Date(log.date) <= new Date(date) && (!log.enddate || new Date(log.enddate) >= new Date(date));
-    });
-
-    // Step 5: Sort the filtered logs by date and time (descending order)
-    filteredLogs.sort((a, b) => {
-      if (a.date === b.date) {
-        return b.time.localeCompare(a.time);
-      }
-      return new Date(b.date) - new Date(a.date);
-    });
-
-// console.log(filteredLogs,"filteredLogs")
-      try {
-        let mergedDataallfirst = allData.map((upload, index) => {
-          const loginInfo = filteredLogs.filter((login) => login.userid === upload.user && login.projectvendor === upload.vendor);
-//  console.log(loginInfo,"loginInfo")
-          let loginallot = loginInfo ? loginInfo : [];
-
-          let filteredDataDateTime = null;
-
-          if (loginallot.length > 0) {
-            const groupedByDateTime = {};
-
-            loginallot.forEach((item) => {
-              const dateTime = item.date + ' ' + item.time;
-              if (!groupedByDateTime[dateTime]) {
-                groupedByDateTime[dateTime] = [];
-              }
-              groupedByDateTime[dateTime].push(item);
-            });
-
-            // Extract the last item of each group
-            const lastItemsForEachDateTime = Object.values(groupedByDateTime).map((group) => group[group.length - 1]);
-
-            // Sort the last items by date and time
-            lastItemsForEachDateTime.sort((a, b) => {
-              return new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time);
-            });
-
-            // Find the first item in the sorted array that meets the criteria
-            for (let i = 0; i < lastItemsForEachDateTime.length; i++) {
-              const dateTime = `${lastItemsForEachDateTime[i].date}T${lastItemsForEachDateTime[i].time}Z`;
-              // let datevalsplit = upload.mode == "Manual" ? "" : upload.formatteddatetime.split(" ");
-              let datevalsplitfinal = upload.mode == 'Manual' ? `${upload.fromdate}T${uploadtime}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`;
-              if (new Date(dateTime) <= new Date(datevalsplitfinal)) {
-                filteredDataDateTime = lastItemsForEachDateTime[i];
-              } else {
-                break;
-              }
-            }
-          }
-
-          let logininfoname = loginallot.length > 0 && filteredDataDateTime && filteredDataDateTime.empname ? filteredDataDateTime.empname : loginInfo ? loginInfo.empname : '';
-          
-      // logininfoname &&    console.log(logininfoname,"logininfoname")
-          
-          // const filenamelistviewAll = upload.filename && upload.filename?.split(".x");
-          const comparedate = upload.mode == 'Manual' ? upload.fromdate : upload.formatteddate;
-          const comparetime = upload.mode == 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime;
-          // console.log(logininfoname,'logininfoname')
-
+      const result = allData
+        .filter((item) => d.users.includes(item.user))
+        .map((item) => {
+          const finalcategory = item.unallotcategory || (item.mode === "Manual" ? item.filename : item.filenameupdated);
+          const finalsubcategory = item.unallotsubcategory || item.category;
+          const comparedate = item.mode === "Manual" ? item.fromdate : item.formatteddate;
+          const comparetime = item.mode === "Manual" ? convertTo24HourFormat(item.time) : item.formattedtime;
           const dateTime = `${comparedate}T${comparetime}Z`;
-
-          // const userInfo = loginInfo ? users.find((user) => user.companyname === logininfoname) : '';
-          const userInfo = users.find((user) => logininfoname === user.companyname && new Date(dateTime) >= new Date(user.userShiftTimings.shiftFromTime) && new Date(dateTime) <= new Date(user.userShiftTimings.shiftEndTime));
-          //  console.log(userInfo,'userInfo')
-          let shiftEndTime = `${req.body.fromdate}T00:00:00.000Z`;
-          let shiftFromTime = `${req.body.fromdate}T00:00:00.000Z`;
-
-    
-          if (userInfo) {
-            userShiftTimings = userInfo.userShiftTimings;
-        //  logininfoname === "ABI.GNANAMOORTHY"    &&     console.log(userShiftTimings, 'sdfd')
-          } else {
-            userShiftTimings = { shiftFromTime: shiftFromTime, shiftEndTime: shiftEndTime, shiftsts: '' };
+const username = users.find(data => data.companyname === d.name)?.username
+          if (compareDateTimes(dateTime, shiftfromdatetime, shifttodatetime)) {
+            return {
+              empname: d.name || "",
+              empcode: d.empcode || "",
+              branch: d.branch || "",
+              company: d.companyname || "",
+              username: username|| "",
+              team: d.team || "",
+              unit: d.unit || "",
+              date:comparedate,
+              time:comparetime,
+              filename: finalcategory,
+              category: finalsubcategory,
+              // olddateval: dateTime,
+              shifttiming: d.weekoff || "",
+           
+              dateval:  `${comparedate} ${comparetime}`,
+              olddateval: dateTime,
+            };
           }
+          return null;
+        })
+        .filter(Boolean); // remove nulls
 
-          let getprocessCode = userInfo ? userInfo.process : '';
+      productions.push(...result); // flatten into productions array
+    });
 
-          const finalcategory = upload.unallotcategory ? upload.unallotcategory : upload.mode == 'Manual' ? upload.filename : upload.filenameupdated;
+  // productions = productions.filter((d) => d !== null && d !== undefined);
 
-          const finalsubcategory = upload.unallotsubcategory ? upload.unallotsubcategory : upload.category;
+    function getTimeDifference(start, end) {
+      // console.log(start, end, "startend");
+      if (start && end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
 
-          let finalunitrate = upload.updatedunitrate ? Number(upload.updatedunitrate) : Number(upload.unitrate);
-          let finalflag = upload.updatedflag ? Number(upload.updatedflag) : Number(upload.flagcount);
-
-          let unitrateold = Number(upload.unitrate);
-          let flagold = Number(upload.flagcount);
-
-          let LateEntryPointsDeduct = upload.mode == 'Manual' && upload.lateentrystatus === 'Late Entry';
-
-          const istDate = new Date(`${comparedate}T${comparetime}Z`);
-
-          // Subtract 10 hours and 30 minutes
-          // const resultDate = subtractTime(istDate, 10, 30);
-          // const formattedResult = formatDateCst(resultDate);
-          const resultDate = addTimeBasedOnDST(`${comparedate} ${comparetime}`);
-          if (
-            compareDateTimes(dateTime, userShiftTimings.shiftFromTime, userShiftTimings.shiftEndTime) 
-            // &&
-            // (category.length === 0 || category.includes(finalcategory)) &&
-            // (subcategory.length === 0 || subcategory.includes(finalsubcategory)) &&
-            // (company.length === 0 || company.includes(userInfo?.company)) &&
-            // (branch.length === 0 || branch.includes(userInfo?.branch)) &&
-            // (unit.length === 0 || unit.includes(userInfo?.unit)) &&
-            // (team.length === 0 || team.includes(userInfo?.team)) &&
-            // (empname.length === 0 || empname.includes(userInfo?.companyname) )
-          ) {
-           return {
-          user: upload.user,
-          fromdate: upload.fromdate,
-          todate: upload.todate,
-          vendor: upload.vendor,
-          category: finalsubcategory,
-          dateval: upload.mode === 'Manual' ? `${upload.fromdate} ${convertTo24HourFormat(upload.time)}` : `${upload.formatteddate} ${upload.formattedtime}`,
-          olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
-          filename: finalcategory,
-          mode: upload.mode === 'Manual' ? 'Manual' : 'Production',
-          // section: upload.section,
-          // flagcount: upload.flagcount,
-          // unitrate: upload.unitrate,
-          // csection: upload.updatedsection ? upload.updatedsection : '',
-          // cflagcount: upload.updatedflag ? upload.updatedflag : '',
-          // cunitrate: upload.updatedflag ? upload.updatedflag : '',
-          // unitid: upload.unitid,
-          worktook: upload.worktook,
-          lateentry: LateEntryPointsDeduct,
-          // points: LateEntryPointsDeduct ? 0 : (unitrateold * 8.333333333333333).toFixed(3),
-          // cpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * 8.333333333333333).toFixed(3),
-          // totalpoints: LateEntryPointsDeduct ? 0 : (finalunitrate * finalflag * 8.333333333333333).toFixed(3),
-          cstist: String(resultDate),
-          date: date,
-                //  date: upload.mode === 'Manual' ? upload.fromdate : upload.formatteddate,
-          time: upload.mode === 'Manual' ? convertTo24HourFormat(upload.time) : upload.formattedtime,
-          // olddateval: upload.mode === 'Manual' ? `${upload.fromdate}T${convertTo24HourFormat(upload.time)}Z` : `${upload.formatteddate}T${upload.formattedtime}Z`,
-         company: userInfo && userInfo.company,
-              unit: userInfo && userInfo.unit,
-              branch: userInfo && userInfo.branch,
-              team: userInfo && userInfo.team,
-          empname: userInfo && userInfo.companyname,
-          empcode: userInfo && userInfo.empcode,
-          shifttiming: userInfo && userInfo.shift,
-          shiftmode: userInfo && userInfo.shiftMode,
-          username: userInfo && userInfo.username,
-          userid: userInfo && userInfo.userid,
-          _id: upload._id,
-        };
-          }
-        });
-console.log(mergedDataallfirst.length,"mergedDataallfirst")
-       
-
-function getTimeDifference(start, end) {
-          // console.log(start, end, "startend");
-          if (start && end) {
-            const startDate = new Date(start);
-            const endDate = new Date(end);
-
-            if (startDate > endDate) {
-              return '00:00:00';
-            } else {
-              const diff = new Date(endDate - startDate);
-              return diff.toISOString().substr(11, 8);
-            }
-          }
+        if (startDate > endDate) {
+          return "00:00:00";
+        } else {
+          const diff = new Date(endDate - startDate);
+          return diff.toISOString().substr(11, 8);
         }
+      }
+    }
 
-     
+    let lastTimes = {};
 
-        mergedDataallfirst = mergedDataallfirst.filter((d) => d !== null && d !== undefined);
-console.log(mergedDataallfirst.length,"mergedDataallfirst2")
+    let mergedDataall = productions
+      .filter((d) => d !== null && d !== undefined)
+      .sort((a, b) => {
+        // First sort by empname
+        if (a.empname < b.empname) return -1;
+        if (a.empname > b.empname) return 1;
+        return new Date(a.olddateval) - new Date(b.olddateval);
+      });
 
+    // const empFirstLastIndex = {};
+    // const mergedDataallFinal = [];
 
-        mergedDataall = mergedDataallfirst.sort((a, b) => {
-          // First sort by empname
-          if (a.empname < b.empname) return -1;
-          if (a.empname > b.empname) return 1;
-          // If empnames are equal, sort by dateval
-          //  return a.dateval.localeCompare(b.dateval);
-          return new Date(a.olddateval) - new Date(b.olddateval);
-        });
+    // mergedDataall.forEach((item, idx) => {
+    //   if (!empFirstLastIndex[item.empname]) {
+    //     empFirstLastIndex[item.empname] = { first: idx, last: idx };
+    //   } else {
+    //     empFirstLastIndex[item.empname].last = idx;
+    //   }
+    // });
+
+    // mergedDataall.forEach((item, index) => {
+    //   const { first, last } = empFirstLastIndex[item.empname];
+    //   const originalDatetime = item.dateval;
+    //   // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+    //   const finddatevalue = originalDatetime && originalDatetime?.split(" ");
+    //   const findtime = finddatevalue && finddatevalue[1];
+    //   const finddate = finddatevalue && finddatevalue[0];
+
+    //   const formattedTimeshift = findtime;
+
+    //   const clockindate = attendances.find((d) => {
+    //     const [day, month, year] = d.date.split("-"); // Split the date string from the attendance record
+    //     const dateObject = new Date(year, month - 1, day); // Create a new Date object
+    //     const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`; // Format the date
+    //     //  console.log(formattedDateString, date , item.username == d.username)
+    //     return formattedDateString === date && item.username == d.username;
+    //   });
+
+    //   // const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
+    //   // const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
+    //   // let formattedHours = hours;
+    //   // if (ampm === 'PM' && hours < 12) {
+    //   //   formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
+    //   // } else if (ampm === 'AM' && hours === 12) {
+    //   //   formattedHours = 0; // Convert 12 AM to 0 hours
+    //   // }
+    //   const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : "";
+    //   //  `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    //   // return formattedTime;
+
+    //   if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+    //     if (item) {
+    //       if (!lastTimes.hasOwnProperty(item.empname)) {
+    //         lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+    //       }
+    //       item.claimstatus = "first";
+    //       item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`);
+    //     }
+    //   } else if (item.empname == mergedDataall[index - 1].empname) {
+    //     // item.empname = loginInfo.empname;
+    //     item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
+    //     // lastTimes[loginInfo.empname] = findtime;
+    //     //  productionResult.push(item);
+    //     item.claimstatus = "";
+    //     if (index === last) {
+    //       item.claimstatus = "last";
+    //     }
+    //   }
+    // });
 
         const empFirstLastIndex = {};
-            const mergedDataallFinal = [];
-    const lastTimes = {};
+const mergedDataallFinal = [];
+
+mergedDataall.forEach((item, idx) => {
+  const key = `${item.empname}-${item.shifttimng}`;
+  if (!empFirstLastIndex[key]) {
+    empFirstLastIndex[key] = { first: idx, last: idx };
+  } else {
+    empFirstLastIndex[key].last = idx;
+  }
+});
+
+mergedDataall.forEach((item, index) => {
+  const key = `${item.empname}-${item.shifttimng}`;
+  const { first, last } = empFirstLastIndex[key];
+  const originalDatetime = item.dateval;
+  const finddatevalue = originalDatetime && originalDatetime?.split(" ");
+  const findtime = finddatevalue && finddatevalue[1];
+  const finddate = finddatevalue && finddatevalue[0];
+  const formattedTimeshift = findtime;
+
+  const clockindate = attendances.find((d) => {
+    const [day, month, year] = d.date.split("-");
+    const dateObject = new Date(year, month - 1, day);
+    const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`;
+    return formattedDateString === finddate && item.username == d.username;
+  });
+
+  const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : "";
+
+  if (
+    index == 0 ||
+    item.empname !== mergedDataall[index - 1].empname ||
+    item.shifttimng !== mergedDataall[index - 1].shifttimng
+  ) {
+    if (item) {
+      if (!lastTimes.hasOwnProperty(key)) {
+        lastTimes[key] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+      }
+      item.claimstatus = "first";
+      item.worktook = getTimeDifference(`${finddate}T${lastTimes[key]}Z`, `${finddate}T${findtime}Z`);
+    }
+  } else {
+    item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
+    item.claimstatus = "";
+    if (index === last) {
+      item.claimstatus = "last";
+    }
+  }
+});
 
 
-        mergedDataall.forEach((item, idx) => {
-          if (!empFirstLastIndex[item.empname]) {
-            empFirstLastIndex[item.empname] = { first: idx, last: idx };
-          } else {
-            empFirstLastIndex[item.empname].last = idx;
-          }
-        });
-
-        mergedDataall.forEach((item, index) => {
-          const { first, last } = empFirstLastIndex[item.empname];
-          const originalDatetime = item.dateval;
-          // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
-          const finddatevalue = originalDatetime && originalDatetime?.split(' ');
-          const findtime = finddatevalue && finddatevalue[1];
-          const finddate = finddatevalue && finddatevalue[0];
-
-          const formattedTimeshift = findtime;
-
-          const clockindate = attendances.find((d) => {
-            const [day, month, year] = d.date.split('-'); // Split the date string from the attendance record
-            const dateObject = new Date(year, month - 1, day); // Create a new Date object
-            const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, '0')}-${dateObject.getDate().toString().padStart(2, '0')}`; // Format the date
-            //  console.log(formattedDateString, date , item.username == d.username)
-            return formattedDateString === date && item.username == d.username;
-          });
-
-          // const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
-          // const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
-          // let formattedHours = hours;
-          // if (ampm === 'PM' && hours < 12) {
-          //   formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
-          // } else if (ampm === 'AM' && hours === 12) {
-          //   formattedHours = 0; // Convert 12 AM to 0 hours
-          // }
-          const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : '';
-          //  `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-          // return formattedTime;
-
-          if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
-            if (item) {
-              if (!lastTimes.hasOwnProperty(item.empname)) {
-                lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
-              }
-              item.claimstatus = 'first';
-              item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`);
-            }
-          } else if (item.empname == mergedDataall[index - 1].empname) {
-            // item.empname = loginInfo.empname;
-            item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
-            // lastTimes[loginInfo.empname] = findtime;
-            //  productionResult.push(item);
-            item.claimstatus = '';
-            if (index === last) {
-              item.claimstatus = 'last';
-            }
-          }
-        });
-
-            const clockinDiffMin = parseInt(attendenceControlCriteria.clockindifferencetime);
+    const clockinDiffMin = parseInt(attendenceControlCriteria.clockindifferencetime);
     const clockoutDiffMin = parseInt(attendenceControlCriteria.clockoutdifferencetime);
 
     const groupByEmpDate = {};
 
     function timeToSeconds(timeStr) {
-      const [h, m, s] = timeStr.split(':').map(Number);
+      const [h, m, s] = timeStr.split(":").map(Number);
       return h * 3600 + m * 60 + s;
     }
 
@@ -8485,7 +9369,7 @@ console.log(mergedDataallfirst.length,"mergedDataallfirst2")
       if (!groupByEmpDate[key]) groupByEmpDate[key] = [];
       groupByEmpDate[key].push(item);
     });
-console.log(mergedDataall.length,"mergedDataall")
+    console.log(mergedDataall.length, "mergedDataall");
     // Iterate each emp-date group
     for (const key in groupByEmpDate) {
       const records = groupByEmpDate[key];
@@ -8502,14 +9386,14 @@ console.log(mergedDataall.length,"mergedDataall")
       if (firstRecord) {
         mergedDataallFinal.push({
           ...firstRecord,
-          claimstatus: 'first',
+          claimstatus: "first",
         });
       }
 
       if (lastRecord && (!firstRecord || lastRecord.dateval !== firstRecord.dateval)) {
         mergedDataallFinal.push({
           ...lastRecord,
-          claimstatus: 'last',
+          claimstatus: "last",
         });
       }
     }
@@ -8526,38 +9410,36 @@ console.log(mergedDataall.length,"mergedDataall")
       groupedProd[key].push(prod);
     });
 
-
-
-  console.log(groupedProd, 'groupedProd')
+    // console.log(groupedProd, "groupedProd");
     // Step 2: Build the final output
-     finalProductions = Object.entries(groupedProd).map(([key, prod]) => {
-      const [username, date] = key.split('_');
-      const loginData = prod.find((e) => e.claimstatus === 'first');
-      const loginDataLast = prod.find((e) => e.claimstatus === 'last');
-
+    finalProductions = Object.entries(groupedProd).map(([key, prod]) => {
+      const [username, date1] = key.split("_");
+      const loginData = prod.find((e) => e.claimstatus === "first");
+      const loginDataLast = prod.find((e) => e.claimstatus === "last");
+// console.log(prod,"prod")
       const loginTimes = prod
-        .filter((e) => e.claimstatus === 'first')
+        .filter((e) => e.claimstatus === "first")
         .map((e) => e.time)
         .sort(); // Ascending
 
       const logoffTimes = prod
-        .filter((e) => e.claimstatus === 'last')
+        .filter((e) => e.claimstatus === "last")
         .map((e) => e.time)
         .sort(); // Ascending
 
-      const combinedLogin = new Date(`${date}T${loginTimes[0] || null}`);
-      const formattedLoginTime = combinedLogin.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+      const combinedLogin = new Date(`${date1}T${loginTimes[0] || null}`);
+      const formattedLoginTime = combinedLogin.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
         hour12: true,
       });
 
-      const combinedLogoff = new Date(`${date}T${logoffTimes[logoffTimes.length - 1] || null}`);
-      const formattedLogoffTime = combinedLogoff.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+      const combinedLogoff = new Date(`${date1}T${logoffTimes[logoffTimes.length - 1] || null}`);
+      const formattedLogoffTime = combinedLogoff.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
         hour12: true,
       });
 
@@ -8571,34 +9453,1184 @@ console.log(mergedDataall.length,"mergedDataall")
         team: (loginData && loginData.team) || null,
         empname: (loginData && loginData.empname) || null,
         empcode: (loginData && loginData.empcode) || null,
-        date:date,
+        date: date,
         firstclaim: formattedLoginTime,
-         lastclaim: formattedLogoffTime,
+        lastclaim: formattedLogoffTime,
         clockouttime: formattedLogoffTime,
         clockouttime: formattedLogoffTime,
         firstworktook: loginData && loginData.worktook,
         lastworktook: loginDataLast && loginDataLast.worktook,
       };
     });
-  console.log(finalProductions.length, 'finalProductions')
-
-      } catch (err) {
-        console.log(err, 'err');
-        // return next(new ErrorHandler("Records not found", 404));
-      }
- 
-
-
-    mergedData = finalProductions.filter((item) => item != null);
-  } catch (err) {
-    console.log(err, 'err');
-    return next(new ErrorHandler('Records not found!', 404));
   }
+     mergedData = finalProductions.filter((item) => item != null&& item.date == date);
+    // console.log(finalProductions.length, "finalProductions");
+     return res.status(200).json({
+    mergedData,isDayPointsCreated
+  });
+  } catch (err) {
+    console.log(err, "err");
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+});
 
+
+
+//hierarchy
+
+exports.getAllHierarchyListAttendanceBasedClaim = catchAsyncErrors(async (req, res, next) => {
+  let result, hierarchy, resultAccessFilter,hierarchyfilter,reportingtobaseduser, filteredoverall, hierarchySecond, hierarchyMap, resulted, resultedTeam, hierarchyFinal, hierarchyDefault;
+
+  try {
+    const { listpageaccessmode } = req.body;
+
+    let levelFinal = req.body?.sector === "all" ? ["Primary", "Secondary", "Tertiary"] : [req.body?.sector];
+
+    if (listpageaccessmode === "Reporting to Based") {
+      let usersss = await Users.find(
+        {
+          enquirystatus: {
+            $nin: ["Enquiry Purpose"],
+          },
+          resonablestatus: {
+            $nin: ["Not Joined", "Postponed", "Rejected", "Closed", "Releave Employee", "Absconded", "Hold", "Terminate"],
+          },
+          reportingto: req.body.username,
+        },
+        {
+          empcode: 1,
+          companyname: 1,
+        }
+      ).lean();
+    }
+
+    result = await Users.find(
+      {
+        enquirystatus: {
+          $nin: ["Enquiry Purpose"],
+        },
+        // resonablestatus: {
+        //   $nin: ["Releave Employee", "Absconded", "Hold", "Terminate"],
+        // },
+      },
+      {
+        companyname: 1,
+        branch: 1,
+        company: 1,
+        unit: 1,
+        team: 1,
+        department: 1,
+        originalpassword: 1,
+        resonablestatus: 1,
+        username: 1,
+        // _id: 1
+      }
+    );
+
+    //myhierarchy dropdown
+    if (req.body.hierachy === "myhierarchy" && (listpageaccessmode === "Hierarchy Based" || listpageaccessmode === "Overall")) {
+      hierarchy = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+        level: req.body.sector,
+      });
+      hierarchyDefault = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+      });
+
+      let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+      hierarchyFinal = req.body.sector === "all" ? (answerDef.length > 0 ? [].concat(...answerDef) : []) : hierarchy.length > 0 ? [].concat(...hierarchy.map((item) => item.employeename)) : [];
+      hierarchyMap = hierarchyFinal.length > 0 ? hierarchyFinal : [];
+
+      hierarchyfilter = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+        level: "Primary",
+      });
+      resulted = result.filter((data) => hierarchyMap.includes(data.companyname));
+    }
+    // all hierarchy list dropdown
+    if (req.body.hierachy === "allhierarchy" && (listpageaccessmode === "Hierarchy Based" || listpageaccessmode === "Overall")) {
+      hierarchySecond = await Hirerarchi.find({}, { employeename: 1, supervisorchoose: 1, level: 1, control: 1 });
+
+      let sectorFinal = req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector];
+
+      hierarchyDefault = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+        level: { $in: sectorFinal },
+      });
+
+      let answerDef = hierarchyDefault.map((data) => data.employeename).flat();
+
+      function findEmployeesRecursive(currentSupervisors, processedSupervisors, result) {
+        const filteredData = hierarchySecond.filter((item) => item.supervisorchoose.some((supervisor) => currentSupervisors.includes(supervisor) && !processedSupervisors.has(supervisor)));
+
+        if (filteredData.length === 0) {
+          return result;
+        }
+
+        const newEmployees = filteredData.reduce((employees, item) => {
+          employees.push(...item.employeename);
+          processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+          return employees;
+        }, []);
+
+        const uniqueNewEmployees = [...new Set(newEmployees)];
+        result = [...result, ...filteredData];
+
+        return findEmployeesRecursive(uniqueNewEmployees, processedSupervisors, result);
+      }
+
+      const processedSupervisors = new Set();
+      const filteredOverallItem = findEmployeesRecursive(answerDef, processedSupervisors, []);
+      let answerDeoverall = filteredOverallItem.filter((data) => (req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"].includes(data.level) : data.level == req.body.sector)).map((item) => item.employeename[0]);
+
+      resultedTeam = result.filter((data) => answerDeoverall.includes(data.companyname));
+
+      let hierarchyallfinal = await Hirerarchi.find({
+        employeename: { $in: answerDeoverall.map((item) => item) },
+        level: req.body.sector,
+      });
+      hierarchyFinal = req.body.sector === "all" ? (answerDeoverall.length > 0 ? [].concat(...answerDeoverall) : []) : hierarchyallfinal.length > 0 ? [].concat(...hierarchyallfinal.map((item) => item.employeename)) : [];
+    }
+    //my + all hierarchy list dropdown
+    if (req.body.hierachy === "myallhierarchy" && (listpageaccessmode === "Hierarchy Based" || listpageaccessmode === "Overall")) {
+      hierarchySecond = await Hirerarchi.find({}, { employeename: 1, supervisorchoose: 1, level: 1, control: 1 });
+
+      let sectorFinal = req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector];
+
+      hierarchyDefault = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+        level: { $in: sectorFinal },
+      });
+
+      let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+      function findEmployeesRecursive(currentSupervisors, processedSupervisors, result) {
+        const filteredData = hierarchySecond.filter((item) => item.supervisorchoose.some((supervisor) => currentSupervisors.includes(supervisor) && (req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"].includes(item.level) : req.body.sector == item.level) && !processedSupervisors.has(supervisor)));
+
+        if (filteredData.length === 0) {
+          return result;
+        }
+
+        const newEmployees = filteredData.reduce((employees, item) => {
+          employees.push(...item.employeename);
+          processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+          return employees;
+        }, []);
+
+        const uniqueNewEmployees = [...new Set(newEmployees)];
+        result = [...result, ...filteredData];
+
+        return findEmployeesRecursive(uniqueNewEmployees, processedSupervisors, result);
+      }
+
+      const processedSupervisors = new Set();
+      const filteredOverallItem = findEmployeesRecursive([req.body.username], processedSupervisors, []);
+      let answerDeoverall = filteredOverallItem.filter((data) => (req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"].includes(data.level) : data.level == req.body.sector)).map((item) => item.employeename[0]);
+
+      filteredoverall = result.filter((data) => answerDeoverall.includes(data.companyname));
+    }
+
+    if (listpageaccessmode === "Reporting to Based") {
+      reportingtobaseduser = result;
+    }
+
+    let finalsupervisor = req.body.hierachy == "myhierarchy" ? resulted?.map((Data) => Data?.companyname) : req.body.hierachy == "allhierarchy" ? resultedTeam?.map((Data) => Data?.companyname) : filteredoverall?.map((Data) => Data?.companyname);
+
+    const restrictTeam = await Hirerarchi.aggregate([
+      {
+        $match: {
+          $or: [
+            {
+              supervisorchoose: { $in: finalsupervisor }, // Matches if supervisorchoose field has a value in finalsupervisor
+            },
+            {
+              employeename: { $in: finalsupervisor }, // Matches if employeename field has a value in finalsupervisor
+            },
+          ],
+          level: { $in: levelFinal }, // Matches if level field has a value in levelFinal
+        },
+      },
+      {
+        $lookup: {
+          from: "reportingheaders",
+          let: {
+            teamControlsArray: {
+              $ifNull: ["$pagecontrols", []],
+            },
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $in: ["$name", "$$teamControlsArray"],
+                    }, // Check if 'name' is in 'teamcontrols' array
+                    {
+                      $in: [
+                        req?.body?.pagename,
+                        "$reportingnew", // Check if 'menuteamloginstatus' is in 'reportingnew' array
+                      ],
+                    }, // Additional condition for reportingnew array
+                  ],
+                },
+              },
+            },
+          ],
+          as: "reportData", // The resulting matched documents will be in this field
+        },
+      },
+      {
+        $project: {
+          supervisorchoose: 1,
+          employeename: 1,
+          reportData: 1,
+        },
+      },
+    ]);
+  //  console.log(filteredoverall, "filteredoverall");
+    let restrictListTeam = restrictTeam?.filter((data) => data?.reportData?.length > 0)?.flatMap((Data) => Data?.employeename);
+    const resultAccessFilterHierarchy = req.body.hierachy === "myhierarchy" ? resulted : req.body.hierachy === "allhierarchy" ? resultedTeam : filteredoverall;
+    resultAccessFilter = restrictListTeam?.length > 0 ? resultAccessFilterHierarchy?.filter((data) => restrictListTeam?.includes(data?.companyname)).map(d => d.companyname) : [];
+    // console.log(filteredoverall.length, resultAccessFilter, "filteredoverall");
+  } catch (err) {
+    console.log(err, "err");
+    return next(new ErrorHandler("Records not found!", 404));
+  }
   return res.status(200).json({
-    mergedData,
+    resultAccessFilter,
   });
 });
+
+
+exports.getAllTeamAttendanceBasedClaim = catchAsyncErrors(
+  async (req, res, next) => {
+    let result,
+   isDayPointsCreated=0,
+      reportingtobaseduser,
+          clientuserid,
+          hierarchy,
+          resultAccessFilter,
+          secondaryhierarchyfinal,
+          tertiaryhierarchyfinal,
+          primaryhierarchyfinal,
+          hierarchyfilter,
+          filteredoverall,
+          primaryhierarchy,
+          hierarchyfilter1,
+          secondaryhierarchy,
+          hierarchyfilter2,
+          tertiaryhierarchy,
+          primaryhierarchyall,
+          secondaryhierarchyall,
+          tertiaryhierarchyall,
+          branch,
+          hierarchySecond,
+          overallMyallList,
+          hierarchyMap,
+          resulted,
+          resultedTeam,
+          myallTotalNames,
+          hierarchyFinal,
+          hierarchyDefault,
+          reportingusers, hierarchyfirstlevel;
+        let resultAccessFilterHierarchy = [];
+        let resultsectorother = []
+        let filteredoverallsectorall = []
+     let mergedData = [];
+  try {
+
+       const { listpageaccessmode } = req.body;
+          let clientidsmap;
+          let levelFinal = req.body?.sector === "all" ? ["Primary", "Secondary", "Tertiary"] : [req.body?.sector]
+    
+          let finalDataRestrictList = []
+          if (listpageaccessmode === "Reporting to Based") {
+            let usersss = await Users.find(
+              {
+                enquirystatus: {
+                  $nin: ["Enquiry Purpose"],
+                },
+                resonablestatus: {
+                  $nin: [
+                    "Not Joined",
+                    "Postponed",
+                    "Rejected",
+                    "Closed",
+                    "Releave Employee",
+                    "Absconded",
+                    "Hold",
+                    "Terminate",
+                  ],
+                },
+                reportingto: req.body.username,
+              },
+              {
+                empcode: 1,
+                companyname: 1,
+              }
+            ).lean();
+            // const companyNames = usersss.map((user) => user.companyname);
+            // let clientids = await ClientUserid.find(
+            //   {
+            //     // projectvendor: { $in: vendorNames },
+            //     empname: { $in: companyNames },
+            //   },
+            //   { userid: 1 }
+            // ).lean();
+            // clientidsmap = clientids.map((user) => user.userid);
+          }
+    
+  const  date  = req.body.date;
+
+    const dateObj = new Date(date);
+
+ 
+    // Extract day, month, and year components
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const year = dateObj.getFullYear();
+console.log(req.body.names,"names")
+    // Format the date components into the desired format
+    const formattedDate = `${day}-${month}-${year}`;
+
+    const prodDayPoints = await DayPointsUpload.findOne({ date: date }, { uploaddata: 1 });
+ isDayPointsCreated = await DayPointsUpload.countDocuments({ date: date });
+
+    // console.log(prodDayPoints,"prodDayPoints")
+    // const filteredDaypoints = prodDayPoints ? prodDayPoints?.uploaddata.filter((d) =>req.body.names.includes(d.name) && d.weekoff != "Week Off" && d.weekoff != "Not Allot" && d.weekoff != "Not Alloted") : [];
+
+// if(isDayPointsCreated > 0){
+    const filteredDaypoints = prodDayPoints?.uploaddata?.filter(
+  (d) =>
+    req.body.names.includes(d.name) &&
+    !["Week Off", "Not Allot", "Not Alloted"].includes(d.weekoff)
+) || [];
+    const userIds = [...new Set(filteredDaypoints.map((d) => d.users).flatMap((d) => d))];
+console.log(filteredDaypoints,"filteredDaypoints")
+    const userProdDayTimes = [...new Set(filteredDaypoints.map((d) => d.fromtodate))]
+      .map((d) => {
+        const fromdate = d.split("$")[0].split(".")[0];
+        const todate = d.split("$")[1].split(".")[0];
+        const checkfromtotimezero = fromdate === todate;
+        return {
+          fromdate: new Date(`${fromdate}Z`),
+          todate: new Date(`${todate}Z`),
+          checkfromtotimezero: checkfromtotimezero,
+        };
+      })
+      .filter((d) => d.checkfromtotimezero == false);
+
+    const { minStart, maxEnd } = userProdDayTimes
+      .filter((d) => d.fromdate && d.todate)
+      .reduce(
+        (acc, obj) => {
+          const startTime = new Date(obj.fromdate);
+          const endTime = new Date(obj.todate);
+
+          // Update minimum start time
+          if (!acc.minStart || startTime < acc.minStart) {
+            acc.minStart = startTime;
+          }
+
+          // Update maximum end time
+          if (!acc.maxEnd || endTime > acc.maxEnd) {
+            acc.maxEnd = endTime;
+          }
+
+          return acc;
+        },
+        { minStart: null, maxEnd: null } // Proper initialization
+      );
+
+    const fromdate = String(minStart).split("0")[0].split("T")[0];
+    const fromtime = String(minStart).split("0")[0].split("T")[1];
+
+    const enddate = String(maxEnd).split("0")[0].split("T")[0];
+    const endtime = String(maxEnd).split("0")[0].split("T")[1];
+
+    const prodIndQuery = {
+      status: "Approved",
+      fromdate: { $gte: fromdate, $lte: enddate },
+      time: { $gte: fromtime, $lte: endtime },
+      user: {
+        $in: userIds,
+        // ["HFF0662"],
+      },
+    };
+
+    const [users,  productionUploads, productionIndividuals, attendances,attendenceControlCriteria] = await Promise.all([
+      Users.find({}, { username: 1, companyname: 1 }),
+      // TimePoints.find({}, { category: 1, subcategory: 1, time: 1 }),
+      ProductionUpload.find(
+        {
+          dateobjformatdate: { $gte: minStart, $lte: maxEnd },
+          user: {
+            $in: userIds,
+            // ["HFF0662"],
+          },
+        },
+        {
+          filenameupdated: 1,
+          category: 1,
+          unallotcategory: 1,
+          user: 1,
+          unallotsubcategory: 1,
+          formatteddate: 1,
+          formattedtime: 1,
+          dateobjformatdate: 1,
+        }
+      ),
+      ProducionIndividual.find(prodIndQuery, {
+        filename: 1,
+        unallotcategory: 1,
+        user: 1,
+        unallotsubcategory: 1,
+        fromdate: 1,
+        time: 1,
+        category: 1,
+        mode: 1,
+      }),
+      Attendances.find({ date: formattedDate }, { clockintime: 1, date: 1, username: 1 }),
+            AttendanceControlCriteria.findOne().sort({ createdAt: -1 }).exec(),
+
+    ]);
+    let allData = [...productionUploads, ...productionIndividuals];
+    console.log(allData.length);
+
+    let productions = [];
+
+     function compareDateTimes(dateT, shiftFrom, shiftEnd) {
+      // Parse the datetime strings into Date objects
+      const dateTimeObj = new Date(dateT);
+      const shiftFromTimeObj = new Date(shiftFrom);
+      const shiftEndTimeObj = new Date(shiftEnd);
+      // Perform the comparisons
+      const isWithinShift = dateTimeObj >= shiftFromTimeObj && dateTimeObj <= shiftEndTimeObj;
+
+      return isWithinShift;
+    }
+
+    filteredDaypoints.forEach((d) => {
+      const totalshifttiming = d.fromtodate;
+      const shiftstart = totalshifttiming ? totalshifttiming.split("$")[0].split(".")[0] : "";
+      const shiftend = totalshifttiming ? totalshifttiming.split("$")[1].split(".")[0] : "";
+
+      const shiftfromdatetime = shiftstart ? `${shiftstart}Z` : null;
+      const shifttodatetime = shiftend ? `${shiftend}Z` : null;
+
+      const result = allData
+        .filter((item) => d.users.includes(item.user))
+        .map((item) => {
+          const finalcategory = item.unallotcategory || (item.mode === "Manual" ? item.filename : item.filenameupdated);
+          const finalsubcategory = item.unallotsubcategory || item.category;
+          const comparedate = item.mode === "Manual" ? item.fromdate : item.formatteddate;
+          const comparetime = item.mode === "Manual" ? convertTo24HourFormat(item.time) : item.formattedtime;
+          const dateTime = `${comparedate}T${comparetime}Z`;
+const username = users.find(data => data.companyname === d.name)?.username
+          if (compareDateTimes(dateTime, shiftfromdatetime, shifttodatetime)) {
+            return {
+              empname: d.name || "",
+              empcode: d.empcode || "",
+              branch: d.branch || "",
+              company: d.companyname || "",
+              username: username|| "",
+              team: d.team || "",
+              unit: d.unit || "",
+              date:comparedate,
+              time:comparetime,
+              filename: finalcategory,
+              category: finalsubcategory,
+              // olddateval: dateTime,
+              shifttiming: d.weekoff || "",
+           
+              dateval:  `${comparedate} ${comparetime}`,
+              olddateval: dateTime,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean); // remove nulls
+
+      productions.push(...result); // flatten into productions array
+    });
+
+  // productions = productions.filter((d) => d !== null && d !== undefined);
+
+    function getTimeDifference(start, end) {
+      // console.log(start, end, "startend");
+      if (start && end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+
+        if (startDate > endDate) {
+          return "00:00:00";
+        } else {
+          const diff = new Date(endDate - startDate);
+          return diff.toISOString().substr(11, 8);
+        }
+      }
+    }
+
+    let lastTimes = {};
+
+    let mergedDataall = productions
+      .filter((d) => d !== null && d !== undefined)
+      .sort((a, b) => {
+        // First sort by empname
+        if (a.empname < b.empname) return -1;
+        if (a.empname > b.empname) return 1;
+        return new Date(a.olddateval) - new Date(b.olddateval);
+      });
+
+    // const empFirstLastIndex = {};
+    // const mergedDataallFinal = [];
+
+    // mergedDataall.forEach((item, idx) => {
+    //   if (!empFirstLastIndex[item.empname]) {
+    //     empFirstLastIndex[item.empname] = { first: idx, last: idx };
+    //   } else {
+    //     empFirstLastIndex[item.empname].last = idx;
+    //   }
+    // });
+
+    // mergedDataall.forEach((item, index) => {
+    //   const { first, last } = empFirstLastIndex[item.empname];
+    //   const originalDatetime = item.dateval;
+    //   // const formattedDateTime = originalDatetime.toISOString().replace('T', ' ').slice(0, 19);
+    //   const finddatevalue = originalDatetime && originalDatetime?.split(" ");
+    //   const findtime = finddatevalue && finddatevalue[1];
+    //   const finddate = finddatevalue && finddatevalue[0];
+
+    //   const formattedTimeshift = findtime;
+
+    //   const clockindate = attendances.find((d) => {
+    //     const [day, month, year] = d.date.split("-"); // Split the date string from the attendance record
+    //     const dateObject = new Date(year, month - 1, day); // Create a new Date object
+    //     const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1).toString().padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`; // Format the date
+    //     //  console.log(formattedDateString, date , item.username == d.username)
+    //     return formattedDateString === date && item.username == d.username;
+    //   });
+
+    //   // const [timePart, ampm] = clockindate ? clockindate.clockintime.split(' ') : ''; // Split the time and AM/PM
+    //   // const [hours, minutes, seconds] = timePart ? timePart.split(':').map(Number) : ''; // Split hours, minutes, and seconds
+    //   // let formattedHours = hours;
+    //   // if (ampm === 'PM' && hours < 12) {
+    //   //   formattedHours += 12; // Convert hours to 24-hour format if PM and not 12 PM
+    //   // } else if (ampm === 'AM' && hours === 12) {
+    //   //   formattedHours = 0; // Convert 12 AM to 0 hours
+    //   // }
+    //   const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : "";
+    //   //  `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    //   // return formattedTime;
+
+    //   if (index == 0 || item.empname !== mergedDataall[index - 1].empname) {
+    //     if (item) {
+    //       if (!lastTimes.hasOwnProperty(item.empname)) {
+    //         lastTimes[item.empname] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+    //       }
+    //       item.claimstatus = "first";
+    //       item.worktook = getTimeDifference(`${finddate}T${lastTimes[item.empname]}Z`, `${finddate}T${findtime}Z`);
+    //     }
+    //   } else if (item.empname == mergedDataall[index - 1].empname) {
+    //     // item.empname = loginInfo.empname;
+    //     item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
+    //     // lastTimes[loginInfo.empname] = findtime;
+    //     //  productionResult.push(item);
+    //     item.claimstatus = "";
+    //     if (index === last) {
+    //       item.claimstatus = "last";
+    //     }
+    //   }
+    // });
+
+    
+    const empFirstLastIndex = {};
+const mergedDataallFinal = [];
+
+mergedDataall.forEach((item, idx) => {
+  const key = `${item.empname}-${item.shifttimng}`;
+  if (!empFirstLastIndex[key]) {
+    empFirstLastIndex[key] = { first: idx, last: idx };
+  } else {
+    empFirstLastIndex[key].last = idx;
+  }
+});
+
+mergedDataall.forEach((item, index) => {
+  const key = `${item.empname}-${item.shifttimng}`;
+  const { first, last } = empFirstLastIndex[key];
+  const originalDatetime = item.dateval;
+  const finddatevalue = originalDatetime && originalDatetime?.split(" ");
+  const findtime = finddatevalue && finddatevalue[1];
+  const finddate = finddatevalue && finddatevalue[0];
+  const formattedTimeshift = findtime;
+
+  const clockindate = attendances.find((d) => {
+    const [day, month, year] = d.date.split("-");
+    const dateObject = new Date(year, month - 1, day);
+    const formattedDateString = `${dateObject.getFullYear()}-${(dateObject.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${dateObject.getDate().toString().padStart(2, "0")}`;
+    return formattedDateString === finddate && item.username == d.username;
+  });
+
+  const formattedTime = clockindate ? convertTo24HourFormat(clockindate.clockintime) : "";
+
+  if (
+    index == 0 ||
+    item.empname !== mergedDataall[index - 1].empname ||
+    item.shifttimng !== mergedDataall[index - 1].shifttimng
+  ) {
+    if (item) {
+      if (!lastTimes.hasOwnProperty(key)) {
+        lastTimes[key] = clockindate && formattedTime < formattedTimeshift ? formattedTime : formattedTimeshift;
+      }
+      item.claimstatus = "first";
+      item.worktook = getTimeDifference(`${finddate}T${lastTimes[key]}Z`, `${finddate}T${findtime}Z`);
+    }
+  } else {
+    item.worktook = getTimeDifference(mergedDataall[index - 1].olddateval, item.olddateval);
+    item.claimstatus = "";
+    if (index === last) {
+      item.claimstatus = "last";
+    }
+  }
+});
+
+
+    const clockinDiffMin = parseInt(attendenceControlCriteria.clockindifferencetime);
+    const clockoutDiffMin = parseInt(attendenceControlCriteria.clockoutdifferencetime);
+
+    const groupByEmpDate = {};
+
+    function timeToSeconds(timeStr) {
+      const [h, m, s] = timeStr.split(":").map(Number);
+      return h * 3600 + m * 60 + s;
+    }
+
+    // Group data by empname + date
+    mergedDataall.forEach((item) => {
+      const key = `${item.empname}_${item.date}`;
+      if (!groupByEmpDate[key]) groupByEmpDate[key] = [];
+      groupByEmpDate[key].push(item);
+    });
+    console.log(mergedDataall.length, "mergedDataall");
+    // Iterate each emp-date group
+    for (const key in groupByEmpDate) {
+      const records = groupByEmpDate[key];
+      const firstRecord = records.find((item) => {
+        const seconds = timeToSeconds(item.worktook);
+        return seconds <= clockinDiffMin * 60;
+      });
+
+      const lastRecord = [...records].reverse().find((item) => {
+        const seconds = timeToSeconds(item.worktook);
+        return seconds <= clockoutDiffMin * 60;
+      });
+
+      if (firstRecord) {
+        mergedDataallFinal.push({
+          ...firstRecord,
+          claimstatus: "first",
+        });
+      }
+
+      if (lastRecord && (!firstRecord || lastRecord.dateval !== firstRecord.dateval)) {
+        mergedDataallFinal.push({
+          ...lastRecord,
+          claimstatus: "last",
+        });
+      }
+    }
+
+    // Get Production Data
+    // Step 1: Group events by username and date
+    const groupedProd = {};
+
+    mergedDataallFinal.forEach((prod) => {
+      const key = `${prod.username}_${prod.date}`;
+      if (!groupedProd[key]) {
+        groupedProd[key] = [];
+      }
+      groupedProd[key].push(prod);
+    });
+
+    // console.log(groupedProd, "groupedProd");
+    // Step 2: Build the final output
+const    finalProductions = Object.entries(groupedProd).map(([key, prod]) => {
+      const [username, date1] = key.split("_");
+      const loginData = prod.find((e) => e.claimstatus === "first");
+      const loginDataLast = prod.find((e) => e.claimstatus === "last");
+// console.log(prod,"prod")
+      const loginTimes = prod
+        .filter((e) => e.claimstatus === "first")
+        .map((e) => e.time)
+        .sort(); // Ascending
+
+      const logoffTimes = prod
+        .filter((e) => e.claimstatus === "last")
+        .map((e) => e.time)
+        .sort(); // Ascending
+
+      const combinedLogin = new Date(`${date1}T${loginTimes[0] || null}`);
+      const formattedLoginTime = combinedLogin.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+
+      const combinedLogoff = new Date(`${date1}T${logoffTimes[logoffTimes.length - 1] || null}`);
+      const formattedLogoffTime = combinedLogoff.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+
+      return {
+        shiftmode: (loginData && loginData.shiftmode) || null,
+        userid: (loginData && loginData.userid) || null,
+        shiftname: (loginData && loginData.shifttiming) || null,
+        company: (loginData && loginData.company) || null,
+        branch: (loginData && loginData.branch) || null,
+        unit: (loginData && loginData.unit) || null,
+        team: (loginData && loginData.team) || null,
+        empname: (loginData && loginData.empname) || null,
+        empcode: (loginData && loginData.empcode) || null,
+          companyname: (loginData && loginData.empname) || null,
+        date: (loginData && loginData.date) || null,
+        firstclaim: formattedLoginTime,
+        lastclaim: formattedLogoffTime,
+        clockouttime: formattedLogoffTime,
+        clockouttime: formattedLogoffTime,
+        firstworktook: loginData && loginData.worktook,
+        lastworktook: loginDataLast && loginDataLast.worktook,
+      };
+    });
+     mergedData = finalProductions.filter((item) => item != null && item.date == date);
+console.log(mergedData.length,"mergedData")
+   result = mergedData
+      resultsectorother = result
+      //myhierarchy dropdown
+      if (
+        req.body.hierachy === "myhierarchy" &&
+        (listpageaccessmode === "Hierarchy Based" ||
+          listpageaccessmode === "Overall")
+      ) {
+        hierarchy = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: req.body.sector,
+        });
+        hierarchyDefault = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+        });
+
+        let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+        hierarchyFinal =
+          req.body.sector === "all"
+            ? answerDef.length > 0
+              ? [].concat(...answerDef)
+              : []
+            : hierarchy.length > 0
+              ? [].concat(...hierarchy.map((item) => item.employeename))
+              : [];
+
+        hierarchyMap = hierarchyFinal.length > 0 ? hierarchyFinal : [];
+
+        hierarchyfilter = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: "Primary",
+        });
+        primaryhierarchy = hierarchyfilter.map((item) => item.employeename[0])
+          ? hierarchyfilter.map((item) => item.employeename[0])
+          : [];
+
+        hierarchyfilter1 = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: "Secondary",
+        });
+        secondaryhierarchy = hierarchyfilter1.map(
+          (item) => item.employeename[0]
+        )
+          ? hierarchyfilter1.map((item) => item.employeename[0])
+          : [];
+
+        hierarchyfilter2 = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: "Tertiary",
+        });
+        tertiaryhierarchy = hierarchyfilter2.map((item) => item.employeename[0])
+          ? hierarchyfilter2.map((item) => item.employeename[0])
+          : [];
+
+        resulted = result
+          .map((userObj) => {
+            const matchingHierarchy = hierarchyDefault.find(
+              (hierarchyObj) =>
+                hierarchyObj.employeename[0] == userObj.companyname
+            );
+            return {
+              shiftmode: userObj.shiftmode ,
+        userid: userObj.userid,
+        shiftname: userObj.shiftname,
+        company: userObj.company,
+        branch: userObj.branch,
+        unit: userObj.unit,
+        team: userObj.team,
+        empname: userObj.empname,
+          companyname: userObj.empname,
+        empcode: userObj.empcode,
+        date: userObj.date,
+        firstclaim: userObj.firstclaim,
+        lastclaim: userObj.lastclaim,
+        clockouttime: userObj.clockouttime,
+        clockouttime: userObj.clockouttime,
+        firstworktook: userObj.firstworktook,
+        lastworktook: userObj.lastworktook,
+              level: matchingHierarchy ? matchingHierarchy.level : "",
+              control: matchingHierarchy ? matchingHierarchy.control : "",
+
+            };
+          })
+          .filter((data) => hierarchyMap.includes(data.companyname));
+      }
+
+      if (
+        req.body.hierachy === "allhierarchy" &&
+        (listpageaccessmode === "Hierarchy Based" ||
+          listpageaccessmode === "Overall")
+      ) {
+        hierarchySecond = await Hirerarchi.find(
+          {},
+          { employeename: 1, supervisorchoose: 1, level: 1, control: 1 }
+        );
+
+
+        // let sectorFinal = req.body.sector == "all"
+        //   ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+        // hierarchyDefault = await Hirerarchi.find({
+        //   supervisorchoose: req.body.username,
+        //   level: { $in: sectorFinal },
+
+        // });
+
+
+        let sectorFinal = req.body.sector == "all"
+          ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+        let FirstSuphierarchyDefaultLevel = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+        }, { level: 1 });
+
+        FirstSuphierarchyDefaultLevel = req.body.sector == "all" ? FirstSuphierarchyDefaultLevel.map(item => item.level) : [req.body.sector]
+
+        hierarchyDefault = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: { $in: FirstSuphierarchyDefaultLevel },
+        });
+
+        let answerDef = hierarchyDefault
+          .map((data) => data.employeename)
+          .flat();
+
+        function findEmployeesRecursive(
+          currentSupervisors,
+          processedSupervisors,
+          result
+        ) {
+          const filteredData = hierarchySecond.filter((item) =>
+            item.supervisorchoose.some(
+              (supervisor) =>
+                currentSupervisors.includes(supervisor) &&
+                FirstSuphierarchyDefaultLevel.includes(item.level) &&
+                !processedSupervisors.has(supervisor)
+            )
+          );
+
+          if (filteredData.length === 0) {
+            return result;
+          }
+
+          const newEmployees = filteredData.reduce((employees, item) => {
+            employees.push(...item.employeename);
+            processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+            return employees;
+          }, []);
+
+          const uniqueNewEmployees = [...new Set(newEmployees)];
+          result = [...result, ...filteredData];
+
+          return findEmployeesRecursive(
+            uniqueNewEmployees,
+            processedSupervisors,
+            result
+          );
+        }
+
+        const processedSupervisors = new Set();
+        const filteredOverallItem = findEmployeesRecursive(
+          answerDef,
+          processedSupervisors,
+          []
+        );
+        let answerDeoverall = filteredOverallItem
+          .filter((data) =>
+            FirstSuphierarchyDefaultLevel.includes(data.level)
+          )
+          .map((item) => item.employeename[0]);
+
+        resultedTeam = result
+          .map((userObj) => {
+            const matchingHierarchycontrol = filteredOverallItem.find(
+              (hierarchyObj) =>
+                hierarchyObj.employeename[0] == userObj.companyname
+            );
+            return {
+             shiftmode: userObj.shiftmode ,
+        userid: userObj.userid,
+        shiftname: userObj.shiftname,
+        company: userObj.company,
+        branch: userObj.branch,
+        unit: userObj.unit,
+        team: userObj.team,
+        empname: userObj.empname,
+        companyname: userObj.empname,
+        empcode: userObj.empcode,
+        date: userObj.date,
+        firstclaim: userObj.firstclaim,
+        lastclaim: userObj.lastclaim,
+        clockouttime: userObj.clockouttime,
+        clockouttime: userObj.clockouttime,
+        firstworktook: userObj.firstworktook,
+        lastworktook: userObj.lastworktook,
+              level: matchingHierarchycontrol ? matchingHierarchycontrol.level : "",
+              control: matchingHierarchycontrol ? matchingHierarchycontrol.control : "",
+            };
+          })
+          .filter((data) => answerDeoverall.includes(data.companyname));
+
+
+
+      }
+
+      //my + all hierarchy list dropdown
+
+      if (
+        req.body.hierachy === "myallhierarchy" &&
+        (listpageaccessmode === "Hierarchy Based" ||
+          listpageaccessmode === "Overall")
+      ) {
+        hierarchySecond = await Hirerarchi.find(
+          {},
+          { employeename: 1, supervisorchoose: 1, level: 1, control: 1 }
+        );
+
+        let sectorFinal = req.body.sector == "all"
+          ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+        let FirstSuphierarchyDefaultLevel = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+        }, { level: 1 });
+        FirstSuphierarchyDefaultLevel = req.body.sector == "all" ? FirstSuphierarchyDefaultLevel.map(item => item.level) : [req.body.sector]
+
+        hierarchyDefault = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: { $in: FirstSuphierarchyDefaultLevel },
+        });
+console.log(result.length,"result")
+        let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+        function findEmployeesRecursive(
+          currentSupervisors,
+          processedSupervisors,
+          result
+        ) {
+          const filteredData = hierarchySecond.filter((item) =>
+            item.supervisorchoose.some(
+              (supervisor) =>
+                currentSupervisors.includes(supervisor) &&
+                FirstSuphierarchyDefaultLevel.includes(item.level) &&
+                !processedSupervisors.has(supervisor)
+            )
+          );
+
+          if (filteredData.length === 0) {
+            return result;
+          }
+
+          const newEmployees = filteredData.reduce((employees, item) => {
+            employees.push(...item.employeename);
+            processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+            return employees;
+          }, []);
+
+          const uniqueNewEmployees = [...new Set(newEmployees)];
+          result = [...result, ...filteredData];
+
+          return findEmployeesRecursive(
+            uniqueNewEmployees,
+            processedSupervisors,
+            result
+          );
+        }
+
+        const processedSupervisors = new Set();
+        const filteredOverallItem = findEmployeesRecursive(
+          [req.body.username],
+          processedSupervisors,
+          []
+        );
+        let answerDeoverall = filteredOverallItem
+          .filter((data) =>
+            FirstSuphierarchyDefaultLevel.includes(data.level)
+          )
+          .map((item) => item.employeename[0]);
+
+        filteredoverall = result
+          .map((userObj) => {
+            const matchingHierarchycontrol = filteredOverallItem.find(
+              (hierarchyObj) =>
+                hierarchyObj.employeename[0] == userObj.companyname
+            );
+            return {
+              shiftmode: userObj.shiftmode ,
+        userid: userObj.userid,
+        shiftname: userObj.shiftname,
+        company: userObj.company,
+        branch: userObj.branch,
+        unit: userObj.unit,
+        team: userObj.team,
+        empname: userObj.empname,
+        companyname: userObj.empname,
+        
+        empcode: userObj.empcode,
+        date: userObj.date,
+        firstclaim: userObj.firstclaim,
+        lastclaim: userObj.lastclaim,
+        clockouttime: userObj.clockouttime,
+        clockouttime: userObj.clockouttime,
+        firstworktook: userObj.firstworktook,
+        lastworktook: userObj.lastworktook,
+              level: matchingHierarchycontrol ? matchingHierarchycontrol.level : "",
+              control: matchingHierarchycontrol ? matchingHierarchycontrol.control : "",
+            };
+          })
+          .filter((data) => answerDeoverall.includes(data.companyname));
+
+
+ }
+
+      if (listpageaccessmode === "Reporting to Based") {
+        reportingtobaseduser = result.map((userObj) => {
+          return {
+           shiftmode: userObj.shiftmode ,
+        userid: userObj.userid,
+        shiftname: userObj.shiftname,
+        company: userObj.company,
+        branch: userObj.branch,
+        unit: userObj.unit,
+        team: userObj.team,
+        empname: userObj.empname,
+          companyname: userObj.empname,
+        empcode: userObj.empcode,
+        date: userObj.date,
+        firstclaim: userObj.firstclaim,
+        lastclaim: userObj.lastclaim,
+        clockouttime: userObj.clockouttime,
+        clockouttime: userObj.clockouttime,
+        firstworktook: userObj.firstworktook,
+        lastworktook: userObj.lastworktook,
+          
+            level: "",
+            control: "",
+          };
+        });
+      }
+
+    //  console.log(filteredoverall,"filteredoverall")
+      let finalsupervisor = req.body.hierachy == "myhierarchy" ? resulted?.map(Data => Data?.companyname) : req.body.hierachy == "allhierarchy" ? resultedTeam?.map(Data => Data?.companyname) : filteredoverall?.map(Data => Data?.companyname)
+
+      const restrictTeam = await Hirerarchi.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                supervisorchoose: { $in: finalsupervisor } // Matches if supervisorchoose field has a value in finalsupervisor
+              },
+              {
+                employeename: { $in: finalsupervisor }     // Matches if employeename field has a value in finalsupervisor
+              }
+            ],
+            level: { $in: levelFinal } // Matches if level field has a value in levelFinal
+          },
+        },
+        {
+          $lookup: {
+            from: "reportingheaders",
+            let: {
+              teamControlsArray: {
+                $ifNull: ["$pagecontrols", []]
+              }
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $in: [
+                          "$name",
+                          "$$teamControlsArray"
+                        ]
+                      }, // Check if 'name' is in 'teamcontrols' array
+                      {
+                        $in: [
+                          req?.body?.pagename,
+                          "$reportingnew" // Check if 'menuteamloginstatus' is in 'reportingnew' array
+                        ]
+                      } // Additional condition for reportingnew array
+                    ]
+                  }
+                }
+              }
+            ],
+            as: "reportData" // The resulting matched documents will be in this field
+          }
+        },
+        {
+          $project: {
+            supervisorchoose: 1,
+            employeename: 1,
+            reportData: 1
+          }
+        }
+      ]);
+      let restrictListTeam = restrictTeam?.filter(data => data?.reportData?.length > 0)?.flatMap(Data => Data?.employeename)
+      // console.log(restrictListTeam,restrictTeam, resultedTeam, "restrictListTeam")
+      resultAccessFilterHierarchy = req.body.hierachy === "myhierarchy" ? resulted : req.body.hierachy === "allhierarchy" ? resultedTeam : filteredoverall;
+      resultAccessFilter = restrictListTeam?.length > 0 ? resultAccessFilterHierarchy?.filter(data => restrictListTeam?.includes(data?.companyname)) : [];
+
+
+   return res.status(200).json({
+        hierarchyfirstlevel,
+        isDayPointsCreated,
+        filteredoverallsectorall,
+        resultAccessFilterHierarchy: resultAccessFilterHierarchy.length,
+        resultAccessFilter,
+      });
+ 
+    } catch (err) {
+      console.log(err,"errrteam")
+      return next(new ErrorHandler("Records not found!", 404));
+    }
+
+  }
+);
 
 
 

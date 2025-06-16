@@ -228,7 +228,8 @@ productionRoute.route("/productionoriginallastthree").get(productionOriginalLast
 
 //  production upload backend route
 const {
-  getOverallAttendanceBasedClaim,getAllProductionUploadFilterUsersFirstlastclaim,getIndividualAttendanceBasedClaim,
+  getOverallAttendanceBasedClaim,getAllProductionUploadFilterUsersFirstlastclaim,getIndividualAttendanceBasedClaim,getAllTeamAttendanceBasedClaim,
+  getAllHierarchyListAttendanceBasedClaim,
   getAllProductionUploadFilenames, productionDayCategoryIdFilter, bulkProductionOrgUpdateCategorySubcategory,
   bulkDeleteUnitRateUnallot, updateBulkDatasUnitandFlag, updateBulkDatasUnitandSection, updateBulkDatasFlagOnly,
   updateBulkDatasUnitOnly, getProductionUploadDatasById, undoFieldName, productionUploadCheckMismatchPresentFilter,
@@ -244,6 +245,8 @@ const {
 productionRoute.route("/productionuploads").get(getAllProductionUpload);
 productionRoute.route("/overallattendancebasedclaim").post(getOverallAttendanceBasedClaim);
 productionRoute.route("/individualattendancebasedclaim").post(getIndividualAttendanceBasedClaim);
+productionRoute.route("/teamattendancebasedclaim").post(getAllTeamAttendanceBasedClaim);
+productionRoute.route("/hierarchyteamattendancebasedclaim").post(getAllHierarchyListAttendanceBasedClaim);
 productionRoute.route("/productionuploadfirstlastclaim").post(getAllProductionUploadFilterUsersFirstlastclaim);
 
 productionRoute.route("/productionuploadfilenameonlybulkdownload").post(getAllProductionUploadFilenamesonlyBulkDownload);

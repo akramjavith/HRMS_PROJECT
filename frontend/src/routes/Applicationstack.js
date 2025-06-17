@@ -983,6 +983,13 @@ const IndividualProductionbaseattendance = React.lazy(() => import('../pages/pro
 const TeamProductionbaseattendance = React.lazy(() => import('../pages/production/reports/teamproductionbasedattenadance.js'));
 
 
+
+const TempOverallProductionbaseattendance = React.lazy(() => import('../pages/production/reports/tempoverallproductionbaseattendance.js'));
+const TempIndividualProductionbaseattendance = React.lazy(() => import('../pages/production/reports/tempindividualproductionbaseattendance.js'));
+const TempTeamProductionbaseattendance = React.lazy(() => import('../pages/production/reports/tempteamproductionbasedattenadance.js'));
+
+
+
 const App = () => {
   return (
     <>
@@ -2037,6 +2044,9 @@ const App = () => {
              <Route path="production/teamproductionbasedattendance" element={<TeamProductionbaseattendance />} />
 
 
+              <Route path="production/tempoverallproductionbasedattendance" element={<TempOverallProductionbaseattendance />} />
+             <Route path="production/tempindividualproductionbasedattendance" element={<TempIndividualProductionbaseattendance />} />
+             <Route path="production/tempteamproductionbasedattendance" element={<TempTeamProductionbaseattendance />} />
 
             
             

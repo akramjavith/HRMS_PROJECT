@@ -5811,13 +5811,18 @@ export const SERVICE = {
     SINGLE_TEMP_CATEGORY_TIME_LOG_: `${BASE_URL}/api/tempcategorytimelog`,
     TEMP_CATEGORY_TIME_LOG_CALCULATION: `${BASE_URL}/api/tempcategorytimelogcalculation`,
 
-
+//original
     OVERALL_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/overallattendancebasedclaim`,
     PRODUCTION_UPLOAD_FIRST_LAST_CLAIM: `${BASE_URL}/api/productionuploadfirstlastclaim`,
     INDIVIDUAL_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/individualattendancebasedclaim`,
+      TEAM_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/teamattendancebasedclaim`,
+      HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/hierarchyteamattendancebasedclaim`,
 
-TEAM_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/teamattendancebasedclaim`,
-HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/hierarchyteamattendancebasedclaim`,
+//temp
+    TEMP_OVERALL_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/tempoverallattendancebasedclaim`,
+    TEMP_INDIVIDUAL_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/tempindividualattendancebasedclaim`,
+      TEMP_TEAM_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/tempteamattendancebasedclaim`,
+      TEMP_HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/temphierarchyteamattendancebasedclaim`,
 
 
     

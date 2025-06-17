@@ -68,7 +68,7 @@ const CustomRateField = ({ value, row, column, updateRowData }) => {
 
 
 
-function Individualproductionbaseattendance() {
+function TempIndividualproductionbaseattendance() {
 
 
     const [productionbasedattendance,setProductionbasedattendance] = useState({
@@ -205,7 +205,7 @@ date:""
         if (gridRefTableImg.current) {
             domtoimage.toBlob(gridRefTableImg.current)
                 .then((blob) => {
-                    saveAs(blob, 'individualproductionbaseattendance .png');
+                    saveAs(blob, 'tempindividualproductionbaseattendance .png');
                 })
                 .catch((error) => {
                     console.error("dom-to-image error: ", error);
@@ -323,7 +323,7 @@ let res_project = []
                 date: productionbasedattendance.date,
             });
 if(res.data.users.length > 0){
-             res_project = await axios.post(SERVICE.INDIVIDUAL_ATTENDANCE_BASED_CLAIM, {
+             res_project = await axios.post(SERVICE.TEMP_INDIVIDUAL_ATTENDANCE_BASED_CLAIM, {
                 headers: {
                     Authorization: `Bearer ${auth.APIToken}`,
                 },
@@ -334,7 +334,7 @@ if(res.data.users.length > 0){
 
         }
             if(res_project.data.isDayPointsCreated  === 0){
-     setPopupContentMalert("Please Create Production Day Points");
+     setPopupContentMalert("Please Create Production Day Temp Points");
         setPopupSeverityMalert("warning");
         handleClickOpenPopupMalert();
 
@@ -666,7 +666,7 @@ if(res.data.users.length > 0){
             <br />
 
             {/* ****** Table Start ****** */}
-            {isUserRoleCompare?.includes("lindividualproductionbaseattendance") && (
+            {isUserRoleCompare?.includes("ltempindividualproductionbaseattendance") && (
                 <>
                     <Box sx={userStyle.container}>
                         {/* ******************************************************EXPORT Buttons****************************************************** */}
@@ -703,7 +703,7 @@ if(res.data.users.length > 0){
                             </Grid>
                             <Grid item md={8} xs={12} sm={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                 <Box>
-                                    {isUserRoleCompare?.includes("excelindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("exceltempindividualproductionbaseattendance") && (
                                         <>
                                             <Button onClick={(e) => {
                                                 setIsFilterOpen(true)
@@ -711,7 +711,7 @@ if(res.data.users.length > 0){
                                             }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes("csvindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("csvtempindividualproductionbaseattendance") && (
                                         <>
                                             <Button onClick={(e) => {
                                                 setIsFilterOpen(true)
@@ -719,7 +719,7 @@ if(res.data.users.length > 0){
                                             }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes("printindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("printtempindividualproductionbaseattendance") && (
                                         <>
                                             <Button sx={userStyle.buttongrp} onClick={handleprint}>
                                                 &ensp;
@@ -728,7 +728,7 @@ if(res.data.users.length > 0){
                                             </Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes("pdfindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("pdftempindividualproductionbaseattendance") && (
                                         <>
                                             <Button
                                                 sx={userStyle.buttongrp}
@@ -741,7 +741,7 @@ if(res.data.users.length > 0){
                                             </Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes("imageindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("imagetempindividualproductionbaseattendance") && (
                                         <>
                                             <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
                                                 {" "}
@@ -901,4 +901,4 @@ if(res.data.users.length > 0){
     );
 }
 
-export default Individualproductionbaseattendance;
+export default TempIndividualproductionbaseattendance;

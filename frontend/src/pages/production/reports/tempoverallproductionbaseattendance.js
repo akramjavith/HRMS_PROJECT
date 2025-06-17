@@ -68,7 +68,7 @@ const CustomRateField = ({ value, row, column, updateRowData }) => {
 
 
 
-function Individualproductionbaseattendance() {
+function TempOverallproductionbaseattendance() {
 
 
     const [productionbasedattendance,setProductionbasedattendance] = useState({
@@ -205,7 +205,7 @@ date:""
         if (gridRefTableImg.current) {
             domtoimage.toBlob(gridRefTableImg.current)
                 .then((blob) => {
-                    saveAs(blob, 'individualproductionbaseattendance .png');
+                    saveAs(blob, 'tempoverallproductionbaseattendance .png');
                 })
                 .catch((error) => {
                     console.error("dom-to-image error: ", error);
@@ -323,18 +323,17 @@ let res_project = []
                 date: productionbasedattendance.date,
             });
 if(res.data.users.length > 0){
-             res_project = await axios.post(SERVICE.INDIVIDUAL_ATTENDANCE_BASED_CLAIM, {
+             res_project = await axios.post(SERVICE.TEMP_OVERALL_ATTENDANCE_BASED_CLAIM, {
                 headers: {
                     Authorization: `Bearer ${auth.APIToken}`,
                 },
                 fromdate: productionbasedattendance.date,
-                users:res.data.users,
-                companyname:isUserRoleAccess?.companyname
+                users:res.data.users
             });
 
         }
-            if(res_project.data.isDayPointsCreated  === 0){
-     setPopupContentMalert("Please Create Production Day Points");
+        if(res_project.data.isDayPointsCreated  === 0){
+     setPopupContentMalert("Please Create Production Day Temp Points");
         setPopupSeverityMalert("warning");
         handleClickOpenPopupMalert();
 
@@ -357,10 +356,13 @@ if(res.data.users.length > 0){
             });
 
             setProjmaster(itemsWithSerialNumber);
-
-
-            setProjectCheck(false);
+              setProjectCheck(false);
         }
+
+
+
+
+          
         } catch (err) { setProjectCheck(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
     };
 
@@ -603,9 +605,17 @@ if(res.data.users.length > 0){
         getapi();
     }, []);
 
+
+
+
+
+
+
+
+
     return (
         <Box>
-            <Headtitle title={"Individual Production Base Attendance"} />
+            <Headtitle title={"Temp Production Base Attendance"} />
             {/* ****** Header Content ****** */}
             <PageHeading
                 title="Production First Claim and Last Claim Timing"
@@ -619,7 +629,7 @@ if(res.data.users.length > 0){
             <>
                 <Box sx={userStyle.selectcontainer}>
                     <Grid item xs={8}>
-                        <Typography sx={userStyle.importheadtext}>Individual Production Base Attendance</Typography>
+                        <Typography sx={userStyle.importheadtext}>Temp Production Base Attendance</Typography>
                     </Grid>
                     <>
                         <br />
@@ -666,12 +676,12 @@ if(res.data.users.length > 0){
             <br />
 
             {/* ****** Table Start ****** */}
-            {isUserRoleCompare?.includes("lindividualproductionbaseattendance") && (
+            {isUserRoleCompare?.includes("ltempoverallproductionbaseattendance") && (
                 <>
                     <Box sx={userStyle.container}>
                         {/* ******************************************************EXPORT Buttons****************************************************** */}
                         <Grid item xs={8}>
-                            <Typography sx={userStyle.importheadtext}>Individual Production Base Attendance List</Typography>
+                            <Typography sx={userStyle.importheadtext}>Temp Production Base Attendance List</Typography>
                         </Grid>
                         <Grid container spacing={2} style={userStyle.dataTablestyle}>
                             <Grid item md={2} xs={12} sm={12}>
@@ -703,7 +713,7 @@ if(res.data.users.length > 0){
                             </Grid>
                             <Grid item md={8} xs={12} sm={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                 <Box>
-                                    {isUserRoleCompare?.includes("excelindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("exceltempoverallproductionbaseattendance") && (
                                         <>
                                             <Button onClick={(e) => {
                                                 setIsFilterOpen(true)
@@ -711,7 +721,7 @@ if(res.data.users.length > 0){
                                             }} sx={userStyle.buttongrp}><FaFileExcel />&ensp;Export to Excel&ensp;</Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes("csvindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("csvtempoverallproductionbaseattendance") && (
                                         <>
                                             <Button onClick={(e) => {
                                                 setIsFilterOpen(true)
@@ -719,7 +729,7 @@ if(res.data.users.length > 0){
                                             }} sx={userStyle.buttongrp}><FaFileCsv />&ensp;Export to CSV&ensp;</Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes("printindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("printtempoverallproductionbaseattendance") && (
                                         <>
                                             <Button sx={userStyle.buttongrp} onClick={handleprint}>
                                                 &ensp;
@@ -728,7 +738,7 @@ if(res.data.users.length > 0){
                                             </Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes("pdfindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("pdftempoverallproductionbaseattendance") && (
                                         <>
                                             <Button
                                                 sx={userStyle.buttongrp}
@@ -741,7 +751,7 @@ if(res.data.users.length > 0){
                                             </Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes("imageindividualproductionbaseattendance") && (
+                                    {isUserRoleCompare?.includes("imagetempoverallproductionbaseattendance") && (
                                         <>
                                             <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
                                                 {" "}
@@ -901,4 +911,4 @@ if(res.data.users.length > 0){
     );
 }
 
-export default Individualproductionbaseattendance;
+export default TempOverallproductionbaseattendance;

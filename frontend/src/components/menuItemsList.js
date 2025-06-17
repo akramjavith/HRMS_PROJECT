@@ -2621,6 +2621,21 @@ export const menuItems = [
                 url: "/production/tempproductionreviewew",
                 access: true,
               },
+                {
+                title: "Temp Overall Production Base Attendance",
+                dbname: "menutempoverallproductionbaseattendance",
+                url: "/production/tempoverallproductionbasedattendance",
+              },
+                {
+                title: "Temp Individual Production Base Attendance",
+                dbname: "menutempindividualproductionbaseattendance",
+                url: "/production/tempindividualproductionbasedattendance",
+              },
+                 {
+                title: "Temp Team Production Base Attendance",
+                dbname: "menutempteamproductionbaseattendance",
+                url: "/production/tempteamproductionbasedattendance",
+              },
             ],
           },
         ],

@@ -29,7 +29,17 @@ import HomeMaintenance from './HomeMaintenance';
 
 const Homelayout = () => {
   const { auth } = useContext(AuthContext);
-  const { isUserRoleAccess, isUserRoleCompare, isAssignBranch } = useContext(UserRoleAccessContext);
+  const { isUserRoleAccess, isUserRoleCompare, isAssignBranch ,listPageAccessMode} = useContext(UserRoleAccessContext);
+
+   let listpageaccessby =
+        listPageAccessMode?.find(
+            (data) =>
+                data.modulename === "Setup" &&
+                data.submodulename === "Team Dashboard" &&
+                data.mainpagename === "" &&
+                data.subpagename === "" &&
+                data.subsubpagename === ""
+        )?.listpageaccessmode || "Overall";
 
   const links1 = [
     ...(isUserRoleCompare?.includes('lquickactions') && isUserRoleCompare?.includes('lapplyleave')
@@ -136,51 +146,61 @@ const Homelayout = () => {
     company: data.company,
     unit: data.unit,
   }));
+
+
+
+
+
+
+
+
   const fetchEmployee = async () => {
     try {
-      let [res_Employee, res_leave, res_notice, res_relieve, res_notcheckin, res_News, res_candidate, res_upcoming] = await Promise.all([
+
+           let res= await axios.post(
+                  SERVICE.HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM,
+                  {
+                      headers: {
+                          Authorization: `Bearer ${auth.APIToken}`,
+                      },
+                      hierachy: "myallhierarchy",
+                      sector: "all",
+                      username: isUserRoleAccess.companyname,
+                      pagename: "menuteamdashboard",
+                      listpageaccessmode: listpageaccessby,
+                  }
+              );
+if(res.data.resultAccessFilter.length > 0){
+const hierarchyempnames = res.data.resultAccessFilter
+      let [res_Employee, res_leave, res_notcheckin, res_News, res_candidate, res_upcoming] = await Promise.all([
         isUserRoleCompare?.includes('ltotalemployee') && isUserRoleCompare?.includes('lliveemployeelist')
-          ? axios.post(SERVICE.EMPLOYEE_HOME_COUNT, {
+
+          ? axios.post(SERVICE.EMPLOYEE_HOME_COUNT_TEAM, {
               headers: {
                 Authorization: `Bearer ${auth.APIToken}`,
               },
               // pageName: 'Employee',
+              hierarchyempnames:hierarchyempnames,
               assignbranch: accessbranch,
             })
           : Promise.resolve([]),
 
         isUserRoleCompare?.includes('ltodayleave')
-          ? axios.post(SERVICE.LEAVE_HOME, {
+          ? axios.post(SERVICE.APPLY_LEAVE_HOME_TEAM, {
               headers: {
                 Authorization: `Bearer ${auth.APIToken}`,
               },
+               hierarchyempnames:hierarchyempnames,
               assignbranch: accessbranch,
             })
           : Promise.resolve([]),
-
-        isUserRoleCompare?.includes('lnoticeperiodemp')
-          ? axios.post(SERVICE.NOTICEPERIODAPPLYBYASSIGNBRANCH, {
-              headers: {
-                Authorization: `Bearer ${auth.APIToken}`,
-              },
-              assignbranch: accessbranch,
-            })
-          : Promise.resolve([]),
-
-        isUserRoleCompare?.includes('lreleiveemployee') && isUserRoleCompare?.includes('ldeactivateemployeeslist')
-          ? axios.post(SERVICE.RELEIVE_HOME_COUNT, {
-              headers: {
-                Authorization: `Bearer ${auth.APIToken}`,
-              },
-              assignbranch: accessbranch,
-            })
-          : Promise.resolve([]),
-
+    
         isUserRoleCompare?.includes('lnotcheckinemp')
-          ? axios.post(SERVICE.NOTCLOCKIN_HOME_COUNT, {
+          ? axios.post(SERVICE.NOTCLOCKIN_HOME_COUNT_TEAM, {
               headers: {
                 Authorization: `Bearer ${auth.APIToken}`,
               },
+                hierarchyempnames:hierarchyempnames,
               assignbranch: accessbranch,
             })
           : Promise.resolve([]),
@@ -190,6 +210,7 @@ const Homelayout = () => {
               headers: {
                 Authorization: `Bearer ${auth.APIToken}`,
               },
+               
               assignbranch: accessbranch,
             })
           : Promise.resolve([]),
@@ -213,18 +234,16 @@ const Homelayout = () => {
             })
           : Promise.resolve([]),
       ]);
-      let ans = res_notice?.data?.noticeperiodapply.filter((data) => data.approvedStatus === 'true' && data.cancelstatus === false && data.continuestatus === false);
       const notcheckinuser = Number(res_notcheckin?.data?.user);
       const applyleavecount = Number(res_leave?.data?.applyleaves);
       console.log(notcheckinuser, applyleavecount, res_Employee?.data?.allusers, 'couintchek');
-      setNoticeCount(ans);
-      setReleiveEmp(res_relieve ? res_relieve?.data?.user : 0);
-      setLeaveCount(res_leave?.data?.applyleaves);
+   
       setEmployees(res_Employee ? res_Employee?.data?.allusers : 0);
       setNotClockIn(Number(res_Employee?.data?.allusers) - (notcheckinuser + applyleavecount));
       setNewsEvents(res_News?.data?.scheduleevent.filter((item, index) => index <= 5));
       setCandidate(res_candidate?.data?.candidates);
       setUpcomingInterview(res_upcoming?.data?.candidates);
+    }
     } catch (err) {
       console.log(err, 'errr');
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -233,22 +252,6 @@ const Homelayout = () => {
 
   //get all data.
   const fetchMeetingfilter = async () => {
-    //         try {
-
-    //             (isUserRoleCompare?.includes("ltodaymeeting") && isUserRoleCompare?.includes("lschedulemeetingfilter"))     ?
-    //             let res_employee = await axios.post(SERVICE.SCHEDULEMEETINGFILTERFPAGE, {
-    //                 headers: {
-    //                     Authorization: `Bearer ${auth.APIToken}`,
-    //                 },
-
-    //                 role: isUserRoleAccess.role,
-    //                 companyname: isUserRoleAccess.companyname,
-    //                 selectedfilter: todaymeeting.todaymeet,
-    //             })
-    // :Promise.resolve([]),
-
-    //             setMeetingArray(res_employee?.data?.filteredschedulemeeting.filter((item, index) => index <= 5));
-    //         }
     try {
       let res_employee = [];
 
@@ -304,7 +307,7 @@ const Homelayout = () => {
     <>
       <Box sx={{ marginTop: '-32px' }}>
         <Box sx={{ heigth: 'maxcontent' }}>
-          <Grid container spacing={2} sx={{ alignItems: 'end', justifyContent: 'center', marginTop: '-98px' }}>
+          <Grid container spacing={2} sx={{ alignItems: 'end',  marginTop: '-98px' }}>
             {isUserRoleCompare?.includes('ltotalemployee') && isUserRoleCompare?.includes('lliveemployeelist') && (
               <Grid item md={2.4} xs={12} sm={6}>
                 <Box sx={userStyle.taskboxeshome}>
@@ -349,51 +352,6 @@ const Homelayout = () => {
               </Grid>
             )}
 
-            {isUserRoleCompare?.includes('lnoticeperiodemp') && (
-              <Grid item md={2.4} xs={12} sm={6}>
-                <Box sx={userStyle.taskboxeshome}>
-                  <Link to="/noticeperiodapprovelist" target="_blank" style={{ textDecoration: 'none', color: '#000000' }}>
-                    <Grid container>
-                      <Grid item md={8} xs={8} sm={8}>
-                        <Box sx={{ height: '40px' }}>
-                          <Typography sx={{ fontSize: '12.5px', fontWeight: 400 }}> Notice Period Emp</Typography>
-                        </Box>
-                        <span style={{ lineHeight: 1, fontSize: '25px', fontWeight: 700 }}>{noticeCount ? noticeCount.length : 0}</span>
-                        {employees === 0 ? null : <span style={{ fontSize: '20px' }}>/{employees}</span>}
-                      </Grid>
-                      <Grid item md={4} xs={4} sm={4}>
-                        <Box sx={userStyle.totaltaskiconnotice}>
-                          <TextSnippetOutlinedIcon style={{ fontSize: '1.9rem' }} />
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Link>
-                </Box>
-              </Grid>
-            )}
-
-            {isUserRoleCompare?.includes('lreleiveemployee') && isUserRoleCompare?.includes('ldeactivateemployeeslist') && (
-              <Grid item md={2.4} xs={12} sm={6}>
-                <Box sx={userStyle.taskboxeshome}>
-                  <Link to="/updatepages/deactivateemployeeslist" target="_blank" style={{ textDecoration: 'none', color: '#000000' }}>
-                    <Grid container>
-                      <Grid item md={8} xs={8} sm={8}>
-                        <Box sx={{ height: '40px' }}>
-                          <Typography sx={{ fontSize: '12.5px', fontWeight: 400 }}> Relieve Employee</Typography>
-                        </Box>
-                        <span style={{ lineHeight: 1, fontSize: '25px', fontWeight: 700 }}>{releiveEmp}</span>
-                        {employees === 0 && releiveEmp === 0 ? null : <span style={{ fontSize: '20px' }}>/{employees + releiveEmp}</span>}
-                      </Grid>
-                      <Grid item md={4} xs={4} sm={4}>
-                        <Box sx={userStyle.totaltaskiconrelieve}>
-                          <PersonOffOutlinedIcon style={{ fontSize: '1.9rem' }} />
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Link>
-                </Box>
-              </Grid>
-            )}
 
             {isUserRoleCompare?.includes('lnotcheckinemp') && (
               <Grid item md={2.4} xs={12} sm={6}>

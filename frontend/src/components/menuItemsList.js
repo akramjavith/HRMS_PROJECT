@@ -193,6 +193,18 @@ export const menuItems = [
     url: "",
     navmenu: true,
     submenu: [
+        {
+        title: "Team Dashboard",
+        dbname: "menuteamdashboard",
+        url: "/teamdashboard",
+        access: true,
+      },
+         {
+        title: "My Dashboard",
+        dbname: "menumydashboard",
+        url: "/dashboard",
+        access: true,
+      },
       {
         title: "Company",
         dbname: "menucompany",

@@ -234,44 +234,34 @@ exports.getAllApplyleaveApprovedForUserShiftRoasterAssignbranch = catchAsyncErro
 
 
 exports.getAllApplyleaveHome = catchAsyncErrors(async (req, res, next) => {
-    let applyleaves;
-    try {
-        const currentDate = new Date();
-        const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+  let applyleaves;
+  try {
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+    const { assignbranch } = req.body;
 
-        // console.log(formattedDate, "formattedDateapp")
-        const { assignbranch } = req.body;
+    const branchFilter = assignbranch.map((branchObj) => ({
+      branch: branchObj.branch,
+      company: branchObj.company,
+      unit: branchObj.unit,
+    }));
 
-        const branchFilter = assignbranch.map((branchObj) => ({
-            branch: branchObj.branch,
-            company: branchObj.company,
-            unit: branchObj.unit
-        }));
+    let Query = { $or: branchFilter };
 
-        let Query = { $or: branchFilter };
+    let filterQuery = {
+      status: 'Approved',
+      date: { $in: formattedDate },
+      ...Query,
+    };
+    applyleaves = await Applyleave.countDocuments(filterQuery, { date: 1 });
+  } catch (err) {
+    return next(new ErrorHandler('Records not found!', 404));
+  }
 
-        let filterQuery = {
-            status: "Approved",
-            date: { $in: formattedDate },
-            ...Query
-        }
-
-
-        applyleaves = await Applyleave.countDocuments(filterQuery, { date: 1 })
-        // console.log(applyleaves, 'uihi')
-
-    } catch (err) {
-        return next(new ErrorHandler("Records not found!", 404));
-    }
-    // if (!applyleaves) {
-    //     return next(new ErrorHandler('Applyleave not found!', 404));
-    // }
-    return res.status(200).json({
-        applyleaves
-    });
-})
-
-
+  return res.status(200).json({
+    applyleaves,
+  });
+});
 
 exports.getAllApplyleaveHomeList = catchAsyncErrors(async (req, res, next) => {
   let applyleaves;
@@ -305,6 +295,7 @@ exports.getAllApplyleaveHomeList = catchAsyncErrors(async (req, res, next) => {
     applyleaves,
   });
 });
+
 
 
 exports.getAllApplyleaveFilterHome = catchAsyncErrors(async (req, res, next) => {

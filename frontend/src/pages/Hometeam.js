@@ -22,7 +22,7 @@ import moment from 'moment-timezone';
 import LoadingButton from '@mui/lab/LoadingButton';
 import BlockIcon from '@mui/icons-material/Block';
 import WarningIcon from '@mui/icons-material/Warning';
-import Homelayout from './Homelayout';
+import Homelayout from './Homelayoutteam.js';
 import HomeBirthday from './HomeBirthday';
 import { AUTH, BASE_URL } from '../services/Authservice';
 import Servertime from '../components/Servertime';

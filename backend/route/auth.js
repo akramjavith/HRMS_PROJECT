@@ -281,4 +281,16 @@ authRoute.route("/getalluseractivitystorage").get(getAllUserActivityStorage);
 authRoute.route("/dynamicqueryuseractivitycontroller").post(dynamicQueryUserActivityController);
 authRoute.route("/dynamicqueryuseractivityscreeenshotcontroller").post(dynamicQueryUserActivityScreenshotController);
 
+
+
+const { getDashboardtHierarchyTeam,getUserWithStatusHomeCountTeam,getAllApplyleaveHomeTeam,getAllUserHomeCountNotClockInTeam} = require("../controller/login/dashboardteamcontroller.js");
+authRoute.route("/dashboardhierarchyteam").post(getDashboardtHierarchyTeam);
+authRoute.route("/userwithstatuscountteam").post(getUserWithStatusHomeCountTeam);
+authRoute.route("/applyleavehometeam").post(getAllApplyleaveHomeTeam);
+authRoute.route("/notclockinteam").post(getAllUserHomeCountNotClockInTeam);
+
+
+
+
+
 module.exports = authRoute;

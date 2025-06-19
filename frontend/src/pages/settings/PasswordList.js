@@ -71,38 +71,48 @@ function PasswordList() {
   const [documentsList, setDocumentsList] = useState([]);
   const [documentsListForFilter, setDocumentsListForFilter] = useState([]);
   const { isUserRoleCompare, isUserRoleAccess, allUsersData, allTeam, buttonStyles, isAssignBranch, pageName, setPageName } = useContext(UserRoleAccessContext);
-  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
-    ? isAssignBranch?.map((data) => ({
-        branch: data.branch,
-        company: data.company,
-        unit: data.unit,
-        branchaddress: data?.branchaddress,
-      }))
-    : isAssignBranch
-        ?.filter((data) => {
-          let fetfinalurl = [];
-          if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.subsubpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.subpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.mainpagenameurl;
-          } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
-            fetfinalurl = data.submodulenameurl;
-          } else if (data?.modulenameurl?.length !== 0) {
-            fetfinalurl = data.modulenameurl;
-          } else {
-            fetfinalurl = [];
-          }
-          const remove = [window.location.pathname?.substring(1), window.location.pathname];
-          return fetfinalurl?.some((item) => remove?.includes(item));
-        })
-        ?.map((data) => ({
-          branch: data.branch,
-          company: data.company,
-          unit: data.unit,
-          branchaddress: data?.branchaddress,
-        }));
+  
+  
+  
+  
+  // const accessbranch = isUserRoleAccess?.role?.includes('Manager')
+  //   ? isAssignBranch?.map((data) => ({
+  //       branch: data.branch,
+  //       company: data.company,
+  //       unit: data.unit,
+  //       branchaddress: data?.branchaddress,
+  //     }))
+  //   : isAssignBranch
+  //       ?.filter((data) => {
+  //         let fetfinalurl = [];
+  //         if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
+  //           fetfinalurl = data.subsubpagenameurl;
+  //         } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
+  //           fetfinalurl = data.subpagenameurl;
+  //         } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
+  //           fetfinalurl = data.mainpagenameurl;
+  //         } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.submodulenameurl?.includes(window.location.pathname)) {
+  //           fetfinalurl = data.submodulenameurl;
+  //         } else if (data?.modulenameurl?.length !== 0) {
+  //           fetfinalurl = data.modulenameurl;
+  //         } else {
+  //           fetfinalurl = [];
+  //         }
+  //         const remove = [window.location.pathname?.substring(1), window.location.pathname];
+  //         return fetfinalurl?.some((item) => remove?.includes(item));
+  //       })
+  //       ?.map((data) => ({
+  //         branch: data.branch,
+  //         company: data.company,
+  //         unit: data.unit,
+  //         branchaddress: data?.branchaddress,
+  //       }));
+
+         const accessbranch = isAssignBranch?.map((data) => ({
+    branch: data.branch,
+    company: data.company,
+    unit: data.unit,
+  }));
 
   const [singleDoc, setSingleDoc] = useState({});
   const [password, setPassword] = useState({

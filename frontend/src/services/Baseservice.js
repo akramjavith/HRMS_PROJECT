@@ -5825,6 +5825,12 @@ export const SERVICE = {
       TEMP_HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM: `${BASE_URL}/api/temphierarchyteamattendancebasedclaim`,
 
 
+      //dashboard team controller
+
+     DASHBOARD_HIERARCHY_TEAM: `${BASE_URL}/api/dashboardhierarchyteam`,
+      EMPLOYEE_HOME_COUNT_TEAM: `${BASE_URL}/api/userwithstatuscountteam`,
+      APPLY_LEAVE_HOME_TEAM: `${BASE_URL}/api/applyleavehometeam`,
+      NOTCLOCKIN_HOME_COUNT_TEAM: `${BASE_URL}/api/notclockinteam`,
     
 
     

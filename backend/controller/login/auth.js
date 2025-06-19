@@ -24209,163 +24209,6 @@ exports.getHierarchyBasedEmployeeWorkstation = catchAsyncErrors(async (req, res,
     });
 });
 
-// exports.getUserWithStatusHomeCount = catchAsyncErrors(async (req, res, next) => {
-//     let allusers;
-//     try {
-//         const { pageName, assignbranch } = req.body;
-
-//         const branchFilter = assignbranch.map((branchObj) => ({
-//             branch: branchObj.branch,
-//             company: branchObj.company,
-//             unit: branchObj.unit
-//         }));
-// console.log(branchFilter,"branchFilter")
-//         let Query = { $or: branchFilter };
-
-//         // Define the past 3 days range
-//         const today = moment();
-//         const pastThreeAttendaysDays = [
-//             today.clone().subtract(1, "days").format("DD-MM-YYYY"),
-//             today.clone().subtract(2, "days").format("DD-MM-YYYY"),
-//             today.clone().subtract(3, "days").format("DD-MM-YYYY"),
-//         ];
-//         const pastThreeLeaveDays = [
-//             today.clone().subtract(1, "days").format("DD/MM/YYYY"),
-//             today.clone().subtract(2, "days").format("DD/MM/YYYY"),
-//             today.clone().subtract(3, "days").format("DD/MM/YYYY"),
-//         ];
-//         const pastThreeDaysISO = [
-//             today.clone().subtract(1, "days").format("YYYY-MM-DD"),
-//             today.clone().subtract(2, "days").format("YYYY-MM-DD"),
-//             today.clone().subtract(3, "days").format("YYYY-MM-DD"),
-//         ];
-//         // Fetch relevant attendance records for the past 3 days
-//         let attendance = await Attendance.find(
-//             {
-//                 date: {
-//                     $in: pastThreeAttendaysDays,
-//                 },
-//             },
-//             { date: 1, userid: 1 }
-//         ).lean();
-//         // Fetch relevant leave records
-//         let allLeaveStatus = await ApplyLeave.find(
-//             {
-//                 date: { $in: pastThreeLeaveDays },
-//             },
-//             { employeename: 1, employeeid: 1, date: 1 }
-//         ).lean();
-
-//         let holidays = await Holiday.find(
-//             {
-//                 date: { $in: pastThreeDaysISO },
-//             },
-//             { date: 1, employee: 1 }
-//         ).lean();
-
-//         let noticeperiodstatus = await Noticeperiod.find(
-//             {},
-//             {
-//                 empname: 1,
-//                 empcode: 1,
-//                 status: 1,
-//                 rejectStatus: 1,
-//                 cancelstatus: 1,
-//                 approvedStatus: 1,
-//                 continuestatus: 1,
-//                 recheckStatus: 1,
-//             }
-//         ).lean();
-
-//         // Create a map for fast lookup of attendance records
-//         const attendanceMap = attendance.reduce((acc, item) => {
-//             const userId = item.userid.toString();
-//             const date = moment(item.date, "DD-MM-YYYY").format("DD/MM/YYYY");
-//             if (!acc[userId]) {
-//                 acc[userId] = [];
-//             }
-//             acc[userId].push(date);
-//             return acc;
-//         }, {});
-
-//         // Create a map for fast lookup of leave records
-//         const leaveMap = allLeaveStatus.reduce((acc, item) => {
-//             const userKey = `${item.employeeid}_${item.employeename}`;
-//             const leaveDates = item.date.map((date) =>
-//                 moment(date, "DD/MM/YYYY").format("DD/MM/YYYY")
-//             );
-//             if (!acc[userKey]) {
-//                 acc[userKey] = [];
-//             }
-//             acc[userKey].push(...leaveDates);
-//             return acc;
-//         }, {});
-
-//         // Create a map for fast lookup of holiday records
-//         const holidayMap = holidays.reduce((acc, item) => {
-//             const date = moment(item.date).format("DD/MM/YYYY");
-//             item.employee.forEach((employee) => {
-//                 if (!acc[employee]) {
-//                     acc[employee] = [];
-//                 }
-//                 acc[employee].push(date);
-//             });
-//             return acc;
-//         }, {});
-
-
-
-//         let filterQuery = {
-//             enquirystatus: {
-//                 $nin: ["Enquiry Purpose"],
-//             },
-//             resonablestatus: {
-//                 $nin: [
-//                     "Not Joined",
-//                     "Postponed",
-//                     "Rejected",
-//                     "Closed",
-//                     "Releave Employee",
-//                     "Absconded",
-//                     "Hold",
-//                     "Terminate",
-//                 ],
-//             },
-//             ...Query,
-//         };
-
-//         if (pageName === "Employee") {
-//             filterQuery.workmode = {
-//                 $ne: "Internship",
-//             };
-//         } else if (pageName === "Internship") {
-//             filterQuery.workmode = {
-//                 $eq: "Internship",
-//             };
-//         }
-//         // Use $or to filter incomes that match any of the branch, company, and unit combinations
-//         filterQuery = {
-//             $and: [
-//                 filterQuery, // Retain previous conditions
-//                 { $or: branchFilter } // Apply branch filtering
-//             ]
-//         };
-//         allusers = await User.countDocuments(filterQuery);
-//     } catch (err) {
-//         console.log(err, "err")
-//         return next(new ErrorHandler("Records not found!", 404));
-//     }
-
-//     // if (!finalArray) {
-//     //     return next(new ErrorHandler("Users not found", 400));
-//     // }
-
-//     return res.status(200).json({
-//         // count: finalArray.length,
-//         // allusers: finalArray,
-//         allusers
-//     });
-// });
 
 
 exports.getUserWithStatusHomeCount = catchAsyncErrors(async (req, res, next) => {
@@ -24397,7 +24240,7 @@ exports.getUserWithStatusHomeCount = catchAsyncErrors(async (req, res, next) => 
     let allLeaveStatus = await ApplyLeave.find(
       {
         date: { $in: pastThreeLeaveDays },
-        status: { $nin: ['Rejected'] },
+        status: { $nin: ['Rejected', 'Cancel'] },
       },
       { employeename: 1, employeeid: 1, date: 1 }
     ).lean();
@@ -24484,32 +24327,23 @@ exports.getUserWithStatusHomeCount = catchAsyncErrors(async (req, res, next) => 
       ...Query,
     };
 
-    // if (pageName === "Employee") {
+    
     filterQuery.workmode = {
       $ne: 'Internship',
     };
-    // } else if (pageName === "Internship") {
-    //     filterQuery.workmode = {
-    //         $eq: "Internship",
-    //     };
-    // }
+   
     if (branchFilter.length > 0) {
       allusers = await User.countDocuments(filterQuery).lean();
     } else {
       allusers = [];
     }
   } catch (err) {
-    console.log(err,"err")
     return next(new ErrorHandler('Records not found!', 404));
   }
 
-  // if (!finalArray) {
-  //     return next(new ErrorHandler("Users not found", 400));
-  // }
+
 
   return res.status(200).json({
-    // count: finalArray.length,
-    // allusers: finalArray,
     allusers,
   });
 });

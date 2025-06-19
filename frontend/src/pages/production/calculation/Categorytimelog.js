@@ -321,46 +321,40 @@ function CategoryTimeLog() {
     const sendRequest = async () => {
         setPageName(!pageName)
         try {
-            //           selectedBranchFrom.map((item) =>
-            //    axios.post(SERVICE.CREATE_CATEGORY_TIME_LOG_, {
-            //         headers: {
-            //             Authorization: `Bearer ${auth.APIToken}`,
-            //         },
-            //         branch: item.value,
-            //         fromdate: String(production.fromdate),
-            //        username: String(isUserRoleAccess.companyname),
-            //         addedby: [
-            //             {
-            //                 name: String(isUserRoleAccess.companyname),
-            //                 // date: String(new Date()),
-            //             },
-            //         ],
-            //     })
-            // );
 
-            const requ = await axios.post(SERVICE.CATEGORY_TIME_LOG_CALCULATION, {
+            let res = await axios.post(SERVICE.CATEGORY_TIME_LOG_CALCULATION, {
                 headers: {
                     Authorization: `Bearer ${auth.APIToken}`,
                 },
                 branch: selectedBranchFrom.map((item) => item.value),
                 date: String(production.fromdate),
                 username: String(isUserRoleAccess.companyname),
-            })
-            console.log(requ.data.categorytimelog, "resa")
-            if (requ.data.count > 0) {
+            });
+            console.log(res.data, "resa")
+
+            if (res.data.isDayPointsCreated === 0) {
+                setPopupContentMalert("Please Create Production Day Points");
+                setPopupSeverityMalert("warning");
+                handleClickOpenPopupMalert();
+
+                setloadingdeloverall(false);
+
+            } else if (res.data.count > 0) {
                 await fetchCategoryTimeLog();
                 setPopupContent("Added Successfully");
                 setPopupSeverity("success");
                 handleClickOpenPopup();
                 setloadingdeloverall(false);
 
-            } else {
+            }
+            else {
                 setPopupContentMalert("No Data To Create");
                 setPopupSeverityMalert("warning");
                 handleClickOpenPopupMalert();
             }
 
         } catch (err) {
+            console.log(err, "erecat")
             handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
         }
     };
@@ -389,6 +383,7 @@ function CategoryTimeLog() {
             handleClickOpenPopupMalert();
         }
         else {
+            console.log("abc")
             sendRequest();
         }
     };

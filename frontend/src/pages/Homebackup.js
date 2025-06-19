@@ -138,7 +138,7 @@ const Home = () => {
                 setPasswordAlert(false);
                 setRemainingDays(daysRemaining);
                 setShowPopup(true); // Show the popup
-                handleOpenPopup(true);
+                // handleOpenPopup(true);
             }
         } catch (err) {
             handleApiError(err, setShowAlert, handleClickOpenerr);

@@ -7,6 +7,7 @@ const RolesAndResponsiblities = React.lazy(() => import('../pages/hr/RolesAndRes
 const RequestVisitorFollowupFilter = React.lazy(() => import("../pages/interactors/visitors/RequestVisitorFollowUpFilter"));
 const VisitorEnquiery = React.lazy(() => import("../pages/interactors/visitors/VisitorEnquiery"));
 const Home = React.lazy(() => import("../pages/Home"));
+const HomeTeam = React.lazy(() => import("../pages/Hometeam"));
 const Footer = React.lazy(() => import("../components/footer/footer"));
 const Branch = React.lazy(() => import("../pages/hr/Branch"));
 const Unit = React.lazy(() => import("../pages/hr/Unit"));
@@ -1011,6 +1012,7 @@ const App = () => {
 
             <Route path="appcareer/candidates/:id" element={<Candidate />} />
             <Route path="dashboard" element={<Home />} />
+            <Route path="teamdashboard" element={<HomeTeam />} />
             <Route path="branch" element={<Branch />} />
             <Route path="unit" element={<Unit />} />
             <Route path="area" element={<Area />} />

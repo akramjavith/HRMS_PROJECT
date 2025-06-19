@@ -335,9 +335,10 @@ function compareDateTimes(dateT, shiftFrom, shiftEnd) {
 
 exports.CategoryTimelogCalculation = catchAsyncErrors(async (req, res, next) => {
   try {
-     const { branch, date, username } = req.body;
-
+    const { branch, date, username } = req.body;
+console.log(date,"dataea")
     const dateObj = new Date(date);
+    let isDayPointsCreated = 0;
 
     // Extract day, month, and year components
     const day = String(dateObj.getDate()).padStart(2, "0");
@@ -352,107 +353,11 @@ exports.CategoryTimelogCalculation = catchAsyncErrors(async (req, res, next) => 
     let newDateOnePlus = currentDate.toISOString().split("T")[0];
 
     const prodDayPoints = await DayPointsUpload.findOne({ date: date }, { uploaddata: 1 });
+    isDayPointsCreated = await DayPointsUpload.countDocuments({ date: date });
 
-    const filteredDaypoints = prodDayPoints ? prodDayPoints?.uploaddata.filter((d) => branch.includes(d.branch) ) : [];
-    const userIds = [...new Set(filteredDaypoints.map((d) => d.users).flatMap((d) => d))];
-    const userProdDayTimes = [...new Set(filteredDaypoints.map((d) => d.fromtodate))]
-      .map((d) => {
-        const fromdate = d.split("$")[0].split(".")[0];
-        const todate = d.split("$")[1].split(".")[0];
-        const checkfromtotimezero = fromdate === todate;
-        return {
-          fromdate: new Date(`${fromdate}Z`),
-          todate: new Date(`${todate}Z`),
-          checkfromtotimezero: checkfromtotimezero,
-        };
-      })
-      .filter((d) => d.checkfromtotimezero == false);
-
-    const { minStart, maxEnd } = userProdDayTimes
-      .filter((d) => d.fromdate && d.todate)
-      .reduce(
-        (acc, obj) => {
-          const startTime = new Date(obj.fromdate);
-          const endTime = new Date(obj.todate);
-
-          // Update minimum start time
-          if (!acc.minStart || startTime < acc.minStart) {
-            acc.minStart = startTime;
-          }
-
-          // Update maximum end time
-          if (!acc.maxEnd || endTime > acc.maxEnd) {
-            acc.maxEnd = endTime;
-          }
-
-          return acc;
-        },
-        { minStart: null, maxEnd: null } // Proper initialization
-      );
-
-    const fromdate = String(minStart).split("0")[0].split("T")[0];
-    const fromtime = String(minStart).split("0")[0].split("T")[1];
-
-    const enddate = String(maxEnd).split("0")[0].split("T")[0];
-    const endtime = String(maxEnd).split("0")[0].split("T")[1];
-
-    const prodIndQuery = {
-      fromdate: { $gte: fromdate, $lte: enddate },
-      time: { $gte: fromtime, $lte: endtime },
-      user: {
-        $in: filteredDaypoints.flatMap((d) => d.users),
-        // ["TTS402"],
-      },
-    };
-
-    const [ timepoints, productionUploads, productionIndividuals] = await Promise.all([
-   
-      TimePoints.find({}, {}),
-      ProductionUpload.find(
-        {
-          dateobjformatdate: { $gte: minStart, $lte: maxEnd },
-          user: {
-            $in: filteredDaypoints.flatMap((d) => d.users),
-         
-          },
-        },
-        {
-          filenameupdated: 1,
-          category: 1,
-          unallotcategory: 1,
-          user: 1,
-          unallotsubcategory: 1,
-          formatteddate: 1,
-          formattedtime: 1,
-          dateobjformatdate: 1,
-        }
-      ),
-      ProducionIndividual.find(prodIndQuery, {
-        filename: 1,
-        unallotcategory: 1,
-        user: 1,
-        unallotsubcategory: 1,
-        fromdate: 1,
-        time: 1,
-        category: 1,
-        mode: 1,
-      }),
-    ]);
-    const allData = [...productionUploads, ...productionIndividuals];
-    console.log(allData.length,"alldata");
-
-
-    let productions = allData.map((item) => {
-      const userInfoShifts = filteredDaypoints.filter((d) => d.users.includes(item.user));
-
-      const userInfo = filteredDaypoints.find((d) => d.users.includes(item.user));
-      const finalcategory = item.unallotcategory ? item.unallotcategory : item?.mode == "Manual" ? item.filename : item.filenameupdated;
-      const finalsubcategory = item.unallotsubcategory ? item.unallotsubcategory : item.category;
-      const comparedate = item?.mode == "Manual" ? item.fromdate : item.formatteddate;
-      const comparetime = item?.mode == "Manual" ? convertTo24HourFormat(item.time) : item.formattedtime;
-      const dateTime = `${comparedate}T${comparetime}Z`;
-
-      let userShiftTimes = [...new Set(userInfoShifts.map((d) => d.fromtodate))]
+      const filteredDaypoints = prodDayPoints ? prodDayPoints?.uploaddata.filter((d) => branch.includes(d.branch)) : [];
+      const userIds = [...new Set(filteredDaypoints.map((d) => d.users).flatMap((d) => d))];
+      const userProdDayTimes = [...new Set(filteredDaypoints.map((d) => d.fromtodate))]
         .map((d) => {
           const fromdate = d.split("$")[0].split(".")[0];
           const todate = d.split("$")[1].split(".")[0];
@@ -465,7 +370,7 @@ exports.CategoryTimelogCalculation = catchAsyncErrors(async (req, res, next) => 
         })
         .filter((d) => d.checkfromtotimezero == false);
 
-      const { minStart, maxEnd } = userShiftTimes
+      const { minStart, maxEnd } = userProdDayTimes
         .filter((d) => d.fromdate && d.todate)
         .reduce(
           (acc, obj) => {
@@ -486,75 +391,174 @@ exports.CategoryTimelogCalculation = catchAsyncErrors(async (req, res, next) => 
           },
           { minStart: null, maxEnd: null } // Proper initialization
         );
-      const shiftfromdatetime = minStart ? `${minStart?.toISOString()?.split(".")[0]}Z` : null;
-      const shifttodatetime = maxEnd ? `${maxEnd?.toISOString()?.split(".")[0]}Z` : null;
-      // console.log(dateTime, `${shiftfromdatetime}`, `${shifttodatetime}`);
-      if (compareDateTimes(dateTime, `${shiftfromdatetime}`, `${shifttodatetime}`))
+
+      const fromdate = String(minStart).split("0")[0].split("T")[0];
+      const fromtime = String(minStart).split("0")[0].split("T")[1];
+
+      const enddate = String(maxEnd).split("0")[0].split("T")[0];
+      const endtime = String(maxEnd).split("0")[0].split("T")[1];
+
+      const prodIndQuery = {
+        fromdate: { $gte: fromdate, $lte: enddate },
+        time: { $gte: fromtime, $lte: endtime },
+        user: {
+          $in: filteredDaypoints.flatMap((d) => d.users),
+          // ["TTS402"],
+        },
+      };
+
+      const [timepoints, productionUploads, productionIndividuals] = await Promise.all([
+        TimePoints.find({}, {}),
+        ProductionUpload.find(
+          {
+            dateobjformatdate: { $gte: minStart, $lte: maxEnd },
+            user: {
+              $in: filteredDaypoints.flatMap((d) => d.users),
+            },
+          },
+          {
+            filenameupdated: 1,
+            category: 1,
+            unallotcategory: 1,
+            user: 1,
+            unallotsubcategory: 1,
+            formatteddate: 1,
+            formattedtime: 1,
+            dateobjformatdate: 1,
+          }
+        ),
+        ProducionIndividual.find(prodIndQuery, {
+          filename: 1,
+          unallotcategory: 1,
+          user: 1,
+          unallotsubcategory: 1,
+          fromdate: 1,
+          time: 1,
+          category: 1,
+          mode: 1,
+        }),
+      ]);
+      const allData = [...productionUploads, ...productionIndividuals];
+      console.log(allData.length, "alldata");
+
+      let productions = allData.map((item) => {
+        const userInfoShifts = filteredDaypoints.filter((d) => d.users.includes(item.user));
+
+        const userInfo = filteredDaypoints.find((d) => d.users.includes(item.user));
+        const finalcategory = item.unallotcategory ? item.unallotcategory : item?.mode == "Manual" ? item.filename : item.filenameupdated;
+        const finalsubcategory = item.unallotsubcategory ? item.unallotsubcategory : item.category;
+        const comparedate = item?.mode == "Manual" ? item.fromdate : item.formatteddate;
+        const comparetime = item?.mode == "Manual" ? convertTo24HourFormat(item.time) : item.formattedtime;
+        const dateTime = `${comparedate}T${comparetime}Z`;
+
+        let userShiftTimes = [...new Set(userInfoShifts.map((d) => d.fromtodate))]
+          .map((d) => {
+            const fromdate = d.split("$")[0].split(".")[0];
+            const todate = d.split("$")[1].split(".")[0];
+            const checkfromtotimezero = fromdate === todate;
+            return {
+              fromdate: new Date(`${fromdate}Z`),
+              todate: new Date(`${todate}Z`),
+              checkfromtotimezero: checkfromtotimezero,
+            };
+          })
+          .filter((d) => d.checkfromtotimezero == false);
+
+        const { minStart, maxEnd } = userShiftTimes
+          .filter((d) => d.fromdate && d.todate)
+          .reduce(
+            (acc, obj) => {
+              const startTime = new Date(obj.fromdate);
+              const endTime = new Date(obj.todate);
+
+              // Update minimum start time
+              if (!acc.minStart || startTime < acc.minStart) {
+                acc.minStart = startTime;
+              }
+
+              // Update maximum end time
+              if (!acc.maxEnd || endTime > acc.maxEnd) {
+                acc.maxEnd = endTime;
+              }
+
+              return acc;
+            },
+            { minStart: null, maxEnd: null } // Proper initialization
+          );
+        const shiftfromdatetime = minStart ? `${minStart?.toISOString()?.split(".")[0]}Z` : null;
+        const shifttodatetime = maxEnd ? `${maxEnd?.toISOString()?.split(".")[0]}Z` : null;
+        // console.log(dateTime, `${shiftfromdatetime}`, `${shifttodatetime}`);
+        if (compareDateTimes(dateTime, `${shiftfromdatetime}`, `${shifttodatetime}`))
+          return {
+            empname: userInfo.name || "",
+            empcode: userInfo.empcode || "",
+            branch: userInfo.branch || "",
+            filename: finalcategory || "",
+            category: finalsubcategory || "",
+            olddateval: dateTime,
+            dateval: `${comparedate} ${comparetime}`,
+          };
+      });
+
+      productions = productions.filter((d) => d !== null && d !== undefined);
+      console.log(productions[0], "productions");
+
+      let categoryHoursDataAll = productions.reduce((acc, current) => {
+        const existingItem = acc.find(
+          (item) =>
+            item.filename === current.filename &&
+            item.empname === current.empname &&
+            item.branch === current.branch &&
+            item.category === current.category
+        );
+        let timedata = timepoints.find((d) => d.category == current.filename && (d.subcategory === current.category || d.subcategory === "ALL"));
+        const timevalue = timedata ? timedata.time : "00:00:00";
+        // const finalTime = addTime(timevalue, Number(current.count));
+
+        if (existingItem) {
+          existingItem.count += 1;
+          existingItem.allothours = timevalue ? addTime(timevalue, Number(existingItem.count)) : "00:00:00";
+        } else {
+          acc.push({
+            category: current.category,
+            filename: current.filename,
+            empname: current.empname,
+            fromdate: date,
+            todate: date,
+            branch: current.branch,
+            count: 1,
+            allothours: timevalue ? addTime(timevalue, Number(1)) : "00:00:00",
+          });
+        }
+        return acc;
+      }, []);
+
+      const finalData = branch.map((d) => {
+        const filtered = categoryHoursDataAll.filter((item) => item.branch === d);
         return {
-          empname: userInfo.name || "",
-          empcode: userInfo.empcode || "",
-          branch: userInfo.branch || "",
-          filename: finalcategory|| "",
-          category: finalsubcategory|| "",
-          olddateval: dateTime,
-          dateval: `${comparedate} ${comparetime}`,
-        };
-    });
-
-productions = productions.filter((d) => d !== null && d !== undefined);
-    console.log(productions[0], "productions");
-
-    let categoryHoursDataAll = productions.reduce((acc, current) => {
-      const existingItem = acc.find((item) => item.filename === current.filename &&
-       item.empname === current.empname && item.branch === current.branch &&
-        item.category === current.category);
-      let timedata = timepoints.find((d) => d.category == current.filename && (d.subcategory === current.category || d.subcategory === "ALL"));
-      const timevalue = timedata ? timedata.time : "00:00:00";
-      // const finalTime = addTime(timevalue, Number(current.count));
-   
-
-      if (existingItem) {
-        existingItem.count += 1;
-        existingItem.allothours = timevalue ? addTime(timevalue, Number(existingItem.count)) : "00:00:00";
-      } else {
-        acc.push({
-          category: current.category,
-          filename: current.filename,
-          empname: current.empname,
+          branch: d,
           fromdate: date,
-          todate: date,
-          branch: current.branch,
-          count: 1,
-          allothours: timevalue ? addTime(timevalue, Number(1)) : "00:00:00",
+          username: username,
+          addedby: [
+            {
+              name: username,
+              // date:date.now,
+            },
+          ],
+
+          data: filtered,
+        };
+      });
+      if (productions.length > 0) {
+        await categoryTimeLog.insertMany(finalData, {
+          ordered: false, // continue inserting even if some docs fail
         });
       }
-      return acc;
-    }, []);
-
-    const finalData = branch.map((d) => {
-      const filtered = categoryHoursDataAll.filter((item) => item.branch === d);
-      return {
-        branch: d,
-        fromdate: date,
-        username: username,
-        addedby: [
-          {
-            name: username,
-            // date:date.now,
-          },
-        ],
-
-        data: filtered,
-      };
-    });
-    if (productions.length > 0) {
-      await categoryTimeLog.insertMany(finalData, {
-        ordered: false, // continue inserting even if some docs fail
-      });
-    }
-    // console.log(categorytimelog.length, "categorytimelog");
+   
+   console.log(isDayPointsCreated, date,"isDayPointsCreated");
     return res.status(200).json({
       // count: products.length,
+      isDayPointsCreated,
       message: "Added Successfully",
       count: categoryHoursDataAll.length,
     });

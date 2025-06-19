@@ -1,149 +1,182 @@
-import React, { useState, useEffect, useContext, } from "react";
-import {
-    Box, Divider, Button,
-    Chip,
-    Grid,
-    Typography,
-    Tooltip,
-} from "@mui/material";
-import { ThreeDots } from "react-loader-spinner";
-import { userStyle } from "../pageStyle";
-import axios from "axios";
-import { SERVICE } from "../services/Baseservice";
-import { Link } from "react-router-dom";
-import { handleApiError } from "../components/Errorhandling";
-import { UserRoleAccessContext, AuthContext } from "../context/Appcontext";
-import moment from "moment-timezone";
+import React, { useState, useEffect, useContext } from 'react';
+import { Box, Divider, Button, Chip, Grid, Typography, Tooltip } from '@mui/material';
+import { ThreeDots } from 'react-loader-spinner';
+import { userStyle } from '../pageStyle';
+import axios from '../axiosInstance';
+import { SERVICE } from '../services/Baseservice';
+import { Link } from 'react-router-dom';
+import { handleApiError } from '../components/Errorhandling';
+import { UserRoleAccessContext, AuthContext } from '../context/Appcontext';
+import moment from 'moment-timezone';
 
 const HomeAccuracy = () => {
+  const [loader, setLoader] = useState(false);
+  const { auth } = useContext(AuthContext);
+  const { isUserRoleCompare } = useContext(UserRoleAccessContext);
 
-    const [loader, setLoader] = useState(false)
-    const { auth } = useContext(AuthContext);
-    const { isUserRoleCompare } = useContext(UserRoleAccessContext);
+  // Error Popup model
+  const [isErrorOpendialog, setIsErrorOpendialog] = useState(false);
+  const [showAlert, setShowAlert] = useState();
+  const handleClickOpenerr = () => {
+    setIsErrorOpendialog(true);
+  };
 
-    // Error Popup model
-    const [isErrorOpendialog, setIsErrorOpendialog] = useState(false);
-    const [showAlert, setShowAlert] = useState();
-    const handleClickOpenerr = () => {
-        setIsErrorOpendialog(true);
-    };
+  const [btnselecttoday, setBtnSelectToday] = useState('Today');
+  const [clientUserIDArray, setClientUserIDArray] = useState([]);
 
-    const [btnselecttoday, setBtnSelectToday] = useState("Today")
-    const [clientUserIDArray, setClientUserIDArray] = useState([]);
-
-    const fetchAchievedAccuracyIndividual = async (btnselect) => {
-        setBtnSelectToday(btnselect)
-        setLoader(true)
-        try {
-            if ((isUserRoleCompare?.includes("lachievedaccuracyindividualreviewinternalstatuslist") && isUserRoleCompare?.includes("laccuracy"))) {
-
-                let request = await axios.post(SERVICE.ACCURACY_HOME, {
-                    headers: {
-                        Authorization: `Bearer ${auth.APIToken}`,
-                    },
-                    selectedFilter: btnselect,
-                    fromWhere: "Internal"
-                });
-                setClientUserIDArray(request?.data?.filteredData.length > 0 ? request?.data?.filteredData.filter((item, index) => index <= 5) : []);
-                setLoader(false)
-            }
-
-        } catch (err) { setLoader(false); handleApiError(err, setShowAlert, handleClickOpenerr); }
+  const fetchAchievedAccuracyIndividual = async (btnselect) => {
+    setBtnSelectToday(btnselect);
+    setLoader(true);
+    try {
+      if (isUserRoleCompare?.includes('lachievedaccuracyindividualreviewinternalstatuslist') && isUserRoleCompare?.includes('laccuracy')) {
+        let request = await axios.post(SERVICE.ACCURACY_HOME, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+          selectedFilter: btnselect,
+          fromWhere: 'Internal',
+        });
+        setClientUserIDArray(request?.data?.filteredData.length > 0 ? request?.data?.filteredData.filter((item, index) => index <= 5) : []);
+        setLoader(false);
+      }
+    } catch (err) {
+      setLoader(false);
+      handleApiError(err, setShowAlert, handleClickOpenerr);
     }
+  };
 
-    useEffect(() => {
-        fetchAchievedAccuracyIndividual("Today");
-    }, [])
+  useEffect(() => {
+    fetchAchievedAccuracyIndividual('Today');
+  }, []);
 
-    const getColorFromTitle = (title) => {
-        const letter = title?.charAt(0).toUpperCase();
-        const colors = {
-            A: '#e5d652a8', B: '#e5d652a8', C: '#e5d652a8', D: '#e5d652a8', E: '#e5d652a8', F: '#e5d652a8', L: '#e5d652a8', // Group 1
-            G: '#f5888899', H: '#f5888899', I: '#f5888899', J: '#f5888899', K: '#f5888899', T: '#f5888899',               // Group 2
-            M: '#82f2c4ab', N: '#82f2c4ab', O: '#82f2c4ab', P: '#82f2c4ab', Q: '#82f2c4ab', R: '#82f2c4ab', Z: '#82f2c4ab', // Group 3
-            S: '#88c3f599',                                                                                      // Group 4
-            U: '#e184b699', V: '#e184b699', W: '#673ab782', X: '#673ab782', Y: '#673ab782'                             // Group 5 and 6
-        };
-
-        return colors[letter] || '#88c3f599';
+  const getColorFromTitle = (title) => {
+    const letter = title?.charAt(0).toUpperCase();
+    const colors = {
+      A: '#e5d652a8',
+      B: '#e5d652a8',
+      C: '#e5d652a8',
+      D: '#e5d652a8',
+      E: '#e5d652a8',
+      F: '#e5d652a8',
+      L: '#e5d652a8', // Group 1
+      G: '#f5888899',
+      H: '#f5888899',
+      I: '#f5888899',
+      J: '#f5888899',
+      K: '#f5888899',
+      T: '#f5888899', // Group 2
+      M: '#82f2c4ab',
+      N: '#82f2c4ab',
+      O: '#82f2c4ab',
+      P: '#82f2c4ab',
+      Q: '#82f2c4ab',
+      R: '#82f2c4ab',
+      Z: '#82f2c4ab', // Group 3
+      S: '#88c3f599', // Group 4
+      U: '#e184b699',
+      V: '#e184b699',
+      W: '#673ab782',
+      X: '#673ab782',
+      Y: '#673ab782', // Group 5 and 6
     };
 
-    const getColorFromTitleLetter = (title) => {
-        const letter = title?.charAt(0).toUpperCase();
-        const colors = {
-            A: '#b5a626', B: '#b5a626', C: '#b5a626', D: '#b5a626', E: '#b5a626', F: '#b5a626', L: '#b5a626', // Group 1
-            G: '#d76a6a', H: '#d76a6a', I: '#d76a6a', J: '#d76a6a', K: '#d76a6a', T: '#d76a6a',               // Group 2
-            M: '#49b589', N: '#49b589', O: '#49b589', P: '#49b589', Q: '#49b589', R: '#49b589', Z: '#49b589', // Group 3
-            S: '#6095c2',                                                                                      // Group 4
-            U: '#ce6fa2', V: '#ce6fa2', W: '#7952be', X: '#7952be', Y: '#7952be'                             // Group 5 and 6
-        };
+    return colors[letter] || '#88c3f599';
+  };
 
-        return colors[letter] || '#6095c2';
+  const getColorFromTitleLetter = (title) => {
+    const letter = title?.charAt(0).toUpperCase();
+    const colors = {
+      A: '#b5a626',
+      B: '#b5a626',
+      C: '#b5a626',
+      D: '#b5a626',
+      E: '#b5a626',
+      F: '#b5a626',
+      L: '#b5a626', // Group 1
+      G: '#d76a6a',
+      H: '#d76a6a',
+      I: '#d76a6a',
+      J: '#d76a6a',
+      K: '#d76a6a',
+      T: '#d76a6a', // Group 2
+      M: '#49b589',
+      N: '#49b589',
+      O: '#49b589',
+      P: '#49b589',
+      Q: '#49b589',
+      R: '#49b589',
+      Z: '#49b589', // Group 3
+      S: '#6095c2', // Group 4
+      U: '#ce6fa2',
+      V: '#ce6fa2',
+      W: '#7952be',
+      X: '#7952be',
+      Y: '#7952be', // Group 5 and 6
     };
 
-    return (
-        <>
+    return colors[letter] || '#6095c2';
+  };
 
-            {(isUserRoleCompare?.includes("lachievedaccuracyindividualreviewinternalstatuslist") && isUserRoleCompare?.includes("laccuracy")) && (
+  return (
+    <>
+      {isUserRoleCompare?.includes('lachievedaccuracyindividualreviewinternalstatuslist') && isUserRoleCompare?.includes('laccuracy') && (
+        <Grid item xs={12} md={6} sm={8}>
+          <Box
+            sx={{
+              ...userStyle?.homepagecontainer,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              height: '100%',
+            }}
+          >
+            <Typography sx={{ fontWeight: '700' }}>Accuracy</Typography>
+            <br />
 
-                <Grid item xs={12} md={6} sm={8}>
-                    <Box
-                        sx={{
-                            ...userStyle?.homepagecontainer,
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between",
-                            height: "100%",
-                        }}
-                    >
-
-                        <Typography sx={{ fontWeight: "700" }}>Accuracy</Typography>
-                        <br />
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                                gap: "10px",
-                                flexWrap: "nowrap",
-                                justifyContent: {
-                                    xs: "space-around",
-                                    sm: "space-between",
-                                },
-                                alignItems: "center",
-                                overflowX: "auto",
-                            }}
-                        >
-                            {["Last Month", "Last Week", "Yesterday", "Today", "Tomorrow", "This Week", "This Month"].map((label) => (
-                                <Button
-                                    key={label}
-                                    variant="outlined"
-                                    onClick={() => fetchAchievedAccuracyIndividual(label, btnselecttoday)}
-                                    sx={{
-                                        backgroundColor: btnselecttoday === label ? "#34abab" : "none",
-                                        color: btnselecttoday === label ? "white" : "inherit",
-                                        "&:hover": {
-                                            backgroundColor: btnselecttoday === label ? "#34abab" : "none",
-                                            color: btnselecttoday === label ? "white" : "inherit",
-                                        },
-                                        borderRadius: "28px",
-                                        textTransform: "capitalize",
-                                        padding: "6px 12px",
-                                        fontSize: {
-                                            xs: "08px",
-                                            sm: "10px",
-                                            md: "12px",
-                                        },
-                                        whiteSpace: "nowrap",
-                                    }}
-                                >
-                                    {label}
-                                </Button>
-                            ))}
-                        </Box>
-                        <br />
-                        <br />
-                        <Grid container spacing={2} >
-                            {loader ? (
+            <Box
+              sx={{
+                display: 'flex',
+                gap: '10px',
+                flexWrap: 'nowrap',
+                justifyContent: {
+                  xs: 'space-around',
+                  sm: 'space-between',
+                },
+                alignItems: 'center',
+                overflowX: 'auto',
+              }}
+            >
+              {['Last Month', 'Last Week', 'Yesterday', 'Today', 'Tomorrow', 'This Week', 'This Month'].map((label) => (
+                <Button
+                  key={label}
+                  variant="outlined"
+                  onClick={() => fetchAchievedAccuracyIndividual(label, btnselecttoday)}
+                  sx={{
+                    backgroundColor: btnselecttoday === label ? '#34abab' : 'none',
+                    color: btnselecttoday === label ? 'white' : 'inherit',
+                    '&:hover': {
+                      backgroundColor: btnselecttoday === label ? '#34abab' : 'none',
+                      color: btnselecttoday === label ? 'white' : 'inherit',
+                    },
+                    borderRadius: '28px',
+                    textTransform: 'capitalize',
+                    padding: '6px 12px',
+                    fontSize: {
+                      xs: '08px',
+                      sm: '10px',
+                      md: '12px',
+                    },
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {label}
+                </Button>
+              ))}
+            </Box>
+            <br />
+            <br />
+            <Grid container spacing={2}>
+              {/* {loader ? (
                                 <>
                                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px' }}>
                                         <ThreeDots
@@ -159,84 +192,82 @@ const HomeAccuracy = () => {
                                     </Grid>
                                 </>
                             ) : (
-                                <>
-                                    {clientUserIDArray?.length === 0 ? (
+                                <> */}
+              {/* {clientUserIDArray?.length === 0 ? (
                                         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px' }}>
                                             <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>No Data</Typography>
                                         </Grid>
-                                    ) : (
-                                        <Grid container columnSpacing={2}>
-                                            {clientUserIDArray?.map((exercise, index) => (
-                                                <Grid item md={6} lg={6} xs={12} sm={12} key={index}>
-                                                    <Grid container sx={{ m: 1.5 }}>
-
-
-                                                        <Grid item md={2} lg={2} xs={2} sm={2}>
-                                                            <Chip
-                                                                label={exercise.employeename?.charAt(0)?.toUpperCase()}
-                                                                sx={{
-                                                                    bgcolor: getColorFromTitle(exercise?.employeename
-                                                                    ),
-                                                                    color: getColorFromTitleLetter(exercise?.employeename
-                                                                    ),
-                                                                    width: 40,
-                                                                    height: 40,
-                                                                    fontSize: '18px',
-                                                                    fontWeight: 'bold',
-                                                                }}
-                                                            />
-                                                        </Grid>
-                                                        <Grid item md={6} lg={6} xs={6} sm={6}>
-                                                            <Tooltip title={exercise?.employeename?.length > 10 ? exercise?.employeename : ''}>
-                                                                <Typography
-                                                                    sx={{
-                                                                        fontWeight: 800,
-                                                                        fontSize: {
-                                                                            xs: "10px", // Smaller font size for mobile
-                                                                            sm: "12px",
-                                                                        },
-                                                                        textTransform: "uppercase",
-                                                                    }}
-                                                                >
-                                                                    {exercise.employeename?.length > 10
-                                                                        ? `${exercise.employeename.substring(0, 10)}...`
-                                                                        : exercise.employeename}
-                                                                </Typography>
-                                                            </Tooltip>
-                                                            <Typography variant="body2" color="textSecondary">
-                                                                {/* {exercise.target}: */}
-                                                                {moment(exercise.date).format("DD/MM/YYYY")}
-                                                            </Typography>
-                                                        </Grid>
-                                                        <Grid item md={4} lg={4} xs={4} sm={4}>
-                                                            <Typography variant="subtitle2" sx={{ color: '#4cb3b0', fontWeight: 'bold' }}>{exercise.minimumaccuracy}</Typography>
-                                                            <Typography variant="subtitle2" sx={{ color: '#db8c39', fontWeight: 'bold' }}>{exercise.internalstatus}</Typography>
-                                                            <Typography variant="subtitle2" sx={{ color: '#db8c39', fontWeight: 'bold' }}>{exercise.accuracy}</Typography>
-                                                        </Grid>
-                                                    </Grid>
-                                                    <Divider />
-                                                </Grid>
-                                            ))}
-                                        </Grid>
-                                    )}
-                                </>
-                            )}
-
-                        </Grid>
-                        <br />
-                        <Grid container sx={{ justifyContent: "flex-end", marginTop: "auto" }}>
-
-                            <Link to="/quality/accuracy/achievedaccuracyindividualreviewinternalstatuslist" target="_blank">
-                                <Button variant="contained" sx={{ backgroundColor: '#ff5e65', borderRadius: "13px", textTransform: "capitalize", fontWeight: "bold" }} size="small">
-                                    View More
-                                </Button>
-                            </Link>
-                        </Grid>
-                    </Box>
-                </Grid>
-            )}
-        </>
-    );
+                                    ) : ( */}
+              <Grid container columnSpacing={2}>
+                {clientUserIDArray?.map((exercise, index) => (
+                  <Grid item md={6} lg={6} xs={12} sm={12} key={index}>
+                    <Grid container sx={{ m: 1.5 }}>
+                      <Grid item md={2} lg={2} xs={2} sm={2}>
+                        <Chip
+                          label={exercise.employeename?.charAt(0)?.toUpperCase()}
+                          sx={{
+                            bgcolor: getColorFromTitle(exercise?.employeename),
+                            color: getColorFromTitleLetter(exercise?.employeename),
+                            width: 40,
+                            height: 40,
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                          }}
+                        />
+                      </Grid>
+                      <Grid item md={6} lg={6} xs={6} sm={6}>
+                        <Tooltip title={exercise?.employeename?.length > 10 ? exercise?.employeename : ''}>
+                          <Typography
+                            sx={{
+                              fontWeight: 800,
+                              fontSize: {
+                                xs: '10px', // Smaller font size for mobile
+                                sm: '12px',
+                              },
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {exercise.employeename?.length > 10 ? `${exercise.employeename.substring(0, 10)}...` : exercise.employeename}
+                          </Typography>
+                        </Tooltip>
+                        <Typography variant="body2" color="textSecondary">
+                          {/* {exercise.target}: */}
+                          {moment(exercise.date).format('DD/MM/YYYY')}
+                        </Typography>
+                      </Grid>
+                      <Grid item md={4} lg={4} xs={4} sm={4}>
+                        <Typography variant="subtitle2" sx={{ color: '#4cb3b0', fontWeight: 'bold' }}>
+                          {exercise.minimumaccuracy}
+                        </Typography>
+                        <Typography variant="subtitle2" sx={{ color: '#db8c39', fontWeight: 'bold' }}>
+                          {exercise.internalstatus}
+                        </Typography>
+                        <Typography variant="subtitle2" sx={{ color: '#db8c39', fontWeight: 'bold' }}>
+                          {exercise.accuracy}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Divider />
+                  </Grid>
+                ))}
+              </Grid>
+              {/* //         )}
+                            //     </>
+                            // )} */}
+            </Grid>
+            <br />
+            <Grid container sx={{ justifyContent: 'flex-end', marginTop: 'auto' }}>
+              <Link to="/quality/accuracy/achievedaccuracyindividualreviewinternalstatuslist" target="_blank">
+                <Button variant="contained" sx={{ backgroundColor: '#ff5e65', borderRadius: '13px', textTransform: 'capitalize', fontWeight: 'bold' }} size="small">
+                  View More
+                </Button>
+              </Link>
+            </Grid>
+          </Box>
+        </Grid>
+      )}
+    </>
+  );
 };
 
 export default HomeAccuracy;

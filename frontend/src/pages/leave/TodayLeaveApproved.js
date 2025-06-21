@@ -4880,6 +4880,7 @@ function TodayLeaveApproved() {
                 headers: {
                     Authorization: `Bearer ${auth.APIToken}`,
                 },
+
                 assignbranch: accessbranch,
             });
             setApplyleavecheck(true);

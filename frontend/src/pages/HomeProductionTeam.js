@@ -1,0 +1,529 @@
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { Box, TableHead, TableContainer, Table, Dialog, FormControl, Divider, DialogContent, Button, Chip, List, ListItem, ListItemText, Avatar, DialogActions, DialogTitle, DialogContentText, Grid, TableBody, Paper, Typography, Tooltip } from '@mui/material';
+import { StyledTableRow, StyledTableCell } from '../components/Table';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { userStyle, colourStyles } from '../pageStyle';
+
+import axios from '../axiosInstance';
+import { SERVICE } from '../services/Baseservice';
+import { Link } from 'react-router-dom';
+import { handleApiError } from '../components/Errorhandling';
+import { format, addDays, differenceInDays } from 'date-fns';
+import { UserRoleAccessContext, AuthContext } from '../context/Appcontext';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
+import BlockIcon from '@mui/icons-material/Block';
+import WarningIcon from '@mui/icons-material/Warning';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
+import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
+import PersonOffOutlinedIcon from '@mui/icons-material/PersonOffOutlined';
+import LockClockOutlinedIcon from '@mui/icons-material/LockClockOutlined';
+import moment from 'moment-timezone';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+
+const HomeProduction = () => {
+  function getWeekNumberInMonth(date) {
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const dayOfWeek = firstDayOfMonth.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+    // If the first day of the month is not Monday (1), calculate the adjustment
+    const adjustment = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+    // Calculate the day of the month adjusted for the starting day of the week
+    const dayOfMonthAdjusted = date.getDate() + adjustment;
+
+    // Calculate the week number based on the adjusted day of the month
+    const weekNumber = Math.ceil(dayOfMonthAdjusted / 7);
+
+    return weekNumber;
+  }
+
+  const getattendancestatus = (alldata, attS) => {
+    let result = attS.filter((data, index) => {
+      return data?.clockinstatus === alldata?.clockinstatus && data?.clockoutstatus === alldata?.clockoutstatus;
+    });
+
+    return result[0]?.name;
+  };
+
+  const [loader, setLoader] = useState(false);
+
+  const { auth } = useContext(AuthContext);
+
+  const { isUserRoleAccess, isUserRoleCompare, listPageAccessMode, pageName, setPageName, buttonStyles, isAssignBranch } = useContext(UserRoleAccessContext);
+
+  let listpageaccessby = listPageAccessMode?.find((data) => data.modulename === 'Production' && data.submodulename === 'Manual Entry' && data.mainpagename === 'Production Manual Entry Filter' && data.subpagename === '' && data.subsubpagename === '')?.listpageaccessmode || 'Overall';
+
+
+  let listpageaccessbyhir =
+    listPageAccessMode?.find(
+      (data) =>
+        data.modulename === "Setup" &&
+        data.submodulename === "Team Dashboard" &&
+        data.mainpagename === "" &&
+        data.subpagename === "" &&
+        data.subsubpagename === ""
+    )?.listpageaccessmode || "Overall";
+
+  // Error Popup model
+  const [isErrorOpendialog, setIsErrorOpendialog] = useState(false);
+  const [showAlert, setShowAlert] = useState();
+  const handleClickOpenerr = () => {
+    setIsErrorOpendialog(true);
+  };
+
+  const [upcomingInterview, setUpcomingInterview] = useState([]);
+  const [btnselect, setBtnSelect] = useState('Original', 'Today');
+  const [btnselecttoday, setBtnSelectToday] = useState('Today');
+
+  const [clientUserIDArray, setClientUserIDArray] = useState([]);
+
+  const handleFilter = async (btnselect, btntemp) => {
+    setBtnSelectToday(btnselect);
+    setBtnSelect(btntemp);
+    setLoader(true);
+    try {
+      if (isUserRoleCompare?.includes('lproductionreview') && isUserRoleCompare?.includes('ltempreview') && isUserRoleCompare?.includes('lproductions')) {
+        let fromdate, todate;
+        const today = new Date();
+        const selectedFilter = btnselect;
+        // const formatDate = (date) => date.toISOString().split("T")[0];
+        const formatDate = (date) => {
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+          const year = date.getFullYear();
+          return `${year}-${month}-${day}`;
+        };
+
+        switch (selectedFilter) {
+          case 'Today':
+            fromdate = todate = formatDate(today);
+            break;
+          case 'Tomorrow':
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            fromdate = todate = formatDate(tomorrow);
+            break;
+
+          case 'This Week':
+            const startOfThisWeek = new Date(today);
+            startOfThisWeek.setDate(today.getDate() - ((today.getDay() + 6) % 7)); // Monday
+            const endOfThisWeek = new Date(startOfThisWeek);
+            endOfThisWeek.setDate(startOfThisWeek.getDate() + 6); // Sunday
+            fromdate = formatDate(startOfThisWeek);
+            todate = formatDate(endOfThisWeek);
+            break;
+          case 'This Month':
+            fromdate = formatDate(new Date(today.getFullYear(), today.getMonth(), 1));
+            todate = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+
+            break;
+          case 'Last Month':
+            fromdate = formatDate(new Date(today.getFullYear(), today.getMonth() - 1, 1)); // First day of last month
+            todate = formatDate(new Date(today.getFullYear(), today.getMonth(), 0)); // Last day of last month
+            break;
+
+          default:
+            fromdate = '';
+            // fromdate = formatDate(new Date());
+            break;
+        }
+
+            let res = await axios.post(SERVICE.HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM, {
+                headers: {
+                  Authorization: `Bearer ${auth.APIToken}`,
+                },
+                hierachy: "myallhierarchy",
+                sector: "all",
+                username: isUserRoleAccess.companyname,
+                pagename: "menuteamdashboard",
+                listpageaccessmode: listpageaccessbyhir,
+              });
+
+
+
+        let FINALAPI = btntemp === 'Original' ? SERVICE.DAY_POINTS_FILTER_HOME_TEAM : SERVICE.TEMP_DAY_POINTS_FILTER_HOME_TEAM;
+
+        let res1 = await axios.post(FINALAPI, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+          fromdate: fromdate,
+          todate: todate ? todate : fromdate,
+           hierarchyempnames: res.data.resultAccessFilter,
+
+          // compare: "All",
+        });
+        const itemsWithSerialNumber = res1.data?.map((item, index) => {
+          let status = '';
+          if (Number(item.point) < Number(item.daypoint)) {
+            status = 'Below Min Points';
+          } else if (item.avgpoint <= 50) {
+            status = 'Below 50%';
+          } else if (item.avgpoint > 50 && item.avgpoint <= 75) {
+            status = 'Between 51 - 75%';
+          } else if (item.avgpoint > 75 && item.avgpoint <= 100) {
+            status = 'Between 76 - 100%';
+          } else if (item.avgpoint > 100 && item.avgpoint <= 149) {
+            status = 'Between 101 - 149%';
+          } else if (item.avgpoint > 149) {
+            status = '150% and Above';
+          }
+
+          let mindiffval = Number(item.point) - Number(item.daypoint);
+          let tardiffval = Number(item.point) - Number(item.target);
+
+          return {
+            ...item,
+            id: index + 1,
+            serialNumber: index + 1,
+            production: String(item.production),
+            manual: String(item.manual),
+            nonproduction: String(item.nonproduction),
+            point: Number(Number(item.point).toFixed(2)),
+            // allowancepoint: String(item.allowancepoint),
+            // nonallowancepoint: String(item.nonallowancepoint),
+            avgpoint: Number(Number(item.avgpoint).toFixed(2)),
+            daypoint: item.daypoint ? Number(Number(item.daypoint).toFixed(2)) : '',
+            mindiff: item.daypoint ? (mindiffval <= 0 ? Number(mindiffval.toFixed(2)) : Number(mindiffval.toFixed(2))) : '',
+            tardiff: item.target ? (tardiffval <= 0 ? Number(tardiffval.toFixed(2)) : Number(tardiffval.toFixed(2))) : '',
+            status: item.target == 0 ? ' ' : status,
+            oldstartdate: item.startDate,
+            oldenddate: item.endDate,
+            experience: Number(item.exper),
+
+            startDate: moment(item.startDate).format('DD-MM-YYYY'),
+            endDate: moment(item.endDate).format('DD-MM-YYYY'),
+            minreached: Number(item.point) < Number(item.daypoint) ? 'Not Reached' : 'Reached',
+          };
+        });
+        setClientUserIDArray(itemsWithSerialNumber);
+        setLoader(false);
+      }
+    } catch (err) {
+      setLoader(false);
+      const messages = err?.response?.data?.message;
+      if (messages) {
+        setShowAlert(
+          <>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+            <p style={{ fontSize: '20px', fontWeight: 900 }}>{messages}</p>
+          </>
+        );
+        handleClickOpenerr();
+      } else {
+        setShowAlert(
+          <>
+            <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+            <p style={{ fontSize: '20px', fontWeight: 900 }}>{'something went wrong!'}</p>
+          </>
+        );
+        handleClickOpenerr();
+      }
+    }
+  };
+
+  useEffect(() => {
+    handleFilter('Today', 'Original');
+  }, []);
+
+  const getColorFromTitle = (title) => {
+    const letter = title.charAt(0).toUpperCase();
+    const colors = {
+      A: '#e5d652a8',
+      B: '#e5d652a8',
+      C: '#e5d652a8',
+      D: '#e5d652a8',
+      E: '#e5d652a8',
+      F: '#e5d652a8',
+      L: '#e5d652a8', // Group 1
+      G: '#f5888899',
+      H: '#f5888899',
+      I: '#f5888899',
+      J: '#f5888899',
+      K: '#f5888899',
+      T: '#f5888899', // Group 2
+      M: '#82f2c4ab',
+      N: '#82f2c4ab',
+      O: '#82f2c4ab',
+      P: '#82f2c4ab',
+      Q: '#82f2c4ab',
+      R: '#82f2c4ab',
+      Z: '#82f2c4ab', // Group 3
+      S: '#88c3f599', // Group 4
+      U: '#e184b699',
+      V: '#e184b699',
+      W: '#673ab782',
+      X: '#673ab782',
+      Y: '#673ab782', // Group 5 and 6
+    };
+
+    return colors[letter] || '#88c3f599';
+  };
+
+  const getColorFromTitleLetter = (title) => {
+    const letter = title.charAt(0).toUpperCase();
+    const colors = {
+      A: '#b5a626',
+      B: '#b5a626',
+      C: '#b5a626',
+      D: '#b5a626',
+      E: '#b5a626',
+      F: '#b5a626',
+      L: '#b5a626', // Group 1
+      G: '#d76a6a',
+      H: '#d76a6a',
+      I: '#d76a6a',
+      J: '#d76a6a',
+      K: '#d76a6a',
+      T: '#d76a6a', // Group 2
+      M: '#49b589',
+      N: '#49b589',
+      O: '#49b589',
+      P: '#49b589',
+      Q: '#49b589',
+      R: '#49b589',
+      Z: '#49b589', // Group 3
+      S: '#6095c2', // Group 4
+      U: '#ce6fa2',
+      V: '#ce6fa2',
+      W: '#7952be',
+      X: '#7952be',
+      Y: '#7952be', // Group 5 and 6
+    };
+
+    return colors[letter] || '#6095c2';
+  };
+
+  return (
+    <>
+      {isUserRoleCompare?.includes('lproductionreview') && isUserRoleCompare?.includes('ltempreview') && isUserRoleCompare?.includes('lproductions') && (
+        <Grid item xs={12} md={8} sm={8}>
+          <Box
+            sx={{
+              ...userStyle?.homepagecontainer,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              height: '100%',
+            }}
+          >
+            <Typography sx={{ fontWeight: '700' }}>Production</Typography>
+            <br />
+
+            <Box
+              sx={{
+                display: 'flex',
+                gap: '10px',
+                flexWrap: {
+                  xs: 'wrap',
+                },
+                flexDirection: {
+                  xs: 'row', // Stack buttons vertically on small screens
+                  sm: 'row', // Align buttons in a row on larger screens
+                },
+                alignItems: {
+                  xs: 'flex-start', // Align items to start for mobile
+                  sm: 'center', // Center items on larger screens
+                  md: 'center', // Center items on larger screens
+                  lg: 'center', // Center items on larger screens
+                },
+                justifyContent: {
+                  md: 'space-between',
+                  lg: 'space-between',
+                  xs: 'center',
+                  sm: 'center',
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: '10px',
+                }}
+              >
+                {['Original', 'Temp'].map((label) => (
+                  <Button
+                    key={label}
+                    variant="outlined"
+                    onClick={() => handleFilter(btnselecttoday, label)}
+                    // onClick={() => fetchButtonEvents(label)}
+                    sx={{
+                      backgroundColor: btnselect === label ? '#34abab' : 'none',
+                      color: btnselect === label ? 'white' : 'inherit',
+                      '&:hover': {
+                        backgroundColor: btnselect === label ? '#34abab' : 'none',
+                        color: btnselect === label ? 'white' : 'inherit',
+                      },
+                      borderRadius: '28px',
+                      textTransform: 'capitalize',
+                      fontSize: {
+                        xs: '12px', // Smaller font size for mobile
+                        sm: '14px', // Larger font size for bigger screens
+                      },
+                    }}
+                    color="success"
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: '10px', // Space between buttons
+                  flexWrap: 'nowrap', // Prevent wrapping to the next row
+                  justifyContent: {
+                    xs: 'space-around', // Distribute buttons evenly on smaller screens
+                    sm: 'space-between', // Adjust spacing for medium screens
+                  },
+                  alignItems: 'center', // Align buttons vertically in the center
+                  overflowX: 'auto', // Enable horizontal scrolling if the screen is too small
+                }}
+              >
+                {['Last Month', 'Last Week', 'Yesterday', 'Today', 'Tomorrow', 'This Week', 'This Month'].map((label) => (
+                  <Button
+                    key={label}
+                    variant="outlined"
+                    onClick={() => handleFilter(label, btnselect)}
+                    sx={{
+                      backgroundColor: btnselecttoday === label ? '#34abab' : 'none',
+                      color: btnselecttoday === label ? 'white' : 'inherit',
+                      '&:hover': {
+                        backgroundColor: btnselecttoday === label ? '#34abab' : 'none',
+                        color: btnselecttoday === label ? 'white' : 'inherit',
+                      },
+                      borderRadius: '28px',
+                      textTransform: 'capitalize',
+                      padding: '6px 12px', // Adjust padding for a smaller button
+                      fontSize: {
+                        xs: '08px', // Reduced font size for mobile
+                        sm: '10px', // Slightly larger for small screens
+                        md: '12px', // Default size for medium and above
+                      },
+                      whiteSpace: 'nowrap', // Prevent text wrapping within buttons
+                    }}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </Box>
+            </Box>
+
+            <br />
+
+            <br />
+
+            <Grid container spacing={2}>
+              {/* Conditional rendering if meetingArray is empty */}
+              {/* {loader ? (
+                                    <>
+                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px' }}>
+                                            <ThreeDots
+                                                height="80"
+                                                width="80"
+                                                radius="9"
+                                                color="#1976d2"
+                                                ariaLabel="three-dots-loading"
+                                                wrapperStyle={{}}
+                                                wrapperClassName=""
+                                                visible={true}
+                                            />
+                                        </Grid>
+                                    </>
+                                ) : (
+                                    <>
+
+                                        {clientUserIDArray.length === 0 ? (
+                                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px' }}>
+                                                <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>No Data</Typography>
+                                            </Grid>
+                                        ) : ( */}
+
+              <Grid container columnSpacing={2}>
+                {clientUserIDArray.map((exercise, index) => (
+                  <Grid item md={6} lg={6} xs={12} sm={12} key={index}>
+                    <Grid container sx={{ m: 1.5 }}>
+                      <Grid item md={2} lg={2} xs={2} sm={2}>
+                        {/* <Chip
+                                                        label={exercise.name}
+                                                        sx={{ bgcolor: '#f2f2f2', color: '#555', width: 40, height: 40, fontSize: '18px', fontWeight: 'bold' }}
+                                                    /> */}
+                        <Chip
+                          label={exercise.name.charAt(0).toUpperCase()}
+                          sx={{
+                            bgcolor: getColorFromTitle(exercise.name),
+                            color: getColorFromTitleLetter(exercise.name),
+                            width: 40,
+                            height: 40,
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                          }}
+                        />
+                      </Grid>
+                      <Grid item md={6} lg={6} xs={6} sm={6}>
+                        {/* <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{exercise.name}</Typography> */}
+                        <Tooltip title={exercise.name.length > 10 ? exercise.name : ''}>
+                          <Typography
+                            sx={{
+                              fontWeight: 800,
+                              fontSize: {
+                                xs: '10px', // Smaller font size for mobile
+                                sm: '12px',
+                              },
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {exercise.name.length > 10 ? `${exercise.name.substring(0, 10)}...` : exercise.name}
+                          </Typography>
+                        </Tooltip>
+                        <Typography variant="body2" color="textSecondary">
+                          {/* {exercise.target}: */}
+                          {`${moment(exercise.oldstartdate.split('T')[0]).format('DD/MM/YYYY')} to ${moment(exercise.oldenddate.split('T')[0]).format('DD/MM/YYYY')}`}
+                        </Typography>
+                      </Grid>
+                      <Grid item md={4} lg={4} xs={4} sm={4}>
+                        <Typography variant="subtitle2" sx={{ color: '#4cb3b0', fontWeight: 'bold' }}>{`${exercise.point} / ${exercise.target}`}</Typography>
+                        <Typography variant="subtitle2" sx={{ color: '#db8c39', fontWeight: 'bold' }}>
+                          {exercise.status}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Divider />
+                  </Grid>
+                ))}
+              </Grid>
+
+              {/* )}
+                                    </>
+                                )} */}
+            </Grid>
+            {/* Always render the View More button at the bottom */}
+
+            <Grid container sx={{ justifyContent: 'flex-end', marginTop: 'auto' }}>
+              {btnselect === 'Original' ? (
+                <Link to="/productionreviewteam" target="_blank">
+                  <Button variant="contained" sx={{ backgroundColor: '#ff5e65', borderRadius: '13px', textTransform: 'capitalize', fontWeight: 'bold' }} size="small">
+                    View More
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/tempproductionreviewteam" target="_blank">
+                  <Button variant="contained" sx={{ backgroundColor: '#ff5e65', borderRadius: '13px', textTransform: 'capitalize', fontWeight: 'bold' }} size="small">
+                    View More
+                  </Button>
+                </Link>
+              )}
+            </Grid>
+          </Box>
+        </Grid>
+      )}
+    </>
+  );
+};
+
+export default HomeProduction;

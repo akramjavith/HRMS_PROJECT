@@ -990,6 +990,17 @@ const TempIndividualProductionbaseattendance = React.lazy(() => import('../pages
 const TempTeamProductionbaseattendance = React.lazy(() => import('../pages/production/reports/tempteamproductionbasedattenadance.js'));
 
 
+const LiveEmployeeListTeam = React.lazy(() => import("../pages/hr/employees/LiveEmployeeListHome"));
+const TodayLeaveApprovedteam = React.lazy(() => import("../pages/teamDashboard/TodayLeaveApproved.js"));
+const NotcheckinemplistTeam = React.lazy(() => import("../pages/teamDashboard/Notcheckinemplistteam.js"));
+const ScheduleMeetingFilterTeam = React.lazy(() => import("../pages/teamDashboard/ScheduleMeetingFilterTeam.js"));
+const AdvancehomelistTeam = React.lazy(() => import("../pages/teamDashboard/advancehomelistteam.js"));
+const Loanrequestteam = React.lazy(() => import("../pages/teamDashboard/loanrequestteam.js"));
+const ProductionReviewteam = React.lazy(() => import("../pages/teamDashboard/Productionreviewteam.js"));
+const TempProductionReviewteam = React.lazy(() => import("../pages/teamDashboard/TempProductionReviewTeam.js"));
+const MinimumpointsTeam = React.lazy(() => import("../pages/teamDashboard/MinimumPointsTeam.js"));
+// const TaskTeam = React.lazy(() => import("../pages/teamDashboard/"));
+
 
 const App = () => {
   return (
@@ -2050,7 +2061,15 @@ const App = () => {
              <Route path="production/tempindividualproductionbasedattendance" element={<TempIndividualProductionbaseattendance />} />
              <Route path="production/tempteamproductionbasedattendance" element={<TempTeamProductionbaseattendance />} />
 
-            
+              <Route path="liveemployeelisthome" element={<LiveEmployeeListTeam />} />
+              <Route path="todayleaveapprovedteam" element={<TodayLeaveApprovedteam />} />
+              <Route path="notcheckinemplistteam" element={<NotcheckinemplistTeam />} />
+              <Route path="schedulemeetingfilterteam" element={<ScheduleMeetingFilterTeam />} />
+              <Route path="advancehomelistteam" element={<AdvancehomelistTeam />} />
+              <Route path="loanrequestteam" element={<Loanrequestteam />} />
+              <Route path="productionreviewteam" element={<ProductionReviewteam />} />
+              <Route path="tempproductionreviewteam" element={<TempProductionReviewteam />} />
+              <Route path="minimumpointsteam" element={<MinimumpointsTeam />} />
             
             
             {/* page not found */}

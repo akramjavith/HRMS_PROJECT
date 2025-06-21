@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ScheduleEventsSchema = new Schema({
   company: {
@@ -53,6 +53,14 @@ const ScheduleEventsSchema = new Schema({
     type: [String],
     required: false,
   },
+  uniqueId: {
+    type: String,
+    required: false,
+  },
+  files: {
+    type: [String],
+    required: false,
+  },
   files: [
     {
       data: {
@@ -83,6 +91,10 @@ const ScheduleEventsSchema = new Schema({
         type: String,
         required: false,
       },
+      date: {
+        type: Date,
+        default: Date.now,
+      },
     },
   ],
   updatedby: [
@@ -92,8 +104,8 @@ const ScheduleEventsSchema = new Schema({
         required: false,
       },
       date: {
-        type: String,
-        required: false,
+        type: Date,
+        default: Date.now,
       },
     },
   ],
@@ -102,5 +114,10 @@ const ScheduleEventsSchema = new Schema({
     default: Date.now,
   },
 });
-ScheduleEventsSchema.index({ company: 1, branch: 1, unit: 1 })
-module.exports = mongoose.model("Events", ScheduleEventsSchema);
+
+ScheduleEventsSchema.index({ company: 1 });
+ScheduleEventsSchema.index({ branch: 1 });
+ScheduleEventsSchema.index({ unit: 1 });
+ScheduleEventsSchema.index({ date: 1 });
+
+module.exports = mongoose.model('Events', ScheduleEventsSchema);

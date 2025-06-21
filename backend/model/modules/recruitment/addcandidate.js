@@ -1,6 +1,187 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const CandidateSchema = new Schema({
+  candidateresumeid: {
+    type: String,
+    required: false,
+  },
+  pgenerateviapincode: {
+    type: Boolean,
+    required: false,
+  },
+  pvillageorcity: {
+    type: String,
+    required: false,
+  },
+  pdistrict: {
+    type: String,
+    required: false,
+  },
+  cgenerateviapincode: {
+    type: Boolean,
+    required: false,
+  },
+  cvillageorcity: {
+    type: String,
+    required: false,
+  },
+  cdistrict: {
+    type: String,
+    required: false,
+  },
+  addesstype: {
+    type: String,
+    required: false,
+  },
+  personalprefix: {
+    type: String,
+    required: false,
+  },
+  referencename: {
+    type: String,
+    required: false,
+  },
+  landmarkpositionprefix: {
+    type: String,
+    required: false,
+  },
+  landmarkname: {
+    type: String,
+    required: false,
+  },
+  houseflatnumber: {
+    type: String,
+    required: false,
+  },
+  streetroadname: {
+    type: String,
+    required: false,
+  },
+  localityareaname: {
+    type: String,
+    required: false,
+  },
+  pcountry: {
+    type: String,
+    required: false,
+  },
+  pstate: {
+    type: String,
+    required: false,
+  },
+  pcity: {
+    type: String,
+    required: false,
+  },
+  ppincode: {
+    type: String,
+    required: false,
+  },
+  gpscoordinate: {
+    type: String,
+    required: false,
+  },
+  //currentAddress
+  samesprmnt: {
+    type: Boolean,
+    required: false,
+  },
+  caddesstype: {
+    type: String,
+    required: false,
+  },
+  cpersonalprefix: {
+    type: String,
+    required: false,
+  },
+  creferencename: {
+    type: String,
+    required: false,
+  },
+  clandmarkpositionprefix: {
+    type: String,
+    required: false,
+  },
+  clandmarkname: {
+    type: String,
+    required: false,
+  },
+  chouseflatnumber: {
+    type: String,
+    required: false,
+  },
+  cstreetroadname: {
+    type: String,
+    required: false,
+  },
+  clocalityareaname: {
+    type: String,
+    required: false,
+  },
+  ccountry: {
+    type: String,
+    required: false,
+  },
+  cstate: {
+    type: String,
+    required: false,
+  },
+  ccity: {
+    type: String,
+    required: false,
+  },
+  cpincode: {
+    type: String,
+    required: false,
+  },
+  cgpscoordinate: {
+    type: String,
+    required: false,
+  },
+  experienceoption: {
+    type: String,
+    required: false,
+  },
+  experienceestimation: {
+    type: String,
+    required: false,
+  },
+  approval: {
+    type: String,
+    required: false,
+  },
+  approvalsentdate: {
+    type: String,
+    required: false,
+  },
+  approvalid: {
+    type: String,
+    required: false,
+  },
+  candidateDocuments: [
+    {
+      name: {
+        type: String,
+        required: false,
+      },
+      orginpath: {
+        type: String,
+        required: false,
+      },
+      documentid: {
+        type: String,
+        required: false,
+      },
+      preview: {
+        type: String,
+        required: false,
+      },
+      remarks: {
+        type: String,
+        required: false,
+      },
+    },
+  ],
   rolebacktoid: {
     type: String,
     required: false,
@@ -9,7 +190,14 @@ const CandidateSchema = new Schema({
     type: Boolean,
     required: false,
   },
-
+  candidatestatusexp: {
+    type: String,
+    required: false,
+  },
+  workmode: {
+    type: String,
+    required: false,
+  },
   rolebackto: {
     type: String,
     required: false,
@@ -30,7 +218,10 @@ const CandidateSchema = new Schema({
     type: String,
     required: false,
   },
-
+  faceDescriptor: {
+    type: [Number],
+    required: false,
+  },
   domainexperienceestimation: {
     type: String,
     required: false,
@@ -221,6 +412,10 @@ const CandidateSchema = new Schema({
   },
   educationdetails: [
     {
+      percentage: {
+        type: String,
+        required: false,
+      },
       categoryedu: {
         type: String,
         required: false,
@@ -288,12 +483,62 @@ const CandidateSchema = new Schema({
       },
     },
   ],
-  resumefile: [
+
+  candidatedatafile: [
     {
-      data: {
+      candidatefilename: {
         type: String,
         required: false,
       },
+
+      name: {
+        type: String,
+        required: false,
+      },
+      mimetype: {
+        type: String,
+        required: false,
+      },
+      filename: {
+        type: String,
+        required: false,
+      },
+      filesize: {
+        type: String,
+        required: false,
+      },
+      remark: {
+        type: String,
+        required: false,
+      },
+      uniqueid: {
+        type: String,
+        required: false,
+      },
+      link: {
+        type: String,
+        required: false,
+      },
+      linkname: {
+        type: String,
+        required: false,
+      },
+      csfilname: {
+        type: String,
+        required: false,
+      },
+      uploadedby: {
+        type: String,
+        required: false,
+      },
+      shortname: {
+        type: String,
+        required: false,
+      },
+    },
+  ],
+  resumefile: [
+    {
       name: {
         type: String,
         required: false,
@@ -302,7 +547,16 @@ const CandidateSchema = new Schema({
         type: String,
         required: false,
       },
-      remark: {
+
+      mimetype: {
+        type: String,
+        required: false,
+      },
+      filename: {
+        type: String,
+        required: false,
+      },
+      filesize: {
         type: String,
         required: false,
       },
@@ -310,19 +564,20 @@ const CandidateSchema = new Schema({
   ],
   coverletterfile: [
     {
-      data: {
-        type: String,
-        required: false,
-      },
-      preview: {
-        type: String,
-        required: false,
-      },
       name: {
         type: String,
         required: false,
       },
-      remark: {
+
+      mimetype: {
+        type: String,
+        required: false,
+      },
+      filename: {
+        type: String,
+        required: false,
+      },
+      filesize: {
         type: String,
         required: false,
       },
@@ -330,19 +585,20 @@ const CandidateSchema = new Schema({
   ],
   experienceletterfile: [
     {
-      data: {
-        type: String,
-        required: false,
-      },
-      preview: {
-        type: String,
-        required: false,
-      },
       name: {
         type: String,
         required: false,
       },
-      remark: {
+
+      mimetype: {
+        type: String,
+        required: false,
+      },
+      filename: {
+        type: String,
+        required: false,
+      },
+      filesize: {
         type: String,
         required: false,
       },
@@ -350,19 +606,42 @@ const CandidateSchema = new Schema({
   ],
   payslipletterfile: [
     {
-      data: {
-        type: String,
-        required: false,
-      },
-      preview: {
-        type: String,
-        required: false,
-      },
       name: {
         type: String,
         required: false,
       },
-      remark: {
+
+      mimetype: {
+        type: String,
+        required: false,
+      },
+      filename: {
+        type: String,
+        required: false,
+      },
+      filesize: {
+        type: String,
+        required: false,
+      },
+    },
+  ],
+
+  files: [
+    {
+      name: {
+        type: String,
+        required: false,
+      },
+
+      mimetype: {
+        type: String,
+        required: false,
+      },
+      filename: {
+        type: String,
+        required: false,
+      },
+      filesize: {
         type: String,
         required: false,
       },
@@ -376,8 +655,8 @@ const CandidateSchema = new Schema({
         required: false,
       },
       date: {
-        type: String,
-        required: false,
+        type: Date,
+        default: Date.now,
       },
     },
   ],
@@ -388,8 +667,8 @@ const CandidateSchema = new Schema({
         required: false,
       },
       date: {
-        type: String,
-        required: false,
+        type: Date,
+        default: Date.now,
       },
     },
   ],
@@ -428,27 +707,6 @@ const CandidateSchema = new Schema({
     required: false,
   },
 
-  files: [
-    {
-      data: {
-        type: String,
-        required: false,
-      },
-      filename: {
-        type: String,
-        required: false,
-      },
-      preview: {
-        type: String,
-        required: false,
-      },
-      remark: {
-        type: String,
-        required: false,
-      },
-    },
-  ],
-
   username: {
     type: String,
     required: false,
@@ -465,54 +723,7 @@ const CandidateSchema = new Schema({
     type: String,
     required: false,
   },
-  candidatedatafile: [
-    {
-      candidatefilename: {
-        type: String,
-        required: false,
-      },
-      data: {
-        type: String,
-        required: false,
-      },
-      name: {
-        type: String,
-        required: false,
-      },
-      preview: {
-        type: String,
-        required: false,
-      },
-      remark: {
-        type: String,
-        required: false,
-      },
-      uniqueid: {
-        type: String,
-        required: false,
-      },
-      link: {
-        type: String,
-        required: false,
-      },
-      linkname: {
-        type: String,
-        required: false,
-      },
-      csfilname: {
-        type: String,
-        required: false,
-      },
-      uploadedby: {
-        type: String,
-        required: false,
-      },
-      shortname: {
-        type: String,
-        required: false,
-      },
-    },
-  ],
+
   rolebacktocompany: {
     type: String,
     required: false,
@@ -660,7 +871,7 @@ const CandidateSchema = new Schema({
         required: false,
       },
       roundsubcategory: {
-        type: String,
+        type: [String],
         required: false,
       },
       roundname: {
@@ -725,6 +936,14 @@ const CandidateSchema = new Schema({
       interviewForm: [
         {
           attendby: {
+            type: String,
+            required: false,
+          },
+          ignored: {
+            type: String,
+            required: false,
+          },
+          additionalinformation: {
             type: String,
             required: false,
           },
@@ -841,6 +1060,26 @@ const CandidateSchema = new Schema({
             type: String,
             required: false,
           },
+          informreason: {
+            type: String,
+            required: false,
+          },
+          datedescription: {
+            type: String,
+            required: false,
+          },
+          fromdate: {
+            type: String,
+            required: false,
+          },
+          todate: {
+            type: String,
+            required: false,
+          },
+          date: {
+            type: String,
+            required: false,
+          },
           optionArr: [
             {
               status: {
@@ -848,6 +1087,30 @@ const CandidateSchema = new Schema({
                 required: false,
               },
               options: {
+                type: String,
+                required: false,
+              },
+              tamiloptions: {
+                type: String,
+                required: false,
+              },
+              description: {
+                type: String,
+                required: false,
+              },
+              tamildescription: {
+                type: String,
+                required: false,
+              },
+              validation: {
+                type: String,
+                required: false,
+              },
+              betweenfrom: {
+                type: String,
+                required: false,
+              },
+              betweento: {
                 type: String,
                 required: false,
               },
@@ -890,6 +1153,10 @@ const CandidateSchema = new Schema({
                     required: false,
                   },
                   answer: {
+                    type: String,
+                    required: false,
+                  },
+                  tamilanswer: {
                     type: String,
                     required: false,
                   },
@@ -1060,6 +1327,18 @@ const CandidateSchema = new Schema({
               type: String,
               required: false,
             },
+            fromdate: {
+              type: String,
+              required: false,
+            },
+            todate: {
+              type: String,
+              required: false,
+            },
+            date: {
+              type: String,
+              required: false,
+            },
             optionArr: [
               {
                 status: {
@@ -1067,6 +1346,30 @@ const CandidateSchema = new Schema({
                   required: false,
                 },
                 options: {
+                  type: String,
+                  required: false,
+                },
+                tamiloptions: {
+                  type: String,
+                  required: false,
+                },
+                description: {
+                  type: String,
+                  required: false,
+                },
+                tamildescription: {
+                  type: String,
+                  required: false,
+                },
+                validation: {
+                  type: String,
+                  required: false,
+                },
+                betweenfrom: {
+                  type: String,
+                  required: false,
+                },
+                betweento: {
                   type: String,
                   required: false,
                 },
@@ -1109,6 +1412,10 @@ const CandidateSchema = new Schema({
                       required: false,
                     },
                     answer: {
+                      type: String,
+                      required: false,
+                    },
+                    tamilanswer: {
                       type: String,
                       required: false,
                     },
@@ -1279,6 +1586,18 @@ const CandidateSchema = new Schema({
             type: String,
             required: false,
           },
+          fromdate: {
+            type: String,
+            required: false,
+          },
+          todate: {
+            type: String,
+            required: false,
+          },
+          date: {
+            type: String,
+            required: false,
+          },
           optionArr: [
             {
               status: {
@@ -1286,6 +1605,30 @@ const CandidateSchema = new Schema({
                 required: false,
               },
               options: {
+                type: String,
+                required: false,
+              },
+              tamiloptions: {
+                type: String,
+                required: false,
+              },
+              description: {
+                type: String,
+                required: false,
+              },
+              tamildescription: {
+                type: String,
+                required: false,
+              },
+              validation: {
+                type: String,
+                required: false,
+              },
+              betweenfrom: {
+                type: String,
+                required: false,
+              },
+              betweento: {
                 type: String,
                 required: false,
               },
@@ -1328,6 +1671,10 @@ const CandidateSchema = new Schema({
                     required: false,
                   },
                   answer: {
+                    type: String,
+                    required: false,
+                  },
+                  tamilanswer: {
                     type: String,
                     required: false,
                   },
@@ -1380,6 +1727,6 @@ const CandidateSchema = new Schema({
     },
   ],
 });
-CandidateSchema.index({ overallstatus: 1, createdAt: 1 })
-CandidateSchema.index({ fromdate: 1, todate: 1, "interviewrounds.roundcreatedAt": 1 })
-module.exports = mongoose.model("Candidate", CandidateSchema);
+CandidateSchema.index({ overallstatus: 1, createdAt: 1 });
+CandidateSchema.index({ fromdate: 1, todate: 1, 'interviewrounds.roundcreatedAt': 1 });
+module.exports = mongoose.model('Candidate', CandidateSchema);

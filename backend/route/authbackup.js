@@ -5,61 +5,61 @@ const authRoute = express.Router();
 const { isAuthorized } = require("../middleware/routeauthorised");
 
 // connect customer group controller
-const { getAllUsers, getAlluserDataFilterLongAbsend, getAlluserDataFilterLongAbsendCompleted, getAllUsersPostergenerate, getAllTheLogUsers, getAlluserDataFilterLongAbsendHierarchy,
-    getAllEmployeesForAttendanceFilter, getFilteredUserForShiftAdjusment, getAllNotInEmployees,
-    deleteUsersShiftAllot, getAllUsersnewFilter, getIndividualUserLoginStatus, getHierarchyBasedEmployeeStatus,
-    undoPayrunListInnerDataUser, updateVerifyUser, getAllUsersAssignbranch, getAllUsersexceldataByAssign,
-    getAllUsersexceldataAssignbranch, getAllUsersexceldataAssignbranchHome, dynamicQueryUserController, getUserCredentials, getAllUserTemporaryLoginStatus, checkEmployeeEmptyFields, getAllProfileImage, getAllUserClockinAndClockoutStatusCheckLogin, getAllUserLoginStatusAction,
-    getAllUserstatusDepCheck, getAllShiftToUserBulkDelete, deleteShiftAnyLog, getAllUserProductionDayShiftAttendanceFilter, getAllUsersEmployee, getAllUserLoginExpStatus, getAllUserLoginStatus, deleteAnyLog, getAllUserProductionDayShiftFilter, updateAnyLogValues,
-    getAllUserClockinAndClockoutStatusLoginCheck, updatePayrunListInnerDataUser, getUserDocumentPrep, getAllUserAttendancePayRun, getAllUsersWithoutStatus, getUserWithStatus, getAllTemplateUsers, getOnBoardingSalaryFix, getFormerUserNames, checkduplicateemployeenameedit,
-    getAllFilteredUsers, checkduplicateemployeenamecreate, getAllUsersnew, getAllSalaryFixFilterReport, updateUsersShiftLogLastObjects, getAllSalaryFixFilter, getUsersAllData, getAllEnquieryUsers, getAllDactiveIntern, getAllRemoteuserFilter, getAllUserProduction,
-    viewpassword, getAllUserClockinAndClockoutStatusMyIndividual, getAllUserClockinAndClockoutStatusForMontLopCalFilterPayrun, getAllUserClockinAndClockoutStatusForMontLopCalFilterPayRunMasterFetch, getAllUserClockinAndClockoutStatusForMontLopCalFilterMinPointsNew,
-    getAllUserClockinAndClockoutStatusForMontLopCalFilterPayRunnew, getAllUserClockinAndClockoutStatusForMontLopCalFilterMinPoints, getAllUserClockinAndClockoutStatusLeave, getAllUserClockinAndClockoutStatusForMontLopCal,
-    getAllUserClockinAndClockoutStatusForMontLopCalFilter, getAllUserAttMonthCountFilterLimited, getAllUserAttMonthCount, getAllUserAttMonthCountFilter, getAllIntern, updateIntern, userscheckBranch,
-    getAllTheUsers, getSingleUserSignleRole, verifyUserEmail, verifytwofa, verifychecktwofa, usersLimitedEmpcode, usersLimitedEmpcodeCreate, usersLimitedEmpcodeNonmanual, updateUsersShiftAllotObjects,
-    updateUsersShiftAllotObjectsStatus, getAllUsersLogin, getAllUserstatus, getAllAddEmployeeLimit, getHrManager, getAttenddancefilter, getAllUserstaskProfile, getAllUsersexceldata, getAllUserslimit, regAuth,
-    loginAuth, logincheckAuth, loginOut, forgotPassword, resetPassword, getSingleUser, updateUser, deleteUser, updateUserPwd, getAllUserCheck, getAllSkillToUser, getAllRoleToUser, getAllTeamToUser,
-    getAllShiftToUser, getAllUserBranch, getAllQualToUser, getAllDesigToUser, getAllUnitToUser, getAllDepartmentToUser, getAllFloorToUser, getAllUserscompanyname, getAllUserClockinAndClockoutStatus, getAllUserClockinAndClockoutStatusFilter,
-    getAlluserDataFilter, employeeCodeAutogenerate, getAllUsersnewFilterMissingfield, getAllTheUsersEmployee, getAllUsersWithXEmployee, getAllUserAaccessibleBranch, getAllUsersCompanyname, getHierarchyBasedEmployeeStatusdefault,
-    getAllUserEnquiryLive, getAllUsersVisitorRegister, getAllUserClockinAndClockoutStatusDocumentPreparation, getAllUserClockinAndClockoutStatusForMontLopCalFilterDocPrep, getAllUserClockinAndClockoutStatusForMontLopCalFilterFinalSalary,
-    updateUserPwdReset, getAllUserClockinAndClockoutStatusLogin, getAllusersLimitedFinalsalary, deleteUserLogObjects, getAllUserClockinAndClockoutStatusIndividualHierarchyFilter, getAllUsersPayrunexceldataFinal, getAllUserAttMonthCountFilterPayRunMaster,
-    getAllUserClockinAndClockoutStatusIndividual, authenticateUser, getAllUsersPayrunexceldata, getAllUserClockinAndClockoutStatusFilterDateWise,
-    getAllUserClockinAndClockoutStatusIndividualFilter, getAllUserTotalShiftDays, getAllUserTotalShiftDaysHome,
-    getUserWithStatusHomeCount, getAllUserHomeCountReleive, getAllUserHomeCountNotClockIn, getAllUserHomeCountNotClockInList,
-    getAlluserDataFilterLongAbsendHierarchyHome,
-    //  getAlluserDataFilterLongAbsendHierarchyCompleted
-} = require("../controller/login/auth");
+const {
+  getAllTeamShiftHierarchyList, getAllTeamShiftHierarchyListNotificationCount,
+  getAllSalaryRevenueByCode, getAllUsers, getAlluserDataFilterLongAbsend, getAlluserDataFilterLongAbsendCompleted, getAllUsersexceldataAssignbranchHome, getAllUsersPostergenerate, getAllTheLogUsers, getAlluserDataFilterLongAbsendHierarchy,
+  getAllEmployeesForAttendanceFilter, getFilteredUserForShiftAdjusment, getAllNotInEmployees, getAlluserDataFilterLongAbsendHierarchyHome,
+  deleteUsersShiftAllot, getAllUsersnewFilter, getIndividualUserLoginStatus, getHierarchyBasedEmployeeStatus,
+  undoPayrunListInnerDataUser, updateVerifyUser, getAllUsersAssignbranch, getAllUsersexceldataByAssign,
+  getAllUsersexceldataAssignbranch, dynamicQueryUserController, getUserCredentials, getAllUserTemporaryLoginStatus, checkEmployeeEmptyFields, getAllProfileImage, getAllUserClockinAndClockoutStatusCheckLogin, getAllUserLoginStatusAction,
+  getAllUserstatusDepCheck, getAllShiftToUserBulkDelete, deleteShiftAnyLog, getAllUserProductionDayShiftAttendanceFilter, getAllUsersEmployee, getAllUserLoginExpStatus, getAllUserLoginStatus, deleteAnyLog, getAllUserProductionDayShiftFilter, updateAnyLogValues,
+  getAllUserClockinAndClockoutStatusLoginCheck, updatePayrunListInnerDataUser, getUserDocumentPrep, getAllUserAttendancePayRun, getAllUsersWithoutStatus, getUserWithStatus, getAllTemplateUsers, getOnBoardingSalaryFix, getFormerUserNames, checkduplicateemployeenameedit,
+  getAllFilteredUsers, checkduplicateemployeenamecreate, getAllUsersnew, getAllSalaryFixFilterReport, updateUsersShiftLogLastObjects, getAllSalaryFixFilter, getUsersAllData, getAllEnquieryUsers, getAllDactiveIntern, getAllRemoteuserFilter, getAllUserProduction,
+  getAllUserTotalShiftDaysHome, viewpassword, getAllUserClockinAndClockoutStatusMyIndividual, updatePCUsername, getAllUserClockinAndClockoutStatusForMontLopCalFilterPayrun, getAllUserClockinAndClockoutStatusForMontLopCalFilterPayRunMasterFetch, getAllUserClockinAndClockoutStatusForMontLopCalFilterMinPointsNew,
+  getAllUserClockinAndClockoutStatusForMontLopCalFilterPayRunnew, getAllUserClockinAndClockoutStatusForMontLopCalFilterMinPoints, getAllUserClockinAndClockoutStatusLeave, getAllUserClockinAndClockoutStatusForMontLopCal,
+  getAllUserClockinAndClockoutStatusForMontLopCalFilter, getAllUserAttMonthCountFilterLimited, getAllUserAttMonthCount, getAllUserAttMonthCountFilter, getAllIntern, updateIntern, userscheckBranch,
+  getAllTheUsers, getSingleUserSignleRole, verifyUserEmail, verifytwofa, verifychecktwofa, usersLimitedEmpcode, usersLimitedEmpcodeCreate, usersLimitedEmpcodeNonmanual, updateUsersShiftAllotObjects,
+  updateUsersShiftAllotObjectsStatus, getAllUsersLogin, getAllUserstatus, getAllAddEmployeeLimit, getHrManager, getAttenddancefilter, getAllUserstaskProfile, getAllUsersexceldata, getAllUserslimit, regAuth,
+  loginAuth, logincheckAuth, loginOut, forgotPassword, resetPassword, getSingleUser, updateUser, deleteUser, updateUserPwd, getAllUserCheck, getAllSkillToUser, getAllRoleToUser, getAllTeamToUser,
+  getAllShiftToUser, getAllUserBranch, getAllQualToUser, getAllDesigToUser, getAllUnitToUser, getAllDepartmentToUser, getAllFloorToUser, getAllUserscompanyname, getAllUserClockinAndClockoutStatus, getAllUserClockinAndClockoutStatusFilter,
+  getAlluserDataFilter, employeeCodeAutogenerate, getAllUsersnewFilterMissingfield, getAllTheUsersEmployee, getAllUsersWithXEmployee, getAllUserAaccessibleBranch, getAllUsersCompanyname, getHierarchyBasedEmployeeStatusdefault,
+  getAllUserEnquiryLive, getAllUsersVisitorRegister, getAllUserClockinAndClockoutStatusDocumentPreparation, getAllUserClockinAndClockoutStatusForMontLopCalFilterDocPrep, getAllUserClockinAndClockoutStatusForMontLopCalFilterFinalSalary,
+  updateUserPwdReset, getAllUserClockinAndClockoutStatusLogin, getAllusersLimitedFinalsalary, deleteUserLogObjects, getAllUserClockinAndClockoutStatusIndividualHierarchyFilter, getAllUsersPayrunexceldataFinal, getAllUserAttMonthCountFilterPayRunMaster,
+  getAllUserClockinAndClockoutStatusIndividual, getAllUserHomeCountNotClockInList, getAllShiftToUserOverAllBulkDelete, getAllUserHomeCountNotClockIn, getAllUserHomeCountReleive, getUserWithStatusHomeCount, getHierarchyBasedEmployeeWorkstation, getHierarchyBasedEmployeeWorkstationhira, authenticateUser, duplicateFaceDetector, getAllUsersPayrunexceldata, getAllUserClockinAndClockoutStatusFilterDateWise, getAllUserClockinAndClockoutStatusIndividualFilter, getAllUserTotalShiftDays,
+  getAllEmployeesForAttendanceFilterForAccessbranchWiseList,getCurrentServerTime,getAllDepartmentUsersUpdateAttendanceMode } = require("../controller/login/auth");
+
+authRoute.route('/getcurrentservertime').get(getCurrentServerTime);
+authRoute.route('/departmentusersupdateattmode').post(getAllDepartmentUsersUpdateAttendanceMode);
+authRoute.route("/teamleaveshifthierarchy").post(getAllTeamShiftHierarchyList);
+authRoute.route("/teamleaveshifthierarchynotificationcount").post(getAllTeamShiftHierarchyListNotificationCount);
+authRoute.route("/salaryslabrevenuebycode").post(getAllSalaryRevenueByCode);
 authRoute.route("/usersproductiondayshiftfilter").post(getAllUserProductionDayShiftFilter);
-
-
-authRoute.route("/userwithstatushomecount").post(getUserWithStatusHomeCount);
-authRoute.route("/userhomecountrelieve").get(getAllUserHomeCountReleive);
-authRoute.route("/userhomecountnotclockin").get(getAllUserHomeCountNotClockIn);
-authRoute.route("/userhomecountnotclockinlist").get(getAllUserHomeCountNotClockInList);
-
 authRoute.route("/userslimitcompanyname").get(getAllUserscompanyname);
 authRoute.route("/getallusersdata").get(getUsersAllData);
 authRoute.route("/userclockinclockoutstatuslogincheck").post(getAllUserClockinAndClockoutStatusLoginCheck);
 authRoute.route("/usersexceldataassignbranch").post(getAllUsersexceldataAssignbranch);
-authRoute.route("/usersexceldataassignbranchhome").get(getAllUsersexceldataAssignbranchHome);
 authRoute.route("/usersexceldatabyassignbranch").post(getAllUsersexceldataByAssign);
 authRoute.route("/usershiftallotsdelete").post(deleteUsersShiftAllot);
 authRoute.route("/individualusersloginstatus").post(getIndividualUserLoginStatus);
 authRoute.route("/authenticate").post(authenticateUser);
+authRoute.route("/userwithstatushomecount").post(getUserWithStatusHomeCount);
+authRoute.route("/userhomecountrelieve").post(getAllUserHomeCountReleive);
+authRoute.route("/userhomecountnotclockin").post(getAllUserHomeCountNotClockIn);
+authRoute.route("/userhomecountnotclockinlist").post(getAllUserHomeCountNotClockInList);
+authRoute.route("/hierarchybasedemployeeworkstationhira").post(getHierarchyBasedEmployeeWorkstationhira);
+authRoute.route("/hierarchybasedemployeeworkstation").post(getHierarchyBasedEmployeeWorkstation);
+authRoute.route("/duplicatefacecheck").post(duplicateFaceDetector);
 authRoute.route("/hierarchybasedemployeeloginstatus").post(getHierarchyBasedEmployeeStatus);
 authRoute.route("/hierarchybasedemployeeloginstatusdefault").post(getHierarchyBasedEmployeeStatusdefault);
 authRoute.route("/getalluserscompanyname").get(getAllUsersCompanyname);
 authRoute.route("/usershiftadjustmentfilter").post(getFilteredUserForShiftAdjusment);
 authRoute.route("/userforallattendancefilter").post(getAllEmployeesForAttendanceFilter);
+authRoute.route("/userforallattendancefilterforaccessbranchwiselist").post(getAllEmployeesForAttendanceFilterForAccessbranchWiseList);
 authRoute.route("/usersnewfiltermissingfield").post(getAllUsersnewFilterMissingfield);
 authRoute.route("/getfilteralluserdatalongabsend").post(getAlluserDataFilterLongAbsend);
-authRoute.route("/getfilteralluserdatalongabsendcompleted").post(getAlluserDataFilterLongAbsendCompleted);
 authRoute.route("/longabsentrestrictionhierarchylist").post(getAlluserDataFilterLongAbsendHierarchy);
-// authRoute.route("/longabsentrestrictionhierarchylistcompleted").post(getAlluserDataFilterLongAbsendHierarchyCompleted);
-
-authRoute.route("/longabsentrestrictionhierarchylistHome").post(getAlluserDataFilterLongAbsendHierarchyHome);
-
-
+authRoute.route("/getfilteralluserdatalongabsendcompleted").post(getAlluserDataFilterLongAbsendCompleted);
+authRoute.route("/pcnameuser/:id").put(updatePCUsername);
 authRoute.route("/usersassignuserbranch").post(getAllUsersAssignbranch);
 //log update/delete
 authRoute.route("/deleteanylog").delete(deleteAnyLog);
@@ -73,6 +73,8 @@ authRoute.route("/getemployeemissingfields").get(checkEmployeeEmptyFields);
 
 authRoute.route("/getallprofileimages").get(getAllProfileImage);
 authRoute.route("/user/shiftcheckbulk").post(getAllShiftToUserBulkDelete);
+authRoute.route("/user/shiftcheckbulkdelete").post(getAllShiftToUserOverAllBulkDelete);
+authRoute.route("/user/shiftcheckbulkdelete").post(getAllShiftToUserOverAllBulkDelete);
 //expiry data
 //emplogin status
 authRoute.route("/usersloginstatus").get(getAllUserLoginStatus);
@@ -88,16 +90,19 @@ authRoute.route("/usersbranchcheck").get(userscheckBranch);
 authRoute.route("/userpwreset/:id").put(updateUserPwdReset);
 authRoute.route("/formerusernames").get(getFormerUserNames);
 authRoute.route("/onboardingsalaryfixfilter").post(getOnBoardingSalaryFix);
+authRoute.route("/longabsentrestrictionhierarchylistHome").post(getAlluserDataFilterLongAbsendHierarchyHome);
 authRoute.route("/userwithstatus").post(getUserWithStatus);
 authRoute.route("/getalltemplateusers").get(getAllTemplateUsers);
 authRoute.route("/verifiedlist/:id").put(updateVerifyUser);
 authRoute.route("/checkcompanynamecreate").post(checkduplicateemployeenamecreate);
 authRoute.route("/checkcompanynameedit").post(checkduplicateemployeenameedit);
 authRoute.route("/userspostergenerate").get(getAllUsersPostergenerate);
+authRoute.route("/usersexceldataassignbranchhome").get(getAllUsersexceldataAssignbranchHome);
 authRoute.route("/alluseremployee").get(getAllTheUsersEmployee);
 authRoute.route("/getfilteralluserdata").post(getAlluserDataFilter);
 authRoute.route('/:id/verify/:token').get(verifyUserEmail);
 authRoute.route("/usersenquirystatus").get(getAllEnquieryUsers);
+authRoute.route("/getalluserstotalshiftdayshome").post(getAllUserTotalShiftDaysHome);
 authRoute.route("/allusers").get(getAllTheUsers);
 authRoute.route("/alluserslog").get(getAllTheLogUsers);
 authRoute.route("/verification/viewpassword").post(viewpassword);
@@ -148,8 +153,8 @@ authRoute.route("/userslimitedempcodenonmanual").get(usersLimitedEmpcodeNonmanua
 authRoute.route("/userclockinclockoutstatus").post(getAllUserClockinAndClockoutStatus);
 authRoute.route("/userclockinclockoutstatusfilter").post(getAllUserClockinAndClockoutStatusFilter);
 authRoute
-    .route("/userclockinclockoutstatusfilterdatewise")
-    .post(getAllUserClockinAndClockoutStatusFilterDateWise);
+  .route("/userclockinclockoutstatusfilterdatewise")
+  .post(getAllUserClockinAndClockoutStatusFilterDateWise);
 // authRoute.route("/userclockinclockoutstatusformontlopcal").post(getAllUserClockinAndClockoutStatusForMontLopCal);
 authRoute.route("/userclockinclockoutstatusformontlopcalfilter").post(getAllUserClockinAndClockoutStatusForMontLopCalFilter);
 authRoute.route("/usersprod").get(getAllUserProduction);
@@ -219,11 +224,10 @@ authRoute.route("/preemployeedocuments").get(getAllPreEmployeeDocuments);
 authRoute.route("/employeedocumentsidcard").get(getAllEmployeeDocumentsforidcard);
 authRoute.route("/employeedocumentcommonidwithallnew").post(getSingleEmployeeDocumentByCommonidWithAllnew);
 authRoute.route("/getalluserstotalshiftdays").post(getAllUserTotalShiftDays);
-authRoute.route("/getalluserstotalshiftdayshome").post(getAllUserTotalShiftDaysHome);
 
 const {
-    updateOverallEmployeename,
-    updateOverallEmployeeCode,
+  updateOverallEmployeename,
+  updateOverallEmployeeCode,
 } = require("../controller/login/OverallEmployeenameUpdate");
 
 authRoute.route("/employeenameoverallupdate").put(updateOverallEmployeename);
@@ -231,36 +235,83 @@ authRoute.route("/employeecodeoverallupdate").put(updateOverallEmployeeCode);
 
 
 const {
-    updateOverallBranchname,
-    getAllBranchCheck
+  updateOverallBranchname,
+  getAllBranchCheck
 } = require("../controller/login/OverallBranchnameUpdate");
 authRoute.route("/branchoverallupdate").put(updateOverallBranchname);
 authRoute.route("/branchAllCheck").post(getAllBranchCheck);
 
 const {
-    updateOverallTeamname,
-    getAllTeamCheck
+  updateOverallTeamname,
+  getAllTeamCheck,
+  allTeamBulkCheck
 } = require("../controller/login/OverallTeamUpdate");
 
 authRoute.route("/overallupdatecheck").put(updateOverallTeamname);
 authRoute.route("/overalldelcheck").post(getAllTeamCheck);
+authRoute.route("/overallbulkdelcheck").post(allTeamBulkCheck);
 
 const {
-    updateOverallDepartmentname,
-    getAllDepartmentCheck
+  updateOverallDepartmentname,
+  getAllDepartmentCheck,
+  DepartmentOverallCheckBulkdelete
 } = require("../controller/login/OverallDepatmentUpdate");
 
 authRoute.route("/departoverallupdate").put(updateOverallDepartmentname);
 authRoute.route("/departoverallcheck").post(getAllDepartmentCheck);
+authRoute.route("/departoverallbulkcheck").post(DepartmentOverallCheckBulkdelete);
+
 
 
 const {
-    updateOverallDesignationname,
-    getAllDesignationCheck
+  updateOverallDesignationname,
+  getAllDesignationCheck,
+  designationbulkcheck
 } = require("../controller/login/OverallDesignationUpdate");
 
 authRoute.route("/desigoverallupdate").put(updateOverallDesignationname);
 authRoute.route("/desigoverallcheck").post(getAllDesignationCheck);
+authRoute.route("/designationbulkcheck").post(designationbulkcheck);
+
+const userActivityMulter = require("../middleware/userActivityMulter.js");
+const { createUserActivity, dynamicQueryUserActivityController, getAllUserActivityStorage, createUserActivityScreenshot, dynamicQueryUserActivityScreenshotController, } = require("../controller/login/userActivity.js");
+authRoute.route("/saveuseractivityscrennshot").post(userActivityMulter.single("screenshot"), createUserActivityScreenshot);
+authRoute.route("/saveuseractivity").post(createUserActivity);
+authRoute.route("/getalluseractivitystorage").get(getAllUserActivityStorage);
+authRoute.route("/dynamicqueryuseractivitycontroller").post(dynamicQueryUserActivityController);
+authRoute.route("/dynamicqueryuseractivityscreeenshotcontroller").post(dynamicQueryUserActivityScreenshotController);
+
+
+
+const { getDashboardtHierarchyTeam,getUserWithStatusHomeCountTeam,getAllApplyleaveHomeTeam,getAllUserHomeCountNotClockInTeam,
+  getAllScheduleEventsHomeTeam,getUserWithStatusHomeCountListTeam,getAllApplyleaveHomeListTeam,getAllAdvanceByAssignBranchHomeTeam,
+  getAllAdvanceByAssignBranchHomeTeamList,getAllLoanByAssignBranchHomeTeam,getAllApplyleaveFilterHomeTeam,
+  getAllUserHomeCountNotClockInListTeam,ScheduleMeetingFilterTeam,getAllLoanByAssignBranchForPaginationList,getAllPermissionsHomeTeam,
+  dayPointsfilterHomeTeam,tempPointsfilterHomeTeam,getAllUsersexceldataAssignbranchHomeTeam,getAllUserTotalShiftDaysHomeTeam,
+  getAllUsersexceldataAssignbranchTeamDashboard
+} = require("../controller/login/dashboardteamcontroller.js");
+authRoute.route("/dashboardhierarchyteam").post(getDashboardtHierarchyTeam);
+authRoute.route("/userwithstatuscountteam").post(getUserWithStatusHomeCountTeam);
+authRoute.route("/applyleavehometeam").post(getAllApplyleaveHomeTeam);
+authRoute.route("/notclockinteam").post(getAllUserHomeCountNotClockInTeam);
+authRoute.route("/scheduleeventsteamhome").post(getAllScheduleEventsHomeTeam);
+authRoute.route("/userwithstatuscountlistteam").post(getUserWithStatusHomeCountListTeam);
+authRoute.route("/applyleavehomelistteam").post(getAllApplyleaveHomeListTeam);
+authRoute.route("/notclockinlistteam").post(getAllUserHomeCountNotClockInListTeam);
+authRoute.route("/schedulemeetingfilterteam").post(ScheduleMeetingFilterTeam);
+authRoute.route("/advanceassignbranchhometeam").post(getAllAdvanceByAssignBranchHomeTeam);
+authRoute.route("/advanceassignbranchhometeamlist").post(getAllAdvanceByAssignBranchHomeTeamList);
+authRoute.route("/loanteam").post(getAllLoanByAssignBranchHomeTeam);
+authRoute.route("/loanteamlist").post(getAllLoanByAssignBranchForPaginationList);
+authRoute.route("/applyleavefilterhometeam").post(getAllApplyleaveFilterHomeTeam);
+authRoute.route("/permissionhometeam").post(getAllPermissionsHomeTeam);
+authRoute.route("/daypointsfilterhometeam").post(dayPointsfilterHomeTeam);
+authRoute.route("/tempointsfilterhometeam").post(tempPointsfilterHomeTeam);
+authRoute.route("/userexceldatahometeam").post(getAllUsersexceldataAssignbranchHomeTeam);
+authRoute.route("/minimumhometeam").post(getAllUserTotalShiftDaysHomeTeam);
+authRoute.route("/userexceldataassignbranchteamdashboard").post(getAllUsersexceldataAssignbranchTeamDashboard);
+
+
 
 
 

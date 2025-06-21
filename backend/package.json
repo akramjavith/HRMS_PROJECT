@@ -30,6 +30,7 @@
     "image-to-pdf": "^2.0.0",
     "jimp": "^0.22.8",
     "jsonwebtoken": "^9.0.0",
+    "luxon": "^3.6.1",
     "mime-types": "^3.0.1",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.45",

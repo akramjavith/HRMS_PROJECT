@@ -2334,8 +2334,7 @@ export const SERVICE = {
     USERSHIFTCHECKOVERALLBULK: `${BASE_URL}/api/user/shiftcheckbulkdelete`,
     USERSKILLCHECK: `${BASE_URL}/api/user/skillcheck`,
     USERSWITHSTATUS: `${BASE_URL}/api/userwithstatus`,
-    USERS_COMPANYNAMES: `${BASE_URL}/api/getalluserscompanyname`,
-    USERS_LIMITED_DROPDOWN_FINALSALARY: `${BASE_URL}/api/userslimitedfinalsalary`,
+    USERS_COMPANYNAMES: `${BASE_URL}/api/getalluserscompanyname`,USERS_LIMITED_DROPDOWN_FINALSALARY: `${BASE_URL}/api/userslimitedfinalsalary`,
     USERS_LIMITED_EMPCODE: `${BASE_URL}/api/userslimitedempcode`,
     USERS_LIMITED_EMPCODE_CREATE: `${BASE_URL}/api/userslimitedempcodecreate`,
     USERS_LIMITED_EMPCODE_NONMANUAL: `${BASE_URL}/api/userslimitedempcodenonmanual`,
@@ -5829,9 +5828,37 @@ export const SERVICE = {
 
      DASHBOARD_HIERARCHY_TEAM: `${BASE_URL}/api/dashboardhierarchyteam`,
       EMPLOYEE_HOME_COUNT_TEAM: `${BASE_URL}/api/userwithstatuscountteam`,
+      EMPLOYEE_HOME_COUNT_LIST_TEAM: `${BASE_URL}/api/userwithstatuscountlistteam`,
       APPLY_LEAVE_HOME_TEAM: `${BASE_URL}/api/applyleavehometeam`,
       NOTCLOCKIN_HOME_COUNT_TEAM: `${BASE_URL}/api/notclockinteam`,
-    
+      ALL_EVENT_HOME_TEAM: `${BASE_URL}/api/scheduleeventsteamhome`,
+      APPLY_LEAVE_HOME_LIST_TEAM: `${BASE_URL}/api/applyleavehomelistteam`,
+      NOTCLOCKIN_HOME_COUNT_LIST_TEAM: `${BASE_URL}/api/notclockinlistteam`,
+      SCHEDULE_MEETING_FILTER_LIST_TEAM: `${BASE_URL}/api/schedulemeetingfilterteam`,
+      ADVANCE_TEAM: `${BASE_URL}/api/advanceassignbranchhometeam`,
+      ADVANCE_TEAM_LIST_TEAM: `${BASE_URL}/api/advanceassignbranchhometeamlist`,
+      LOAN_TEAM: `${BASE_URL}/api/loanteam`,
+      LOAN_LIST_TEAM: `${BASE_URL}/api/loanteamlist`,
+      APPLYLEAVE_FILTERED_HOME_COUNT_TEAM: `${BASE_URL}/api/applyleavefilterhometeam`,
+      PERMISSION_HOME_TEAM: `${BASE_URL}/api/permissionhometeam`,
+      DAY_POINTS_FILTER_HOME_TEAM: `${BASE_URL}/api/daypointsfilterhometeam`,
+      TEMP_DAY_POINTS_FILTER_HOME_TEAM: `${BASE_URL}/api/tempointsfilterhometeam`,
+      USER_EXCEL_DATA_HOME_TEAM: `${BASE_URL}/api/userexceldatahometeam`,
+      MINIMUM_HOME_TEAM: `${BASE_URL}/api/minimumhometeam`,
+      USERSEXCELDATAASSIGNBRANCHE_TEAM: `${BASE_URL}/api/userexceldataassignbranchteamdashboard`,
+      GETUSE_TOTALSHIFT_DAYS_TEAM: `${BASE_URL}/api/usertotalshiftdayshometeam`,
+      ASSIGNED_HOME_TEAM: `${BASE_URL}/api/taskforassignedhometeam`,
+      
+
+      
+
+      
+
+
+      
+
+      
+      
 
     
     

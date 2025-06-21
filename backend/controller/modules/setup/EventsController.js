@@ -40,28 +40,31 @@ exports.getAllScheduleEvents = catchAsyncErrors(async (req, res, next) => {
 
 exports.getAllScheduleEventsHome = catchAsyncErrors(async (req, res, next) => {
   let scheduleevent;
-  try {
+  try { 
     const { assignbranch } = req.body;
 
     const branchFilter = assignbranch.map((branchObj) => ({
-      $and: [
-        { company: { $elemMatch: { $eq: branchObj.company } } },
-        { branch: { $elemMatch: { $eq: branchObj.branch } } },
-        { unit: { $elemMatch: { $eq: branchObj.unit } } },
-      ],
+      branch: branchObj.branch,
+      company: branchObj.company,
+    unit: branchObj.unit
     }));
 
-    // Use $or to filter incomes that match any of the branch, company, and unit combinations
-    const filterQuery = { $or: branchFilter };
+    let filterQuery = { $or: branchFilter };
 
-    scheduleevent = await ScheduleEvents.find(filterQuery, { eventname: 1, eventdescription: 1 });
+    // Use $or to filter incomes that match any of the branch, company, and unit combinations
+   
+if(branchFilter.length > 0){
+    scheduleevent = await ScheduleEvents.find(filterQuery,{eventname:1,eventdescription:1});
+    }else{
+    
+    scheduleevent =[]
+    }
     // scheduleevent = await ScheduleEvents.find();
   } catch (err) {
+  console.log(err,"errevent")
     return next(new ErrorHandler("Records not found!", 404));
   }
-  if (!scheduleevent) {
-    return next(new ErrorHandler("ScheduleEvents not found!", 404));
-  }
+ 
   return res.status(200).json({
     scheduleevent,
   });

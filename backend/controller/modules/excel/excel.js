@@ -9500,11 +9500,7 @@ exports.getAllCandidateUpcomingInterview = catchAsyncErrors(async (req, res, nex
   let candidates, filteredschedule, filteredschedulemeeting;
   try {
 
-    // let fromdate, todate;
-    // const selectedFilter = req.body.selectedfilter;
-
-    // const formatDate = (date) => date.toISOString().split("T")[0];
-
+ 
     let fromdate, todate;
     const today = new Date();
     const selectedFilter = req.body.selectedfilter;
@@ -9517,7 +9513,24 @@ exports.getAllCandidateUpcomingInterview = catchAsyncErrors(async (req, res, nex
       return `${year}-${month}-${day}`;
     };
 
+    // Calculate the start of the week (assuming Sunday is the start)
+    const getWeekStartDate = (date) => {
+      const start = new Date(date);
+      start.setDate(start.getDate() - start.getDay());
+      return start;
+    };
 
+    // Calculate the end of the week (assuming Saturday is the end)
+    const getWeekEndDate = (date) => {
+      const end = new Date(date);
+      end.setDate(end.getDate() + (6 - end.getDay()));
+      return end;
+    };
+
+    // Calculate the start and end of the month
+    const getMonthStartDate = (date) => new Date(date.getFullYear(), date.getMonth(), 1);
+    const getMonthEndDate = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 0);
+ 
 
     switch (selectedFilter) {
 
@@ -9566,16 +9579,26 @@ exports.getAllCandidateUpcomingInterview = catchAsyncErrors(async (req, res, nex
       default:
         fromdate = "";
     }
-    const branchFilter = req.body.assignbranch.map((branchObj) => ({
-      "interviewrounds.branch": branchObj.branch,
-      "interviewrounds.company": branchObj.company,
-    }));
-    let Query = { $or: branchFilter };
+    
+    console.log(req.body.assignbranch,"ass")
+    
+    
+  const branchFilter = req.body.assignbranch.map((branchObj) => ({
+        
+        "interviewrounds.branch":branchObj.branch,
+         "interviewrounds.company":branchObj.company,
+         
+        
+        }));
+        let Query = {$or:branchFilter}
+        
+
     candidates = await Addcandidate.aggregate([
       {
         $match: {
-          ...Query,
-
+          // overallstatus: "Applied",
+...Query,
+//$or:branchFilter,
           ...(fromdate && todate ? { "interviewrounds.date": { $gte: fromdate, $lte: todate } } :
             fromdate ? { "interviewrounds.date": { $eq: fromdate } } :
               {}
@@ -9702,9 +9725,9 @@ exports.getAllCandidateUpcomingInterview = catchAsyncErrors(async (req, res, nex
       }
     ]);
 
-    // console.log(candidates[0], "candidateshomeupcoming")
+     console.log(candidates[0], "candidateshomeupcoming")
   } catch (err) {
-    console.log(err.message);
+    console.log(err,"upcominge");
   }
 
   return res.status(200).json({

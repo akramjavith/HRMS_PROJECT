@@ -5848,6 +5848,20 @@ export const SERVICE = {
       USERSEXCELDATAASSIGNBRANCHE_TEAM: `${BASE_URL}/api/userexceldataassignbranchteamdashboard`,
       GETUSE_TOTALSHIFT_DAYS_TEAM: `${BASE_URL}/api/usertotalshiftdayshometeam`,
       ASSIGNED_HOME_TEAM: `${BASE_URL}/api/taskforassignedhometeam`,
+      TASK_USER_REPORT_TEAM: `${BASE_URL}/api/taskuserreportsteam`,
+      MAINTENANCE_TASK_FOR_USER_TEAM: `${BASE_URL}/api/maintenancetaskforuserteam`,
+      MAINTENANCE_TASK_FOR_USER_TEAM_LIST: `${BASE_URL}/api/maintenancetaskforuserteamlist`,
+      CLIENTUSERID_MYLOGIN_ALLOT_TEAM: `${BASE_URL}/api/clientuseridlimiteduserteam`,
+      RAISE_TICKET_HOME_TEAM: `${BASE_URL}/api/risetickethometeamcount`,
+      PENDING_TICKETS_TEAM: `${BASE_URL}/api/pendingtickets`,
+      RAISE_TICKET_FORWARDED_TEAM: `${BASE_URL}/api/raiseticketforwardedemployeeteam`,
+      USER_ASSIGN_BRANCH_TEAM: `${BASE_URL}/api/userassignbranchhometeam`,
+      MY_VERIFICATION_TEAM_LIST: `${BASE_URL}/api/myverificaitonteamlist`,
+
+
+      
+
+      
       
 
       

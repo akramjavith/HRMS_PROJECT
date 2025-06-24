@@ -26,8 +26,18 @@ const HomeMyLoginAllot = () => {
   };
 
   const { auth } = useContext(AuthContext);
-  const { isUserRoleAccess, isUserRoleCompare } = useContext(UserRoleAccessContext);
+  const { isUserRoleAccess, isUserRoleCompare,listPageAccessMode } = useContext(UserRoleAccessContext);
 
+
+  let listpageaccessby =
+      listPageAccessMode?.find(
+        (data) =>
+          data.modulename === "Setup" &&
+          data.submodulename === "Team Dashboard" &&
+          data.mainpagename === "" &&
+          data.subpagename === "" &&
+          data.subsubpagename === ""
+      )?.listpageaccessmode || "Overall";
   // Error Popup model
   const [isErrorOpendialog, setIsErrorOpendialog] = useState(false);
   const [showAlert, setShowAlert] = useState();
@@ -168,13 +178,24 @@ const HomeMyLoginAllot = () => {
       setLoader(true);
 
       let finalData = [];
+       let reshir = await axios.post(SERVICE.HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM, {
+                        headers: {
+                          Authorization: `Bearer ${auth.APIToken}`,
+                        },
+                        hierachy: "myallhierarchy",
+                        sector: "all",
+                        username: isUserRoleAccess.companyname,
+                        pagename: "menuteamdashboard",
+                        listpageaccessmode: listpageaccessby,
+                      });
 
       if (isUserRoleCompare?.includes('lmyloginallot')) {
-        let res = await axios.post(SERVICE.CLIENTUSERID_LIMITED_USER, {
+        let res = await axios.post(SERVICE.CLIENTUSERID_MYLOGIN_ALLOT_TEAM, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
-          companyname: isUserRoleAccess.companyname,
+          // companyname: isUserRoleAccess.companyname,
+           hierarchyempnames: reshir?.data?.resultAccessFilter,
 
           date: new Date().toString(),
         });
@@ -251,7 +272,7 @@ const HomeMyLoginAllot = () => {
             </Grid>
             <br />
             <Grid container sx={{ justifyContent: 'flex-end', marginTop: 'auto' }}>
-              <Link to="/updatepages/individualloginallotlist" target="_blank">
+              <Link to="/loginallotteam" target="_blank">
                 <Button variant="contained" sx={{ backgroundColor: '#ff5e65', borderRadius: '13px', textTransform: 'capitalize', fontWeight: 'bold' }} size="small">
                   View More
                 </Button>

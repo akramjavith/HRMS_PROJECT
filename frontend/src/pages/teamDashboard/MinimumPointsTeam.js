@@ -1433,7 +1433,7 @@ function MinPointsCalc() {
 
   const rowDataTable = filteredData.map((item, index) => {
     return {
-      id: item._id,
+      id: item.serialNumber,
       serialNumber: item.serialNumber,
       company: item.company,
       branch: item.branch,

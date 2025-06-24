@@ -580,75 +580,152 @@ exports.clientUserIdLimitedTimestudyByCompnynameMulti = catchAsyncErrors(async (
 });
 
 
+// exports.clientUseridsLimitedUser = catchAsyncErrors(async (req, res, next) => {
+//   let clientuserid;
+//   try {
+
+//     clientuserid = await ClientUserID.aggregate([
+//       { $unwind: '$loginallotlog' },
+//       {
+//         $sort: {
+//           'loginallotlog.date': 1,
+//           'loginallotlog.time': 1,
+//         },
+//       },
+
+//       {
+//         $group: {
+//           _id: {
+//             userid: '$userid',
+//             projectvendor: '$projectvendor',
+//           },
+//           logs: { $push: '$loginallotlog' },
+//         },
+//       },
+//       {
+//         $project: {
+//           userid: '$_id.userid',
+//           projectvendor: '$_id.projectvendor',
+
+//           logs: {
+//             $map: {
+//               input: { $range: [0, { $size: '$logs' }] },
+//               as: 'idx',
+//               in: {
+//                 currentLog: { $arrayElemAt: ['$logs', '$$idx'] },
+//                 endDate: {
+//                   $cond: {
+//                     if: { $lt: ['$$idx', { $subtract: [{ $size: '$logs' }, 1] }] },
+//                     then: { $arrayElemAt: ['$logs.date', { $add: ['$$idx', 1] }] },
+//                     else: null,
+//                   },
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       },
+//       { $unwind: '$logs' },
+//       {
+//         $replaceRoot: { newRoot: { $mergeObjects: ['$logs.currentLog', { endDate: '$logs.endDate' }] } },
+//       },
+//       {
+//         $match: {
+//           empname: req.body.companyname,
+//           date: { $lte: req.body.date },
+//           $or: [
+//             { endDate: null },
+//             { endDate: { $gt: req.body.date } },
+//           ],
+//         },
+//       },
+//       {
+//         $sort: { date: -1, time: -1 },
+//       },
+//     ]);
+//     // console.log(clientuserid, 'clientuserid')
+//   } catch (err) {
+//     console.log(err.message);
+//   }
+
+//   return res.status(200).json({
+//     clientuserid,
+//   });
+// });
+
+
 exports.clientUseridsLimitedUser = catchAsyncErrors(async (req, res, next) => {
-  let clientuserid;
+  let clientuserid = [];
   try {
+   
+    loginids = await ClientUserID.find({ "loginallotlog.empname": req.body.companyname }, { userid: 1, loginallotlog: 1, projectvendor: 1 }).lean();
+    let logs = loginids.flatMap((user) =>
+      user.loginallotlog.map((log) => ({
+        userid: user.userid,
+        _id: user._id,
+        projectvendor: user.projectvendor,
+        date: log.date,
+        time: log.time,
+        empname: log.empname,
+        empcode: log.empcode,
+        enddate: log.enddate ? log.enddate : null,
+      }))
+    );
 
-    clientuserid = await ClientUserID.aggregate([
-      { $unwind: '$loginallotlog' },
-      {
-        $sort: {
-          'loginallotlog.date': 1,
-          'loginallotlog.time': 1,
-        },
-      },
+    // Step 2: Sort logs by date and time (ascending order)
+    logs.sort((a, b) => {
+      if (a.date === b.date) {
+        return a.time.localeCompare(b.time);
+      }
+      return new Date(a.date) - new Date(b.date);
+    });
 
-      {
-        $group: {
-          _id: {
-            userid: '$userid',
-            projectvendor: '$projectvendor',
-          },
-          logs: { $push: '$loginallotlog' },
-        },
-      },
-      {
-        $project: {
-          userid: '$_id.userid',
-          projectvendor: '$_id.projectvendor',
+    // Step 3: Calculate the enddate for each log (except the last log for each userid)
+    const userLogsMap = {};
+    logs.forEach((log) => {
+      if (!userLogsMap[log.userid]) {
+        userLogsMap[log.userid] = {};
+      }
 
-          logs: {
-            $map: {
-              input: { $range: [0, { $size: '$logs' }] },
-              as: 'idx',
-              in: {
-                currentLog: { $arrayElemAt: ['$logs', '$$idx'] },
-                endDate: {
-                  $cond: {
-                    if: { $lt: ['$$idx', { $subtract: [{ $size: '$logs' }, 1] }] },
-                    then: { $arrayElemAt: ['$logs.date', { $add: ['$$idx', 1] }] },
-                    else: null,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      { $unwind: '$logs' },
-      {
-        $replaceRoot: { newRoot: { $mergeObjects: ['$logs.currentLog', { endDate: '$logs.endDate' }] } },
-      },
-      {
-        $match: {
-          empname: req.body.companyname,
-          date: { $lte: req.body.date },
-          $or: [
-            { endDate: null },
-            { endDate: { $gt: req.body.date } },
-          ],
-        },
-      },
-      {
-        $sort: { date: -1, time: -1 },
-      },
-    ]);
-    // console.log(clientuserid, 'clientuserid')
+      if (!userLogsMap[log.userid][log.projectvendor]) {
+        userLogsMap[log.userid][log.projectvendor] = [];
+      }
+
+      userLogsMap[log.userid][log.projectvendor].push(log);
+    });
+
+    Object.values(userLogsMap).forEach((userLogs) => {
+      Object.values(userLogs).forEach((logsArray) => {
+        logsArray.forEach((log, idx) => {
+          if (idx < logsArray.length - 1) {
+            log.enddate = logsArray[idx + 1].date;
+          }
+        });
+      });
+    });
+    // Step 4: Filter logs based on input date
+    const filteredLogs = logs.filter((log) => {
+      return new Date(log.date) <= new Date(req.body.date) && (!log.enddate || new Date(log.enddate) >= new Date(req.body.date));
+    });
+
+    // Step 5: Sort the filtered logs by date and time (descending order)
+    filteredLogs.sort((a, b) => {
+      if (a.date === b.date) {
+        return b.time.localeCompare(a.time);
+      }
+      return new Date(b.date) - new Date(a.date);
+    });
+    clientuserid = filteredLogs.filter((d) => d.empname === req.body.companyname);
+
+    console.log(clientuserid.length, "clientuserid");
   } catch (err) {
     console.log(err.message);
   }
-
+  // if (!clientuserid) {
+  //   return next(new ErrorHandler("Client User ID not found!", 404));
+  // }
   return res.status(200).json({
+    // count: products.length,
     clientuserid,
   });
 });

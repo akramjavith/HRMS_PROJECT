@@ -999,7 +999,14 @@ const Loanrequestteam = React.lazy(() => import("../pages/teamDashboard/loanrequ
 const ProductionReviewteam = React.lazy(() => import("../pages/teamDashboard/Productionreviewteam.js"));
 const TempProductionReviewteam = React.lazy(() => import("../pages/teamDashboard/TempProductionReviewTeam.js"));
 const MinimumpointsTeam = React.lazy(() => import("../pages/teamDashboard/MinimumPointsTeam.js"));
-// const TaskTeam = React.lazy(() => import("../pages/teamDashboard/"));
+const TaskTeam = React.lazy(() => import("../pages/teamDashboard/TaskForUsersReportTeam.js"));
+const MaintenanceTeam = React.lazy(() => import("../pages/teamDashboard/MaintenanceFilterListTeam.js"));
+const LoginAllotTeam = React.lazy(() => import("../pages/teamDashboard/MyLoginAllotTeam.js"));
+const RaiseTicketListTeam = React.lazy(() => import("../pages/teamDashboard/RaiseTicketlist.js"));
+
+
+const RaiseTicketGroupTeam = React.lazy(() => import("../pages/teamDashboard/RaiseTicketTeamGroupTeam.js"));
+const MyVerificationTeam = React.lazy(() => import("../pages/teamDashboard/MyVerificaitonTeam.js"));
 
 
 const App = () => {
@@ -2061,6 +2068,8 @@ const App = () => {
              <Route path="production/tempindividualproductionbasedattendance" element={<TempIndividualProductionbaseattendance />} />
              <Route path="production/tempteamproductionbasedattendance" element={<TempTeamProductionbaseattendance />} />
 
+
+{/* team dashboard */}
               <Route path="liveemployeelisthome" element={<LiveEmployeeListTeam />} />
               <Route path="todayleaveapprovedteam" element={<TodayLeaveApprovedteam />} />
               <Route path="notcheckinemplistteam" element={<NotcheckinemplistTeam />} />
@@ -2070,6 +2079,14 @@ const App = () => {
               <Route path="productionreviewteam" element={<ProductionReviewteam />} />
               <Route path="tempproductionreviewteam" element={<TempProductionReviewteam />} />
               <Route path="minimumpointsteam" element={<MinimumpointsTeam />} />
+              <Route path="taskreportteam" element={<TaskTeam />} />
+              <Route path="maintenanceteamlist" element={<MaintenanceTeam />} />
+              <Route path="loginallotteam" element={<LoginAllotTeam />} />
+              <Route path="raiseticketlistteam" element={<RaiseTicketListTeam />} />
+              <Route path="raiseticketteamgroupteam" element={<RaiseTicketGroupTeam />} />
+              <Route path="myverificationteam" element={<MyVerificationTeam />} />
+
+              
             
             
             {/* page not found */}

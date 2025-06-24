@@ -257,28 +257,145 @@ exports.getAllTaskUserReportsOverall = catchAsyncErrors(async (req, res, next) =
 
 exports.getAllTaskUserReports = catchAsyncErrors(async (req, res, next) => {
   let result, totalProjects, overall;
-  const { frequency, page, pageSize } = req.body;
+  const { frequency, status, fromdate, todate, page, pageSize, allFilters, logicOperator, searchQuery } = req.body;
   const skip = (page - 1) * pageSize; // Calculate the number of items to skip
-  console.log(frequency, 'frequency')
+  let query = {};
+  let Overallquery = {};
+  const from = moment.tz(req.body.fromdate, 'YYYY-MM-DD', 'Asia/Kolkata').startOf('day').toDate();
+  const to = moment.tz(req.body.todate, 'YYYY-MM-DD', 'Asia/Kolkata').endOf('day').toDate();
+
+  if (frequency?.length > 0) {
+    query.frequency = { $in: frequency };
+    Overallquery.frequency = { $in: frequency };
+  }
+  if (status?.length > 0) {
+    query.taskstatus = { $in: status };
+    Overallquery.taskstatus = { $in: status };
+  }
+
+  if (fromdate && todate) {
+    query = {
+      ...query,
+      formattedDate: {
+        $gte: from,
+        $lte: to,
+      },
+    };
+
+    Overallquery = {
+      ...Overallquery,
+      formattedDate: {
+        $gte: from,
+        $lte: to,
+      },
+    };
+  }
+
+  let conditions = [];
+
+  // Advanced search filter
+  if (allFilters && allFilters.length > 0) {
+    allFilters.forEach((filter) => {
+      if (filter.column && filter.condition && (filter.value || ['Blank', 'Not Blank'].includes(filter.condition))) {
+        conditions.push(createFilterCondition(filter.column, filter.condition, filter.value));
+      }
+    });
+  }
+  if (searchQuery && searchQuery !== undefined) {
+    const searchTermsArray = searchQuery.split(' ');
+    const regexTerms = searchTermsArray.map((term) => new RegExp(term, 'i'));
+    const orConditions = regexTerms.map((regex) => ({
+      $or: [
+        { taskstatus: regex },
+        { taskassigneddate: regex },
+        { taskdate: regex },
+        { taskdetails: regex },
+        { frequency: regex },
+        { completedbyuser: regex },
+        { userdescription: regex },
+        { category: regex },
+        { subcategory: regex },
+        { duration: regex },
+        { breakup: regex },
+        { required: { $in: regex } },
+        { schedule: regex },
+      ],
+    }));
+
+    query = {
+      ...query,
+      $and: [...orConditions],
+    };
+  }
+
+  // Apply logicOperator to combine conditions
+  if (conditions.length > 0) {
+    if (logicOperator === 'AND') {
+      query.$and = conditions;
+    } else if (logicOperator === 'OR') {
+      query.$or = conditions;
+    }
+  }
+
   try {
     // First, count the total number of projects matching the frequency criteria
-    totalProjects = await TaskForUser.countDocuments({
-      frequency: { $in: frequency }
-    });
-    overall = await TaskForUser.find({
-      frequency: { $in: frequency }
-    });
+    totalProjects = await TaskForUser.countDocuments(query);
+    overall = await TaskForUser.find(Overallquery, {
+      category: 1,
+      subcategory: 1,
+      frequency: 1,
+      schedule: 1,
+      username: 1,
+      date: 1,
+      shiftEndTime: 1,
+      taskdetails: 1,
+      timetodo: 1,
+      description: 1,
+      taskstatus: 1,
+      taskassigneddate: 1,
+      taskdate: 1,
+      taskassign: 1,
+      breakup: 1,
+      assignId: 1,
+      monthdate: 1,
+      weekdays: 1,
+      tasktime: 1,
+      annumonth: 1,
+      required: 1,
+      duration: 1,
+      priority: 1,
+    }).lean();
 
     // Then, find the projects with pagination
-    result = await TaskForUser.find({
-      frequency: { $in: frequency }
+    result = await TaskForUser.find(query, {
+      category: 1,
+      subcategory: 1,
+      frequency: 1,
+      schedule: 1,
+      username: 1,
+      date: 1,
+      shiftEndTime: 1,
+      taskdetails: 1,
+      timetodo: 1,
+      description: 1,
+      taskstatus: 1,
+      tasktime: 1,
+      taskassigneddate: 1,
+      timetodo: 1,
+      taskdate: 1,
+      taskassign: 1,
+      breakup: 1,
+      assignId: 1,
+      monthdate: 1,
+      weekdays: 1,
+      annumonth: 1,
+      required: 1,
+      duration: 1,
+      priority: 1,
     })
+      .lean()
       .skip(skip)
       .limit(pageSize);
-
-    if (!result || result.length === 0) {
-      return next(new ErrorHandler("Data not found!", 404));
-    }
 
     return res.status(200).json({
       totalProjects,
@@ -288,10 +405,10 @@ exports.getAllTaskUserReports = catchAsyncErrors(async (req, res, next) => {
       totalPages: Math.ceil(totalProjects / pageSize),
     });
   } catch (err) {
-    return next(new ErrorHandler("Records not found!", 404));
+    console.log(err, 'err');
+    return next(new ErrorHandler('Records not found!', 404));
   }
 });
-
 exports.getAllTaskForUserAutoGenerate = catchAsyncErrors(async (req, res, next) => {
   const { updatedAns, dateNow, username } = req.body;
   let uniqueElements, nonscheduledata;

@@ -23,9 +23,9 @@ import HomeTask from "./HomeTaskTeam";
 import HomeExpenseIncome from "./HomeExpenseIncome";
 import HomeAsset from "./HomeAsset";
 import HomeInterview from "./HomeInterview";
-import HomeTickets from "./HomeTickets";
+import HomeTickets from "./HomeTicketsTeam";
 import HomeLoginAllot from "./HomeMyLoginAllotTeam";
-import HomeMaintenance from "./HomeMaintenance";
+import HomeMaintenance from "./HomeMaintenanceTeam";
 
 const Homelayout = () => {
   const { auth } = useContext(AuthContext);

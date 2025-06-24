@@ -6980,657 +6980,1348 @@ exports.getLocalOtp = catchAsyncErrors(async (req, res, next) => {
     });
   }
 });
+// exports.logincheckAuth = catchAsyncErrors(async (req, res, next) => {
+//   let resversion = false;
+//   let appUpdateCalculation = 7;
+//   try {
+//     const { username, password, otp, publicIP, macAddress, systemname, currenturl, localIp, hostname, version, applogin } = req.body;
+//     let MatchedNotMatched;
+//     let controlcriteria;
+//     let holidayWeekOffRestriction;
+//     let userCheckInControlCriteria;
+//     resversion = version === '1.13.0' ? true : (resversion = version === '1.14.0' ? true : (resversion = version === '1.15.0' ? true : (resversion = version === '1.16.0' ? true : false)));
+
+//     const PresenLoginUserDate = new Date();
+//     // let hostname = "TT_1_U4_G-HRA";
+//     const resonablestatusarray = ['Absconded', 'Hold', 'Terminate', 'Releave Employee', 'Not Joined', 'Postponed', 'Rejected', 'Closed'];
+//     //version mismatch
+//     if (!username || !password) {
+//       return next(new ErrorHandler('Please enter username and password', 400));
+//     }
+//     // Check if email & password entered by user
+//     if (applogin === true && version !== '1.13.0' && version !== '1.14.0' && version !== '1.15.0' && version !== '1.16.0') {
+//       return next(new ErrorHandler('Please Update current version!..', 400));
+//     }
+
+//     if (applogin === undefined || version === undefined) {
+//       return next(new ErrorHandler('Please Update current version!..', 400));
+//     }
+//     // Finding if user exists in database
+//     const user = await User.findOne({
+//       resonablestatus: {
+//         $nin: ['Not Joined', 'Postponed', 'Rejected', 'Closed', 'Releave Employee', 'Absconded', 'Hold', 'Terminate'],
+//       },
+
+//       username,
+//     }).select('+password');
+//     if (!user) {
+//       return next(new ErrorHandler('Login Restricted! Please Enter Valid Username&Password', 401));
+//     }
+
+//     const userUniqueAddresss = user?.loginUserStatus?.find((data) => data?.username === systemname && macAddress === data?.macaddress);
+//     appUpdateCalculation = userUniqueAddresss ? 7 - Math.floor((new Date().getTime() - new Date(userUniqueAddresss?.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 7;
+
+//     // If checks password is correct or not
+//     const isPwdMatched = await bcrypt.compare(password, user.password);
+
+//     if (!isPwdMatched) {
+//       return next(new ErrorHandler('Invalid Password', 401));
+//     }
+//     if (resonablestatusarray.includes(user?.resonablestatus)) {
+//       return next(new ErrorHandler('Login Restricted', 401));
+//     }
+
+//     const overallsettings = await AdminOverAllSettings.find({}, { loginbyworkstation: 1, externalurl: 1, internalurl: 1, loginmode: 1, overalltwofaswitch: 1, loginrestrictionswitch: 1, loginapprestriction: 1 });
+
+//     const clockinip = await ClockinIP.find({ branch: user?.branch });
+//     let individualsettings = await IndividualSettings.find({
+//       company: user?.company,
+//       branch: user?.branch,
+//       unit: user?.unit,
+//       team: user?.team,
+//       companyname: { $in: user?.companyname },
+//     });
+//     let individualtwofaswitch = individualsettings?.find((item) => item.companyname.includes(user?.companyname));
+
+//     let autoLogoutTime = await AutoLogout.aggregate([
+//       {
+//         $facet: {
+//           matchedData: [
+//             {
+//               $unwind: '$todos',
+//             },
+//             {
+//               $match: {
+//                 'todos.employeename': user.companyname,
+//               },
+//             },
+//             {
+//               $project: {
+//                 autologoutmins: '$todos.autologoutmins',
+//               },
+//             },
+//           ],
+//           notMatched: [
+//             {
+//               $match: {
+//                 autologoutswitch: true,
+//               },
+//             },
+//             {
+//               $project: {
+//                 autologoutmins: '$autologoutmins',
+//               },
+//             },
+//           ],
+//         },
+//       },
+//       {
+//         $project: {
+//           result: {
+//             $cond: {
+//               if: {
+//                 $gt: [{ $size: '$matchedData' }, 0],
+//               },
+//               then: '$matchedData',
+//               else: '$notMatched',
+//             },
+//           },
+//         },
+//       },
+//     ]);
+
+//     let checkAutoLogoutTime = autoLogoutTime[0].result?.length > 0 ? autoLogoutTime[0].result[0]?.autologoutmins : 5;
+
+//     const dateCheck = new Date();
+//     dateCheck.setMinutes(dateCheck.getMinutes() + Number(checkAutoLogoutTime));
+//     let checkAutoLogoutDate = req?.body?.checkautologout === 'check' ? dateCheck : 'none';
+//     let overallLoginByWorkStation = overallsettings[overallsettings.length - 1]?.loginbyworkstation
+//       ? overallsettings[overallsettings.length - 1]?.loginbyworkstation
+//       : {
+//           primary: true,
+//           secondary: true,
+//           wfh: true,
+//           unauthorized: true,
+//         };
+//     let indiviDualLoginByWorkStation = individualtwofaswitch?.loginbyworkstation ? individualtwofaswitch?.loginbyworkstation : {};
+//     let finalLoginByWorkStation = Object.entries(indiviDualLoginByWorkStation)?.length > 0 ? indiviDualLoginByWorkStation : overallLoginByWorkStation;
+//     let externalurl = overallsettings[overallsettings.length - 1]?.externalurl?.length > 0 ? overallsettings[overallsettings.length - 1]?.externalurl?.map((item) => new URL(item).hostname) : [];
+//     let internalurl = overallsettings[overallsettings.length - 1]?.internalurl?.length > 0 ? overallsettings[overallsettings.length - 1]?.internalurl?.map((item) => new URL(item).hostname) : [];
+
+//     let finalLoginMode = individualtwofaswitch ? individualtwofaswitch?.loginmode : overallsettings[overallsettings.length - 1]?.loginmode;
+//     if (internalurl?.length === 0 || externalurl?.length === 0) {
+//       return next(new ErrorHandler(`UnAuthorized Login 1, Contact Administrator`, 401));
+//     }
+
+//     if (currenturl !== undefined && finalLoginMode === 'Internal Login' && !internalurl?.includes(currenturl) && !user.role?.includes('Manager')) {
+//       return next(new ErrorHandler(`UnAuthorized Login 2, Contact Administrator`, 401));
+//     } else if (currenturl !== undefined && finalLoginMode === 'External Login' && !externalurl?.includes(currenturl) && !user.role?.includes('Manager')) {
+//       return next(new ErrorHandler(`UnAuthorized Login 3,Contact Administrator`, 401));
+//     } else if (currenturl !== undefined && finalLoginMode === 'Both Login' && !externalurl?.includes(currenturl) && !internalurl?.includes(currenturl) && !user.role?.includes('Manager')) {
+//       return next(new ErrorHandler(`UnAuthorized Login 4,Contact Administrator`, 401));
+//     }
+
+//     const attendenceControlCriteria = await ControlCriteria.find({}, { allowedautoclockoutcount: 1 });
+
+//     const autoCLockOutCount = attendenceControlCriteria[0]?.allowedautoclockoutcount ? Number(attendenceControlCriteria[0]?.allowedautoclockoutcount) : 0;
+//     const finalautoCLockOutCount = autoCLockOutCount + 1;
+//     let checkAutoClockAttendance = [];
+
+//     if (autoCLockOutCount > 0) {
+//       checkAutoClockAttendance = await Attendance.find({ userid: user._id })
+//         .sort({ createdAt: -1 }) // Sort by latest date
+//         .limit(finalautoCLockOutCount) // Limit to the latest N records
+//         .exec();
+//     }
+
+//     let checkAutoClockOut = checkAutoClockAttendance?.length > 0 && checkAutoClockAttendance?.length === finalautoCLockOutCount && checkAutoClockAttendance?.every((data) => data?.autoclockout === true);
+
+//     if (!user.role.includes('Manager') && checkAutoClockOut && !user?.autoclockoutreleasedates?.includes(moment().format('DD-MM-YYYY'))) {
+//       return next(new ErrorHandler(`You're in Long Auto clockkout! Contact Supervisor`, 401));
+//     }
+
+//     //   if (!user.role.includes("Manager")) {
+//     const today = moment();
+//     const pastThreeAttendaysDays = [today.clone().format('DD-MM-YYYY'), today.clone().subtract(1, 'days').format('DD-MM-YYYY'), today.clone().subtract(2, 'days').format('DD-MM-YYYY'), today.clone().subtract(3, 'days').format('DD-MM-YYYY')];
+//     const pastThreeLeaveDays = [today.clone().format('DD/MM/YYYY'), today.clone().subtract(1, 'days').format('DD/MM/YYYY'), today.clone().subtract(2, 'days').format('DD/MM/YYYY'), today.clone().subtract(3, 'days').format('DD/MM/YYYY')];
+//     const pastThreeDaysISO = [today.clone().format('YYYY-MM-DD'), today.clone().subtract(1, 'days').format('YYYY-MM-DD'), today.clone().subtract(2, 'days').format('YYYY-MM-DD'), today.clone().subtract(3, 'days').format('YYYY-MM-DD')];
+
+//     // Fetch relevant attendance records, leave records, and holidays for the specific user in parallel
+//     const [attendance, allLeaveStatus, holidays] = await Promise.all([
+//       // Fetch relevant attendance records for the past 3 days for the specific user
+//       Attendance.find(
+//         {
+//           date: {
+//             $in: pastThreeAttendaysDays,
+//           },
+//           userid: user._id,
+//         },
+//         { date: 1, userid: 1 }
+//       ).lean(),
+
+//       // Fetch relevant leave records for the specific user
+//       ApplyLeave.find(
+//         {
+//           date: { $in: pastThreeLeaveDays },
+//           employeeid: user.empcode,
+//           employeename: user.companyname,
+//           status: { $nin: ['Rejected', 'Cancel'] },
+//         },
+//         { employeename: 1, employeeid: 1, date: 1 }
+//       ).lean(),
+
+//       // Fetch relevant holidays for the specific user
+//       Holiday.find(
+//         {
+//           date: { $in: pastThreeDaysISO },
+//           company: { $in: [user.company] }, // Checks if user's company is in the company array
+//           applicablefor: { $in: [user.branch] }, // Checks if user's branch is in the applicablefor array
+//           unit: { $in: [user.unit] }, // Checks if user's unit is in the unit array
+//           team: { $in: [user.team] }, // Checks if user's team is in the team array
+//           employee: { $in: [user.companyname, 'ALL'] }, // This checks if 'user.companyname' or 'ALL' is in the employee array
+//         },
+//         { date: 1, employee: 1 }
+//       ).lean(),
+//     ]);
+
+//     // Continue with your logic
+
+//     // Create maps for attendance, leave, and holidays for quick lookup
+
+//     const attendanceMap = attendance.reduce((acc, item) => {
+//       const date = moment(item.date, 'DD-MM-YYYY').format('DD/MM/YYYY');
+//       acc[date] = true;
+//       return acc;
+//     }, {});
+//     const myCheckList = await MyCheckList.find({ candidatename: { $in: [user.companyname] } }).lean();
+//     let leaveWithCheckList = allLeaveStatus
+//       .map((item) => {
+//         let foundData = myCheckList?.find((dataNew) => dataNew.commonid == item._id);
+//         let areAllGroupsCompleted = foundData?.groups?.every((itemNew) => (itemNew.data !== undefined && itemNew.data !== '') || itemNew.files !== undefined);
+
+//         if (areAllGroupsCompleted) {
+//           return {
+//             ...item,
+//             updatestatus: 'Completed',
+//           };
+//         }
+//         return null;
+//       })
+//       .filter((item) => item);
+//     const leaveMap = leaveWithCheckList.reduce((acc, item) => {
+//       item.date.forEach((date) => {
+//         acc[date] = true;
+//       });
+//       return acc;
+//     }, {});
+
+//     const holidayMap = holidays.reduce((acc, item) => {
+//       const date = moment(item.date).format('DD/MM/YYYY');
+//       acc[date] = true;
+//       return acc;
+//     }, {});
+
+//     // Function to check the status for the past 3 days
+//     const checkStatusForPast3Days = (weekOffDays) => {
+//       let absentDays = 0;
+//       let leaveDays = 0;
+//       let holidayDays = 0;
+
+//       for (let date of pastThreeLeaveDays) {
+//         // const dayOfWeek = moment(date, "DD/MM/YYYY").format("dddd"); // Get day of the week
+
+//         // if (weekOffDays.includes(dayOfWeek)) {
+//         //   continue; // Skip week off days
+//         // }
+//         if (attendanceMap[date]) {
+//           // User was present on this date
+//           continue;
+//         } else if (leaveMap[date]) {
+//           // User was on leave on this date
+//           leaveDays++;
+//         } else if (holidayMap[date]) {
+//           // User had a holiday on this date
+
+//           holidayDays++;
+//         } else {
+//           // User was absent on this date
+//           absentDays++;
+//         }
+//       }
+
+//       if (absentDays >= 4) {
+//         return 'Long Absent';
+//       } else if (leaveDays >= 4) {
+//         return 'Long Leave';
+//       } else if (holidayDays >= 4) {
+//         return null;
+//       } else {
+//         return null;
+//       }
+//     };
+
+//     // Function to determine the final status
+//     const determineStatus = (attendanceStatus, livestatus) => {
+//       if (attendanceStatus) {
+//         return attendanceStatus;
+//       } else if (livestatus) {
+//         return livestatus;
+//       } else {
+//         return 'No Status';
+//       }
+//     };
+//     let weekOffDays = [];
+//     if (user.boardingLog && user.boardingLog.length > 0) {
+//       const lastBoardingLog = user.boardingLog[user.boardingLog.length - 1];
+//       weekOffDays = lastBoardingLog.weekoff || [];
+//     }
+//     // Determine the user's status
+//     const attendanceStatus = checkStatusForPast3Days(weekOffDays);
+//     const livestatus = !attendanceStatus ? 'Live' : null;
+
+//     const userStatus = determineStatus(attendanceStatus, livestatus);
+
+//     const todaydate = moment().format('DD-MM-YYYY');
+//     const tomorrow = moment().add(1, 'days').format('DD-MM-YYYY');
+//     const dayAfterTomorrow = moment().add(2, 'days').format('DD-MM-YYYY');
+//     const dateArray = [todaydate, tomorrow, dayAfterTomorrow];
+
+//     let checkArray = user?.longleaveabsentaprooveddate?.every((date) => !dateArray.includes(date));
+//     if (
+//       !pastThreeDaysISO?.includes(user?.doj) &&
+//       new Date(user.doj) > new Date(pastThreeDaysISO[pastThreeDaysISO.length - 1].split('-').reverse().join('-')) &&
+//       (userStatus === 'Long Absent' || userStatus === 'Long Leave') &&
+//       Array.isArray(user?.longleaveabsentaprooveddate) &&
+//       checkArray &&
+//       !user.role.includes('Manager')
+//     ) {
+//       return next(new ErrorHandler(`Login Restricted! You're in ${userStatus}, Please Contact Administrator`, 401));
+//     }
+
+//     controlcriteria = await ControlCriteria.find();
+//     const lastCriteria = controlcriteria?.[controlcriteria.length - 1];
+//     userCheckInControlCriteria = lastCriteria?.weekofftodos?.find((data) => data?.employeename === user?.companyname && data?.company === user?.company && data?.branch === user?.branch && data?.unit === user?.unit);
+//     const holidayWeekOffData = await HolidayWeekOffRestriction.findOne({ companyname: user?.companyname, date: moment().format('YYYY-MM-DD') });
+//     holidayWeekOffRestriction = holidayWeekOffData ? true : false;
+
+//     let adminTwofaswitch, loginswitch;
+//     if (overallsettings.length === 0) {
+//       adminTwofaswitch = true;
+//       loginswitch = true;
+//     } else {
+//       adminTwofaswitch = overallsettings[overallsettings.length - 1].overalltwofaswitch;
+//       loginswitch = overallsettings[overallsettings.length - 1].loginrestrictionswitch;
+//     }
+
+//     let loginapprestriction = user?.extramode ? user?.extramode : individualtwofaswitch ? individualtwofaswitch?.loginapprestriction : overallsettings[overallsettings.length - 1]?.loginapprestriction;
+//     let restrictionBtwShift = individualtwofaswitch ? individualtwofaswitch?.loginapprestriction : overallsettings[overallsettings.length - 1]?.loginapprestriction;
+
+//     let check = individualtwofaswitch ? individualtwofaswitch?.twofaswitch : adminTwofaswitch;
+//     let checkLogin = individualtwofaswitch ? individualtwofaswitch?.loginipswitch : loginswitch;
+
+//     const WorkStationShortName = await WorkStationShortNameGeneration();
+//     const checkWorkStationAccess = (matchedWorkStation, finalLoginByWorkStation) => {
+//       if (!finalLoginByWorkStation) return true; // Handle undefined/null case
+
+//       switch (matchedWorkStation) {
+//         case 'Work From Home':
+//           return finalLoginByWorkStation?.wfh === true;
+//         case 'Secondary WorkStation':
+//           return finalLoginByWorkStation?.secondary === true;
+//         case 'Primary WorkStation':
+//           return finalLoginByWorkStation?.primary === true;
+//         case '':
+//           return finalLoginByWorkStation?.unauthorized === true;
+//         default:
+//           return false;
+//       }
+//     };
+
+//     const workStationFind = WorkStationShortName?.find((data) => data?.systemshortname === hostname);
+//     const workstationNames = user?.workstation;
+//     let matchedWorkStation = '';
+//     let matchedUserWorkStation = '';
+
+//     if (workstationNames[0] === `${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`) {
+//       matchedUserWorkStation = user?.workstation?.find((data) => data === `${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`);
+//       matchedWorkStation = 'Primary WorkStation';
+//     } else if (workstationNames?.slice(1, user?.workstation?.length).includes(`${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`)) {
+//       matchedUserWorkStation = user?.workstation?.find((data) => data === `${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`);
+//       matchedWorkStation = 'Secondary WorkStation';
+//     } else if (user?.workstationinput?.slice(0, 15) === hostname) {
+//       matchedUserWorkStation = user?.workstationinput;
+//       matchedWorkStation = 'Work From Home';
+//     }
+
+//     let loginByWorkStation = await checkWorkStationAccess(matchedWorkStation, finalLoginByWorkStation);
+
+//     if (req.body.macAddress !== 'none' && !user?.role?.includes('Manager') && !loginByWorkStation) {
+//       return next(new ErrorHandler(`This WorkStation Login Restricted!! Please Login Authorized WorkStation!!!`, 401));
+//     }
+
+//     MatchedNotMatched = ['Primary WorkStation', 'Secondary WorkStation', 'Work From Home'].includes(matchedWorkStation) ? 'Matched' : 'Not-Matched';
+//     const userSecondaryWorkStationCount = user?.loginUserStatus?.length > 0 ? user?.loginUserStatus?.filter((data) => data.matched === 'Secondary WorkStation') : [];
+//     const countWorStation = matchedWorkStation === 'Primary WorkStation' ? 1 : matchedWorkStation === 'Secondary WorkStation' ? 2 : 0;
+
+//     user['sigindate'] = moment().format('DD-MM-YYYY');
+//     const result = await user.save();
+//     if (user?.loginUserStatus?.length > 0 && hostname !== 'none' && macAddress !== 'none') {
+//       const remaining = user?.loginUserStatus?.map((data) => {
+//         if (data.macaddress === macAddress || data.hostname === hostname) {
+//           (data['status'] = 'Active'),
+//             (data['date'] = PresenLoginUserDate),
+//             (data['version'] = version),
+//             (data['hostname'] = hostname),
+//             (data['workstation'] = matchedUserWorkStation),
+//             (data['matchedstatus'] = MatchedNotMatched),
+//             (data['matched'] = matchedWorkStation),
+//             (data['count'] = countWorStation);
+//         } else {
+//           data['status'] = 'Inactive';
+//         }
+//         return data;
+//       });
+//       user['loginUserStatus'] = remaining;
+//       const resultloginUserStatus = await user.save();
+//     }
+
+//     var logincheck;
+//     if (clockinip?.length === 0) {
+//       logincheck = 'NOTSHOW';
+//     } else {
+//       logincheck = 'SHOW';
+//     }
+//     const isIpInData = clockinip?.some((entry) => entry.ipaddress.includes(publicIP));
+//     if (checkLogin && !user.role.includes('Manager') && logincheck === 'SHOW' && !isIpInData) {
+//       return next(new ErrorHandler('Login Restricted', 401));
+//     }
+//     const userMacTwoFatrue = user?.loginUserStatus?.some((data) => (data.macaddress === macAddress || data.hostname === hostname) && data?.twofaenabled === true);
+
+//     if (!userMacTwoFatrue && check && !user.role.includes('Manager')) {
+//       // authenticator.options = { step: 60 };
+//       const secret = authenticator.generateSecret();
+//       const uri = authenticator.keyuri(user?.companyname, 'HILIFE.AI', secret);
+//       const image = await qrcode.toDataURL(uri);
+//       if (user?.loginUserStatus?.length == 0 || user?.loginUserStatus === undefined) {
+//         user['loginUserStatus'] = {
+//           macaddress: macAddress,
+//           username: systemname,
+//           localip: localIp,
+//           status: 'Active',
+//           twofatempsecret: secret,
+//           hostname: hostname,
+//           twofaenabled: false,
+//           version: version,
+//           workstation: matchedUserWorkStation,
+//           matchedstatus: MatchedNotMatched,
+//           matched: matchedWorkStation,
+//           count: countWorStation,
+//           date: PresenLoginUserDate,
+//         };
+//         const result = await user.save();
+//         return res.status(201).json({
+//           generateqr: true,
+//           image,
+//           result,
+//           loginapprestriction,
+//           checkAutoLogoutTime,
+//           checkAutoLogoutDate,
+//           controlcriteria,
+//           MatchedNotMatched,
+//           resversion,
+//           matchedWorkStation,
+//           appUpdateCalculation,
+//           restrictionBtwShift,
+//           holidayWeekOffRestriction,
+//           userCheckInControlCriteria,
+//         });
+//       } else if (user?.loginUserStatus?.length > 0) {
+//         const gesyscont = user?.loginUserStatus.filter((data) => {
+//           return data.macaddress != 'none';
+//         });
+
+//         if (macAddress != 'none') {
+//           if (Number(user?.employeecount) + Number(user?.wfhcount) === gesyscont?.length && !user?.loginUserStatus?.some((data) => data.macaddress === macAddress || data.hostname === hostname)) {
+//             return next(new ErrorHandler('Reached Your System Count.Please Contact Administrator', 401));
+//           } else {
+//             const remaining = user?.loginUserStatus?.filter((data) => data.macaddress !== macAddress && data.hostname !== hostname)?.map((dar) => ({ ...dar, status: 'Inactive' }));
+
+//             user['loginUserStatus'] = [
+//               ...remaining,
+//               {
+//                 macaddress: macAddress,
+
+//                 username: systemname,
+//                 localip: localIp,
+//                 status: 'Active',
+//                 hostname: hostname,
+//                 twofatempsecret: secret,
+//                 twofaenabled: false,
+//                 version: version,
+//                 workstation: matchedUserWorkStation,
+//                 matchedstatus: MatchedNotMatched,
+//                 matched: matchedWorkStation,
+//                 count: countWorStation,
+//                 date: PresenLoginUserDate,
+//               },
+//             ];
+//             const result = await user.save();
+//             return res.status(201).json({
+//               generateqr: true,
+//               image,
+//               result,
+//               loginapprestriction,
+//               checkAutoLogoutTime,
+//               checkAutoLogoutDate,
+//               controlcriteria,
+//               MatchedNotMatched,
+//               resversion,
+//               matchedWorkStation,
+//               appUpdateCalculation,
+//               restrictionBtwShift,
+//               holidayWeekOffRestriction,
+//               userCheckInControlCriteria,
+//             });
+//           }
+//         } else {
+//           if (macAddress != 'none') {
+//             const remaining = user?.loginUserStatus?.filter((data) => data.macaddress !== macAddress || data.hostname !== hostname)?.map((dar) => ({ ...dar, status: 'Inactive' }));
+
+//             user['loginUserStatus'] = [
+//               ...remaining,
+//               {
+//                 macaddress: macAddress,
+//                 username: systemname,
+//                 localip: localIp,
+//                 status: 'Active',
+//                 hostname: hostname,
+//                 twofatempsecret: secret,
+//                 twofaenabled: false,
+//                 version: version,
+//                 workstation: matchedUserWorkStation,
+//                 matchedstatus: MatchedNotMatched,
+//                 matched: matchedWorkStation,
+//                 count: countWorStation,
+//                 date: PresenLoginUserDate,
+//               },
+//             ];
+
+//             const result = await user.save();
+//             return res.status(201).json({
+//               generateqr: true,
+//               image,
+//               result,
+//               loginapprestriction,
+//               checkAutoLogoutTime,
+//               checkAutoLogoutDate,
+//               controlcriteria,
+//               MatchedNotMatched,
+//               resversion,
+//               matchedWorkStation,
+//               appUpdateCalculation,
+//               restrictionBtwShift,
+//               holidayWeekOffRestriction,
+//               userCheckInControlCriteria,
+//             });
+//           } else {
+//             const result = user;
+//             return res.status(201).json({
+//               generateqr: true,
+//               image,
+
+//               result,
+//               loginapprestriction,
+//               checkAutoLogoutTime,
+//               checkAutoLogoutDate,
+//               controlcriteria,
+//               MatchedNotMatched,
+//               resversion,
+//               matchedWorkStation,
+//               appUpdateCalculation,
+//               restrictionBtwShift,
+//               holidayWeekOffRestriction,
+//               userCheckInControlCriteria,
+//             });
+//           }
+//         }
+//       }
+//     } else if (userMacTwoFatrue && check && !user.role.includes('Manager')) {
+//       if (!otp) {
+//         const remaining = user?.loginUserStatus?.filter((data) => data.macaddress !== macAddress)?.map((dar) => ({ ...dar, status: 'Inactive' }));
+
+//         return res.status(201).json({
+//           otpneeded: true,
+//           loginapprestriction,
+//           checkAutoLogoutTime,
+//           checkAutoLogoutDate,
+//           controlcriteria,
+//           MatchedNotMatched,
+//           resversion,
+//           matchedWorkStation,
+//           appUpdateCalculation,
+//           restrictionBtwShift,
+//           holidayWeekOffRestriction,
+//           userCheckInControlCriteria,
+//         });
+//       }
+
+//       const userMacTwoFaSecret = user?.loginUserStatus?.find((data) => (data.macaddress === macAddress || data.hostname === hostname) && data?.twofaenabled === true);
+
+//       if (hostname !== 'none' && macAddress !== 'none') {
+//         const remaining = user?.loginUserStatus?.map((data) => {
+//           if (data.macaddress === macAddress || data.hostname === hostname) {
+//             (data['status'] = 'Active'), (data['date'] = PresenLoginUserDate);
+//           } else {
+//             data['status'] = 'Inactive';
+//           }
+//           return data;
+//         });
+//         user['loginUserStatus'] = remaining;
+//         const result = await user.save();
+//       }
+//       const verified = authenticator.check(otp, userMacTwoFaSecret.twofasecret);
+//       console.log(verified, 'verified');
+//       if (!verified) {
+//         return next(new ErrorHandler('Kindly check your WinAuth QR code! Invalid Otp', 401));
+//       }
+//       checksendToken(result, 200, res, loginapprestriction, checkAutoLogoutTime, checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion, matchedWorkStation, appUpdateCalculation, restrictionBtwShift, holidayWeekOffRestriction, userCheckInControlCriteria);
+//     } else {
+//       const gesyscont = user?.loginUserStatus.filter((data) => {
+//         return data.macaddress != 'none';
+//       });
+//       if (user?.loginUserStatus?.find((data) => data.macaddress === macAddress || data.hostname === hostname)) {
+//         const result = await user.save();
+//         checksendToken(result, 200, res, loginapprestriction, checkAutoLogoutTime, checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion, matchedWorkStation, appUpdateCalculation, restrictionBtwShift, holidayWeekOffRestriction, userCheckInControlCriteria);
+//       } else if (Number(user?.employeecount) + Number(user?.wfhcount) === gesyscont?.length && macAddress !== 'none' && hostname !== 'none' && !user?.loginUserStatus?.some((data) => data.macaddress === macAddress || data.hostname === hostname)) {
+//         return next(new ErrorHandler('Reached Your System Count.Please Contact Administrator', 401));
+//       } else {
+//         if (macAddress !== 'none') {
+//           const remaining = user?.loginUserStatus?.map((dar) => ({
+//             ...dar,
+//             status: 'Inactive',
+//           }));
+
+//           user['loginUserStatus'] = [
+//             ...remaining,
+//             {
+//               macaddress: macAddress,
+//               username: systemname,
+//               hostname: hostname,
+//               localip: localIp,
+//               status: 'Active',
+//               version: version,
+//               workstation: matchedUserWorkStation,
+//               matchedstatus: MatchedNotMatched,
+//               matched: matchedWorkStation,
+//               count: countWorStation,
+//               date: PresenLoginUserDate,
+//             },
+//           ];
+//           // user["signintime"] = (todaydate && extraTime?.length > 0 && extraTime[0] === moment().format("YYYY-MM-DD")) ?
+//           // moment(user?.signintime).format("DD-MM-YYYY")=== moment().format("DD-MM-YYYY") ? "" : todaydate : ''
+
+//           const result = await user.save();
+//           checksendToken(result, 200, res, loginapprestriction, checkAutoLogoutTime, checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion, matchedWorkStation, appUpdateCalculation, restrictionBtwShift, holidayWeekOffRestriction, userCheckInControlCriteria);
+//         } else {
+//           checksendToken(user, 200, res, loginapprestriction, checkAutoLogoutTime, checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion, matchedWorkStation, appUpdateCalculation, restrictionBtwShift, holidayWeekOffRestriction, userCheckInControlCriteria);
+//         }
+//       }
+//     }
+//   } catch (err) {
+//     console.log(err, 'er11 users');
+//     return next(new ErrorHandler('User not found', 404));
+//   }
+// });
+
 exports.logincheckAuth = catchAsyncErrors(async (req, res, next) => {
-  let resversion = false;
-  let appUpdateCalculation = 7;
-  try {
-    const { username, password, otp, publicIP, macAddress, systemname, currenturl, localIp, hostname, version, applogin } = req.body;
-    let MatchedNotMatched;
-    let controlcriteria;
-    let holidayWeekOffRestriction;
-    let userCheckInControlCriteria;
-    resversion = version === '1.13.0' ? true : (resversion = version === '1.14.0' ? true : (resversion = version === '1.15.0' ? true : (resversion = version === '1.16.0' ? true : false)));
+    let resversion = false;
+    let appUpdateCalculation = 7
+    try {
+        const {
+            username,
+            password,
+            otp,
+            publicIP,
+            macAddress,
+            systemname,
+            currenturl,
+            localIp,
+            hostname,
+            version,
+            applogin,
+        } = req.body;
+        let MatchedNotMatched;
+        let controlcriteria;
+        resversion = version === "1.9.0" ? true : false
 
-    const PresenLoginUserDate = new Date();
-    // let hostname = "TT_1_U4_G-HRA";
-    const resonablestatusarray = ['Absconded', 'Hold', 'Terminate', 'Releave Employee', 'Not Joined', 'Postponed', 'Rejected', 'Closed'];
-    //version mismatch
-    if (!username || !password) {
-      return next(new ErrorHandler('Please enter username and password', 400));
-    }
-    // Check if email & password entered by user
-    if (applogin === true && version !== '1.13.0' && version !== '1.14.0' && version !== '1.15.0' && version !== '1.16.0') {
-      return next(new ErrorHandler('Please Update current version!..', 400));
-    }
 
-    if (applogin === undefined || version === undefined) {
-      return next(new ErrorHandler('Please Update current version!..', 400));
-    }
-    // Finding if user exists in database
-    const user = await User.findOne({
-      resonablestatus: {
-        $nin: ['Not Joined', 'Postponed', 'Rejected', 'Closed', 'Releave Employee', 'Absconded', 'Hold', 'Terminate'],
-      },
 
-      username,
-    }).select('+password');
-    if (!user) {
-      return next(new ErrorHandler('Login Restricted! Please Enter Valid Username&Password', 401));
-    }
+        // let hostname = "TT_1_U4_G-HRA";
+        const resonablestatusarray = [
+            "Absconded",
+            "Hold",
+            "Terminate",
+            "Releave Employee",
+            "Not Joined",
+            "Postponed",
+            "Rejected",
+            "Closed",
+        ];
+        //version mismatch
+        if (!username || !password) {
+            return next(new ErrorHandler("Please enter username and password", 400));
+        }
+        // Check if email & password entered by user
+        if (applogin === true && version !== "1.4.0" && version !== "1.5.0" && version !== "1.6.0" && version !== "1.7.0" && version !== "1.8.0" && version !== "1.9.0") {
+            return next(new ErrorHandler("Please Update current version!..", 400));
+        }
 
-    const userUniqueAddresss = user?.loginUserStatus?.find((data) => data?.username === systemname && macAddress === data?.macaddress);
-    appUpdateCalculation = userUniqueAddresss ? 7 - Math.floor((new Date().getTime() - new Date(userUniqueAddresss?.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 7;
+        if (applogin === undefined || version === undefined) {
+            return next(new ErrorHandler("Please Update current version!..", 400));
+        }
+        // Finding if user exists in database
+        const user = await User.findOne({
+            resonablestatus: {
+                $nin: [
+                    "Not Joined",
+                    "Postponed",
+                    "Rejected",
+                    "Closed",
+                    "Releave Employee",
+                    "Absconded",
+                    "Hold",
+                    "Terminate",
+                ],
+            },
+            username,
+        }).select("+password");
+        if (!user) {
+            return next(
+                new ErrorHandler(
+                    "Login Restricted! Please Enter Valid Username&Password",
+                    401
+                )
+            );
+        }
 
-    // If checks password is correct or not
-    const isPwdMatched = await bcrypt.compare(password, user.password);
 
-    if (!isPwdMatched) {
-      return next(new ErrorHandler('Invalid Password', 401));
-    }
-    if (resonablestatusarray.includes(user?.resonablestatus)) {
-      return next(new ErrorHandler('Login Restricted', 401));
-    }
+        const userUniqueAddresss = user?.loginUserStatus?.find(data => data?.username === systemname && macAddress === data?.macaddress)
+        appUpdateCalculation = userUniqueAddresss ? 7 - (Math.floor((new Date().getTime() - new Date(userUniqueAddresss?.createdAt).getTime()) / (1000 * 60 * 60 * 24))) : 7;
 
-    const overallsettings = await AdminOverAllSettings.find({}, { loginbyworkstation: 1, externalurl: 1, internalurl: 1, loginmode: 1, overalltwofaswitch: 1, loginrestrictionswitch: 1, loginapprestriction: 1 });
 
-    const clockinip = await ClockinIP.find({ branch: user?.branch });
-    let individualsettings = await IndividualSettings.find({
-      company: user?.company,
-      branch: user?.branch,
-      unit: user?.unit,
-      team: user?.team,
-      companyname: { $in: user?.companyname },
-    });
-    let individualtwofaswitch = individualsettings?.find((item) => item.companyname.includes(user?.companyname));
+        // If checks password is correct or not
+        const isPwdMatched = await bcrypt.compare(password, user.password);
 
-    let autoLogoutTime = await AutoLogout.aggregate([
-      {
-        $facet: {
-          matchedData: [
+        if (!isPwdMatched) {
+            return next(new ErrorHandler("Invalid Password", 401));
+        }
+        if (resonablestatusarray.includes(user?.resonablestatus)) {
+            return next(new ErrorHandler("Login Restricted", 401));
+        }
+
+        const overallsettings = await AdminOverAllSettings.find();
+        const clockinip = await ClockinIP.find({ branch: user?.branch });
+        let individualsettings = await IndividualSettings.find({
+            company: user?.company,
+            branch: user?.branch,
+            unit: user?.unit,
+            team: user?.team,
+            companyname: { $in: user?.companyname },
+        });
+        let individualtwofaswitch = individualsettings?.find((item) =>
+            item.companyname.includes(user?.companyname)
+        );
+
+
+        let autoLogoutTime = await AutoLogout.aggregate([
             {
-              $unwind: '$todos',
+                $facet: {
+                    matchedData: [
+                        {
+                            $unwind: "$todos"
+                        },
+                        {
+                            $match: {
+                                "todos.employeename":
+                                    user.companyname
+                            }
+                        },
+                        {
+                            $project: {
+                                autologoutmins:
+                                    "$todos.autologoutmins"
+                            }
+                        }
+                    ],
+                    notMatched: [
+                        {
+                            $match: {
+                                autologoutswitch: true
+                            }
+                        },
+                        {
+                            $project: {
+                                autologoutmins: "$autologoutmins"
+                            }
+                        }
+                    ]
+                }
             },
             {
-              $match: {
-                'todos.employeename': user.companyname,
-              },
-            },
-            {
-              $project: {
-                autologoutmins: '$todos.autologoutmins',
-              },
-            },
-          ],
-          notMatched: [
-            {
-              $match: {
-                autologoutswitch: true,
-              },
-            },
-            {
-              $project: {
-                autologoutmins: '$autologoutmins',
-              },
-            },
-          ],
-        },
-      },
-      {
-        $project: {
-          result: {
-            $cond: {
-              if: {
-                $gt: [{ $size: '$matchedData' }, 0],
-              },
-              then: '$matchedData',
-              else: '$notMatched',
-            },
-          },
-        },
-      },
-    ]);
+                $project: {
+                    result: {
+                        $cond: {
+                            if: {
+                                $gt: [{ $size: "$matchedData" }, 0]
+                            },
+                            then: "$matchedData",
+                            else: "$notMatched"
+                        }
+                    }
+                }
+            }
+        ])
 
-    let checkAutoLogoutTime = autoLogoutTime[0].result?.length > 0 ? autoLogoutTime[0].result[0]?.autologoutmins : 5;
 
-    const dateCheck = new Date();
-    dateCheck.setMinutes(dateCheck.getMinutes() + Number(checkAutoLogoutTime));
-    let checkAutoLogoutDate = req?.body?.checkautologout === 'check' ? dateCheck : 'none';
-    let overallLoginByWorkStation = overallsettings[overallsettings.length - 1]?.loginbyworkstation
-      ? overallsettings[overallsettings.length - 1]?.loginbyworkstation
-      : {
-          primary: true,
-          secondary: true,
-          wfh: true,
-          unauthorized: true,
+        let checkAutoLogoutTime = autoLogoutTime[0].result?.length > 0 ? autoLogoutTime[0].result[0]?.autologoutmins : 5;
+
+        const dateCheck = new Date();
+        dateCheck.setMinutes(dateCheck.getMinutes() + Number(checkAutoLogoutTime));
+        let checkAutoLogoutDate = req?.body?.checkautologout === "check" ? dateCheck : "none"
+        let externalurl =
+            overallsettings[overallsettings.length - 1]?.externalurl?.length > 0
+                ? overallsettings[overallsettings.length - 1]?.externalurl?.map(
+                    (item) => new URL(item).hostname
+                )
+                : [];
+        let internalurl =
+            overallsettings[overallsettings.length - 1]?.internalurl?.length > 0
+                ? overallsettings[overallsettings.length - 1]?.internalurl?.map(
+                    (item) => new URL(item).hostname
+                )
+                : [];
+
+        let finalLoginMode = individualtwofaswitch
+            ? individualtwofaswitch?.loginmode
+            : overallsettings[overallsettings.length - 1]?.loginmode;
+
+        if (
+            currenturl !== undefined &&
+            finalLoginMode === "Internal Login" &&
+            !internalurl?.includes(currenturl) &&
+            !user.role?.includes("Manager")
+        ) {
+
+            return next(
+                new ErrorHandler(`UnAuthorized Login, Contact Administrator`, 401)
+            );
+        } else if (
+            currenturl !== undefined &&
+            finalLoginMode === "External Login" &&
+            !externalurl?.includes(currenturl) &&
+            !user.role?.includes("Manager")
+        ) {
+            return next(
+                new ErrorHandler(`UnAuthorized Login ,Contact Administrator`, 401)
+            );
+        }
+
+        //   if (!user.role.includes("Manager")) {
+        const today = moment();
+        const pastThreeAttendaysDays = [
+            today.clone().format("DD-MM-YYYY"),
+            today.clone().subtract(1, "days").format("DD-MM-YYYY"),
+            today.clone().subtract(2, "days").format("DD-MM-YYYY"),
+            today.clone().subtract(3, "days").format("DD-MM-YYYY"),
+        ];
+        const pastThreeLeaveDays = [
+            today.clone().format("DD/MM/YYYY"),
+
+            today.clone().subtract(1, "days").format("DD/MM/YYYY"),
+            today.clone().subtract(2, "days").format("DD/MM/YYYY"),
+            today.clone().subtract(3, "days").format("DD/MM/YYYY"),
+        ];
+        const pastThreeDaysISO = [
+            today.clone().format("YYYY-MM-DD"),
+            today.clone().subtract(1, "days").format("YYYY-MM-DD"),
+            today.clone().subtract(2, "days").format("YYYY-MM-DD"),
+            today.clone().subtract(3, "days").format("YYYY-MM-DD"),
+        ];
+
+        // Fetch relevant attendance records, leave records, and holidays for the specific user in parallel
+        const [attendance, allLeaveStatus, holidays] = await Promise.all([
+            // Fetch relevant attendance records for the past 3 days for the specific user
+            Attendance.find(
+                {
+                    date: {
+                        $in: pastThreeAttendaysDays,
+                    },
+                    userid: user._id,
+                },
+                { date: 1, userid: 1 }
+            ).lean(),
+
+            // Fetch relevant leave records for the specific user
+            ApplyLeave.find(
+                {
+                    date: { $in: pastThreeLeaveDays },
+                    employeeid: user.empcode,
+                    employeename: user.companyname,
+                },
+                { employeename: 1, employeeid: 1, date: 1 }
+            ).lean(),
+
+            // Fetch relevant holidays for the specific user
+            Holiday.find(
+                {
+                    date: { $in: pastThreeDaysISO },
+                    company: { $in: [user.company] }, // Checks if user's company is in the company array
+                    applicablefor: { $in: [user.branch] }, // Checks if user's branch is in the applicablefor array
+                    unit: { $in: [user.unit] }, // Checks if user's unit is in the unit array
+                    team: { $in: [user.team] }, // Checks if user's team is in the team array
+                    employee: { $in: [user.companyname, "ALL"] }, // This checks if 'user.companyname' or 'ALL' is in the employee array
+                },
+                { date: 1, employee: 1 }
+            ).lean(),
+        ]);
+
+        // Continue with your logic
+
+        // Create maps for attendance, leave, and holidays for quick lookup
+
+        const attendanceMap = attendance.reduce((acc, item) => {
+            const date = moment(item.date, "DD-MM-YYYY").format("DD/MM/YYYY");
+            acc[date] = true;
+            return acc;
+        }, {});
+        const leaveMap = allLeaveStatus.reduce((acc, item) => {
+            item.date.forEach((date) => {
+                acc[date] = true;
+            });
+            return acc;
+        }, {});
+
+        const holidayMap = holidays.reduce((acc, item) => {
+            const date = moment(item.date).format("DD/MM/YYYY");
+            acc[date] = true;
+            return acc;
+        }, {});
+
+        // Function to check the status for the past 3 days
+        const checkStatusForPast3Days = (weekOffDays) => {
+            let absentDays = 0;
+            let leaveDays = 0;
+            let holidayDays = 0;
+
+            for (let date of pastThreeLeaveDays) {
+                // const dayOfWeek = moment(date, "DD/MM/YYYY").format("dddd"); // Get day of the week
+
+                // if (weekOffDays.includes(dayOfWeek)) {
+                //   continue; // Skip week off days
+                // }
+                if (attendanceMap[date]) {
+                    // User was present on this date
+                    continue;
+                } else if (leaveMap[date]) {
+                    // User was on leave on this date
+                    leaveDays++;
+                } else if (holidayMap[date]) {
+                    // User had a holiday on this date
+
+                    holidayDays++;
+                } else {
+                    // User was absent on this date
+                    absentDays++;
+                }
+            }
+
+            if (absentDays >= 4) {
+                return "Long Absent";
+            } else if (leaveDays >= 4) {
+                return "Long Leave";
+            } else if (holidayDays >= 4) {
+                return null;
+            } else {
+                return null;
+            }
         };
-    let indiviDualLoginByWorkStation = individualtwofaswitch?.loginbyworkstation ? individualtwofaswitch?.loginbyworkstation : {};
-    let finalLoginByWorkStation = Object.entries(indiviDualLoginByWorkStation)?.length > 0 ? indiviDualLoginByWorkStation : overallLoginByWorkStation;
-    let externalurl = overallsettings[overallsettings.length - 1]?.externalurl?.length > 0 ? overallsettings[overallsettings.length - 1]?.externalurl?.map((item) => new URL(item).hostname) : [];
-    let internalurl = overallsettings[overallsettings.length - 1]?.internalurl?.length > 0 ? overallsettings[overallsettings.length - 1]?.internalurl?.map((item) => new URL(item).hostname) : [];
 
-    let finalLoginMode = individualtwofaswitch ? individualtwofaswitch?.loginmode : overallsettings[overallsettings.length - 1]?.loginmode;
-    if (internalurl?.length === 0 || externalurl?.length === 0) {
-      return next(new ErrorHandler(`UnAuthorized Login 1, Contact Administrator`, 401));
-    }
-
-    if (currenturl !== undefined && finalLoginMode === 'Internal Login' && !internalurl?.includes(currenturl) && !user.role?.includes('Manager')) {
-      return next(new ErrorHandler(`UnAuthorized Login 2, Contact Administrator`, 401));
-    } else if (currenturl !== undefined && finalLoginMode === 'External Login' && !externalurl?.includes(currenturl) && !user.role?.includes('Manager')) {
-      return next(new ErrorHandler(`UnAuthorized Login 3,Contact Administrator`, 401));
-    } else if (currenturl !== undefined && finalLoginMode === 'Both Login' && !externalurl?.includes(currenturl) && !internalurl?.includes(currenturl) && !user.role?.includes('Manager')) {
-      return next(new ErrorHandler(`UnAuthorized Login 4,Contact Administrator`, 401));
-    }
-
-    const attendenceControlCriteria = await ControlCriteria.find({}, { allowedautoclockoutcount: 1 });
-
-    const autoCLockOutCount = attendenceControlCriteria[0]?.allowedautoclockoutcount ? Number(attendenceControlCriteria[0]?.allowedautoclockoutcount) : 0;
-    const finalautoCLockOutCount = autoCLockOutCount + 1;
-    let checkAutoClockAttendance = [];
-
-    if (autoCLockOutCount > 0) {
-      checkAutoClockAttendance = await Attendance.find({ userid: user._id })
-        .sort({ createdAt: -1 }) // Sort by latest date
-        .limit(finalautoCLockOutCount) // Limit to the latest N records
-        .exec();
-    }
-
-    let checkAutoClockOut = checkAutoClockAttendance?.length > 0 && checkAutoClockAttendance?.length === finalautoCLockOutCount && checkAutoClockAttendance?.every((data) => data?.autoclockout === true);
-
-    if (!user.role.includes('Manager') && checkAutoClockOut && !user?.autoclockoutreleasedates?.includes(moment().format('DD-MM-YYYY'))) {
-      return next(new ErrorHandler(`You're in Long Auto clockkout! Contact Supervisor`, 401));
-    }
-
-    //   if (!user.role.includes("Manager")) {
-    const today = moment();
-    const pastThreeAttendaysDays = [today.clone().format('DD-MM-YYYY'), today.clone().subtract(1, 'days').format('DD-MM-YYYY'), today.clone().subtract(2, 'days').format('DD-MM-YYYY'), today.clone().subtract(3, 'days').format('DD-MM-YYYY')];
-    const pastThreeLeaveDays = [today.clone().format('DD/MM/YYYY'), today.clone().subtract(1, 'days').format('DD/MM/YYYY'), today.clone().subtract(2, 'days').format('DD/MM/YYYY'), today.clone().subtract(3, 'days').format('DD/MM/YYYY')];
-    const pastThreeDaysISO = [today.clone().format('YYYY-MM-DD'), today.clone().subtract(1, 'days').format('YYYY-MM-DD'), today.clone().subtract(2, 'days').format('YYYY-MM-DD'), today.clone().subtract(3, 'days').format('YYYY-MM-DD')];
-
-    // Fetch relevant attendance records, leave records, and holidays for the specific user in parallel
-    const [attendance, allLeaveStatus, holidays] = await Promise.all([
-      // Fetch relevant attendance records for the past 3 days for the specific user
-      Attendance.find(
-        {
-          date: {
-            $in: pastThreeAttendaysDays,
-          },
-          userid: user._id,
-        },
-        { date: 1, userid: 1 }
-      ).lean(),
-
-      // Fetch relevant leave records for the specific user
-      ApplyLeave.find(
-        {
-          date: { $in: pastThreeLeaveDays },
-          employeeid: user.empcode,
-          employeename: user.companyname,
-          status: { $nin: ['Rejected', 'Cancel'] },
-        },
-        { employeename: 1, employeeid: 1, date: 1 }
-      ).lean(),
-
-      // Fetch relevant holidays for the specific user
-      Holiday.find(
-        {
-          date: { $in: pastThreeDaysISO },
-          company: { $in: [user.company] }, // Checks if user's company is in the company array
-          applicablefor: { $in: [user.branch] }, // Checks if user's branch is in the applicablefor array
-          unit: { $in: [user.unit] }, // Checks if user's unit is in the unit array
-          team: { $in: [user.team] }, // Checks if user's team is in the team array
-          employee: { $in: [user.companyname, 'ALL'] }, // This checks if 'user.companyname' or 'ALL' is in the employee array
-        },
-        { date: 1, employee: 1 }
-      ).lean(),
-    ]);
-
-    // Continue with your logic
-
-    // Create maps for attendance, leave, and holidays for quick lookup
-
-    const attendanceMap = attendance.reduce((acc, item) => {
-      const date = moment(item.date, 'DD-MM-YYYY').format('DD/MM/YYYY');
-      acc[date] = true;
-      return acc;
-    }, {});
-    const myCheckList = await MyCheckList.find({ candidatename: { $in: [user.companyname] } }).lean();
-    let leaveWithCheckList = allLeaveStatus
-      .map((item) => {
-        let foundData = myCheckList?.find((dataNew) => dataNew.commonid == item._id);
-        let areAllGroupsCompleted = foundData?.groups?.every((itemNew) => (itemNew.data !== undefined && itemNew.data !== '') || itemNew.files !== undefined);
-
-        if (areAllGroupsCompleted) {
-          return {
-            ...item,
-            updatestatus: 'Completed',
-          };
-        }
-        return null;
-      })
-      .filter((item) => item);
-    const leaveMap = leaveWithCheckList.reduce((acc, item) => {
-      item.date.forEach((date) => {
-        acc[date] = true;
-      });
-      return acc;
-    }, {});
-
-    const holidayMap = holidays.reduce((acc, item) => {
-      const date = moment(item.date).format('DD/MM/YYYY');
-      acc[date] = true;
-      return acc;
-    }, {});
-
-    // Function to check the status for the past 3 days
-    const checkStatusForPast3Days = (weekOffDays) => {
-      let absentDays = 0;
-      let leaveDays = 0;
-      let holidayDays = 0;
-
-      for (let date of pastThreeLeaveDays) {
-        // const dayOfWeek = moment(date, "DD/MM/YYYY").format("dddd"); // Get day of the week
-
-        // if (weekOffDays.includes(dayOfWeek)) {
-        //   continue; // Skip week off days
-        // }
-        if (attendanceMap[date]) {
-          // User was present on this date
-          continue;
-        } else if (leaveMap[date]) {
-          // User was on leave on this date
-          leaveDays++;
-        } else if (holidayMap[date]) {
-          // User had a holiday on this date
-
-          holidayDays++;
-        } else {
-          // User was absent on this date
-          absentDays++;
-        }
-      }
-
-      if (absentDays >= 4) {
-        return 'Long Absent';
-      } else if (leaveDays >= 4) {
-        return 'Long Leave';
-      } else if (holidayDays >= 4) {
-        return null;
-      } else {
-        return null;
-      }
-    };
-
-    // Function to determine the final status
-    const determineStatus = (attendanceStatus, livestatus) => {
-      if (attendanceStatus) {
-        return attendanceStatus;
-      } else if (livestatus) {
-        return livestatus;
-      } else {
-        return 'No Status';
-      }
-    };
-    let weekOffDays = [];
-    if (user.boardingLog && user.boardingLog.length > 0) {
-      const lastBoardingLog = user.boardingLog[user.boardingLog.length - 1];
-      weekOffDays = lastBoardingLog.weekoff || [];
-    }
-    // Determine the user's status
-    const attendanceStatus = checkStatusForPast3Days(weekOffDays);
-    const livestatus = !attendanceStatus ? 'Live' : null;
-
-    const userStatus = determineStatus(attendanceStatus, livestatus);
-
-    const todaydate = moment().format('DD-MM-YYYY');
-    const tomorrow = moment().add(1, 'days').format('DD-MM-YYYY');
-    const dayAfterTomorrow = moment().add(2, 'days').format('DD-MM-YYYY');
-    const dateArray = [todaydate, tomorrow, dayAfterTomorrow];
-
-    let checkArray = user?.longleaveabsentaprooveddate?.every((date) => !dateArray.includes(date));
-    if (
-      !pastThreeDaysISO?.includes(user?.doj) &&
-      new Date(user.doj) > new Date(pastThreeDaysISO[pastThreeDaysISO.length - 1].split('-').reverse().join('-')) &&
-      (userStatus === 'Long Absent' || userStatus === 'Long Leave') &&
-      Array.isArray(user?.longleaveabsentaprooveddate) &&
-      checkArray &&
-      !user.role.includes('Manager')
-    ) {
-      return next(new ErrorHandler(`Login Restricted! You're in ${userStatus}, Please Contact Administrator`, 401));
-    }
-
-    controlcriteria = await ControlCriteria.find();
-    const lastCriteria = controlcriteria?.[controlcriteria.length - 1];
-    userCheckInControlCriteria = lastCriteria?.weekofftodos?.find((data) => data?.employeename === user?.companyname && data?.company === user?.company && data?.branch === user?.branch && data?.unit === user?.unit);
-    const holidayWeekOffData = await HolidayWeekOffRestriction.findOne({ companyname: user?.companyname, date: moment().format('YYYY-MM-DD') });
-    holidayWeekOffRestriction = holidayWeekOffData ? true : false;
-
-    let adminTwofaswitch, loginswitch;
-    if (overallsettings.length === 0) {
-      adminTwofaswitch = true;
-      loginswitch = true;
-    } else {
-      adminTwofaswitch = overallsettings[overallsettings.length - 1].overalltwofaswitch;
-      loginswitch = overallsettings[overallsettings.length - 1].loginrestrictionswitch;
-    }
-
-    let loginapprestriction = user?.extramode ? user?.extramode : individualtwofaswitch ? individualtwofaswitch?.loginapprestriction : overallsettings[overallsettings.length - 1]?.loginapprestriction;
-    let restrictionBtwShift = individualtwofaswitch ? individualtwofaswitch?.loginapprestriction : overallsettings[overallsettings.length - 1]?.loginapprestriction;
-
-    let check = individualtwofaswitch ? individualtwofaswitch?.twofaswitch : adminTwofaswitch;
-    let checkLogin = individualtwofaswitch ? individualtwofaswitch?.loginipswitch : loginswitch;
-
-    const WorkStationShortName = await WorkStationShortNameGeneration();
-    const checkWorkStationAccess = (matchedWorkStation, finalLoginByWorkStation) => {
-      if (!finalLoginByWorkStation) return true; // Handle undefined/null case
-
-      switch (matchedWorkStation) {
-        case 'Work From Home':
-          return finalLoginByWorkStation?.wfh === true;
-        case 'Secondary WorkStation':
-          return finalLoginByWorkStation?.secondary === true;
-        case 'Primary WorkStation':
-          return finalLoginByWorkStation?.primary === true;
-        case '':
-          return finalLoginByWorkStation?.unauthorized === true;
-        default:
-          return false;
-      }
-    };
-
-    const workStationFind = WorkStationShortName?.find((data) => data?.systemshortname === hostname);
-    const workstationNames = user?.workstation;
-    let matchedWorkStation = '';
-    let matchedUserWorkStation = '';
-
-    if (workstationNames[0] === `${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`) {
-      matchedUserWorkStation = user?.workstation?.find((data) => data === `${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`);
-      matchedWorkStation = 'Primary WorkStation';
-    } else if (workstationNames?.slice(1, user?.workstation?.length).includes(`${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`)) {
-      matchedUserWorkStation = user?.workstation?.find((data) => data === `${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`);
-      matchedWorkStation = 'Secondary WorkStation';
-    } else if (user?.workstationinput?.slice(0, 15) === hostname) {
-      matchedUserWorkStation = user?.workstationinput;
-      matchedWorkStation = 'Work From Home';
-    }
-
-    let loginByWorkStation = await checkWorkStationAccess(matchedWorkStation, finalLoginByWorkStation);
-
-    if (req.body.macAddress !== 'none' && !user?.role?.includes('Manager') && !loginByWorkStation) {
-      return next(new ErrorHandler(`This WorkStation Login Restricted!! Please Login Authorized WorkStation!!!`, 401));
-    }
-
-    MatchedNotMatched = ['Primary WorkStation', 'Secondary WorkStation', 'Work From Home'].includes(matchedWorkStation) ? 'Matched' : 'Not-Matched';
-    const userSecondaryWorkStationCount = user?.loginUserStatus?.length > 0 ? user?.loginUserStatus?.filter((data) => data.matched === 'Secondary WorkStation') : [];
-    const countWorStation = matchedWorkStation === 'Primary WorkStation' ? 1 : matchedWorkStation === 'Secondary WorkStation' ? 2 : 0;
-
-    user['sigindate'] = moment().format('DD-MM-YYYY');
-    const result = await user.save();
-    if (user?.loginUserStatus?.length > 0 && hostname !== 'none' && macAddress !== 'none') {
-      const remaining = user?.loginUserStatus?.map((data) => {
-        if (data.macaddress === macAddress || data.hostname === hostname) {
-          (data['status'] = 'Active'),
-            (data['date'] = PresenLoginUserDate),
-            (data['version'] = version),
-            (data['hostname'] = hostname),
-            (data['workstation'] = matchedUserWorkStation),
-            (data['matchedstatus'] = MatchedNotMatched),
-            (data['matched'] = matchedWorkStation),
-            (data['count'] = countWorStation);
-        } else {
-          data['status'] = 'Inactive';
-        }
-        return data;
-      });
-      user['loginUserStatus'] = remaining;
-      const resultloginUserStatus = await user.save();
-    }
-
-    var logincheck;
-    if (clockinip?.length === 0) {
-      logincheck = 'NOTSHOW';
-    } else {
-      logincheck = 'SHOW';
-    }
-    const isIpInData = clockinip?.some((entry) => entry.ipaddress.includes(publicIP));
-    if (checkLogin && !user.role.includes('Manager') && logincheck === 'SHOW' && !isIpInData) {
-      return next(new ErrorHandler('Login Restricted', 401));
-    }
-    const userMacTwoFatrue = user?.loginUserStatus?.some((data) => (data.macaddress === macAddress || data.hostname === hostname) && data?.twofaenabled === true);
-
-    if (!userMacTwoFatrue && check && !user.role.includes('Manager')) {
-      // authenticator.options = { step: 60 };
-      const secret = authenticator.generateSecret();
-      const uri = authenticator.keyuri(user?.companyname, 'HILIFE.AI', secret);
-      const image = await qrcode.toDataURL(uri);
-      if (user?.loginUserStatus?.length == 0 || user?.loginUserStatus === undefined) {
-        user['loginUserStatus'] = {
-          macaddress: macAddress,
-          username: systemname,
-          localip: localIp,
-          status: 'Active',
-          twofatempsecret: secret,
-          hostname: hostname,
-          twofaenabled: false,
-          version: version,
-          workstation: matchedUserWorkStation,
-          matchedstatus: MatchedNotMatched,
-          matched: matchedWorkStation,
-          count: countWorStation,
-          date: PresenLoginUserDate,
+        // Function to determine the final status
+        const determineStatus = (attendanceStatus, livestatus) => {
+            if (attendanceStatus) {
+                return attendanceStatus;
+            } else if (livestatus) {
+                return livestatus;
+            } else {
+                return "No Status";
+            }
         };
-        const result = await user.save();
-        return res.status(201).json({
-          generateqr: true,
-          image,
-          result,
-          loginapprestriction,
-          checkAutoLogoutTime,
-          checkAutoLogoutDate,
-          controlcriteria,
-          MatchedNotMatched,
-          resversion,
-          matchedWorkStation,
-          appUpdateCalculation,
-          restrictionBtwShift,
-          holidayWeekOffRestriction,
-          userCheckInControlCriteria,
-        });
-      } else if (user?.loginUserStatus?.length > 0) {
-        const gesyscont = user?.loginUserStatus.filter((data) => {
-          return data.macaddress != 'none';
-        });
-
-        if (macAddress != 'none') {
-          if (Number(user?.employeecount) + Number(user?.wfhcount) === gesyscont?.length && !user?.loginUserStatus?.some((data) => data.macaddress === macAddress || data.hostname === hostname)) {
-            return next(new ErrorHandler('Reached Your System Count.Please Contact Administrator', 401));
-          } else {
-            const remaining = user?.loginUserStatus?.filter((data) => data.macaddress !== macAddress && data.hostname !== hostname)?.map((dar) => ({ ...dar, status: 'Inactive' }));
-
-            user['loginUserStatus'] = [
-              ...remaining,
-              {
-                macaddress: macAddress,
-
-                username: systemname,
-                localip: localIp,
-                status: 'Active',
-                hostname: hostname,
-                twofatempsecret: secret,
-                twofaenabled: false,
-                version: version,
-                workstation: matchedUserWorkStation,
-                matchedstatus: MatchedNotMatched,
-                matched: matchedWorkStation,
-                count: countWorStation,
-                date: PresenLoginUserDate,
-              },
-            ];
-            const result = await user.save();
-            return res.status(201).json({
-              generateqr: true,
-              image,
-              result,
-              loginapprestriction,
-              checkAutoLogoutTime,
-              checkAutoLogoutDate,
-              controlcriteria,
-              MatchedNotMatched,
-              resversion,
-              matchedWorkStation,
-              appUpdateCalculation,
-              restrictionBtwShift,
-              holidayWeekOffRestriction,
-              userCheckInControlCriteria,
-            });
-          }
-        } else {
-          if (macAddress != 'none') {
-            const remaining = user?.loginUserStatus?.filter((data) => data.macaddress !== macAddress || data.hostname !== hostname)?.map((dar) => ({ ...dar, status: 'Inactive' }));
-
-            user['loginUserStatus'] = [
-              ...remaining,
-              {
-                macaddress: macAddress,
-                username: systemname,
-                localip: localIp,
-                status: 'Active',
-                hostname: hostname,
-                twofatempsecret: secret,
-                twofaenabled: false,
-                version: version,
-                workstation: matchedUserWorkStation,
-                matchedstatus: MatchedNotMatched,
-                matched: matchedWorkStation,
-                count: countWorStation,
-                date: PresenLoginUserDate,
-              },
-            ];
-
-            const result = await user.save();
-            return res.status(201).json({
-              generateqr: true,
-              image,
-              result,
-              loginapprestriction,
-              checkAutoLogoutTime,
-              checkAutoLogoutDate,
-              controlcriteria,
-              MatchedNotMatched,
-              resversion,
-              matchedWorkStation,
-              appUpdateCalculation,
-              restrictionBtwShift,
-              holidayWeekOffRestriction,
-              userCheckInControlCriteria,
-            });
-          } else {
-            const result = user;
-            return res.status(201).json({
-              generateqr: true,
-              image,
-
-              result,
-              loginapprestriction,
-              checkAutoLogoutTime,
-              checkAutoLogoutDate,
-              controlcriteria,
-              MatchedNotMatched,
-              resversion,
-              matchedWorkStation,
-              appUpdateCalculation,
-              restrictionBtwShift,
-              holidayWeekOffRestriction,
-              userCheckInControlCriteria,
-            });
-          }
+        let weekOffDays = [];
+        if (user.boardingLog && user.boardingLog.length > 0) {
+            const lastBoardingLog = user.boardingLog[user.boardingLog.length - 1];
+            weekOffDays = lastBoardingLog.weekoff || [];
         }
-      }
-    } else if (userMacTwoFatrue && check && !user.role.includes('Manager')) {
-      if (!otp) {
-        const remaining = user?.loginUserStatus?.filter((data) => data.macaddress !== macAddress)?.map((dar) => ({ ...dar, status: 'Inactive' }));
+        // Determine the user's status
+        const attendanceStatus = checkStatusForPast3Days(weekOffDays);
+        const livestatus = !attendanceStatus ? "Live" : null;
 
-        return res.status(201).json({
-          otpneeded: true,
-          loginapprestriction,
-          checkAutoLogoutTime,
-          checkAutoLogoutDate,
-          controlcriteria,
-          MatchedNotMatched,
-          resversion,
-          matchedWorkStation,
-          appUpdateCalculation,
-          restrictionBtwShift,
-          holidayWeekOffRestriction,
-          userCheckInControlCriteria,
-        });
-      }
+        const userStatus = determineStatus(attendanceStatus, livestatus);
 
-      const userMacTwoFaSecret = user?.loginUserStatus?.find((data) => (data.macaddress === macAddress || data.hostname === hostname) && data?.twofaenabled === true);
+        const todaydate = moment().format("DD-MM-YYYY");
+        const tomorrow = moment().add(1, "days").format("DD-MM-YYYY");
+        const dayAfterTomorrow = moment().add(2, "days").format("DD-MM-YYYY");
+        const dateArray = [todaydate, tomorrow, dayAfterTomorrow];
 
-      if (hostname !== 'none' && macAddress !== 'none') {
-        const remaining = user?.loginUserStatus?.map((data) => {
-          if (data.macaddress === macAddress || data.hostname === hostname) {
-            (data['status'] = 'Active'), (data['date'] = PresenLoginUserDate);
-          } else {
-            data['status'] = 'Inactive';
-          }
-          return data;
-        });
-        user['loginUserStatus'] = remaining;
-        const result = await user.save();
-      }
-      const verified = authenticator.check(otp, userMacTwoFaSecret.twofasecret);
-      console.log(verified, 'verified');
-      if (!verified) {
-        return next(new ErrorHandler('Kindly check your WinAuth QR code! Invalid Otp', 401));
-      }
-      checksendToken(result, 200, res, loginapprestriction, checkAutoLogoutTime, checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion, matchedWorkStation, appUpdateCalculation, restrictionBtwShift, holidayWeekOffRestriction, userCheckInControlCriteria);
-    } else {
-      const gesyscont = user?.loginUserStatus.filter((data) => {
-        return data.macaddress != 'none';
-      });
-      if (user?.loginUserStatus?.find((data) => data.macaddress === macAddress || data.hostname === hostname)) {
-        const result = await user.save();
-        checksendToken(result, 200, res, loginapprestriction, checkAutoLogoutTime, checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion, matchedWorkStation, appUpdateCalculation, restrictionBtwShift, holidayWeekOffRestriction, userCheckInControlCriteria);
-      } else if (Number(user?.employeecount) + Number(user?.wfhcount) === gesyscont?.length && macAddress !== 'none' && hostname !== 'none' && !user?.loginUserStatus?.some((data) => data.macaddress === macAddress || data.hostname === hostname)) {
-        return next(new ErrorHandler('Reached Your System Count.Please Contact Administrator', 401));
-      } else {
-        if (macAddress !== 'none') {
-          const remaining = user?.loginUserStatus?.map((dar) => ({
-            ...dar,
-            status: 'Inactive',
-          }));
-
-          user['loginUserStatus'] = [
-            ...remaining,
-            {
-              macaddress: macAddress,
-              username: systemname,
-              hostname: hostname,
-              localip: localIp,
-              status: 'Active',
-              version: version,
-              workstation: matchedUserWorkStation,
-              matchedstatus: MatchedNotMatched,
-              matched: matchedWorkStation,
-              count: countWorStation,
-              date: PresenLoginUserDate,
-            },
-          ];
-          // user["signintime"] = (todaydate && extraTime?.length > 0 && extraTime[0] === moment().format("YYYY-MM-DD")) ?
-          // moment(user?.signintime).format("DD-MM-YYYY")=== moment().format("DD-MM-YYYY") ? "" : todaydate : ''
-
-          const result = await user.save();
-          checksendToken(result, 200, res, loginapprestriction, checkAutoLogoutTime, checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion, matchedWorkStation, appUpdateCalculation, restrictionBtwShift, holidayWeekOffRestriction, userCheckInControlCriteria);
-        } else {
-          checksendToken(user, 200, res, loginapprestriction, checkAutoLogoutTime, checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion, matchedWorkStation, appUpdateCalculation, restrictionBtwShift, holidayWeekOffRestriction, userCheckInControlCriteria);
+        let checkArray = user?.longleaveabsentaprooveddate?.every(
+            (date) => !dateArray.includes(date)
+        );
+        if (
+            !pastThreeDaysISO?.includes(user?.doj) &&
+            userStatus === "Long Absent" &&
+            Array.isArray(user?.longleaveabsentaprooveddate) &&
+            checkArray &&
+            !user.role.includes("Manager")
+        ) {
+            return next(
+                new ErrorHandler(
+                    `Login Restricted! You're in ${userStatus}, Please Contact Administrator`,
+                    401
+                )
+            );
         }
-      }
+
+        controlcriteria = await ControlCriteria.find();
+
+        let adminTwofaswitch, loginswitch;
+        if (overallsettings.length === 0) {
+            adminTwofaswitch = true;
+            loginswitch = true;
+        } else {
+            adminTwofaswitch =
+                overallsettings[overallsettings.length - 1].overalltwofaswitch;
+            loginswitch =
+                overallsettings[overallsettings.length - 1].loginrestrictionswitch;
+        }
+
+        let loginapprestriction = user?.extramode
+            ? user?.extramode
+            : individualtwofaswitch
+                ? individualtwofaswitch?.loginapprestriction
+                : overallsettings[overallsettings.length - 1]?.loginapprestriction;
+
+        let check = individualtwofaswitch
+            ? individualtwofaswitch?.twofaswitch
+            : adminTwofaswitch;
+        let checkLogin = individualtwofaswitch
+            ? individualtwofaswitch?.loginipswitch
+            : loginswitch;
+
+        const WorkStationShortName = await WorkStationShortNameGeneration();
+
+        const workStationFind = WorkStationShortName?.find(data => data?.systemshortname === hostname)
+        const workstationNames = user?.workstation;
+        let matchedWorkStation = "";
+        let matchedUserWorkStation = "";
+
+        if (workstationNames[0] === `${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`) {
+
+            matchedUserWorkStation = user?.workstation?.find(data => data === `${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`)
+            matchedWorkStation = "Primary WorkStation";
+
+        } else if (workstationNames?.slice(1, user?.workstation?.length).includes(`${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`)) {
+
+            matchedUserWorkStation = user?.workstation?.find(data => data === `${workStationFind?.cabinname}(${workStationFind?.branch}-${workStationFind?.floor})`)
+            matchedWorkStation = "Secondary WorkStation";
+
+        } else if (user?.workstationinput?.slice(0, 15) === hostname) {
+
+            matchedUserWorkStation = user?.workstationinput
+            matchedWorkStation = "Work From Home";
+        }
+
+        MatchedNotMatched = ["Primary WorkStation", "Secondary WorkStation", "Work From Home"].includes(matchedWorkStation) ? "Matched" : "Not-Matched";
+        const userSecondaryWorkStationCount = user?.loginUserStatus?.length > 0 ? user?.loginUserStatus?.filter(data => data.matched === 'Secondary WorkStation') : []
+        const countWorStation = matchedWorkStation === "Primary WorkStation" ?
+            1 : matchedWorkStation === "Secondary WorkStation" ? 2 : 0
+
+        user["sigindate"] = moment().format("DD-MM-YYYY");
+        const result = await user.save();
+
+        var logincheck;
+        if (clockinip?.length === 0) {
+            logincheck = "NOTSHOW";
+        } else {
+            logincheck = "SHOW";
+        }
+        const isIpInData = clockinip?.some((entry) =>
+            entry.ipaddress.includes(publicIP)
+        );
+        if (
+            checkLogin &&
+            !user.role.includes("Manager") &&
+            logincheck === "SHOW" &&
+            !isIpInData
+        ) {
+            return next(new ErrorHandler("Login Restricted", 401));
+        }
+        const userMacTwoFatrue = user?.loginUserStatus?.some(
+            (data) => (data.macaddress === macAddress || data.hostname === hostname) && data?.twofaenabled === true
+        );
+
+        if (!userMacTwoFatrue && check && !user.role.includes("Manager")) {
+            const secret = authenticator.generateSecret();
+            const uri = authenticator.keyuri(user?.companyname, "HILIFE.AI", secret);
+            const image = await qrcode.toDataURL(uri);
+
+            if (
+                user?.loginUserStatus?.length == 0 ||
+                user?.loginUserStatus === undefined
+            ) {
+                user["loginUserStatus"] = {
+                    macaddress: macAddress,
+                    username: systemname,
+                    localip: localIp,
+                    status: "Active",
+                    twofatempsecret: secret,
+                    hostname: hostname,
+                    twofaenabled: false,
+                    version: version,
+                    workstation: matchedUserWorkStation,
+                    matchedstatus: MatchedNotMatched,
+                    matched: matchedWorkStation,
+                    count: countWorStation
+
+                };
+                const result = await user.save();
+                return res.status(201).json({
+                    generateqr: true,
+                    image,
+                    result,
+                    loginapprestriction,
+                    checkAutoLogoutTime,
+                    checkAutoLogoutDate,
+                    controlcriteria,
+                    MatchedNotMatched,
+                    resversion,
+                    matchedWorkStation,
+                    appUpdateCalculation
+                });
+            } else if (user?.loginUserStatus?.length > 0) {
+                const gesyscont = user?.loginUserStatus.filter((data) => {
+                    return data.macaddress != "none";
+                });
+
+                if (macAddress != "none") {
+                    if (
+                        ((Number(user?.employeecount) + Number(user?.wfhcount)) === gesyscont?.length) &&
+                        !user?.loginUserStatus?.some(
+                            (data) => (data.macaddress === macAddress || data.hostname === hostname)
+                        )
+                    ) {
+                        return next(
+                            new ErrorHandler(
+                                "Reached Your System Count.Please Contact Administrator",
+                                401
+                            )
+                        );
+                    } else {
+                        const remaining = user?.loginUserStatus
+                            ?.filter((data) => data.macaddress !== macAddress && data.hostname !== hostname)
+                            ?.map((dar) => ({ ...dar, status: "Inactive" }));
+
+                        user["loginUserStatus"] = [
+                            ...remaining,
+                            {
+                                macaddress: macAddress,
+
+                                username: systemname,
+                                localip: localIp,
+                                status: "Active",
+                                hostname: hostname,
+                                twofatempsecret: secret,
+                                twofaenabled: false,
+                                version: version,
+                                workstation: matchedUserWorkStation,
+                                matchedstatus: MatchedNotMatched,
+                                matched: matchedWorkStation,
+                                count: countWorStation
+                            },
+                        ];
+                        const result = await user.save();
+                        return res.status(201).json({
+                            generateqr: true,
+                            image,
+                            result,
+                            loginapprestriction,
+                            checkAutoLogoutTime,
+                            checkAutoLogoutDate,
+                            controlcriteria,
+                            MatchedNotMatched,
+                            resversion,
+                            matchedWorkStation,
+                            appUpdateCalculation
+                        });
+                    }
+                } else {
+                    if (macAddress != "none") {
+                        const remaining = user?.loginUserStatus
+                            ?.filter((data) => (data.macaddress !== macAddress || data.hostname !== hostname))
+                            ?.map((dar) => ({ ...dar, status: "Inactive" }));
+
+                        user["loginUserStatus"] = [
+                            ...remaining,
+                            {
+                                macaddress: macAddress,
+                                username: systemname,
+                                localip: localIp,
+                                status: "Active",
+                                hostname: hostname,
+                                twofatempsecret: secret,
+                                twofaenabled: false,
+                                version: version,
+                                workstation: matchedUserWorkStation,
+                                matchedstatus: MatchedNotMatched,
+                                matched: matchedWorkStation,
+                                count: countWorStation
+                            },
+                        ];
+
+                        const result = await user.save();
+                        return res.status(201).json({
+                            generateqr: true,
+                            image,
+                            result,
+                            loginapprestriction,
+                            checkAutoLogoutTime,
+                            checkAutoLogoutDate,
+                            controlcriteria,
+                            MatchedNotMatched,
+                            resversion,
+                            matchedWorkStation,
+                            appUpdateCalculation
+                        });
+                    } else {
+                        const result = user;
+                        return res.status(201).json({
+                            generateqr: true,
+                            image,
+
+                            result,
+                            loginapprestriction,
+                            checkAutoLogoutTime,
+                            checkAutoLogoutDate,
+                            controlcriteria,
+                            MatchedNotMatched,
+                            resversion,
+                            matchedWorkStation,
+                            appUpdateCalculation
+                        });
+                    }
+                }
+            }
+        } else if (userMacTwoFatrue && check && !user.role.includes("Manager")) {
+            if (!otp) {
+                const remaining = user?.loginUserStatus
+                    ?.filter((data) => data.macaddress !== macAddress)
+                    ?.map((dar) => ({ ...dar, status: "Inactive" }));
+
+                return res.status(201).json({
+                    otpneeded: true,
+                    loginapprestriction,
+                    checkAutoLogoutTime,
+                    checkAutoLogoutDate,
+                    controlcriteria,
+                    MatchedNotMatched,
+                    resversion,
+                    matchedWorkStation,
+                    appUpdateCalculation
+                });
+            }
+
+            const userMacTwoFaSecret = user?.loginUserStatus?.find(
+                (data) => (data.macaddress === macAddress || data.hostname === hostname) && data?.twofaenabled === true
+            );
+
+            const verified = authenticator.check(otp, userMacTwoFaSecret.twofasecret);
+
+            if (!verified) {
+                return next(new ErrorHandler("Kindly check your WinAuth QR code! Invalid Otp", 401));
+            }
+            checksendToken(result, 200, res, loginapprestriction, checkAutoLogoutTime,
+                checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion,
+                matchedWorkStation, appUpdateCalculation);
+        } else {
+            const gesyscont = user?.loginUserStatus.filter((data) => {
+                return data.macaddress != "none";
+            });
+            if (
+                user?.loginUserStatus?.find((data) =>
+                    (data.macaddress === macAddress || data.hostname === hostname))
+            ) {
+                const result = await user.save();
+                checksendToken(result, 200, res, loginapprestriction, checkAutoLogoutTime,
+                    checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion,
+                    matchedWorkStation, appUpdateCalculation);
+            } else if (
+
+                ((Number(user?.employeecount) + Number(user?.wfhcount)) === gesyscont?.length) &&
+                macAddress !== "none" && hostname !== "none" &&
+                !user?.loginUserStatus?.some((data) => (data.macaddress === macAddress || data.hostname === hostname))
+            ) {
+                return next(
+                    new ErrorHandler(
+                        "Reached Your System Count.Please Contact Administrator",
+                        401
+                    )
+                );
+            } else {
+                if (macAddress !== "none") {
+                    const remaining = user?.loginUserStatus?.map((dar) => ({
+                        ...dar,
+                        status: "Inactive",
+                    }));
+
+                    user["loginUserStatus"] = [
+                        ...remaining,
+                        {
+                            macaddress: macAddress,
+                            username: systemname,
+                            hostname: hostname,
+                            localip: localIp,
+                            status: "Active",
+                            version: version,
+                            workstation: matchedUserWorkStation,
+                            matchedstatus: MatchedNotMatched,
+                            matched: matchedWorkStation,
+                            count: countWorStation
+                        },
+                    ];
+                    // user["signintime"] = (todaydate && extraTime?.length > 0 && extraTime[0] === moment().format("YYYY-MM-DD")) ?
+                    // moment(user?.signintime).format("DD-MM-YYYY")=== moment().format("DD-MM-YYYY") ? "" : todaydate : ''
+
+                    const result = await user.save();
+                    checksendToken(
+                        result,
+                        200,
+                        res,
+                        loginapprestriction,
+                        checkAutoLogoutTime,
+                        checkAutoLogoutDate,
+                        controlcriteria,
+                        MatchedNotMatched, resversion,
+                        matchedWorkStation,
+                        appUpdateCalculation
+                    );
+                } else {
+                    checksendToken(user, 200, res, loginapprestriction, checkAutoLogoutTime,
+                        checkAutoLogoutDate, controlcriteria, MatchedNotMatched, resversion,
+                        matchedWorkStation, appUpdateCalculation);
+                }
+            }
+        }
+    } catch (err) {
+        return next(new ErrorHandler("User not found", 404));
     }
-  } catch (err) {
-    console.log(err, 'er11 users');
-    return next(new ErrorHandler('User not found', 404));
-  }
 });
 
 exports.authenticateUser = catchAsyncErrors(async (req, res, next) => {

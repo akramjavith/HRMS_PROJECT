@@ -16,9 +16,13 @@ const Noticeperiod = require("../../model/modules/recruitment/noticeperiodapply"
 const AssignBranch = require("../../model/modules/assignbranch");
 const AutoLogout = require("../../model/modules/settings/autologout");
 const { ObjectId } = require("mongodb");
+const TaskMaintenanceNonScheduleGrouping = require("../../model/modules/account/taskmaintenancenongrouping");
+const Maintenance = require("../../model/modules/account/maintenance");
+const TaskMaintenanceForUser = require("../../model/modules/account/taskmaintenanceforuser");
 const crypto = require("crypto");
 const qrcode = require("qrcode");
-const moment = require("moment");
+// const moment = require("moment");
+const moment = require('moment-timezone');
 const { authenticator } = require("otplib");
 const Token = require("../../model/login/token");
 const sendVerificationEmail = require("./sendEmail");
@@ -64,6 +68,10 @@ const ProductionDayList = require('../../model/modules/production/productiondayl
 const DayPointsUpload = require('../../model/modules/production/dayPointsUpload');
 const TempPointsUpload = require("../../model/modules/production/daypointsuploadtemp");
 const TaskForUser = require("../../model/modules/task/taskforuser");
+const ClientUserID = require("../../model/modules/production/ClientUserIDModel");
+const Raiseticketmaster = require("../../model/modules/tickets/raiseticketmaster");
+const Templatelist = require('../../model/modules/settings/Templatelist');
+const { v4: uuidv4 } = require('uuid');
 
 
 const currentDateAttStatus = new Date();
@@ -932,7 +940,7 @@ const checkClockInStatus = (
   clockouttime,
   rowshiftmode,
   weekoffpresentstatus,
-  leavecriterias,
+  leavecriterias ,
   weekNumberInMonth,
   dayName,
   rowdepartment,
@@ -5220,7 +5228,7 @@ exports.getUserWithStatusHomeCountTeam = catchAsyncErrors(async (req, res, next)
   let allusers;
   try {
     const { pageName, assignbranch, hierarchyempnames } = req.body;
-    console.log(hierarchyempnames, "hierarchyempnames");
+    // console.log(hierarchyempnames, "hierarchyempnames");
     const branchFilter = assignbranch.map((branchObj) => ({
       branch: branchObj.branch,
       company: branchObj.company,
@@ -5543,7 +5551,7 @@ exports.getAllUserHomeCountNotClockInListTeam = catchAsyncErrors(async (req, res
           return ur.username === oldItem.username && ur._id == oldItem.userid;
         })
     );
-    console.log(finalfiltered,hierarchyempnames,"finalfiltered")
+    // console.log(finalfiltered,hierarchyempnames,"finalfiltered")
     if (branchFilter.length > 0) {
       filtered = finalfiltered.filter(
         (ur) =>
@@ -6650,9 +6658,9 @@ exports.getAllUsersexceldataAssignbranchTeamDashboard = catchAsyncErrors(async (
 
   let users, usersAll, depMonthSet;
   try {
-    console.log(query,req.body.hierarchyempnames,"querysdfsdsdf")
+    // console.log(query,req.body.hierarchyempnames,"querysdfsdsdf")
     depMonthSet = await DepartmentMonth.find({ monthname: month, year: year }, { department: 1, fromdate: 1, todate: 1 });
-    usersAll = await User.find(query, {});
+    usersAll = await User.find(query, {company:1,branch:1,unit:1,department:1,reasondate:1,boardingLog:1,team:1,departmentlog:1,assignExpLog:1,processlog:1,empcode:1,companyname:1,doj:1});
     const fromDateSet = [...new Set(depMonthSet.map((d) => d.fromdate))];
     // console.log(usersAll,"")
     users = usersAll
@@ -6673,7 +6681,15 @@ exports.getAllUsersexceldataAssignbranchTeamDashboard = catchAsyncErrors(async (
         let todate = findfromtodate ? findfromtodate.todate : '';
         if (item.reasondate == '' || (item.resonablestatus !== '' && new Date(item.reasondate) >= new Date(fromdate))) {
           return {
-            ...item, // Use _doc to avoid including Mongoose metadata
+
+            ...item._doc, // Use _doc to avoid including Mongoose metadata
+            company:item.company,
+            // company:item.company,
+            // company:item.company,
+            // company:item.company,
+            // company:item.company,
+            // company:item.company,
+            // company:item.company,
             department: findUserDeprtment,
           };
         }
@@ -6692,7 +6708,7 @@ exports.getAllUsersexceldataAssignbranchTeamDashboard = catchAsyncErrors(async (
   return res.status(200).json({ count: users.length, users });
 });
 
-
+//miniumum points 
 exports.getAllUserTotalShiftDaysHomeDashboardTeam = catchAsyncErrors(async (req, res, next) => {
   let resultshiftallot = [];
   let graceTime;
@@ -6791,6 +6807,8 @@ exports.getAllUserTotalShiftDaysHomeDashboardTeam = catchAsyncErrors(async (req,
         Permission.find({ employeename: { $in: userCds } }, { employeeid: 1, date: 1, status: 1, applytype: 1, compensationstatus: 1, compensationapplytype: 1, requesthours: 1 }),
         Leavecriteria.find({ leavetype: 'No Call/No Show' }, { mode: 1, company: 1, branch: 1, unit: 1, team: 1, employee: 1, designation: 1, department: 1, leavetype: 1, tookleave: 1 }),
       ]);
+
+      // console.log(leavecriterias,"leavecriterias")
       // graceTime = controlcriteria[0].gracetime;
       clockOutHours = controlcriteria[0].clockout;
       lateclockincount = controlcriteria[0].lateclockincount;
@@ -7159,8 +7177,8 @@ exports.getAllUserTotalShiftDaysHomeDashboardTeam = catchAsyncErrors(async (req,
           lateclockincount: lateclockincount,
           earlyclockoutcount: earlyclockoutcount,
           totalnumberofdays: getTotalMonthDaysUser(item?.department, depMonthSet, ismonth, isyear),
-          empshiftdays: getTotalMonthDaysForEmpUser(dojDate, item?.department, depMonthSet, ismonth, isyear),
-          totalcounttillcurrendate: getTotalMonthsCurrentDateCountUserPayrun(dojDate, item?.department, depMonthSet, ismonth, isyear, item.reasondate),
+          empshiftdays: getTotalMonthDaysForEmpUser(item.doj, item?.department, depMonthSet, ismonth, isyear),
+          totalcounttillcurrendate: getTotalMonthsCurrentDateCountUserPayrun(item.doj, item?.department, depMonthSet, ismonth, isyear, item.reasondate),
           totalshift: getTotalShiftHoursUser(item?._id.toString(), createdUserDates, attendance),
           weekoffpresentstatus: checkWeekOffPresentStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
        
@@ -7276,7 +7294,7 @@ exports.getAllUserTotalShiftDaysHomeDashboardTeam = catchAsyncErrors(async (req,
       });
    
   finaluser = finaluser.filter(d => d != null)
-  console.log(finaluser.length,"final")
+  // console.log(finaluser.length,"final")
     } catch (err) {
     console.log(err, 'errrmini');
     return next(new ErrorHandler('Records not found!', 404));
@@ -7392,11 +7410,18 @@ exports.getAllUserTotalShiftDaysHomeTeam = catchAsyncErrors(async (req, res, nex
 
     const userIds = users.map((user) => user._id);
     const userCds = users.map((user) => user.companyname);
-    const [attendance, allLeaveStatus, permission] = await Promise.all([
-      Attendance.find({ userid: { $in: userIds }, createdAt: { $gte: attFromDate, $lte: attToDate } }),
-      ApplyLeave.find({ employeename: { $in: userCds } }),
-      Permission.find({ employeename: { $in: userCds } }, { employeeid: 1, date: 1, status: 1, applytype: 1, compensationstatus: 1, compensationapplytype: 1, requesthours: 1, shiftmode: 1 }),
-    ]);
+    // const [attendance, allLeaveStatus, permission,] = await Promise.all([
+    //   Attendance.find({ userid: { $in: userIds }, createdAt: { $gte: attFromDate, $lte: attToDate } }),
+    //   ApplyLeave.find({ employeename: { $in: userCds } }),
+    //   Permission.find({ employeename: { $in: userCds } }, { employeeid: 1, date: 1, status: 1, applytype: 1, compensationstatus: 1, compensationapplytype: 1, requesthours: 1, shiftmode: 1 }),
+  
+    // ]);
+     const [attendance, allLeaveStatus, permission, leavecriterias] = await Promise.all([
+        Attendance.find({ userid: { $in: userIds }, createdAt: { $gte: attFromDate, $lte: attToDate } }),
+        ApplyLeave.find({ employeename: { $in: userCds } }),
+        Permission.find({ employeename: { $in: userCds } }, { employeeid: 1, date: 1, status: 1, applytype: 1, compensationstatus: 1, compensationapplytype: 1, requesthours: 1 }),
+        Leavecriteria.find({ leavetype: 'No Call/No Show' }, { mode: 1, company: 1, branch: 1, unit: 1, team: 1, employee: 1, designation: 1, department: 1, leavetype: 1, tookleave: 1 }),
+      ]);
 
     clockOutHours = controlcriteria[0].clockout;
     lateclockincount = controlcriteria[0].lateclockincount;
@@ -7680,121 +7705,212 @@ exports.getAllUserTotalShiftDaysHomeTeam = catchAsyncErrors(async (req, res, nex
         const isWeekOffWithAdjustment = isWeekOff && matchingItem;
         const isWeekOffWithManual = isWeekOff && matchingItemAllot;
 
+        // const row = {
+        //   id: `${item._id.toString()}_${date.formattedDate}_${date.shiftMode}`,
+        //   userid: item._id.toString(),
+        //   company: item.company,
+        //   branch: item.branch,
+        //   unit: item.unit,
+        //   team: item.team,
+        //   department: item.department,
+        //   username: item.companyname,
+        //   empcode: item.empcode,
+        //   weekoff: item.weekoff,
+        //   boardingLog: item.boardingLog,
+        //   shiftallot: item.shiftallot,
+        //   doj: dojDate,
+        //   shift: getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+        //   date: `${date.formattedDate} ${date.dayName} ${date.dayCount}`,
+        //   role: item.role,
+        //   rowformattedDate: date.formattedDate,
+        //   dayName: date.dayName,
+        //   shiftMode: date.shiftMode,
+        //   reasondate: item.reasondate,
+        //   clockin: checkGetClockInTime(
+        //     attendanceFiltered,
+        //     item._id.toString(),
+        //     date.formattedDate,
+        //     getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+        //     date.shiftMode
+        //   ),
+        //   clockout: checkGetClockOutTime(
+        //     attendanceFiltered,
+        //     item._id.toString(),
+        //     date.formattedDate,
+        //     getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+        //     date.shiftMode
+        //   ),
+        //   clockinstatus: checkClockInStatus(
+        //     checkGetClockInTime(
+        //       attendanceFiltered,
+        //       item._id.toString(),
+        //       date.formattedDate,
+        //       getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+        //       date.shiftMode
+        //     ),
+        //     getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+        //     graceTime,
+        //     allLeaveStatus,
+        //     holidays,
+        //     checkGetClockInDate(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
+        //     item.branch,
+        //     item.empcode,
+        //     item.company,
+        //     date.formattedDate,
+        //     item.unit,
+        //     item.team,
+        //     item.companyname,
+        //     earlyclockin,
+        //     lateclockin,
+        //     afterlateclockin,
+        //     leavetype,
+        //     permission,
+        //     checkGetClockOutTime(
+        //       attendanceFiltered,
+        //       item._id.toString(),
+        //       date.formattedDate,
+        //       getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+        //       date.shiftMode
+        //     ),
+        //     date.shiftMode,
+        //     checkWeekOffPresentStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode)
+        //   ),
+        //   clockoutstatus: checkClockOutStatus(
+        //     checkGetClockOutTime(
+        //       attendanceFiltered,
+        //       item._id.toString(),
+        //       date.formattedDate,
+        //       getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+        //       date.shiftMode
+        //     ),
+        //     checkGetClockInTime(
+        //       attendanceFiltered,
+        //       item._id.toString(),
+        //       date.formattedDate,
+        //       getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+        //       date.shiftMode
+        //     ),
+        //     getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+        //     clockOutHours,
+        //     checkGetClockInDate(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
+        //     allLeaveStatus,
+        //     holidays,
+        //     item.branch,
+        //     item.empcode,
+        //     item.company,
+        //     date.formattedDate,
+        //     item.unit,
+        //     item.team,
+        //     item.companyname,
+        //     onclockout,
+        //     earlyclockout,
+        //     beforeearlyclockout,
+        //     checkGetClockInAutoStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
+        //     leavetype,
+        //     permission,
+        //     date.shiftMode,
+        //     checkWeekOffPresentStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode)
+        //   ),
+        //   attendanceautostatus: checkAttendanceStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
+        //   lateclockincount: lateclockincount,
+        //   earlyclockoutcount: earlyclockoutcount,
+        //   totalnumberofdays: getTotalMonthDaysUser(item.department, depMonthSetFiltered, ismonth, isyear),
+        //   empshiftdays: getTotalMonthDaysForEmpUser(dojDate, item.department, depMonthSetFiltered, ismonth, isyear),
+        //   totalcounttillcurrendate: getTotalMonthsCurrentDateCountUser(dojDate, item.department, depMonthSetFiltered, ismonth, isyear),
+        //   totalshift: getTotalShiftHoursUser(item._id.toString(), createdUserDates, attendanceFiltered),
+        //   weekoffpresentstatus: checkWeekOffPresentStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
+        // };
+       
         const row = {
-          id: `${item._id.toString()}_${date.formattedDate}_${date.shiftMode}`,
-          userid: item._id.toString(),
-          company: item.company,
-          branch: item.branch,
-          unit: item.unit,
-          team: item.team,
-          department: item.department,
-          username: item.companyname,
-          empcode: item.empcode,
-          weekoff: item.weekoff,
-          boardingLog: item.boardingLog,
-          shiftallot: item.shiftallot,
-          doj: dojDate,
-          shift: getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
-          date: `${date.formattedDate} ${date.dayName} ${date.dayCount}`,
-          role: item.role,
-          rowformattedDate: date.formattedDate,
-          dayName: date.dayName,
-          shiftMode: date.shiftMode,
-          reasondate: item.reasondate,
-          clockin: checkGetClockInTime(
-            attendanceFiltered,
-            item._id.toString(),
-            date.formattedDate,
-            getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
-            date.shiftMode
-          ),
-          clockout: checkGetClockOutTime(
-            attendanceFiltered,
-            item._id.toString(),
-            date.formattedDate,
-            getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
-            date.shiftMode
-          ),
+            id: `${item._id.toString()}_${date.formattedDate}_${date.shiftMode}`,
+            userid: item._id.toString(),
+            company: item.company,
+            branch: item.branch,
+            unit: item.unit,
+            team: item.team,
+            department: item.department,
+            username: item.companyname,
+            empcode: item.empcode,
+            weekoff: item.weekoff,
+            boardingLog: item.boardingLog,
+            shiftallot: item.shiftallot,
+            doj: item.doj,
+            shift: getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered),
+            date: `${date.formattedDate} ${date.dayName} ${date.dayCount}`,
+            role: item.role,
+            rowformattedDate: date.formattedDate,
+            dayName: date.dayName,
+            shiftMode: date.shiftMode,
+            reasondate: item.reasondate,
+              clockin: checkGetClockInTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
+          clockout: checkGetClockOutTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
           clockinstatus: checkClockInStatus(
-            checkGetClockInTime(
-              attendanceFiltered,
-              item._id.toString(),
-              date.formattedDate,
-              getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
-              date.shiftMode
-            ),
-            getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+            checkGetClockInTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
+            getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem),
             graceTime,
             allLeaveStatus,
             holidays,
-            checkGetClockInDate(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
-            item.branch,
-            item.empcode,
-            item.company,
+            checkGetClockInDate(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
+            item?.branch,
+            item?.empcode,
+            item?.company,
             date.formattedDate,
-            item.unit,
-            item.team,
-            item.companyname,
+            item?.unit,
+            item?.team,
+            item?.companyname,
             earlyclockin,
             lateclockin,
             afterlateclockin,
             leavetype,
             permission,
-            checkGetClockOutTime(
-              attendanceFiltered,
-              item._id.toString(),
-              date.formattedDate,
-              getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
-              date.shiftMode
-            ),
+            checkGetClockOutTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
             date.shiftMode,
-            checkWeekOffPresentStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode)
+            checkWeekOffPresentStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
+            leavecriterias,
+            date.weekNumberInMonth,
+            date.dayName,
+            item?.department,
+            item?.designation
           ),
           clockoutstatus: checkClockOutStatus(
-            checkGetClockOutTime(
-              attendanceFiltered,
-              item._id.toString(),
-              date.formattedDate,
-              getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
-              date.shiftMode
-            ),
-            checkGetClockInTime(
-              attendanceFiltered,
-              item._id.toString(),
-              date.formattedDate,
-              getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
-              date.shiftMode
-            ),
-            getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item.department, depMonthSetFiltered, matchingRemovedItem, matchingAssignShiftItem),
+            checkGetClockOutTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
+            checkGetClockInTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
+            getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem),
             clockOutHours,
-            checkGetClockInDate(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
+            checkGetClockInDate(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
             allLeaveStatus,
             holidays,
-            item.branch,
-            item.empcode,
-            item.company,
+            item?.branch,
+            item?.empcode,
+            item?.company,
             date.formattedDate,
-            item.unit,
-            item.team,
-            item.companyname,
+            item?.unit,
+            item?.team,
+            item?.companyname,
             onclockout,
             earlyclockout,
             beforeearlyclockout,
-            checkGetClockInAutoStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
+            checkGetClockInAutoStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
             leavetype,
             permission,
             date.shiftMode,
-            checkWeekOffPresentStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode)
+            checkWeekOffPresentStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
+            leavecriterias,
+            date.weekNumberInMonth,
+            date.dayName,
+            item?.department,
+            item?.designation
           ),
-          attendanceautostatus: checkAttendanceStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
+          attendanceautostatus: checkAttendanceStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
           lateclockincount: lateclockincount,
           earlyclockoutcount: earlyclockoutcount,
-          totalnumberofdays: getTotalMonthDaysUser(item.department, depMonthSetFiltered, ismonth, isyear),
-          empshiftdays: getTotalMonthDaysForEmpUser(dojDate, item.department, depMonthSetFiltered, ismonth, isyear),
-          totalcounttillcurrendate: getTotalMonthsCurrentDateCountUser(dojDate, item.department, depMonthSetFiltered, ismonth, isyear),
-          totalshift: getTotalShiftHoursUser(item._id.toString(), createdUserDates, attendanceFiltered),
-          weekoffpresentstatus: checkWeekOffPresentStatus(attendanceFiltered, item._id.toString(), date.formattedDate, date.shiftMode),
-        };
+          totalnumberofdays: getTotalMonthDaysUser(item?.department, depMonthSet, ismonth, isyear),
+          empshiftdays: getTotalMonthDaysForEmpUser(item.doj, item?.department, depMonthSet, ismonth, isyear),
+          totalcounttillcurrendate: getTotalMonthsCurrentDateCountUserPayrun(item.doj, item?.department, depMonthSet, ismonth, isyear, item.reasondate),
+          totalshift: getTotalShiftHoursUser(item?._id.toString(), createdUserDates, attendance),
+          weekoffpresentstatus: checkWeekOffPresentStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
+          };
+       
         return row;
       });
 
@@ -7803,7 +7919,7 @@ exports.getAllUserTotalShiftDaysHomeTeam = catchAsyncErrors(async (req, res, nex
 
     finaluser = finaluser.filter(t => t != null && t != undefined)
 
-    console.log(finaluser.length,"finaluser")
+    // console.log(finaluser.length,"finaluser")
   } catch (err) {
     console.log(err,"errrmofmnsdfsjfdoj")
     return next(new ErrorHandler('Records not found!', 404));
@@ -7816,830 +7932,8 @@ exports.getAllUserTotalShiftDaysHomeTeam = catchAsyncErrors(async (req, res, nex
 
 
 
-// exports.getAllUserTotalShiftDaysHomeTeam = catchAsyncErrors(async (req, res, next) => {
-//   let graceTime;
-//   let clockOutHours;
-//   let lateclockincount;
-//   let earlyclockoutcount;
-//   let onclockout;
-//   let earlyclockin;
-//   let earlyclockout;
-//   let lateclockin;
-//   let afterlateclockin;
-//   let beforeearlyclockout;
-//   let finaluserbefore = [];
-//   let finaluser = [];
 
-//   const { ismonth, isyear, department, employees, montharray } = req.body;
-
-//   // Transform `result` to match MongoDB fields
-//   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-//   let querydeptmonth = {
-//     monthname: monthNames[ismonth - 1],
-//     year: isyear,
-//   };
-//   // console.log(montharray, "montharray");
-//   function getMonthStartAndEndDate(monthname, year) {
-//     // Create a mapping of month names to their 0-based indices
-//     const monthMap = {
-//       January: 0,
-//       February: 1,
-//       March: 2,
-//       April: 3,
-//       May: 4,
-//       June: 5,
-//       July: 6,
-//       August: 7,
-//       September: 8,
-//       October: 9,
-//       November: 10,
-//       December: 11,
-//     };
-
-//     // Get the month index
-//     const monthIndex = monthMap[monthname];
-
-//     if (monthIndex === undefined) {
-//       throw new Error("Invalid month name provided.");
-//     }
-
-//     // Start date is the first day of the month
-//     const monthStartDate = new Date(year, monthIndex, 1);
-
-//     // End date is the last day of the month (calculated as the day before the first day of the next month)
-//     const firstDayNextMonth = new Date(year, monthIndex + 1, 1);
-//     const monthEndDate = new Date(firstDayNextMonth - 1);
-
-//     // Return start and end dates in YYYY-MM-DD format
-//     return {
-//       startDate: monthStartDate.toISOString().split("T")[0], // YYYY-MM-DD
-//       endDate: monthEndDate.toISOString().split("T")[0], // YYYY-MM-DD
-//     };
-//   }
-
-//   // Example usage
-//   const { monthStartDate, monthEndDate } = getMonthStartAndEndDate(monthNames[ismonth - 1], Number(isyear));
-
-//   try {
-//     const [usersAll, depMonthSets, controlcriteria, holidays, leavetype] = await Promise.all([
-//       User.find(
-//         {
-//           companyname:{$in:req.body.hierarchyempnames},
-//           enquirystatus: {
-//             $nin: ["Enquiry Purpose"],
-//           },
-//         },
-//         {
-//           company: 1,
-//           branch: 1,
-//           unit: 1,
-//           team: 1,
-//           dot: 1,
-//           department: 1,
-//           doj: 1,
-//           empcode: 1,
-//           companyname: 1,
-//           floor: 1,
-//           username: 1,
-//           designation: 1,
-//           role: 1,
-//           weekoff: 1,
-//           shiftallot: 1,
-//           shifttiming: 1,
-//           boardingLog: 1,
-//           attendancemode: 1,
-//           reasondate: 1,
-//           departmentlog: 1,
-//           designationlog: 1,
-//           resonablestatus: 1,
-//         }
-//       ),
-//       DepartmentMonth.find(querydeptmonth, { department: 1, year: 1, month: 1, monthname: 1, fromdate: 1, todate: 1, totaldays: 1 }),
-//       ControlCriteria.find(),
-//       Holiday.find({}, { date: 1, company: 1, applicablefor: 1, unit: 1, team: 1, employee: 1, noofdays: 1 }),
-//       Leavetype.find({}, { leavetype: 1, code: 1 }),
-//     ]);
-// console.log(usersAll.length,"usersAll")
-//     function filterLatestLogs(monthArray, departmentlog) {
-//       // Step 1: Sort logs by startdate
-//       const sortedLogs = [...departmentlog].sort((a, b) => new Date(a.startdate) - new Date(b.startdate));
-
-//       // Step 2: Assign an effective end date (next log startdate - 1 day)
-//       sortedLogs.forEach((log, index) => {
-//         if (index < sortedLogs.length - 1) {
-//           log.enddate = new Date(new Date(sortedLogs[index + 1].startdate).getTime() - 86400000); // 1 day before next log's startdate
-//         } else {
-//           log.enddate = new Date("9999-12-31"); // Default max end date for the last log
-//         }
-//       });
-
-//       // Step 3: Filter logs based on monthArray and department
-//       const filteredLogs = sortedLogs.filter((log) => {
-//         return monthArray.some((month) => {
-//           const fromDate = new Date(month.fromdate);
-//           const toDate = new Date(month.todate);
-//           const startDate = new Date(log.startdate);
-//           const endDate = new Date(log.enddate);
-
-//           return startDate <= toDate && endDate >= fromDate && log.department === month.department;
-//         });
-//       });
-
-//       // Step 4: Select the latest log per department based on updateddatetime
-//       const latestLogs = {};
-//       filteredLogs.forEach((log) => {
-//         const dept = log.department;
-//         if (!latestLogs[dept] || new Date(log.updateddatetime) > new Date(latestLogs[dept].updateddatetime)) {
-//           latestLogs[dept] = log;
-//         }
-//       });
-
-//       return Object.values(latestLogs);
-//     }
-//     function filterLatestLogsTeam(monthArray, teamLog, department) {
-//       // Step 1: Sort logs by startdate
-//       const sortedLogs = [...teamLog].sort((a, b) => new Date(a.startdate) - new Date(b.startdate));
-
-//       // Step 2: Assign an effective end date (next log startdate - 1 day)
-//       sortedLogs.forEach((log, index) => {
-//         if (index < sortedLogs.length - 1) {
-//           log.enddate = new Date(new Date(sortedLogs[index + 1].startdate).getTime() - 86400000); // 1 day before next log's startdate
-//         } else {
-//           log.enddate = new Date("9999-12-31"); // Default max end date for the last log
-//         }
-//       });
-
-//       // Step 3: Filter logs based on monthArray and department
-//       const filteredLogs = sortedLogs.filter((log) => {
-//         return monthArray.some((month) => {
-//           const fromDate = new Date(month.fromdate);
-//           const toDate = new Date(month.todate);
-//           const startDate = new Date(log.startdate);
-//           const endDate = new Date(log.enddate);
-
-//           return startDate <= toDate && endDate >= fromDate && department === month.department;
-//         });
-//       });
-
-//       // Step 4: Select the latest log per department based on updateddatetime
-//       const latestLogs = {};
-//       filteredLogs.forEach((log) => {
-//         const dept = log.department;
-//         if (!latestLogs[dept] || new Date(log.updateddatetime) > new Date(latestLogs[dept].updateddatetime)) {
-//           latestLogs[dept] = log;
-//         }
-//       });
-
-//       return Object.values(latestLogs);
-//     }
-
-//     let users = usersAll
-//       .map((user) => {
-//         const item = { ...user._doc };
-//         let filteredBoarding = user.boardingLog.filter((log) => log.logcreation !== "shift" && log.ischangeteam);
-
-//         const finalDepartment = filterLatestLogs(depMonthSets, user.departmentlog).length > 0 ? filterLatestLogs(depMonthSets, user.departmentlog, item.companyname)[filterLatestLogs(depMonthSets, user.departmentlog).length - 1]?.department : "";
-//         item.department = finalDepartment;
-
-//         if (filteredBoarding.length > 0) {
-//           const latestTeamLogs = filterLatestLogsTeam(depMonthSets, filteredBoarding, finalDepartment);
-//           item.team = latestTeamLogs.length > 0 ? latestTeamLogs[latestTeamLogs.length - 1]?.team : "";
-//         }
-
-//         return item;
-//       })
-//       .filter((d) => {
-//         const userDepartmentDate = depMonthSets.find((dms) => d.department === dms.department);
-//         const fromdate = userDepartmentDate ? new Date(userDepartmentDate.fromdate) : monthStartDate;
-//         const todate = userDepartmentDate ? new Date(userDepartmentDate.todate) : monthEndDate;
-//         // console.log(fromdate, todate, 'todate');
-//         const dojcompare = d.department == "Internship" && d.departmentlog.length > 1 ? true : fromdate >= new Date(d.doj) || todate >= new Date(d.doj);
-//         return dojcompare && (d.reasondate === "" || !d.reasondate || new Date(d.reasondate) >= fromdate || new Date(d.reasondate) >= todate) ;
-//       });
-
-//     const resultDateArray = depMonthSets.reduce(
-//       (acc, curr) => {
-//         // Compare and update the earliest fromdate
-//         if (new Date(curr.fromdate) < new Date(acc.fromdate)) {
-//           acc.fromdate = curr.fromdate;
-//         }
-//         // Compare and update the latest todate
-//         if (new Date(curr.todate) > new Date(acc.todate)) {
-//           acc.todate = curr.todate;
-//         }
-//         return acc;
-//       },
-//       {
-//         fromdate: depMonthSets[0].fromdate, // Start with the first fromdate
-//         todate: depMonthSets[0].todate, // Start with the first todate
-//       }
-//     );
-
-//     // function formatDate(dateString) {
-//     //   const [day, month, year] = dateString?.split("-");
-//     //   return `${year}-${month}-${day}`;
-//     // }
-
-//     let attFromDate = resultDateArray.fromdate;
-//     let attToDate = resultDateArray.todate;
-//     // console.log(attFromDate, attToDate, 'sdf');
-
-//     function getAllDatesBetween(attFromDate, attToDate) {
-//       // Parse the input dates
-//       const startDate = new Date(attFromDate);
-//       const endDate = new Date(attToDate);
-
-//       const dateArray = [];
-//       const currentDate = new Date(startDate);
-
-//       // Loop through dates from start to end
-//       while (currentDate <= endDate) {
-//         const day = String(currentDate.getDate()).padStart(2, "0"); // Ensure 2 digits
-//         const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-//         const year = currentDate.getFullYear();
-//         dateArray.push(`${day}-${month}-${year}`);
-
-//         // Move to the next day
-//         currentDate.setDate(currentDate.getDate() + 1);
-//       }
-
-//       return dateArray;
-//     }
-
-//     const dateArray = getAllDatesBetween(attFromDate, attToDate);
-
-//     const userIds = usersAll.map((user) => user._id);
-//     const userCds = usersAll.map((user) => user.companyname);
-
-//     const [attendances, allLeaveStatus, permission, leavecriterias] = await Promise.all([
-//       Attendance.find({ userid: { $in: userIds }, date: { $in: dateArray } }),
-//       ApplyLeave.find({ employeename: { $in: userCds } }),
-//       Permission.find({ employeename: { $in: userCds } }, { employeeid: 1, date: 1, status: 1, applytype: 1, compensationstatus: 1, compensationapplytype: 1, requesthours: 1, shiftmode: 1 }),
-//       Leavecriteria.find({ leavetype: "No Call/No Show" }, { mode: 1, company: 1, branch: 1, unit: 1, team: 1, employee: 1, designation: 1, department: 1, leavetype: 1, tookleave: 1 }),
-//     ]);
-//     // const leavecriterias = await Leavecriteria.find({ leavetype: 'No Call/No Show' }, { mode: 1, company: 1, branch: 1, unit: 1, team: 1, employee: 1, designation: 1, department: 1, leavetype: 1, tookleave: 1 });
-//     // // graceTime = controlcriteria[0].gracetime;
-//     // clockOutHours = controlcriteria[0].clockout;
-//     // lateclockincount = controlcriteria[0].lateclockincount;
-//     // earlyclockoutcount = controlcriteria[0].earlyclockoutcount;
-//     // onclockout = controlcriteria[0].onclockout;
-//     // earlyclockin = controlcriteria[0].earlyclockin;
-//     // lateclockin = controlcriteria[0].lateclockin;
-//     // earlyclockout = controlcriteria[0].earlyclockout;
-//     // afterlateclockin = controlcriteria[0].afterlateclockin;
-//     // beforeearlyclockout = controlcriteria[0].afterlateclockin;
-
-//     finaluserbefore = users?.flatMap((item, index) => {
-//       let isEmployeeGrace = controlcriteria[0].todos && controlcriteria[0].todos.find((d) => d.company === item.company && d.branch === item.branch && d.unit === item.unit && d.team === item.team && d.employeename === item.companyname);
-
-//       if (isEmployeeGrace) {
-//         graceTime = isEmployeeGrace.employeegracetime;
-//       }
-
-//       let userDates = [];
-
-//       // Remove duplicate entries with the most recent entry
-//       const uniqueEntriesDep = {};
-//       item.departmentlog?.forEach((entry) => {
-//         const entryDate = new Date(entry.startdate); // Parse the startdate into a date object
-//         const key = entry.startdate;
-//         if (!(key in uniqueEntriesDep)) {
-//           uniqueEntriesDep[key] = entry;
-//         }
-//       });
-//       // const foundDepartment = depMonthSets?.find((d) => Number(d.year) === isyear && d.monthname === monthNames[ismonth - 1]);
-
-//       const uniqueDepLog = Object.values(uniqueEntriesDep);
-//       // let relevantDepLogEntry = uniqueDepLog
-//       //     .filter(log => new Date(log.startdate) <= new Date(foundDepartment && foundDepartment.fromdate))
-//       //     .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0];
-
-//       // if (!relevantDepLogEntry) {
-//       //     relevantDepLogEntry = uniqueDepLog
-//       //         .filter(log => new Date(log.startdate) <= new Date(foundDepartment && foundDepartment.todate))
-//       //         .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0];
-//       // }
-
-//       // let relevantDepLogEntry;
-
-//       // depMonthSets?.forEach((d) => {
-//       //   montharray.forEach((data) => {
-//       //     if (Number(d.year) === Number(data.year) && d.monthname === data.month) {
-//       //       // Try to find the latest startdate before or equal to fromdate
-//       //       const foundEntry = uniqueDepLog.filter((log) => new Date(log.startdate) <= new Date(d.fromdate)).sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0];
-
-//       //       if (foundEntry) {
-//       //         relevantDepLogEntry = foundEntry;
-//       //       } else {
-//       //         // If not found, try with todate
-//       //         const fallbackEntry = uniqueDepLog.filter((log) => new Date(log.startdate) <= new Date(d.todate)).sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0];
-
-//       //         if (fallbackEntry) {
-//       //           relevantDepLogEntry = fallbackEntry;
-//       //         }
-//       //         0;
-//       //       }
-//       //     }
-//       //   });
-//       // });
-
-//       // const comparedDate = depMonthSets?.filter((d) => d.department === (relevantDepLogEntry && relevantDepLogEntry?.department) && Number(d.year) === isyear && d.monthname === monthNames[ismonth - 1]);
-//       const comparedDate = depMonthSets?.filter((d) => d.department === item.department);
-
-//       // const dojDate = item?.boardingLog.length > 0 ? item?.boardingLog[0].startdate : item?.doj;
-//       const dojDate = item?.doj;
-//       let departmentDateSet = [];
-//       comparedDate.map((data) => {
-//         departmentDateSet.push({ department: data.department, fromdate: data.fromdate, todate: data.todate, monthname: data.monthname, year: data.year });
-//       });
-
-//       if (comparedDate && comparedDate.length > 0) {
-//         comparedDate?.forEach((dep) => {
-//           if (!dep.fromdate && !dep.todate) {
-//             return "";
-//           }
-
-//           if (!item?.doj) {
-//             return "";
-//           }
-
-//           const [year2, month2, day2] = dojDate?.split("-").map(Number);
-//           const joiningDate = new Date(year2, month2 - 1, day2);
-//           const [year1, month1, day1] = dep.fromdate?.split("-").map(Number);
-//           const [year, month, day] = dep.todate?.split("-").map(Number);
-//           const lastDate = new Date(year, month - 1, day);
-//           const firstDate = new Date(year1, month1 - 1, day1);
-
-//           if (joiningDate < firstDate) {
-//             // Check if the shift date is before or equal to the current date
-//             if (lastDate >= currentDateAttStatus) {
-//               // If matched, push the range from 'fromdate' to 'todate'
-//               const startDate = new Date(firstDate);
-//               // Loop through the dates in the range
-//               while (startDate <= currentDateAttStatus) {
-//                 userDates.push({
-//                   formattedDate: format(startDate, "dd/MM/yyyy"),
-//                   dayName: format(startDate, "EEEE"),
-//                   dayCount: startDate.getDate(),
-//                   weekNumberInMonth:
-//                     getWeekNumberInMonth(startDate) === 1
-//                       ? `${getWeekNumberInMonth(startDate)}st Week`
-//                       : getWeekNumberInMonth(startDate) === 2
-//                       ? `${getWeekNumberInMonth(startDate)}nd Week`
-//                       : getWeekNumberInMonth(startDate) === 3
-//                       ? `${getWeekNumberInMonth(startDate)}rd Week`
-//                       : getWeekNumberInMonth(startDate) > 3
-//                       ? `${getWeekNumberInMonth(startDate)}th Week`
-//                       : "",
-//                 });
-//                 startDate.setDate(startDate.getDate() + 1);
-//               }
-//             } else if (lastDate <= currentDateAttStatus) {
-//               // If matched, push the range from 'fromdate' to 'todate'
-//               const startDate = new Date(firstDate);
-//               // Loop through the dates in the range
-//               while (startDate <= lastDate) {
-//                 userDates.push({
-//                   formattedDate: format(startDate, "dd/MM/yyyy"),
-//                   dayName: format(startDate, "EEEE"),
-//                   dayCount: startDate.getDate(),
-//                   weekNumberInMonth:
-//                     getWeekNumberInMonth(startDate) === 1
-//                       ? `${getWeekNumberInMonth(startDate)}st Week`
-//                       : getWeekNumberInMonth(startDate) === 2
-//                       ? `${getWeekNumberInMonth(startDate)}nd Week`
-//                       : getWeekNumberInMonth(startDate) === 3
-//                       ? `${getWeekNumberInMonth(startDate)}rd Week`
-//                       : getWeekNumberInMonth(startDate) > 3
-//                       ? `${getWeekNumberInMonth(startDate)}th Week`
-//                       : "",
-//                 });
-//                 startDate.setDate(startDate.getDate() + 1);
-//               }
-//             }
-//           } else {
-//             // Check if the shift date is before or equal to the current date
-//             if (lastDate >= currentDateAttStatus) {
-//               // If matched, push the range from 'fromdate' to 'todate'
-//               const startDate = new Date(joiningDate);
-//               // Loop through the dates in the range
-//               while (startDate <= currentDateAttStatus) {
-//                 userDates.push({
-//                   formattedDate: format(startDate, "dd/MM/yyyy"),
-//                   dayName: format(startDate, "EEEE"),
-//                   dayCount: startDate.getDate(),
-//                   weekNumberInMonth:
-//                     getWeekNumberInMonth(startDate) === 1
-//                       ? `${getWeekNumberInMonth(startDate)}st Week`
-//                       : getWeekNumberInMonth(startDate) === 2
-//                       ? `${getWeekNumberInMonth(startDate)}nd Week`
-//                       : getWeekNumberInMonth(startDate) === 3
-//                       ? `${getWeekNumberInMonth(startDate)}rd Week`
-//                       : getWeekNumberInMonth(startDate) > 3
-//                       ? `${getWeekNumberInMonth(startDate)}th Week`
-//                       : "",
-//                 });
-//                 startDate.setDate(startDate.getDate() + 1);
-//               }
-//             } else if (lastDate <= currentDateAttStatus) {
-//               // If matched, push the range from 'fromdate' to 'todate'
-//               const startDate = new Date(joiningDate);
-//               // Loop through the dates in the range
-//               while (startDate <= lastDate) {
-//                 userDates.push({
-//                   formattedDate: format(startDate, "dd/MM/yyyy"),
-//                   dayName: format(startDate, "EEEE"),
-//                   dayCount: startDate.getDate(),
-//                   weekNumberInMonth:
-//                     getWeekNumberInMonth(startDate) === 1
-//                       ? `${getWeekNumberInMonth(startDate)}st Week`
-//                       : getWeekNumberInMonth(startDate) === 2
-//                       ? `${getWeekNumberInMonth(startDate)}nd Week`
-//                       : getWeekNumberInMonth(startDate) === 3
-//                       ? `${getWeekNumberInMonth(startDate)}rd Week`
-//                       : getWeekNumberInMonth(startDate) > 3
-//                       ? `${getWeekNumberInMonth(startDate)}th Week`
-//                       : "",
-//                 });
-//                 startDate.setDate(startDate.getDate() + 1);
-//               }
-//             }
-//           }
-//         });
-//       } else {
-//         const [year2, month2, day2] = dojDate?.split("-").map(Number);
-//         const joiningDate = new Date(year2, month2 - 1, day2);
-//         // Calculate the start date of the month based on the selected month
-//         const startDate = new Date(isyear, ismonth - 1, 1);
-
-//         const endDate = new Date(startDate);
-//         endDate.setMonth(endDate.getMonth() + 1);
-//         endDate.setDate(endDate.getDate() - 1);
-
-//         if (joiningDate < startDate) {
-//           // Check if the shift date is before or equal to the current date
-//           if (endDate >= currentDateAttStatus) {
-//             let currentDate1 = new Date(startDate);
-
-//             while (currentDate1 <= endDate) {
-//               userDates.push({
-//                 formattedDate: format(currentDate1, "dd/MM/yyyy"),
-//                 dayName: format(currentDate1, "EEEE"),
-//                 dayCount: currentDate1.getDate(),
-//                 weekNumberInMonth:
-//                   getWeekNumberInMonth(currentDate1) === 1
-//                     ? `${getWeekNumberInMonth(currentDate1)}st Week`
-//                     : getWeekNumberInMonth(currentDate1) === 2
-//                     ? `${getWeekNumberInMonth(currentDate1)}nd Week`
-//                     : getWeekNumberInMonth(currentDate1) === 3
-//                     ? `${getWeekNumberInMonth(currentDate1)}rd Week`
-//                     : getWeekNumberInMonth(currentDate1) > 3
-//                     ? `${getWeekNumberInMonth(currentDate1)}th Week`
-//                     : "",
-//               });
-//               currentDate1.setDate(currentDate1.getDate() + 1);
-//             }
-//           } else if (endDate <= currentDateAttStatus) {
-//             let currentDate1 = new Date(startDate);
-
-//             while (currentDate1 <= endDate) {
-//               userDates.push({
-//                 formattedDate: format(currentDate1, "dd/MM/yyyy"),
-//                 dayName: format(currentDate1, "EEEE"),
-//                 dayCount: currentDate1.getDate(),
-//                 weekNumberInMonth:
-//                   getWeekNumberInMonth(currentDate1) === 1
-//                     ? `${getWeekNumberInMonth(currentDate1)}st Week`
-//                     : getWeekNumberInMonth(currentDate1) === 2
-//                     ? `${getWeekNumberInMonth(currentDate1)}nd Week`
-//                     : getWeekNumberInMonth(currentDate1) === 3
-//                     ? `${getWeekNumberInMonth(currentDate1)}rd Week`
-//                     : getWeekNumberInMonth(currentDate1) > 3
-//                     ? `${getWeekNumberInMonth(currentDate1)}th Week`
-//                     : "",
-//               });
-//               currentDate1.setDate(currentDate1.getDate() + 1);
-//             }
-//           }
-//         } else {
-//           // Check if the shift date is before or equal to the current date
-//           if (endDate >= currentDateAttStatus) {
-//             // If matched, push the range from 'fromdate' to 'todate'
-//             const startDate = new Date(joiningDate);
-//             // Loop through the dates in the range
-//             while (startDate <= currentDateAttStatus) {
-//               userDates.push({
-//                 formattedDate: format(startDate, "dd/MM/yyyy"),
-//                 dayName: format(startDate, "EEEE"),
-//                 dayCount: startDate.getDate(),
-//                 weekNumberInMonth:
-//                   getWeekNumberInMonth(startDate) === 1
-//                     ? `${getWeekNumberInMonth(startDate)}st Week`
-//                     : getWeekNumberInMonth(startDate) === 2
-//                     ? `${getWeekNumberInMonth(startDate)}nd Week`
-//                     : getWeekNumberInMonth(startDate) === 3
-//                     ? `${getWeekNumberInMonth(startDate)}rd Week`
-//                     : getWeekNumberInMonth(startDate) > 3
-//                     ? `${getWeekNumberInMonth(startDate)}th Week`
-//                     : "",
-//               });
-//               startDate.setDate(startDate.getDate() + 1);
-//             }
-//           } else if (endDate <= currentDateAttStatus) {
-//             let currentDate1 = new Date(startDate);
-
-//             while (currentDate1 <= endDate) {
-//               userDates.push({
-//                 formattedDate: format(currentDate1, "dd/MM/yyyy"),
-//                 dayName: format(currentDate1, "EEEE"),
-//                 dayCount: currentDate1.getDate(),
-//                 weekNumberInMonth:
-//                   getWeekNumberInMonth(currentDate1) === 1
-//                     ? `${getWeekNumberInMonth(currentDate1)}st Week`
-//                     : getWeekNumberInMonth(currentDate1) === 2
-//                     ? `${getWeekNumberInMonth(currentDate1)}nd Week`
-//                     : getWeekNumberInMonth(currentDate1) === 3
-//                     ? `${getWeekNumberInMonth(currentDate1)}rd Week`
-//                     : getWeekNumberInMonth(currentDate1) > 3
-//                     ? `${getWeekNumberInMonth(currentDate1)}th Week`
-//                     : "",
-//               });
-//               currentDate1.setDate(currentDate1.getDate() + 1);
-//             }
-//           }
-//         }
-//       }
-
-//       const filteredMatchingDoubleShiftItem = item.shiftallot?.filter((val) => val && val?.empcode === item?.empcode && val?.adjstatus === "Approved");
-
-//       // Create a Set to store unique entries based on formattedDate, dayName, dayCount, and shiftMode
-//       let uniqueEntries = new Set();
-
-//       // Iterate over removedUserDates and add unique entries to the Set
-//       userDates.forEach((date) => {
-//         uniqueEntries.add(
-//           JSON.stringify({
-//             formattedDate: date.formattedDate,
-//             dayName: date.dayName,
-//             dayCount: date.dayCount,
-//             shiftMode: "Main Shift",
-//             weekNumberInMonth: date.weekNumberInMonth,
-//           })
-//         );
-//       });
-
-//       // Iterate over filteredMatchingDoubleShiftItem and add unique entries to the Set
-//       filteredMatchingDoubleShiftItem.forEach((item) => {
-//         const [day, month, year] = item.adjdate?.split("/");
-//         let newFormattedDate = new Date(`${year}-${month}-${day}`);
-
-//         if (item.adjustmenttype === "Shift Adjustment" || item.adjustmenttype === "Add On Shift" || item.adjustmenttype === "Shift Weekoff Swap") {
-//           uniqueEntries.add(
-//             JSON.stringify({
-//               formattedDate: item.adjdate,
-//               dayName: moment(item.adjdate, "DD/MM/YYYY").format("dddd"),
-//               dayCount: parseInt(moment(item.adjdate, "DD/MM/YYYY").format("DD")),
-//               shiftMode: "Second Shift",
-//               weekNumberInMonth:
-//                 getWeekNumberInMonth(newFormattedDate) === 1
-//                   ? `${getWeekNumberInMonth(newFormattedDate)}st Week`
-//                   : getWeekNumberInMonth(newFormattedDate) === 2
-//                   ? `${getWeekNumberInMonth(newFormattedDate)}nd Week`
-//                   : getWeekNumberInMonth(newFormattedDate) === 3
-//                   ? `${getWeekNumberInMonth(newFormattedDate)}rd Week`
-//                   : getWeekNumberInMonth(newFormattedDate) > 3
-//                   ? `${getWeekNumberInMonth(newFormattedDate)}th Week`
-//                   : "",
-//             })
-//           );
-//         }
-//       });
-
-//       // Convert Set back to an array of objects
-//       let createdUserDatesUnique = Array.from(uniqueEntries).map((entry) => JSON.parse(entry));
-
-//       function sortUserDates(dates) {
-//         return dates.sort((a, b) => {
-//           if (a.formattedDate === b.formattedDate) {
-//             // If dates are the same, sort by shift mode
-//             if (a.shiftMode < b.shiftMode) return -1;
-//             if (a.shiftMode > b.shiftMode) return 1;
-//             return 0;
-//           } else {
-//             // Otherwise, sort by date
-//             const dateA = new Date(a.formattedDate.split("/").reverse().join("/"));
-//             const dateB = new Date(b.formattedDate.split("/").reverse().join("/"));
-//             return dateA - dateB;
-//           }
-//         });
-//       }
-
-//       // Sort the array
-//       const sortedCreatedUserDates = sortUserDates(createdUserDatesUnique);
-//       const createdUserDates = sortedCreatedUserDates?.filter((d) => {
-//         const filterData = userDates.some((val) => val.formattedDate === d.formattedDate);
-//         if (filterData) {
-//           return d;
-//         }
-//       });
-//       // console.log(createdUserDates,'createdUserDates')
-//       // Map each user date to a row
-//       const userRows = createdUserDates?.map((date) => {
-//         let filteredRowData = item.shiftallot?.filter((val) => val?.empcode == item?.empcode);
-//         // console.log(filteredRowData, "filteredRowData");
-//         const matchingItem = filteredRowData?.find((item) => item && item?.adjdate == date.formattedDate);
-//         const matchingItemAllot = filteredRowData?.find((item) => item && formatDate(item?.date) == date.formattedDate);
-//         const matchingDoubleShiftItem = filteredRowData?.find((item) => item && item?.todate === date.formattedDate);
-//         const matchingRemovedItem = filteredRowData?.find((item) => item?.removedshiftdate === date.formattedDate);
-//         const matchingAssignShiftItem = filteredRowData?.find((item) => item?.adjdate === date.formattedDate && item?.adjstatus === "Approved" && item?.adjustmenttype === "Assign Shift");
-
-//         const filterBoardingLog =
-//           item?.boardingLog &&
-//           item?.boardingLog?.filter((item) => {
-//             return item.logcreation === "user" || item.logcreation === "shift";
-//           });
-
-//         // const uniqueDepLog = Object.values(uniqueEntriesDep);
-//         const [columnDay, columnMonth, columnYear] = date.formattedDate?.split("/");
-//         const finalDate = `${columnYear}-${columnMonth}-${columnDay}`;
-
-//         // Remove duplicate entries with the most recent entry
-//         // const uniqueEntriesDesig = {};
-//         // item?.designationlog?.forEach((entry) => {
-//         //   const entryDate = new Date(entry.startdate);
-//         //   const key = entry.startdate;
-//         //   if (!(key in uniqueEntriesDesig)) {
-//         //     uniqueEntriesDesig[key] = entry;
-//         //   }
-//         // });
-
-//         // const uniqueDesigLog = Object.values(uniqueEntriesDesig);
-
-//         // Find the relevant log entry for the given date
-//         // const relevantDesigLogEntry = uniqueDesigLog.filter((log) => log.startdate <= finalDate).sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0];
-
-//         const depMonthSet = depMonthSets?.filter((d) => d.department === item?.department);
-//         const attendance = attendances.filter((d) => {
-//           const [userday, usermonth, useryear] = date.formattedDate?.split("/");
-//           const [attday, attmonth, attyear] = d.date?.split("-");
-//           const userDate = `${useryear}-${usermonth}-${userday}`;
-//           const datevalue = `${attyear}-${attmonth}-${attday}`;
-//           return d.username === item.username && new Date(datevalue) >= new Date(userDate) && new Date(datevalue) <= new Date(userDate);
-//         });
-
-//         // Remove duplicate entries with the most recent entry
-//         const uniqueEntriesAtt = {};
-//         controlcriteria[0].attendancetimelog?.forEach((entry) => {
-//           const key = entry.startdate;
-//           if (!(key in uniqueEntriesAtt)) {
-//             uniqueEntriesAtt[key] = entry;
-//           }
-//         });
-
-//         const uniqueAttLog = Object.values(uniqueEntriesAtt);
-//         let relevantAttLogEntry = uniqueAttLog.filter((log) => new Date(log.startdate) <= new Date(finalDate)).sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0];
-
-//         if (relevantAttLogEntry) {
-//           clockOutHours = relevantAttLogEntry.clockout;
-//           lateclockincount = relevantAttLogEntry.lateclockincount;
-//           earlyclockoutcount = relevantAttLogEntry.earlyclockoutcount;
-//           onclockout = relevantAttLogEntry.onclockout;
-//           earlyclockin = relevantAttLogEntry.earlyclockin;
-//           lateclockin = relevantAttLogEntry.lateclockin;
-//           earlyclockout = relevantAttLogEntry.earlyclockout;
-//           afterlateclockin = relevantAttLogEntry.afterlateclockin;
-//           beforeearlyclockout = relevantAttLogEntry.beforeearlyclockout;
-//         }
-
-//         if (!isEmployeeGrace) {
-//           // graceTime = controlcriteria[0].gracetime;
-//           graceTime = relevantAttLogEntry && relevantAttLogEntry.gracetime;
-//         }
-
-//         // Check if the dayName is Sunday or Monday
-//         // const isWeekOff = item?.weekoff?.includes(date.dayName);
-//         const isWeekOff = getWeekOffDay(date, filterBoardingLog, item?.department, depMonthSet) === "Week Off" ? true : false;
-//         const isWeekOffWithAdjustment = isWeekOff && matchingItem;
-//         const isWeekOffWithManual = isWeekOff && matchingItemAllot;
-
-//         const row = {
-//           id: `${item?._id.toString()}_${date.formattedDate}_${date.shiftMode}`,
-//           userid: item?._id.toString(),
-//           company: item?.company,
-//           branch: item?.branch,
-//           unit: item?.unit,
-//           team: item?.team,
-//           department: item.department,
-//           designation: item?.designation,
-//           username: item?.companyname,
-//           empcode: item?.empcode,
-//           weekoff: item?.weekoff,
-//           boardingLog: item?.boardingLog,
-//           shiftallot: item?.shiftallot,
-//           doj: dojDate,
-//           shift: getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem),
-//           date: `${date.formattedDate} ${date.dayName} ${date.dayCount}`,
-//           role: item?.role,
-//           rowformattedDate: date.formattedDate,
-//           finalDate: finalDate,
-//           dayName: date.dayName,
-//           shiftMode: date.shiftMode,
-//           reasondate: item?.reasondate,
-//           departmentDateSet: departmentDateSet,
-//           clockin: checkGetClockInTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
-//           clockout: checkGetClockOutTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
-//           clockinstatus: checkClockInStatus(
-//             checkGetClockInTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
-//             getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem),
-//             graceTime,
-//             allLeaveStatus,
-//             holidays,
-//             checkGetClockInDate(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
-//             item?.branch,
-//             item?.empcode,
-//             item?.company,
-//             date.formattedDate,
-//             item?.unit,
-//             item?.team,
-//             item?.companyname,
-//             earlyclockin,
-//             lateclockin,
-//             afterlateclockin,
-//             leavetype,
-//             permission,
-//             checkGetClockOutTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
-//             date.shiftMode,
-//             checkWeekOffPresentStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
-//             leavecriterias,
-//             date.weekNumberInMonth,
-//             date.dayName,
-//             item?.department,
-//             item?.designation
-//           ),
-//           clockoutstatus: checkClockOutStatus(
-//             checkGetClockOutTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
-//             checkGetClockInTime(attendance, item?._id.toString(), date.formattedDate, getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem), date.shiftMode),
-//             getShiftForDate(date, matchingItem, matchingItemAllot, isWeekOffWithAdjustment, isWeekOffWithManual, filterBoardingLog, isWeekOff, matchingDoubleShiftItem, item?.department, depMonthSet, matchingRemovedItem, matchingAssignShiftItem),
-//             clockOutHours,
-//             checkGetClockInDate(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
-//             allLeaveStatus,
-//             holidays,
-//             item?.branch,
-//             item?.empcode,
-//             item?.company,
-//             date.formattedDate,
-//             item?.unit,
-//             item?.team,
-//             item?.companyname,
-//             onclockout,
-//             earlyclockout,
-//             beforeearlyclockout,
-//             checkGetClockInAutoStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
-//             leavetype,
-//             permission,
-//             date.shiftMode,
-//             checkWeekOffPresentStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
-//             leavecriterias,
-//             date.weekNumberInMonth,
-//             date.dayName,
-//             item?.department,
-//             item?.designation
-//           ),
-//           attendanceautostatus: checkAttendanceStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
-//           lateclockincount: lateclockincount,
-//           earlyclockoutcount: earlyclockoutcount,
-//           totalnumberofdays: getTotalMonthDaysUser(item?.department, depMonthSet, ismonth, isyear),
-//           empshiftdays: getTotalMonthDaysForEmpUser(dojDate, item?.department, depMonthSet, ismonth, isyear),
-//           totalcounttillcurrendate: getTotalMonthsCurrentDateCountUserPayrun(dojDate, item?.department, depMonthSet, ismonth, isyear, item.reasondate),
-//           totalshift: getTotalShiftHoursUser(item?._id.toString(), createdUserDates, attendance),
-//           weekoffpresentstatus: checkWeekOffPresentStatus(attendance, item?._id.toString(), date.formattedDate, date.shiftMode),
-//         };
-
-//         return row;
-//       });
-
-//       return userRows;
-//     });
-
-//     finaluser = finaluserbefore;
-//  console.log(finaluser.length, "finaluser");
-//   } catch (err) {
-//     console.log(err);
-//     return next(new ErrorHandler("Records not found!", 404));
-//   }
-
-//   // if (!finaluser) {
-//   //   return next(new ErrorHandler("Users not found", 400));
-//   // }
-
-//   return res.status(200).json({ finaluser });
-// });
-
-
-
-
-
+//task
 exports.getAllTaskForAssingnedhomeTeam = catchAsyncErrors(async (req, res, next) => {
   let fromdate, todate;
   const today = new Date();
@@ -8650,7 +7944,7 @@ exports.getAllTaskForAssingnedhomeTeam = catchAsyncErrors(async (req, res, next)
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
     const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return `${year}-${month}-${date}`;
   };
 
   // Set date ranges based on the selected filter
@@ -8702,18 +7996,17 @@ exports.getAllTaskForAssingnedhomeTeam = catchAsyncErrors(async (req, res, next)
       fromdate = "";
   }
 
+  const from = moment.tz(fromdate, 'YYYY-MM-DD', 'Asia/Kolkata').startOf('day').toDate();
+  const to = moment.tz(todate, 'YYYY-MM-DD', 'Asia/Kolkata').endOf('day').toDate();
 
-
+// console.log(from,to,fromdate,todate,"dfdf")
 
   let taskforuser;
 
   try {
     const statuses = ["Assigned", "Pending", "Finished By Others", "Not Applicable to Me", "Postponed", "Paused", "Completed"];
 
-    let query = {
-
-    }
-
+ 
 
 
     const [
@@ -8727,12 +8020,12 @@ exports.getAllTaskForAssingnedhomeTeam = catchAsyncErrors(async (req, res, next)
     ] = await Promise.all(
       statuses.map(status => TaskForUser.countDocuments({
         ...(fromdate && todate
-          ? { taskassigneddate: { $gte: fromdate, $lte: todate } }
+          ? { formattedDate: { $gte: from, $lte: to } }
           : fromdate
-            ? { taskassigneddate: { $eq: fromdate } }
+            ? { formattedDate: { $eq: from } }
             : {}),
         taskstatus: status,
-        username:req.body.hierarchyempnames
+           username:{$in:req.body.hierarchyempnames}
       }))
     );
 
@@ -8752,6 +8045,1560 @@ exports.getAllTaskForAssingnedhomeTeam = catchAsyncErrors(async (req, res, next)
       taskforuser
     });
   } catch (err) {
+    console.log(err,"erretask")
     return next(new ErrorHandler("Records not found!", 404));
+  }
+});
+
+
+
+
+exports.getAllTaskUserReportsTeam = catchAsyncErrors(async (req, res, next) => {
+  let result, totalProjects, overall;
+  const { frequency, status, fromdate, todate, page, pageSize, allFilters, logicOperator, searchQuery } = req.body;
+  const skip = (page - 1) * pageSize; // Calculate the number of items to skip
+  let query = {};
+  let Overallquery = {};
+  const from = moment.tz(req.body.fromdate, 'YYYY-MM-DD', 'Asia/Kolkata').startOf('day').toDate();
+  const to = moment.tz(req.body.todate, 'YYYY-MM-DD', 'Asia/Kolkata').endOf('day').toDate();
+
+  if (frequency?.length > 0) {
+    query.frequency = { $in: frequency };
+    Overallquery.frequency = { $in: frequency };
+  }
+  if (status?.length > 0) {
+    query.taskstatus = { $in: status };
+    Overallquery.taskstatus = { $in: status };
+  }
+
+  if (fromdate && todate) {
+    query = {
+      ...query,
+      formattedDate: {
+        $gte: from,
+        $lte: to,
+      },
+       username:{$in:req.body.hierarchyempnames}
+    };
+
+    Overallquery = {
+      ...Overallquery,
+      formattedDate: {
+        $gte: from,
+        $lte: to,
+      },
+         username:{$in:req.body.hierarchyempnames}
+    };
+  }
+console.log(query,"query")
+  let conditions = [];
+
+  // Advanced search filter
+  if (allFilters && allFilters.length > 0) {
+    allFilters.forEach((filter) => {
+      if (filter.column && filter.condition && (filter.value || ['Blank', 'Not Blank'].includes(filter.condition))) {
+        conditions.push(createFilterCondition(filter.column, filter.condition, filter.value));
+      }
+    });
+  }
+  if (searchQuery && searchQuery !== undefined) {
+    const searchTermsArray = searchQuery.split(' ');
+    const regexTerms = searchTermsArray.map((term) => new RegExp(term, 'i'));
+    const orConditions = regexTerms.map((regex) => ({
+      $or: [
+        { taskstatus: regex },
+        { taskassigneddate: regex },
+        { taskdate: regex },
+        { taskdetails: regex },
+        { frequency: regex },
+        { completedbyuser: regex },
+        { userdescription: regex },
+        { category: regex },
+        { subcategory: regex },
+        { duration: regex },
+        { breakup: regex },
+        { required: { $in: regex } },
+        { schedule: regex },
+      ],
+    }));
+
+    query = {
+      ...query,
+      $and: [...orConditions],
+    };
+  }
+
+  // Apply logicOperator to combine conditions
+  if (conditions.length > 0) {
+    if (logicOperator === 'AND') {
+      query.$and = conditions;
+    } else if (logicOperator === 'OR') {
+      query.$or = conditions;
+    }
+  }
+
+  try {
+    // First, count the total number of projects matching the frequency criteria
+    totalProjects = await TaskForUser.countDocuments(query);
+    overall = await TaskForUser.find(Overallquery, {
+      category: 1,
+      subcategory: 1,
+      frequency: 1,
+      schedule: 1,
+      username: 1,
+      date: 1,
+      shiftEndTime: 1,
+      taskdetails: 1,
+      timetodo: 1,
+      description: 1,
+      taskstatus: 1,
+      taskassigneddate: 1,
+      taskdate: 1,
+      taskassign: 1,
+      breakup: 1,
+      assignId: 1,
+      monthdate: 1,
+      weekdays: 1,
+      tasktime: 1,
+      annumonth: 1,
+      required: 1,
+      duration: 1,
+      priority: 1,
+    }).lean();
+
+    // Then, find the projects with pagination
+    result = await TaskForUser.find(query, {
+      category: 1,
+      subcategory: 1,
+      frequency: 1,
+      schedule: 1,
+      username: 1,
+      date: 1,
+      shiftEndTime: 1,
+      taskdetails: 1,
+      timetodo: 1,
+      description: 1,
+      taskstatus: 1,
+      tasktime: 1,
+      taskassigneddate: 1,
+      timetodo: 1,
+      taskdate: 1,
+      taskassign: 1,
+      breakup: 1,
+      assignId: 1,
+      monthdate: 1,
+      weekdays: 1,
+      annumonth: 1,
+      required: 1,
+      duration: 1,
+      priority: 1,
+    })
+      .lean()
+      .skip(skip)
+      .limit(pageSize);
+
+    return res.status(200).json({
+      totalProjects,
+      currentPage: page,
+      result,
+      overall,
+      totalPages: Math.ceil(totalProjects / pageSize),
+    });
+  } catch (err) {
+    console.log(err, 'err');
+    return next(new ErrorHandler('Records not found!', 404));
+  }
+});
+
+
+
+//maintenance
+
+
+exports.getAllSortedTaskMaintenanceForUserHomeTeam = catchAsyncErrors(async (req, res, next) => {
+    let taskmaintenanceforuser, taskmaintenanceforuserstatus, filteruser, result, maintenancenonschedule;
+
+
+    try {
+
+        const dayvalue = req.body.selectedFilter; // Change to "Today" for today's values
+
+      
+        function getDatesForDayValue(dayvalue) {
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+            if (dayvalue === "Last Month") {
+                // Last Month
+                const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                let day = [];
+                let date = [];
+                let fulldate = [];
+                let currentDate = new Date(startOfLastMonth);
+                while (currentDate <= endOfLastMonth) {
+                    day.push(daysOfWeek[currentDate.getDay()]);
+                    date.push(currentDate.getDate());
+                    fulldate.push(currentDate.toISOString().split("T")[0]);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                const fulldatewithdays = fulldate.map((d, ind) => ({
+                    day: daysOfWeek[new Date(d).getDay()],
+                    date: d
+                }));
+                return { day, date, fulldate, fulldatewithdays };
+            }
+            else if (dayvalue === "Last Week") {
+                // Last Week (Monday to Sunday)
+                const lastWeekStart = new Date(today);
+                lastWeekStart.setDate(today.getDate() - dayOfWeek - 6); // Monday of last week
+                let day = [];
+                let date = [];
+                let fulldate = [];
+                for (let i = 0; i < 7; i++) {
+                    const currentDate = new Date(lastWeekStart);
+                    currentDate.setDate(lastWeekStart.getDate() + i);
+                    day.push(daysOfWeek[currentDate.getDay()]);
+                    date.push(currentDate.getDate());
+                    fulldate.push(currentDate.toISOString().split("T")[0]);
+                }
+                const fulldatewithdays = fulldate.map((d, ind) => ({
+                    day: daysOfWeek[new Date(d).getDay()],
+                    date: d
+                }));
+                return { day, date, fulldate, fulldatewithdays };
+            }
+            else if (dayvalue === "Yesterday") {
+                // Yesterday
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+                const day = [daysOfWeek[yesterday.getDay()]];
+                const date = [yesterday.getDate()];
+                const fulldate = [yesterday.toISOString().split("T")[0]]; // "YYYY-MM-DD"
+                return { day, date, fulldate };
+            }
+            else if (dayvalue === "Today") {
+                // Today
+                const day = [daysOfWeek[dayOfWeek]];
+                const date = [today.getDate()];
+                const fulldate = [today.toISOString().split("T")[0]]; // "YYYY-MM-DD"
+                return { day, date, fulldate };
+            } else if (dayvalue === "Tomorrow") {
+                // Tomorrow
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                const day = [daysOfWeek[tomorrow.getDay()]];
+                const date = [tomorrow.getDate()];
+                const fulldate = [tomorrow.toISOString().split("T")[0]]; // "YYYY-MM-DD"
+                return { day, date, fulldate };
+            } else if (dayvalue === "This Week") {
+                // This Week (Monday to Sunday)
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - dayOfWeek + 1); // Adjust to Monday
+                let day = [];
+                let date = [];
+                let fulldate = [];
+                for (let i = 0; i < 7; i++) {
+                    const currentDate = new Date(startOfWeek);
+                    currentDate.setDate(startOfWeek.getDate() + i);
+                    day.push(daysOfWeek[currentDate.getDay()]);
+                    date.push(currentDate.getDate());
+                    fulldate.push(currentDate.toISOString().split("T")[0]);
+                }
+                const fulldatewithdays = fulldate.map((d, ind) => ({
+                    day: daysOfWeek[new Date(d).getDay()],
+                    date: d
+                }));
+                return { day, date, fulldate, fulldatewithdays };
+            } else if (dayvalue === "This Month") {
+                // This Month
+                const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                let day = [];
+                let date = [];
+                let fulldate = [];
+                let currentDate = new Date(startOfMonth);
+                while (currentDate <= endOfMonth) {
+                    day.push(daysOfWeek[currentDate.getDay()]);
+                    date.push(currentDate.getDate());
+                    fulldate.push(currentDate.toISOString().split("T")[0]);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                const fulldatewithdays = fulldate.map((d, ind) => ({
+                    day: daysOfWeek[new Date(d).getDay()],
+                    date: d
+                }));
+                return { day, date, fulldate, fulldatewithdays };
+            }
+
+        }
+
+
+        // Example usage:
+        const { day, date, fulldate, fulldatewithdays } = getDatesForDayValue(dayvalue);
+        
+        
+         const branchFilter = req.body.assignbranch.map((branchObj) => ({
+      branch: branchObj.branch,
+      company: branchObj.company,
+     unit: branchObj.unit
+    }));
+
+    let QueryTaskMaintenance = { $or: branchFilter };
+    
+       const branchFilterNonSchedule = req.body.assignbranch.map((branchObj) => ({
+      branchto: branchObj.branch,
+      companyto: branchObj.company,
+     unitto: branchObj.unit
+    }));
+ QueryTaskMaintenance.employeenameto= {$in: req.body.hierarchyempnames }
+  let QueryTaskMaintenanceNonSchedule = { $or: branchFilterNonSchedule };
+ QueryTaskMaintenanceNonSchedule.employeenames= {$in: req.body.hierarchyempnames }
+        taskmaintenanceforuser = await Maintenance.find(QueryTaskMaintenance, { employeenameto: 1, assetmaterial: 1, weekdays: 1, monthdate: 1, annumonth: 1, annuday: 1, frequency: 1, schedule: 1, timetodo: 1, });
+
+        maintenancenonschedule = await TaskMaintenanceNonScheduleGrouping.find(QueryTaskMaintenanceNonSchedule, { assetmaterial: 1, schedule: 1, date: 1, type: 1, employeenames: 1 });
+
+        let combinedData = [...taskmaintenanceforuser, ...maintenancenonschedule]
+        
+        // console.log(combinedData,"combinedData")
+
+        filteruser = combinedData.map(d => {
+            const monthdateAsNumber = parseInt(d.monthdate, 10);
+            const isToday = (dayvalue === "Today" && ((d.type && fulldate.includes(d.date)) || d.frequency === "Daily"
+
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+            ));
+
+
+            const isTomorrow = (dayvalue === "Tomorrow" && ((d.type && fulldate.includes(d.date))
+                || d.frequency === "Daily"
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+
+            ));
+
+
+            const isThisWeek = (dayvalue === "This Week" && ((d.type && fulldate.includes(d.date))
+                || d.frequency === "Daily"
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+
+            ));
+
+
+            const isThisMonth = (dayvalue === "This Month" && ((d.type && fulldate.includes(d.date))
+                || d.frequency === "Daily"
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+            ));
+            // Add logging for debugging
+
+            if (isToday) {
+                return { ...d._doc, date: fulldate[0] };
+            } else if (isTomorrow) {
+                return { ...d._doc, date: fulldate[0] };
+            } else if (isThisWeek) {
+                return {
+                    ...d._doc,
+                    date: d.type ? d.date : (d.frequency === "Daily" ? fulldate[0]
+                        : d.frequency === "Date Wise" || d.frequency === "Monthly" ? `${fulldate[0].split("-")[0]}-${fulldate[0].split("-")[1]}-${d.monthdate}`
+                            : (d.frequency === "Day Wise" || d.frequency === "Weekly") ? fulldatewithdays.find(t => d.weekdays.includes(t.day)).date
+                                : "")
+                };
+            } else if (isThisMonth) {
+                return {
+                    ...d._doc,
+                    date: d.type ? d.date : (d.frequency === "Daily" ? fulldate[0]
+                        : d.frequency === "Date Wise" || d.frequency === "Monthly" ? `${fulldate[0].split("-")[0]}-${fulldate[0].split("-")[1]}-${d.monthdate}`
+                            : (d.frequency === "Day Wise" || d.frequency === "Weekly") ? fulldatewithdays.find(t => d.weekdays.includes(t.day)).date
+                                : "")
+                };
+            } else {
+                return null;
+            }
+        }).filter(Boolean);  // Filter out null values
+
+        let result1 = [];
+filteruser = filteruser.map(t => ({
+  ...t,
+  employeenames: (t.employeenames || []).filter(item => req.body.hierarchyempnames.includes(item))
+}));
+                 filteruser.forEach(d => {
+            d.type ?
+                d.employeenames.forEach(employee => {
+                    result1.push({
+                        ...d,
+                        employeenameto: employee
+                    });
+                })
+                :
+                d.employeenameto.forEach(employee => {
+                    result1.push({
+                        ...d,
+                        employeenameto: employee
+                    });
+                });
+        });
+
+        let findtaskstatus = result1.map(d => ({ id: d._id, username: d.employeenameto }))
+
+
+        let query = {};
+
+        if (findtaskstatus.length > 0) {
+            query.$or = findtaskstatus.map(d => ({
+
+                orginalid: String(d.id),
+                username: d.username
+            }));
+        }
+        taskmaintenanceforuserstatus = await TaskMaintenanceForUser.find(query, {
+            orginalid: 1, username: 1, taskstatus: 1
+        });
+
+
+        result = result1.map(item => {
+
+            let findstatus = taskmaintenanceforuserstatus.find(d =>
+                d.orginalid == String(item._id) && d.username == item.employeenameto)?.taskstatus
+
+            return {
+                ...item,
+                status: findstatus ? findstatus : "Pending"
+            }
+        })
+
+    } catch (err) {
+    console.log(err,"errmaintenance")
+        return next(new ErrorHandler("Records not found!", 404));
+    }
+    if (!result) {
+        return next(new ErrorHandler("Data not found!", 404));
+    }
+    return res.status(200).json({
+        // count: products.length,
+        result,
+    });
+});
+
+exports.getAllSortedTaskMaintenanceForUserHomeTeamList = catchAsyncErrors(async (req, res, next) => {
+    let taskmaintenanceforuser, taskmaintenanceforuserstatus, filteruser, result, maintenancenonschedule;
+
+
+    try {
+
+        const dayvalue = req.body.selectedFilter;
+        function getDatesForDayValue(dayvalue) {
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+            if (dayvalue === "Today") {
+                // For "Today"
+                const day = [daysOfWeek[dayOfWeek]];
+                const date = [today.getDate()];
+                const fulldate = [today.toISOString().split("T")[0]]; // "YYYY-MM-DD"
+                return { day, date, fulldate };
+            } else if (dayvalue === "Tomorrow") {
+                // For "Tomorrow"
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                const day = [daysOfWeek[tomorrow.getDay()]];
+                const date = [tomorrow.getDate()];
+                const fulldate = [tomorrow.toISOString().split("T")[0]]; // "YYYY-MM-DD"
+                return { day, date, fulldate };
+            }
+            else if (dayvalue === "Yesterday") {
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+                const day = [daysOfWeek[yesterday.getDay()]];
+                const date = [yesterday.getDate()];
+                const fulldate = [yesterday.toISOString().split("T")[0]]; // "YYYY-MM-DD"
+                return { day, date, fulldate };
+            }
+            else if (dayvalue === "This Week") {
+                // For "This Week" (Monday to Sunday)
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - dayOfWeek + 1); // Adjust to Monday
+
+                let day = [];
+                let date = [];
+                let fulldate = [];
+
+                for (let i = 0; i < 7; i++) {
+                    const currentDate = new Date(startOfWeek);
+                    currentDate.setDate(startOfWeek.getDate() + i);
+
+                    day.push(daysOfWeek[currentDate.getDay()]);
+                    date.push(currentDate.getDate());
+                    fulldate.push(currentDate.toISOString().split("T")[0]); // "YYYY-MM-DD"
+                }
+                const daysOfWeek2 = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",];
+
+                let fulldatewithdays = fulldate.map((d, ind) => ({
+
+                    day: daysOfWeek2[ind],
+                    date: d
+                }))
+                return { day, date, fulldate, fulldatewithdays };
+            }
+            else if (dayvalue === "Last Week") {
+                const startOfLastWeek = new Date(today);
+                startOfLastWeek.setDate(today.getDate() - dayOfWeek - 6); // Previous Monday
+                const endOfLastWeek = new Date(startOfLastWeek);
+                endOfLastWeek.setDate(startOfLastWeek.getDate() + 6); // Previous Sunday
+
+                let day = [];
+                let date = [];
+                let fulldate = [];
+
+                for (let i = 0; i < 7; i++) {
+                    const currentDate = new Date(startOfLastWeek);
+                    currentDate.setDate(startOfLastWeek.getDate() + i);
+
+                    day.push(daysOfWeek[currentDate.getDay()]);
+                    date.push(currentDate.getDate());
+                    fulldate.push(currentDate.toISOString().split("T")[0]);
+                }
+
+                let fulldatewithdays = fulldate.map((d, ind) => ({
+                    day: daysOfWeek[ind],
+                    date: d
+                }));
+
+                return { day, date, fulldate, fulldatewithdays };
+            }
+            else if (dayvalue === "This Month") {
+                // For "This Month"
+
+                const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1); // October 1st
+                const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // October 31st
+
+                const startOfWeek = new Date(startOfMonth);
+                startOfWeek.setDate(startOfMonth.getDate() + 1); // Adjust to the Monday of the current week
+                const endOfWeek = new Date(endOfMonth);
+                endOfWeek.setDate(endOfMonth.getDate() + 1);
+                let day = [];
+                let date = [];
+                let fulldate = [];
+
+                // Loop from the start of the week (which could be in the previous month) until the end of the current month
+                let currentDate = new Date(startOfWeek);
+                let endOfMonthDate = new Date(endOfWeek);
+
+
+                while (currentDate <= endOfMonthDate) {
+                    day.push(daysOfWeek[currentDate.getDay()]); // Day of the week (e.g., Monday, Tuesday)
+                    date.push(currentDate.getDate()); // Date of the day (e.g., 30, 1, 2, etc.)
+                    fulldate.push(currentDate.toISOString().split("T")[0]); // "YYYY-MM-DD"
+
+                    // Move to the next day
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                const daysOfWeek2 = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+                // Generate fulldatewithdays combining the date with the day of the week
+                let fulldatewithdays = fulldate.map((d, ind) => ({
+                    day: daysOfWeek2[new Date(d).getDay()],
+                    date: d
+                }));
+                return { day, date, fulldate, fulldatewithdays };
+            }
+            else if (dayvalue === "Last Month") {
+                const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); // 1st of last month
+                const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of last month
+
+                let day = [];
+                let date = [];
+                let fulldate = [];
+
+                let currentDate = new Date(startOfLastMonth);
+                while (currentDate <= endOfLastMonth) {
+                    day.push(daysOfWeek[currentDate.getDay()]);
+                    date.push(currentDate.getDate());
+                    fulldate.push(currentDate.toISOString().split("T")[0]);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                let fulldatewithdays = fulldate.map((d, ind) => ({
+                    day: daysOfWeek[new Date(d).getDay()],
+                    date: d
+                }));
+
+                return { day, date, fulldate, fulldatewithdays };
+            }
+        }
+
+        // Example usage:
+        const { day, date, fulldate, fulldatewithdays } = getDatesForDayValue(dayvalue);
+
+
+        taskmaintenanceforuser = await Maintenance.find({employeenameto:{$in:req.body.hierarchyempnames}}, { employeenameto: 1, assetmaterial: 1, weekdays: 1, monthdate: 1, annumonth: 1, annuday: 1, frequency: 1, schedule: 1, timetodo: 1, });
+
+        maintenancenonschedule = await TaskMaintenanceNonScheduleGrouping.find({employeenames:{$in:req.body.hierarchyempnames}}, { assetmaterial: 1, schedule: 1, date: 1, type: 1, employeenames: 1 });
+
+        let combinedData = [...taskmaintenanceforuser, ...maintenancenonschedule]
+
+        filteruser = combinedData.map(d => {
+            const monthdateAsNumber = parseInt(d.monthdate, 10);
+            const isToday = (dayvalue === "Today" && ((d.type && fulldate.includes(d.date)) || d.frequency === "Daily"
+
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+            ));
+
+
+            const isTomorrow = (dayvalue === "Tomorrow" && ((d.type && fulldate.includes(d.date))
+                || d.frequency === "Daily"
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+
+            ));
+
+
+            const isThisWeek = (dayvalue === "This Week" && ((d.type && fulldate.includes(d.date))
+                || d.frequency === "Daily"
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+
+            ));
+
+
+            const isThisMonth = (dayvalue === "This Month" && ((d.type && fulldate.includes(d.date))
+                || d.frequency === "Daily"
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+            ));
+
+            const isYesterday = (dayvalue === "Yesterday" && ((d.type && fulldate.includes(d.date))
+                || d.frequency === "Daily"
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+            ));
+
+            const isLastWeek = (dayvalue === "Last Week" && ((d.type && fulldate.includes(d.date))
+                || d.frequency === "Daily"
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+            ));
+
+            const isLastMonth = (dayvalue === "Last Month" && ((d.type && fulldate.includes(d.date))
+                || d.frequency === "Daily"
+                || (d.frequency === "Date Wise" && date.includes(monthdateAsNumber))
+                || (d.frequency === "Day Wise" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Weekly" && day.map(item => (d.weekdays).includes(item)))
+                || (d.frequency === "Monthly" && date.includes(monthdateAsNumber))
+            ));
+            // Add logging for debugging
+
+            if (isToday) {
+                return { ...d._doc, date: fulldate[0] };
+            }
+            else if (isTomorrow) {
+                return { ...d._doc, date: fulldate[0] };
+            }
+            else if (isYesterday) {
+                return { ...d._doc, date: fulldate[0] };
+            }
+            else if (isThisWeek) {
+                return {
+                    ...d._doc,
+                    date: d.type ? d.date : (d.frequency === "Daily" ? fulldate[0]
+                        : d.frequency === "Date Wise" || d.frequency === "Monthly" ? `${fulldate[0].split("-")[0]}-${fulldate[0].split("-")[1]}-${d.monthdate}`
+                            : (d.frequency === "Day Wise" || d.frequency === "Weekly") ? fulldatewithdays.find(t => d.weekdays.includes(t.day)).date
+                                : "")
+                };
+            }
+            else if (isThisMonth) {
+                return {
+                    ...d._doc,
+                    date: d.type ? d.date : (d.frequency === "Daily" ? fulldate[0]
+                        : d.frequency === "Date Wise" || d.frequency === "Monthly" ? `${fulldate[0].split("-")[0]}-${fulldate[0].split("-")[1]}-${d.monthdate}`
+                            : (d.frequency === "Day Wise" || d.frequency === "Weekly") ? fulldatewithdays.find(t => d.weekdays.includes(t.day)).date
+                                : "")
+                };
+            }
+
+            else if (isLastWeek) {
+                return {
+                    ...d._doc,
+                    date: d.type ? d.date : (d.frequency === "Daily" ? fulldate[0]
+                        : d.frequency === "Date Wise" || d.frequency === "Monthly" ? `${fulldate[0].split("-")[0]}-${fulldate[0].split("-")[1]}-${d.monthdate}`
+                            : (d.frequency === "Day Wise" || d.frequency === "Weekly") ? fulldatewithdays.find(t => d.weekdays.includes(t.day)).date
+                                : "")
+                };
+            }
+            else if (isLastMonth) {
+                return {
+                    ...d._doc,
+                    date: d.type ? d.date : (d.frequency === "Daily" ? fulldate[0]
+                        : d.frequency === "Date Wise" || d.frequency === "Monthly" ? `${fulldate[0].split("-")[0]}-${fulldate[0].split("-")[1]}-${d.monthdate}`
+                            : (d.frequency === "Day Wise" || d.frequency === "Weekly") ? fulldatewithdays.find(t => d.weekdays.includes(t.day)).date
+                                : "")
+                };
+            }
+
+
+
+            else {
+                return null;
+            }
+        }).filter(Boolean);  // Filter out null values
+
+        let result1 = [];
+
+        filteruser = filteruser.map(t => ({
+  ...t,
+  employeenames: (t.employeenames || []).filter(item => req.body.hierarchyempnames.includes(item))
+}));
+
+        filteruser.forEach(d => {
+            d.type ?
+                d.employeenames.forEach(employee => {
+                    result1.push({
+                        ...d,
+                        employeenameto: employee
+                    });
+                })
+                :
+                d.employeenameto.forEach(employee => {
+                    result1.push({
+                        ...d,
+                        employeenameto: employee
+                    });
+                });
+        });
+        let findtaskstatus = result1.map(d => ({ id: d._id, username: d.employeenameto }))
+
+
+        let query = {};
+
+        if (findtaskstatus.length > 0) {
+            query.$or = findtaskstatus.map(d => ({
+
+                orginalid: String(d.id),
+                username: d.username
+            }));
+        }
+        taskmaintenanceforuserstatus = await TaskMaintenanceForUser.find(query, {
+            orginalid: 1, username: 1, taskstatus: 1
+        });
+
+
+        result = result1.map(item => {
+
+            let findstatus = taskmaintenanceforuserstatus.find(d =>
+                d.orginalid == String(item._id) && d.username == item.employeenameto)?.taskstatus
+
+            return {
+                ...item,
+                status: findstatus ? findstatus : "Pending"
+            }
+        })
+
+    } catch (err) {
+        return next(new ErrorHandler("Records not found!", 404));
+    }
+
+    return res.status(200).json({
+        // count: products.length,
+        result,
+    });
+});
+
+
+//my login allot
+
+exports.clientUseridsLimitedUserTeam = catchAsyncErrors(async (req, res, next) => {
+  let clientuserid = [];
+  try {
+   
+    loginids = await ClientUserID.find({ "loginallotlog.empname": { $in: req.body.hierarchyempnames } }, { userid: 1, loginallotlog: 1, projectvendor: 1 }).lean();
+    let logs = loginids.flatMap((user) =>
+      user.loginallotlog.map((log) => ({
+        userid: user.userid,
+        _id: user._id,
+        projectvendor: user.projectvendor,
+        date: log.date,
+        time: log.time,
+        empname: log.empname,
+        empcode: log.empcode,
+        enddate: log.enddate ? log.enddate : null,
+      }))
+    );
+
+    // Step 2: Sort logs by date and time (ascending order)
+    logs.sort((a, b) => {
+      if (a.date === b.date) {
+        return a.time.localeCompare(b.time);
+      }
+      return new Date(a.date) - new Date(b.date);
+    });
+
+    // Step 3: Calculate the enddate for each log (except the last log for each userid)
+    const userLogsMap = {};
+    logs.forEach((log) => {
+      if (!userLogsMap[log.userid]) {
+        userLogsMap[log.userid] = {};
+      }
+
+      if (!userLogsMap[log.userid][log.projectvendor]) {
+        userLogsMap[log.userid][log.projectvendor] = [];
+      }
+
+      userLogsMap[log.userid][log.projectvendor].push(log);
+    });
+
+    Object.values(userLogsMap).forEach((userLogs) => {
+      Object.values(userLogs).forEach((logsArray) => {
+        logsArray.forEach((log, idx) => {
+          if (idx < logsArray.length - 1) {
+            log.enddate = logsArray[idx + 1].date;
+          }
+        });
+      });
+    });
+    // Step 4: Filter logs based on input date
+    const filteredLogs = logs.filter((log) => {
+      return new Date(log.date) <= new Date(req.body.date) && (!log.enddate || new Date(log.enddate) >= new Date(req.body.date));
+    });
+
+    // Step 5: Sort the filtered logs by date and time (descending order)
+    filteredLogs.sort((a, b) => {
+      if (a.date === b.date) {
+        return b.time.localeCompare(a.time);
+      }
+      return new Date(b.date) - new Date(a.date);
+    });
+    clientuserid = filteredLogs.filter((d) => req.body.hierarchyempnames.includes(d.empname));
+
+    console.log(clientuserid.length, "clientuserid");
+  } catch (err) {
+    console.log(err.message);
+  }
+  // if (!clientuserid) {
+  //   return next(new ErrorHandler("Client User ID not found!", 404));
+  // }
+  return res.status(200).json({
+    // count: products.length,
+    clientuserid,
+  });
+});
+
+
+//tickets and checklist
+
+//my tickets
+exports.getAllRaiseTicketFilteredIndividualDatasHomeTeam = catchAsyncErrors(async (req, res, next) => {
+  let result;
+  let { hierarchyempnames } = req.body;
+
+  try {
+    result = await Raiseticketmaster.countDocuments({ employeename: {$in:hierarchyempnames} });
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+
+  return res.status(200).json({
+    result,
+  });
+});
+
+//my pending tickets
+exports.getAllRaiseTicketWithoutClosedHomeTeam = catchAsyncErrors(async (req, res, next) => {
+  let raisetickets;
+  let { hierarchyempnames } = req.body;
+  try {
+    raisetickets = await Raiseticketmaster.find({employeename: {$in:hierarchyempnames}, raiseself: { $nin: ["Closed", "Reject", "Resolved"] } });
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+  if (!raisetickets) {
+    return next(new ErrorHandler("Raise Ticket not found!", 404));
+  }
+  return res.status(200).json({
+    raisetickets,
+  });
+});
+
+//details needed tickets
+exports.getAllRaiseTicketForwardedEmployeeTeam = catchAsyncErrors(async (req, res, next) => {
+  let raisetickets;
+  let { hierarchyempnames } = req.body;
+  try {
+    raisetickets = await Raiseticketmaster.aggregate([
+      {
+        $match: {
+          raiseself: "Forwarded",
+          forwardedemployee: {
+            $elemMatch: {
+             $in:hierarchyempnames
+            }
+          }
+        }
+      }
+    ])
+
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+
+  return res.status(200).json({ raisetickets });
+});
+
+
+exports.getAllUsersAssignbranchHomeTeam = catchAsyncErrors(async (req, res, next) => {
+  const { assignbranch } = req.body;
+  let { hierarchyempnames } = req.body;
+  if (!Array.isArray(assignbranch) || assignbranch.length === 0) {
+    // return next(new ErrorHandler("assignbranch must be a non-empty array", 400));
+  }
+  // Create a query array for company and branch
+  const query = {
+    $or: assignbranch.map((item) => ({
+      company: item.company,
+      branch: item.branch,
+      unit: item.unit,
+    })),
+    enquirystatus: { $nin: ['Enquiry Purpose'] },
+    resonablestatus: { $nin: ['Not Joined', 'Postponed', 'Rejected', 'Closed', 'Releave Employee', 'Absconded', 'Hold', 'Terminate'] },
+ companyname: {$in:hierarchyempnames}
+  };
+
+  let users;
+
+  try {
+    users = await User.find(
+      query,
+
+      {
+        status: 1,
+        resonablestatus: 1,
+        reasonname: 1,
+        lastworkday: 1,
+        rejoin: 1,
+        reasonablestatusremarks: 1,
+        department: 1,
+        dob: 1,
+        gender: 1,
+        maritalstatus: 1,
+        bloodgroup: 1,
+        location: 1,
+        contactpersonal: 1,
+        panno: 1,
+        aadhar: 1,
+        designationlog: 1,
+        contactfamily: 1,
+        approvedremotestatus: 1,
+        ctaluk: 1,
+        dom: 1,
+        processlog: 1,
+        boardingLog: 1,
+        attendancemode: 1,
+        attendancemodelog: 1,
+        company: 1,
+        reasondate: 1,
+        empreason: 1,
+        percentage: 1,
+        empcode: 1,
+        companyname: 1,
+        team: 1,
+        username: 1,
+        usernameautogenerate: 1,
+        workmode: 1,
+        email: 1,
+        employeecount: 1,
+        systemmode: 1,
+        companyemail: 1,
+
+        unit: 1,
+        branch: 1,
+        designation: 1,
+        floor: 1,
+        shift: 1,
+        reportingto: 1,
+        experience: 1,
+        doj: 1,
+        dot: 1,
+        bankname: 1,
+        bankbranchname: 1,
+        accountholdername: 1,
+        accountnumber: 1,
+        ifsccode: 1,
+        shifttiming: 1,
+        shiftgrouping: 1,
+        legalname: 1,
+        callingname: 1,
+        pdoorno: 1,
+        paddresstype: 1,
+        ppersonalprefix: 1,
+        presourcename: 1,
+        plandmarkandpositionalprefix: 1,
+        pgpscoordination: 1,
+        caddresstype: 1,
+        cpersonalprefix: 1,
+        cresourcename: 1,
+        clandmarkandpositionalprefix: 1,
+        cgpscoordination: 1,
+        pstreet: 1,
+        candidateid: 1,
+        parea: 1,
+        plandmark: 1,
+        ptaluk: 1,
+        ppost: 1,
+        ppincode: 1,
+        pcountry: 1,
+        pstate: 1,
+        pcity: 1,
+        cdoorno: 1,
+        cstreet: 1,
+        carea: 1,
+        role: 1,
+        clandmark: 1,
+        ctaluk: 1,
+        cpost: 1,
+        cpincode: 1,
+        ccountry: 1,
+        cstate: 1,
+        ccity: 1,
+        reasondate: 1,
+        process: 1,
+        workstation: 1,
+        weekoff: 1,
+        originalpassword: 1,
+        enquirystatus: 1,
+        area: 1,
+        enableworkstation: 1,
+        wordcheck: 1,
+        shiftallot: 1,
+        firstname: 1,
+        lastname: 1,
+        employeecount: 1,
+        emergencyno: 1,
+        name: 1,
+        salarysetup: 1,
+        mode: 1,
+        salarycode: 1,
+        basic: 1,
+        hra: 1,
+        conveyance: 1,
+        medicalallowance: 1,
+        productionallowance: 1,
+        otherallowance: 1,
+        productionallowancetwo: 1,
+        pffromdate: 1,
+        pfenddate: 1,
+        esifromdate: 1,
+        esienddate: 1,
+        pfesistatus: 1,
+        resonablestatus: 1,
+        reasonname: 1,
+        lastworkday: 1,
+        department: 1,
+        dob: 1,
+        location: 1,
+        bloodgroup: 1,
+        gender: 1,
+        maritalstatus: 1,
+        lastname: 1,
+        contactpersonal: 1,
+        processlog: 1,
+        boardingLog: 1,
+        attendancemode: 1,
+        attendancemodelog: 1,
+        designationlog: 1,
+        company: 1,
+        reasondate: 1,
+        empreason: 1,
+        percentage: 1,
+        empcode: 1,
+        companyname: 1,
+        team: 1,
+        floor: 1,
+        username: 1,
+        usernameautogenerate: 1,
+        workmode: 1,
+        email: 1,
+        employeecount: 1,
+        systemmode: 1,
+        companyemail: 1,
+
+        unit: 1,
+        branch: 1,
+        designation: 1,
+        team: 1,
+        bankdetails: 1,
+        shift: 1,
+        reportingto: 1,
+        experience: 1,
+        doj: 1,
+        role: 1,
+        bankname: 1,
+        bankbranchname: 1,
+        accountholdername: 1,
+        accountnumber: 1,
+        ifsccode: 1,
+        shifttiming: 1,
+        shiftgrouping: 1,
+        legalname: 1,
+        callingname: 1,
+        pdoorno: 1,
+        paddresstype: 1,
+        ppersonalprefix: 1,
+        presourcename: 1,
+        plandmarkandpositionalprefix: 1,
+        pgpscoordination: 1,
+        caddresstype: 1,
+        cpersonalprefix: 1,
+        cresourcename: 1,
+        clandmarkandpositionalprefix: 1,
+        cgpscoordination: 1,
+        pstreet: 1,
+        parea: 1,
+        plandmark: 1,
+        ptaluk: 1,
+        ppost: 1,
+        ppincode: 1,
+        pcountry: 1,
+        pstate: 1,
+        pcity: 1,
+        cdoorno: 1,
+        cstreet: 1,
+        carea: 1,
+        clandmark: 1,
+        ctaluk: 1,
+        cpost: 1,
+        cpincode: 1,
+        ccountry: 1,
+        cstate: 1,
+        ccity: 1,
+        reasondate: 1,
+        process: 1,
+        workstation: 1,
+        weekoff: 1,
+        originalpassword: 1,
+        enquirystatus: 1,
+        area: 1,
+        enableworkstation: 1,
+        wordcheck: 1,
+        shiftallot: 1,
+        twofaenabled: 1,
+        fathername: 1,
+        mothername: 1,
+        firstname: 1,
+        workstationinput: 1,
+        emergencyno: 1,
+        referencetodo: 1,
+        contactno: 1,
+        details: 1,
+        assignExpLog: 1,
+        grosssalary: 1,
+        timemins: 1,
+        modeexperience: 1,
+        targetexperience: 1,
+        targetpts: 1,
+        expval: 1,
+        expmode: 1,
+        process: 1,
+        processtype: 1,
+        processduration: 1,
+        duration: 1,
+        workstationofficestatus: 1,
+      }
+    );
+  } catch (err) {
+    return next(new ErrorHandler('Records not found!', 404));
+  }
+
+  if (!users) {
+    return next(new ErrorHandler('Users not found', 400));
+  }
+
+  return res.status(200).json({ count: users.length, users });
+});
+
+
+exports.getAllTemplateVerificationAssignBranchTeam = catchAsyncErrors(async (req, res, next) => {
+  const { assignbranch,hierarchyempnames } = req.body;
+
+ 
+
+  let templateList;
+  try {
+     const query = {
+    $or: assignbranch.map((item) => ({
+      company: item.company,
+      branch: item.branch,
+      unit: item.unit,
+    })),
+     employeename: { $in: hierarchyempnames }
+  };
+    templateList = await Templatelist.find(query);
+  } catch (err) {
+    return next(new ErrorHandler('Data not found!', 404));
+  }
+
+  if (!templateList || templateList.length === 0) {
+    return next(new ErrorHandler('Templatelist not found!', 404));
+  }
+
+  return res.status(200).json({
+    templateList,
+  });
+});
+
+
+exports.getAllTemplateVerificationAssignBranchForfilterTeam = catchAsyncErrors(async (req, res, next) => {
+  const { assignbranch, companyname } = req.body;
+  let { hierarchyempnames } = req.body;
+  const query = {
+    // $or: assignbranch.map(item => ({
+    //     company: item.company,
+    //     branch: item.branch,
+    //     unit: item.unit
+    // }))
+    companyname:{ $in: hierarchyempnames },
+  };
+
+  let templateListVerification;
+  try {
+    const [templateList, users] = await Promise.all([
+      Templatelist.find({
+        employeename: { $in: hierarchyempnames },
+      }).lean(),
+      User.find(
+        query,
+
+        {
+          status: 1,
+          resonablestatus: 1,
+          reasonname: 1,
+          lastworkday: 1,
+          rejoin: 1,
+          reasonablestatusremarks: 1,
+          department: 1,
+          dob: 1,
+          gender: 1,
+          maritalstatus: 1,
+          bloodgroup: 1,
+          location: 1,
+          contactpersonal: 1,
+          panno: 1,
+          aadhar: 1,
+          designationlog: 1,
+          contactfamily: 1,
+          approvedremotestatus: 1,
+          ctaluk: 1,
+          dom: 1,
+          processlog: 1,
+          boardingLog: 1,
+          attendancemode: 1,
+          company: 1,
+          reasondate: 1,
+          empreason: 1,
+          percentage: 1,
+          empcode: 1,
+          companyname: 1,
+          team: 1,
+          username: 1,
+          usernameautogenerate: 1,
+          workmode: 1,
+          email: 1,
+          employeecount: 1,
+          systemmode: 1,
+          companyemail: 1,
+
+          unit: 1,
+          branch: 1,
+          designation: 1,
+          floor: 1,
+          shift: 1,
+          reportingto: 1,
+          experience: 1,
+          doj: 1,
+          dot: 1,
+          bankname: 1,
+          bankbranchname: 1,
+          accountholdername: 1,
+          accountnumber: 1,
+          ifsccode: 1,
+          shifttiming: 1,
+          shiftgrouping: 1,
+          legalname: 1,
+          callingname: 1,
+          pdoorno: 1,
+          pstreet: 1,
+          candidateid: 1,
+          parea: 1,
+          plandmark: 1,
+          ptaluk: 1,
+          ppost: 1,
+          ppincode: 1,
+          pcountry: 1,
+          pstate: 1,
+          pcity: 1,
+          cdoorno: 1,
+          cstreet: 1,
+          carea: 1,
+          role: 1,
+          clandmark: 1,
+          ctaluk: 1,
+          cpost: 1,
+          cpincode: 1,
+          ccountry: 1,
+          cstate: 1,
+          ccity: 1,
+          reasondate: 1,
+          process: 1,
+          workstation: 1,
+          weekoff: 1,
+          originalpassword: 1,
+          enquirystatus: 1,
+          area: 1,
+          enableworkstation: 1,
+          wordcheck: 1,
+          shiftallot: 1,
+          firstname: 1,
+          lastname: 1,
+          employeecount: 1,
+          emergencyno: 1,
+          name: 1,
+          salarysetup: 1,
+          mode: 1,
+          salarycode: 1,
+          basic: 1,
+          hra: 1,
+          conveyance: 1,
+          medicalallowance: 1,
+          productionallowance: 1,
+          otherallowance: 1,
+          productionallowancetwo: 1,
+          pffromdate: 1,
+          pfenddate: 1,
+          esifromdate: 1,
+          esienddate: 1,
+          pfesistatus: 1,
+          resonablestatus: 1,
+          reasonname: 1,
+          lastworkday: 1,
+          department: 1,
+          dob: 1,
+          location: 1,
+          bloodgroup: 1,
+          gender: 1,
+          maritalstatus: 1,
+          lastname: 1,
+          contactpersonal: 1,
+          processlog: 1,
+          boardingLog: 1,
+          attendancemode: 1,
+          designationlog: 1,
+          company: 1,
+          reasondate: 1,
+          empreason: 1,
+          percentage: 1,
+          empcode: 1,
+          companyname: 1,
+          team: 1,
+          floor: 1,
+          username: 1,
+          usernameautogenerate: 1,
+          workmode: 1,
+          email: 1,
+          employeecount: 1,
+          systemmode: 1,
+          companyemail: 1,
+
+          unit: 1,
+          branch: 1,
+          designation: 1,
+          team: 1,
+          bankdetails: 1,
+          shift: 1,
+          reportingto: 1,
+          experience: 1,
+          doj: 1,
+          role: 1,
+          bankname: 1,
+          bankbranchname: 1,
+          accountholdername: 1,
+          accountnumber: 1,
+          ifsccode: 1,
+          shifttiming: 1,
+          shiftgrouping: 1,
+          legalname: 1,
+          callingname: 1,
+          pdoorno: 1,
+          pstreet: 1,
+          parea: 1,
+          plandmark: 1,
+          ptaluk: 1,
+          ppost: 1,
+          ppincode: 1,
+          pcountry: 1,
+          pstate: 1,
+          pcity: 1,
+          cdoorno: 1,
+          cstreet: 1,
+          carea: 1,
+          clandmark: 1,
+          ctaluk: 1,
+          cpost: 1,
+          cpincode: 1,
+          ccountry: 1,
+          cstate: 1,
+          ccity: 1,
+          reasondate: 1,
+          process: 1,
+          workstation: 1,
+          weekoff: 1,
+          originalpassword: 1,
+          enquirystatus: 1,
+          area: 1,
+          enableworkstation: 1,
+          wordcheck: 1,
+          shiftallot: 1,
+          twofaenabled: 1,
+          fathername: 1,
+          mothername: 1,
+          firstname: 1,
+          workstationinput: 1,
+          emergencyno: 1,
+          referencetodo: 1,
+          contactno: 1,
+          details: 1,
+          assignExpLog: 1,
+          grosssalary: 1,
+          timemins: 1,
+          modeexperience: 1,
+          targetexperience: 1,
+          targetpts: 1,
+          expval: 1,
+          expmode: 1,
+          process: 1,
+          processtype: 1,
+          processduration: 1,
+          duration: 1,
+          workstationofficestatus: 1,
+          _id: 1,
+        }
+      ).lean(),
+    ]);
+
+    // console.log(templateList, "templateList")
+    // console.log(users, "users")
+
+    let filterArray = [];
+    templateList?.forEach((templateUser) => {
+      templateUser?.employeename?.forEach((empName) => {
+        users?.forEach((user) => {
+          if (user.companyname === empName) {
+            let extendedUser = {
+              id: user?._id,
+              templateId: templateUser?._id,
+              verified: templateUser?.verifiedInfo,
+              corrected: templateUser?.correctedInfo,
+              company: user?.company,
+              branch: user?.branch,
+              unit: user?.unit,
+              team: user?.team,
+              employeename: user?.companyname,
+              filename: templateUser?.filename,
+              information: templateUser?.informationstring,
+              verifyInfo: templateUser?.verifiedInfo,
+            };
+            filterArray.push(extendedUser);
+          }
+        });
+      });
+    });
+    const generateNewIds = async (array) => {
+      return array.map((item) => {
+        return {
+          ...item,
+          commonid: uuidv4(), // Generate a new UUID for each object
+        };
+      });
+    };
+    let needToVerify = filterArray.filter((data) => hierarchyempnames.includes(data.employeename));
+
+    const transformArray = (array) => {
+      let result = [];
+      array?.forEach((obj) => {
+        obj.verifyInfo?.forEach((info) => {
+          if (!info.edited && !info.corrected) {
+            // Create a new object for each information value
+            const newObject = {
+              ...obj,
+              information: info.name, // Assign a single value from the information array
+            };
+            result.push(newObject);
+          }
+        });
+      });
+      return result;
+    };
+    // Transform the array
+    const transformedArray = transformArray(needToVerify);
+
+    const arrayWithNewIds = await generateNewIds(transformedArray);
+    let valid = arrayWithNewIds.filter((item) => {
+      return item.information !== 'Boarding Information' && item.information !== 'Process Allot' && item.information !== 'Login Details';
+    });
+    const removeDuplicateNames = (array) => {
+      const names = array.map((item) => item.information); // Extract names
+      const uniqueNames = [...new Set(names)]; // Filter unique names
+
+      return array.filter((item, index) => {
+        return uniqueNames.includes(item.information) && uniqueNames.splice(uniqueNames.indexOf(item.information), 1);
+      });
+    };
+
+    // Use the function
+    templateListVerification = removeDuplicateNames(valid);
+
+    if (!templateListVerification || templateListVerification.length === 0) {
+      //return next(new ErrorHandler('My Verification not found!', 404));
+      return res.status(200).json({
+        myverification: [],
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      count: templateListVerification.length,
+      myverification: templateListVerification,
+    });
+  } catch (err) {
+    console.log(err,"erer")
+    return next(new ErrorHandler('Data not found!', 404));
   }
 });

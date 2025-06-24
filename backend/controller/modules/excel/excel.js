@@ -9725,7 +9725,7 @@ exports.getAllCandidateUpcomingInterview = catchAsyncErrors(async (req, res, nex
       }
     ]);
 
-     console.log(candidates[0], "candidateshomeupcoming")
+    //  console.log(candidates[0], "candidateshomeupcoming")
   } catch (err) {
     console.log(err,"upcominge");
   }

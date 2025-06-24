@@ -188,7 +188,7 @@ const HomeTask = () => {
                             )} */}
             </Grid>
             <Grid container sx={{ justifyContent: 'flex-end', marginTop: 'auto' }}>
-              <Link to="/task/taskforuserreport" target="_blank">
+              <Link to="/taskreportteam" target="_blank">
                 <Button variant="contained" sx={{ backgroundColor: '#ff5e65', borderRadius: '13px', textTransform: 'capitalize', fontWeight: 'bold' }} size="small">
                   View More
                 </Button>

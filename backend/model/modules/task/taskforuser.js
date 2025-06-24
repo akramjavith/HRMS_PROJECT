@@ -289,4 +289,7 @@ tasktime:{
         default: Date.now
     }
 })
+TaskForUserSchema.index({ formattedDate: 1 });
+TaskForUserSchema.index({ taskassigneddate: 1, username: 1, taskstatus: 1 });
+TaskForUserSchema.index({ username: 1, taskstatus: 1 });
 module.exports = mongoose.model('TaskForUser', TaskForUserSchema);

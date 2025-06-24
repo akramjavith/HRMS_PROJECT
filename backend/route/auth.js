@@ -662,7 +662,10 @@ const { getDashboardtHierarchyTeam,getUserWithStatusHomeCountTeam,getAllApplylea
   getAllUserHomeCountNotClockInListTeam,ScheduleMeetingFilterTeam,getAllLoanByAssignBranchForPaginationList,getAllPermissionsHomeTeam,
   getAllUsersexceldataAssignbranchTeamDashboard,
   dayPointsfilterHomeTeam,tempPointsfilterHomeTeam,getAllUsersexceldataAssignbranchHomeTeam,getAllUserTotalShiftDaysHomeTeam,
-  getAllUserTotalShiftDaysHomeDashboardTeam,getAllTaskForAssingnedhomeTeam
+  getAllUserTotalShiftDaysHomeDashboardTeam,getAllTaskForAssingnedhomeTeam,getAllTaskUserReportsTeam,
+  getAllSortedTaskMaintenanceForUserHomeTeam,getAllSortedTaskMaintenanceForUserHomeTeamList,clientUseridsLimitedUserTeam,
+  getAllRaiseTicketFilteredIndividualDatasHomeTeam,getAllRaiseTicketWithoutClosedHomeTeam,getAllRaiseTicketForwardedEmployeeTeam,
+  getAllUsersAssignbranchHomeTeam,getAllTemplateVerificationAssignBranchForfilterTeam
 } = require("../controller/login/dashboardteamcontroller.js");
 authRoute.route("/dashboardhierarchyteam").post(getDashboardtHierarchyTeam);
 authRoute.route("/userwithstatuscountteam").post(getUserWithStatusHomeCountTeam);
@@ -686,6 +689,15 @@ authRoute.route("/minimumhometeam").post(getAllUserTotalShiftDaysHomeDashboardTe
 authRoute.route("/userexceldataassignbranchteamdashboard").post(getAllUsersexceldataAssignbranchTeamDashboard);
 authRoute.route("/usertotalshiftdayshometeam").post(getAllUserTotalShiftDaysHomeTeam);
 authRoute.route("/taskforassignedhometeam").post(getAllTaskForAssingnedhomeTeam);
+authRoute.route("/taskuserreportsteam").post(getAllTaskUserReportsTeam);
+authRoute.route("/maintenancetaskforuserteam").post(getAllSortedTaskMaintenanceForUserHomeTeam);
+authRoute.route("/maintenancetaskforuserteamlist").post(getAllSortedTaskMaintenanceForUserHomeTeamList);
+authRoute.route("/clientuseridlimiteduserteam").post(clientUseridsLimitedUserTeam);
+authRoute.route("/risetickethometeamcount").post(getAllRaiseTicketFilteredIndividualDatasHomeTeam);
+authRoute.route("/pendingtickets").post(getAllRaiseTicketWithoutClosedHomeTeam);
+authRoute.route("/raiseticketforwardedemployeeteam").post(getAllRaiseTicketForwardedEmployeeTeam);
+authRoute.route("/userassignbranchhometeam").post(getAllUsersAssignbranchHomeTeam);
+authRoute.route("/myverificaitonteamlist").post(getAllTemplateVerificationAssignBranchForfilterTeam);
 
 
 

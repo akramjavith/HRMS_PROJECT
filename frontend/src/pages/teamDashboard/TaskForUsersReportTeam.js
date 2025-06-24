@@ -141,6 +141,17 @@ function TaskForUsersReport({ com }) {
   const [filterValue, setFilterValue] = useState('');
   const gridRefTable = useRef(null);
   const { isUserRoleCompare, isUserRoleAccess, listPageAccessMode, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
+
+    let listpageaccessby =
+      listPageAccessMode?.find(
+        (data) =>
+          data.modulename === "Setup" &&
+          data.submodulename === "Team Dashboard" &&
+          data.mainpagename === "" &&
+          data.subpagename === "" &&
+          data.subsubpagename === ""
+      )?.listpageaccessmode || "Overall";
+
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
   const [items, setItems] = useState([]);
   const [itemsOverallList, setItemsOverallList] = useState([]);
@@ -641,6 +652,19 @@ function TaskForUsersReport({ com }) {
     setPageName(!pageName);
     const Value = valueWeekly?.length > 0 ? valueWeekly : [];
     const Status = valueStatus?.length > 0 ? valueStatus : [];
+
+     let res = await axios.post(SERVICE.HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM, {
+                      headers: {
+                        Authorization: `Bearer ${auth.APIToken}`,
+                      },
+                      hierachy: "myallhierarchy",
+                      sector: "all",
+                      username: isUserRoleAccess.companyname,
+                      pagename: "menuteamdashboard",
+                      listpageaccessmode: listpageaccessby,
+                    });
+
+
     const queryParams = {
       page: Number(page),
       pageSize: Number(pageSize),
@@ -648,6 +672,7 @@ function TaskForUsersReport({ com }) {
       status: Status,
       fromdate: filterUser.fromdate,
       todate: filterUser.todate,
+       hierarchyempnames: res?.data?.resultAccessFilter,
     };
 
     const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
@@ -660,7 +685,7 @@ function TaskForUsersReport({ com }) {
     }
     try {
       setQueueCheck(true);
-      let res_task = await axios.post(SERVICE.ALL_TASKFORUSER_REPORTS, queryParams, {
+      let res_task = await axios.post(SERVICE.TASK_USER_REPORT_TEAM, queryParams, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
         },

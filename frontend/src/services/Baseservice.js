@@ -5857,6 +5857,9 @@ export const SERVICE = {
       RAISE_TICKET_FORWARDED_TEAM: `${BASE_URL}/api/raiseticketforwardedemployeeteam`,
       USER_ASSIGN_BRANCH_TEAM: `${BASE_URL}/api/userassignbranchhometeam`,
       MY_VERIFICATION_TEAM_LIST: `${BASE_URL}/api/myverificaitonteamlist`,
+      MY_VERIFICATION_HOME_TEAM: `${BASE_URL}/api/templateverificationteam`,
+      ACCURACY_HOME_TEAM: `${BASE_URL}/api/achievedaccuracydatahometeam`,
+      ACCURACY_LIST_HOME_TEAM: `${BASE_URL}/api/achievedaccuracydatalisthometeam`,
 
 
       

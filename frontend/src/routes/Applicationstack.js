@@ -989,7 +989,7 @@ const TempOverallProductionbaseattendance = React.lazy(() => import('../pages/pr
 const TempIndividualProductionbaseattendance = React.lazy(() => import('../pages/production/reports/tempindividualproductionbaseattendance.js'));
 const TempTeamProductionbaseattendance = React.lazy(() => import('../pages/production/reports/tempteamproductionbasedattenadance.js'));
 
-
+//team dashboard
 const LiveEmployeeListTeam = React.lazy(() => import("../pages/hr/employees/LiveEmployeeListHome"));
 const TodayLeaveApprovedteam = React.lazy(() => import("../pages/teamDashboard/TodayLeaveApproved.js"));
 const NotcheckinemplistTeam = React.lazy(() => import("../pages/teamDashboard/Notcheckinemplistteam.js"));
@@ -1003,10 +1003,9 @@ const TaskTeam = React.lazy(() => import("../pages/teamDashboard/TaskForUsersRep
 const MaintenanceTeam = React.lazy(() => import("../pages/teamDashboard/MaintenanceFilterListTeam.js"));
 const LoginAllotTeam = React.lazy(() => import("../pages/teamDashboard/MyLoginAllotTeam.js"));
 const RaiseTicketListTeam = React.lazy(() => import("../pages/teamDashboard/RaiseTicketlist.js"));
-
-
 const RaiseTicketGroupTeam = React.lazy(() => import("../pages/teamDashboard/RaiseTicketTeamGroupTeam.js"));
 const MyVerificationTeam = React.lazy(() => import("../pages/teamDashboard/MyVerificaitonTeam.js"));
+const Achievedaccuracyfilterhometeam = React.lazy(() => import("../pages/teamDashboard/Achievedaccuracyindividualfilterteam.js"));
 
 
 const App = () => {
@@ -2085,6 +2084,7 @@ const App = () => {
               <Route path="raiseticketlistteam" element={<RaiseTicketListTeam />} />
               <Route path="raiseticketteamgroupteam" element={<RaiseTicketGroupTeam />} />
               <Route path="myverificationteam" element={<MyVerificationTeam />} />
+              <Route path="achievedaccuracyfilterhometeam" element={<Achievedaccuracyfilterhometeam />} />
 
               
             

@@ -17,7 +17,7 @@ import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 import LockClockOutlinedIcon from "@mui/icons-material/LockClockOutlined";
 import HomeApprove from "./HomeApproveTeam";
 import HomeProduction from "./HomeProductionTeam";
-import HomeAccuracy from "./HomeAccuracy";
+import HomeAccuracy from "./HomeAccuracyTeam";
 import HomeMinimum from "./Homeminimumteam";
 import HomeTask from "./HomeTaskTeam";
 import HomeExpenseIncome from "./HomeExpenseIncome";

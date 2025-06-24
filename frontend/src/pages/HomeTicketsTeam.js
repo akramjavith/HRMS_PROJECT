@@ -150,9 +150,9 @@ const HomeTickets = () => {
                           listpageaccessmode: listpageaccessby,
                         });
       let res_TemplateList = await axios.post(
-        `${SERVICE.MYVERIFICATIONASSIGNEDBRANCH}`,
+        `${SERVICE.MY_VERIFICATION_HOME_TEAM}`,
         {
-          assignbranch: accessbranch,
+        //   assignbranch: accessbranch,
             hierarchyempnames: reshir?.data?.resultAccessFilter,
         },
         {
@@ -164,7 +164,7 @@ const HomeTickets = () => {
       let res_Users = await axios.post(
         `${SERVICE.USER_ASSIGN_BRANCH_TEAM}`,
         {
-          assignbranch: accessbranch,
+        //   assignbranch: accessbranch,
             hierarchyempnames: reshir?.data?.resultAccessFilter,
         },
         {
@@ -207,7 +207,7 @@ const HomeTickets = () => {
           };
         });
       };
-      let needToVerify = filterArray.filter((data) => isUserRoleAccess.companyname === data.employeename);
+      let needToVerify = filterArray.filter((data) => reshir?.data?.resultAccessFilter.includes(data.employeename));
       const transformArray = (array) => {
         let result = [];
         array?.forEach((obj) => {

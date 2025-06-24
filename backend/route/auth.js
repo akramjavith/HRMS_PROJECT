@@ -665,7 +665,8 @@ const { getDashboardtHierarchyTeam,getUserWithStatusHomeCountTeam,getAllApplylea
   getAllUserTotalShiftDaysHomeDashboardTeam,getAllTaskForAssingnedhomeTeam,getAllTaskUserReportsTeam,
   getAllSortedTaskMaintenanceForUserHomeTeam,getAllSortedTaskMaintenanceForUserHomeTeamList,clientUseridsLimitedUserTeam,
   getAllRaiseTicketFilteredIndividualDatasHomeTeam,getAllRaiseTicketWithoutClosedHomeTeam,getAllRaiseTicketForwardedEmployeeTeam,
-  getAllUsersAssignbranchHomeTeam,getAllTemplateVerificationAssignBranchForfilterTeam
+  getAllUsersAssignbranchHomeTeam,getAllTemplateVerificationAssignBranchForfilterTeam,getAllTemplateVerificationAssignBranchTeam,
+  getAchievedAccuracyFilteredDataHomeTeam,getAchievedAccuracyFilteredDataListHomeTeam
 } = require("../controller/login/dashboardteamcontroller.js");
 authRoute.route("/dashboardhierarchyteam").post(getDashboardtHierarchyTeam);
 authRoute.route("/userwithstatuscountteam").post(getUserWithStatusHomeCountTeam);
@@ -698,6 +699,9 @@ authRoute.route("/pendingtickets").post(getAllRaiseTicketWithoutClosedHomeTeam);
 authRoute.route("/raiseticketforwardedemployeeteam").post(getAllRaiseTicketForwardedEmployeeTeam);
 authRoute.route("/userassignbranchhometeam").post(getAllUsersAssignbranchHomeTeam);
 authRoute.route("/myverificaitonteamlist").post(getAllTemplateVerificationAssignBranchForfilterTeam);
+authRoute.route("/templateverificationteam").post(getAllTemplateVerificationAssignBranchTeam);
+authRoute.route("/achievedaccuracydatahometeam").post(getAchievedAccuracyFilteredDataHomeTeam);
+authRoute.route("/achievedaccuracydatalisthometeam").post(getAchievedAccuracyFilteredDataListHomeTeam);
 
 
 

@@ -660,13 +660,13 @@ const { getDashboardtHierarchyTeam,getUserWithStatusHomeCountTeam,getAllApplylea
   getAllScheduleEventsHomeTeam,getUserWithStatusHomeCountListTeam,getAllApplyleaveHomeListTeam,getAllAdvanceByAssignBranchHomeTeam,
   getAllAdvanceByAssignBranchHomeTeamList,getAllLoanByAssignBranchHomeTeam,getAllApplyleaveFilterHomeTeam,
   getAllUserHomeCountNotClockInListTeam,ScheduleMeetingFilterTeam,getAllLoanByAssignBranchForPaginationList,getAllPermissionsHomeTeam,
-  getAllUsersexceldataAssignbranchTeamDashboard,
+  getAllUsersexceldataAssignbranchTeamDashboard,ScheduleMeetingFilterHomeTeam,
   dayPointsfilterHomeTeam,tempPointsfilterHomeTeam,getAllUsersexceldataAssignbranchHomeTeam,getAllUserTotalShiftDaysHomeTeam,
   getAllUserTotalShiftDaysHomeDashboardTeam,getAllTaskForAssingnedhomeTeam,getAllTaskUserReportsTeam,
   getAllSortedTaskMaintenanceForUserHomeTeam,getAllSortedTaskMaintenanceForUserHomeTeamList,clientUseridsLimitedUserTeam,
   getAllRaiseTicketFilteredIndividualDatasHomeTeam,getAllRaiseTicketWithoutClosedHomeTeam,getAllRaiseTicketForwardedEmployeeTeam,
   getAllUsersAssignbranchHomeTeam,getAllTemplateVerificationAssignBranchForfilterTeam,getAllTemplateVerificationAssignBranchTeam,
-  getAchievedAccuracyFilteredDataHomeTeam,getAchievedAccuracyFilteredDataListHomeTeam
+  getAchievedAccuracyFilteredDataHomeTeam,getAchievedAccuracyFilteredDataListHomeTeam,getAllScheduleEventsTeam
 } = require("../controller/login/dashboardteamcontroller.js");
 authRoute.route("/dashboardhierarchyteam").post(getDashboardtHierarchyTeam);
 authRoute.route("/userwithstatuscountteam").post(getUserWithStatusHomeCountTeam);
@@ -676,6 +676,7 @@ authRoute.route("/scheduleeventsteamhome").post(getAllScheduleEventsHomeTeam);
 authRoute.route("/userwithstatuscountlistteam").post(getUserWithStatusHomeCountListTeam);
 authRoute.route("/applyleavehomelistteam").post(getAllApplyleaveHomeListTeam);
 authRoute.route("/notclockinlistteam").post(getAllUserHomeCountNotClockInListTeam);
+authRoute.route("/schedulemeetingfilterhometeam").post(ScheduleMeetingFilterHomeTeam);
 authRoute.route("/schedulemeetingfilterteam").post(ScheduleMeetingFilterTeam);
 authRoute.route("/advanceassignbranchhometeam").post(getAllAdvanceByAssignBranchHomeTeam);
 authRoute.route("/advanceassignbranchhometeamlist").post(getAllAdvanceByAssignBranchHomeTeamList);
@@ -702,6 +703,7 @@ authRoute.route("/myverificaitonteamlist").post(getAllTemplateVerificationAssign
 authRoute.route("/templateverificationteam").post(getAllTemplateVerificationAssignBranchTeam);
 authRoute.route("/achievedaccuracydatahometeam").post(getAchievedAccuracyFilteredDataHomeTeam);
 authRoute.route("/achievedaccuracydatalisthometeam").post(getAchievedAccuracyFilteredDataListHomeTeam);
+authRoute.route("/scheduleeventsteam").post(getAllScheduleEventsTeam);
 
 
 

@@ -15,6 +15,7 @@ const Maintenance = require("../../model/modules/account/maintenance");
 const AssetWorkGrp = require("../../model/modules/account/assetworkstationgrouping");
 const AssetProblemmaster = require('../../model/modules/account/Assetproblemmaster');
 const MaintenanceDetailsmaster = require('../../model/modules/account/MaintanceDetailsmaster');
+const AssetSoftwareDetails = require("../../../model/modules/account/assetsoftwaredetails");
 const Employeeasset = require("../../model/modules/account/employeeassetdistribution");
 const Remainder = require('../../model/modules/task/remainder');
 const EmployeeAssetReturn = require("../../model/modules/account/employeeAssetReturnRegister.js");
@@ -267,7 +268,7 @@ exports.getOverAllEditAssetTypeMasterLinkedData = catchAsyncErrors(async (req, r
 exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, res, next) => {
     let assetspecification, assetspecificationgrp, assetdetail, assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,
         assetproblem, maintenancemaster, assetempdistribution, stockmanage, stock, manualstockentry,
-        maintenancenonschedule, employeeassetreturn;
+        maintenancenonschedule, employeeassetreturn,maintenancedetails,assetsoftwaredetails;
 
     try {
         let nonschedule = req.body.name || []
@@ -278,6 +279,14 @@ exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, r
         let querymaintenancenonschedule = {
             assetmaterial: { $in: nonschedule.map(item => new RegExp("^" + item)) },
         };
+
+         let querysoftwareassetmaster = {
+            assetmaterialcode: { $in: nonschedule.map(item => new RegExp("^" + item)) },
+        };
+
+       
+
+
         // console.log(querymaintenancenonschedule, req.body, "querymaintenancenonschedule")
 
         let queryassetspecification = {
@@ -341,6 +350,20 @@ exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, r
         };
 
 
+           maintenancedetails = await MaintenanceDetailsmaster.find(querymaintenancedetailsmaster, {
+            assetmaterial: 1,
+            assetmaterialcode: 1,
+            _id: 0,
+        });
+
+
+           assetsoftwaredetails = await AssetSoftwareDetails.find(querysoftwareassetmaster, {
+       
+            assetmaterialcode: 1,
+            _id: 0,
+        });
+
+
 
         maintenancenonschedule = await TaskMaintenanceNonScheduleGrouping.find(querymaintenancenonschedule, {
             assetmaterial: 1,
@@ -370,7 +393,7 @@ exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, r
             _id: 0,
         });
 
-        maintenancedetailsmaster = await MaintenanceDetailsmaster.find(querymaintenancedetailsmaster, {
+        maintenancemaster = await Maintenance.find(querymaintenances, {
             assetmaterial: 1,
             _id: 0,
         });
@@ -385,10 +408,7 @@ exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, r
             _id: 0,
         });
 
-        maintenancemaster = await Maintenance.find(querymaintenances, {
-            assetmaterial: 1,
-            _id: 0,
-        });
+      
 
 
         assetempdistribution = await Employeeasset.find(queryempdistribution, {
@@ -432,10 +452,23 @@ exports.getOverAllEditAssetMaterialLinkedData = catchAsyncErrors(async (req, res
     let assetspecification, assetspecificationgrp, assetdetail, assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,
         assetproblem, maintenancemaster,
         assetempdistribution, stockmanage, stock,
-        manualstockentry, maintenancenonschedule, employeeassetreturn;
+        manualstockentry, maintenancenonschedule, employeeassetreturn,maintenancedetails,assetsoftwaredetails;
     try {
-        let matmaintenances = req.body.oldname || [];
+       
         assetspecification = await AssetSpecification.find({ workstation: { $in: req.body.oldname } });
+        
+
+           maintenancedetails = await Maintenance.find({
+            assetmaterial:
+                new RegExp("^" + req.body.oldname)
+        });
+
+
+           assetsoftwaredetails = await AssetSoftwareDetails.find({ assetmaterialcode: { $in: req.body.oldname } });
+
+
+
+        
         assetspecificationgrp = await AssetSpecificationGrouping.find({ assetmaterial: { $in: req.body.oldname } });
         assetdetail = await Assetdetail.find({ material: { $in: req.body.oldname } });
         assetmaterialip = await AssetMaterialIP.find({ assetmaterial: { $in: req.body.oldname } });
@@ -472,9 +505,10 @@ exports.getOverAllEditAssetMaterialLinkedData = catchAsyncErrors(async (req, res
             maintenancedetailsmaster.length + assetworkstationgrouping.length + assetproblem.length +
             maintenancemaster.length + assetempdistribution.length +
             stockmanage.length + stock.length + manualstockentry.length +
-            maintenancenonschedule.length + employeeassetreturn.length
+            maintenancenonschedule.length + employeeassetreturn.length +
+            maintenancedetails.length + assetsoftwaredetails.length
         ,
-
+ maintenancedetails,assetsoftwaredetails,
         assetspecification, assetspecificationgrp, assetdetail, assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,
         assetproblem, maintenancemaster, assetempdistribution, stockmanage, stock,
         manualstockentry, maintenancenonschedule, employeeassetreturn

@@ -202,7 +202,7 @@ export const menuItems = [
          {
         title: "My Dashboard",
         dbname: "menumydashboard",
-        url: "/dashboard",
+        url: "/mydashboard",
         access: true,
       },
       {

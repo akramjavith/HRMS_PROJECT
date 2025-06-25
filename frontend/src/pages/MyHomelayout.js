@@ -15,17 +15,17 @@ import TextSnippetOutlinedIcon from "@mui/icons-material/TextSnippetOutlined";
 import EventBusyOutlinedIcon from "@mui/icons-material/EventBusyOutlined";
 import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 import LockClockOutlinedIcon from "@mui/icons-material/LockClockOutlined";
-import HomeApprove from "./HomeApproveTeam";
-import HomeProduction from "./HomeProductionTeam";
-import HomeAccuracy from "./HomeAccuracyTeam";
-import HomeMinimum from "./Homeminimumteam";
-import HomeTask from "./HomeTaskTeam";
+import HomeApprove from "./MyIndividualHomePages/HomeApproveTeam";
+import HomeProduction from "./MyIndividualHomePages/HomeProductionTeam";
+import HomeAccuracy from "./MyIndividualHomePages/HomeAccuracyTeam";
+import HomeMinimum from "./MyIndividualHomePages/Homeminimumteam";
+import HomeTask from "./MyIndividualHomePages/HomeTaskTeam";
 import HomeExpenseIncome from "./HomeExpenseIncome";
 import HomeAsset from "./HomeAsset";
 import HomeInterview from "./HomeInterview";
-import HomeTickets from "./HomeTicketsTeam";
-import HomeLoginAllot from "./HomeMyLoginAllotTeam";
-import HomeMaintenance from "./HomeMaintenanceTeam";
+import HomeTickets from "./MyIndividualHomePages/HomeTicketsTeam";
+import HomeLoginAllot from "./MyIndividualHomePages/HomeMyLoginAllotTeam";
+import HomeMaintenance from "./MyIndividualHomePages/HomeMaintenanceTeam";
 
 
 const Homelayout = () => {
@@ -104,28 +104,14 @@ const Homelayout = () => {
 
   const fetchEmployee = async () => {
     try {
-      let res = await axios.post(SERVICE.HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-        hierachy: "myallhierarchy",
-        sector: "all",
-        username: isUserRoleAccess.companyname,
-        pagename: "menuteamdashboard",
-        listpageaccessmode: listpageaccessby,
-      });
-
-      if (res.data.resultAccessFilter.length > 0) {
-        const hierarchyempnames = res.data.resultAccessFilter;
-        
-        let [res_Employee, res_leave, res_notcheckin, res_News, res_candidate, res_upcoming] = await Promise.all([
+        let [res_Employee, res_leave, res_notcheckin, res_News] = await Promise.all([
           isUserRoleCompare?.includes("ltotalemployee") && isUserRoleCompare?.includes("lliveemployeelist")
             ? axios.post(SERVICE.EMPLOYEE_HOME_COUNT_TEAM, {
                 headers: {
                   Authorization: `Bearer ${auth.APIToken}`,
                 },
                 // pageName: 'Employee',
-                hierarchyempnames: hierarchyempnames,
+                hierarchyempnames: [isUserRoleAccess.companyname],
                 assignbranch: accessbranch,
               })
             : Promise.resolve([]),
@@ -135,7 +121,7 @@ const Homelayout = () => {
                 headers: {
                   Authorization: `Bearer ${auth.APIToken}`,
                 },
-                hierarchyempnames: hierarchyempnames,
+                hierarchyempnames: [isUserRoleAccess.companyname],
                 assignbranch: accessbranch,
               })
             : Promise.resolve([]),
@@ -145,7 +131,7 @@ const Homelayout = () => {
                 headers: {
                   Authorization: `Bearer ${auth.APIToken}`,
                 },
-                hierarchyempnames: hierarchyempnames,
+                hierarchyempnames: [isUserRoleAccess.companyname],
                 assignbranch: accessbranch,
               })
             : Promise.resolve([]),
@@ -155,7 +141,7 @@ const Homelayout = () => {
                 headers: {
                   Authorization: `Bearer ${auth.APIToken}`,
                 },
-                hierarchyempnames: hierarchyempnames,
+                hierarchyempnames: [isUserRoleAccess.companyname],
                 assignbranch: accessbranch,
               })
             : Promise.resolve([]),
@@ -167,7 +153,7 @@ const Homelayout = () => {
         setEmployees(res_Employee ? res_Employee?.data?.allusers : 0);
         setNotClockIn(Number(res_Employee?.data?.allusers) - (notcheckinuser + applyleavecount));
         setNewsEvents(res_News?.data?.scheduleevent.filter((item, index) => index <= 5));
-      }
+ 
     } catch (err) {
       console.log(err, "errr");
       handleApiError(err, setShowAlert, handleClickOpenerr);
@@ -179,24 +165,13 @@ const Homelayout = () => {
     try {
       let res_employee = [];
 
-       let res = await axios.post(SERVICE.HIERARCHY_TEAM_ATTENDANCE_BASED_CLAIM, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-        hierachy: "myallhierarchy",
-        sector: "all",
-        username: isUserRoleAccess.companyname,
-        pagename: "menuteamdashboard",
-        listpageaccessmode: listpageaccessby,
-      });
-
       if (isUserRoleCompare?.includes("ltodaymeeting") && isUserRoleCompare?.includes("lschedulemeetingfilter")) {
         const response = await axios.post(SERVICE.SCHEDULE_MEETING_FILTER_HOME_TEAM, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
           assignbranch: accessbranchcandidate,
-           hierarchyempnames: res.data.resultAccessFilter,
+           hierarchyempnames: [isUserRoleAccess.companyname],
           selectedfilter: todaymeeting.todaymeet,
         });
 
@@ -208,6 +183,7 @@ const Homelayout = () => {
       handleApiError(err, setShowAlert, handleClickOpenerr);
     }
   };
+
 
   useEffect(() => {
     fetchEmployee();
@@ -226,7 +202,7 @@ const Homelayout = () => {
               <Grid item md={2.4} xs={12} sm={6}>
                 <Box sx={userStyle.taskboxeshome}>
                   <Link
-                 to={'/liveemployeelisthome'}
+                 to={'/myliveemployeelisthome'}
                     target="_blank"
                     style={{ textDecoration: "none", color: "#000000" }}
                   >
@@ -250,7 +226,7 @@ const Homelayout = () => {
             {isUserRoleCompare?.includes("ltodayleave") && (
               <Grid item md={2.4} xs={12} sm={6}>
                 <Box sx={userStyle.taskboxeshome}>
-                  <Link to="/todayleaveapprovedteam" target="_blank" style={{ textDecoration: "none", color: "#000000" }}>
+                  <Link to="/mytodayleaveapprovedteam" target="_blank" style={{ textDecoration: "none", color: "#000000" }}>
                     <Grid container>
                       <Grid item md={8} xs={8} sm={8}>
                         <Box sx={{ height: "40px" }}>
@@ -273,7 +249,7 @@ const Homelayout = () => {
             {isUserRoleCompare?.includes("lnotcheckinemp") && (
               <Grid item md={2.4} xs={12} sm={6}>
                 <Box sx={userStyle.taskboxeshome}>
-                  <Link to="/notcheckinemplistteam" target="_blank" style={{ textDecoration: "none", color: "#000000" }}>
+                  <Link to="/mynotcheckinemplistteam" target="_blank" style={{ textDecoration: "none", color: "#000000" }}>
                     <Grid container>
                       <Grid item md={8} xs={8} sm={8}>
                         <Box sx={{ height: "40px" }}>
@@ -404,7 +380,7 @@ const Homelayout = () => {
 
                   {/* Always render the View More button at the bottom */}
                   <Grid container sx={{ justifyContent: "flex-end", marginTop: "auto" }}>
-                    <Link to="/schedulemeetingfilterteam" target="_blank">
+                    <Link to="/myschedulemeetingfilterteam" target="_blank">
                       <Button
                         variant="contained"
                         sx={{ backgroundColor: "#ff5e65", borderRadius: "13px", textTransform: "capitalize", fontWeight: "bold" }}
@@ -498,7 +474,7 @@ const Homelayout = () => {
                     )}
                   </Grid>
                   <Grid container sx={{ justifyContent: "flex-end", marginTop: "auto" }}>
-                    <Link to="/eventslisthometeam" target="_blank">
+                    <Link to="/myeventslisthome" target="_blank">
                       <Button
                         variant="contained"
                         color="primary"

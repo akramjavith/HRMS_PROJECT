@@ -4700,7 +4700,7 @@ exports.getDashboardtHierarchyTeam = catchAsyncErrors(async (req, res, next) => 
 
 //total employee list
 exports.getUserWithStatusHomeCountListTeam = catchAsyncErrors(async (req, res, next) => {
-    let finalarray;
+    let finalArray;
 
     try {
         const {
@@ -5232,7 +5232,7 @@ exports.getUserWithStatusHomeCountTeam = catchAsyncErrors(async (req, res, next)
   let allusers;
   try {
     const { pageName, assignbranch, hierarchyempnames } = req.body;
-    // console.log(hierarchyempnames, "hierarchyempnames");
+   console.log(hierarchyempnames,assignbranch, "hierarchyempnames");
     const branchFilter = assignbranch.map((branchObj) => ({
       branch: branchObj.branch,
       company: branchObj.company,
@@ -5587,12 +5587,13 @@ exports.getAllScheduleEventsHomeTeam = catchAsyncErrors(async (req, res, next) =
 
     let filterQuery = {
       $or: branchFilter,
-      eventname: { $in: req.body.hierarchyempnames },
+     
     };
 
+ filterQuery.participants= { $in: req.body.hierarchyempnames }
 
     if (branchFilter.length > 0) {
-      scheduleevent = await ScheduleEvents.find(filterQuery, { eventname: 1, eventdescription: 1 });
+      scheduleevent = await ScheduleEvents.find(filterQuery, { eventname: 1, eventdescription: 1,date:1,time:1 });
     } else {
       scheduleevent = [];
     }
@@ -5603,6 +5604,107 @@ exports.getAllScheduleEventsHomeTeam = catchAsyncErrors(async (req, res, next) =
 
   return res.status(200).json({
     scheduleevent,
+  });
+});
+
+//news and events list
+exports.getAllScheduleEventsTeam = catchAsyncErrors(async (req, res, next) => {
+  let scheduleevent;
+  try { 
+    const { assignbranch } = req.body;
+
+    const branchFilter = assignbranch.map((branchObj) => ({
+      $and: [
+        { company: { $elemMatch: { $eq: branchObj.company } } }, 
+        { branch: { $elemMatch: { $eq: branchObj.branch } } },   
+        { unit: { $elemMatch: { $eq: branchObj.unit } } },       
+      ],
+    }));
+
+    // Use $or to filter incomes that match any of the branch, company, and unit combinations
+    const filterQuery = { $or: branchFilter };
+filterQuery.participants = { $in: req.body.hierarchyempnames }
+    scheduleevent = await ScheduleEvents.find(filterQuery, {
+      company: 1, branch: 1, unit: 1, team: 1, eventname: 1, eventdescription: 1, date: 1,
+      time: 1, duration: 1, area: 1, insideoffice: 1, reminder: 1, participants: 1, uniqueId: 1
+      // files: 1
+    }).lean();
+    // scheduleevent = await ScheduleEvents.find();
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+  if (!scheduleevent) {
+    return next(new ErrorHandler("ScheduleEvents not found!", 404));
+  }
+  return res.status(200).json({
+    scheduleevent,
+  });
+});
+
+
+//today meeting home
+exports.ScheduleMeetingFilterHomeTeam = catchAsyncErrors(async (req, res, next) => {
+  let schedulemeeting, filteredschedule, filteredschedulemeeting;
+const {hierarchyempnames} = req.body;
+console.log(hierarchyempnames,"dfse")
+  try {
+  
+   const branchFilter = req.body.assignbranch.map((branchObj) => ({
+      branch: branchObj.branch,
+      company: branchObj.company,
+      // unit: branchObj.unit
+    }));
+
+    let Query = { $or: branchFilter };
+Query.participants= {$in: hierarchyempnames }
+console.log(Query,"meetingquery")
+  
+  
+    const selectedFilter = req.body.selectedfilter;
+    let dateQuery = {...Query};
+
+    if (selectedFilter === "Today") {
+      dateQuery.date = {
+       $gte: moment().startOf("day").toDate().toISOString().split("T")[0],
+     $lte: moment().endOf("day").toDate().toISOString().split("T")[0],
+      };
+    } else if (selectedFilter === "Weekly") {
+      dateQuery.date = {
+        $gte: moment().startOf("week").toDate().toISOString().split("T")[0],
+        $lte: moment().endOf("week").toDate().toISOString().split("T")[0],
+        
+      };
+    } else if (selectedFilter === "Monthly") {
+      dateQuery.date = {
+        $gte: moment().startOf("month").toDate().toISOString().split("T")[0],
+        $lte: moment().endOf("month").toDate().toISOString().split("T")[0],
+      };
+    } else if (selectedFilter === "Yearly") {
+      dateQuery.date = {
+        $gte: moment().startOf("year").toDate().toISOString().split("T")[0],
+        $lte: moment().endOf("year").toDate().toISOString().split("T")[0],
+      };
+    }
+    
+    // console.log(dateQuery.date,"dateQuerymeeting")
+if(branchFilter.length > 0){
+    filteredschedulemeeting = await ScheduleMeeting.find(dateQuery, { title: 1, agenda: 1, date: 1,participants:1 }).lean();
+   
+}else{
+filteredschedulemeeting=[]
+}
+
+// console.log(filteredschedulemeeting,"filteredschedulemeeting")
+  } 
+
+
+  catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+ 
+  return res.status(200).json({
+    filteredschedule,
+    filteredschedulemeeting,
   });
 });
 

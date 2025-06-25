@@ -5834,7 +5834,8 @@ export const SERVICE = {
       ALL_EVENT_HOME_TEAM: `${BASE_URL}/api/scheduleeventsteamhome`,
       APPLY_LEAVE_HOME_LIST_TEAM: `${BASE_URL}/api/applyleavehomelistteam`,
       NOTCLOCKIN_HOME_COUNT_LIST_TEAM: `${BASE_URL}/api/notclockinlistteam`,
-      SCHEDULE_MEETING_FILTER_LIST_TEAM: `${BASE_URL}/api/schedulemeetingfilterteam`,
+      SCHEDULE_MEETING_FILTER_HOME_TEAM: `${BASE_URL}/api/schedulemeetingfilterhometeam`,
+      
       ADVANCE_TEAM: `${BASE_URL}/api/advanceassignbranchhometeam`,
       ADVANCE_TEAM_LIST_TEAM: `${BASE_URL}/api/advanceassignbranchhometeamlist`,
       LOAN_TEAM: `${BASE_URL}/api/loanteam`,
@@ -5860,6 +5861,9 @@ export const SERVICE = {
       MY_VERIFICATION_HOME_TEAM: `${BASE_URL}/api/templateverificationteam`,
       ACCURACY_HOME_TEAM: `${BASE_URL}/api/achievedaccuracydatahometeam`,
       ACCURACY_LIST_HOME_TEAM: `${BASE_URL}/api/achievedaccuracydatalisthometeam`,
+
+SCHEDULE_MEETING_FILTER_LIST_TEAM: `${BASE_URL}/api/schedulemeetingfilterteam`,
+      SCHEDULE_EVENTS_LIST_HOME_TEAM: `${BASE_URL}/api/scheduleeventsteam`,
 
 
       

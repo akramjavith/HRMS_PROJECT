@@ -8,6 +8,7 @@ const RequestVisitorFollowupFilter = React.lazy(() => import("../pages/interacto
 const VisitorEnquiery = React.lazy(() => import("../pages/interactors/visitors/VisitorEnquiery"));
 const Home = React.lazy(() => import("../pages/Home"));
 const HomeTeam = React.lazy(() => import("../pages/Hometeam"));
+const MyHome = React.lazy(() => import("../pages/MyHome.js"));
 const Footer = React.lazy(() => import("../components/footer/footer"));
 const Branch = React.lazy(() => import("../pages/hr/Branch"));
 const Unit = React.lazy(() => import("../pages/hr/Unit"));
@@ -1008,6 +1009,28 @@ const MyVerificationTeam = React.lazy(() => import("../pages/teamDashboard/MyVer
 const Achievedaccuracyfilterhometeam = React.lazy(() => import("../pages/teamDashboard/Achievedaccuracyindividualfilterteam.js"));
 
 
+
+//My Dashboard
+const MyLiveEmployeeListTeam = React.lazy(() => import("../pages/MyDashboardPages/LiveEmployeeListHome"));
+const MyTodayLeaveApprovedteam = React.lazy(() => import("../pages/MyDashboardPages/TodayLeaveApproved.js"));
+const MyNotcheckinemplistTeam = React.lazy(() => import("../pages/MyDashboardPages/Notcheckinemplistteam.js"));
+const MyScheduleMeetingFilterTeam = React.lazy(() => import("../pages/MyDashboardPages/ScheduleMeetingFilterTeam.js"));
+const MyAdvancehomelistTeam = React.lazy(() => import("../pages/MyDashboardPages/advancehomelistteam.js"));
+const MyLoanrequestteam = React.lazy(() => import("../pages/MyDashboardPages/loanrequestteam.js"));
+const MyProductionReviewteam = React.lazy(() => import("../pages/MyDashboardPages/Productionreviewteam.js"));
+const MyTempProductionReviewteam = React.lazy(() => import("../pages/MyDashboardPages/TempProductionReviewTeam.js"));
+const MyMinimumpointsTeam = React.lazy(() => import("../pages/MyDashboardPages/MinimumPointsTeam.js"));
+const MyTaskTeam = React.lazy(() => import("../pages/MyDashboardPages/TaskForUsersReportTeam.js"));
+const MyMaintenanceTeam = React.lazy(() => import("../pages/MyDashboardPages/MaintenanceFilterListTeam.js"));
+const MyLoginAllotTeam = React.lazy(() => import("../pages/MyDashboardPages/MyLoginAllotTeam.js"));
+const MyRaiseTicketListTeam = React.lazy(() => import("../pages/MyDashboardPages/RaiseTicketlist.js"));
+const MyRaiseTicketGroupTeam = React.lazy(() => import("../pages/MyDashboardPages/RaiseTicketTeamGroupTeam.js"));
+const DashboardMyVerificationTeam = React.lazy(() => import("../pages/MyDashboardPages/MyVerificaitonTeam.js"));
+const MyAchievedaccuracyfilterhometeam = React.lazy(() => import("../pages/MyDashboardPages/Achievedaccuracyindividualfilterteam.js"));
+const MyEventsListHome = React.lazy(() => import("../pages/MyDashboardPages/EventsListHome.js"));
+const EventsListHomeTeam = React.lazy(() => import("../pages/teamDashboard/EventsListHome.js"));
+
+
 const App = () => {
   return (
     <>
@@ -1030,6 +1053,7 @@ const App = () => {
             <Route path="appcareer/candidates/:id" element={<Candidate />} />
             <Route path="dashboard" element={<Home />} />
             <Route path="teamdashboard" element={<HomeTeam />} />
+            <Route path="mydashboard" element={<MyHome />} />
             <Route path="branch" element={<Branch />} />
             <Route path="unit" element={<Unit />} />
             <Route path="area" element={<Area />} />
@@ -2085,6 +2109,28 @@ const App = () => {
               <Route path="raiseticketteamgroupteam" element={<RaiseTicketGroupTeam />} />
               <Route path="myverificationteam" element={<MyVerificationTeam />} />
               <Route path="achievedaccuracyfilterhometeam" element={<Achievedaccuracyfilterhometeam />} />
+
+
+              
+{/* my dashboard */}
+              <Route path="myliveemployeelisthome" element={<MyLiveEmployeeListTeam />} />
+              <Route path="mytodayleaveapprovedteam" element={<MyTodayLeaveApprovedteam />} />
+              <Route path="mynotcheckinemplistteam" element={<MyNotcheckinemplistTeam />} />
+              <Route path="myschedulemeetingfilterteam" element={<MyScheduleMeetingFilterTeam />} />
+              <Route path="myadvancehomelistteam" element={<MyAdvancehomelistTeam />} />
+              <Route path="myloanrequestteam" element={<MyLoanrequestteam />} />
+              <Route path="myproductionreviewteam" element={<MyProductionReviewteam />} />
+              <Route path="mytempproductionreviewteam" element={<MyTempProductionReviewteam />} />
+              <Route path="myminimumpointsteam" element={<MyMinimumpointsTeam />} />
+              <Route path="mytaskreportteam" element={<MyTaskTeam />} />
+              <Route path="mymaintenanceteamlist" element={<MyMaintenanceTeam />} />
+              <Route path="myloginallotteam" element={<MyLoginAllotTeam />} />
+              <Route path="myraiseticketlistteam" element={<MyRaiseTicketListTeam />} />
+              <Route path="myraiseticketteamgroupteam" element={<MyRaiseTicketGroupTeam />} />
+              <Route path="dashboardmyverificationteam" element={<DashboardMyVerificationTeam />} />
+              <Route path="myachievedaccuracyfilterhometeam" element={<MyAchievedaccuracyfilterhometeam />} />
+              <Route path="myeventslisthome" element={<MyEventsListHome />} />
+              <Route path="eventslisthometeam" element={<EventsListHomeTeam />} />
 
               
             

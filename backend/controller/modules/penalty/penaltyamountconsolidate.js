@@ -57,69 +57,6 @@ exports.getAllPenaltyAmountConsolidatedList = catchAsyncErrors(
   async (req, res, next) => {
     let penaltyamountconsolidate;
     try {
-// penaltyamountconsolidate = await PenaltyAmountConsolidate.aggregate([
-//   {
-//     $lookup: {
-//       from: "clienterrormonthamounts",
-//       let: { fromdate: "$fromdate", todate: "$todate" },
-//       pipeline: [
-//         {
-//           $match: {
-//             $expr: {
-//               $and: [
-//                 { $gte: ["$fromdate", "$$fromdate"] },
-//                 { $lte: ["$todate", "$$todate"] }
-//               ],
-//             },
-//           },
-//         },
-//       ],
-//       as: "matchedClient",
-//     },
-//   },
-//   {
-//     $lookup: {
-//       from: "managepenaltymonths",
-//       let: { fromdate: "$fromdate", todate: "$todate" },
-//       pipeline: [
-//         {
-//           $match: {
-//             $expr: {
-//               $and: [
-//                 { $gte: ["$fromdate", "$$fromdate"] },
-//                 { $lte: ["$todate", "$$todate"] }
-//               ],
-//             },
-//           },
-//         },
-//       ],
-//       as: "matchedPenalty",
-//     },
-//   },
-//   {
-//     $project: {
-//       fromdate: 1,
-//       todate: 1,
-//       username: 1,
-//       name: 1,
-//       date: 1,
-//       matchpenalty: {
-//         $cond: {
-//           if: { $gt: [{ $size: "$matchedPenalty" }, 0] },
-//           then: "Created",
-//           else: "Not Created",
-//         },
-//       },
-//       matchclient: {
-//         $cond: {
-//           if: { $gt: [{ $size: "$matchedClient" }, 0] },
-//           then: "Created",
-//           else: "Not Created",
-//         },
-//       },
-//     },
-//   }
-// ]);
 
 penaltyamountconsolidate = await PenaltyAmountConsolidate.aggregate([
   {

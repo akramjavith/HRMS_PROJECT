@@ -1,14 +1,14 @@
-import { makeStyles } from "@material-ui/core";
-import CloseIcon from "@mui/icons-material/Close";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import ImageIcon from "@mui/icons-material/Image";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { MultiSelect } from "react-multi-select-component";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { StyledTableCell, StyledTableRow } from "../../components/Table";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
+import { makeStyles } from '@material-ui/core';
+import CloseIcon from '@mui/icons-material/Close';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { MultiSelect } from 'react-multi-select-component';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { StyledTableCell, StyledTableRow } from '../../components/Table';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import {
   Box,
   Button,
@@ -33,96 +33,97 @@ import {
   MenuItem,
   OutlinedInput,
   Popover,
-  Select, Radio, InputAdornment, FormControlLabel, RadioGroup, Tooltip,
+  Select,
+  Radio,
+  InputAdornment,
+  FormControlLabel,
+  RadioGroup,
+  Tooltip,
   TextField,
   Typography,
-} from "@mui/material";
-import axios from "axios";
-import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import "jspdf-autotable";
-import moment from "moment-timezone";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  FaFileCsv, FaSearch,
-  FaFileExcel,
-  FaFilePdf,
-  FaPrint,
-  FaTrash,
-} from "react-icons/fa";
-import { ThreeDots } from "react-loader-spinner";
-import Selects from "react-select";
-import { useReactToPrint } from "react-to-print";
-import csvIcon from "../../components/Assets/CSV.png";
-import excelIcon from "../../components/Assets/excel-icon.png";
-import fileIcon from "../../components/Assets/file-icons.png";
-import pdfIcon from "../../components/Assets/pdf-icon.png";
-import wordIcon from "../../components/Assets/word-icon.png";
-import { handleApiError } from "../../components/Errorhandling";
-import Headtitle from "../../components/Headtitle";
-import Pagination from "../../components/Pagination";
-import StyledDataGrid from "../../components/TableStyle";
-import { AuthContext, UserRoleAccessContext } from "../../context/Appcontext";
-import { colourStyles, userStyle } from "../../pageStyle";
-import { SERVICE } from "../../services/Baseservice";
-import Webcamimage from "./Webcameimageasset";
-import AlertDialog from "../../components/Alert";
-import {
-  DeleteConfirmation,
-  PleaseSelectRow,
-} from "../../components/DeleteConfirmation.js";
-import ExportData from "../../components/ExportData";
-import InfoPopup from "../../components/InfoPopup.js";
-import MessageAlert from "../../components/MessageAlert";
-import PageHeading from "../../components/PageHeading";
-import AggregatedSearchBar from "../../components/AggregatedSearchBar";
-import AggridTable from "../../components/AggridTable";
-import AggridTableForPaginationTable from "../../components/AggridTableForPaginationTable.js";
+} from '@mui/material';
+
+import axios from '../../axiosInstance';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import 'jspdf-autotable';
+import moment from 'moment-timezone';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { FaFileCsv, FaSearch, FaFileExcel, FaFilePdf, FaPrint, FaTrash } from 'react-icons/fa';
+import { ThreeDots } from 'react-loader-spinner';
+import Selects from 'react-select';
+import { useReactToPrint } from 'react-to-print';
+import csvIcon from '../../components/Assets/CSV.png';
+import excelIcon from '../../components/Assets/excel-icon.png';
+import fileIcon from '../../components/Assets/file-icons.png';
+import pdfIcon from '../../components/Assets/pdf-icon.png';
+import wordIcon from '../../components/Assets/word-icon.png';
+import { handleApiError } from '../../components/Errorhandling';
+import Headtitle from '../../components/Headtitle';
+import Pagination from '../../components/Pagination';
+import StyledDataGrid from '../../components/TableStyle';
+import { AuthContext, UserRoleAccessContext } from '../../context/Appcontext';
+import { colourStyles, userStyle } from '../../pageStyle';
+import { SERVICE } from '../../services/Baseservice';
+import Webcamimage from './Webcameimageasset';
+import AlertDialog from '../../components/Alert';
+import { DeleteConfirmation, PleaseSelectRow } from '../../components/DeleteConfirmation.js';
+import ExportData from '../../components/ExportData';
+import InfoPopup from '../../components/InfoPopup.js';
+import MessageAlert from '../../components/MessageAlert';
+import PageHeading from '../../components/PageHeading';
+import AggregatedSearchBar from '../../components/AggregatedSearchBar';
+import AggridTable from '../../components/AggridTable';
+import AggridTableForPaginationTable from '../../components/AggridTableForPaginationTable.js';
 import domtoimage from 'dom-to-image';
-import { MdClose } from "react-icons/md";
-import { IoMdOptions } from "react-icons/io";
-import ManageColumnsContent from "../../components/ManageColumn";
+import { MdClose } from 'react-icons/md';
+import { IoMdOptions } from 'react-icons/io';
+import ManageColumnsContent from '../../components/ManageColumn';
 import Switch from '@mui/material/Switch';
 import { alpha, styled } from '@mui/material/styles';
+import { getCurrentServerTime } from '../../components/getCurrentServerTime';
 
 
 const useStyles = makeStyles((theme) => ({
   inputs: {
-    display: "none",
+    display: 'none',
   },
   preview: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     marginTop: theme.spacing(2),
-    "& > *": {
+    '& > *': {
       margin: theme.spacing(1),
     },
   },
 }));
 
 function AssetDetailsList() {
+
+  const [serverTime, setServerTime] = useState(null);
+  useEffect(() => {
+    const fetchTime = async () => {
+      const time = await getCurrentServerTime();
+      setServerTime(time);
+    };
+
+    fetchTime();
+  }, []);
+
+
   const [items, setItems] = useState([]);
   const [filteredRowData, setFilteredRowData] = useState([]);
   const [filteredChanges, setFilteredChanges] = useState(null);
-  const [searchedString, setSearchedString] = useState("");
+  const [searchedString, setSearchedString] = useState('');
   const [isHandleChange, setIsHandleChange] = useState(false);
   const gridRefTableImg = useRef(null);
   const gridRefTable = useRef(null);
   const { auth } = useContext(AuthContext);
-  const {
-    isUserRoleCompare,
-    isUserRoleAccess,
-    workStationSystemName,
-    isAssignBranch,
-    allfloor,
-    alllocationgrouping,
-    allareagrouping, pageName, setPageName, buttonStyles,
-  } = useContext(UserRoleAccessContext);
+  const { isUserRoleCompare, isUserRoleAccess, workStationSystemName, isAssignBranch, allfloor, alllocationgrouping, allareagrouping, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
   //Datatable
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
 
   // State to track advanced filter
   const [advancedFilter, setAdvancedFilter] = useState(null);
@@ -130,17 +131,16 @@ function AssetDetailsList() {
   const [columnApi, setColumnApi] = useState(null);
   const [filteredDataItems, setFilteredDataItems] = useState([]);
   //  const [filteredRowData, setFilteredRowData] = useState([]);
-  const [logicOperator, setLogicOperator] = useState("AND");
+  const [logicOperator, setLogicOperator] = useState('AND');
 
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState("Contains");
-  const [filterValue, setFilterValue] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('Contains');
+  const [filterValue, setFilterValue] = useState('');
   const [additionalFilters, setAdditionalFilters] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const conditions = ["Contains", "Does Not Contain", "Equals", "Does Not Equal", "Begins With", "Ends With", "Blank", "Not Blank"]; // AgGrid-like conditions
+  const conditions = ['Contains', 'Does Not Contain', 'Equals', 'Does Not Equal', 'Begins With', 'Ends With', 'Blank', 'Not Blank']; // AgGrid-like conditions
 
-
-  const [selectedRowsAssetList, setSelectedRowsAssetList] = useState([])
+  const [selectedRowsAssetList, setSelectedRowsAssetList] = useState([]);
   // Error Popup model
   const [isErrorOpenpop, setIsErrorOpenpop] = useState(false);
   const [showAlertpop, setShowAlertpop] = useState();
@@ -151,14 +151,13 @@ function AssetDetailsList() {
     setIsErrorOpenpop(false);
   };
 
-  const [ovProj, setOvProj] = useState("");
-  const [ovProjcode, setOvProjcode] = useState("");
-  const [ovProjCount, setOvProjCount] = useState("");
-  const [getOverAllCount, setGetOverallCount] = useState("");
+  const [ovProj, setOvProj] = useState('');
+  const [ovProjcode, setOvProjcode] = useState('');
+  const [ovProjCount, setOvProjCount] = useState('');
+  const [getOverAllCount, setGetOverallCount] = useState('');
   //check delete model
   const [isCheckOpen, setisCheckOpen] = useState(false);
   const [overalldeletecheck, setOveraldeletecheck] = useState({
-
     assetmaterialip: [],
     assetworkstationgrouping: [],
     // maintenancedetailsmaster: [],
@@ -180,15 +179,12 @@ function AssetDetailsList() {
     setisCheckOpenbulk(true);
   };
   const handlebulkCloseCheck = () => {
-
     setisCheckOpenbulk(false);
   };
 
-
-
   const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
+  const [popupContentMalert, setPopupContentMalert] = useState('');
+  const [popupSeverityMalert, setPopupSeverityMalert] = useState('');
   const handleClickOpenPopupMalert = () => {
     setOpenPopupMalert(true);
   };
@@ -196,8 +192,8 @@ function AssetDetailsList() {
     setOpenPopupMalert(false);
   };
   const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
+  const [popupContent, setPopupContent] = useState('');
+  const [popupSeverity, setPopupSeverity] = useState('');
   const handleClickOpenPopup = () => {
     setOpenPopup(true);
   };
@@ -234,9 +230,7 @@ function AssetDetailsList() {
   };
 
   const customValueRendererCompany = (valueCompanyCat, _categoryname) => {
-    return valueCompanyCat?.length
-      ? valueCompanyCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Company";
+    return valueCompanyCat?.length ? valueCompanyCat.map(({ label }) => label)?.join(', ') : 'Please Select Company';
   };
 
   //branch multiselect
@@ -257,9 +251,7 @@ function AssetDetailsList() {
   };
 
   const customValueRendererBranch = (valueBranchCat, _categoryname) => {
-    return valueBranchCat?.length
-      ? valueBranchCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Branch";
+    return valueBranchCat?.length ? valueBranchCat.map(({ label }) => label)?.join(', ') : 'Please Select Branch';
   };
 
   //unit multiselect
@@ -278,12 +270,8 @@ function AssetDetailsList() {
   };
 
   const customValueRendererUnit = (valueUnitCat, _categoryname) => {
-    return valueUnitCat?.length
-      ? valueUnitCat.map(({ label }) => label)?.join(", ")
-      : "Please Select Unit";
+    return valueUnitCat?.length ? valueUnitCat.map(({ label }) => label)?.join(', ') : 'Please Select Unit';
   };
-
-
 
   const handleAssetMaterialChange = (options) => {
     setValueAssetMaterial(
@@ -295,14 +283,12 @@ function AssetDetailsList() {
   };
 
   const customValueRendererAssetMaterial = (valueAssetMaterial, _categoryname) => {
-    return valueAssetMaterial?.length
-      ? valueAssetMaterial?.map(({ label }) => label)?.join(", ")
-      : "Please Select Asset Material";
+    return valueAssetMaterial?.length ? valueAssetMaterial?.map(({ label }) => label)?.join(', ') : 'Please Select Asset Material';
   };
 
   //auto select all dropdowns
   const handleAutoSelect = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
     try {
       let selectedValues = accessbranch
         ?.map((data) => ({
@@ -310,30 +296,15 @@ function AssetDetailsList() {
           branch: data.branch,
           unit: data.unit,
         }))
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        );
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit));
       let selectedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         .map((a, index) => {
           return a.company;
         });
 
       let mappedCompany = selectedValues
-        ?.filter(
-          (value, index, self) =>
-            index === self.findIndex((t) => t.company === value.company)
-        )
+        ?.filter((value, index, self) => index === self.findIndex((t) => t.company === value.company))
         ?.map((data) => ({
           label: data?.company,
           value: data?.company,
@@ -343,25 +314,13 @@ function AssetDetailsList() {
       setSelectedOptionsCompany(mappedCompany);
 
       let selectedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         .map((a, index) => {
           return a.branch;
         });
 
       let mappedBranch = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) => t.company === value.company && t.branch === value.branch
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch))
         ?.map((data) => ({
           label: data?.branch,
           value: data?.branch,
@@ -371,31 +330,13 @@ function AssetDetailsList() {
       setSelectedOptionsBranch(mappedBranch);
 
       let selectedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         .map((a, index) => {
           return a.unit;
         });
 
       let mappedUnit = selectedValues
-        .filter(
-          (value, index, self) =>
-            index ===
-            self.findIndex(
-              (t) =>
-                t.company === value.company &&
-                t.branch === value.branch &&
-                t.unit === value.unit
-            )
-        )
+        .filter((value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit))
         ?.map((data) => ({
           label: data?.unit,
           value: data?.unit,
@@ -403,7 +344,6 @@ function AssetDetailsList() {
 
       setValueUnitCat(selectedUnit);
       setSelectedOptionsUnit(mappedUnit);
-
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -426,11 +366,7 @@ function AssetDetailsList() {
       }));
 
       const assetmaterialuniqueArray = resultall.filter((item, index, self) => {
-        return (
-          self.findIndex(
-            (i) => i.label === item.label && i.value === item.value
-          ) === index
-        );
+        return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
       });
 
       setMaterialopt(assetmaterialuniqueArray);
@@ -443,96 +379,46 @@ function AssetDetailsList() {
     handleAssetMaterials();
   }, []);
 
-
   useEffect(() => {
     handleAutoSelect();
   }, [isAssignBranch]);
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (selectedOptionsCompany?.length === 0 &&
-      selectedOptionsBranch?.length === 0 &&
-      selectedOptionsUnit?.length === 0 &&
-      selectedOptionsAssetMaterial?.length === 0) {
-      setPopupContentMalert("Please Select Any One");
-      setPopupSeverityMalert("info");
+    if (selectedOptionsCompany?.length === 0 && selectedOptionsBranch?.length === 0 && selectedOptionsUnit?.length === 0 && selectedOptionsAssetMaterial?.length === 0) {
+      setPopupContentMalert('Please Select Any One');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else {
-      fetchAssetDetails("Filtered");
+    } else {
+      fetchAssetDetails('Filtered');
     }
   };
 
   const handleClear = () => {
     setAssetdetails([]);
     setItems([]);
-    setPage(1)
+    setPage(1);
     setTotalProjects(0);
     setTotalPages(0);
-    setPageSize(10)
+    setPageSize(10);
     setOverallFilterdata([]);
-    setSelectedOptionsCompany([])
-    setSelectedOptionsBranch([])
-    setSelectedOptionsUnit([])
-    setSelectedOptionsAssetMaterial([])
-    setValueCompanyCat([])
-    setValueBranchCat([])
-    setValueUnitCat([])
-    setValueAssetMaterial([])
+    setSelectedOptionsCompany([]);
+    setSelectedOptionsBranch([]);
+    setSelectedOptionsUnit([]);
+    setSelectedOptionsAssetMaterial([]);
+    setValueCompanyCat([]);
+    setValueBranchCat([]);
+    setValueUnitCat([]);
+    setValueAssetMaterial([]);
     setPopupContent('Cleared Successfully');
-    setPopupSeverity("success");
+    setPopupSeverity('success');
     handleClickOpenPopup();
-  }
-  let exportColumnNames = [
-    "Status",
-    "Company",
-    "Branch",
-    "Unit",
-    "Floor",
-    "Area",
-    "Location",
-    "WorkStation",
-    "AssetType",
-    "Asset",
-    "Material",
-    "Component",
-    "Material Code",
-    "Count(Qty)",
-    "Rate",
-    "Warranty",
-    "Purchasedate",
-    "Vendor Group",
-    "Vendor",
-    "Biometric"
-  ];
-  let exportRowValues = [
-    "status",
-    "company",
-    "branch",
-    "unit",
-    "floor",
-    "area",
-    "location",
-    "workstation",
-    "assettype",
-    "asset",
-    "material",
-    "component",
-    "code",
-    "countquantity",
-    "rate",
-    "warranty",
-    "purchasedate",
-    "vendorgroup",
-    "vendor",
-    "biometric",
-  ];
+  };
+  let exportColumnNames = ['Status', 'Company', 'Branch', 'Unit', 'Floor', 'Area', 'Location', 'WorkStation', 'AssetType', 'Asset', 'Material', 'Component', 'Material Code', 'Count(Qty)', 'Rate', 'Warranty', 'Purchasedate', 'Vendor Group', 'Vendor', 'Biometric'];
+  let exportRowValues = ['status', 'company', 'branch', 'unit', 'floor', 'area', 'location', 'workstation', 'assettype', 'asset', 'material', 'component', 'code', 'countquantity', 'rate', 'warranty', 'purchasedate', 'vendorgroup', 'vendor', 'biometric'];
 
   const [areasEdit, setAreasEdit] = useState([]);
-  const [locationsEdit, setLocationsEdit] = useState([
-    { label: "ALL", value: "ALL" },
-  ]);
+  const [locationsEdit, setLocationsEdit] = useState([{ label: 'ALL', value: 'ALL' }]);
 
   const [overallFilterdata, setOverallFilterdata] = useState([]);
   const [totalProjects, setTotalProjects] = useState(0);
@@ -550,38 +436,36 @@ function AssetDetailsList() {
   };
 
   const EbUsage = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" },
+    { label: 'Yes', value: 'Yes' },
+    { label: 'No', value: 'No' },
   ];
   const Biometric = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" },
+    { label: 'Yes', value: 'Yes' },
+    { label: 'No', value: 'No' },
   ];
   const [floorsEdit, setFloorEdit] = useState([]);
   const [workStationOpt, setWorkStationOpt] = useState([]);
   const [filteredWorkStation, setFilteredWorkStation] = useState([]);
   const [Specificationedit, setSpecificationedit] = useState([]);
-  let name = "create";
-  let nameedit = "edit";
+  let name = 'create';
+  let nameedit = 'edit';
   //Edit model...
   const [isEditOpen, setIsEditOpen] = useState(false);
   const handleClickOpenEdit = () => {
     setIsEditOpen(true);
   };
   const handleCloseModEdit = (e, reason) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     setIsEditOpen(false);
   };
 
   const handleChangephonenumberEdit = (e) => {
     const regex = /^\d*\.?\d*$/;
     const inputValue = e.target.value;
-    if (regex.test(inputValue) || inputValue === "") {
+    if (regex.test(inputValue) || inputValue === '') {
       setAssetdetailEdit({ ...assetdetailEdit, estimation: inputValue });
     }
   };
-
-
 
   // const accessbranch = isAssignBranch
   //   ?.map((data) => ({
@@ -590,8 +474,7 @@ function AssetDetailsList() {
   //     unit: data.unit,
   //   }))
 
-
-  const accessbranch = isUserRoleAccess?.role?.includes("Manager")
+  const accessbranch = isUserRoleAccess?.role?.includes('Manager')
     ? isAssignBranch?.map((data) => ({
       branch: data.branch,
       company: data.company,
@@ -601,31 +484,13 @@ function AssetDetailsList() {
       ?.filter((data) => {
         let fetfinalurl = [];
 
-        if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 &&
-          data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
+        if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
           fetfinalurl = data.subsubpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 &&
-          data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
           fetfinalurl = data.subpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 &&
-          data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.mainpagenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
           fetfinalurl = data.mainpagenameurl;
-        } else if (
-          data?.modulenameurl?.length !== 0 &&
-          data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)
-        ) {
+        } else if (data?.modulenameurl?.length !== 0 && data?.submodulenameurl?.length !== 0 && data?.subsubpagenameurl?.includes(window.location.pathname)) {
           fetfinalurl = data.submodulenameurl;
         } else if (data?.modulenameurl?.length !== 0) {
           fetfinalurl = data.modulenameurl;
@@ -633,10 +498,7 @@ function AssetDetailsList() {
           fetfinalurl = [];
         }
 
-        const remove = [
-          window.location.pathname?.substring(1),
-          window.location.pathname,
-        ];
+        const remove = [window.location.pathname?.substring(1), window.location.pathname];
         return fetfinalurl?.some((item) => remove?.includes(item));
       })
       ?.map((data) => ({
@@ -645,11 +507,9 @@ function AssetDetailsList() {
         unit: data.unit,
       }));
 
-
-
   const [showAlert, setShowAlert] = useState();
   const [isErrorOpen, setIsErrorOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [vendorOptEdit, setVendoroptEdit] = useState([]);
   const [assetdetails, setAssetdetails] = useState([]);
   const [assetdetailCheck, setAssetdetailcheck] = useState(false);
@@ -666,14 +526,14 @@ function AssetDetailsList() {
   //filter fields
 
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchQueryManage, setSearchQueryManage] = useState("");
+  const [searchQueryManage, setSearchQueryManage] = useState('');
   const gridRef = useRef(null);
 
-  const [vendorGroup, setVendorGroup] = useState("Please Select Vendor Group");
+  const [vendorGroup, setVendorGroup] = useState('Please Select Vendor Group');
   const [vendorGroupOpt, setVendorGroupopt] = useState([]);
   const [vendorOverall, setVendorOverall] = useState([]);
   const [vendorOpt, setVendoropt] = useState([]);
-  const [vendor, setVendor] = useState("Please Select Vendor");
+  const [vendor, setVendor] = useState('Please Select Vendor');
 
   const fetchVendor = async () => {
     try {
@@ -682,9 +542,7 @@ function AssetDetailsList() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const allGroup = Array.from(
-        new Set(res1?.data?.vendorgrouping.map((d) => d.name))
-      ).map((item) => {
+      const allGroup = Array.from(new Set(res1?.data?.vendorgrouping.map((d) => d.name))).map((item) => {
         return {
           label: item,
           value: item,
@@ -760,43 +618,41 @@ function AssetDetailsList() {
 
   // putcall setstate
   const [assetdetailEdit, setAssetdetailEdit] = useState({
-    company: "Please Select Company",
-    branch: "Please Select Branch",
-    unit: "Please Select Unit",
-    floor: "Please Select Floor",
-    area: "Please Select Area",
-    location: "Please Select Location",
-    workstation: "Please Select Workstation",
-    department: "Please Select Department",
-    responsibleteam: "Please Select Responsible Person",
-    team: "Please Select Responsible Team",
-    assettype: "Please Select Asset Type",
-    asset: "Please Select Asset Head",
-    material: "Please Select Material",
-    component: "Please Select Component",
-    code: "",
-    countquantity: "",
-    materialcountcode: "",
-    workcheck: "",
-    serial: "",
-    rate: "",
-    warranty: "",
-    warrantycalculation: "",
-    estimation: "",
-    estimationtime: "",
-    purchasedate: "",
-    address: "",
-    phonenumber: "",
-    vendor: "Please Select Vendor",
-    customercare: "",
-    stockcode: "",
-    ebusage: "Please Select EB Usage",
-    biometric: "Please Select Biometric",
+    company: 'Please Select Company',
+    branch: 'Please Select Branch',
+    unit: 'Please Select Unit',
+    floor: 'Please Select Floor',
+    area: 'Please Select Area',
+    location: 'Please Select Location',
+    workstation: 'Please Select Workstation',
+    department: 'Please Select Department',
+    responsibleteam: 'Please Select Responsible Person',
+    team: 'Please Select Responsible Team',
+    assettype: 'Please Select Asset Type',
+    asset: 'Please Select Asset Head',
+    material: 'Please Select Material',
+    component: 'Please Select Component',
+    code: '',
+    countquantity: '',
+    materialcountcode: '',
+    workcheck: '',
+    serial: '',
+    rate: '',
+    warranty: '',
+    warrantycalculation: '',
+    estimation: '',
+    estimationtime: '',
+    purchasedate: '',
+    address: '',
+    phonenumber: '',
+    vendor: 'Please Select Vendor',
+    customercare: '',
+    stockcode: '',
+    ebusage: 'Please Select EB Usage',
+    biometric: 'Please Select Biometric',
   });
 
-  const [specificationGroupingEdit, setSpecificationGroupingEdit] = useState(
-    []
-  );
+  const [specificationGroupingEdit, setSpecificationGroupingEdit] = useState([]);
 
   const fetchSpecificationGroupingEdit = async () => {
     try {
@@ -805,22 +661,14 @@ function AssetDetailsList() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      let getvalues = res?.data?.assetspecificationgrouping.filter(
-        (item) =>
-          item.assetmaterial === assetdetailEdit.material &&
-          assetdetailEdit.component === item.component
-      );
+      let getvalues = res?.data?.assetspecificationgrouping.filter((item) => item.assetmaterial === assetdetailEdit.material && assetdetailEdit.component === item.component);
 
       setSpecificationGroupingEdit(getvalues);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
-  console.log(page, pageSize, "number")
-
   const fetchAssetDetails = async (e) => {
-
     const queryParams = {
       page: Number(page),
       pageSize: Number(pageSize),
@@ -831,13 +679,10 @@ function AssetDetailsList() {
       assignbranch: accessbranch,
     };
 
-    const allFilters = [
-      ...additionalFilters,
-      { column: selectedColumn, condition: selectedCondition, value: filterValue }
-    ];
+    const allFilters = [...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
       queryParams.searchQuery = searchQuery;
@@ -845,26 +690,21 @@ function AssetDetailsList() {
     setAssetdetailcheck(true);
 
     try {
-      if (e === "Filtered") {
+      if (e === 'Filtered') {
         let res_employee = await axios.post(SERVICE.ASSET_DATA_FILTER_ACCESS, queryParams, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
         });
-        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : []
+        const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result : [];
         const itemsWithSerialNumber = ans?.map((item, index) => {
-
           return {
             ...item,
             serialNumber: (page - 1) * pageSize + index + 1,
-            purchasedate: (item.purchasedate === "Invalid date" || item.purchasedate === "" || item.purchasedate === undefined) ? "" : moment(item.purchasedate).format("DD/MM/YYYY"),
-            workstation: item.workstation === "Please Select Workstation" ? "" : item.workstation,
-
-
-          }
+            purchasedate: item.purchasedate === 'Invalid date' || item.purchasedate === '' || item.purchasedate === undefined ? '' : moment(item.purchasedate).format('DD/MM/YYYY'),
+            workstation: item.workstation === 'Please Select Workstation' ? '' : item.workstation,
+          };
         });
-        console.log(res_employee?.data, ans, 'res_employee?.data')
-
         setAssetdetails(itemsWithSerialNumber);
         setItems(itemsWithSerialNumber);
         // setOverallFilterdata(res_employee?.data?.totalProjectsData?.length > 0 ?
@@ -882,14 +722,17 @@ function AssetDetailsList() {
         // );
         setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
         setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-        setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-        setPage((data) => { return ans?.length > 0 ? data : 1 });
-        setAssetdetailcheck(false)
+        setPageSize((data) => {
+          return ans?.length > 0 ? data : 10;
+        });
+        setPage((data) => {
+          return ans?.length > 0 ? data : 1;
+        });
+        setAssetdetailcheck(false);
       } else {
-        setAssetdetailcheck(false)
+        setAssetdetailcheck(false);
       }
-    }
-    catch (err) {
+    } catch (err) {
       setAssetdetailcheck(false);
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
@@ -902,7 +745,7 @@ function AssetDetailsList() {
 
   useEffect(() => {
     if (items?.length > 0) {
-      fetchAssetDetails("Filtered");
+      fetchAssetDetails('Filtered');
     }
   }, [page, pageSize, searchQuery]);
 
@@ -910,20 +753,19 @@ function AssetDetailsList() {
     fetchSpecificationGroupingEdit();
   }, [isEditOpen, assetdetailEdit.component]);
 
-
   //image
   const handleCaptureImage = () => {
     if (gridRefTableImg.current) {
-      domtoimage.toBlob(gridRefTableImg.current)
+      domtoimage
+        .toBlob(gridRefTableImg.current)
         .then((blob) => {
-          saveAs(blob, "Assetdetail.png");
+          saveAs(blob, 'Assetdetail.png');
         })
         .catch((error) => {
-          console.error("dom-to-image error: ", error);
+          console.error('dom-to-image error: ', error);
         });
     }
   };
-
 
   const handleSelectionChange = (newSelection) => {
     setSelectedRows(newSelection.selectionModel);
@@ -963,30 +805,20 @@ function AssetDetailsList() {
   //   }
   // };
 
-
-
-
   const handleClickOpenalert = async () => {
     try {
-
-
-
       setIsHandleChange(true);
       if (selectedRows.length === 0) {
         setIsDeleteOpenalert(true);
       } else {
         const [resmatip] = await Promise.all([
-
-
           axios.post(SERVICE.OVERALL_DELETE_ASSET_LIST_LINKED_DATA, {
             headers: {
               Authorization: `Bearer ${auth.APIToken}`,
             },
-            matassetip: selectedRowsAssetList
-
+            matassetip: selectedRowsAssetList,
           }),
-
-        ])
+        ]);
 
         setCheckassetip(resmatip?.data?.assetmaterialip);
         setCheckassetwrkgrp(resmatip?.data?.assetworkstationgrouping);
@@ -995,8 +827,7 @@ function AssetDetailsList() {
         setChecknonschedule(resmatip?.data?.maintenancenonschedulegrouping);
         setCheckAssetempdis(resmatip?.data?.assetempdistribution);
 
-
-        let assetmaterialip = resmatip?.data?.assetmaterialip.map(item => ({
+        let assetmaterialip = resmatip?.data?.assetmaterialip.map((item) => ({
           company: item.company,
           branch: item.branch,
           unit: item.unit,
@@ -1005,9 +836,9 @@ function AssetDetailsList() {
           location: item.location,
           // code: item.component[0].split(`${item.assetmaterial}-`)[1],
           // workstation: data.workstation,
-          assetmaterial: item.component[0]
+          assetmaterial: item.component[0],
         }));
-        let assetworkstationgrouping = resmatip?.data?.assetworkstationgrouping.map(item => ({
+        let assetworkstationgrouping = resmatip?.data?.assetworkstationgrouping.map((item) => ({
           company: item.company,
           branch: item.branch,
           unit: item.unit,
@@ -1016,10 +847,10 @@ function AssetDetailsList() {
           location: item.location,
           // code: item.component[0].split(`${item.assetmaterial}-`)[1],
           // workstation: data.workstation,
-          assetmaterial: item.component[0]
+          assetmaterial: item.component[0],
         }));
 
-        let maintenancemaster = resmatip?.data?.maintenancemaster.map(item => ({
+        let maintenancemaster = resmatip?.data?.maintenancemaster.map((item) => ({
           company: item.company,
           branch: item.branch,
           unit: item.unit,
@@ -1028,9 +859,9 @@ function AssetDetailsList() {
           location: item.location,
           // code: item.assetmaterialcode[0].split(`${item.assetmaterial}-`)[1],
           // workstation: data.workstation,
-          assetmaterial: item.assetmaterialcode[0]
+          assetmaterial: item.assetmaterialcode[0],
         }));
-        let assetempdistribution = resmatip?.data?.assetempdistribution.map(item => ({
+        let assetempdistribution = resmatip?.data?.assetempdistribution.map((item) => ({
           company: item.company,
           branch: item.branch,
           unit: item.unit,
@@ -1039,9 +870,9 @@ function AssetDetailsList() {
           location: item.location,
           // /  code: item.assetmaterialcode.split(`${item.assetmaterial}-`)[1],
           // workstation: data.workstation,
-          assetmaterial: item.assetmaterialcode
+          assetmaterial: item.assetmaterialcode,
         }));
-        let maintenancenonschedulegrouping = resmatip?.data?.maintenancenonschedulegrouping.map(item => ({
+        let maintenancenonschedulegrouping = resmatip?.data?.maintenancenonschedulegrouping.map((item) => ({
           company: item.companyto,
           branch: item.branchto,
           unit: item.unitto,
@@ -1050,17 +881,10 @@ function AssetDetailsList() {
           location: item.locationto,
           // code: item.component[0].split(`${item.assetmaterial}-`)[1],
           // workstation: data.workstation,
-          assetmaterial: item.assetmaterial
+          assetmaterial: item.assetmaterial,
         }));
 
-
-        if (
-          (resmatip?.data?.assetmaterialip)?.length > 0 ||
-          (resmatip?.data?.assetworkstationgrouping)?.length > 0 ||
-          (resmatip?.data?.maintenancemaster)?.length > 0 ||
-          (resmatip?.data?.maintenancenonschedulegrouping)?.length > 0 ||
-          (resmatip?.data?.assetempdistribution)?.length > 0
-        ) {
+        if (resmatip?.data?.assetmaterialip?.length > 0 || resmatip?.data?.assetworkstationgrouping?.length > 0 || resmatip?.data?.maintenancemaster?.length > 0 || resmatip?.data?.maintenancenonschedulegrouping?.length > 0 || resmatip?.data?.assetempdistribution?.length > 0) {
           handleClickOpenCheckbulk();
           // setOveraldeletecheck({ ...overalldeletecheck, ebuse: resebuse?.data?.ebuse, ebread: resebread?.data?.ebread, ebmaterial: resebmaterial?.data?.ebmaterial })
           setOveraldeletecheck({
@@ -1071,32 +895,22 @@ function AssetDetailsList() {
             maintenancenonschedulegrouping: maintenancenonschedulegrouping,
             maintenancemaster: maintenancemaster,
             assetempdistribution: assetempdistribution,
+          });
 
-
-
-          })
-
-
-
-          setCheckassetip([])
-          setCheckmaindetails([])
-          setCheckassetwrkgrp([])
-          setCheckmaintmaster([])
-          setCheckAssetempdis([])
-          setChecknonschedule([])
-
+          setCheckassetip([]);
+          setCheckmaindetails([]);
+          setCheckassetwrkgrp([]);
+          setCheckmaintmaster([]);
+          setCheckAssetempdis([]);
+          setChecknonschedule([]);
         } else {
           setIsDeleteOpencheckbox(true);
         }
       }
-    }
-    catch
-    (err) {
+    } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-
     }
   };
-
 
   const handleCloseModalert = () => {
     setIsDeleteOpenalert(false);
@@ -1120,75 +934,55 @@ function AssetDetailsList() {
   };
 
   const handleAddInputEdit = (e) => {
-    let specificationItem = Specificationedit.find(
-      (item) => e === item.categoryname
-    );
+    let specificationItem = Specificationedit.find((item) => e === item.categoryname);
     let filtersub = specificationItem?.subcategoryname;
     let result;
     if (filtersub.length > 0) {
       result = filtersub?.map((sub, index) => ({
         sub: `${index + 1}.${sub.subcomponent}`,
         subname: sub.subcomponent,
-        type: sub.type ? "Please Select Type" : "",
+        type: sub.type ? 'Please Select Type' : '',
         subcomponentcheck: false,
-        model: sub.model ? "Please Select Model" : "",
-        size: sub.size ? "Please Select Size" : "",
-        variant: sub.variant ? "Please Select variant" : "",
-        brand: sub.brand ? "Please Select Brand" : "",
-        serial: sub.serial ? "" : undefined,
-        other: sub.other ? "" : undefined,
-        capacity: sub.capacity ? "Please Select Capacity" : "",
-        hdmiport: sub.hdmiport ? "" : undefined,
-        vgaport: sub.vgaport ? "" : undefined,
-        dpport: sub.dpport ? "" : undefined,
-        usbport: sub.usbport ? "" : undefined,
-        paneltypescreen: sub.paneltypescreen ? "Please Select Panel Type" : "",
-        resolution: sub.resolution ? "Please Select Screen Resolution" : "",
-        connectivity: sub.connectivity ? "Please Select Connectivity" : "",
-        daterate: sub.daterate ? "Please Select Data Rate" : "",
-        compatibledevice: sub.compatibledevice
-          ? "Please Select Compatible Device"
-          : "",
-        outputpower: sub.outputpower ? "Please Select Output Power" : "",
-        collingfancount: sub.collingfancount
-          ? "Please Select Cooling Fan Count"
-          : "",
-        clockspeed: sub.clockspeed ? "Please Select Clock Speed" : "",
-        core: sub.core ? "Please Select Core" : "",
-        speed: sub.speed ? "Please Select Speed" : "",
-        frequency: sub.frequency ? "Please Select Frequency" : "",
-        output: sub.output ? "Please Select Output" : "",
-        ethernetports: sub.ethernetports ? "Please Select Ethernet Ports" : "",
-        distance: sub.distance ? "Please Select Distance" : "",
-        lengthname: sub.lengthname ? "Please Select Length" : "",
-        slot: sub.slot ? "Please Select Slot" : "",
-        noofchannels: sub.noofchannels ? "Please Select No. Of Channels" : "",
-        colours: sub.colours ? "Please Select Colour" : "",
+        model: sub.model ? 'Please Select Model' : '',
+        size: sub.size ? 'Please Select Size' : '',
+        variant: sub.variant ? 'Please Select variant' : '',
+        brand: sub.brand ? 'Please Select Brand' : '',
+        serial: sub.serial ? '' : undefined,
+        other: sub.other ? '' : undefined,
+        capacity: sub.capacity ? 'Please Select Capacity' : '',
+        hdmiport: sub.hdmiport ? '' : undefined,
+        vgaport: sub.vgaport ? '' : undefined,
+        dpport: sub.dpport ? '' : undefined,
+        usbport: sub.usbport ? '' : undefined,
+        paneltypescreen: sub.paneltypescreen ? 'Please Select Panel Type' : '',
+        resolution: sub.resolution ? 'Please Select Screen Resolution' : '',
+        connectivity: sub.connectivity ? 'Please Select Connectivity' : '',
+        daterate: sub.daterate ? 'Please Select Data Rate' : '',
+        compatibledevice: sub.compatibledevice ? 'Please Select Compatible Device' : '',
+        outputpower: sub.outputpower ? 'Please Select Output Power' : '',
+        collingfancount: sub.collingfancount ? 'Please Select Cooling Fan Count' : '',
+        clockspeed: sub.clockspeed ? 'Please Select Clock Speed' : '',
+        core: sub.core ? 'Please Select Core' : '',
+        speed: sub.speed ? 'Please Select Speed' : '',
+        frequency: sub.frequency ? 'Please Select Frequency' : '',
+        output: sub.output ? 'Please Select Output' : '',
+        ethernetports: sub.ethernetports ? 'Please Select Ethernet Ports' : '',
+        distance: sub.distance ? 'Please Select Distance' : '',
+        lengthname: sub.lengthname ? 'Please Select Length' : '',
+        slot: sub.slot ? 'Please Select Slot' : '',
+        noofchannels: sub.noofchannels ? 'Please Select No. Of Channels' : '',
+        colours: sub.colours ? 'Please Select Colour' : '',
         code: assetdetailEdit.code ? assetdetailEdit.code : undefined,
-        countquantity: assetdetailEdit.countquantity
-          ? assetdetailEdit.countquantity
-          : undefined,
+        countquantity: assetdetailEdit.countquantity ? assetdetailEdit.countquantity : undefined,
         rate: assetdetailEdit.rate ? assetdetailEdit.rate : undefined,
-        warranty: assetdetailEdit.warranty
-          ? assetdetailEdit.warranty
-          : undefined,
-        estimation: assetdetailEdit.estimation
-          ? assetdetailEdit.estimation
-          : undefined,
-        estimationtime: assetdetailEdit.estimationtime
-          ? assetdetailEdit.estimationtime
-          : undefined,
-        warrantycalculation: assetdetailEdit.warrantycalculation
-          ? assetdetailEdit.warrantycalculation
-          : undefined,
-        purchasedate: selectedPurchaseDateEdit
-          ? selectedPurchaseDateEdit
-          : undefined,
+        warranty: assetdetailEdit.warranty ? assetdetailEdit.warranty : undefined,
+        estimation: assetdetailEdit.estimation ? assetdetailEdit.estimation : undefined,
+        estimationtime: assetdetailEdit.estimationtime ? assetdetailEdit.estimationtime : undefined,
+        warrantycalculation: assetdetailEdit.warrantycalculation ? assetdetailEdit.warrantycalculation : undefined,
+        purchasedate: selectedPurchaseDateEdit ? selectedPurchaseDateEdit : undefined,
         // vendorgroup: assetdetailEdit.vendorgroup ? assetdetailEdit.vendorgroup : undefined,
         vendor: assetdetailEdit.vendor ? assetdetailEdit.vendor : undefined,
-        phonenumber: vendorgetidEdit.phonenumber
-          ? vendorgetidEdit.phonenumber
-          : undefined,
+        phonenumber: vendorgetidEdit.phonenumber ? vendorgetidEdit.phonenumber : undefined,
         address: vendorgetidEdit.address ? vendorgetidEdit.address : undefined,
       }));
     } else if (
@@ -1210,88 +1004,50 @@ function AssetDetailsList() {
     ) {
       result = [
         {
-          type: specificationItem.type ? "Please Select Type" : "",
+          type: specificationItem.type ? 'Please Select Type' : '',
           subcomponentcheck: false,
-          model: specificationItem.model ? "Please Select Model" : "",
-          size: specificationItem.size ? "Please Select Size" : "",
-          variant: specificationItem.variant ? "Please Select variant" : "",
-          brand: specificationItem.brand ? "Please Select Brand" : "",
-          serial: specificationItem.serial ? "" : undefined,
-          other: specificationItem.other ? "" : undefined,
-          capacity: specificationItem.capacity ? "Please Select Capacity" : "",
-          hdmiport: specificationItem.hdmiport ? "" : undefined,
-          vgaport: specificationItem.vgaport ? "" : undefined,
-          dpport: specificationItem.dpport ? "" : undefined,
-          usbport: specificationItem.usbport ? "" : undefined,
-          paneltypescreen: specificationItem.paneltypescreen
-            ? "Please Select Panel Type"
-            : "",
-          resolution: specificationItem.resolution
-            ? "Please Select Screen Resolution"
-            : "",
-          connectivity: specificationItem.connectivity
-            ? "Please Select Connectivity"
-            : "",
-          daterate: specificationItem.daterate ? "Please Select Data Rate" : "",
-          compatibledevice: specificationItem.compatibledevice
-            ? "Please Select Compatible Device"
-            : "",
-          outputpower: specificationItem.outputpower
-            ? "Please Select Output Power"
-            : "",
-          collingfancount: specificationItem.collingfancount
-            ? "Please Select Cooling Fan Count"
-            : "",
-          clockspeed: specificationItem.clockspeed
-            ? "Please Select Clock Speed"
-            : "",
-          core: specificationItem.core ? "Please Select Core" : "",
-          speed: specificationItem.speed ? "Please Select Speed" : "",
-          frequency: specificationItem.frequency
-            ? "Please Select Frequency"
-            : "",
-          output: specificationItem.output ? "Please Select Output" : "",
-          ethernetports: specificationItem.ethernetports
-            ? "Please Select Ethernet Ports"
-            : "",
-          distance: specificationItem.distance ? "Please Select Distance" : "",
-          lengthname: specificationItem.lengthname
-            ? "Please Select Length"
-            : "",
-          slot: specificationItem.slot ? "Please Select Slot" : "",
-          noofchannels: specificationItem.noofchannels
-            ? "Please Select No. Of Channels"
-            : "",
-          colours: specificationItem.colours ? "Please Select Colour" : "",
+          model: specificationItem.model ? 'Please Select Model' : '',
+          size: specificationItem.size ? 'Please Select Size' : '',
+          variant: specificationItem.variant ? 'Please Select variant' : '',
+          brand: specificationItem.brand ? 'Please Select Brand' : '',
+          serial: specificationItem.serial ? '' : undefined,
+          other: specificationItem.other ? '' : undefined,
+          capacity: specificationItem.capacity ? 'Please Select Capacity' : '',
+          hdmiport: specificationItem.hdmiport ? '' : undefined,
+          vgaport: specificationItem.vgaport ? '' : undefined,
+          dpport: specificationItem.dpport ? '' : undefined,
+          usbport: specificationItem.usbport ? '' : undefined,
+          paneltypescreen: specificationItem.paneltypescreen ? 'Please Select Panel Type' : '',
+          resolution: specificationItem.resolution ? 'Please Select Screen Resolution' : '',
+          connectivity: specificationItem.connectivity ? 'Please Select Connectivity' : '',
+          daterate: specificationItem.daterate ? 'Please Select Data Rate' : '',
+          compatibledevice: specificationItem.compatibledevice ? 'Please Select Compatible Device' : '',
+          outputpower: specificationItem.outputpower ? 'Please Select Output Power' : '',
+          collingfancount: specificationItem.collingfancount ? 'Please Select Cooling Fan Count' : '',
+          clockspeed: specificationItem.clockspeed ? 'Please Select Clock Speed' : '',
+          core: specificationItem.core ? 'Please Select Core' : '',
+          speed: specificationItem.speed ? 'Please Select Speed' : '',
+          frequency: specificationItem.frequency ? 'Please Select Frequency' : '',
+          output: specificationItem.output ? 'Please Select Output' : '',
+          ethernetports: specificationItem.ethernetports ? 'Please Select Ethernet Ports' : '',
+          distance: specificationItem.distance ? 'Please Select Distance' : '',
+          lengthname: specificationItem.lengthname ? 'Please Select Length' : '',
+          slot: specificationItem.slot ? 'Please Select Slot' : '',
+          noofchannels: specificationItem.noofchannels ? 'Please Select No. Of Channels' : '',
+          colours: specificationItem.colours ? 'Please Select Colour' : '',
           code: assetdetailEdit.code ? assetdetailEdit.code : undefined,
-          countquantity: assetdetailEdit.countquantity
-            ? assetdetailEdit.countquantity
-            : undefined,
+          countquantity: assetdetailEdit.countquantity ? assetdetailEdit.countquantity : undefined,
           rate: assetdetailEdit.rate ? assetdetailEdit.rate : undefined,
-          warranty: assetdetailEdit.warranty
-            ? assetdetailEdit.warranty
-            : undefined,
-          estimation: assetdetailEdit.estimation
-            ? assetdetailEdit.estimation
-            : undefined,
-          estimationtime: assetdetailEdit.estimationtime
-            ? assetdetailEdit.estimationtime
-            : undefined,
-          warrantycalculation: assetdetailEdit.warrantycalculation
-            ? assetdetailEdit.warrantycalculation
-            : undefined,
-          purchasedate: selectedPurchaseDateEdit
-            ? selectedPurchaseDateEdit
-            : undefined,
+          warranty: assetdetailEdit.warranty ? assetdetailEdit.warranty : undefined,
+          estimation: assetdetailEdit.estimation ? assetdetailEdit.estimation : undefined,
+          estimationtime: assetdetailEdit.estimationtime ? assetdetailEdit.estimationtime : undefined,
+          warrantycalculation: assetdetailEdit.warrantycalculation ? assetdetailEdit.warrantycalculation : undefined,
+          purchasedate: selectedPurchaseDateEdit ? selectedPurchaseDateEdit : undefined,
           // vendorgroup: assetdetailEdit.vendorgroup ? assetdetailEdit.vendorgroup : undefined,
 
           vendor: assetdetailEdit.vendor ? assetdetailEdit.vendor : undefined,
-          phonenumber: vendorgetidEdit.phonenumber
-            ? vendorgetidEdit.phonenumber
-            : undefined,
-          address: vendorgetidEdit.address
-            ? vendorgetidEdit.address
-            : undefined,
+          phonenumber: vendorgetidEdit.phonenumber ? vendorgetidEdit.phonenumber : undefined,
+          address: vendorgetidEdit.address ? vendorgetidEdit.address : undefined,
         },
       ];
     }
@@ -1304,7 +1060,7 @@ function AssetDetailsList() {
       [name]: value,
     };
 
-    if (name === "rate" && assetdetailEdit.overallrate == false) {
+    if (name === 'rate' && assetdetailEdit.overallrate == false) {
       let sum = 0;
       updatedTodos.forEach((item) => {
         sum += parseInt(item.rate);
@@ -1313,31 +1069,19 @@ function AssetDetailsList() {
     }
     setTodosEdit(updatedTodos);
     const updatedTodo = updatedTodos[index];
-    if (
-      updatedTodo.estimationtime !== "" &&
-      updatedTodo.purchasedate &&
-      updatedTodo.estimation !== ""
-    ) {
+    if (updatedTodo.estimationtime !== '' && updatedTodo.purchasedate && updatedTodo.estimation !== '') {
       const currentDate = new Date(updatedTodo.purchasedate);
       let expiryDate = new Date(currentDate);
 
-      if (updatedTodo.estimationtime === "Days") {
-        expiryDate.setDate(
-          currentDate.getDate() + parseInt(updatedTodo.estimation)
-        );
-      } else if (updatedTodo.estimationtime === "Month") {
-        expiryDate.setMonth(
-          currentDate.getMonth() + parseInt(updatedTodo.estimation)
-        );
-      } else if (updatedTodo.estimationtime === "Year") {
-        expiryDate.setFullYear(
-          currentDate.getFullYear() + parseInt(updatedTodo.estimation)
-        );
+      if (updatedTodo.estimationtime === 'Days') {
+        expiryDate.setDate(currentDate.getDate() + parseInt(updatedTodo.estimation));
+      } else if (updatedTodo.estimationtime === 'Month') {
+        expiryDate.setMonth(currentDate.getMonth() + parseInt(updatedTodo.estimation));
+      } else if (updatedTodo.estimationtime === 'Year') {
+        expiryDate.setFullYear(currentDate.getFullYear() + parseInt(updatedTodo.estimation));
       }
       const formattedExpiryDate = formatDateString(expiryDate);
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN")
-        ? ""
-        : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
       const updatedTodosCopy = [...updatedTodos];
       updatedTodosCopy[index] = {
         ...updatedTodosCopy[index],
@@ -1346,7 +1090,7 @@ function AssetDetailsList() {
       setTodosEdit(updatedTodosCopy);
     }
     const updatedTodovendor = updatedTodos[index];
-    if (updatedTodovendor.vendor !== "" && id) {
+    if (updatedTodovendor.vendor !== '' && id) {
       const res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
         headers: {
           Authorization: `Bearer ${auth.APIToken}`,
@@ -1375,14 +1119,17 @@ function AssetDetailsList() {
   };
   const [getimgbillcode, setGetImgbillcode] = useState([]);
 
-
   const getimgbillCode = async (id) => {
     let res = await axios.get(`${SERVICE.ASSETDETAIL_SINGLE}/${id}`, {
       headers: {
         Authorization: `Bearer ${auth.APIToken}`,
       },
     });
-    const filesbill = await getMultipleFilesAsObjects(res?.data?.sassetdetail?.files.map(d => d.name), "bill", res?.data?.sassetdetail?.uniqueId);
+    const filesbill = await getMultipleFilesAsObjects(
+      res?.data?.sassetdetail?.files.map((d) => d.name),
+      'bill',
+      res?.data?.sassetdetail?.uniqueId
+    );
     setoldfileNamesBill(res?.data?.sassetdetail?.files.map((d) => `${res?.data?.sassetdetail?.uniqueId}$bill$${d.name}`));
 
     handleFetchBill(filesbill, res?.data?.sassetdetail?.files);
@@ -1404,7 +1151,7 @@ function AssetDetailsList() {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
-          responseType: "blob",
+          responseType: 'blob',
         }
       );
 
@@ -1418,7 +1165,7 @@ function AssetDetailsList() {
 
   //get single row to edit....
   const getCode = async (e, code, data) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
 
     handleClickOpenEdit();
     try {
@@ -1428,14 +1175,9 @@ function AssetDetailsList() {
         },
       });
 
-      const match = workStationSystemName?.find(secObj =>
-        secObj.company === res?.data?.sassetdetail.company &&
-        secObj.branch === res?.data?.sassetdetail.branch &&
-        secObj.unit === res?.data?.sassetdetail.unit &&
-        secObj.floor === res?.data?.sassetdetail.floor &&
-        secObj.cabinname === res?.data?.sassetdetail.workstation?.split("(")[0]
+      const match = workStationSystemName?.find(
+        (secObj) => secObj.company === res?.data?.sassetdetail.company && secObj.branch === res?.data?.sassetdetail.branch && secObj.unit === res?.data?.sassetdetail.unit && secObj.floor === res?.data?.sassetdetail.floor && secObj.cabinname === res?.data?.sassetdetail.workstation?.split('(')[0]
       );
-
 
       setOvProj([
         {
@@ -1447,10 +1189,23 @@ function AssetDetailsList() {
           location: data.location,
           code: data.code,
           // workstation: data.workstation,
-          assetmaterial: data.material
-        }
+          assetmaterial: data.material,
+        },
       ]);
-      getOverallEditSection([
+      getOverallEditSection(
+        [
+          {
+            company: data.company,
+            branch: data.branch,
+            unit: data.unit,
+            floor: data.floor,
+            area: data.area,
+            location: data.location,
+            code: data.code,
+            // workstation: data.workstation,
+            assetmaterial: data.material,
+          },
+        ],
         {
           company: data.company,
           branch: data.branch,
@@ -1460,34 +1215,25 @@ function AssetDetailsList() {
           location: data.location,
           code: data.code,
           // workstation: data.workstation,
-          assetmaterial: data.material
+          assetmaterial: data.material,
         }
-      ], {
-        company: data.company,
-        branch: data.branch,
-        unit: data.unit,
-        floor: data.floor,
-        area: data.area,
-        location: data.location,
-        code: data.code,
-        // workstation: data.workstation,
-        assetmaterial: data.material
-      });
+      );
       // setAssetdetailEdit(res?.data?.sassetdetail);
       setAssetdetailEdit({ ...res?.data?.sassetdetail, workstationlabel: `${res?.data?.sassetdetail?.workstation}(${match && match?.systemshortname})` });
 
       setVendor(res?.data?.sassetdetail?.vendor);
 
-      const filesbill = await getMultipleFilesAsObjects(res?.data?.sassetdetail?.files.map(d => d.name), "bill", res?.data?.sassetdetail?.uniqueId);
+      const filesbill = await getMultipleFilesAsObjects(
+        res?.data?.sassetdetail?.files.map((d) => d.name),
+        'bill',
+        res?.data?.sassetdetail?.uniqueId
+      );
       setoldfileNamesBill(res?.data?.sassetdetail?.files.map((d) => `${res?.data?.sassetdetail?.uniqueId}$bill$${d.name}`));
 
       handleFetchBill(filesbill, res?.data?.sassetdetail?.files);
 
       for (let i = 0; i < res?.data?.sassetdetail?.subcomponent?.length; i++) {
-        await handleChangeGroupNameIndexBased(
-          { value: res?.data?.sassetdetail?.subcomponent[i]?.vendorgroup },
-          i
-        );
+        await handleChangeGroupNameIndexBased({ value: res?.data?.sassetdetail?.subcomponent[i]?.vendorgroup }, i);
       }
 
       setVendorGroup(res?.data?.sassetdetail?.vendorgroup);
@@ -1504,24 +1250,14 @@ function AssetDetailsList() {
       setSelectedPurchaseDateEdit(res?.data?.sassetdetail.purchasedate);
 
       fetchFloorEdit(res?.data?.sassetdetail?.branch);
-      fetchAreaEdit(
-        res?.data?.sassetdetail?.branch,
-        res?.data?.sassetdetail?.floor
-      );
-      fetchAllLocationEdit(
-        res?.data?.sassetdetail?.branch,
-        res?.data?.sassetdetail?.floor,
-        res?.data?.sassetdetail?.area
-      );
+      fetchAreaEdit(res?.data?.sassetdetail?.branch, res?.data?.sassetdetail?.floor);
+      fetchAllLocationEdit(res?.data?.sassetdetail?.branch, res?.data?.sassetdetail?.floor, res?.data?.sassetdetail?.area);
       if (res?.data?.sassetdetail.vendorid) {
-        let resv = await axios.get(
-          `${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.sassetdetail.vendorid}`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-          }
-        );
+        let resv = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${res?.data?.sassetdetail.vendorid}`, {
+          headers: {
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
+        });
         setVendorgetidEdit(resv?.data?.svendordetails);
       }
       let res1 = await axios.get(SERVICE.ASSETWORKSTAION, {
@@ -1530,9 +1266,7 @@ function AssetDetailsList() {
         },
       });
 
-      let result = res1.data.assetworkstation.filter(
-        (d) => d.workstation === res?.data?.sassetdetail.material
-      );
+      let result = res1.data.assetworkstation.filter((d) => d.workstation === res?.data?.sassetdetail.material);
 
       const resultall = result?.map((d) => ({
         ...d,
@@ -1541,13 +1275,13 @@ function AssetDetailsList() {
       }));
       setSpecificationedit(resultall);
     } catch (err) {
-      console.log(err, "error")
+      console.log(err, 'error');
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
   // get single row to view....
   const getviewCode = async (e) => {
-    setPageName(!pageName)
+    setPageName(!pageName);
 
     try {
       let res = await axios.get(`${SERVICE.ASSETDETAIL_SINGLE}/${e}`, {
@@ -1582,15 +1316,15 @@ function AssetDetailsList() {
   };
   const handleCloseManageColumns = () => {
     setManageColumnsOpen(false);
-    setSearchQueryManage("");
+    setSearchQueryManage('');
   };
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const id = open ? 'simple-popover' : undefined;
   const getRowClassName = (params) => {
     if (selectedRows.includes(params.data.id)) {
-      return "custom-id-row"; // This is the custom class for rows with item.tat === 'ago'
+      return 'custom-id-row'; // This is the custom class for rows with item.tat === 'ago'
     }
-    return ""; // Return an empty string for other rows
+    return ''; // Return an empty string for other rows
   };
 
   // Show All Columns & Manage Columns
@@ -1626,12 +1360,10 @@ function AssetDetailsList() {
     actions: true,
     status: true,
   };
-  const [columnVisibility, setColumnVisibility] = useState(
-    initialColumnVisibility
-  );
+  const [columnVisibility, setColumnVisibility] = useState(initialColumnVisibility);
   //get all Sub vendormasters.
 
-  const [deleteAssetdetail, setDeleteAssetdetail] = useState("");
+  const [deleteAssetdetail, setDeleteAssetdetail] = useState('');
 
   // const rowData = async (id, name) => {
   //   setPageName(!pageName)
@@ -1653,8 +1385,6 @@ function AssetDetailsList() {
 
   // Alert delete popup
 
-
-
   const [checkassetip, setCheckassetip] = useState([]);
   const [checkassetwrkgrp, setCheckassetwrkgrp] = useState([]);
   const [checkmaindetails, setCheckmaindetails] = useState([]);
@@ -1663,8 +1393,7 @@ function AssetDetailsList() {
   const [checkassetempdis, setCheckAssetempdis] = useState([]);
 
   const rowData = async (id, code, data) => {
-
-    setPageName(!pageName)
+    setPageName(!pageName);
 
     try {
       // let res = await axios.get(`${SERVICE.ASSETDETAIL_SINGLE}/${id}`, {
@@ -1676,8 +1405,8 @@ function AssetDetailsList() {
       const [res, resmatip, resworkgrp, resmaindetmaster, resmainmaster, resnonschedule, resempdis] = await Promise.all([
         axios.get(`${SERVICE.ASSETDETAIL_SINGLE}/${id}`, {
           headers: {
-            'Authorization': `Bearer ${auth.APIToken}`
-          }
+            Authorization: `Bearer ${auth.APIToken}`,
+          },
         }),
 
         axios.post(SERVICE.OVERALL_DELETE_ASSET_LIST_LINKED_DATA, {
@@ -1694,15 +1423,11 @@ function AssetDetailsList() {
               location: data.location,
               code: data.code,
               // workstation: data.workstation,
-              assetmaterial: data.material
-            }
-          ]
-          ,
-
+              assetmaterial: data.material,
+            },
+          ],
         }),
-
-      ])
-      // console.log(resempdis?.data?.assetempdistribution, "empdis")
+      ]);
       setDeleteAssetdetail(res?.data?.sassetdetail);
       setCheckassetip(resmatip?.data?.assetmaterialip);
       setCheckassetwrkgrp(resmatip?.data?.assetworkstationgrouping);
@@ -1712,22 +1437,18 @@ function AssetDetailsList() {
       setCheckAssetempdis(resmatip?.data?.assetempdistribution);
       setdeletecheck(!deletecheck);
 
-
-
       if (
-        (resmatip?.data?.assetmaterialip)?.length > 0
-        ||
-        (resmatip?.data?.assetworkstationgrouping)?.length > 0 ||
-        (resmatip?.data?.maintenancedetailsmaster)?.length > 0 ||
-        (resmatip?.data?.maintenancemaster)?.length > 0 ||
-        (resmatip?.data?.maintenancenonschedulegrouping)?.length > 0 ||
-        (resmatip?.data?.assetempdistribution)?.length > 0
+        resmatip?.data?.assetmaterialip?.length > 0 ||
+        resmatip?.data?.assetworkstationgrouping?.length > 0 ||
+        resmatip?.data?.maintenancedetailsmaster?.length > 0 ||
+        resmatip?.data?.maintenancemaster?.length > 0 ||
+        resmatip?.data?.maintenancenonschedulegrouping?.length > 0 ||
+        resmatip?.data?.assetempdistribution?.length > 0
       ) {
         handleClickOpenCheck();
       } else {
         handleClickOpen();
       }
-
 
       // handleClickOpen();
     } catch (err) {
@@ -1735,12 +1456,9 @@ function AssetDetailsList() {
     }
   };
 
-
-
-
   let Assetdetailsid = deleteAssetdetail?._id;
   const delAssetdetail = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
 
     try {
       if (Assetdetailsid) {
@@ -1755,16 +1473,16 @@ function AssetDetailsList() {
         setSelectedRows([]);
         setPage(1);
       }
-      fetchAssetDetails("Filtered");
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      fetchAssetDetails('Filtered');
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
   const delAssetcheckbox = async () => {
-    setPageName(!pageName)
+    setPageName(!pageName);
 
     try {
       const deletePromises = selectedRows?.map((item) => {
@@ -1779,33 +1497,25 @@ function AssetDetailsList() {
       setSelectedRows([]);
       setSelectAllChecked(false);
       setPage(1);
-      fetchAssetDetails("Filtered");
+      fetchAssetDetails('Filtered');
       // await fetchAssetSort();
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
-
   const delaccountheadwithoutlink = async () => {
     try {
-      let valfilter = [
+      let valfilter = [...overalldeletecheck.assetmaterialip, ...overalldeletecheck.assetworkstationgrouping, ...overalldeletecheck.maintenancemaster, ...overalldeletecheck.assetempdistribution, ...overalldeletecheck.maintenancenonschedulegrouping];
 
-        ...overalldeletecheck.assetmaterialip,
-        ...overalldeletecheck.assetworkstationgrouping,
-        ...overalldeletecheck.maintenancemaster,
-        ...overalldeletecheck.assetempdistribution,
-        ...overalldeletecheck.maintenancenonschedulegrouping,
-      ];
-
-      let filtered = rowDataTable.filter(d => !valfilter.some(condition =>
-        condition.company === d.company && condition.branch === d.branch
-        && condition.unit === d.unit
-        && condition.floor === d.floor && condition.area === d.area
-        && condition.location === d.location && condition.assetmaterial === `${d.material}-${d.code}`))?.flatMap(d => selectedRows?.filter(item => d.id === item));
+      let filtered = rowDataTable
+        .filter(
+          (d) => !valfilter.some((condition) => condition.company === d.company && condition.branch === d.branch && condition.unit === d.unit && condition.floor === d.floor && condition.area === d.area && condition.location === d.location && condition.assetmaterial === `${d.material}-${d.code}`)
+        )
+        ?.flatMap((d) => selectedRows?.filter((item) => d.id === item));
       const deletePromises = filtered?.map((item) => {
         return axios.delete(`${SERVICE.ASSETDETAIL_SINGLE}/${item}`, {
           headers: {
@@ -1822,40 +1532,36 @@ function AssetDetailsList() {
       setSelectAllChecked(false);
       setPage(1);
 
-      fetchAssetDetails("Filtered");
-      setPopupContent("Deleted Successfully");
-      setPopupSeverity("success");
+      fetchAssetDetails('Filtered');
+      setPopupContent('Deleted Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
-
-
   //print...
   const componentRef = useRef();
   const handleprint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "Assetdetail",
-    pageStyle: "print",
+    documentTitle: 'Assetdetail',
+    pageStyle: 'print',
   });
 
   // page refersh reload code
   const handleBeforeUnload = (event) => {
     event.preventDefault();
-    event.returnValue = ""; // This is required for Chrome support
+    event.returnValue = ''; // This is required for Chrome support
   };
 
   useEffect(() => {
     const beforeUnloadHandler = (event) => handleBeforeUnload(event);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
   }, []);
-
-
 
   const addSerialNumber = (datas) => {
     // const itemsWithSerialNumber = datas?.map((item, index) => (
@@ -1879,7 +1585,6 @@ function AssetDetailsList() {
     setPage(newPage);
     setSelectedRows([]);
     setSelectAllChecked(false);
-
   };
 
   const handlePageSizeChange = (event) => {
@@ -1896,17 +1601,12 @@ function AssetDetailsList() {
     setPage(1);
   };
   // Split the search query into individual terms
-  const searchTerms = searchQuery.toLowerCase().split(" ");
+  const searchTerms = searchQuery.toLowerCase().split(' ');
   // Modify the filtering logic to check each term
   const filteredDatas = items?.filter((item) => {
-    return searchTerms.every((term) =>
-      Object.values(item).join(" ").toLowerCase().includes(term)
-    );
+    return searchTerms.every((term) => Object.values(item).join(' ').toLowerCase().includes(term));
   });
-  const filteredData = filteredDatas?.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const filteredData = filteredDatas?.slice((page - 1) * pageSize, page * pageSize);
 
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const CheckboxHeader = ({ selectAllChecked, onSelectAll }) => (
@@ -1915,12 +1615,11 @@ function AssetDetailsList() {
     </div>
   );
   const columnDataTable = [
-
     {
-      field: "checkbox",
-      headerName: "", // Default header name
+      field: 'checkbox',
+      headerName: '', // Default header name
       headerStyle: {
-        fontWeight: "bold",
+        fontWeight: 'bold',
       },
       sortable: false,
       width: 90,
@@ -1928,39 +1627,34 @@ function AssetDetailsList() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       hide: !columnVisibility.checkbox,
-      headerClassName: "bold-header",
-      pinned: "left",
+      headerClassName: 'bold-header',
+      pinned: 'left',
     },
     {
-      field: "serialNumber",
-      headerName: "SNo",
+      field: 'serialNumber',
+      headerName: 'SNo',
       flex: 0,
       width: 90,
       hide: !columnVisibility.serialNumber,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "status",
-      headerName: "Status",
+      field: 'status',
+      headerName: 'Status',
       flex: 0,
       width: 140,
       hide: !columnVisibility.status,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <Button
           variant="contained"
           style={{
-            padding: "5px",
-            backgroundColor:
-              params.data.status === "Repair"
-                ? "#FFC300"
-                : params.data.status === "In Working"
-                  ? "green"
-                  : "blue",
-            color: params.data.status === "Repair" ? "black" : "white",
-            fontSize: "10px",
-            width: "90px",
-            fontWeight: "bold",
+            padding: '5px',
+            backgroundColor: params.data.status === 'Repair' ? '#FFC300' : params.data.status === 'In Working' ? 'green' : 'blue',
+            color: params.data.status === 'Repair' ? 'black' : 'white',
+            fontSize: '10px',
+            width: '90px',
+            fontWeight: 'bold',
           }}
         >
           {params.data.status}
@@ -1968,176 +1662,176 @@ function AssetDetailsList() {
       ),
     },
     {
-      field: "company",
-      headerName: "Company",
+      field: 'company',
+      headerName: 'Company',
       flex: 0,
       width: 100,
       hide: !columnVisibility.company,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "branch",
-      headerName: "Branch",
+      field: 'branch',
+      headerName: 'Branch',
       flex: 0,
       width: 100,
       hide: !columnVisibility.branch,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "unit",
-      headerName: "Unit",
+      field: 'unit',
+      headerName: 'Unit',
       flex: 0,
       width: 100,
       hide: !columnVisibility.unit,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "floor",
-      headerName: "Floor",
+      field: 'floor',
+      headerName: 'Floor',
       flex: 0,
       width: 100,
       hide: !columnVisibility.floor,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "area",
-      headerName: "Area",
+      field: 'area',
+      headerName: 'Area',
       flex: 0,
       width: 100,
       hide: !columnVisibility.area,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "location",
-      headerName: "Location",
+      field: 'location',
+      headerName: 'Location',
       flex: 0,
       width: 100,
       hide: !columnVisibility.location,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "workstation",
-      headerName: "WorkStation",
+      field: 'workstation',
+      headerName: 'WorkStation',
       flex: 0,
       width: 100,
       hide: !columnVisibility.workstation,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "asset",
-      headerName: "Asset",
+      field: 'asset',
+      headerName: 'Asset',
       flex: 0,
       width: 150,
       hide: !columnVisibility.asset,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "assettype",
-      headerName: "Asset Type",
+      field: 'assettype',
+      headerName: 'Asset Type',
       flex: 0,
       width: 150,
       hide: !columnVisibility.assettype,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "material",
-      headerName: "Material",
+      field: 'material',
+      headerName: 'Material',
       flex: 0,
       width: 150,
       hide: !columnVisibility.material,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "component",
-      headerName: "Component",
+      field: 'component',
+      headerName: 'Component',
       flex: 0,
       width: 150,
       hide: !columnVisibility.component,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "code",
-      headerName: "Material Code",
+      field: 'code',
+      headerName: 'Material Code',
       flex: 0,
       width: 150,
       hide: !columnVisibility.code,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "countquantity",
-      headerName: "Count(Qty)",
+      field: 'countquantity',
+      headerName: 'Count(Qty)',
       flex: 0,
       width: 100,
       hide: !columnVisibility.countquantity,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "rate",
-      headerName: "Rate",
+      field: 'rate',
+      headerName: 'Rate',
       flex: 0,
       width: 100,
       hide: !columnVisibility.rate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "warranty",
-      headerName: "Warranty",
+      field: 'warranty',
+      headerName: 'Warranty',
       flex: 0,
       width: 100,
       hide: !columnVisibility.warranty,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "purchasedate",
-      headerName: "Purchasedate",
+      field: 'purchasedate',
+      headerName: 'Purchasedate',
       flex: 0,
       width: 150,
       hide: !columnVisibility.purchasedate,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "vendorgroup",
-      headerName: "Vendor Group",
+      field: 'vendorgroup',
+      headerName: 'Vendor Group',
       flex: 0,
       width: 150,
       hide: !columnVisibility.vendorgroup,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "vendor",
-      headerName: "Vendor",
+      field: 'vendor',
+      headerName: 'Vendor',
       flex: 0,
       width: 150,
       hide: !columnVisibility.vendor,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "biometric",
-      headerName: "Biometric",
+      field: 'biometric',
+      headerName: 'Biometric',
       flex: 0,
       width: 150,
       hide: !columnVisibility.biometric,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
     },
     {
-      field: "files",
-      headerName: "Attachment",
+      field: 'files',
+      headerName: 'Attachment',
       flex: 0,
       width: 100,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.files,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
         <>
           {/* {params.data.files.length > 0 ? ( */}
           <Button
             sx={{
-              padding: "14px 14px",
-              minWidth: "40px !important",
-              borderRadius: "50% !important",
-              ":hover": {
-                backgroundColor: "#80808036", // theme.palette.primary.main
+              padding: '14px 14px',
+              minWidth: '40px !important',
+              borderRadius: '50% !important',
+              ':hover': {
+                backgroundColor: '#80808036', // theme.palette.primary.main
               },
             }}
             onClick={() => getimgbillCode(params.data.id)}
@@ -2151,17 +1845,17 @@ function AssetDetailsList() {
       ),
     },
     {
-      field: "actions",
-      headerName: "Action",
+      field: 'actions',
+      headerName: 'Action',
       flex: 0,
       width: 290,
-      minHeight: "40px !important",
+      minHeight: '40px !important',
       sortable: false,
       hide: !columnVisibility.actions,
-      headerClassName: "bold-header",
+      headerClassName: 'bold-header',
       cellRenderer: (params) => (
-        <Grid sx={{ display: "flex" }}>
-          {isUserRoleCompare?.includes("eassetmaster") && (
+        <Grid sx={{ display: 'flex' }}>
+          {isUserRoleCompare?.includes('eassetmaster') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -2171,7 +1865,7 @@ function AssetDetailsList() {
               <EditOutlinedIcon sx={buttonStyles.buttonedit} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("dassetmaster") && (
+          {isUserRoleCompare?.includes('dassetmaster') && (
             <Button
               sx={userStyle.buttondelete}
               onClick={(e) => {
@@ -2181,7 +1875,7 @@ function AssetDetailsList() {
               <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("vassetmaster") && (
+          {isUserRoleCompare?.includes('vassetmaster') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -2192,7 +1886,7 @@ function AssetDetailsList() {
               <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />
             </Button>
           )}
-          {isUserRoleCompare?.includes("iassetmaster") && (
+          {isUserRoleCompare?.includes('iassetmaster') && (
             <Button
               sx={userStyle.buttonedit}
               onClick={() => {
@@ -2208,8 +1902,7 @@ function AssetDetailsList() {
     },
   ];
 
-  const filteredSelectedColumn = columnDataTable.filter(data => data.field !== 'checkbox' && data.field !== "actions" && data.field !== "serialNumber");
-
+  const filteredSelectedColumn = columnDataTable.filter((data) => data.field !== 'checkbox' && data.field !== 'actions' && data.field !== 'serialNumber');
 
   const rowDataTable = items?.map((item, index) => {
     return {
@@ -2241,7 +1934,7 @@ function AssetDetailsList() {
       vendor: item.vendor,
       vendorgroup: item.vendorgroup,
       customercare: item.customercare,
-      stockcode: item.materialcountcode + "#" + item.serialNumber,
+      stockcode: item.materialcountcode + '#' + item.serialNumber,
       files: item.files,
       status: item.status,
     };
@@ -2260,9 +1953,7 @@ function AssetDetailsList() {
     setColumnVisibility(updatedVisibility);
   };
 
-  const filteredColumns = columnDataTable.filter((column) =>
-    column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase())
-  );
+  const filteredColumns = columnDataTable.filter((column) => column.headerName.toLowerCase().includes(searchQueryManage.toLowerCase()));
   const toggleColumnVisibility = (field) => {
     setColumnVisibility((prevVisibility) => ({
       ...prevVisibility,
@@ -2272,9 +1963,9 @@ function AssetDetailsList() {
   const manageColumnsContent = (
     <Box
       style={{
-        padding: "10px",
-        minWidth: "325px",
-        "& .MuiDialogContent-root": { padding: "10px 0" },
+        padding: '10px',
+        minWidth: '325px',
+        '& .MuiDialogContent-root': { padding: '10px 0' },
       }}
     >
       <Typography variant="h6">Manage Columns</Typography>
@@ -2282,7 +1973,7 @@ function AssetDetailsList() {
         aria-label="close"
         onClick={handleCloseManageColumns}
         sx={{
-          position: "absolute",
+          position: 'absolute',
           right: 8,
           top: 8,
           color: (theme) => theme.palette.grey[500],
@@ -2290,38 +1981,16 @@ function AssetDetailsList() {
       >
         <CloseIcon />
       </IconButton>
-      <Box sx={{ position: "relative", margin: "10px" }}>
-        <TextField
-          label="Find column"
-          variant="standard"
-          fullWidth
-          value={searchQueryManage}
-          onChange={(e) => setSearchQueryManage(e.target.value)}
-          sx={{ marginBottom: 5, position: "absolute" }}
-        />
+      <Box sx={{ position: 'relative', margin: '10px' }}>
+        <TextField label="Find column" variant="standard" fullWidth value={searchQueryManage} onChange={(e) => setSearchQueryManage(e.target.value)} sx={{ marginBottom: 5, position: 'absolute' }} />
       </Box>
       <br />
       <br />
-      <DialogContent
-        sx={{ minWidth: "auto", height: "200px", position: "relative" }}
-      >
-        <List sx={{ overflow: "auto", height: "100%" }}>
+      <DialogContent sx={{ minWidth: 'auto', height: '200px', position: 'relative' }}>
+        <List sx={{ overflow: 'auto', height: '100%' }}>
           {filteredColumns.map((column) => (
             <ListItem key={column.field}>
-              <ListItemText
-                sx={{ display: "flex" }}
-                primary={
-                  <Switch
-                    sx={{ marginTop: "-5px" }}
-                    size="small"
-                    checked={columnVisibility[column.field]}
-                    onChange={() => toggleColumnVisibility(column.field)}
-                  />
-                }
-                secondary={
-                  column.field === "checkbox" ? "Checkbox" : column.headerName
-                }
-              />
+              <ListItemText sx={{ display: 'flex' }} primary={<Switch sx={{ marginTop: '-5px' }} size="small" checked={columnVisibility[column.field]} onChange={() => toggleColumnVisibility(column.field)} />} secondary={column.field === 'checkbox' ? 'Checkbox' : column.headerName} />
             </ListItem>
           ))}
         </List>
@@ -2329,11 +1998,7 @@ function AssetDetailsList() {
       <DialogActions>
         <Grid container>
           <Grid item md={4}>
-            <Button
-              variant="text"
-              sx={{ textTransform: "none" }}
-              onClick={() => setColumnVisibility(initialColumnVisibility)}
-            >
+            <Button variant="text" sx={{ textTransform: 'none' }} onClick={() => setColumnVisibility(initialColumnVisibility)}>
               Show All
             </Button>
           </Grid>
@@ -2341,7 +2006,7 @@ function AssetDetailsList() {
           <Grid item md={4}>
             <Button
               variant="text"
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: 'none' }}
               onClick={() => {
                 const newColumnVisibility = {};
                 columnDataTable.forEach((column) => {
@@ -2403,13 +2068,7 @@ function AssetDetailsList() {
     //       u.unit === assetdetailEdit.unit
     //   );
     // } else {
-    filteredWorksedit = workStationOpt?.filter(
-      (u) =>
-        u.company === assetdetailEdit.company &&
-        u.branch === assetdetailEdit.branch &&
-        u.unit === assetdetailEdit.unit &&
-        u.floor === assetdetailEdit.floor
-    );
+    filteredWorksedit = workStationOpt?.filter((u) => u.company === assetdetailEdit.company && u.branch === assetdetailEdit.branch && u.unit === assetdetailEdit.unit && u.floor === assetdetailEdit.floor);
     // }
     // const result = filteredWorksedit?.flatMap((item) => {
     //   return item.combinstation.flatMap((combinstationItem) => {
@@ -2434,52 +2093,29 @@ function AssetDetailsList() {
     //   });
     // });
 
-
-
     const result = filteredWorksedit?.flatMap((item) => {
       return item.combinstation.flatMap((combinstationItem) => {
         return combinstationItem.subTodos.length > 0
-          ? combinstationItem.subTodos.map(
-            (subTodo) => {
-              let workStat = subTodo.subcabinname +
-                "(" +
-                item.branch +
-                "-" +
-                item.floor +
-                ")"
+          ? combinstationItem.subTodos.map((subTodo) => {
+            let workStat = subTodo.subcabinname + '(' + item.branch + '-' + item.floor + ')';
 
-              return {
-                ...item,
-                finalworkstation: workStat,
-                finalindividualcabinname: subTodo.subcabinname
-              }
-            }
-
-          )
+            return {
+              ...item,
+              finalworkstation: workStat,
+              finalindividualcabinname: subTodo.subcabinname,
+            };
+          })
           : [
             {
               ...item,
-              finalworkstation: combinstationItem.cabinname +
-                "(" +
-                item.branch +
-                "-" +
-                item.floor +
-                ")",
-              finalindividualcabinname: combinstationItem.cabinname
-            }
-
-
+              finalworkstation: combinstationItem.cabinname + '(' + item.branch + '-' + item.floor + ')',
+              finalindividualcabinname: combinstationItem.cabinname,
+            },
           ];
       });
     });
-    const updatedResult = result.map(mainObj => {
-      const match = workStationSystemName?.find(secObj =>
-        secObj.company === mainObj.company &&
-        secObj.branch === mainObj.branch &&
-        secObj.unit === mainObj.unit &&
-        secObj.floor === mainObj.floor &&
-        secObj.cabinname === mainObj.finalindividualcabinname
-      );
+    const updatedResult = result.map((mainObj) => {
+      const match = workStationSystemName?.find((secObj) => secObj.company === mainObj.company && secObj.branch === mainObj.branch && secObj.unit === mainObj.unit && secObj.floor === mainObj.floor && secObj.cabinname === mainObj.finalindividualcabinname);
 
       if (match) {
         return { ...mainObj, systemshortname: match.systemshortname }; // Add systemshortname to matched object
@@ -2488,15 +2124,13 @@ function AssetDetailsList() {
       return mainObj; // Return original object if no match is found
     });
 
-
     setFilteredWorkStation(
       updatedResult.flat()?.map((d) => ({
         ...d,
         // label: d,
         // value: d,
-        label: d?.systemshortname
-          ? `${d?.finalworkstation}(${d?.systemshortname})`
-          : d?.finalworkstation, value: d?.finalworkstation,
+        label: d?.systemshortname ? `${d?.finalworkstation}(${d?.systemshortname})` : d?.finalworkstation,
+        value: d?.finalworkstation,
       }))
     );
   }, [assetdetailEdit, isEditOpen]);
@@ -2511,9 +2145,7 @@ function AssetDetailsList() {
     setFloorEdit(floorall);
   };
   const fetchAreaEdit = async (a, e) => {
-    let result = allareagrouping
-      .filter((d) => d.branch === a && d.floor === e)
-      .map((data) => data.area);
+    let result = allareagrouping.filter((d) => d.branch === a && d.floor === e).map((data) => data.area);
     let ji = [].concat(...result);
     const all = ji.map((d) => ({
       ...d,
@@ -2525,12 +2157,10 @@ function AssetDetailsList() {
 
   //get all Locations edit.
   const fetchAllLocationEdit = async (a, b, c) => {
-    let result = alllocationgrouping
-      .filter((d) => d.branch === a && d.floor === b && d.area === c)
-      .map((data) => data.location);
+    let result = alllocationgrouping.filter((d) => d.branch === a && d.floor === b && d.area === c).map((data) => data.location);
     let ji = [].concat(...result);
     const all = [
-      { label: "ALL", value: "ALL" },
+      { label: 'ALL', value: 'ALL' },
       ...ji.map((d) => ({
         ...d,
         label: d,
@@ -2552,9 +2182,7 @@ function AssetDetailsList() {
         },
       });
 
-      let result = res.data.assetworkstation?.filter(
-        (d) => d.workstation === assetdetailEdit.material
-      );
+      let result = res.data.assetworkstation?.filter((d) => d.workstation === assetdetailEdit.material);
 
       const resultall = result?.map((d) => ({
         ...d,
@@ -2587,22 +2215,29 @@ function AssetDetailsList() {
       });
       setOvProjCount(res?.data?.count);
 
-
-      setGetOverallCount(`The ${`${d.company + " ," +
-        d.branch + " ," +
-        d.unit + " ," +
-        d.floor + " ," +
-        d.area + " ," +
-        d.location + " ," +
+      setGetOverallCount(`The ${`${d.company +
+        ' ,' +
+        d.branch +
+        ' ,' +
+        d.unit +
+        ' ,' +
+        d.floor +
+        ' ,' +
+        d.area +
+        ' ,' +
+        d.location +
+        ' ,' +
         // d.workstation + " ," +
-        d.assetmaterial + " ," +
-        d.code + " ,"
+        d.assetmaterial +
+        ' ,' +
+        d.code +
+        ' ,'
         } `} is linked in
-          ${res?.data?.assetmaterialip?.length > 0 ? "Asset Material IP," : ""}
-        ${res?.data?.assetworkstationgrouping?.length > 0 ? "Asset Workstation Grouping ," : ""} 
-         ${res?.data?.maintenancemaster?.length > 0 ? "Maintenance Master," : ""}
-        ${res?.data?.assetempdistribution?.length > 0 ? "Employee Asset Distribution ," : ""} 
-        ${res?.data?.maintenancenonschedulegrouping?.length > 0 ? "Maintenance Non Schedule Grouping ," : ""}
+          ${res?.data?.assetmaterialip?.length > 0 ? 'Asset Material IP,' : ''}
+        ${res?.data?.assetworkstationgrouping?.length > 0 ? 'Asset Workstation Grouping ,' : ''} 
+         ${res?.data?.maintenancemaster?.length > 0 ? 'Maintenance Master,' : ''}
+        ${res?.data?.assetempdistribution?.length > 0 ? 'Employee Asset Distribution ,' : ''} 
+        ${res?.data?.maintenancenonschedulegrouping?.length > 0 ? 'Maintenance Non Schedule Grouping ,' : ''}
         
         whether you want to do changes ..??`);
     } catch (err) {
@@ -2620,30 +2255,15 @@ function AssetDetailsList() {
         oldname: ovProj,
       });
 
-      sendEditRequestOverall(
-
-        res?.data?.assetmaterialip,
-        res?.data?.assetworkstationgrouping,
-        res?.data?.maintenancemaster,
-        res?.data?.assetempdistribution,
-        res?.data?.maintenancenonschedulegrouping,
-
-      );
+      sendEditRequestOverall(res?.data?.assetmaterialip, res?.data?.assetworkstationgrouping, res?.data?.maintenancemaster, res?.data?.assetempdistribution, res?.data?.maintenancenonschedulegrouping);
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
 
-  const sendEditRequestOverall = async (
-    assetmaterialip, assetworkstationgrouping, maintenancemaster,
-    assetempdistribution, maintenancenonschedulegrouping) => {
+  const sendEditRequestOverall = async (assetmaterialip, assetworkstationgrouping, maintenancemaster, assetempdistribution, maintenancenonschedulegrouping) => {
     try {
-
       if (assetmaterialip.length > 0) {
-
-
-
-
         let answ = assetmaterialip.map((d, i) => {
           let res = axios.put(`${SERVICE.ASSETMATERIALIP_SINGLE}/${d._id}`, {
             headers: {
@@ -2655,19 +2275,11 @@ function AssetDetailsList() {
             floor: String(assetdetailEdit.floor),
             location: String(assetdetailEdit.location),
             area: String(assetdetailEdit.area),
-
           });
         });
       }
 
-
-
-
-
-
       if (assetworkstationgrouping.length > 0) {
-
-
         let answ = assetworkstationgrouping.map((d, i) => {
           let res = axios.put(`${SERVICE.ASSETWORKSTATIONGROUP_SINGLE}/${d._id}`, {
             headers: {
@@ -2680,18 +2292,11 @@ function AssetDetailsList() {
             floor: String(assetdetailEdit.floor),
             location: String(assetdetailEdit.location),
             area: String(assetdetailEdit.area),
-
           });
         });
       }
 
-
-
-
       if (maintenancemaster.length > 0) {
-
-
-
         let answ = maintenancemaster.map((d, i) => {
           let res = axios.put(`${SERVICE.MAINTENTANCE_SINGLE}/${d._id}`, {
             headers: {
@@ -2703,17 +2308,11 @@ function AssetDetailsList() {
             floor: String(assetdetailEdit.floor),
             location: String(assetdetailEdit.location),
             area: String(assetdetailEdit.area),
-
           });
         });
       }
 
-
-
-
       if (assetempdistribution.length > 0) {
-
-
         let answ = assetempdistribution.map((d, i) => {
           let res = axios.put(`${SERVICE.EMPLOYEEASSET_SINGLE}/${d._id}`, {
             headers: {
@@ -2726,14 +2325,11 @@ function AssetDetailsList() {
             floor: String(assetdetailEdit.floor),
             location: String(assetdetailEdit.location),
             area: String(assetdetailEdit.area),
-
           });
         });
       }
 
       if (maintenancenonschedulegrouping.length > 0) {
-
-
         let answ = maintenancenonschedulegrouping.map((d, i) => {
           let res = axios.put(`${SERVICE.SINGLE_TASK_MAINTENANCE_NONSCHEDULEGROUPING}/${d._id}`, {
             headers: {
@@ -2745,17 +2341,13 @@ function AssetDetailsList() {
             floorto: String(assetdetailEdit.floor),
             locationto: String(assetdetailEdit.location),
             areato: String(assetdetailEdit.area),
-
           });
         });
       }
-
-
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
     }
   };
-
 
   const handleFileDeleteOld = async (filenames) => {
     try {
@@ -2766,7 +2358,7 @@ function AssetDetailsList() {
         filenames: filenames,
       });
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
@@ -2782,21 +2374,10 @@ function AssetDetailsList() {
 
   const handleFileUpload = async (selectedFilesall, type, uniqueId) => {
     try {
-      // console.log(selectedFilesall, "selectedFilesall");
-      // let selectedFiles = selectedFilesall;
-      // .flatMap(t => [{ ...t.files, uniqueId: t.uniqueId }])
-      // let uniqueId = selectedFilesall[0].uniqueId
-      // let selectedFiles = selectedFilesall.flatMap(t =>
-      //   Array.from(t.files).map(file => ({ ...file, uniqueId: t.uniqueId }))
-      // );
-
-      const selectedFiles = selectedFilesall.map(file =>
-        base64ToFile(file.preview, file.name, file.type)
-      );
+      const selectedFiles = selectedFilesall.map((file) => base64ToFile(file.preview, file.name, file.type));
 
       const uploadFiles = async () => {
         for (const selectedFile of selectedFiles) {
-          // console.log(selectedFile, "selectedFile");
           const chunkSize = 5 * 1024 * 1024; // 5MB (adjust based on your requirements)
           const totalChunks = Math.ceil(selectedFile.size / chunkSize);
           const chunkProgress = 100 / totalChunks;
@@ -2813,24 +2394,20 @@ function AssetDetailsList() {
                 }
 
                 const chunk = selectedFile.slice(start, end, selectedFile.type);
-                // console.log(chunk, "chunk");
 
                 const formData = new FormData();
-                formData.append("file", chunk);
-                formData.append("chunkNumber", chunkNumber);
-                formData.append("totalChunks", totalChunks);
-                formData.append("filesize", selectedFile.size);
-                formData.append("originalname", `${uniqueId}$${type}$${selectedFile.name}`);
-
-                // console.log(formData, "formData");
+                formData.append('file', chunk);
+                formData.append('chunkNumber', chunkNumber);
+                formData.append('totalChunks', totalChunks);
+                formData.append('filesize', selectedFile.size);
+                formData.append('originalname', `${uniqueId}$${type}$${selectedFile.name}`);
 
                 try {
                   const response = await axios.post(SERVICE.UPLOAD_CHUNK_ASSET_DETAILS, formData, {
                     headers: {
-                      "Content-Type": "multipart/form-data",
+                      'Content-Type': 'multipart/form-data',
                     },
                   });
-                  // console.log(response, "response");
                   const temp = `Chunk ${chunkNumber + 1}/${totalChunks} uploaded successfully for ${selectedFile.name}`;
 
                   start = end;
@@ -2838,7 +2415,7 @@ function AssetDetailsList() {
 
                   uploadNextChunk();
                 } catch (err) {
-                  console.log(err, "ERrer");
+                  console.log(err, 'ERrer');
                   handleApiError(err, setShowAlert, handleClickOpenerr);
                 }
               } else {
@@ -2846,99 +2423,85 @@ function AssetDetailsList() {
                 console.log(`File upload completed for ${selectedFile.name}`);
               }
             } catch (err) {
-              console.log(err, "asdfse");
+              console.log(err, 'asdfse');
             }
           };
 
           await uploadNextChunk();
         }
-        // setSelectedFiles([]);
-        // console.log("All file uploads completed");
       };
 
       uploadFiles();
     } catch (err) {
-      console.log(err, "errfile");
+      console.log(err, 'errfile');
     }
   };
 
   //editing the single data...
   const sendEditRequest = async () => {
     try {
-      let res = await axios.put(
-        `${SERVICE.ASSETDETAIL_SINGLE}/${subprojectsid}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
+      let res = await axios.put(`${SERVICE.ASSETDETAIL_SINGLE}/${subprojectsid}`, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        company: String(assetdetailEdit.company),
+        branch: String(assetdetailEdit.branch),
+        unit: String(assetdetailEdit.unit),
+        floor: String(assetdetailEdit.floor),
+        location: String(assetdetailEdit.location),
+        area: String(assetdetailEdit.area),
+        ebusage: String(assetdetailEdit.ebusage),
+        biometric: String(assetdetailEdit.biometric),
+        workstation: String(assetdetailEdit.workcheck ? assetdetailEdit.workstation : ''),
+        workcheck: String(assetdetailEdit.workcheck),
+        assettype: String(assetdetailEdit.assettype == undefined ? '' : assetdetailEdit.assettype),
+        asset: String(assetdetailEdit.asset),
+        material: String(assetdetailEdit.material),
+        component: String(assetdetailEdit.component),
+        subcomponent: todosEdit ? [...todosEdit] : [],
+        code: String(assetdetailEdit.code),
+        countquantity: String(assetdetailEdit.countquantity),
+        materialcountcode: String(assetdetailEdit.materialcountcode),
+        serial: String(assetdetailEdit.serial),
+        rate: String(assetdetailEdit.rate),
+        overallrate: Boolean(assetdetailEdit.overallrate),
+        warranty: String(assetdetailEdit.warranty),
+        estimation: String(assetdetailEdit.estimation),
+        estimationtime: String(assetdetailEdit.estimationtime),
+        warrantycalculation: String(assetdetailEdit.warrantycalculation),
+        purchasedate: selectedPurchaseDateEdit,
+        vendorid: String(vendornameidEdit),
+        vendor: String(vendor),
+        vendorgroup: String(vendorGroup),
+        customercare: String(assetdetailEdit.customercare),
+        stockcode: String(assetdetailEdit.stockcode),
+        address: String(vendorgetidEdit.address),
+        phonenumber: String(vendorgetidEdit.phonenumber),
+        // files: [...refImageedit,
+        // ...refImageDragedit,
+        // ...capturedImagesedit],
+        files: [...refImageedit, ...refImageDragedit, ...capturedImagesedit].map((item) => ({ name: item.name, remarks: item.remarks })),
+
+        uniqueId: assetdetailEdit.uniqueId,
+        status: 'In Working',
+        assignedthrough: 'ASSET',
+        updatedby: [
+          ...updateby,
+          {
+            name: String(isUserRoleAccess.companyname),
+            // date: String(new Date(serverTime)),
           },
-          company: String(assetdetailEdit.company),
-          branch: String(assetdetailEdit.branch),
-          unit: String(assetdetailEdit.unit),
-          floor: String(assetdetailEdit.floor),
-          location: String(assetdetailEdit.location),
-          area: String(assetdetailEdit.area),
-          ebusage: String(assetdetailEdit.ebusage),
-          biometric: String(assetdetailEdit.biometric),
-          workstation: String(
-            assetdetailEdit.workcheck ? assetdetailEdit.workstation : ""
-          ),
-          workcheck: String(assetdetailEdit.workcheck),
-          assettype: String(
-            assetdetailEdit.assettype == undefined
-              ? ""
-              : assetdetailEdit.assettype
-          ),
-          asset: String(assetdetailEdit.asset),
-          material: String(assetdetailEdit.material),
-          component: String(assetdetailEdit.component),
-          subcomponent: todosEdit ? [...todosEdit] : [],
-          code: String(assetdetailEdit.code),
-          countquantity: String(assetdetailEdit.countquantity),
-          materialcountcode: String(assetdetailEdit.materialcountcode),
-          serial: String(assetdetailEdit.serial),
-          rate: String(assetdetailEdit.rate),
-          overallrate: Boolean(assetdetailEdit.overallrate),
-          warranty: String(assetdetailEdit.warranty),
-          estimation: String(assetdetailEdit.estimation),
-          estimationtime: String(assetdetailEdit.estimationtime),
-          warrantycalculation: String(assetdetailEdit.warrantycalculation),
-          purchasedate: selectedPurchaseDateEdit,
-          vendorid: String(vendornameidEdit),
-          vendor: String(vendor),
-          vendorgroup: String(vendorGroup),
-          customercare: String(assetdetailEdit.customercare),
-          stockcode: String(assetdetailEdit.stockcode),
-          address: String(vendorgetidEdit.address),
-          phonenumber: String(vendorgetidEdit.phonenumber),
-          // files: [...refImageedit,
-          // ...refImageDragedit,
-          // ...capturedImagesedit],
-          files: [...refImageedit, ...refImageDragedit, ...capturedImagesedit].map(item => ({ name: item.name, remarks: item.remarks })),
-
-          uniqueId: assetdetailEdit.uniqueId,
-          status: "In Working",
-          assignedthrough: "ASSET",
-          updatedby: [
-            ...updateby,
-            {
-              name: String(isUserRoleAccess.companyname),
-              date: String(new Date()),
-            },
-          ],
-        }
-      );
-
-
+        ],
+      });
 
       await getOverallEditSectionUpdate();
       await handleFileDeleteOld(oldfileNamesBill);
-      await handleFileUpload([...refImageedit, ...refImageDragedit, ...capturedImagesedit], "bill", assetdetailEdit.uniqueId);
+      await handleFileUpload([...refImageedit, ...refImageDragedit, ...capturedImagesedit], 'bill', assetdetailEdit.uniqueId);
 
-
-      fetchAssetDetails("Filtered");
+      fetchAssetDetails('Filtered');
       handleCloseModEdit();
-      setPopupContent("Updated Successfully");
-      setPopupSeverity("success");
+      setPopupContent('Updated Successfully');
+      setPopupSeverity('success');
       handleClickOpenPopup();
     } catch (err) {
       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
@@ -2946,104 +2509,70 @@ function AssetDetailsList() {
   };
   const editSubmit = (e) => {
     e.preventDefault();
-    setPageName(!pageName)
+    setPageName(!pageName);
 
-    if (assetdetailEdit.company === "Please Select Company") {
-      setPopupContentMalert("Please Select Company!");
-      setPopupSeverityMalert("info");
+    if (assetdetailEdit.company === 'Please Select Company') {
+      setPopupContentMalert('Please Select Company!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (assetdetailEdit.branch === "Please Select Branch") {
-      setPopupContentMalert("Please Select Branch!");
-      setPopupSeverityMalert("info");
+    } else if (assetdetailEdit.branch === 'Please Select Branch') {
+      setPopupContentMalert('Please Select Branch!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (assetdetailEdit.unit === "Please Select Unit") {
-      setPopupContentMalert("Please Select Unit!");
-      setPopupSeverityMalert("info");
+    } else if (assetdetailEdit.unit === 'Please Select Unit') {
+      setPopupContentMalert('Please Select Unit!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (assetdetailEdit.floor === "Please Select Floor") {
-      setPopupContentMalert("Please Select Floor!");
-      setPopupSeverityMalert("info");
+    } else if (assetdetailEdit.floor === 'Please Select Floor') {
+      setPopupContentMalert('Please Select Floor!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (assetdetailEdit.area === "Please Select Area") {
-      setPopupContentMalert("Please Select Area!");
-      setPopupSeverityMalert("info");
+    } else if (assetdetailEdit.area === 'Please Select Area') {
+      setPopupContentMalert('Please Select Area!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (assetdetailEdit.location === "Please Select Location") {
-      setPopupContentMalert("Please Select Location!");
-      setPopupSeverityMalert("info");
+    } else if (assetdetailEdit.location === 'Please Select Location') {
+      setPopupContentMalert('Please Select Location!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (
-      assetdetailEdit.ebusage === "Please Select EB Usage" ||
-      assetdetailEdit.ebusage === ""
-    ) {
-      setPopupContentMalert("Please Select EB Usage!");
-      setPopupSeverityMalert("info");
+    } else if (assetdetailEdit.ebusage === 'Please Select EB Usage' || assetdetailEdit.ebusage === '') {
+      setPopupContentMalert('Please Select EB Usage!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      assetdetailEdit.biometric === "Please Select Biometric" ||
-      assetdetailEdit.biometric === ""
-    ) {
-      setPopupContentMalert("Please Select Biometric!");
-      setPopupSeverityMalert("info");
+    } else if (assetdetailEdit.biometric === 'Please Select Biometric' || assetdetailEdit.biometric === '') {
+      setPopupContentMalert('Please Select Biometric!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    }
-    else if (
-      vendorGroup === "" ||
-      vendorGroup === "Please Select Vendor Group"
-    ) {
-      setPopupContentMalert("Please Select Vendor Group!");
-      setPopupSeverityMalert("info");
+    } else if (vendorGroup === '' || vendorGroup === 'Please Select Vendor Group') {
+      setPopupContentMalert('Please Select Vendor Group!');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
-    } else if (vendor === "" || vendor === "Please Select Vendor") {
-      setPopupContentMalert("Please Select Vendor!");
-      setPopupSeverityMalert("info");
+    } else if (vendor === '' || vendor === 'Please Select Vendor') {
+      setPopupContentMalert('Please Select Vendor!');
+      setPopupSeverityMalert('info');
+      handleClickOpenPopupMalert();
+    } else if (assetdetailEdit.warranty == 'Yes' && assetdetailEdit.estimation === '') {
+      setPopupContentMalert('Please Enter Warranty Time');
+      setPopupSeverityMalert('info');
       handleClickOpenPopupMalert();
     } else if (
-      assetdetailEdit.warranty == "Yes" &&
-      assetdetailEdit.estimation === ""
-    ) {
-      setPopupContentMalert("Please Enter Warranty Time");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
-    else if (assetdetailEdit.biometric === "Yes" &&   todosEdit.some(d =>d.subcomponentcheck === true&& d.brand && (d.brand === "Please Select Brand" || d.brand === ""))) {
-      setPopupContentMalert("Please Select Brand");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
-    else if (assetdetailEdit.biometric === "Yes" &&   todosEdit.some(d =>d.subcomponentcheck === true && d.model && (d.model === "Please Select Model" || d.model === ""))) {
-      setPopupContentMalert("Please Select Model");
-      setPopupSeverityMalert("info");
-      handleClickOpenPopupMalert();
-    }
-    else if (
-      (assetdetailEdit.company != ovProj[0].company ||
-        assetdetailEdit.branch != ovProj[0].branch ||
-        assetdetailEdit.unit != ovProj[0].unit ||
-        assetdetailEdit.floor != ovProj[0].floor ||
-        assetdetailEdit.area != ovProj[0].area ||
-        assetdetailEdit.location != ovProj[0].location
-      )
-      && ovProjCount > 0
+      (assetdetailEdit.company != ovProj[0].company || assetdetailEdit.branch != ovProj[0].branch || assetdetailEdit.unit != ovProj[0].unit || assetdetailEdit.floor != ovProj[0].floor || assetdetailEdit.area != ovProj[0].area || assetdetailEdit.location != ovProj[0].location) &&
+      ovProjCount > 0
     ) {
       setShowAlertpop(
         <>
-          <ErrorOutlineOutlinedIcon
-            sx={{ fontSize: "100px", color: "orange" }}
-          />
-          <p style={{ fontSize: "20px", fontWeight: 900 }}>{getOverAllCount}</p>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '100px', color: 'orange' }} />
+          <p style={{ fontSize: '20px', fontWeight: 900 }}>{getOverAllCount}</p>
         </>
       );
       handleClickOpenerrpop();
-    }
-    else {
+    } else {
       sendEditRequest();
     }
   };
 
   const [vendorgetidEdit, setVendorgetidEdit] = useState({});
-  const [vendornameidEdit, setVendornameidEdit] = useState("");
+  const [vendornameidEdit, setVendornameidEdit] = useState('');
 
   const vendoridEdit = async (id) => {
     try {
@@ -3072,12 +2601,12 @@ function AssetDetailsList() {
   };
   const webcamClose = () => {
     setIsWebcamOpen(false);
-    setGetImg("");
+    setGetImg('');
   };
   const webcamDataStore = () => {
     setIsWebcamCapture(true);
     webcamClose();
-    setGetImg("");
+    setGetImg('');
   };
   const showWebcam = () => {
     webcamOpen();
@@ -3087,24 +2616,24 @@ function AssetDetailsList() {
 
   const handleUploadPopupClose = () => {
     setUploadPopupOpen(false);
-    setGetImg("");
+    setGetImg('');
     setRefImage([]);
     setPreviewURL(null);
     setRefImageDrag([]);
     setCapturedImages([]);
   };
   const getFileIcon = (fileName) => {
-    const extension1 = fileName?.split(".").pop();
+    const extension1 = fileName?.split('.').pop();
     switch (extension1) {
-      case "pdf":
+      case 'pdf':
         return pdfIcon;
-      case "doc":
-      case "docx":
+      case 'doc':
+      case 'docx':
         return wordIcon;
-      case "xls":
-      case "xlsx":
+      case 'xls':
+      case 'xlsx':
         return excelIcon;
-      case "csv":
+      case 'csv':
         return csvIcon;
       default:
         return fileIcon;
@@ -3119,7 +2648,7 @@ function AssetDetailsList() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -3127,14 +2656,14 @@ function AssetDetailsList() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImage(newSelectedFiles);
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -3148,9 +2677,9 @@ function AssetDetailsList() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
   const removeCapturedImage = (index) => {
     const newCapturedImages = [...capturedImagesedit];
@@ -3164,9 +2693,8 @@ function AssetDetailsList() {
     setRefImageDragedit(newSelectedFiles);
   };
 
-
   const resetImage = () => {
-    setGetImg("");
+    setGetImg('');
     setRefImage([]);
     setPreviewURL(null);
     setRefImageDrag([]);
@@ -3182,7 +2710,7 @@ function AssetDetailsList() {
     let newSelectedFilesDrag = [...refImageDrag];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFilesDrag.push({
@@ -3190,14 +2718,14 @@ function AssetDetailsList() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImageDrag(newSelectedFilesDrag);
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -3215,10 +2743,6 @@ function AssetDetailsList() {
     }
   };
 
-
-
-
-
   const [refImageedit, setRefImageedit] = useState([]);
   const [previewURLedit, setPreviewURLedit] = useState(null);
   const [refImageDragedit, setRefImageDragedit] = useState([]);
@@ -3227,39 +2751,26 @@ function AssetDetailsList() {
   const [capturedImagesedit, setCapturedImagesedit] = useState([]);
   const [getImgedit, setGetImgedit] = useState(null);
 
-
   const handleRemarkChangeUpload = (value, index) => {
-    setRefImageedit((prev) =>
-      prev.map((file, i) =>
-        i === index ? { ...file, remarks: value } : file
-      )
-    );
+    setRefImageedit((prev) => prev.map((file, i) => (i === index ? { ...file, remarks: value } : file)));
   };
   const handleRemarkChangeWebCam = (value, index) => {
-    setCapturedImagesedit((prev) =>
-      prev.map((file, i) =>
-        i === index ? { ...file, remarks: value } : file
-      )
-    );
+    setCapturedImagesedit((prev) => prev.map((file, i) => (i === index ? { ...file, remarks: value } : file)));
   };
 
   const handleRemarkChangeDragDrop = (value, index) => {
-    setRefImageDrag((prev) =>
-      prev.map((file, i) =>
-        i === index ? { ...file, remarks: value } : file
-      )
-    );
+    setRefImageDrag((prev) => prev.map((file, i) => (i === index ? { ...file, remarks: value } : file)));
   };
   const webcamOpenedit = () => {
     setIsWebcamOpenedit(true);
   };
   const webcamCloseedit = () => {
     setIsWebcamOpenedit(false);
-    setGetImgedit("");
+    setGetImgedit('');
   };
   const webcamDataStoreedit = () => {
     webcamCloseedit();
-    setGetImgedit("");
+    setGetImgedit('');
   };
   const showWebcamedit = () => {
     webcamOpenedit();
@@ -3280,7 +2791,6 @@ function AssetDetailsList() {
   const [refImgWarrantyBillEdit, setRefImgWarrantyBillEdit] = useState([]);
   const [refImgbillfilenamesEdit, setRefImgbillfilenamesEdit] = useState([]);
 
-
   const handleInputChangeedit = (event) => {
     const files = event.target.files;
     let newSelectedFiles = [...refImageedit];
@@ -3288,7 +2798,7 @@ function AssetDetailsList() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       // Check if the file is an image
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFiles.push({
@@ -3296,7 +2806,7 @@ function AssetDetailsList() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImageedit(newSelectedFiles);
           setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
@@ -3304,17 +2814,16 @@ function AssetDetailsList() {
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
   };
 
-
   const handleFetchBill = (data, remarks) => {
     const files = Array.from(data); // Ensure it's an array
-    const imageFiles = files.filter(file => file.type.startsWith("image/"));
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
     // if (imageFiles.length !== files.length) {
     //   setPopupContentMalert("Only Accept Images!");
@@ -3343,35 +2852,25 @@ function AssetDetailsList() {
 
       reader.readAsDataURL(file);
       fileReaders.push(readerPromise);
-
     });
 
     Promise.all(fileReaders).then((originalFiles) => {
-      // console.log(newSelectedFiles, "newSelectedFiles");
       let dataremark = newSelectedFiles.map((d, index) => {
-        const findRemark = remarks.find((item, i) => i === index)
+        const findRemark = remarks.find((item, i) => i === index);
         return {
           ...d,
-          remarks: findRemark ? findRemark.remarks : ""
-        }
-      })
+          remarks: findRemark ? findRemark.remarks : '',
+        };
+      });
 
-      console.log(dataremark, remarks, "dataremark")
       setRefImageedit(dataremark);
-      setGetImgbillcode(dataremark)
+      setGetImgbillcode(dataremark);
       setRefImgbillfilenamesEdit(newSelectedFiles.map((d) => d.name));
       setRefImgWarrantyBillEdit((existingFiles) => [...existingFiles, originalFiles]);
-
     });
   };
 
-
-
-  let combinedArray = allUploadedFilesedit.concat(
-    refImageedit,
-    refImageDragedit,
-    capturedImagesedit
-  );
+  let combinedArray = allUploadedFilesedit.concat(refImageedit, refImageDragedit, capturedImagesedit);
   let uniqueValues = {};
   let resultArray = combinedArray.filter((item) => {
     if (!uniqueValues[item.name]) {
@@ -3392,12 +2891,12 @@ function AssetDetailsList() {
     const response = await fetch(file.preview);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
   const resetImageedit = () => {
-    setGetImgedit("");
+    setGetImgedit('');
     setRefImageedit([]);
     setPreviewURLedit(null);
     setRefImageDragedit([]);
@@ -3411,7 +2910,7 @@ function AssetDetailsList() {
     let newSelectedFilesDrag = [...refImageDragedit];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => {
           newSelectedFilesDrag.push({
@@ -3419,14 +2918,14 @@ function AssetDetailsList() {
             size: file.size,
             type: file.type,
             preview: reader.result,
-            base64: reader.result.split(",")[1],
+            base64: reader.result.split(',')[1],
           });
           setRefImageDragedit(newSelectedFilesDrag);
         };
         reader.readAsDataURL(file);
       } else {
-        setPopupContentMalert("Only Accept Images!");
-        setPopupSeverityMalert("info");
+        setPopupContentMalert('Only Accept Images!');
+        setPopupSeverityMalert('info');
         handleClickOpenPopupMalert();
       }
     }
@@ -3448,7 +2947,7 @@ function AssetDetailsList() {
     newSelectedFiles.splice(index, 1);
     setRefImageDragedit(newSelectedFiles);
   };
-  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState("");
+  const [selectedPurchaseDateEdit, setSelectedPurchaseDateEdit] = useState('');
 
   const handleEstimationChangeEdit = (e) => {
     const { value } = e.target;
@@ -3461,40 +2960,28 @@ function AssetDetailsList() {
   };
   const formatDateString = (date) => {
     const d = new Date(date);
-    const day = d.getDate().toString().padStart(2, "0");
-    const month = (d.getMonth() + 1).toString().padStart(2, "0");
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
 
   useEffect(() => {
     calculateExpiryDateEdit();
-  }, [
-    assetdetailEdit.estimationtime,
-    assetdetailEdit.estimation,
-    assetdetailEdit.purchasedate,
-  ]);
+  }, [assetdetailEdit.estimationtime, assetdetailEdit.estimation, assetdetailEdit.purchasedate]);
   const calculateExpiryDateEdit = () => {
     if (assetdetailEdit.estimationtime && assetdetailEdit.purchasedate) {
       const currentDate = new Date(assetdetailEdit.purchasedate);
       let expiryDate = new Date(currentDate);
-      if (assetdetailEdit.estimationtime === "Days") {
-        expiryDate.setDate(
-          currentDate.getDate() + parseInt(assetdetailEdit.estimation)
-        );
-      } else if (assetdetailEdit.estimationtime === "Month") {
-        expiryDate.setMonth(
-          currentDate.getMonth() + parseInt(assetdetailEdit.estimation)
-        );
-      } else if (assetdetailEdit.estimationtime === "Year") {
-        expiryDate.setFullYear(
-          currentDate.getFullYear() + parseInt(assetdetailEdit.estimation)
-        );
+      if (assetdetailEdit.estimationtime === 'Days') {
+        expiryDate.setDate(currentDate.getDate() + parseInt(assetdetailEdit.estimation));
+      } else if (assetdetailEdit.estimationtime === 'Month') {
+        expiryDate.setMonth(currentDate.getMonth() + parseInt(assetdetailEdit.estimation));
+      } else if (assetdetailEdit.estimationtime === 'Year') {
+        expiryDate.setFullYear(currentDate.getFullYear() + parseInt(assetdetailEdit.estimation));
       }
       const formattedExpiryDate = formatDateString(expiryDate);
-      let formattedempty = formattedExpiryDate.includes("NaN-NaN-NaN")
-        ? ""
-        : formattedExpiryDate;
+      let formattedempty = formattedExpiryDate.includes('NaN-NaN-NaN') ? '' : formattedExpiryDate;
       setAssetdetailEdit({
         ...assetdetailEdit,
         warrantycalculation: formattedempty, // Format date as needed
@@ -3514,7 +3001,7 @@ function AssetDetailsList() {
     setIsPdfFilterOpen(false);
   };
 
-  const [fileFormat, setFormat] = useState("");
+  const [fileFormat, setFormat] = useState('');
 
   // const fetchAssetSort = async () => {
   //   try {
@@ -3562,7 +3049,6 @@ function AssetDetailsList() {
   //   fetchAssetSort();
   // }, [page, pageSize, searchQuery]);
 
-
   const pathname = window.location.pathname;
 
   //Access Module
@@ -3574,58 +3060,55 @@ function AssetDetailsList() {
       },
       empcode: String(isUserRoleAccess?.empcode),
       companyname: String(isUserRoleAccess?.companyname),
-      pagename: String("Asset Master List"),
+      pagename: String('Asset Master List'),
       commonid: String(isUserRoleAccess?._id),
-      date: String(new Date()),
+      date: String(new Date(serverTime)),
 
       addedby: [
         {
           name: String(isUserRoleAccess?.username),
-          date: String(new Date()),
+          // date: String(new Date(serverTime)),
         },
       ],
     });
-
-  }
+  };
 
   useEffect(() => {
     getapi();
   }, []);
 
-
   // Search bar
   const [anchorElSearch, setAnchorElSearch] = React.useState(null);
   const handleClickSearch = (event) => {
     setAnchorElSearch(event.currentTarget);
-    localStorage.removeItem("filterModel");
+    localStorage.removeItem('filterModel');
   };
   const handleCloseSearch = () => {
     setAnchorElSearch(null);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   const openSearch = Boolean(anchorElSearch);
   const idSearch = openSearch ? 'simple-popover' : undefined;
 
   const handleAddFilter = () => {
-    if (selectedColumn && filterValue || ["Blank", "Not Blank"].includes(selectedCondition)) {
-      setAdditionalFilters([
-        ...additionalFilters,
-        { column: selectedColumn, condition: selectedCondition, value: filterValue }
-      ]);
-      setSelectedColumn("");
-      setSelectedCondition("Contains");
-      setFilterValue("");
+    if ((selectedColumn && filterValue) || ['Blank', 'Not Blank'].includes(selectedCondition)) {
+      setAdditionalFilters([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+      setSelectedColumn('');
+      setSelectedCondition('Contains');
+      setFilterValue('');
     }
   };
 
   // Show filtered combination in the search bar
   const getSearchDisplay = () => {
     if (advancedFilter && advancedFilter.length > 0) {
-      return advancedFilter.map((filter, index) => {
-        let showname = columnDataTable.find(col => col.field === filter.column)?.headerName;
-        return `${showname} ${filter.condition} "${filter.value}"`;
-      }).join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
+      return advancedFilter
+        .map((filter, index) => {
+          let showname = columnDataTable.find((col) => col.field === filter.column)?.headerName;
+          return `${showname} ${filter.condition} "${filter.value}"`;
+        })
+        .join(' ' + (advancedFilter.length > 1 ? advancedFilter[1].condition : '') + ' ');
     }
     return searchQuery;
   };
@@ -3639,12 +3122,12 @@ function AssetDetailsList() {
     // Reset all filters and pagination state
     setAdvancedFilter(null);
     setAdditionalFilters([]);
-    setSearchQuery("");
+    setSearchQuery('');
     setIsSearchActive(false);
-    setSelectedColumn("");
-    setSelectedCondition("Contains");
-    setFilterValue("");
-    setLogicOperator("AND");
+    setSelectedColumn('');
+    setSelectedCondition('Contains');
+    setFilterValue('');
+    setLogicOperator('AND');
     setFilteredChanges(null);
 
     const queryParams = {
@@ -3659,14 +3142,14 @@ function AssetDetailsList() {
 
     const allFilters = [];
     // Only include advanced filters if they exist, otherwise just use regular searchQuery
-    if (allFilters.length > 0 && selectedColumn !== "") {
-      queryParams.allFilters = allFilters
+    if (allFilters.length > 0 && selectedColumn !== '') {
+      queryParams.allFilters = allFilters;
       queryParams.logicOperator = logicOperator;
     } else if (searchQuery) {
-      queryParams.searchQuery = searchQuery;  // Use searchQuery for regular search
+      queryParams.searchQuery = searchQuery; // Use searchQuery for regular search
     }
 
-    setPageName(!pageName)
+    setPageName(!pageName);
 
     try {
       let res_employee = await axios.post(SERVICE.ASSET_DATA_FILTER_ACCESS, queryParams, {
@@ -3674,26 +3157,18 @@ function AssetDetailsList() {
           Authorization: `Bearer ${auth.APIToken}`,
         },
       });
-      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result.filter(
-        (data) => data.status === "In Working" || data.status === "Repair" || data.status === "Damage"
-      ) : []
+      const ans = res_employee?.data?.result?.length > 0 ? res_employee?.data?.result.filter((data) => data.status === 'In Working' || data.status === 'Repair' || data.status === 'Damage') : [];
 
-      const updatedResult = ans.map(mainObj => {
+      const updatedResult = ans.map((mainObj) => {
         // Split workstation into multiple cabins
-        const workstations = mainObj.workstation.split(",").map(ws => ws.trim());
+        const workstations = mainObj.workstation.split(',').map((ws) => ws.trim());
 
         // Create a new workstation array with the systemshortname added
-        const updatedWorkstations = workstations?.map(ws => {
-          const cabinName = ws.split("(")[0]; // Extract cabin name from "F-A8(TTS-TRICHY-First Floor)"
+        const updatedWorkstations = workstations?.map((ws) => {
+          const cabinName = ws.split('(')[0]; // Extract cabin name from "F-A8(TTS-TRICHY-First Floor)"
 
           // Find the matching object in workStationSystemName
-          const match = workStationSystemName?.find(secObj =>
-            secObj.company === mainObj.company &&
-            secObj.branch === mainObj.branch &&
-            secObj.unit === mainObj.unit &&
-            secObj.floor === mainObj.floor &&
-            secObj.cabinname === cabinName
-          );
+          const match = workStationSystemName?.find((secObj) => secObj.company === mainObj.company && secObj.branch === mainObj.branch && secObj.unit === mainObj.unit && secObj.floor === mainObj.floor && secObj.cabinname === cabinName);
 
           // If match found, append systemshortname to the workstation label
           if (match) {
@@ -3707,24 +3182,18 @@ function AssetDetailsList() {
         // Return the updated object with the new workstations
         return {
           ...mainObj,
-          workstation: updatedWorkstations.join(", ") // Join updated workstations back with commas
+          workstation: updatedWorkstations.join(', '), // Join updated workstations back with commas
         };
       });
 
-
-
       const itemsWithSerialNumber = updatedResult?.map((item, index) => {
-
         return {
           ...item,
           serialNumber: (page - 1) * pageSize + index + 1,
-          purchasedate: (item.purchasedate === "Invalid date" || item.purchasedate === "" || item.purchasedate === undefined) ? "" : moment(item.purchasedate).format("DD/MM/YYYY"),
-          workstation: item.workstation === "Please Select Workstation" ? "" : item.workstation,
-
-
-        }
+          purchasedate: item.purchasedate === 'Invalid date' || item.purchasedate === '' || item.purchasedate === undefined ? '' : moment(item.purchasedate).format('DD/MM/YYYY'),
+          workstation: item.workstation === 'Please Select Workstation' ? '' : item.workstation,
+        };
       });
-
 
       setAssetdetails(itemsWithSerialNumber);
       setItems(itemsWithSerialNumber);
@@ -3742,101 +3211,61 @@ function AssetDetailsList() {
       // );
       setTotalProjects(ans?.length > 0 ? res_employee?.data?.totalProjects : 0);
       setTotalPages(ans?.length > 0 ? res_employee?.data?.totalPages : 0);
-      setPageSize((data) => { return ans?.length > 0 ? data : 10 });
-      setPage((data) => { return ans?.length > 0 ? data : 1 });
-      setAssetdetailcheck(false)
-    } catch (err) { setAssetdetailcheck(false); handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert); }
+      setPageSize((data) => {
+        return ans?.length > 0 ? data : 10;
+      });
+      setPage((data) => {
+        return ans?.length > 0 ? data : 1;
+      });
+      setAssetdetailcheck(false);
+    } catch (err) {
+      setAssetdetailcheck(false);
+      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+    }
   };
-
-
-
 
   const getLinkedLabelItem = (overalldeletecheck) => {
     const {
-
       assetmaterialip = [],
 
       assetworkstationgrouping = [],
       maintenancemaster = [],
       assetempdistribution = [],
       maintenancenonschedulegrouping = [],
-
     } = overalldeletecheck;
 
-    const labels = [
-      ...assetmaterialip, ...assetworkstationgrouping,
-      ...maintenancemaster, ...assetempdistribution,
-      ...maintenancenonschedulegrouping].filter(
-        (value, index, self) =>
-          index ===
-          self.findIndex(
-            (t) =>
-              t.company === value.company &&
-              t.branch === value.branch &&
-              t.unit === value.unit &&
-              t.floor === value.floor &&
-              t.area === value.area &&
-              t.location === value.location &&
-              t.assetmaterial === value.assetmaterial
-          )
-      )
+    const labels = [...assetmaterialip, ...assetworkstationgrouping, ...maintenancemaster, ...assetempdistribution, ...maintenancenonschedulegrouping].filter(
+      (value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit && t.floor === value.floor && t.area === value.area && t.location === value.location && t.assetmaterial === value.assetmaterial)
+    );
 
     return labels;
   };
 
   const getLinkedLabel = (overalldeletecheck) => {
-    const { assetmaterialip = [],
-      assetworkstationgrouping = [],
-      maintenancemaster = [],
-      assetempdistribution = [],
-      maintenancenonschedulegrouping = [], } = overalldeletecheck;
+    const { assetmaterialip = [], assetworkstationgrouping = [], maintenancemaster = [], assetempdistribution = [], maintenancenonschedulegrouping = [] } = overalldeletecheck;
     const labels = [];
 
+    if (assetmaterialip.length > 0) labels.push('Asset Material IP');
+    if (assetworkstationgrouping.length > 0) labels.push('Asset Workstation Grouping');
+    if (maintenancemaster.length > 0) labels.push('Maintenance Master');
+    if (assetempdistribution.length > 0) labels.push('Asset Employee Distribution');
+    if (maintenancenonschedulegrouping.length > 0) labels.push('Maintenance Non Schedule Grouping');
 
-
-    if (assetmaterialip.length > 0) labels.push("Asset Material IP");
-    if (assetworkstationgrouping.length > 0) labels.push("Asset Workstation Grouping");
-    if (maintenancemaster.length > 0) labels.push("Maintenance Master");
-    if (assetempdistribution.length > 0) labels.push("Asset Employee Distribution");
-    if (maintenancenonschedulegrouping.length > 0) labels.push("Maintenance Non Schedule Grouping");
-
-    return labels.join(", ");
+    return labels.join(', ');
   };
 
   const getFilteredUnits = (assetdetails, selectedRows, overalldeletecheck) => {
-    const {
-      assetmaterialip = [],
-      assetworkstationgrouping = [],
-      maintenancemaster = [],
-      assetempdistribution = [],
-      maintenancenonschedulegrouping = []
-    } = overalldeletecheck;
+    const { assetmaterialip = [], assetworkstationgrouping = [], maintenancemaster = [], assetempdistribution = [], maintenancenonschedulegrouping = [] } = overalldeletecheck;
 
-    const allConditions = [
-      ...assetmaterialip, ...assetworkstationgrouping,
-      ...maintenancemaster, ...assetempdistribution,
-      ...maintenancenonschedulegrouping].filter(
-        (value, index, self) =>
-          index ===
-          self.findIndex(
-            (t) =>
-              t.company === value.company &&
-              t.branch === value.branch &&
-              t.unit === value.unit &&
-              t.floor === value.floor &&
-              t.area === value.area &&
-              t.location === value.location &&
-              t.assetmaterial === value.assetmaterial
-          )
-      )
+    const allConditions = [...assetmaterialip, ...assetworkstationgrouping, ...maintenancemaster, ...assetempdistribution, ...maintenancenonschedulegrouping].filter(
+      (value, index, self) => index === self.findIndex((t) => t.company === value.company && t.branch === value.branch && t.unit === value.unit && t.floor === value.floor && t.area === value.area && t.location === value.location && t.assetmaterial === value.assetmaterial)
+    );
 
-    return assetdetails.filter(d => selectedRows?.includes(d._id) && !allConditions.some(condition =>
-      condition.company === d.company && condition.branch === d.branch
-      && condition.unit === d.unit
-      && condition.floor === d.floor && condition.area === d.area
-      && condition.location === d.location && condition.assetmaterial === `${d.material}-${d.code}`
-    ))
-
+    return assetdetails.filter(
+      (d) =>
+        selectedRows?.includes(d._id) &&
+        !allConditions.some((condition) => condition.company === d.company && condition.branch === d.branch && condition.unit === d.unit && condition.floor === d.floor && condition.area === d.area && condition.location === d.location && condition.assetmaterial === `${d.material}-${d.code}`)
+    );
   };
 
   const shouldShowDeleteMessage = (assetdetails, selectedRows, overalldeletecheck) => {
@@ -3847,21 +3276,11 @@ function AssetDetailsList() {
     return getFilteredUnits(assetdetails, selectedRows, overalldeletecheck).length === 0;
   };
 
-
-
-
   return (
     <Box>
-      <Headtitle title={"ASSET DETAILS"} />
+      <Headtitle title={'ASSET DETAILS'} />
       {/* <Typography sx={userStyle.HeaderText}> Manage Asset Detail</Typography> */}
-      <PageHeading
-        title="Manage Asset Detail"
-        modulename="Asset"
-        submodulename="Asset Details"
-        mainpagename="Asset Master List"
-        subpagename=""
-        subsubpagename=""
-      />
+      <PageHeading title="Manage Asset Detail" modulename="Asset" submodulename="Asset Details" mainpagename="Asset Master List" subpagename="" subsubpagename="" />
       <Box>
         {/* Edit DIALOG */}
         <Dialog
@@ -3872,21 +3291,19 @@ function AssetDetailsList() {
           fullWidth={true}
           maxWidth="lg"
           sx={{
-            overflow: "visible",
-            "& .MuiPaper-root": {
-              overflow: "visible",
+            overflow: 'visible',
+            '& .MuiPaper-root': {
+              overflow: 'visible',
             },
-            marginTop: "90px",
+            marginTop: '90px',
           }}
         >
-          <Box sx={{ overflow: "auto", padding: "20px" }}>
+          <Box sx={{ overflow: 'auto', padding: '20px' }}>
             <>
               <form>
                 <Grid container spacing={2}>
                   <Grid item md={12} xs={12} sm={12}>
-                    <Typography sx={userStyle.HeaderText}>
-                      Edit Asset Details
-                    </Typography>
+                    <Typography sx={userStyle.HeaderText}>Edit Asset Details</Typography>
                   </Grid>
                 </Grid>
                 <br />
@@ -3894,7 +3311,7 @@ function AssetDetailsList() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Company<b style={{ color: "red" }}>*</b>
+                        Company<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={isAssignBranch
@@ -3903,13 +3320,7 @@ function AssetDetailsList() {
                             value: data.company,
                           }))
                           .filter((item, index, self) => {
-                            return (
-                              self.findIndex(
-                                (i) =>
-                                  i.label === item.label &&
-                                  i.value === item.value
-                              ) === index
-                            );
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                           })}
                         styles={colourStyles}
                         value={{
@@ -3920,17 +3331,17 @@ function AssetDetailsList() {
                           setAssetdetailEdit({
                             ...assetdetailEdit,
                             company: e.value,
-                            branch: "Please Select Branch",
-                            unit: "Please Select Unit",
-                            floor: "Please Select Floor",
-                            area: "Please Select Area",
-                            location: "Please Select Location",
-                            workstation: "Please Select Workstation",
-                            workstationlabel: "Please Select Workstation",
+                            branch: 'Please Select Branch',
+                            unit: 'Please Select Unit',
+                            floor: 'Please Select Floor',
+                            area: 'Please Select Area',
+                            location: 'Please Select Location',
+                            workstation: 'Please Select Workstation',
+                            workstationlabel: 'Please Select Workstation',
                           });
                           setAreasEdit([]);
                           setFloorEdit([]);
-                          setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                          setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                         }}
                       />
                     </FormControl>
@@ -3938,25 +3349,17 @@ function AssetDetailsList() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Branch<b style={{ color: "red" }}>*</b>
+                        Branch<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={isAssignBranch
-                          ?.filter(
-                            (comp) => assetdetailEdit.company === comp.company
-                          )
+                          ?.filter((comp) => assetdetailEdit.company === comp.company)
                           ?.map((data) => ({
                             label: data.branch,
                             value: data.branch,
                           }))
                           .filter((item, index, self) => {
-                            return (
-                              self.findIndex(
-                                (i) =>
-                                  i.label === item.label &&
-                                  i.value === item.value
-                              ) === index
-                            );
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                           })}
                         styles={colourStyles}
                         value={{
@@ -3967,15 +3370,15 @@ function AssetDetailsList() {
                           setAssetdetailEdit({
                             ...assetdetailEdit,
                             branch: e.value,
-                            unit: "Please Select Unit",
-                            floor: "Please Select Floor",
-                            area: "Please Select Area",
-                            location: "Please Select Location",
-                            workstation: "Please Select Workstation",
-                            workstationlabel: "Please Select Workstation",
+                            unit: 'Please Select Unit',
+                            floor: 'Please Select Floor',
+                            area: 'Please Select Area',
+                            location: 'Please Select Location',
+                            workstation: 'Please Select Workstation',
+                            workstationlabel: 'Please Select Workstation',
                           });
                           setAreasEdit([]);
-                          setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                          setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                           setFloorEdit([]);
                           fetchFloorEdit(e.value);
                         }}
@@ -3985,27 +3388,17 @@ function AssetDetailsList() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Unit<b style={{ color: "red" }}>*</b>
+                        Unit<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={isAssignBranch
-                          ?.filter(
-                            (comp) =>
-                              assetdetailEdit.company === comp.company &&
-                              assetdetailEdit.branch === comp.branch
-                          )
+                          ?.filter((comp) => assetdetailEdit.company === comp.company && assetdetailEdit.branch === comp.branch)
                           ?.map((data) => ({
                             label: data.unit,
                             value: data.unit,
                           }))
                           .filter((item, index, self) => {
-                            return (
-                              self.findIndex(
-                                (i) =>
-                                  i.label === item.label &&
-                                  i.value === item.value
-                              ) === index
-                            );
+                            return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                           })}
                         styles={colourStyles}
                         value={{
@@ -4016,8 +3409,8 @@ function AssetDetailsList() {
                           setAssetdetailEdit({
                             ...assetdetailEdit,
                             unit: e.value,
-                            workstation: "",
-                            workstationlabel: "Please Select Workstation",
+                            workstation: '',
+                            workstationlabel: 'Please Select Workstation',
                           });
                         }}
                       />
@@ -4026,7 +3419,7 @@ function AssetDetailsList() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Floor<b style={{ color: "red" }}>*</b>
+                        Floor<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={floorsEdit}
@@ -4039,14 +3432,14 @@ function AssetDetailsList() {
                           setAssetdetailEdit({
                             ...assetdetailEdit,
                             floor: e.value,
-                            workstation: "",
-                            area: "Please Select Area",
-                            location: "Please Select Location",
-                            workstation: "Please Select Workstation",
-                            workstationlabel: "Please Select Workstation",
+                            workstation: '',
+                            area: 'Please Select Area',
+                            location: 'Please Select Location',
+                            workstation: 'Please Select Workstation',
+                            workstationlabel: 'Please Select Workstation',
                           });
                           setAreasEdit([]);
-                          setLocationsEdit([{ label: "ALL", value: "ALL" }]);
+                          setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
                           fetchAreaEdit(assetdetailEdit.branch, e.value);
                         }}
                       />
@@ -4055,7 +3448,7 @@ function AssetDetailsList() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Area<b style={{ color: "red" }}>*</b>
+                        Area<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={areasEdit}
@@ -4068,17 +3461,13 @@ function AssetDetailsList() {
                           setAssetdetailEdit({
                             ...assetdetailEdit,
                             area: e.value,
-                            workstation: "",
-                            location: "Please Select Location",
-                            workstation: "Please Select Workstation",
-                            workstationlabel: "Please Select Workstation",
+                            workstation: '',
+                            location: 'Please Select Location',
+                            workstation: 'Please Select Workstation',
+                            workstationlabel: 'Please Select Workstation',
                           });
-                          setLocationsEdit([{ label: "ALL", value: "ALL" }]);
-                          fetchAllLocationEdit(
-                            assetdetailEdit.branch,
-                            assetdetailEdit.floor,
-                            e.value
-                          );
+                          setLocationsEdit([{ label: 'ALL', value: 'ALL' }]);
+                          fetchAllLocationEdit(assetdetailEdit.branch, assetdetailEdit.floor, e.value);
                         }}
                       />
                     </FormControl>
@@ -4086,7 +3475,7 @@ function AssetDetailsList() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Location<b style={{ color: "red" }}>*</b>
+                        Location<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={locationsEdit}
@@ -4099,17 +3488,15 @@ function AssetDetailsList() {
                           setAssetdetailEdit({
                             ...assetdetailEdit,
                             location: e.value,
-                            workstation: "Please Select Workstation",
-                            workstationlabel: "Please Select Workstation",
+                            workstation: 'Please Select Workstation',
+                            workstationlabel: 'Please Select Workstation',
                           });
                         }}
                       />
                     </FormControl>
                     <FormGroup>
                       <FormControlLabel
-                        control={
-                          <Checkbox checked={assetdetailEdit.workcheck} />
-                        }
+                        control={<Checkbox checked={assetdetailEdit.workcheck} />}
                         onChange={(e) =>
                           setAssetdetailEdit({
                             ...assetdetailEdit,
@@ -4130,16 +3517,8 @@ function AssetDetailsList() {
                           options={filteredWorkStation}
                           placeholder="Please Select Workstation"
                           value={{
-                            label:
-                              assetdetailEdit.workstationlabel === "" ||
-                                assetdetailEdit.workstationlabel === undefined
-                                ? "Please Select Workstation"
-                                : assetdetailEdit.workstationlabel,
-                            value:
-                              assetdetailEdit.workstation === "" ||
-                                assetdetailEdit.workstation === undefined
-                                ? "Please Select Workstation"
-                                : assetdetailEdit.workstation,
+                            label: assetdetailEdit.workstationlabel === '' || assetdetailEdit.workstationlabel === undefined ? 'Please Select Workstation' : assetdetailEdit.workstationlabel,
+                            value: assetdetailEdit.workstation === '' || assetdetailEdit.workstation === undefined ? 'Please Select Workstation' : assetdetailEdit.workstation,
                           }}
                           onChange={(e) => {
                             setAssetdetailEdit({
@@ -4156,20 +3535,14 @@ function AssetDetailsList() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        EB Usage<b style={{ color: "red" }}>*</b>
+                        EB Usage<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={EbUsage}
                         styles={colourStyles}
                         value={{
-                          label:
-                            assetdetailEdit.ebusage === ""
-                              ? "Please Select EB Usage"
-                              : assetdetailEdit.ebusage,
-                          value:
-                            assetdetailEdit.ebusage === ""
-                              ? "Please Select EB Usage"
-                              : assetdetailEdit.ebusage,
+                          label: assetdetailEdit.ebusage === '' ? 'Please Select EB Usage' : assetdetailEdit.ebusage,
+                          value: assetdetailEdit.ebusage === '' ? 'Please Select EB Usage' : assetdetailEdit.ebusage,
                         }}
                         onChange={(e) => {
                           setAssetdetailEdit({
@@ -4183,20 +3556,14 @@ function AssetDetailsList() {
                   <Grid item md={4} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Biometric<b style={{ color: "red" }}>*</b>
+                        Biometric<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={EbUsage}
                         styles={colourStyles}
                         value={{
-                          label:
-                            assetdetailEdit.biometric === ""
-                              ? "Please Select Biometric"
-                              : assetdetailEdit.biometric,
-                          value:
-                            assetdetailEdit.ebusage === ""
-                              ? "Please Select Biometric"
-                              : assetdetailEdit.ebusage,
+                          label: assetdetailEdit.biometric === '' ? 'Please Select Biometric' : assetdetailEdit.biometric,
+                          value: assetdetailEdit.ebusage === '' ? 'Please Select Biometric' : assetdetailEdit.ebusage,
                         }}
                         onChange={(e) => {
                           setAssetdetailEdit({
@@ -4210,40 +3577,27 @@ function AssetDetailsList() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>Material Countcode</Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="text"
-                        value={assetdetailEdit.materialcountcode}
-                      />
+                      <OutlinedInput id="component-outlined" type="text" value={assetdetailEdit.materialcountcode} />
                     </FormControl>
                   </Grid>
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>Material Code </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="text"
-                        value={assetdetailEdit.code}
-                      />
+                      <OutlinedInput id="component-outlined" type="text" value={assetdetailEdit.code} />
                     </FormControl>
                   </Grid>
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>Count(Qty) </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="number"
-                        sx={userStyle.input}
-                        value={assetdetailEdit.countquantity}
-                      />
+                      <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={assetdetailEdit.countquantity} />
                     </FormControl>
                   </Grid>
 
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        {" "}
-                        Vendor Group Name<b style={{ color: "red" }}>*</b>{" "}
+                        {' '}
+                        Vendor Group Name<b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
                       <Selects
                         options={vendorGroupOpt}
@@ -4252,7 +3606,7 @@ function AssetDetailsList() {
                         onChange={(e) => {
                           handleChangeGroupName(e);
                           setVendorGroup(e.value);
-                          setVendor("Please Select Vendor");
+                          setVendor('Please Select Vendor');
                         }}
                       />
                     </FormControl>
@@ -4261,7 +3615,7 @@ function AssetDetailsList() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Vendor<b style={{ color: "red" }}>*</b>
+                        Vendor<b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Selects
                         options={vendorOpt}
@@ -4281,27 +3635,17 @@ function AssetDetailsList() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Address<b style={{ color: "red" }}>*</b>{" "}
+                        Address<b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="text"
-                        value={vendorgetidEdit?.address}
-                        readOnly
-                      />
+                      <OutlinedInput id="component-outlined" type="text" value={vendorgetidEdit?.address} readOnly />
                     </FormControl>
                   </Grid>
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Phone Number<b style={{ color: "red" }}>*</b>{" "}
+                        Phone Number<b style={{ color: 'red' }}>*</b>{' '}
                       </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="text"
-                        value={vendorgetidEdit?.phonenumber}
-                        readOnly
-                      />
+                      <OutlinedInput id="component-outlined" type="text" value={vendorgetidEdit?.phonenumber} readOnly />
                     </FormControl>
                   </Grid>
 
@@ -4322,27 +3666,17 @@ function AssetDetailsList() {
                           }}
                         />
                       ) : (
-                        <OutlinedInput
-                          id="component-outlined"
-                          type="number"
-                          sx={userStyle.input}
-                          value={assetdetailEdit.rate}
-                          readOnly
-                        />
+                        <OutlinedInput id="component-outlined" type="number" sx={userStyle.input} value={assetdetailEdit.rate} readOnly />
                       )}
                     </FormControl>
                     <FormGroup>
                       <FormControlLabel
-                        control={
-                          <Checkbox checked={assetdetailEdit.overallrate} />
-                        }
+                        control={<Checkbox checked={assetdetailEdit.overallrate} />}
                         onChange={(e) => {
                           setAssetdetailEdit((prevAssetDetail) => ({
                             ...prevAssetDetail,
                             overallrate: !prevAssetDetail.overallrate,
-                            rate: prevAssetDetail.overallrate
-                              ? calculateTotalRateEdit()
-                              : "",
+                            rate: prevAssetDetail.overallrate ? calculateTotalRateEdit() : '',
                           }));
                         }}
                         label="Overall Rate"
@@ -4353,7 +3687,7 @@ function AssetDetailsList() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>
-                        Warranty <b style={{ color: "red" }}>*</b>
+                        Warranty <b style={{ color: 'red' }}>*</b>
                       </Typography>
                       <Select
                         fullWidth
@@ -4368,51 +3702,38 @@ function AssetDetailsList() {
                         }}
                       >
                         <MenuItem value="" disabled>
-                          {" "}
+                          {' '}
                           Please Select
                         </MenuItem>
-                        <MenuItem value="Yes"> {"Yes"} </MenuItem>
-                        <MenuItem value="No"> {"No"} </MenuItem>
+                        <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                        <MenuItem value="No"> {'No'} </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
-                  {assetdetailEdit.warranty === "Yes" && (
+                  {assetdetailEdit.warranty === 'Yes' && (
                     <>
                       <Grid item md={3} xs={12} sm={12}>
                         <Grid container>
                           <Grid item md={6} xs={6} sm={6}>
                             <Typography>
-                              Warranty Time <b style={{ color: "red" }}>*</b>
+                              Warranty Time <b style={{ color: 'red' }}>*</b>
                             </Typography>
                             <FormControl fullWidth size="small">
-                              <OutlinedInput
-                                id="component-outlined"
-                                type="text"
-                                placeholder="Enter Time"
-                                value={assetdetailEdit.estimation}
-                                onChange={(e) => handleChangephonenumberEdit(e)}
-                              />
+                              <OutlinedInput id="component-outlined" type="text" placeholder="Enter Time" value={assetdetailEdit.estimation} onChange={(e) => handleChangephonenumberEdit(e)} />
                             </FormControl>
                           </Grid>
                           <Grid item md={6} xs={6} sm={6}>
                             <Typography>
-                              Estimation <b style={{ color: "red" }}>*</b>
+                              Estimation <b style={{ color: 'red' }}>*</b>
                             </Typography>
-                            <Select
-                              fullWidth
-                              size="small"
-                              labelId="demo-select-small"
-                              id="demo-select-small"
-                              value={assetdetailEdit.estimationtime}
-                              onChange={handleEstimationChangeEdit}
-                            >
+                            <Select fullWidth size="small" labelId="demo-select-small" id="demo-select-small" value={assetdetailEdit.estimationtime} onChange={handleEstimationChangeEdit}>
                               <MenuItem value="" disabled>
-                                {" "}
+                                {' '}
                                 Please Select
                               </MenuItem>
-                              <MenuItem value="Days"> {"Days"} </MenuItem>
-                              <MenuItem value="Month"> {"Month"} </MenuItem>
-                              <MenuItem value="Year"> {"Year"} </MenuItem>
+                              <MenuItem value="Days"> {'Days'} </MenuItem>
+                              <MenuItem value="Month"> {'Month'} </MenuItem>
+                              <MenuItem value="Year"> {'Year'} </MenuItem>
                             </Select>
                           </Grid>
                         </Grid>
@@ -4422,25 +3743,15 @@ function AssetDetailsList() {
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
                       <Typography>Purchase date </Typography>
-                      <OutlinedInput
-                        id="component-outlined"
-                        type="date"
-                        value={selectedPurchaseDateEdit}
-                        onChange={handlePurchaseDateChangeEdit}
-                      />
+                      <OutlinedInput id="component-outlined" type="date" value={selectedPurchaseDateEdit} onChange={handlePurchaseDateChangeEdit} />
                     </FormControl>
                   </Grid>
-                  {assetdetailEdit.warranty === "Yes" && (
+                  {assetdetailEdit.warranty === 'Yes' && (
                     <>
                       <Grid item md={3} xs={12} sm={12}>
                         <FormControl fullWidth size="small">
                           <Typography>Expiry Date </Typography>
-                          <OutlinedInput
-                            id="component-outlined"
-                            type="text"
-                            placeholder=""
-                            value={assetdetailEdit.warrantycalculation}
-                          />
+                          <OutlinedInput id="component-outlined" type="text" placeholder="" value={assetdetailEdit.warrantycalculation} />
                         </FormControl>
                       </Grid>
                     </>
@@ -4502,35 +3813,28 @@ function AssetDetailsList() {
                                   <Grid item md={3} sm={6} xs={12}>
                                     <Grid container spacing={2}>
                                       <Grid item md={10} sm={10} xs={10}>
-
-
                                         <FormGroup>
                                           <FormControlLabel
-
                                             control={
                                               <Switch
                                                 // color="success"
                                                 sx={{
-                                                  "& .MuiSwitch-switchBase.Mui-checked": {
-                                                    color: "green", // Thumb color when checked
+                                                  '& .MuiSwitch-switchBase.Mui-checked': {
+                                                    color: 'green', // Thumb color when checked
                                                   },
-                                                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                    backgroundColor: "green", // Track color when checked
+                                                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                    backgroundColor: 'green', // Track color when checked
                                                   },
-                                                  "& .MuiSwitch-switchBase": {
-                                                    color: "#ff0000a3", // Thumb color when not checked
+                                                  '& .MuiSwitch-switchBase': {
+                                                    color: '#ff0000a3', // Thumb color when not checked
                                                   },
-                                                  "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                    backgroundColor: "#ff0000a3", // Track color when not checked
+                                                  '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                    backgroundColor: '#ff0000a3', // Track color when not checked
                                                   },
                                                 }}
                                                 checked={todo.subcomponentcheck}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "subcomponentcheck",
-                                                    e.target.checked
-                                                  );
+                                                  handleChangeEdit(index, 'subcomponentcheck', e.target.checked);
                                                 }}
                                               />
                                             }
@@ -4542,9 +3846,7 @@ function AssetDetailsList() {
                                   </Grid>
                                 </>
 
-
                                 {todo.subcomponentcheck === true && (
-
                                   <>
                                     {todo.type && (
                                       <>
@@ -4555,11 +3857,7 @@ function AssetDetailsList() {
                                                 <Typography>Type</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.type?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -4572,11 +3870,7 @@ function AssetDetailsList() {
                                                     value: todo.type,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "type",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'type', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -4594,11 +3888,7 @@ function AssetDetailsList() {
                                                 <Typography>Model</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.model?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -4611,11 +3901,7 @@ function AssetDetailsList() {
                                                     value: todo.model,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "model",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'model', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -4633,11 +3919,7 @@ function AssetDetailsList() {
                                                 <Typography>Size</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.size?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -4650,11 +3932,7 @@ function AssetDetailsList() {
                                                     value: todo.size,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "size",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'size', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -4672,11 +3950,7 @@ function AssetDetailsList() {
                                                 <Typography>Variants</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.variant?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -4689,11 +3963,7 @@ function AssetDetailsList() {
                                                     value: todo.variant,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "variant",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'variant', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -4711,11 +3981,7 @@ function AssetDetailsList() {
                                                 <Typography>Brand</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.brand?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -4728,11 +3994,7 @@ function AssetDetailsList() {
                                                     value: todo.brand,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "brand",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'brand', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -4756,11 +4018,7 @@ function AssetDetailsList() {
                                                 value={todo.serial}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "serial",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'serial', e.target.value);
                                                 }}
                                               />
                                             </Grid>
@@ -4783,11 +4041,7 @@ function AssetDetailsList() {
                                                 value={todo.other}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "other",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'other', e.target.value);
                                                 }}
                                               />
                                             </Grid>
@@ -4804,11 +4058,7 @@ function AssetDetailsList() {
                                                 <Typography>Capacity</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.capacity?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -4821,11 +4071,7 @@ function AssetDetailsList() {
                                                     value: todo.capacity,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "capacity",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'capacity', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -4851,18 +4097,10 @@ function AssetDetailsList() {
                                                 onChange={(e) => {
                                                   const inputText = e.target.value;
                                                   // Regex to allow only non-negative numbers
-                                                  const validatedInput =
-                                                    inputText.match(/^\d*$/);
+                                                  const validatedInput = inputText.match(/^\d*$/);
 
-                                                  const sanitizedInput =
-                                                    validatedInput !== null
-                                                      ? validatedInput[0]
-                                                      : "0";
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "hdmiport",
-                                                    sanitizedInput
-                                                  );
+                                                  const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                  handleChangeEdit(index, 'hdmiport', sanitizedInput);
                                                 }}
                                               />
                                             </Grid>
@@ -4886,18 +4124,10 @@ function AssetDetailsList() {
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
                                                   const inputText = e.target.value;
-                                                  const validatedInput =
-                                                    inputText.match(/^\d*$/);
+                                                  const validatedInput = inputText.match(/^\d*$/);
 
-                                                  const sanitizedInput =
-                                                    validatedInput !== null
-                                                      ? validatedInput[0]
-                                                      : "0";
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "vgaport",
-                                                    sanitizedInput
-                                                  );
+                                                  const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                  handleChangeEdit(index, 'vgaport', sanitizedInput);
                                                 }}
                                               />
                                             </Grid>
@@ -4921,18 +4151,10 @@ function AssetDetailsList() {
                                                 value={todo.dpport}
                                                 onChange={(e) => {
                                                   const inputText = e.target.value;
-                                                  const validatedInput =
-                                                    inputText.match(/^\d*$/);
+                                                  const validatedInput = inputText.match(/^\d*$/);
 
-                                                  const sanitizedInput =
-                                                    validatedInput !== null
-                                                      ? validatedInput[0]
-                                                      : "0";
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "dpport",
-                                                    sanitizedInput
-                                                  );
+                                                  const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                  handleChangeEdit(index, 'dpport', sanitizedInput);
                                                 }}
                                               />
                                             </Grid>
@@ -4956,18 +4178,10 @@ function AssetDetailsList() {
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
                                                   const inputText = e.target.value;
-                                                  const validatedInput =
-                                                    inputText.match(/^\d*$/);
+                                                  const validatedInput = inputText.match(/^\d*$/);
 
-                                                  const sanitizedInput =
-                                                    validatedInput !== null
-                                                      ? validatedInput[0]
-                                                      : "0";
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "usbport",
-                                                    sanitizedInput
-                                                  );
+                                                  const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                  handleChangeEdit(index, 'usbport', sanitizedInput);
                                                 }}
                                               />
                                             </Grid>
@@ -4984,11 +4198,7 @@ function AssetDetailsList() {
                                                 <Typography>Panel Type</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.paneltype?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5001,11 +4211,7 @@ function AssetDetailsList() {
                                                     value: todo.paneltypescreen,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "paneltypescreen",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'paneltypescreen', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5020,23 +4226,15 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Screen Resolution
-                                                </Typography>
+                                                <Typography>Screen Resolution</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
-                                                    ?.screenresolution?.map(
-                                                      (item) => ({
-                                                        ...item,
-                                                        label: item,
-                                                        value: item,
-                                                      })
-                                                    )}
+                                                    .find((item) => item.subcomponent === todo.subname)
+                                                    ?.screenresolution?.map((item) => ({
+                                                      ...item,
+                                                      label: item,
+                                                      value: item,
+                                                    }))}
                                                   styles={colourStyles}
                                                   isDisabled={todo.subcomponentcheck === false}
                                                   value={{
@@ -5044,11 +4242,7 @@ function AssetDetailsList() {
                                                     value: todo.resolution,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "resolution",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'resolution', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5063,16 +4257,10 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Connectivity
-                                                </Typography>
+                                                <Typography>Connectivity</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.connectivity?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5085,11 +4273,7 @@ function AssetDetailsList() {
                                                     value: todo.connectivity,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "connectivity",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'connectivity', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5107,11 +4291,7 @@ function AssetDetailsList() {
                                                 <Typography>Data Rate</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.datarate?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5124,11 +4304,7 @@ function AssetDetailsList() {
                                                     value: todo.daterate,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "daterate",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'daterate', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5143,23 +4319,15 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Compatible Device
-                                                </Typography>
+                                                <Typography>Compatible Device</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
-                                                    ?.compatibledevices?.map(
-                                                      (item) => ({
-                                                        ...item,
-                                                        label: item,
-                                                        value: item,
-                                                      })
-                                                    )}
+                                                    .find((item) => item.subcomponent === todo.subname)
+                                                    ?.compatibledevices?.map((item) => ({
+                                                      ...item,
+                                                      label: item,
+                                                      value: item,
+                                                    }))}
                                                   styles={colourStyles}
                                                   isDisabled={todo.subcomponentcheck === false}
                                                   value={{
@@ -5167,11 +4335,7 @@ function AssetDetailsList() {
                                                     value: todo.compatibledevice,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "compatibledevice",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'compatibledevice', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5186,16 +4350,10 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Output Power
-                                                </Typography>
+                                                <Typography>Output Power</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    .find((item) => item.subcomponent === todo.subname)
                                                     ?.outputpower?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5208,11 +4366,7 @@ function AssetDetailsList() {
                                                     value: todo.outputpower,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "outputpower",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'outputpower', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5227,23 +4381,15 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Cooling Fan Count
-                                                </Typography>
+                                                <Typography>Cooling Fan Count</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
-                                                    ?.coolingfancount?.map(
-                                                      (item) => ({
-                                                        ...item,
-                                                        label: item,
-                                                        value: item,
-                                                      })
-                                                    )}
+                                                    .find((item) => item.subcomponent === todo.subname)
+                                                    ?.coolingfancount?.map((item) => ({
+                                                      ...item,
+                                                      label: item,
+                                                      value: item,
+                                                    }))}
                                                   styles={colourStyles}
                                                   isDisabled={todo.subcomponentcheck === false}
                                                   value={{
@@ -5251,11 +4397,7 @@ function AssetDetailsList() {
                                                     value: todo.collingfancount,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "collingfancount",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'collingfancount', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5273,11 +4415,7 @@ function AssetDetailsList() {
                                                 <Typography>Clock Speed</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.clockspeed?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5290,11 +4428,7 @@ function AssetDetailsList() {
                                                     value: todo.clockspeed,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "clockspeed",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'clockspeed', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5312,11 +4446,7 @@ function AssetDetailsList() {
                                                 <Typography>Core</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.core?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5329,11 +4459,7 @@ function AssetDetailsList() {
                                                     value: todo.core,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "core",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'core', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5351,11 +4477,7 @@ function AssetDetailsList() {
                                                 <Typography>Speed</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.speed?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5368,11 +4490,7 @@ function AssetDetailsList() {
                                                     value: todo.speed,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "speed",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'speed', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5390,11 +4508,7 @@ function AssetDetailsList() {
                                                 <Typography>Frequency</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.frequency?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5407,11 +4521,7 @@ function AssetDetailsList() {
                                                     value: todo.frequency,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "frequency",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'frequency', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5429,11 +4539,7 @@ function AssetDetailsList() {
                                                 <Typography>Output</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.output?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5446,11 +4552,7 @@ function AssetDetailsList() {
                                                     value: todo.output,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "output",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'output', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5465,23 +4567,15 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Ethernet Ports
-                                                </Typography>
+                                                <Typography>Ethernet Ports</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
-                                                    ?.ethernetports?.map(
-                                                      (item) => ({
-                                                        ...item,
-                                                        label: item,
-                                                        value: item,
-                                                      })
-                                                    )}
+                                                    ?.find((item) => item.subcomponent === todo.subname)
+                                                    ?.ethernetports?.map((item) => ({
+                                                      ...item,
+                                                      label: item,
+                                                      value: item,
+                                                    }))}
                                                   styles={colourStyles}
                                                   isDisabled={todo.subcomponentcheck === false}
                                                   value={{
@@ -5489,11 +4583,7 @@ function AssetDetailsList() {
                                                     value: todo.ethernetports,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "ethernetports",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'ethernetports', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5511,11 +4601,7 @@ function AssetDetailsList() {
                                                 <Typography>Distance</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.distance?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5528,11 +4614,7 @@ function AssetDetailsList() {
                                                     value: todo.distance,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "distance",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'distance', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5550,11 +4632,7 @@ function AssetDetailsList() {
                                                 <Typography>Length</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.lengthname?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5567,11 +4645,7 @@ function AssetDetailsList() {
                                                     value: todo.lengthname,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "lengthname",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'lengthname', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5589,11 +4663,7 @@ function AssetDetailsList() {
                                                 <Typography>Slot</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.slot?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5606,11 +4676,7 @@ function AssetDetailsList() {
                                                     value: todo.slot,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "slot",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'slot', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5625,16 +4691,10 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  No. Of Channels
-                                                </Typography>
+                                                <Typography>No. Of Channels</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.noofchannels?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5647,11 +4707,7 @@ function AssetDetailsList() {
                                                     value: todo.noofchannels,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "noofchannels",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'noofchannels', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5669,11 +4725,7 @@ function AssetDetailsList() {
                                                 <Typography>Colour</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    ?.find(
-                                                      (item) =>
-                                                        item.subcomponent ===
-                                                        todo.subname
-                                                    )
+                                                    ?.find((item) => item.subcomponent === todo.subname)
                                                     ?.colours?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -5686,11 +4738,7 @@ function AssetDetailsList() {
                                                     value: todo.colours,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "colours",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'colours', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5735,11 +4783,7 @@ function AssetDetailsList() {
                                                 value={todo.countquantity}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "countquantity",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'countquantity', e.target.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -5762,11 +4806,7 @@ function AssetDetailsList() {
                                                   const inputValue = e.target.value;
                                                   const regex = /^[0-9]*$/;
                                                   if (regex.test(inputValue)) {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "rate",
-                                                      inputValue
-                                                    );
+                                                    handleChangeEdit(index, 'rate', inputValue);
                                                   }
                                                 }}
                                               />
@@ -5788,25 +4828,15 @@ function AssetDetailsList() {
                                                 value={todo.warranty}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "warranty",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'warranty', e.target.value);
                                                 }}
                                               >
                                                 <MenuItem value="" disabled>
-                                                  {" "}
+                                                  {' '}
                                                   Please Select
                                                 </MenuItem>
-                                                <MenuItem value="Yes">
-                                                  {" "}
-                                                  {"Yes"}{" "}
-                                                </MenuItem>
-                                                <MenuItem value="No">
-                                                  {" "}
-                                                  {"No"}{" "}
-                                                </MenuItem>
+                                                <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                                <MenuItem value="No"> {'No'} </MenuItem>
                                               </Select>
                                             </FormControl>
                                           </Grid>
@@ -5814,7 +4844,7 @@ function AssetDetailsList() {
                                       </Grid>
                                     </>
 
-                                    {todo.warranty === "Yes" && (
+                                    {todo.warranty === 'Yes' && (
                                       <>
                                         <Grid item md={3} sm={6} xs={12}>
                                           <Grid container>
@@ -5829,11 +4859,7 @@ function AssetDetailsList() {
                                                   value={todo.estimation}
                                                   disabled={todo.subcomponentcheck === false}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "estimation",
-                                                      e.target.value
-                                                    );
+                                                    handleChangeEdit(index, 'estimation', e.target.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -5848,29 +4874,16 @@ function AssetDetailsList() {
                                                 disabled={todo.subcomponentcheck === false}
                                                 value={todo.estimationtime}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "estimationtime",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'estimationtime', e.target.value);
                                                 }}
                                               >
                                                 <MenuItem value="" disabled>
-                                                  {" "}
+                                                  {' '}
                                                   Please Select
                                                 </MenuItem>
-                                                <MenuItem value="Days">
-                                                  {" "}
-                                                  {"Days"}{" "}
-                                                </MenuItem>
-                                                <MenuItem value="Month">
-                                                  {" "}
-                                                  {"Month"}{" "}
-                                                </MenuItem>
-                                                <MenuItem value="Year">
-                                                  {" "}
-                                                  {"Year"}{" "}
-                                                </MenuItem>
+                                                <MenuItem value="Days"> {'Days'} </MenuItem>
+                                                <MenuItem value="Month"> {'Month'} </MenuItem>
+                                                <MenuItem value="Year"> {'Year'} </MenuItem>
                                               </Select>
                                             </Grid>
                                           </Grid>
@@ -5883,9 +4896,7 @@ function AssetDetailsList() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Purchase date{" "}
-                                              </Typography>
+                                              <Typography>Purchase date </Typography>
                                               <OutlinedInput
                                                 id="component-outlined"
                                                 type="date"
@@ -5893,11 +4904,7 @@ function AssetDetailsList() {
                                                 value={todo.purchasedate}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "purchasedate",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'purchasedate', e.target.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -5905,22 +4912,14 @@ function AssetDetailsList() {
                                         </Grid>
                                       </Grid>
                                     </>
-                                    {todo.warranty === "Yes" && (
+                                    {todo.warranty === 'Yes' && (
                                       <>
                                         <Grid item md={3} sm={6} xs={12}>
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Expiry Date{" "}
-                                                </Typography>
-                                                <OutlinedInput
-                                                  id="component-outlined"
-                                                  type="text"
-                                                  size="small"
-                                                  placeholder=""
-                                                  value={todo.warrantycalculation}
-                                                />
+                                                <Typography>Expiry Date </Typography>
+                                                <OutlinedInput id="component-outlined" type="text" size="small" placeholder="" value={todo.warrantycalculation} />
                                               </FormControl>
                                             </Grid>
                                           </Grid>
@@ -5935,7 +4934,7 @@ function AssetDetailsList() {
                                             <FormControl fullWidth size="small">
                                               <Typography>
                                                 Vendor Group Name
-                                                <b style={{ color: "red" }}>*</b>
+                                                <b style={{ color: 'red' }}>*</b>
                                               </Typography>
                                               <Selects
                                                 options={vendorGroupOpt}
@@ -5946,20 +4945,12 @@ function AssetDetailsList() {
                                                   value: todo.vendorgroup,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeGroupNameIndexBased(
-                                                    e,
-                                                    index
-                                                  );
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "vendorgroup",
-                                                    e.value
-                                                  );
+                                                  handleChangeGroupNameIndexBased(e, index);
+                                                  handleChangeEdit(index, 'vendorgroup', e.value);
 
                                                   setTodosEdit((prev) => {
                                                     const updated = [...prev];
-                                                    updated[index].vendor =
-                                                      "Please Select Vendor";
+                                                    updated[index].vendor = 'Please Select Vendor';
                                                     return updated;
                                                   });
                                                 }}
@@ -5974,7 +4965,7 @@ function AssetDetailsList() {
                                             <FormControl fullWidth size="small">
                                               <Typography>
                                                 Vendor
-                                                <b style={{ color: "red" }}>*</b>
+                                                <b style={{ color: 'red' }}>*</b>
                                               </Typography>
                                               <Selects
                                                 options={vendorOptInd[index]}
@@ -5985,12 +4976,7 @@ function AssetDetailsList() {
                                                   value: todo.vendor,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "vendor",
-                                                    e.value,
-                                                    e._id
-                                                  );
+                                                  handleChangeEdit(index, 'vendor', e.value, e._id);
                                                 }}
                                               />
                                             </FormControl>
@@ -6005,13 +4991,7 @@ function AssetDetailsList() {
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
                                               <Typography>Address</Typography>
-                                              <OutlinedInput
-                                                id="component-outlined"
-                                                type="text"
-                                                disabled={todo.subcomponentcheck === false}
-                                                value={todo?.address}
-                                                readOnly
-                                              />
+                                              <OutlinedInput id="component-outlined" type="text" disabled={todo.subcomponentcheck === false} value={todo?.address} readOnly />
                                             </FormControl>
                                           </Grid>
                                         </Grid>
@@ -6024,22 +5004,14 @@ function AssetDetailsList() {
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
                                               <Typography>Phone Number</Typography>
-                                              <OutlinedInput
-                                                id="component-outlined"
-                                                type="text"
-                                                disabled={todo.subcomponentcheck === false}
-                                                value={todo?.phonenumber}
-                                                readOnly
-                                              />
+                                              <OutlinedInput id="component-outlined" type="text" disabled={todo.subcomponentcheck === false} value={todo?.phonenumber} readOnly />
                                             </FormControl>
                                           </Grid>
                                         </Grid>
                                       </Grid>
                                     </>
-
                                   </>
                                 )}
-
 
                                 {/* <Grid item md={1} sm={3} xs={3}>
                                   <Button
@@ -6074,35 +5046,28 @@ function AssetDetailsList() {
                                   <Grid item md={3} sm={6} xs={12}>
                                     <Grid container spacing={2}>
                                       <Grid item md={10} sm={10} xs={10}>
-
-
                                         <FormGroup>
                                           <FormControlLabel
-
                                             control={
                                               <Switch
                                                 // color="success"
                                                 sx={{
-                                                  "& .MuiSwitch-switchBase.Mui-checked": {
-                                                    color: "green", // Thumb color when checked
+                                                  '& .MuiSwitch-switchBase.Mui-checked': {
+                                                    color: 'green', // Thumb color when checked
                                                   },
-                                                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                    backgroundColor: "green", // Track color when checked
+                                                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                    backgroundColor: 'green', // Track color when checked
                                                   },
-                                                  "& .MuiSwitch-switchBase": {
-                                                    color: "#ff0000a3", // Thumb color when not checked
+                                                  '& .MuiSwitch-switchBase': {
+                                                    color: '#ff0000a3', // Thumb color when not checked
                                                   },
-                                                  "& .MuiSwitch-switchBase + .MuiSwitch-track": {
-                                                    backgroundColor: "#ff0000a3", // Track color when not checked
+                                                  '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+                                                    backgroundColor: '#ff0000a3', // Track color when not checked
                                                   },
                                                 }}
                                                 checked={todo.subcomponentcheck}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "subcomponentcheck",
-                                                    e.target.checked
-                                                  );
+                                                  handleChangeEdit(index, 'subcomponentcheck', e.target.checked);
                                                 }}
                                               />
                                             }
@@ -6114,7 +5079,6 @@ function AssetDetailsList() {
                                   </Grid>
                                 </>
                                 {todo.subcomponentcheck === true && (
-
                                   <>
                                     {todo.type && (
                                       <>
@@ -6125,13 +5089,7 @@ function AssetDetailsList() {
                                                 <Typography>Type</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.type?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6144,11 +5102,7 @@ function AssetDetailsList() {
                                                     value: todo.type,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "type",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'type', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6166,13 +5120,7 @@ function AssetDetailsList() {
                                                 <Typography>Model</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.model?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6185,11 +5133,7 @@ function AssetDetailsList() {
                                                     value: todo.model,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "model",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'model', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6207,13 +5151,7 @@ function AssetDetailsList() {
                                                 <Typography>Size</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.size?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6226,11 +5164,7 @@ function AssetDetailsList() {
                                                     value: todo.size,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "size",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'size', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6248,13 +5182,7 @@ function AssetDetailsList() {
                                                 <Typography>Variants</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.variant?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6267,11 +5195,7 @@ function AssetDetailsList() {
                                                     value: todo.variant,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "variant",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'variant', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6289,13 +5213,7 @@ function AssetDetailsList() {
                                                 <Typography>Brand</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.brand?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6308,11 +5226,7 @@ function AssetDetailsList() {
                                                     value: todo.brand,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "brand",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'brand', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6336,11 +5250,7 @@ function AssetDetailsList() {
                                                 value={todo.serial}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "serial",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'serial', e.target.value);
                                                 }}
                                               />
                                             </Grid>
@@ -6363,11 +5273,7 @@ function AssetDetailsList() {
                                                 placeholder="Please Enter Other"
                                                 value={todo.other}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "other",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'other', e.target.value);
                                                 }}
                                               />
                                             </Grid>
@@ -6384,13 +5290,7 @@ function AssetDetailsList() {
                                                 <Typography>Capacity</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.capacity?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6403,11 +5303,7 @@ function AssetDetailsList() {
                                                     value: todo.capacity,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "capacity",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'capacity', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6432,18 +5328,10 @@ function AssetDetailsList() {
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
                                                   const inputText = e.target.value;
-                                                  const validatedInput =
-                                                    inputText.match(/^\d*$/);
+                                                  const validatedInput = inputText.match(/^\d*$/);
 
-                                                  const sanitizedInput =
-                                                    validatedInput !== null
-                                                      ? validatedInput[0]
-                                                      : "0";
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "hdmiport",
-                                                    sanitizedInput
-                                                  );
+                                                  const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                  handleChangeEdit(index, 'hdmiport', sanitizedInput);
                                                 }}
                                               />
                                             </Grid>
@@ -6467,18 +5355,10 @@ function AssetDetailsList() {
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
                                                   const inputText = e.target.value;
-                                                  const validatedInput =
-                                                    inputText.match(/^\d*$/);
+                                                  const validatedInput = inputText.match(/^\d*$/);
 
-                                                  const sanitizedInput =
-                                                    validatedInput !== null
-                                                      ? validatedInput[0]
-                                                      : "0";
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "vgaport",
-                                                    sanitizedInput
-                                                  );
+                                                  const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                  handleChangeEdit(index, 'vgaport', sanitizedInput);
                                                 }}
                                               />
                                             </Grid>
@@ -6502,18 +5382,10 @@ function AssetDetailsList() {
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
                                                   const inputText = e.target.value;
-                                                  const validatedInput =
-                                                    inputText.match(/^\d*$/);
+                                                  const validatedInput = inputText.match(/^\d*$/);
 
-                                                  const sanitizedInput =
-                                                    validatedInput !== null
-                                                      ? validatedInput[0]
-                                                      : "0";
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "dpport",
-                                                    sanitizedInput
-                                                  );
+                                                  const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                  handleChangeEdit(index, 'dpport', sanitizedInput);
                                                 }}
                                               />
                                             </Grid>
@@ -6537,18 +5409,10 @@ function AssetDetailsList() {
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
                                                   const inputText = e.target.value;
-                                                  const validatedInput =
-                                                    inputText.match(/^\d*$/);
+                                                  const validatedInput = inputText.match(/^\d*$/);
 
-                                                  const sanitizedInput =
-                                                    validatedInput !== null
-                                                      ? validatedInput[0]
-                                                      : "0";
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "usbport",
-                                                    sanitizedInput
-                                                  );
+                                                  const sanitizedInput = validatedInput !== null ? validatedInput[0] : '0';
+                                                  handleChangeEdit(index, 'usbport', sanitizedInput);
                                                 }}
                                               />
                                             </Grid>
@@ -6566,13 +5430,7 @@ function AssetDetailsList() {
                                                 <Typography>Panel Type</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.paneltype?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6585,11 +5443,7 @@ function AssetDetailsList() {
                                                     value: todo.paneltypescreen,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "paneltypescreen",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'paneltypescreen', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6604,25 +5458,15 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Screen Resolution
-                                                </Typography>
+                                                <Typography>Screen Resolution</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
-                                                    ?.screenresolution?.map(
-                                                      (item) => ({
-                                                        ...item,
-                                                        label: item,
-                                                        value: item,
-                                                      })
-                                                    )}
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
+                                                    ?.screenresolution?.map((item) => ({
+                                                      ...item,
+                                                      label: item,
+                                                      value: item,
+                                                    }))}
                                                   styles={colourStyles}
                                                   isDisabled={todo.subcomponentcheck === false}
                                                   value={{
@@ -6630,11 +5474,7 @@ function AssetDetailsList() {
                                                     value: todo.resolution,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "resolution",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'resolution', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6649,18 +5489,10 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Connectivity
-                                                </Typography>
+                                                <Typography>Connectivity</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.connectivity?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6673,11 +5505,7 @@ function AssetDetailsList() {
                                                     value: todo.connectivity,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "connectivity",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'connectivity', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6695,13 +5523,7 @@ function AssetDetailsList() {
                                                 <Typography>Data Rate</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.datarate?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6714,11 +5536,7 @@ function AssetDetailsList() {
                                                     value: todo.daterate,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "daterate",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'daterate', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6733,25 +5551,15 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Compatible Device
-                                                </Typography>
+                                                <Typography>Compatible Device</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
-                                                    ?.compatibledevices?.map(
-                                                      (item) => ({
-                                                        ...item,
-                                                        label: item,
-                                                        value: item,
-                                                      })
-                                                    )}
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
+                                                    ?.compatibledevices?.map((item) => ({
+                                                      ...item,
+                                                      label: item,
+                                                      value: item,
+                                                    }))}
                                                   styles={colourStyles}
                                                   isDisabled={todo.subcomponentcheck === false}
                                                   value={{
@@ -6759,11 +5567,7 @@ function AssetDetailsList() {
                                                     value: todo.compatibledevice,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "compatibledevice",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'compatibledevice', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6778,18 +5582,10 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Output Power
-                                                </Typography>
+                                                <Typography>Output Power</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.outputpower?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6802,11 +5598,7 @@ function AssetDetailsList() {
                                                     value: todo.outputpower,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "outputpower",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'outputpower', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6821,25 +5613,15 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Cooling Fan Count
-                                                </Typography>
+                                                <Typography>Cooling Fan Count</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
-                                                    ?.coolingfancount?.map(
-                                                      (item) => ({
-                                                        ...item,
-                                                        label: item,
-                                                        value: item,
-                                                      })
-                                                    )}
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
+                                                    ?.coolingfancount?.map((item) => ({
+                                                      ...item,
+                                                      label: item,
+                                                      value: item,
+                                                    }))}
                                                   styles={colourStyles}
                                                   isDisabled={todo.subcomponentcheck === false}
                                                   value={{
@@ -6847,11 +5629,7 @@ function AssetDetailsList() {
                                                     value: todo.collingfancount,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "collingfancount",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'collingfancount', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6869,13 +5647,7 @@ function AssetDetailsList() {
                                                 <Typography>Clock Speed</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.clockspeed?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6888,11 +5660,7 @@ function AssetDetailsList() {
                                                     value: todo.clockspeed,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "clockspeed",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'clockspeed', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6910,13 +5678,7 @@ function AssetDetailsList() {
                                                 <Typography>Core</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.core?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6929,11 +5691,7 @@ function AssetDetailsList() {
                                                     value: todo.core,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "core",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'core', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6951,13 +5709,7 @@ function AssetDetailsList() {
                                                 <Typography>Speed</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.speed?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -6970,11 +5722,7 @@ function AssetDetailsList() {
                                                     value: todo.speed,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "speed",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'speed', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -6992,13 +5740,7 @@ function AssetDetailsList() {
                                                 <Typography>Frequency</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.frequency?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -7011,11 +5753,7 @@ function AssetDetailsList() {
                                                     value: todo.frequency,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "frequency",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'frequency', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -7033,13 +5771,7 @@ function AssetDetailsList() {
                                                 <Typography>Output</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.output?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -7052,11 +5784,7 @@ function AssetDetailsList() {
                                                     value: todo.output,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "output",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'output', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -7071,25 +5799,15 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Ethernet Ports
-                                                </Typography>
+                                                <Typography>Ethernet Ports</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
-                                                    ?.ethernetports?.map(
-                                                      (item) => ({
-                                                        ...item,
-                                                        label: item,
-                                                        value: item,
-                                                      })
-                                                    )}
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
+                                                    ?.ethernetports?.map((item) => ({
+                                                      ...item,
+                                                      label: item,
+                                                      value: item,
+                                                    }))}
                                                   styles={colourStyles}
                                                   isDisabled={todo.subcomponentcheck === false}
                                                   value={{
@@ -7097,11 +5815,7 @@ function AssetDetailsList() {
                                                     value: todo.ethernetports,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "ethernetports",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'ethernetports', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -7119,13 +5833,7 @@ function AssetDetailsList() {
                                                 <Typography>Distance</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.distance?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -7138,11 +5846,7 @@ function AssetDetailsList() {
                                                     value: todo.distance,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "distance",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'distance', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -7160,13 +5864,7 @@ function AssetDetailsList() {
                                                 <Typography>Length</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.lengthname?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -7179,11 +5877,7 @@ function AssetDetailsList() {
                                                     value: todo.lengthname,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "lengthname",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'lengthname', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -7201,13 +5895,7 @@ function AssetDetailsList() {
                                                 <Typography>Slot</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.slot?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -7220,11 +5908,7 @@ function AssetDetailsList() {
                                                     value: todo.slot,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "slot",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'slot', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -7239,18 +5923,10 @@ function AssetDetailsList() {
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  No. Of Channels
-                                                </Typography>
+                                                <Typography>No. Of Channels</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.noofchannels?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -7263,11 +5939,7 @@ function AssetDetailsList() {
                                                     value: todo.noofchannels,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "noofchannels",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'noofchannels', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -7285,13 +5957,7 @@ function AssetDetailsList() {
                                                 <Typography>Colour</Typography>
                                                 <Selects
                                                   options={specificationGroupingEdit
-                                                    .find(
-                                                      (item) =>
-                                                        assetdetailEdit.component ===
-                                                        item.component &&
-                                                        assetdetailEdit.material ===
-                                                        item.assetmaterial
-                                                    )
+                                                    .find((item) => assetdetailEdit.component === item.component && assetdetailEdit.material === item.assetmaterial)
                                                     ?.colours?.map((item) => ({
                                                       ...item,
                                                       label: item,
@@ -7304,11 +5970,7 @@ function AssetDetailsList() {
                                                     value: todo.colours,
                                                   }}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "colours",
-                                                      e.value
-                                                    );
+                                                    handleChangeEdit(index, 'colours', e.value);
                                                   }}
                                                 />
                                               </FormControl>
@@ -7353,11 +6015,7 @@ function AssetDetailsList() {
                                                 disabled={todo.subcomponentcheck === false}
                                                 value={todo.countquantity}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "countquantity",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'countquantity', e.target.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -7380,11 +6038,7 @@ function AssetDetailsList() {
                                                   const inputValue = e.target.value;
                                                   const regex = /^[0-9]*$/;
                                                   if (regex.test(inputValue)) {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "rate",
-                                                      inputValue
-                                                    );
+                                                    handleChangeEdit(index, 'rate', inputValue);
                                                   }
                                                 }}
                                               />
@@ -7399,8 +6053,7 @@ function AssetDetailsList() {
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
                                               <Typography>
-                                                Warranty{" "}
-                                                <b style={{ color: "red" }}>*</b>
+                                                Warranty <b style={{ color: 'red' }}>*</b>
                                               </Typography>
                                               <Select
                                                 fullWidth
@@ -7410,25 +6063,15 @@ function AssetDetailsList() {
                                                 disabled={todo.subcomponentcheck === false}
                                                 value={todo.warranty}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "warranty",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'warranty', e.target.value);
                                                 }}
                                               >
                                                 <MenuItem value="" disabled>
-                                                  {" "}
+                                                  {' '}
                                                   Please Select
                                                 </MenuItem>
-                                                <MenuItem value="Yes">
-                                                  {" "}
-                                                  {"Yes"}{" "}
-                                                </MenuItem>
-                                                <MenuItem value="No">
-                                                  {" "}
-                                                  {"No"}{" "}
-                                                </MenuItem>
+                                                <MenuItem value="Yes"> {'Yes'} </MenuItem>
+                                                <MenuItem value="No"> {'No'} </MenuItem>
                                               </Select>
                                             </FormControl>
                                           </Grid>
@@ -7436,14 +6079,13 @@ function AssetDetailsList() {
                                       </Grid>
                                     </>
 
-                                    {todo.warranty === "Yes" && (
+                                    {todo.warranty === 'Yes' && (
                                       <>
                                         <Grid item md={3} sm={6} xs={12}>
                                           <Grid container>
                                             <Grid item md={6} xs={6} sm={6}>
                                               <Typography>
-                                                Warranty Time{" "}
-                                                <b style={{ color: "red" }}>*</b>
+                                                Warranty Time <b style={{ color: 'red' }}>*</b>
                                               </Typography>
                                               <FormControl fullWidth size="small">
                                                 <OutlinedInput
@@ -7454,19 +6096,14 @@ function AssetDetailsList() {
                                                   placeholder="Enter Time"
                                                   value={todo.estimation}
                                                   onChange={(e) => {
-                                                    handleChangeEdit(
-                                                      index,
-                                                      "estimation",
-                                                      e.target.value
-                                                    );
+                                                    handleChangeEdit(index, 'estimation', e.target.value);
                                                   }}
                                                 />
                                               </FormControl>
                                             </Grid>
                                             <Grid item md={6} xs={6} sm={6}>
                                               <Typography>
-                                                Estimation{" "}
-                                                <b style={{ color: "red" }}>*</b>
+                                                Estimation <b style={{ color: 'red' }}>*</b>
                                               </Typography>
                                               <Select
                                                 fullWidth
@@ -7476,29 +6113,16 @@ function AssetDetailsList() {
                                                 value={todo.estimationtime}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "estimationtime",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'estimationtime', e.target.value);
                                                 }}
                                               >
                                                 <MenuItem value="" disabled>
-                                                  {" "}
+                                                  {' '}
                                                   Please Select
                                                 </MenuItem>
-                                                <MenuItem value="Days">
-                                                  {" "}
-                                                  {"Days"}{" "}
-                                                </MenuItem>
-                                                <MenuItem value="Month">
-                                                  {" "}
-                                                  {"Month"}{" "}
-                                                </MenuItem>
-                                                <MenuItem value="Year">
-                                                  {" "}
-                                                  {"Year"}{" "}
-                                                </MenuItem>
+                                                <MenuItem value="Days"> {'Days'} </MenuItem>
+                                                <MenuItem value="Month"> {'Month'} </MenuItem>
+                                                <MenuItem value="Year"> {'Year'} </MenuItem>
                                               </Select>
                                             </Grid>
                                           </Grid>
@@ -7511,9 +6135,7 @@ function AssetDetailsList() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Purchase date{" "}
-                                              </Typography>
+                                              <Typography>Purchase date </Typography>
                                               <OutlinedInput
                                                 id="component-outlined"
                                                 type="date"
@@ -7521,11 +6143,7 @@ function AssetDetailsList() {
                                                 size="small"
                                                 value={todo.purchasedate}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "purchasedate",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'purchasedate', e.target.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -7533,23 +6151,14 @@ function AssetDetailsList() {
                                         </Grid>
                                       </Grid>
                                     </>
-                                    {todo.warranty === "Yes" && (
+                                    {todo.warranty === 'Yes' && (
                                       <>
                                         <Grid item md={3} sm={6} xs={12}>
                                           <Grid container spacing={2}>
                                             <Grid item md={10} sm={10} xs={10}>
                                               <FormControl fullWidth size="small">
-                                                <Typography>
-                                                  Expiry Date{" "}
-                                                </Typography>
-                                                <OutlinedInput
-                                                  id="component-outlined"
-                                                  type="text"
-                                                  size="small"
-                                                  disabled={todo.subcomponentcheck === false}
-                                                  placeholder=""
-                                                  value={todo.warrantycalculation}
-                                                />
+                                                <Typography>Expiry Date </Typography>
+                                                <OutlinedInput id="component-outlined" type="text" size="small" disabled={todo.subcomponentcheck === false} placeholder="" value={todo.warrantycalculation} />
                                               </FormControl>
                                             </Grid>
                                           </Grid>
@@ -7561,9 +6170,7 @@ function AssetDetailsList() {
                                         <Grid container spacing={2}>
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
-                                              <Typography>
-                                                Purchase date{" "}
-                                              </Typography>
+                                              <Typography>Purchase date </Typography>
                                               <OutlinedInput
                                                 id="component-outlined"
                                                 type="date"
@@ -7571,11 +6178,7 @@ function AssetDetailsList() {
                                                 value={todo.purchasedate}
                                                 disabled={todo.subcomponentcheck === false}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "purchasedate",
-                                                    e.target.value
-                                                  );
+                                                  handleChangeEdit(index, 'purchasedate', e.target.value);
                                                 }}
                                               />
                                             </FormControl>
@@ -7591,7 +6194,7 @@ function AssetDetailsList() {
                                             <FormControl fullWidth size="small">
                                               <Typography>
                                                 Vendor Group Name
-                                                <b style={{ color: "red" }}>*</b>
+                                                <b style={{ color: 'red' }}>*</b>
                                               </Typography>
                                               <Selects
                                                 options={vendorGroupOpt}
@@ -7602,20 +6205,12 @@ function AssetDetailsList() {
                                                   value: todo.vendorgroup,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeGroupNameIndexBased(
-                                                    e,
-                                                    index
-                                                  );
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "vendorgroup",
-                                                    e.value
-                                                  );
+                                                  handleChangeGroupNameIndexBased(e, index);
+                                                  handleChangeEdit(index, 'vendorgroup', e.value);
 
                                                   setTodosEdit((prev) => {
                                                     const updated = [...prev];
-                                                    updated[index].vendor =
-                                                      "Please Select Vendor";
+                                                    updated[index].vendor = 'Please Select Vendor';
                                                     return updated;
                                                   });
                                                 }}
@@ -7630,7 +6225,7 @@ function AssetDetailsList() {
                                             <FormControl fullWidth size="small">
                                               <Typography>
                                                 Vendor
-                                                <b style={{ color: "red" }}>*</b>
+                                                <b style={{ color: 'red' }}>*</b>
                                               </Typography>
                                               <Selects
                                                 options={vendorOptInd[index]}
@@ -7641,12 +6236,7 @@ function AssetDetailsList() {
                                                   value: todo.vendor,
                                                 }}
                                                 onChange={(e) => {
-                                                  handleChangeEdit(
-                                                    index,
-                                                    "vendor",
-                                                    e.value,
-                                                    e._id
-                                                  );
+                                                  handleChangeEdit(index, 'vendor', e.value, e._id);
                                                 }}
                                               />
                                             </FormControl>
@@ -7661,13 +6251,7 @@ function AssetDetailsList() {
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
                                               <Typography>Address</Typography>
-                                              <OutlinedInput
-                                                id="component-outlined"
-                                                type="text"
-                                                disabled={todo.subcomponentcheck === false}
-                                                value={todo?.address}
-                                                readOnly
-                                              />
+                                              <OutlinedInput id="component-outlined" type="text" disabled={todo.subcomponentcheck === false} value={todo?.address} readOnly />
                                             </FormControl>
                                           </Grid>
                                         </Grid>
@@ -7680,19 +6264,14 @@ function AssetDetailsList() {
                                           <Grid item md={10} sm={10} xs={10}>
                                             <FormControl fullWidth size="small">
                                               <Typography>Phone Number</Typography>
-                                              <OutlinedInput
-                                                id="component-outlined"
-                                                type="text"
-                                                value={todo?.phonenumber}
-                                                readOnly
-                                              />
+                                              <OutlinedInput id="component-outlined" type="text" value={todo?.phonenumber} readOnly />
                                             </FormControl>
                                           </Grid>
                                         </Grid>
                                       </Grid>
                                     </>
-
-                                  </>)}
+                                  </>
+                                )}
                                 {/* <Grid item md={1} sm={3} xs={3}>
                                   <Button
                                     sx={{
@@ -7715,7 +6294,6 @@ function AssetDetailsList() {
                                   </Button>
                                 </Grid> */}
                               </Grid>
-
                             </Grid>
                           </Grid>
                         )}
@@ -7728,17 +6306,15 @@ function AssetDetailsList() {
                 <Grid container spacing={1}>
                   <Grid item md={3} xs={12} sm={12}>
                     <Typography>Photos</Typography>
-                    <Box sx={{ display: "flex", justifyContent: "left" }}>
-                      <Button
-                        variant="contained"
-                        onClick={handleClickUploadPopupOpenedit}
-                      >
+                    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                      <Button variant="contained" onClick={handleClickUploadPopupOpenedit}>
                         Upload
                       </Button>
                     </Box>
                   </Grid>
                   <Grid item lg={12} md={12} sm={12} xs={12}>
-                    {isWebcamCapture == true && capturedImagesedit?.length > 0 &&
+                    {isWebcamCapture == true &&
+                      capturedImagesedit?.length > 0 &&
                       capturedImagesedit?.map((file, index) => (
                         <Grid
                           container
@@ -7746,35 +6322,30 @@ function AssetDetailsList() {
                           alignItems="center"
                           spacing={2}
                           sx={{
-                            padding: "8px 0",
-                            borderBottom: "1px solid #ddd",
+                            padding: '8px 0',
+                            borderBottom: '1px solid #ddd',
                           }}
                         >
                           {/* File Icon */}
                           <Grid item md={1} sm={2} xs={2}>
                             <Box
                               sx={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
                               }}
                             >
-                              {file.type.includes("image/") ? (
+                              {file.type.includes('image/') ? (
                                 <img
                                   src={file.preview}
                                   alt={file.name}
                                   height={40}
                                   style={{
-                                    maxWidth: "100%",
+                                    maxWidth: '100%',
                                   }}
                                 />
                               ) : (
-                                <img
-                                  className={classes.preview}
-                                  src={getFileIcon(file.name)}
-                                  height={40}
-                                  alt="file icon"
-                                />
+                                <img className={classes.preview} src={getFileIcon(file.name)} height={40} alt="file icon" />
                               )}
                             </Box>
                           </Grid>
@@ -7784,9 +6355,9 @@ function AssetDetailsList() {
                             <Typography
                               variant="subtitle2"
                               sx={{
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
                               }}
                             >
                               {file.name}
@@ -7795,14 +6366,7 @@ function AssetDetailsList() {
 
                           {/* Remarks Input */}
                           <Grid item md={4} sm={4} xs={4}>
-                            <TextField
-                              variant="outlined"
-                              size="small"
-                              placeholder="Enter remarks"
-                              value={file?.remarks || ""}
-                              onChange={(e) => handleRemarkChangeWebCam(e.target.value, index)}
-                              fullWidth
-                            />
+                            <TextField variant="outlined" size="small" placeholder="Enter remarks" value={file?.remarks || ''} onChange={(e) => handleRemarkChangeWebCam(e.target.value, index)} fullWidth />
                           </Grid>
 
                           {/* View and Delete Icons */}
@@ -7812,269 +6376,233 @@ function AssetDetailsList() {
                             sm={3}
                             xs={3}
                             sx={{
-                              display: "flex",
-                              justifyContent: "flex-end",
+                              display: 'flex',
+                              justifyContent: 'flex-end',
                               gap: 1,
                             }}
                           >
                             <Button
                               sx={{
-                                padding: "6px",
-                                minWidth: "36px",
-                                borderRadius: "50%",
-                                ":hover": {
-                                  backgroundColor: "#f0f0f0",
+                                padding: '6px',
+                                minWidth: '36px',
+                                borderRadius: '50%',
+                                ':hover': {
+                                  backgroundColor: '#f0f0f0',
                                 },
                               }}
                               onClick={() => renderFilePreview(file)}
                             >
-                              <VisibilityOutlinedIcon
-                                style={{ fontSize: "18px", color: "#357AE8" }}
-                              />
+                              <VisibilityOutlinedIcon style={{ fontSize: '18px', color: '#357AE8' }} />
                             </Button>
                             <Button
                               sx={{
-                                padding: "6px",
-                                minWidth: "36px",
-                                borderRadius: "50%",
-                                ":hover": {
-                                  backgroundColor: "#f0f0f0",
+                                padding: '6px',
+                                minWidth: '36px',
+                                borderRadius: '50%',
+                                ':hover': {
+                                  backgroundColor: '#f0f0f0',
                                 },
                               }}
                               onClick={() => removeCapturedImage(index)}
                             >
-                              <FaTrash
-                                style={{ fontSize: "18px", color: "#a73131" }}
-                              />
+                              <FaTrash style={{ fontSize: '18px', color: '#a73131' }} />
                             </Button>
                           </Grid>
                         </Grid>
                       ))}
-                    {refImageedit?.length > 0 && refImageedit?.map((file, index) => (
-                      <Grid
-                        container
-                        key={index}
-                        alignItems="center"
-                        spacing={2}
-                        sx={{
-                          padding: "8px 0",
-                          borderBottom: "1px solid #ddd",
-                        }}
-                      >
-                        {/* File Icon */}
-                        <Grid item md={1} sm={2} xs={2}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            {file.type.includes("image/") ? (
-                              <img
-                                src={file.preview}
-                                alt={file.name}
-                                height={40}
-                                style={{
-                                  maxWidth: "100%",
-                                }}
-                              />
-                            ) : (
-                              <img
-                                className={classes.preview}
-                                src={getFileIcon(file.name)}
-                                height={40}
-                                alt="file icon"
-                              />
-                            )}
-                          </Box>
-                        </Grid>
-
-                        {/* File Name */}
-                        <Grid item md={3} sm={3} xs={3}>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                            }}
-                          >
-                            {file.name}
-                          </Typography>
-                        </Grid>
-
-                        {/* Remarks Input */}
-                        <Grid item md={4} sm={4} xs={4}>
-                          <TextField
-                            variant="outlined"
-                            size="small"
-                            placeholder="Enter remarks"
-                            value={file?.remarks || ""}
-                            onChange={(e) => handleRemarkChangeUpload(e.target.value, index)}
-                            fullWidth
-                          />
-                        </Grid>
-
-                        {/* View and Delete Icons */}
+                    {refImageedit?.length > 0 &&
+                      refImageedit?.map((file, index) => (
                         <Grid
-                          item
-                          md={4}
-                          sm={3}
-                          xs={3}
+                          container
+                          key={index}
+                          alignItems="center"
+                          spacing={2}
                           sx={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                            gap: 1,
+                            padding: '8px 0',
+                            borderBottom: '1px solid #ddd',
                           }}
                         >
-                          <Button
-                            sx={{
-                              padding: "6px",
-                              minWidth: "36px",
-                              borderRadius: "50%",
-                              ":hover": {
-                                backgroundColor: "#f0f0f0",
-                              },
-                            }}
-                            onClick={() => renderFilePreview(file)}
-                          >
-                            <VisibilityOutlinedIcon
-                              style={{ fontSize: "18px", color: "#357AE8" }}
-                            />
-                          </Button>
-                          <Button
-                            sx={{
-                              padding: "6px",
-                              minWidth: "36px",
-                              borderRadius: "50%",
-                              ":hover": {
-                                backgroundColor: "#f0f0f0",
-                              },
-                            }}
-                            onClick={() => handleDeleteFile(index)}
-                          >
-                            <FaTrash
-                              style={{ fontSize: "18px", color: "#a73131" }}
-                            />
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    ))}
+                          {/* File Icon */}
+                          <Grid item md={1} sm={2} xs={2}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }}
+                            >
+                              {file.type.includes('image/') ? (
+                                <img
+                                  src={file.preview}
+                                  alt={file.name}
+                                  height={40}
+                                  style={{
+                                    maxWidth: '100%',
+                                  }}
+                                />
+                              ) : (
+                                <img className={classes.preview} src={getFileIcon(file.name)} height={40} alt="file icon" />
+                              )}
+                            </Box>
+                          </Grid>
 
+                          {/* File Name */}
+                          <Grid item md={3} sm={3} xs={3}>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {file.name}
+                            </Typography>
+                          </Grid>
 
+                          {/* Remarks Input */}
+                          <Grid item md={4} sm={4} xs={4}>
+                            <TextField variant="outlined" size="small" placeholder="Enter remarks" value={file?.remarks || ''} onChange={(e) => handleRemarkChangeUpload(e.target.value, index)} fullWidth />
+                          </Grid>
 
-                    {refImageDragedit?.length > 0 && refImageDragedit?.map((file, index) => (
-                      <Grid
-                        container
-                        key={index}
-                        alignItems="center"
-                        spacing={2}
-                        sx={{
-                          padding: "8px 0",
-                          borderBottom: "1px solid #ddd",
-                        }}
-                      >
-                        {/* File Icon */}
-                        <Grid item md={1} sm={2} xs={2}>
-                          <Box
+                          {/* View and Delete Icons */}
+                          <Grid
+                            item
+                            md={4}
+                            sm={3}
+                            xs={3}
                             sx={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            {file.type.includes("image/") ? (
-                              <img
-                                src={file.preview}
-                                alt={file.name}
-                                height={40}
-                                style={{
-                                  maxWidth: "100%",
-                                }}
-                              />
-                            ) : (
-                              <img
-                                className={classes.preview}
-                                src={getFileIcon(file.name)}
-                                height={40}
-                                alt="file icon"
-                              />
-                            )}
-                          </Box>
-                        </Grid>
-
-                        {/* File Name */}
-                        <Grid item md={3} sm={3} xs={3}>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
+                              display: 'flex',
+                              justifyContent: 'flex-end',
+                              gap: 1,
                             }}
                           >
-                            {file.name}
-                          </Typography>
+                            <Button
+                              sx={{
+                                padding: '6px',
+                                minWidth: '36px',
+                                borderRadius: '50%',
+                                ':hover': {
+                                  backgroundColor: '#f0f0f0',
+                                },
+                              }}
+                              onClick={() => renderFilePreview(file)}
+                            >
+                              <VisibilityOutlinedIcon style={{ fontSize: '18px', color: '#357AE8' }} />
+                            </Button>
+                            <Button
+                              sx={{
+                                padding: '6px',
+                                minWidth: '36px',
+                                borderRadius: '50%',
+                                ':hover': {
+                                  backgroundColor: '#f0f0f0',
+                                },
+                              }}
+                              onClick={() => handleDeleteFile(index)}
+                            >
+                              <FaTrash style={{ fontSize: '18px', color: '#a73131' }} />
+                            </Button>
+                          </Grid>
                         </Grid>
+                      ))}
 
-                        {/* Remarks Input */}
-                        <Grid item md={4} sm={4} xs={4}>
-                          <TextField
-                            variant="outlined"
-                            size="small"
-                            placeholder="Enter remarks"
-                            value={file?.remarks || ""}
-                            onChange={(e) => handleRemarkChangeDragDrop(e.target.value, index)}
-                            fullWidth
-                          />
-                        </Grid>
-
-                        {/* View and Delete Icons */}
+                    {refImageDragedit?.length > 0 &&
+                      refImageDragedit?.map((file, index) => (
                         <Grid
-                          item
-                          md={4}
-                          sm={3}
-                          xs={3}
+                          container
+                          key={index}
+                          alignItems="center"
+                          spacing={2}
                           sx={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                            gap: 1,
+                            padding: '8px 0',
+                            borderBottom: '1px solid #ddd',
                           }}
                         >
-                          <Button
+                          {/* File Icon */}
+                          <Grid item md={1} sm={2} xs={2}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }}
+                            >
+                              {file.type.includes('image/') ? (
+                                <img
+                                  src={file.preview}
+                                  alt={file.name}
+                                  height={40}
+                                  style={{
+                                    maxWidth: '100%',
+                                  }}
+                                />
+                              ) : (
+                                <img className={classes.preview} src={getFileIcon(file.name)} height={40} alt="file icon" />
+                              )}
+                            </Box>
+                          </Grid>
+
+                          {/* File Name */}
+                          <Grid item md={3} sm={3} xs={3}>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {file.name}
+                            </Typography>
+                          </Grid>
+
+                          {/* Remarks Input */}
+                          <Grid item md={4} sm={4} xs={4}>
+                            <TextField variant="outlined" size="small" placeholder="Enter remarks" value={file?.remarks || ''} onChange={(e) => handleRemarkChangeDragDrop(e.target.value, index)} fullWidth />
+                          </Grid>
+
+                          {/* View and Delete Icons */}
+                          <Grid
+                            item
+                            md={4}
+                            sm={3}
+                            xs={3}
                             sx={{
-                              padding: "6px",
-                              minWidth: "36px",
-                              borderRadius: "50%",
-                              ":hover": {
-                                backgroundColor: "#f0f0f0",
-                              },
+                              display: 'flex',
+                              justifyContent: 'flex-end',
+                              gap: 1,
                             }}
-                            onClick={() => renderFilePreview(file)}
                           >
-                            <VisibilityOutlinedIcon
-                              style={{ fontSize: "18px", color: "#357AE8" }}
-                            />
-                          </Button>
-                          <Button
-                            sx={{
-                              padding: "6px",
-                              minWidth: "36px",
-                              borderRadius: "50%",
-                              ":hover": {
-                                backgroundColor: "#f0f0f0",
-                              },
-                            }}
-                            onClick={() => handleRemoveFile(index)}
-                          >
-                            <FaTrash
-                              style={{ fontSize: "18px", color: "#a73131" }}
-                            />
-                          </Button>
+                            <Button
+                              sx={{
+                                padding: '6px',
+                                minWidth: '36px',
+                                borderRadius: '50%',
+                                ':hover': {
+                                  backgroundColor: '#f0f0f0',
+                                },
+                              }}
+                              onClick={() => renderFilePreview(file)}
+                            >
+                              <VisibilityOutlinedIcon style={{ fontSize: '18px', color: '#357AE8' }} />
+                            </Button>
+                            <Button
+                              sx={{
+                                padding: '6px',
+                                minWidth: '36px',
+                                borderRadius: '50%',
+                                ':hover': {
+                                  backgroundColor: '#f0f0f0',
+                                },
+                              }}
+                              onClick={() => handleRemoveFile(index)}
+                            >
+                              <FaTrash style={{ fontSize: '18px', color: '#a73131' }} />
+                            </Button>
+                          </Grid>
                         </Grid>
-                      </Grid>
-                    ))}
+                      ))}
                   </Grid>
                   <Grid item md={1} xs={6} sm={6} marginTop={3}>
                     <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={editSubmit}>
@@ -8082,15 +6610,11 @@ function AssetDetailsList() {
                     </Button>
                   </Grid>
                   <Grid item md={1} xs={6} sm={6} marginTop={3}>
-                    <Button
-                      sx={buttonStyles.btncancel}
-                      onClick={handleCloseModEdit}
-                    >
+                    <Button sx={buttonStyles.btncancel} onClick={handleCloseModEdit}>
                       Cancel
                     </Button>
                   </Grid>
                 </Grid>
-
               </form>
             </>
           </Box>
@@ -8099,21 +6623,17 @@ function AssetDetailsList() {
       <br />
 
       {/* ****** Table Start ****** */}
-      {isUserRoleCompare?.includes("lassetmaster") && (
+      {isUserRoleCompare?.includes('lassetmaster') && (
         <>
           <Box sx={userStyle.dialogbox}>
             {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
-              <Typography sx={userStyle.importheadtext}>
-                AssetDetails List
-              </Typography>
+              <Typography sx={userStyle.importheadtext}>AssetDetails List</Typography>
             </Grid>
             <Grid container spacing={2}>
               <>
                 <Grid item md={3} xs={12} sm={12}>
-                  <Typography>
-                    Company
-                  </Typography>
+                  <Typography>Company</Typography>
                   <FormControl size="small" fullWidth>
                     <MultiSelect
                       options={accessbranch
@@ -8122,12 +6642,7 @@ function AssetDetailsList() {
                           value: data.company,
                         }))
                         .filter((item, index, self) => {
-                          return (
-                            self.findIndex(
-                              (i) =>
-                                i.label === item.label && i.value === item.value
-                            ) === index
-                          );
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                         })}
                       value={selectedOptionsCompany}
                       onChange={(e) => {
@@ -8140,27 +6655,16 @@ function AssetDetailsList() {
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      {" "}
-                      Branch
-                    </Typography>
+                    <Typography> Branch</Typography>
                     <MultiSelect
                       options={accessbranch
-                        ?.filter((comp) =>
-                          valueCompanyCat?.includes(comp.company)
-                        )
+                        ?.filter((comp) => valueCompanyCat?.includes(comp.company))
                         ?.map((data) => ({
                           label: data.branch,
                           value: data.branch,
                         }))
                         .filter((item, index, self) => {
-                          return (
-                            self.findIndex(
-                              (i) =>
-                                i.label === item.label &&
-                                i.value === item.value
-                            ) === index
-                          );
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                         })}
                       value={selectedOptionsBranch}
                       onChange={(e) => {
@@ -8173,29 +6677,16 @@ function AssetDetailsList() {
                 </Grid>
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      {" "}
-                      Unit
-                    </Typography>
+                    <Typography> Unit</Typography>
                     <MultiSelect
                       options={accessbranch
-                        ?.filter(
-                          (comp) =>
-                            valueCompanyCat?.includes(comp.company) &&
-                            valueBranchCat?.includes(comp.branch)
-                        )
+                        ?.filter((comp) => valueCompanyCat?.includes(comp.company) && valueBranchCat?.includes(comp.branch))
                         ?.map((data) => ({
                           label: data.unit,
                           value: data.unit,
                         }))
                         .filter((item, index, self) => {
-                          return (
-                            self.findIndex(
-                              (i) =>
-                                i.label === item.label &&
-                                i.value === item.value
-                            ) === index
-                          );
+                          return self.findIndex((i) => i.label === item.label && i.value === item.value) === index;
                         })}
                       value={selectedOptionsUnit}
                       onChange={(e) => {
@@ -8208,9 +6699,7 @@ function AssetDetailsList() {
                 </Grid>
                 <Grid item md={3} xs={12} sm={6}>
                   <FormControl fullWidth size="small">
-                    <Typography>
-                      Asset material
-                    </Typography>
+                    <Typography>Asset material</Typography>
                     <MultiSelect
                       options={materialOpt}
                       value={selectedOptionsAssetMaterial}
@@ -8228,7 +6717,7 @@ function AssetDetailsList() {
             <br />
             <Grid container spacing={2}>
               <Grid item md={3} sm={12} xs={12}>
-                <Grid sx={{ display: "flex", gap: "15px" }}>
+                <Grid sx={{ display: 'flex', gap: '15px' }}>
                   <Button
                     variant="contained"
                     sx={buttonStyles.buttonsubmit}
@@ -8236,7 +6725,7 @@ function AssetDetailsList() {
                       handleSubmit(e);
                     }}
                   >
-                    {" "}
+                    {' '}
                     Filter
                   </Button>
                   <Button
@@ -8245,13 +6734,12 @@ function AssetDetailsList() {
                       handleClear();
                     }}
                   >
-                    {" "}
+                    {' '}
                     CLEAR
                   </Button>
                 </Grid>
               </Grid>
             </Grid>
-
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
               <Grid item md={2} xs={12} sm={12}>
                 <Box>
@@ -8268,7 +6756,7 @@ function AssetDetailsList() {
                       },
                     }}
                     onChange={handlePageSizeChange}
-                    sx={{ width: "77px" }}
+                    sx={{ width: '77px' }}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={5}>5</MenuItem>
@@ -8286,18 +6774,18 @@ function AssetDetailsList() {
                 xs={12}
                 sm={12}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelassetmaster") && (
+                  {isUserRoleCompare?.includes('excelassetmaster') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
-                          setFormat("xl");
+                          setFormat('xl');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -8306,12 +6794,12 @@ function AssetDetailsList() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvassetmaster") && (
+                  {isUserRoleCompare?.includes('csvassetmaster') && (
                     <>
                       <Button
                         onClick={(e) => {
                           setIsFilterOpen(true);
-                          setFormat("csv");
+                          setFormat('csv');
                         }}
                         sx={userStyle.buttongrp}
                       >
@@ -8320,7 +6808,7 @@ function AssetDetailsList() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printassetmaster") && (
+                  {isUserRoleCompare?.includes('printassetmaster') && (
                     <>
                       <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
@@ -8329,7 +6817,7 @@ function AssetDetailsList() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfassetmaster") && (
+                  {isUserRoleCompare?.includes('pdfassetmaster') && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
@@ -8342,22 +6830,18 @@ function AssetDetailsList() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imageassetmaster") && (
-                    <Button
-                      sx={userStyle.buttongrp}
-                      onClick={handleCaptureImage}
-                    >
-                      {" "}
-                      <ImageIcon
-                        sx={{ fontSize: "15px" }}
-                      /> &ensp;Image&ensp;{" "}
+                  {isUserRoleCompare?.includes('imageassetmaster') && (
+                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                      {' '}
+                      <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
                     </Button>
                   )}
                 </Box>
               </Grid>
               <Grid item md={2} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
-                  <OutlinedInput size="small"
+                  <OutlinedInput
+                    size="small"
                     id="outlined-adornment-weight"
                     startAdornment={
                       <InputAdornment position="start">
@@ -8373,12 +6857,13 @@ function AssetDetailsList() {
                         )}
                         <Tooltip title="Show search options">
                           <span>
-                            <IoMdOptions style={{ cursor: 'pointer', }} onClick={handleClickSearch} />
+                            <IoMdOptions style={{ cursor: 'pointer' }} onClick={handleClickSearch} />
                           </span>
                         </Tooltip>
-                      </InputAdornment>}
+                      </InputAdornment>
+                    }
                     aria-describedby="outlined-weight-helper-text"
-                    inputProps={{ 'aria-label': 'weight', }}
+                    inputProps={{ 'aria-label': 'weight' }}
                     type="text"
                     value={getSearchDisplay()}
                     onChange={handleSearchChange}
@@ -8397,26 +6882,13 @@ function AssetDetailsList() {
               Manage Columns
             </Button>
             &ensp;
-            {isUserRoleCompare?.includes("bdassetmaster") && (
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleClickOpenalert}
-                sx={buttonStyles.buttonbulkdelete}
-              >
+            {isUserRoleCompare?.includes('bdassetmaster') && (
+              <Button variant="contained" color="error" onClick={handleClickOpenalert} sx={buttonStyles.buttonbulkdelete}>
                 Bulk Delete
               </Button>
             )}
             {/* Manage Column */}
-
-
-            <Popover
-              id={id}
-              open={isManageColumnsOpen}
-              anchorEl={anchorEl}
-              onClose={handleCloseManageColumns}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left", }}
-            >
+            <Popover id={id} open={isManageColumnsOpen} anchorEl={anchorEl} onClose={handleCloseManageColumns} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
               <ManageColumnsContent
                 handleClose={handleCloseManageColumns}
                 searchQuery={searchQueryManage}
@@ -8429,23 +6901,14 @@ function AssetDetailsList() {
                 columnDataTable={columnDataTable}
               />
             </Popover>
-
-
-
-            <Popover
-              id={idSearch}
-              open={openSearch}
-              anchorEl={anchorElSearch}
-              onClose={handleCloseSearch}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
-            >
-              <Box style={{ padding: "10px", maxWidth: '450px' }}>
+            <Popover id={idSearch} open={openSearch} anchorEl={anchorElSearch} onClose={handleCloseSearch} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+              <Box style={{ padding: '10px', maxWidth: '450px' }}>
                 <Typography variant="h6">Advance Search</Typography>
                 <IconButton
                   aria-label="close"
                   onClick={handleCloseSearch}
                   sx={{
-                    position: "absolute",
+                    position: 'absolute',
                     right: 8,
                     top: 8,
                     color: (theme) => theme.palette.grey[500],
@@ -8453,27 +6916,33 @@ function AssetDetailsList() {
                 >
                   <CloseIcon />
                 </IconButton>
-                <DialogContent sx={{ width: "100%" }}>
-                  <Box sx={{
-                    width: '350px',
-                    maxHeight: '400px',
-                    overflow: 'hidden',
-                    position: 'relative'
-                  }}>
-                    <Box sx={{
-                      maxHeight: '300px',
-                      overflowY: 'auto',
-                      // paddingRight: '5px'
-                    }}>
+                <DialogContent sx={{ width: '100%' }}>
+                  <Box
+                    sx={{
+                      width: '350px',
+                      maxHeight: '400px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        maxHeight: '300px',
+                        overflowY: 'auto',
+                        // paddingRight: '5px'
+                      }}
+                    >
                       <Grid container spacing={1}>
                         <Grid item md={12} sm={12} xs={12}>
                           <Typography>Columns</Typography>
-                          <Select fullWidth size="small"
+                          <Select
+                            fullWidth
+                            size="small"
                             MenuProps={{
                               PaperProps: {
                                 style: {
                                   maxHeight: 200,
-                                  width: "auto",
+                                  width: 'auto',
                                 },
                               },
                             }}
@@ -8482,7 +6951,9 @@ function AssetDetailsList() {
                             onChange={(e) => setSelectedColumn(e.target.value)}
                             displayEmpty
                           >
-                            <MenuItem value="" disabled>Select Column</MenuItem>
+                            <MenuItem value="" disabled>
+                              Select Column
+                            </MenuItem>
                             {filteredSelectedColumn.map((col) => (
                               <MenuItem key={col.field} value={col.field}>
                                 {col.headerName}
@@ -8492,12 +6963,14 @@ function AssetDetailsList() {
                         </Grid>
                         <Grid item md={12} sm={12} xs={12}>
                           <Typography>Operator</Typography>
-                          <Select fullWidth size="small"
+                          <Select
+                            fullWidth
+                            size="small"
                             MenuProps={{
                               PaperProps: {
                                 style: {
                                   maxHeight: 200,
-                                  width: "auto",
+                                  width: 'auto',
                                 },
                               },
                             }}
@@ -8515,11 +6988,13 @@ function AssetDetailsList() {
                         </Grid>
                         <Grid item md={12} sm={12} xs={12}>
                           <Typography>Value</Typography>
-                          <TextField fullWidth size="small"
-                            value={["Blank", "Not Blank"].includes(selectedCondition) ? "" : filterValue}
+                          <TextField
+                            fullWidth
+                            size="small"
+                            value={['Blank', 'Not Blank'].includes(selectedCondition) ? '' : filterValue}
                             onChange={(e) => setFilterValue(e.target.value)}
-                            disabled={["Blank", "Not Blank"].includes(selectedCondition)}
-                            placeholder={["Blank", "Not Blank"].includes(selectedCondition) ? "Disabled" : "Enter value"}
+                            disabled={['Blank', 'Not Blank'].includes(selectedCondition)}
+                            placeholder={['Blank', 'Not Blank'].includes(selectedCondition) ? 'Disabled' : 'Enter value'}
                             sx={{
                               '& .MuiOutlinedInput-root.Mui-disabled': {
                                 backgroundColor: 'rgb(0 0 0 / 26%)',
@@ -8533,11 +7008,7 @@ function AssetDetailsList() {
                         {additionalFilters.length > 0 && (
                           <>
                             <Grid item md={12} sm={12} xs={12}>
-                              <RadioGroup
-                                row
-                                value={logicOperator}
-                                onChange={(e) => setLogicOperator(e.target.value)}
-                              >
+                              <RadioGroup row value={logicOperator} onChange={(e) => setLogicOperator(e.target.value)}>
                                 <FormControlLabel value="AND" control={<Radio />} label="AND" />
                                 <FormControlLabel value="OR" control={<Radio />} label="OR" />
                               </RadioGroup>
@@ -8545,25 +7016,26 @@ function AssetDetailsList() {
                           </>
                         )}
                         {additionalFilters.length === 0 && (
-                          <Grid item md={4} sm={12} xs={12} >
-                            <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                          <Grid item md={4} sm={12} xs={12}>
+                            <Button variant="contained" onClick={handleAddFilter} sx={{ textTransform: 'capitalize' }} disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
                               Add Filter
                             </Button>
                           </Grid>
                         )}
 
                         <Grid item md={2} sm={12} xs={12}>
-                          <Button variant="contained" onClick={() => {
-                            if (items?.length) {
-                              fetchAssetDetails("Filtered");
-                              setIsSearchActive(true);
-                              setAdvancedFilter([
-                                ...additionalFilters,
-                                { column: selectedColumn, condition: selectedCondition, value: filterValue }
-                              ])
-                            }
-
-                          }} sx={{ textTransform: "capitalize" }} disabled={["Blank", "Not Blank"].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}>
+                          <Button
+                            variant="contained"
+                            onClick={() => {
+                              if (items?.length) {
+                                fetchAssetDetails('Filtered');
+                                setIsSearchActive(true);
+                                setAdvancedFilter([...additionalFilters, { column: selectedColumn, condition: selectedCondition, value: filterValue }]);
+                              }
+                            }}
+                            sx={{ textTransform: 'capitalize' }}
+                            disabled={['Blank', 'Not Blank'].includes(selectedCondition) ? false : !filterValue || selectedColumn.length === 0}
+                          >
                             Search
                           </Button>
                         </Grid>
@@ -8577,22 +7049,12 @@ function AssetDetailsList() {
             <br />
             {assetdetailCheck ? (
               <>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#1976d2"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClassName=""
-                    visible={true}
-                  />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <ThreeDots height="80" width="80" radius="9" color="#1976d2" ariaLabel="three-dots-loading" wrapperStyle={{}} wrapperClassName="" visible={true} />
                 </Box>
               </>
             ) : (
               <>
-
                 {/* <AggridTable
                   rowDataTable={rowDataTable}
                   columnDataTable={columnDataTable}
@@ -8624,7 +7086,7 @@ function AssetDetailsList() {
                   rowDataTable={rowDataTable}
                   columnDataTable={columnDataTable}
                   columnVisibility={columnVisibility}
-                  pagenamecheck={"Asset List"}
+                  pagenamecheck={'Asset List'}
                   selectedRowsAssetList={selectedRowsAssetList}
                   setSelectedRowsAssetList={setSelectedRowsAssetList}
                   page={page}
@@ -8641,7 +7103,6 @@ function AssetDetailsList() {
                   gridRefTableImg={gridRefTableImg}
                   itemsList={assetdetails}
                 />
-
               </>
             )}
           </Box>
@@ -8649,20 +7110,10 @@ function AssetDetailsList() {
       )}
 
       {/* view model */}
-      <Dialog
-        open={openview}
-        onClose={handleClickOpenview}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        sx={{ marginTop: "95px" }}
-        maxWidth="lg"
-      >
-        <Box sx={{ width: "850px", padding: "20px 50px" }}>
+      <Dialog open={openview} onClose={handleClickOpenview} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" sx={{ marginTop: '95px' }} maxWidth="lg">
+        <Box sx={{ width: '850px', padding: '20px 50px' }}>
           <>
-            <Typography sx={userStyle.HeaderText}>
-              {" "}
-              View Asset Details
-            </Typography>
+            <Typography sx={userStyle.HeaderText}> View Asset Details</Typography>
             <br /> <br />
             <Grid container spacing={2}>
               <Grid item md={3} xs={12} sm={12}>
@@ -8704,7 +7155,7 @@ function AssetDetailsList() {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">WorkStation</Typography>
-                  <Typography>{assetdetailEdit.workstation === "Please Select Workstation" ? "" : assetdetailEdit.workstation}</Typography>
+                  <Typography>{assetdetailEdit.workstation === 'Please Select Workstation' ? '' : assetdetailEdit.workstation}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
@@ -8764,7 +7215,7 @@ function AssetDetailsList() {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Purchasedate</Typography>
-                  <Typography>{(assetdetailEdit.purchasedate === "Invalid date" || assetdetailEdit.purchasedate === "" || assetdetailEdit.purchasedate === undefined) ? "" : moment(assetdetailEdit.purchasedate).format("DD/MM/YYYY")}</Typography>
+                  <Typography>{assetdetailEdit.purchasedate === 'Invalid date' || assetdetailEdit.purchasedate === '' || assetdetailEdit.purchasedate === undefined ? '' : moment(assetdetailEdit.purchasedate).format('DD/MM/YYYY')}</Typography>
                 </FormControl>
               </Grid>
               <Grid item md={3} xs={12} sm={12}>
@@ -8788,10 +7239,10 @@ function AssetDetailsList() {
               <Grid item md={3} xs={12} sm={12}>
                 <FormControl fullWidth size="small">
                   <Typography variant="h6">Asset Distributed</Typography>
-                  <Typography>{assetdetailEdit?.distributed ? "Yes" : "No"}</Typography>
+                  <Typography>{assetdetailEdit?.distributed ? 'Yes' : 'No'}</Typography>
                 </FormControl>
               </Grid>
-              {assetdetailEdit?.distributed &&
+              {assetdetailEdit?.distributed && (
                 <>
                   <Grid item md={3} xs={12} sm={12}>
                     <FormControl fullWidth size="small">
@@ -8800,54 +7251,30 @@ function AssetDetailsList() {
                     </FormControl>
                   </Grid>
                 </>
-              }
-
-
+              )}
             </Grid>
             <br /> <br /> <br />
             <Grid container spacing={2}>
-              <Button
-                variant="contained"
-                sx={buttonStyles.buttonsubmit}
-                onClick={handleCloseview}
-              >
-                {" "}
-                Back{" "}
+              <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleCloseview}>
+                {' '}
+                Back{' '}
               </Button>
             </Grid>
           </>
         </Box>
       </Dialog>
 
-
       {/* webcam alert start */}
-      <Dialog
-        open={isWebcamOpen}
-        onClose={webcamClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="sm"
-        fullWidth={true}
-      >
+      <Dialog open={isWebcamOpen} onClose={webcamClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="sm" fullWidth={true}>
         <DialogContent
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            textAlign: "center",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'center',
+            textAlign: 'center',
+            alignItems: 'center',
           }}
         >
-          <Webcamimage
-            name={name}
-            getImg={getImg}
-            setGetImg={setGetImg}
-            valNum={valNum}
-            setValNum={setValNum}
-            capturedImages={capturedImages}
-            setCapturedImages={setCapturedImages}
-            setRefImage={setRefImage}
-            setRefImageDrag={setRefImageDrag}
-          />
+          <Webcamimage name={name} getImg={getImg} setGetImg={setGetImg} valNum={valNum} setValNum={setValNum} capturedImages={capturedImages} setCapturedImages={setCapturedImages} setRefImage={setRefImage} setRefImageDrag={setRefImageDrag} />
         </DialogContent>
         <DialogActions>
           <Button variant="contained" color="success" onClick={webcamDataStore}>
@@ -8860,24 +7287,14 @@ function AssetDetailsList() {
       </Dialog>
 
       {/* UPLOAD IMAGE DIALOG EDIT */}
-      <Dialog
-        open={uploadPopupOpenedit}
-        onClose={handleUploadPopupCloseedit}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        sx={{ marginTop: "95px" }}
-      >
-        <DialogTitle
-          id="customized-dialog-title1"
-          sx={{ backgroundColor: "#e0e0e0", color: "#000", display: "flex" }}
-        >
+      <Dialog open={uploadPopupOpenedit} onClose={handleUploadPopupCloseedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" sx={{ marginTop: '95px' }}>
+        <DialogTitle id="customized-dialog-title1" sx={{ backgroundColor: '#e0e0e0', color: '#000', display: 'flex' }}>
           Upload Image Edit
         </DialogTitle>
-        <DialogContent sx={{ minWidth: "750px", height: "850px" }}>
+        <DialogContent sx={{ minWidth: '750px', height: '850px' }}>
           <Grid container spacing={2}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
-              <Typography variant="body2" style={{ marginTop: "5px" }}>
+              <Typography variant="body2" style={{ marginTop: '5px' }}>
                 Max File size: 5MB
               </Typography>
               {/* {showDragField ? ( */}
@@ -8890,15 +7307,12 @@ function AssetDetailsList() {
                           src={file.preview}
                           alt={file.name}
                           style={{
-                            maxWidth: "70px",
-                            maxHeight: "70px",
-                            marginTop: "10px",
+                            maxWidth: '70px',
+                            maxHeight: '70px',
+                            marginTop: '10px',
                           }}
                         />
-                        <Button
-                          onClick={() => handleRemoveFileedit(index)}
-                          style={{ marginTop: "0px", color: "red" }}
-                        >
+                        <Button onClick={() => handleRemoveFileedit(index)} style={{ marginTop: '0px', color: 'red' }}>
                           X
                         </Button>
                       </>
@@ -8907,18 +7321,18 @@ function AssetDetailsList() {
                 ) : (
                   <div
                     style={{
-                      marginTop: "10px",
-                      marginLeft: "0px",
-                      border: "1px dashed #ccc",
-                      padding: "0px",
-                      width: "100%",
-                      height: "150px",
-                      display: "flex",
-                      alignContent: "center",
-                      textAlign: "center",
+                      marginTop: '10px',
+                      marginLeft: '0px',
+                      border: '1px dashed #ccc',
+                      padding: '0px',
+                      width: '100%',
+                      height: '150px',
+                      display: 'flex',
+                      alignContent: 'center',
+                      textAlign: 'center',
                     }}
                   >
-                    <div style={{ display: "flex", margin: "50px auto" }}>
+                    <div style={{ display: 'flex', margin: '50px auto' }}>
                       <ContentCopyIcon /> Drag and drop
                     </div>
                   </div>
@@ -8929,29 +7343,14 @@ function AssetDetailsList() {
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <br />
               <FormControl size="small" fullWidth>
-                <Grid sx={{ display: "flex" }}>
-                  <Button
-                    variant="contained"
-                    component="label"
-                    sx={userStyle.uploadbtn}
-                  >
-                    {" "}
+                <Grid sx={{ display: 'flex' }}>
+                  <Button variant="contained" component="label" sx={userStyle.uploadbtn}>
+                    {' '}
                     Upload
-                    <input
-                      type="file"
-                      multiple
-                      id="productimage"
-                      accept="image/*"
-                      hidden
-                      onChange={handleInputChangeedit}
-                    />
+                    <input type="file" multiple id="productimage" accept="image/*" hidden onChange={handleInputChangeedit} />
                   </Button>
                   &ensp;
-                  <Button
-                    variant="contained"
-                    onClick={showWebcamedit}
-                    sx={userStyle.uploadbtn}
-                  >
+                  <Button variant="contained" onClick={showWebcamedit} sx={userStyle.uploadbtn}>
                     Webcam
                   </Button>
                 </Grid>
@@ -8964,18 +7363,13 @@ function AssetDetailsList() {
                     <Grid item md={2} sm={2} xs={12}>
                       <Box
                         style={{
-                          isplay: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          marginLeft: "37px",
+                          isplay: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          marginLeft: '37px',
                         }}
                       >
-                        <img
-                          src={image.preview}
-                          alt={image.name}
-                          height={50}
-                          style={{ maxWidth: "-webkit-fill-available" }}
-                        />
+                        <img src={image.preview} alt={image.name} height={50} style={{ maxWidth: '-webkit-fill-available' }} />
                       </Box>
                     </Grid>
                     <Grid
@@ -8984,55 +7378,52 @@ function AssetDetailsList() {
                       sm={7}
                       xs={12}
                       sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      <Typography variant="subtitle2">
-                        {" "}
-                        {image.name}{" "}
-                      </Typography>
+                      <Typography variant="subtitle2"> {image.name} </Typography>
                     </Grid>
                     <Grid item md={1} sm={1} xs={12}>
-                      <Grid sx={{ display: "flex" }}>
+                      <Grid sx={{ display: 'flex' }}>
                         <Button
                           sx={{
-                            marginTop: "15px !important",
-                            padding: "14px 14px",
-                            minWidth: "40px !important",
-                            borderRadius: "50% !important",
-                            ":hover": {
-                              backgroundColor: "#80808036", // theme.palette.primary.main
+                            marginTop: '15px !important',
+                            padding: '14px 14px',
+                            minWidth: '40px !important',
+                            borderRadius: '50% !important',
+                            ':hover': {
+                              backgroundColor: '#80808036', // theme.palette.primary.main
                             },
                           }}
                           onClick={() => renderFilePreview(image)}
                         >
                           <VisibilityOutlinedIcon
                             style={{
-                              fontsize: "12px",
-                              color: "#357AE8",
-                              marginTop: "35px !important",
+                              fontsize: '12px',
+                              color: '#357AE8',
+                              marginTop: '35px !important',
                             }}
                           />
                         </Button>
                         <Button
                           sx={{
-                            marginTop: "15px !important",
-                            padding: "14px 14px",
-                            minWidth: "40px !important",
-                            borderRadius: "50% !important",
-                            ":hover": {
-                              backgroundColor: "#80808036",
+                            marginTop: '15px !important',
+                            padding: '14px 14px',
+                            minWidth: '40px !important',
+                            borderRadius: '50% !important',
+                            ':hover': {
+                              backgroundColor: '#80808036',
                             },
                           }}
                           onClick={() => removeCapturedImage(index)}
                         >
                           <FaTrash
                             style={{
-                              color: "#a73131",
-                              fontSize: "12px",
-                              marginTop: "35px !important",
+                              color: '#a73131',
+                              fontSize: '12px',
+                              marginTop: '35px !important',
                             }}
                           />
                         </Button>
@@ -9045,27 +7436,22 @@ function AssetDetailsList() {
                   <Grid item md={2} sm={2} xs={2}>
                     <Box
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
-                      {file.type.includes("image/") ? (
+                      {file.type.includes('image/') ? (
                         <img
                           src={file.preview}
                           alt={file.name}
                           height={50}
                           style={{
-                            maxWidth: "-webkit-fill-available",
+                            maxWidth: '-webkit-fill-available',
                           }}
                         />
                       ) : (
-                        <img
-                          className={classes.preview}
-                          src={getFileIcon(file.name)}
-                          height="10"
-                          alt="file icon"
-                        />
+                        <img className={classes.preview} src={getFileIcon(file.name)} height="10" alt="file icon" />
                       )}
                     </Box>
                   </Grid>
@@ -9075,44 +7461,40 @@ function AssetDetailsList() {
                     sm={7}
                     xs={7}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Typography variant="subtitle2"> {file.name} </Typography>
                   </Grid>
                   <Grid item md={1} sm={1} xs={1}>
-                    <Grid sx={{ display: "flex" }}>
+                    <Grid sx={{ display: 'flex' }}>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => renderFilePreview(file)}
                       >
-                        <VisibilityOutlinedIcon
-                          style={{ fontsize: "12px", color: "#357AE8" }}
-                        />
+                        <VisibilityOutlinedIcon style={{ fontsize: '12px', color: '#357AE8' }} />
                       </Button>
                       <Button
                         sx={{
-                          padding: "14px 14px",
-                          minWidth: "40px !important",
-                          borderRadius: "50% !important",
-                          ":hover": {
-                            backgroundColor: "#80808036", // theme.palette.primary.main
+                          padding: '14px 14px',
+                          minWidth: '40px !important',
+                          borderRadius: '50% !important',
+                          ':hover': {
+                            backgroundColor: '#80808036', // theme.palette.primary.main
                           },
                         }}
                         onClick={() => handleDeleteFileedit(index)}
                       >
-                        <FaTrash
-                          style={{ color: "#a73131", fontSize: "12px" }}
-                        />
+                        <FaTrash style={{ color: '#a73131', fontSize: '12px' }} />
                       </Button>
                     </Grid>
                   </Grid>
@@ -9135,20 +7517,13 @@ function AssetDetailsList() {
       </Dialog>
 
       {/* webcam alert start */}
-      <Dialog
-        open={isWebcamOpenedit}
-        onClose={webcamCloseedit}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="sm"
-        fullWidth={true}
-      >
+      <Dialog open={isWebcamOpenedit} onClose={webcamCloseedit} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="sm" fullWidth={true}>
         <DialogContent
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            textAlign: "center",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'center',
+            textAlign: 'center',
+            alignItems: 'center',
           }}
         >
           <Webcamimage
@@ -9164,11 +7539,7 @@ function AssetDetailsList() {
           />
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={webcamDataStoreedit}
-          >
+          <Button variant="contained" color="success" onClick={webcamDataStoreedit}>
             OK
           </Button>
           <Button variant="contained" color="error" onClick={webcamCloseedit}>
@@ -9176,95 +7547,65 @@ function AssetDetailsList() {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        open={isimgviewbill}
-        onClose={handlecloseImgcodeviewbill}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={isimgviewbill} onClose={handlecloseImgcodeviewbill} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="md" fullWidth>
         <DialogContent>
           <Typography variant="h6">Images</Typography>
-          <Grid container >
-            <Grid item md={3} sm={10} xs={10}>  <Typography variant="h6">File</Typography>    </Grid>
-            <Grid
-              item
-              md={4}
-              sm={10}
-              xs={10}
-              sx={{ display: "flex", alignItems: "center" }}
-            > <Typography variant="h6">File Name</Typography>    </Grid>
-            <Grid
-              item
-              md={4}
-              sm={10}
-              xs={10}
-              sx={{ display: "flex", alignItems: "center" }}
-            > <Typography variant="h6">Remarks</Typography>    </Grid>
+          <Grid container>
+            <Grid item md={3} sm={10} xs={10}>
+              {' '}
+              <Typography variant="h6">File</Typography>{' '}
+            </Grid>
+            <Grid item md={4} sm={10} xs={10} sx={{ display: 'flex', alignItems: 'center' }}>
+              {' '}
+              <Typography variant="h6">File Name</Typography>{' '}
+            </Grid>
+            <Grid item md={4} sm={10} xs={10} sx={{ display: 'flex', alignItems: 'center' }}>
+              {' '}
+              <Typography variant="h6">Remarks</Typography>{' '}
+            </Grid>
           </Grid>
           {getimgbillcode.map((imagefilebill, index) => (
             <Grid container key={index}>
               <Grid item md={3} sm={10} xs={10}>
-
-
-                {imagefilebill.type.includes("image/") ? (
+                {imagefilebill.type.includes('image/') ? (
                   <img
                     src={imagefilebill.preview}
                     alt={imagefilebill.name}
                     height={40}
                     style={{
-                      maxWidth: "70px",
-                      maxHeight: "70px",
-                      marginTop: "10px",
+                      maxWidth: '70px',
+                      maxHeight: '70px',
+                      marginTop: '10px',
                     }}
                   />
                 ) : (
-                  <img
-                    className={classes.preview}
-                    src={getFileIcon(imagefilebill.name)}
-                    height={40}
-                    alt="file icon"
-                  />
+                  <img className={classes.preview} src={getFileIcon(imagefilebill.name)} height={40} alt="file icon" />
                 )}
               </Grid>
 
-
-              <Grid
-                item
-                md={4}
-                sm={10}
-                xs={10}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
+              <Grid item md={4} sm={10} xs={10} sx={{ display: 'flex', alignItems: 'center' }}>
                 <Typography>{imagefilebill.name}</Typography>
               </Grid>
-              <Grid
-                item
-                md={4}
-                sm={10}
-                xs={10}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
+              <Grid item md={4} sm={10} xs={10} sx={{ display: 'flex', alignItems: 'center' }}>
                 <Typography>{imagefilebill.remarks}</Typography>
               </Grid>
               <Grid item md={1} sm={1} xs={1}>
                 <Button
                   sx={{
-                    padding: "14px 14px",
-                    minWidth: "40px !important",
-                    borderRadius: "50% !important",
-                    ":hover": {
-                      backgroundColor: "#80808036", // theme.palette.primary.main
+                    padding: '14px 14px',
+                    minWidth: '40px !important',
+                    borderRadius: '50% !important',
+                    ':hover': {
+                      backgroundColor: '#80808036', // theme.palette.primary.main
                     },
                   }}
                   onClick={() => renderFilePreview(imagefilebill)}
                 >
                   <VisibilityOutlinedIcon
                     style={{
-                      fontsize: "12px",
-                      color: "#357AE8",
-                      marginTop: "35px !important",
+                      fontsize: '12px',
+                      color: '#357AE8',
+                      marginTop: '35px !important',
                     }}
                   />
                 </Button>
@@ -9280,23 +7621,20 @@ function AssetDetailsList() {
         </DialogActions>
       </Dialog>
 
-
-
       <Dialog open={isCheckOpen} onClose={handleCloseCheck} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
-          <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: "orange" }} />
+        <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
 
-          <Typography variant="h6" sx={{ color: "black", textAlign: "center" }}>
+          <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
             {(() => {
               // Mapping of conditions and their corresponding labels
               const conditions = [
-
-                { check: checkassetip?.length > 0, label: "Asset Material IP" },
-                { check: checkassetwrkgrp?.length > 0, label: "Asset WorkStation Grouping" },
-                { check: checkmaindetails?.length > 0, label: "Maintenance Details Master" },
-                { check: checkmaintmaster?.length > 0, label: "Maintenance Master" },
-                { check: checknonschedule?.length > 0, label: "Maintenance Non Schedule Grouping" },
-                { check: checkassetempdis?.length > 0, label: "Asset Employee Distribution" },
+                { check: checkassetip?.length > 0, label: 'Asset Material IP' },
+                { check: checkassetwrkgrp?.length > 0, label: 'Asset WorkStation Grouping' },
+                { check: checkmaindetails?.length > 0, label: 'Maintenance Details Master' },
+                { check: checkmaintmaster?.length > 0, label: 'Maintenance Master' },
+                { check: checknonschedule?.length > 0, label: 'Maintenance Non Schedule Grouping' },
+                { check: checkassetempdis?.length > 0, label: 'Asset Employee Distribution' },
               ];
 
               // Filter out the true conditions
@@ -9304,153 +7642,131 @@ function AssetDetailsList() {
 
               // Build the message dynamically
               if (linkedItems.length > 0) {
-                const linkedLabels = linkedItems.map((item) => item.label).join(", ");
+                const linkedLabels = linkedItems.map((item) => item.label).join(', ');
                 return (
                   <>
-                    <span style={{ fontWeight: "700", color: "#777" }}>{`${deleteAssetdetail.company + " ," +
-                      deleteAssetdetail.branch + " ," +
-                      deleteAssetdetail.unit + " ," +
-                      deleteAssetdetail.floor + " ," +
-                      deleteAssetdetail.area + " ," +
-                      deleteAssetdetail.location + " ," +
+                    <span style={{ fontWeight: '700', color: '#777' }}>{`${deleteAssetdetail.company +
+                      ' ,' +
+                      deleteAssetdetail.branch +
+                      ' ,' +
+                      deleteAssetdetail.unit +
+                      ' ,' +
+                      deleteAssetdetail.floor +
+                      ' ,' +
+                      deleteAssetdetail.area +
+                      ' ,' +
+                      deleteAssetdetail.location +
+                      ' ,' +
                       // deleteAssetdetail.workstation + " ," +
-                      deleteAssetdetail.material + " ," +
-                      deleteAssetdetail.code + " ,"
-
-
+                      deleteAssetdetail.material +
+                      ' ,' +
+                      deleteAssetdetail.code +
+                      ' ,'
                       } `}</span>
-                    was linked in <span style={{ fontWeight: "700" }}>{linkedLabels}</span>
+                    was linked in <span style={{ fontWeight: '700' }}>{linkedLabels}</span>
                   </>
                 );
               } else {
                 // Default empty message if no conditions are true
-                return "";
+                return '';
               }
             })()}
           </Typography>
-
-
         </DialogContent>
         <DialogActions>
-          < Button onClick={handleCloseCheck} autoFocus variant="contained" color="error">
-            {" "}
-            OK{" "}
+          <Button onClick={handleCloseCheck} autoFocus variant="contained" color="error">
+            {' '}
+            OK{' '}
           </Button>
         </DialogActions>
       </Dialog>
 
-
       <Dialog open={isbulkCheckOpen} onClose={handlebulkCloseCheck} aria-labelledby="alert-dialog-title" maxWidth="md" aria-describedby="alert-dialog-description">
-        <DialogContent sx={{ textAlign: "center", alignItems: "center" }}>
-          <ErrorOutlineOutlinedIcon sx={{ fontSize: "80px", color: "orange" }} />
-          <Typography variant="h6" sx={{ color: "black", textAlign: "center" }}>
-            {(
-
-              overalldeletecheck.assetmaterialip?.length > 0 ||
-              overalldeletecheck.assetworkstationgrouping?.length > 0 ||
-              overalldeletecheck.maintenancemaster?.length > 0 ||
-              overalldeletecheck.assetempdistribution?.length > 0 ||
-              overalldeletecheck.maintenancenonschedulegrouping?.length > 0
-
-            )
-              && (
-                <>
-                  <span style={{ fontWeight: "700", color: "#777" }}>
-                    { }
-                  </span>{' '}
-                  <TableContainer component={Paper} >
-                    <Table
-                      sx={{ minWidth: 700 }}
-                      aria-label="customized table"
-                      id="jobopening"
-                    >
-                      <TableHead sx={{ fontWeight: "600" }}>
+        <DialogContent sx={{ textAlign: 'center', alignItems: 'center' }}>
+          <ErrorOutlineOutlinedIcon sx={{ fontSize: '80px', color: 'orange' }} />
+          <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
+            {(overalldeletecheck.assetmaterialip?.length > 0 || overalldeletecheck.assetworkstationgrouping?.length > 0 || overalldeletecheck.maintenancemaster?.length > 0 || overalldeletecheck.assetempdistribution?.length > 0 || overalldeletecheck.maintenancenonschedulegrouping?.length > 0) && (
+              <>
+                <span style={{ fontWeight: '700', color: '#777' }}>{ }</span>{' '}
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 700 }} aria-label="customized table" id="jobopening">
+                    <TableHead sx={{ fontWeight: '600' }}>
+                      <StyledTableRow>
+                        <StyledTableCell>SNo</StyledTableCell>
+                        <StyledTableCell>Company</StyledTableCell>
+                        <StyledTableCell>Branch</StyledTableCell>
+                        <StyledTableCell>Unit</StyledTableCell>
+                        <StyledTableCell>Floor</StyledTableCell>
+                        <StyledTableCell>Area</StyledTableCell>
+                        <StyledTableCell>Location</StyledTableCell>
+                        <StyledTableCell>Material</StyledTableCell>
+                      </StyledTableRow>
+                    </TableHead>
+                    <TableBody align="left">
+                      {getLinkedLabelItem(overalldeletecheck)?.length > 0 ? (
+                        getLinkedLabelItem(overalldeletecheck)?.map((row, index) => (
+                          <StyledTableRow key={index}>
+                            <StyledTableCell sx={{ padding: '10px' }}>{index + 1}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '10px' }}>{row.company}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '10px' }}>{row?.branch}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '10px' }}>{row.unit}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '10px' }}>{row.floor}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '10px' }}>{row?.area}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '10px' }}>{row.location}</StyledTableCell>
+                            <StyledTableCell sx={{ padding: '10px' }}>{row.assetmaterial}</StyledTableCell>
+                          </StyledTableRow>
+                        ))
+                      ) : (
                         <StyledTableRow>
-                          <StyledTableCell>SNo</StyledTableCell>
-                          <StyledTableCell>Company</StyledTableCell>
-                          <StyledTableCell>Branch</StyledTableCell>
-                          <StyledTableCell>Unit</StyledTableCell>
-                          <StyledTableCell>Floor</StyledTableCell>
-                          <StyledTableCell>Area</StyledTableCell>
-                          <StyledTableCell>Location</StyledTableCell>
-                          <StyledTableCell>Material</StyledTableCell>
+                          {' '}
+                          <StyledTableCell colSpan={7} align="center">
+                            No Data Available
+                          </StyledTableCell>{' '}
                         </StyledTableRow>
-                      </TableHead>
-                      <TableBody align="left">
-                        {
-                          getLinkedLabelItem(overalldeletecheck)?.length > 0 ? (
-
-                            getLinkedLabelItem(overalldeletecheck)?.map((row, index) => (
-                              <StyledTableRow key={index}>
-                                <StyledTableCell sx={{ padding: "10px" }}>{index + 1}</StyledTableCell>
-                                <StyledTableCell sx={{ padding: "10px" }}>{row.company}</StyledTableCell>
-                                <StyledTableCell sx={{ padding: "10px" }}>{row?.branch}</StyledTableCell>
-                                <StyledTableCell sx={{ padding: "10px" }}>{row.unit}</StyledTableCell>
-                                <StyledTableCell sx={{ padding: "10px" }}>{row.floor}</StyledTableCell>
-                                <StyledTableCell sx={{ padding: "10px" }}>{row?.area}</StyledTableCell>
-                                <StyledTableCell sx={{ padding: "10px" }}>{row.location}</StyledTableCell>
-                                <StyledTableCell sx={{ padding: "10px" }}>{row.assetmaterial}</StyledTableCell>
-                              </StyledTableRow>
-                            ))
-                          ) : (
-                            <StyledTableRow>
-                              {" "}
-                              <StyledTableCell colSpan={7} align="center">
-                                No Data Available
-                              </StyledTableCell>{" "}
-                            </StyledTableRow>
-                          )
-
-                        }
-                        <StyledTableRow></StyledTableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                  was linked in{' '}
-                  <span style={{ fontWeight: "700", color: "#777" }}>
-                    {getLinkedLabel(overalldeletecheck)}
-                  </span>
-                  {shouldShowDeleteMessage(assetdetails, selectedRows, overalldeletecheck) && (
-                    <Typography>Do you want to delete others?...</Typography>
-                  )}
-                </>
-              )}
+                      )}
+                      <StyledTableRow></StyledTableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                was linked in <span style={{ fontWeight: '700', color: '#777' }}>{getLinkedLabel(overalldeletecheck)}</span>
+                {shouldShowDeleteMessage(assetdetails, selectedRows, overalldeletecheck) && <Typography>Do you want to delete others?...</Typography>}
+              </>
+            )}
           </Typography>
         </DialogContent>
         <DialogActions>
           {shouldEnableOkButton(assetdetails, selectedRows, overalldeletecheck) ? (
-            <Button onClick={handlebulkCloseCheck} autoFocus variant="contained" color="error"> OK </Button>
+            <Button onClick={handlebulkCloseCheck} autoFocus variant="contained" color="error">
+              {' '}
+              OK{' '}
+            </Button>
           ) : null}
           {shouldShowDeleteMessage(assetdetails, selectedRows, overalldeletecheck) && (
             <>
-              <Button onClick={delaccountheadwithoutlink} variant="contained"> Yes </Button>
-              <Button onClick={handlebulkCloseCheck} autoFocus variant="contained" color="error">Cancel</Button>
+              <Button onClick={delaccountheadwithoutlink} variant="contained">
+                {' '}
+                Yes{' '}
+              </Button>
+              <Button onClick={handlebulkCloseCheck} autoFocus variant="contained" color="error">
+                Cancel
+              </Button>
             </>
           )}
         </DialogActions>
       </Dialog>
 
-
       <Box>
-        <Dialog
-          open={isErrorOpenpop}
-          onClose={handleCloseerrpop}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          sx={{ marginTop: "95px" }}
-        >
-          <DialogContent
-            sx={{ width: "350px", textAlign: "center", alignItems: "center" }}
-          >
+        <Dialog open={isErrorOpenpop} onClose={handleCloseerrpop} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" sx={{ marginTop: '95px' }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlertpop}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={() => {
                 sendEditRequest();
@@ -9461,15 +7777,15 @@ function AssetDetailsList() {
             </Button>
             <Button
               style={{
-                backgroundColor: "#f4f4f4",
-                color: "#444",
-                boxShadow: "none",
-                borderRadius: "3px",
-                padding: "7px 13px",
-                border: "1px solid #0000006b",
-                "&:hover": {
-                  "& .css-bluauu-MuiButtonBase-root-MuiButton-root": {
-                    backgroundColor: "#f4f4f4",
+                backgroundColor: '#f4f4f4',
+                color: '#444',
+                boxShadow: 'none',
+                borderRadius: '3px',
+                padding: '7px 13px',
+                border: '1px solid #0000006b',
+                '&:hover': {
+                  '& .css-bluauu-MuiButtonBase-root-MuiButton-root': {
+                    backgroundColor: '#f4f4f4',
                   },
                 },
               }}
@@ -9481,24 +7797,11 @@ function AssetDetailsList() {
         </Dialog>
       </Box>
 
-
-
-
       {/* EXTERNAL COMPONENTS -------------- START */}
       {/* VALIDATION */}
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
+      <MessageAlert openPopup={openPopupMalert} handleClosePopup={handleClosePopupMalert} popupContent={popupContentMalert} popupSeverity={popupSeverityMalert} />
       {/* SUCCESS */}
-      <AlertDialog
-        openPopup={openPopup}
-        handleClosePopup={handleClosePopup}
-        popupContent={popupContent}
-        popupSeverity={popupSeverity}
-      />
+      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
       {/* PRINT PDF EXCEL CSV */}
       <ExportData
         isFilterOpen={isFilterOpen}
@@ -9510,58 +7813,32 @@ function AssetDetailsList() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={assetdetails ?? []}
-        filename={"AssetDetail"}
+        filename={'AssetDetail'}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
       />
       {/* INFO */}
-      <InfoPopup
-        openInfo={openInfo}
-        handleCloseinfo={handleCloseinfo}
-        heading="Asset Detail Info"
-        addedby={addedby}
-        updateby={updateby}
-      />
+      <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Asset Detail Info" addedby={addedby} updateby={updateby} />
       {/*SINGLE DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onClose={handleCloseMod}
-        onConfirm={delAssetdetail}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delAssetdetail} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/*BULK DELETE ALERT DIALOG ARE YOU SURE? */}
-      <DeleteConfirmation
-        open={isDeleteOpencheckbox}
-        onClose={handleCloseModcheckbox}
-        onConfirm={delAssetcheckbox}
-        title="Are you sure?"
-        confirmButtonText="Yes"
-        cancelButtonText="Cancel"
-      />
+      <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delAssetcheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
       {/* PLEASE SELECT ANY ROW */}
-      <PleaseSelectRow
-        open={isDeleteOpenalert}
-        onClose={handleCloseModalert}
-        message="Please Select any Row"
-        iconColor="orange"
-        buttonText="OK"
-      />
+      <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
       {/* EXTERNAL COMPONENTS -------------- END */}
       <Box>
         <Dialog open={isErrorOpen} onClose={handleCloseerr} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-          <DialogContent sx={{ width: "350px", textAlign: "center", alignItems: "center" }}>
+          <DialogContent sx={{ width: '350px', textAlign: 'center', alignItems: 'center' }}>
             <Typography variant="h6">{showAlert}</Typography>
           </DialogContent>
           <DialogActions>
             <Button
               variant="contained"
               style={{
-                padding: "7px 13px",
-                color: "white",
-                background: "rgb(25, 118, 210)",
+                padding: '7px 13px',
+                color: 'white',
+                background: 'rgb(25, 118, 210)',
               }}
               onClick={handleCloseerr}
             >

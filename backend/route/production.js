@@ -509,10 +509,11 @@ productionRoute.route("/manageidlework/new").post(addManageidlework);
 productionRoute.route("/manageidlework/:id").delete(deleteManageidlework).get(getSingleManageidlework).put(updateManageidlework);
 
 
-const { getAllNonProductionUnitRate, addNonProductionUnitRate, getSingleNonProductionUnitRate, updateNonProductionUnitRate, deleteNonProductionUnitRate } = require("../controller/modules/production/nonproductionunitrate");
-productionRoute.route("/nonproductionunitrate").get(getAllNonProductionUnitRate);
-productionRoute.route("/nonproductionunitrate/new").post(addNonProductionUnitRate);
-productionRoute.route("/nonproductionunitrate/:id").get(getSingleNonProductionUnitRate).put(updateNonProductionUnitRate).delete(deleteNonProductionUnitRate);
+const { getAllNonProductionUnitRate, addNonProductionUnitRate, getSingleNonProductionUnitRate, getAllNonProductionUnitRateForPagination, updateNonProductionUnitRate, deleteNonProductionUnitRate } = require('../controller/modules/production/nonproductionunitrate');
+productionRoute.route('/nonproductionunitrate').get(getAllNonProductionUnitRate);
+productionRoute.route('/nonproductionunitrateforpagination').post(getAllNonProductionUnitRateForPagination);
+productionRoute.route('/nonproductionunitrate/new').post(addNonProductionUnitRate);
+productionRoute.route('/nonproductionunitrate/:id').get(getSingleNonProductionUnitRate).put(updateNonProductionUnitRate).delete(deleteNonProductionUnitRate);
 
 //for category and subcategory
 const { getAllCategoryAndSubcategory, addCategoryAndSubcategory, getSingleCategoryAndSubcategory, updateCategoryAndSubcategory, deleteCategoryAndSubcategory } = require("../controller/modules/production/categoryandsubcategory");
@@ -596,6 +597,7 @@ const {
   getAllPenaltyAmountConsolidatedDateBasedRestriction
 } = require("../controller/modules/penalty/penaltyamountconsolidate");
 productionRoute.route("/penaltyamountconsolidatedlist").get(getAllPenaltyAmountConsolidatedList);
+productionRoute.route("/getallpenaltyamountdatebasedrestriction").post(getAllPenaltyAmountConsolidatedDateBasedRestriction);
 
 
 
@@ -604,7 +606,6 @@ productionRoute.route("/penaltyamountconsolidate/new").post(addPenaltyAmountCons
 productionRoute.route("/filterpenaltyamountconsolidated").post(getFilterPenaltyAmountConsolidated);
 productionRoute.route("/filterpenaltyamountconsolidatedmonthview").post(getAllPenaltyAmountConsolidatedMonthView);
 productionRoute.route("/filterpenaltyamountconsolidatedmonthviewindividual").post(getAllPenaltyMonthAmountConsolidatedViewIndividual);
-productionRoute.route("/getallpenaltyamountdatebasedrestriction").post(getAllPenaltyAmountConsolidatedDateBasedRestriction);
 productionRoute
   .route("/penaltyamountconsolidate/:id")
   .delete(deletePenaltyAmountConsolidated)

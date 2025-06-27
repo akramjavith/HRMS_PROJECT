@@ -5867,11 +5867,16 @@ SCHEDULE_MEETING_FILTER_LIST_TEAM: `${BASE_URL}/api/schedulemeetingfilterteam`,
 
 
       
+  // Non production entry
+  NONPRODUCTIONENTRY: `${BASE_URL}/api/nonproductionentrys`,
+  NONPRODUCTIONENTRY_CREATE: `${BASE_URL}/api/nonproductionentry/new`,
+  NONPRODUCTIONENTRY_SINGLE: `${BASE_URL}/api/nonproductionentry`,
+      
+      
+  NON_PRODUCTIONENTRY_UNITALLOT_CATEGORY_SUBCATEGORY: `${BASE_URL}/api/categoryandsubcategoryunitallot`,
 
       
-      
-
-      
+  
 
       
 

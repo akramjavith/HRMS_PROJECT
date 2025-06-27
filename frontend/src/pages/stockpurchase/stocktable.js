@@ -1965,20 +1965,29 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
     setUploadPopupOpenwarrantyedit(true);
   };
 
-  const vendorid = async (id) => {
-    try {
-      let res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-      });
-      setVendorgetid(res?.data?.svendordetails);
-      setVendornameid(id);
-    } catch (err) {
-      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-    }
-  };
-
+   const vendorid = async (id) => {
+     try {
+       if (id) {
+         let res = await axios.get(`${SERVICE.SINGLE_VENDORDETAILS}/${id}`, {
+           headers: {
+             Authorization: `Bearer ${auth.APIToken}`,
+           },
+         });
+         setVendorgetid(res?.data?.svendordetails);
+         setVendornameid(id);
+       } else {
+         setVendorgetid({
+           ...vendorgetid,
+           gstnumber: '',
+           address: '',
+           phonenumber: '',
+         });
+         setVendornameid('');
+       }
+     } catch (err) {
+       handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
+     }
+   };
   //get all vom master name.
   const fetchVomMaster = async (e) => {
     try {
@@ -2126,6 +2135,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
       setEducationtodo(res?.data?.sstock?.tododetails);
       setVendorGroup(res?.data?.sstock?.vendorgroup);
       setVendorNew(res?.data?.sstock?.vendor);
+      setVendornameid(res?.data?.sstock?.vendorid);
       setoldfileNamesBill(res?.data?.sstock?.filenamesbill.map((d) => `${res?.data?.sstock?.uniqueId}$bill$${d}`));
       setOldfileNamesWar(res?.data?.sstock?.filenames.map((d) => `${res?.data?.sstock?.uniqueId}$todo$${d}`));
       setStockmanagemasteredit({
@@ -2853,7 +2863,7 @@ function ListReferenceCategoryDoc({ vendorAuto }) {
         vendorgroup: String(vendorGroup),
         vendor: String(vendorNew),
         gstno: String(vendorgetid.gstnumber === undefined ? '' : vendorgetid.gstnumber),
-        vendorid: String(vendornameid._id ? vendornameid._id : ''),
+       vendorid: String(vendornameid) ? String(vendornameid) : '',
         billno: Number(stockmanagemasteredit.billno),
         productdetails: String(stockmanagemasteredit.productdetails),
         warrantydetails: String(stockmanagemasteredit.warranty === 'Yes' ? stockmanagemasteredit.warrantydetails : ""),

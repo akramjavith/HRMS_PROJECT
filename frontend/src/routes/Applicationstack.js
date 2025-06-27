@@ -1031,6 +1031,10 @@ const MyEventsListHome = React.lazy(() => import("../pages/MyDashboardPages/Even
 const EventsListHomeTeam = React.lazy(() => import("../pages/teamDashboard/EventsListHome.js"));
 
 
+const NonProductionEntry = React.lazy(() => import('../pages/production/penalty/Nonproductionentry.js'));
+const IdleTimeWork = React.lazy(() => import('../pages/production/penalty/Idletimework.js'));
+
+
 const App = () => {
   return (
     <>
@@ -2132,8 +2136,9 @@ const App = () => {
               <Route path="myeventslisthome" element={<MyEventsListHome />} />
               <Route path="eventslisthometeam" element={<EventsListHomeTeam />} />
 
-              
-            
+                <Route path="production/nonproductionentry" element={<NonProductionEntry />} />
+                        <Route path="production/idletimework" element={<IdleTimeWork />} />
+
             
             {/* page not found */}
             {/* <Route path="*" element={<p>Not found!</p>} /> */}

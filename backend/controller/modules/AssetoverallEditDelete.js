@@ -1295,12 +1295,23 @@ exports.getOverAllEditUOMLinkedData = catchAsyncErrors(async (req, res, next) =>
 
 //overall delete asset master
 exports.getOverAllDeleteAssetMasterLinkedData = catchAsyncErrors(async (req, res, next) => {
-    let assetmaterialip, assetworkstationgrouping, maintenancemaster,
+    let assetmaterialip, assetworkstationgrouping, maintenancemaster,assetsoftwaredetails,
         maintenancedetailsmaster, assetempdistribution, maintenancenonschedulegrouping
 
 
     try {
-        // console.log(req.body, "body")
+
+         let softwaremaster = req.body.matassetip.map((item) => ({
+            company: item.company,
+            branch: item.branch,
+            unit: item.unit,
+            floor: item.floor,
+            area: item.area,
+            location: item.location,
+            assetmaterialcode: { $elemMatch: { $regex: `.*${item.code.replace(/[$^.*+?()[\]{}|\\]/g, '\\$&')}.*`, $options: "i" } },
+        }));
+
+
         let assetips = req.body.matassetip.map((item) => ({
             company: item.company,
             branch: item.branch,
@@ -1355,7 +1366,9 @@ exports.getOverAllDeleteAssetMasterLinkedData = catchAsyncErrors(async (req, res
         }));
 
 
-
+   let queryassetdetailsoftware = {
+            $or: softwaremaster
+        };
 
         let queryassetmaterialip = {
             $or: assetips
@@ -1377,6 +1390,16 @@ exports.getOverAllDeleteAssetMasterLinkedData = catchAsyncErrors(async (req, res
 
 
 
+        assetsoftwaredetails = await AssetSoftwareDetails.find(queryassetdetailsoftware, {
+            company: 1,
+            branch: 1,
+            unit: 1,
+            floor: 1,
+            location: 1,
+            area: 1,
+            assetmaterialcode: 1,
+            _id: 0,
+        });
 
 
         assetmaterialip = await AssetMaterialIP.find(queryassetmaterialip, {
@@ -1449,10 +1472,8 @@ exports.getOverAllDeleteAssetMasterLinkedData = catchAsyncErrors(async (req, res
 
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
         assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,
         maintenancemaster, assetempdistribution, maintenancenonschedulegrouping
@@ -1465,8 +1486,22 @@ exports.getOverAllDeleteAssetMasterLinkedData = catchAsyncErrors(async (req, res
 //overall edit asset master
 exports.getOverAllEditAssetMasterLinkedData = catchAsyncErrors(async (req, res, next) => {
     let assetmaterialip, assetworkstationgrouping, maintenancemaster,
+    assetsoftwaredetails,
         maintenancedetailsmaster, assetempdistribution, maintenancenonschedulegrouping
     try {
+
+             let softwaremaster = req.body.oldname.map((item) => ({
+            company: item.company,
+            branch: item.branch,
+            unit: item.unit,
+            floor: item.floor,
+            area: item.area,
+            location: item.location,
+            assetmaterialcode: { $elemMatch: { $regex: `.*${item.code.replace(/[$^.*+?()[\]{}|\\]/g, '\\$&')}.*`, $options: "i" } },
+        }));
+
+
+
         let assetips = req.body.oldname.map((item) => ({
             company: item.company,
             branch: item.branch,
@@ -1521,7 +1556,9 @@ exports.getOverAllEditAssetMasterLinkedData = catchAsyncErrors(async (req, res, 
         }));
 
 
-
+ let queryassetdetailsoftware = {
+            $or: softwaremaster
+        };
 
         let queryassetmaterialip = {
             $or: assetips
@@ -1541,6 +1578,16 @@ exports.getOverAllEditAssetMasterLinkedData = catchAsyncErrors(async (req, res, 
         };
 
 
+     assetsoftwaredetails = await AssetSoftwareDetails.find(queryassetdetailsoftware, {
+            company: 1,
+            branch: 1,
+            unit: 1,
+            floor: 1,
+            location: 1,
+            area: 1,
+            assetmaterialcode: 1,
+            _id: 0,
+        });
 
 
 
@@ -1613,20 +1660,22 @@ exports.getOverAllEditAssetMasterLinkedData = catchAsyncErrors(async (req, res, 
         });
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
 
     return res.status(200).json({
         count: assetmaterialip.length + assetworkstationgrouping.length +
-            maintenancemaster.length + assetempdistribution.length + maintenancenonschedulegrouping.length
+            maintenancemaster.length +
+            assetsoftwaredetails.length +
+             assetempdistribution.length + maintenancenonschedulegrouping.length
         ,
 
-        assetmaterialip, assetworkstationgrouping, maintenancemaster,
+    assetmaterialip, assetworkstationgrouping, maintenancemaster,    assetsoftwaredetails,
         maintenancedetailsmaster, assetempdistribution, maintenancenonschedulegrouping
 
     });
 });
+
 
 
 //overall delete assetspecificationgrouping 

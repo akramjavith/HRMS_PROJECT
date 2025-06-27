@@ -516,8 +516,9 @@ productionRoute.route('/nonproductionunitrate/new').post(addNonProductionUnitRat
 productionRoute.route('/nonproductionunitrate/:id').get(getSingleNonProductionUnitRate).put(updateNonProductionUnitRate).delete(deleteNonProductionUnitRate);
 
 //for category and subcategory
-const { getAllCategoryAndSubcategory, addCategoryAndSubcategory, getSingleCategoryAndSubcategory, updateCategoryAndSubcategory, deleteCategoryAndSubcategory } = require("../controller/modules/production/categoryandsubcategory");
+const { getAllCategoryAndSubcategory,getAllCategoryAndSubcategoryFromUnitAllot, addCategoryAndSubcategory, getSingleCategoryAndSubcategory, updateCategoryAndSubcategory, deleteCategoryAndSubcategory } = require("../controller/modules/production/categoryandsubcategory");
 productionRoute.route("/categoryandsubcategory").get(getAllCategoryAndSubcategory);
+productionRoute.route("/categoryandsubcategoryunitallot").post(getAllCategoryAndSubcategoryFromUnitAllot);
 productionRoute.route("/categoryandsubcategory/new").post(addCategoryAndSubcategory);
 productionRoute.route("/categoryandsubcategory/:id").get(getSingleCategoryAndSubcategory).put(updateCategoryAndSubcategory).delete(deleteCategoryAndSubcategory);
 
@@ -535,10 +536,13 @@ productionRoute.route("/productionclientrate/new").post(addProductionClientRate)
 productionRoute.route("/productionclientrate/:id").get(getSingleProductionClientRate).put(updateProductionClientRate).delete(deleteProductionClientRate);
 
 
-const { getAllNonproductionunitallot, deleteNonproductionunitallot, updateNonproductionunitallot, getSingleNonproductionunitallot, addNonproductionunitallot } = require("../controller/modules/production/nonproduction/NonproductionunitallotController");
+const { getAllNonproductionunitallot, deleteNonproductionunitallot, updateNonproductionunitallot,getAllNonproductionunitallotProduction, getSingleNonproductionunitallot, addNonproductionunitallot } = require("../controller/modules/production/nonproduction/NonproductionunitallotController");
 productionRoute.route("/nonproductionunitallot").get(getAllNonproductionunitallot);
+productionRoute.route("/nonproductionunitallotpagination").post(getAllNonproductionunitallotProduction);
 productionRoute.route("/nonproductionunitallot/new").post(addNonproductionunitallot);
 productionRoute.route("/nonproductionunitallot/:id").get(getSingleNonproductionunitallot).put(updateNonproductionunitallot).delete(deleteNonproductionunitallot);
+
+
 
 const { addPenaltyClientAmountUpload, updatePenaltyClientAmountUpload, deletePenaltyClientAmountUpload, getAllPenaltyClientAmountUpload, getSinglePenaltyClientAmountUpload, updatePenaltyClientAmountSingleUpload } = require("../controller/modules/production/penaltyclienterrorupload");
 productionRoute.route("/penaltyclientamounts").get(getAllPenaltyClientAmountUpload);
@@ -771,11 +775,21 @@ productionRoute.route("/wavierpercentage/new").post(addWavierpercentage);
 productionRoute.route("/wavierpercentage/:id").get(getSingleWavierpercentage).put(updateWavierpercentage).delete(deleteWavierpercentage);
 
 //for non production 
-const { getAllNonproduction, deleteNonproduction, getSingleNonproduction, updateNonproduction, addNonproduction, getAllNonProductionFilter } = require("../controller/modules/production/nonproduction/nonproduction");
+const { getAllNonproduction, deleteNonproduction, getSingleNonproduction, getAllUsersNonProductionForExports, getAllUsersNonProduction, getAllNonproductionListFilterExports, getAllNonproductionListFilterRejected, getAllNonproductionForPagination, getAllNonproductionListFilterApproved, getAllNonproductionListFilterForAssign, getAllNonproductionListFilter, updateNonproduction, addNonproduction, getAllNonProductionFilter } = require("../controller/modules/production/nonproduction/nonproduction");
 productionRoute.route("/nonproduction").get(getAllNonproduction);
+productionRoute.route("/nonproductionforpagination").post(getAllNonproductionForPagination);
+productionRoute.route("/alluserfornonproduction").post(getAllUsersNonProduction);
+productionRoute.route("/alluserfornonproductionforexports").post(getAllUsersNonProductionForExports);
 productionRoute.route("/nonproduction/new").post(addNonproduction);
+productionRoute.route("/nonproductionfilterlist").post(getAllNonproductionListFilter);
+productionRoute.route("/nonproductionfilterlistexports").post(getAllNonproductionListFilterExports);
+productionRoute.route("/nonproductionfilterlistforpagination").post(getAllNonproductionListFilterForAssign);
+productionRoute.route("/nonproductionfilterlistforpaginationapproved").post(getAllNonproductionListFilterApproved);
+productionRoute.route("/nonproductionfilterlistforpaginationrejected").post(getAllNonproductionListFilterRejected);
 productionRoute.route("/nonproductionfilter").post(getAllNonProductionFilter);
 productionRoute.route("/nonproduction/:id").get(getSingleNonproduction).put(updateNonproduction).delete(deleteNonproduction);
+
+
 
 const { getOriginalMismatchFilteredData, getUpdateFlagCount, getOriginalUnmatchedData, getOriginalUnmatchedDataCountCheck, getTempMismatchFilteredData, getUpdateTempFlagCount, getTempUnmatchedData } = require("../controller/modules/production/originalmismatchfiltercontroller");
 productionRoute.route("/originalmismatchfilter").post(getOriginalMismatchFilteredData);
@@ -1065,6 +1079,16 @@ productionRoute.route("/tempcategorytimelogs").get(getAllTempcategoryTimeLog);
 productionRoute.route("/tempcategorytimelog/new").post(addTempcategoryTimeLog);
 productionRoute.route("/tempcategorytimelogcalculation").post(TempCategoryTimelogCalculation);
 productionRoute.route("/tempcategorytimelog/:id").delete(deleteTempcategoryTimeLog).get(getSingleTempcategoryTimeLog).put(updateTempcategoryTimeLog);
+
+
+
+
+// for non production entry controller
+const { getAllNonproductionentry, getSingleNonproductionentry, updateNonproductionentry, addNonproductionentry, deleteNonproductionentry } = require("../controller/modules/production/nonproductionentry");
+productionRoute.route("/nonproductionentrys").get(getAllNonproductionentry);
+productionRoute.route("/nonproductionentry/new").post(addNonproductionentry);
+productionRoute.route("/nonproductionentry/:id").delete(deleteNonproductionentry).get(getSingleNonproductionentry).put(updateNonproductionentry);
+
 
 
 

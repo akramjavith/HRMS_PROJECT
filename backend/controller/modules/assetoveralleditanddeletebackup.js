@@ -15,25 +15,26 @@ const Maintenance = require("../../model/modules/account/maintenance");
 const AssetWorkGrp = require("../../model/modules/account/assetworkstationgrouping");
 const AssetProblemmaster = require('../../model/modules/account/Assetproblemmaster');
 const MaintenanceDetailsmaster = require('../../model/modules/account/MaintanceDetailsmaster');
+const AssetSoftwareDetails = require("../../model/modules/account/assetsoftwaredetails");
+
 const Employeeasset = require("../../model/modules/account/employeeassetdistribution");
 const Remainder = require('../../model/modules/task/remainder');
 const EmployeeAssetReturn = require("../../model/modules/account/employeeAssetReturnRegister.js");
 const ErrorHandler = require('../../utils/errorhandler');
 const catchAsyncErrors = require('../../middleware/catchAsyncError');
 
-
+const NotAddedBills = require("../../model/modules/expense/NotaddedBills.js");
+const SchedulePaymentBills = require("../../model/modules/account/otherpayment.js");
 
 
 //overall delete accouthead
 exports.getOverAllDeleteAccHeadLinkedData = catchAsyncErrors(async (req, res, next) => {
     let assettypegrouping, assetmaterial, assetdetail, stockmanage, stock, manualstockentry;
-    console.log(req.body.accountheadassetmaterial, "assetmaterial")
     try {
         let querytypegrouping = {
             accounthead: { $in: req.body.accountheadtypegrouping },
         };
 
-        // console.log(querytypegrouping, "querytypegrouping")
         let queryassetmaterial = {
             assethead: { $in: req.body.accountheadassetmaterial },
         };
@@ -61,7 +62,7 @@ exports.getOverAllDeleteAccHeadLinkedData = catchAsyncErrors(async (req, res, ne
 
 
         let querystock = {
-            asset: { $in: req.body.accountheadstock },
+            producthead: { $in: req.body.accountheadstock },
         };
 
         // let querymanaulstock = {
@@ -105,7 +106,7 @@ exports.getOverAllDeleteAccHeadLinkedData = catchAsyncErrors(async (req, res, ne
         });
 
         stock = await Stock.find(querystock, {
-            asset: 1,
+            producthead: 1,
             _id: 0,
         });
 
@@ -117,10 +118,8 @@ exports.getOverAllDeleteAccHeadLinkedData = catchAsyncErrors(async (req, res, ne
 
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
         assettypegrouping, assetmaterial, assetdetail, stockmanage, stock, manualstockentry,
     });
@@ -136,12 +135,10 @@ exports.getOverAllEditAccHeadLinkedData = catchAsyncErrors(async (req, res, next
         assetmaterial = await Assetmaterial.find({ assethead: { $in: req.body.oldname } })
         assetdetail = await Assetdetail.find({ asset: { $in: req.body.oldname } })
         stockmanage = await Stockmanage.find({ asset: { $in: req.body.oldname } })
-        stock = await Stock.find({ asset: { $in: req.body.oldname } })
+        stock = await Stock.find({ producthead: { $in: req.body.oldname } })
         manualstockentry = await Manualstock.find({ producthead: { $in: req.body.oldname } })
-        console.log(req.body.oldname, "oldname")
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
 
@@ -165,7 +162,6 @@ exports.getOverAllDeleteTypeMasterLinkedData = catchAsyncErrors(async (req, res,
             name: { $in: req.body.accountheadtypegrouping },
         };
 
-        // console.log(querytypegrouping, "querytypegrouping")
         let queryassetmaterial = {
             assettype: { $in: req.body.accountheadassetmaterial },
         };
@@ -221,10 +217,8 @@ exports.getOverAllDeleteTypeMasterLinkedData = catchAsyncErrors(async (req, res,
 
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
         assettypegrouping, assetmaterial, assetdetail, stockmanage, stock, manualstockentry,
     });
@@ -245,7 +239,6 @@ exports.getOverAllEditAssetTypeMasterLinkedData = catchAsyncErrors(async (req, r
 
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
 
@@ -267,7 +260,7 @@ exports.getOverAllEditAssetTypeMasterLinkedData = catchAsyncErrors(async (req, r
 exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, res, next) => {
     let assetspecification, assetspecificationgrp, assetdetail, assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,
         assetproblem, maintenancemaster, assetempdistribution, stockmanage, stock, manualstockentry,
-        maintenancenonschedule, employeeassetreturn;
+        maintenancenonschedule, employeeassetreturn,maintenancedetails,assetsoftwaredetails;
 
     try {
         let nonschedule = req.body.name || []
@@ -278,6 +271,14 @@ exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, r
         let querymaintenancenonschedule = {
             assetmaterial: { $in: nonschedule.map(item => new RegExp("^" + item)) },
         };
+
+         let querysoftwareassetmaster = {
+            assetsoftwarematerial: { $in: nonschedule.map(item => new RegExp("^" + item)) },
+        };
+
+       
+
+
         // console.log(querymaintenancenonschedule, req.body, "querymaintenancenonschedule")
 
         let queryassetspecification = {
@@ -341,6 +342,20 @@ exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, r
         };
 
 
+           maintenancedetails = await MaintenanceDetailsmaster.find(querymaintenancedetailsmaster, {
+            assetmaterial: 1,
+            assetmaterialcode: 1,
+            _id: 0,
+        });
+
+
+           assetsoftwaredetails = await AssetSoftwareDetails.find(querysoftwareassetmaster, {
+       
+            assetmaterialcode: 1,
+            _id: 0,
+        });
+
+
 
         maintenancenonschedule = await TaskMaintenanceNonScheduleGrouping.find(querymaintenancenonschedule, {
             assetmaterial: 1,
@@ -370,7 +385,7 @@ exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, r
             _id: 0,
         });
 
-        maintenancedetailsmaster = await MaintenanceDetailsmaster.find(querymaintenancedetailsmaster, {
+        maintenancemaster = await Maintenance.find(querymaintenances, {
             assetmaterial: 1,
             _id: 0,
         });
@@ -385,10 +400,7 @@ exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, r
             _id: 0,
         });
 
-        maintenancemaster = await Maintenance.find(querymaintenances, {
-            assetmaterial: 1,
-            _id: 0,
-        });
+      
 
 
         assetempdistribution = await Employeeasset.find(queryempdistribution, {
@@ -419,7 +431,7 @@ exports.getOverAllDeleteAssetMaterialLinkedData = catchAsyncErrors(async (req, r
     }
     // console.log(assettypegrouping, "condition")
     return res.status(200).json({
-        assetspecification, assetspecificationgrp, assetdetail, assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,
+        assetspecification, assetspecificationgrp, assetdetail, assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,maintenancedetails,assetsoftwaredetails,
         assetproblem, maintenancemaster, assetempdistribution, stockmanage, stock, manualstockentry, maintenancenonschedule, employeeassetreturn
     });
 });
@@ -432,10 +444,23 @@ exports.getOverAllEditAssetMaterialLinkedData = catchAsyncErrors(async (req, res
     let assetspecification, assetspecificationgrp, assetdetail, assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,
         assetproblem, maintenancemaster,
         assetempdistribution, stockmanage, stock,
-        manualstockentry, maintenancenonschedule, employeeassetreturn;
+        manualstockentry, maintenancenonschedule, employeeassetreturn,maintenancedetails,assetsoftwaredetails;
     try {
-        let matmaintenances = req.body.oldname || [];
+       
         assetspecification = await AssetSpecification.find({ workstation: { $in: req.body.oldname } });
+        
+
+           maintenancedetails = await Maintenance.find({
+            assetmaterial:
+                new RegExp("^" + req.body.oldname)
+        });
+
+
+           assetsoftwaredetails = await AssetSoftwareDetails.find({ assetsoftwarematerial: { $in: req.body.oldname } });
+
+
+
+        
         assetspecificationgrp = await AssetSpecificationGrouping.find({ assetmaterial: { $in: req.body.oldname } });
         assetdetail = await Assetdetail.find({ material: { $in: req.body.oldname } });
         assetmaterialip = await AssetMaterialIP.find({ assetmaterial: { $in: req.body.oldname } });
@@ -472,9 +497,10 @@ exports.getOverAllEditAssetMaterialLinkedData = catchAsyncErrors(async (req, res
             maintenancedetailsmaster.length + assetworkstationgrouping.length + assetproblem.length +
             maintenancemaster.length + assetempdistribution.length +
             stockmanage.length + stock.length + manualstockentry.length +
-            maintenancenonschedule.length + employeeassetreturn.length
+            maintenancenonschedule.length + employeeassetreturn.length +
+            maintenancedetails.length + assetsoftwaredetails.length
         ,
-
+ maintenancedetails,assetsoftwaredetails,
         assetspecification, assetspecificationgrp, assetdetail, assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,
         assetproblem, maintenancemaster, assetempdistribution, stockmanage, stock,
         manualstockentry, maintenancenonschedule, employeeassetreturn
@@ -521,7 +547,6 @@ exports.getOverAllDeleteAssetSpecificationLinkedDataSingle = catchAsyncErrors(as
                 // { "subcomponent.subname": { $in: req.body.namesub } },
             ],
         };
-        // console.log(queryassetdetail, "queryassetdetail")
 
         let querystockmanage = {
 
@@ -568,7 +593,6 @@ exports.getOverAllDeleteAssetSpecificationLinkedDataSingle = catchAsyncErrors(as
             ],
         };
 
-        console.log(req.body.namesub, "2552")
         assetspecificationgrp = await AssetSpecificationGrouping.find(queryassetspecificationgrp, {
             component: 1,
             subcomponent: 1,
@@ -601,10 +625,8 @@ exports.getOverAllDeleteAssetSpecificationLinkedDataSingle = catchAsyncErrors(as
         });
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
         assetspecificationgrp, assetdetail, stockmanage, stock, manualstockentry
     });
@@ -616,7 +638,6 @@ exports.getOverAllDeleteAssetSpecificationLinkedData = catchAsyncErrors(async (r
     let assetspecificationgrp, assetdetail, stockmanage, stock, manualstockentry;
 
     try {
-        // console.log(req.body)
         const { data } = req.body
 
         let queryassetspecificationgrp = {
@@ -631,12 +652,6 @@ exports.getOverAllDeleteAssetSpecificationLinkedData = catchAsyncErrors(async (r
                 }
             }),
         };
-
-
-
-
-
-        // console.log(queryassetspecificationgrp, "queryassetspecificationgrp")
 
         let queryassetdetail = {
             // component: { $in: req.body.matassetdetail },
@@ -653,7 +668,6 @@ exports.getOverAllDeleteAssetSpecificationLinkedData = catchAsyncErrors(async (r
                 }
             }),
         };
-        // console.log(queryassetdetail, "queryassetdetail")
 
         let querystockmanage = {
 
@@ -669,8 +683,6 @@ exports.getOverAllDeleteAssetSpecificationLinkedData = catchAsyncErrors(async (r
                 }
             }),
         };
-
-        // console.log(querystockmanage, "querystockmanage")
         let querystock = {
             $or: data.map(item => {
                 if (item.subcomponent && item.subcomponent.length > 0) {
@@ -683,7 +695,6 @@ exports.getOverAllDeleteAssetSpecificationLinkedData = catchAsyncErrors(async (r
                 }
             }),
         };
-        // console.log(querystock, "querystock")
         let querymanaulstock = {
 
             $or: data.map(item => {
@@ -698,7 +709,6 @@ exports.getOverAllDeleteAssetSpecificationLinkedData = catchAsyncErrors(async (r
             }),
         };
 
-        // console.log(querymanaulstock, "querymanaulstock")
         assetspecificationgrp = await AssetSpecificationGrouping.find(queryassetspecificationgrp, {
             component: 1,
             subcomponent: 1,
@@ -730,12 +740,9 @@ exports.getOverAllDeleteAssetSpecificationLinkedData = catchAsyncErrors(async (r
             _id: 0,
         });
 
-        // console.log(assetspecificationgrp.length, "assetspecificationgrp")
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
         assetspecificationgrp, assetdetail, stockmanage, stock, manualstockentry
     });
@@ -747,7 +754,6 @@ exports.getOverAllDeleteAssetSpecificationLinkedData = catchAsyncErrors(async (r
 exports.getOverAllEditAssetSpecificationLinkedData = catchAsyncErrors(async (req, res, next) => {
     let assetspecificationgrp, assetdetail, stockmanage, stock, manualstockentry;
     try {
-        // console.log(req.body.oldname, "oldname")
         let query = {
 
             $or: [
@@ -826,10 +832,7 @@ exports.getOverAllEditAssetSpecificationLinkedData = catchAsyncErrors(async (req
         stock = await Stock.find(query);
         manualstockentry = await Manualstock.find(querymanual);
 
-        // console.log(manualstockentry, "manualstockentry")
-
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
 
@@ -844,8 +847,9 @@ exports.getOverAllEditAssetSpecificationLinkedData = catchAsyncErrors(async (req
 
 
 //overall delete vendor master
+//overall delete vendor master
 exports.getOverAllDeleteVendorMasterLinkedData = catchAsyncErrors(async (req, res, next) => {
-    let vendorgrouping, assetdetail, expense, schedulepayment, stock, manualstockentry;
+    let vendorgrouping, assetdetail, expense, schedulepayment, stock, manualstockentry, schedulepaymentbills, notaddedbills;
 
     try {
 
@@ -893,6 +897,14 @@ exports.getOverAllDeleteVendorMasterLinkedData = catchAsyncErrors(async (req, re
             vendor: 1,
             _id: 0,
         });
+        schedulepaymentbills = await SchedulePaymentBills.find(queryschedulepayment, {
+            vendor: 1,
+            _id: 0,
+        });
+        notaddedbills = await NotAddedBills.find(queryschedulepayment, {
+            vendor: 1,
+            _id: 0,
+        });
 
 
         assetdetail = await Assetdetail.find(queryassetdetail, {
@@ -920,7 +932,7 @@ exports.getOverAllDeleteVendorMasterLinkedData = catchAsyncErrors(async (req, re
     }
     // console.log(assettypegrouping, "condition")
     return res.status(200).json({
-        vendorgrouping, assetdetail, expense, schedulepayment, stock, manualstockentry
+        vendorgrouping, assetdetail, expense, schedulepayment, stock, manualstockentry, schedulepaymentbills, notaddedbills
     });
 });
 
@@ -929,12 +941,21 @@ exports.getOverAllDeleteVendorMasterLinkedData = catchAsyncErrors(async (req, re
 
 //overall edit vendor master
 exports.getOverAllEditVendorMasterLinkedData = catchAsyncErrors(async (req, res, next) => {
-    let vendorgrouping, assetdetail, expense, schedulepayment, stock, manualstockentry
+    let vendorgrouping, assetdetail, expense, schedulepayment, stock, manualstockentry, schedulepaymentbills, notaddedbills;
     try {
+
+
         vendorgrouping = await VendorGrouping.find({ vendor: { $in: req.body.oldname } });
         expense = await Expenses.find({ vendorname: { $in: req.body.oldname } });
         assetdetail = await Assetdetail.find({ vendor: { $in: req.body.oldname } });
-        schedulepayment = await SchedulePaymentMaster.find({ vendor: { $in: req.body.oldname } });
+        schedulepayment = await SchedulePaymentMaster.find({
+            $or: [
+                { vendor: req.body.oldname },
+                { "statuslog.vendor": req.body.oldname }
+            ]
+        });
+        schedulepaymentbills = await SchedulePaymentBills.find({ vendor: { $in: req.body.oldname } });
+        notaddedbills = await NotAddedBills.find({ vendor: { $in: req.body.oldname } });
 
         stock = await Stock.find({ vendor: { $in: req.body.oldname } });
         manualstockentry = await Manualstock.find({ vendorname: { $in: req.body.oldname } });
@@ -948,10 +969,11 @@ exports.getOverAllEditVendorMasterLinkedData = catchAsyncErrors(async (req, res,
 
     return res.status(200).json({
         count: vendorgrouping.length + assetdetail.length + expense.length + schedulepayment.length +
-            stock.length + manualstockentry.length
+            stock.length + manualstockentry.length + schedulepaymentbills?.length + notaddedbills?.length
         ,
 
-        vendorgrouping, expense, assetdetail, schedulepayment, stock, manualstockentry,
+        vendorgrouping, expense, assetdetail, schedulepayment, stock, manualstockentry, schedulepaymentbills,
+        notaddedbills
 
     });
 });
@@ -960,34 +982,53 @@ exports.getOverAllEditVendorMasterLinkedData = catchAsyncErrors(async (req, res,
 
 //overall delete vendor grouping
 exports.getOverAllDeleteVendorGroupingLinkedData = catchAsyncErrors(async (req, res, next) => {
-    let assetdetail, expense, schedulepayment, stock, manualstockentry;
+    let assetdetail, expense, schedulepayment, stock, manualstockentry, schedulepaymentbills;
+
+
 
     try {
 
-
         let queryexpense = {
-            vendorgrouping: { $in: req.body.expense },
+            $or:
+                req.body.data.map(item => ({ vendorgrouping: item.name, vendorname: item.vendor }))
+
         };
 
         let queryschedulepayment = {
-            vendorgrouping: { $in: req.body.schedule },
+            // vendorgrouping: { $in: req.body.vendorgroup },
+            // vendor: { $in: req.body.vendorgroup },
+            $or:
+                req.body.data.map(item => ({ vendorgrouping: item.name, vendor: item.vendor }))
+
         };
 
 
         let queryassetdetail = {
-            vendorgroup: { $in: req.body.matassetdetail },
+            // vendorgroup: { $in: req.body.vendorgroup },
+            // vendor: { $in: req.body.vendor },
+            $or:
+                req.body.data.map(item => ({ vendorgroup: item.name, vendor: item.vendor }))
+
         };
 
 
 
 
         let querystock = {
-            vendorgroup: { $in: req.body.matstock },
+            // vendorgroup: { $in: req.body.vendorgroup },
+            // vendor: { $in: req.body.vendor },
+            $or:
+                req.body.data.map(item => ({ vendorgroup: item.name, vendor: item.vendor }))
+
         };
 
         let querymanaulstock = {
 
-            vendorgroup: { $in: req.body.matproduct },
+            // vendorgroup: { $in: req.body.vendorgroup },
+            // vendorname: { $in: req.body.vendor },
+            $or:
+                req.body.data.map(item => ({ vendorgroup: item.name, vendorname: item.vendor }))
+
         };
 
 
@@ -995,16 +1036,25 @@ exports.getOverAllDeleteVendorGroupingLinkedData = catchAsyncErrors(async (req, 
 
         expense = await Expenses.find(queryexpense, {
             vendorgrouping: 1,
+            vendorname: 1,
             _id: 0,
         });
         schedulepayment = await SchedulePaymentMaster.find(queryschedulepayment, {
             vendorgrouping: 1,
+            vendor: 1,
+            _id: 0,
+        });
+        schedulepaymentbills = await SchedulePaymentBills.find(queryschedulepayment, {
+            vendorgrouping: 1,
+            vendor: 1,
             _id: 0,
         });
 
 
+
         assetdetail = await Assetdetail.find(queryassetdetail, {
             vendorgroup: 1,
+            vendor: 1,
             _id: 0,
         });
 
@@ -1012,37 +1062,77 @@ exports.getOverAllDeleteVendorGroupingLinkedData = catchAsyncErrors(async (req, 
 
         stock = await Stock.find(querystock, {
             vendorgroup: 1,
+            vendor: 1,
             _id: 0,
         });
 
         manualstockentry = await Manualstock.find(querymanaulstock, {
 
             vendorgroup: 1,
+            vendorname: 1,
             _id: 0,
         });
-
+        console.log(schedulepaymentbills, "schedulepaymentbills")
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
-        assetdetail, expense, schedulepayment, stock, manualstockentry
+        assetdetail, expense, schedulepayment, stock, manualstockentry, schedulepaymentbills
     });
 });
 
-
 //overall edit vendor grouping
 exports.getOverAllEditVendorGroupingLinkedData = catchAsyncErrors(async (req, res, next) => {
-    let assetdetail, expense, schedulepayment, stock, manualstockentry
+    let assetdetail, expense, schedulepayment, stock, manualstockentry, schedulepaymentbills
+    let queryexpense = {
+        vendorgrouping: { $in: req.body.oldname },
+        vendorname: { $in: req.body.oldnamevendor },
+
+    };
+
+    let queryschedulepayment = {
+        vendorgrouping: { $in: req.body.oldname },
+        vendor: { $in: req.body.oldnamevendor },
+
+
+    };
+
+
+    let queryassetdetail = {
+        vendorgroup: { $in: req.body.oldname },
+        vendor: { $in: req.body.oldnamevendor },
+
+    };
+
+
+
+
+    let querystock = {
+        vendorgroup: { $in: req.body.oldname },
+        vendor: { $in: req.body.oldname },
+
+
+    };
+
+    let querymanaulstock = {
+
+        vendorgroup: { $in: req.body.oldname },
+        vendorname: { $in: req.body.oldnamevendor },
+
+
+    };
+
+
+
+
     try {
-        expense = await Expenses.find({ vendorgrouping: { $in: req.body.oldname } });
-        assetdetail = await Assetdetail.find({ vendorgroup: { $in: req.body.oldname } });
-        schedulepayment = await SchedulePaymentMaster.find({ vendorgrouping: { $in: req.body.oldname } });
+        expense = await Expenses.find(queryexpense);
+        assetdetail = await Assetdetail.find(queryassetdetail);
+        schedulepayment = await SchedulePaymentMaster.find(queryschedulepayment);
+        schedulepaymentbills = await SchedulePaymentBills.find(queryschedulepayment);
 
-        stock = await Stock.find({ vendorgroup: { $in: req.body.oldname } });
-        manualstockentry = await Manualstock.find({ vendorgroup: { $in: req.body.oldname } });
-
+        stock = await Stock.find(querystock);
+        manualstockentry = await Manualstock.find(querymanaulstock);
 
 
     } catch (err) {
@@ -1051,11 +1141,11 @@ exports.getOverAllEditVendorGroupingLinkedData = catchAsyncErrors(async (req, re
     }
 
     return res.status(200).json({
-        count: assetdetail.length + expense.length + schedulepayment.length +
+        count: assetdetail.length + expense.length + schedulepayment.length + schedulepaymentbills.length +
             stock.length + manualstockentry.length
         ,
 
-        expense, assetdetail, schedulepayment, stock, manualstockentry,
+        expense, assetdetail, schedulepayment, stock, manualstockentry, schedulepaymentbills
 
     });
 });
@@ -1074,10 +1164,8 @@ exports.getOverAllDeleteFrequencyLinkedData = catchAsyncErrors(async (req, res, 
         });
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
         remainder
     });
@@ -1091,7 +1179,6 @@ exports.getOverAllEditFrequencyLinkedData = catchAsyncErrors(async (req, res, ne
         remainder = await Remainder.find({ frequency: { $in: req.body.oldname } });
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
 
@@ -1117,36 +1204,47 @@ exports.getOverAllDeleteUOMLinkedData = catchAsyncErrors(async (req, res, next) 
             { "stockmaterialarray.uomnew": { $in: req.body.data } }
             ]
         }
+        
+        
+        let query1 = {
+            $or: [{ uom: { $in: req.body.data } },
+
+            { "tododetails.uomnew": { $in: req.body.data } }
+            ]
+        }
+        
+        
 
         stockmanage = await Stockmanage.find(query, {
             uom: 1,
             stockmaterialarray: 1,
+            
             requestmode: 1,
             _id: 0,
         });
 
 
 
-        stock = await Stock.find(query, {
+        stock = await Stock.find(query1, {
             uom: 1,
             stockmaterialarray: 1,
+             tododetails:1,
             requestmode: 1,
             _id: 0,
         });
 
-        manualstockentry = await Manualstock.find(query, {
+        manualstockentry = await Manualstock.find(query1, {
 
             uom: 1,
             stockmaterialarray: 1,
+            tododetails:1,
             requestmode: 1,
             _id: 0,
         });
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
         stockmanage, stock, manualstockentry
     });
@@ -1164,15 +1262,19 @@ exports.getOverAllEditUOMLinkedData = catchAsyncErrors(async (req, res, next) =>
             { "stockmaterialarray.uomnew": { $in: req.body.oldname } }
             ]
         }
+        
+         let query1 = {
+            $or: [{ uom: { $in: req.body.oldname } },
+
+            { "tododetails.uomnew": { $in: req.body.oldname } }
+            ]
+        }
 
         stockmanage = await Stockmanage.find(query);
-        stock = await Stock.find(query);
-        manualstockentry = await Manualstock.find(query);
+        stock = await Stock.find(query1);
+        manualstockentry = await Manualstock.find(query1);
 
-
-        console.log(stockmanage, stock, manualstockentry, "edit")
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
 
@@ -1194,7 +1296,6 @@ exports.getOverAllDeleteAssetMasterLinkedData = catchAsyncErrors(async (req, res
 
 
     try {
-        // console.log(req.body, "body")
         let assetips = req.body.matassetip.map((item) => ({
             company: item.company,
             branch: item.branch,
@@ -1343,10 +1444,8 @@ exports.getOverAllDeleteAssetMasterLinkedData = catchAsyncErrors(async (req, res
 
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
         assetmaterialip, maintenancedetailsmaster, assetworkstationgrouping,
         maintenancemaster, assetempdistribution, maintenancenonschedulegrouping
@@ -1507,7 +1606,6 @@ exports.getOverAllEditAssetMasterLinkedData = catchAsyncErrors(async (req, res, 
         });
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
 
@@ -1646,20 +1744,11 @@ exports.getOverAllDeleteAssetSpecificationGroupingLinkedData = catchAsyncErrors(
             query.$or.push(...dataFieldConditions);
         }
 
-
-
-
-
-        // console.log(req.body, "query")
-
         assetdetail = await Assetdetail.find(query, {
             component: 1,
             subcomponent: 1,
             _id: 0,
         });
-
-
-
 
         stock = await Stock.find(query, {
             component: 1,
@@ -1675,10 +1764,8 @@ exports.getOverAllDeleteAssetSpecificationGroupingLinkedData = catchAsyncErrors(
         });
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
-    // console.log(assettypegrouping, "condition")
     return res.status(200).json({
         assetdetail, stock, manualstockentry
     });
@@ -1716,9 +1803,7 @@ exports.getOverAllEditAssetSpecificationGroupingLinkedData = catchAsyncErrors(as
         // Initialize an array to hold the conditions for datafield properties
         let dataFieldConditions = [];
 
-
-
-        if (req.body.datafield.type && req.body.datafield.type.length > 0) {
+        if (req.body.datafield?.type && req.body.datafield?.type.length > 0) {
             dataFieldConditions.push({ type: { $in: req.body.datafield?.type } });
         }
         if (req.body.datafield.model && req.body.datafield.model.length > 0) {
@@ -1797,26 +1882,17 @@ exports.getOverAllEditAssetSpecificationGroupingLinkedData = catchAsyncErrors(as
             query.$or.push(...dataFieldConditions);
         }
 
-
-
-
-
-        console.log(query, "queryedit")
         assetdetail = await Assetdetail.find(query, {
             component: 1,
             subcomponent: 1,
 
         });
 
-        console.log(assetdetail.length, "length")
-
-
         stock = await Stock.find(query, {
             component: 1,
             subcomponent: 1,
 
         });
-
         manualstockentry = await Manualstock.find(query, {
 
             component: 1,
@@ -1827,7 +1903,6 @@ exports.getOverAllEditAssetSpecificationGroupingLinkedData = catchAsyncErrors(as
 
 
     } catch (err) {
-        console.log(err)
         return next(new ErrorHandler("Records not found!", 404));
     }
 
@@ -1848,8 +1923,6 @@ exports.getOverAllEditAssetSpecificationGroupingLinkedData = catchAsyncErrors(as
 //     // let result
 //     try {
 //         const { result, component, subcomponent } = req.body
-
-//         // console.log(req.body, "deded")
 
 //         // const dynamicSubcomponentQuery = {};
 //         // let query = {
@@ -1893,7 +1966,6 @@ exports.getOverAllEditAssetSpecificationGroupingLinkedData = catchAsyncErrors(as
 //         // //         { component: component }
 //         // // }
 
-//         // console.log(query, "query");
 //         // const updateFields = {};
 //         // for (const key in result) {
 //         //     if (result[key] && Array.isArray(result[key])) {
@@ -1903,13 +1975,9 @@ exports.getOverAllEditAssetSpecificationGroupingLinkedData = catchAsyncErrors(as
 //         //     }
 //         // }
 
-//         // // console.log(updateFields, "updateFields");
-
 //         // // Perform the update operation
 //         // // const updatedAsset = await Assetdetail.updateMany(query, { $set: updateFields });
 //         // const updatedAsset = await Assetdetail.find(query);
-
-//         // console.log(updatedAsset, "updatedAsset");
 
 //         const elemMatchConditions = {};
 
@@ -1995,12 +2063,8 @@ exports.getOverAllEditAssetSpecificationGroupingLinkedData = catchAsyncErrors(as
 //             const result1 = await Stock.bulkWrite(bulkOps);
 //             const result2 = await Manualstock.bulkWrite(bulkOps);
 
-//             console.log(result, "Bulk write operation completed");
-//             console.log(result1, "Bulk write operation completed");
-//             console.log(result2, "Bulk write operation completed");
 //         }
 //     } catch (err) {
-//         console.log(err)
 //         return next(new ErrorHandler("Records not found!", 404));
 //     }
 //     if (!result) {
@@ -2034,40 +2098,7 @@ exports.getAllEditArrayAssetspecification = catchAsyncErrors(async (req, res, ne
                 subcomponent: { $elemMatch: elemMatchConditions }
             };
 
-            // if (subcomponent !== "") {
-            //     Object.keys(result).forEach((field) => {
-            //         const update = {
-            //             updateMany: {
-            //                 filter: {
-            //                     component: component,
-            //                     "subcomponent.subname": subcomponent
-            //                 },
-            //                 update: {
-            //                     $set: {
-            //                         [`subcomponent.$[elem].${field}`]: ""
-            //                     }
-            //                 },
-            //                 arrayFilters: [{ "elem.subname": subcomponent }]
-            //             }
-            //         };
-            //         bulkOps.push(update);
-            //     });
-            // } else {
-            //     Object.keys(result).forEach((field) => {
-            //         const update = {
-            //             updateMany: {
-            //                 filter: { component: component },
-            //                 update: {
-            //                     $set: {
-            //                         [`subcomponent.$[elem].${field}`]: ""
-            //                     }
-            //                 },
-            //                 // arrayFilters: [{ "elem.subname": subcomponent }]
-            //             }
-            //         };
-            //         bulkOps.push(update);
-            //     });
-            // }
+          
 
             if (subcomponent !== "") {
                 Object.keys(result).forEach((field) => {
@@ -2106,33 +2137,19 @@ exports.getAllEditArrayAssetspecification = catchAsyncErrors(async (req, res, ne
         }
 
         if (bulkOps.length > 0) {
-            const result = await Assetdetail.bulkWrite(bulkOps);
+            const resultasset = await Assetdetail.bulkWrite(bulkOps);
             const result1 = await Stock.bulkWrite(bulkOps);
             const result2 = await Manualstock.bulkWrite(bulkOps);
 
-            console.log(result, "Bulk write operation completed");
-            console.log(result1, "Bulk write operation completed");
-            console.log(result2, "Bulk write operation completed");
         }
+        
     } catch (err) {
-        console.log(err, "edseer")
         return next(new ErrorHandler("Records not found!", 404));
     }
-    if (!result) {
-        return next(new ErrorHandler('Areagrouping not found!', 404));
-    }
+   // if (!result) {
+     //   return next(new ErrorHandler(' not found!', 404));
+  //  }
     return res.status(200).json({
-        result
+       // result
     });
 })
-
-
-
-
-
-
-
-
-
-
-

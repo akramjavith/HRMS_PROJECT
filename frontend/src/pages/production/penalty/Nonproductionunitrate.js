@@ -1879,7 +1879,7 @@ function Nonproductionunitrate() {
                             type="text"
                             inputMode="decimal"
                             pattern="[0-9]*"
-                             disabled={nonProductionUnitRateEdit.process != "Day"}
+                            disabled={nonProductionUnitRateEdit.process != "Day"}
                             placeholder="Please Enter Min Days"
                             value={nonProductionUnitRateEdit.mindays}
                             onChange={(e) => {
@@ -1904,7 +1904,7 @@ function Nonproductionunitrate() {
                             id="component-outlined"
                             type="text"
                             inputMode="decimal"
-                             disabled={nonProductionUnitRateEdit.process != "Hours"}
+                            disabled={nonProductionUnitRateEdit.process != "Hours"}
                             pattern="[0-9]*"
                             placeholder="Please Enter Min Hours"
                             value={nonProductionUnitRateEdit.minhours}
@@ -1931,7 +1931,7 @@ function Nonproductionunitrate() {
                             type="text"
                             inputMode="decimal"
                             pattern="[0-9]*"
-                             disabled={nonProductionUnitRateEdit.process != "Mins"}
+                            disabled={nonProductionUnitRateEdit.process != "Mins"}
                             placeholder="Please Enter Min Minutes"
                             value={nonProductionUnitRateEdit.minminutes}
                             onChange={(e) => {
@@ -1957,7 +1957,7 @@ function Nonproductionunitrate() {
                             type="text"
                             inputMode="decimal"
                             pattern="[0-9]*"
-                             disabled={nonProductionUnitRateEdit.process != "Day"}
+                            disabled={nonProductionUnitRateEdit.process != "Day"}
                             placeholder="Please Enter Max Days"
                             value={nonProductionUnitRateEdit.maxdays}
                             onChange={(e) => {
@@ -1983,7 +1983,7 @@ function Nonproductionunitrate() {
                             type="text"
                             inputMode="decimal"
                             pattern="[0-9]*"
-                             disabled={nonProductionUnitRateEdit.process != "Hours"}
+                            disabled={nonProductionUnitRateEdit.process != "Hours"}
                             placeholder="Please Enter Max Hours"
                             value={nonProductionUnitRateEdit.maxhours}
                             onChange={(e) => {
@@ -2010,7 +2010,7 @@ function Nonproductionunitrate() {
                             inputMode="decimal"
                             pattern="[0-9]*"
                             placeholder="Please Enter Max Minutes"
-                             disabled={nonProductionUnitRateEdit.process != "Mins"}
+                            disabled={nonProductionUnitRateEdit.process != "Mins"}
                             value={nonProductionUnitRateEdit.maxminutes}
                             onChange={(e) => {
                               const value = e.target.value;

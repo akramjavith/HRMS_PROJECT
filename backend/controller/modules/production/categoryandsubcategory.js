@@ -1,4 +1,5 @@
 const CategoryAndSubcategory = require('../../../model/modules/production/categoryandsubcategory');
+const NonProductionunitAllot = require("../../../model/modules/production/nonproduction/NonProductionunitallotModel");
 const ErrorHandler = require('../../../utils/errorhandler');
 const catchAsyncErrors = require('../../../middleware/catchAsyncError');
 
@@ -25,6 +26,31 @@ exports.getAllCategoryAndSubcategory = catchAsyncErrors(async (req, res, next) =
     });
 
 })
+
+
+exports.getAllCategoryAndSubcategoryFromUnitAllot = catchAsyncErrors(async (req, res, next) => {
+    let categoryandsubcategory
+    try {
+        console.log(req.body.name,"mam,essdrf")
+        categoryandsubcategory = await NonProductionunitAllot.find({employeename:req.body.name},{category:1,subcategory:1})
+    } catch (err) {
+        return next(new ErrorHandler("Records not found!", 404));
+    }
+    if (!categoryandsubcategory) {
+        return next(new ErrorHandler('category not found', 404));
+    }
+    // Add serial numbers to the doccategory
+    const allcategoryandsubcategory = categoryandsubcategory.map((data, index) => ({
+        serialNumber: index + 1,
+        ...data.toObject()
+    }));
+
+    return res.status(200).json({
+        categoryandsubcategory: allcategoryandsubcategory
+    });
+
+})
+
 
 
 exports.addCategoryAndSubcategory = catchAsyncErrors(async (req, res, next) => {

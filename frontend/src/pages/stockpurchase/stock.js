@@ -3393,6 +3393,7 @@ function Stockmaster() {
       setSelectedAssetTypeEdit(res?.data?.sstock?.workstation);
       setVendorGroupEdit(res?.data?.sstock?.vendorgroup);
       setVendorNewEdit(res?.data?.sstock?.vendor);
+        setVendornameid(res?.data?.sstock?.vendorid);
       setFrequencyValueedit(res?.data?.sstock?.vendorfrequency);
       handleChangeGroupNameEdit({ value: res?.data?.sstock?.vendorgroup });
       setVendoroptIndEdit(new Array(res?.data?.sstock?.subcomponent?.length).fill([]));

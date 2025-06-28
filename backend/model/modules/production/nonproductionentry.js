@@ -9,7 +9,7 @@ const nonproductionentrySchema = new Schema({
     },
 
     mode: {
-        type: String,
+        type: [String],
         required: false,
     },
     count: {

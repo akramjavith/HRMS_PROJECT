@@ -21,59 +21,29 @@ exports.getAllNonProductionUnitRate = catchAsyncErrors(async (req, res, next) =>
 
 })
 
-// exports.getAllNonProductionUnitRateForPagination = catchAsyncErrors(async (req, res, next) => {
-//     let nonproductionunitrate
 
-//     try {
-//         const {
-//             page, pageSize, allFilters, logicOperator, searchQuery,
-//         } = req.body;
+exports.getAllNonProductionUnitRateDuplicate = catchAsyncErrors(async (req, res, next) => {
+    let nonproductionunitrate
+    try {
+const {category,subcategory,base,process} = req.body
+if(base === "Time"){
+  nonproductionunitrate = await NonProductionUnitRate.countDocuments({categoryname:category,subcategory:subcategory,base:base,process:process})
+}else{
+  nonproductionunitrate = await NonProductionUnitRate.countDocuments({categoryname:category,subcategory:subcategory,base:"Time"})
+}
 
-//         let query = {};
+      
+    } catch (err) {
+        return next(new ErrorHandler("Records not found!", 404));
+    }
 
-//         // Advanced search filter
-//         let conditions = [];
-//         if (allFilters?.length > 0) {
-//             allFilters.forEach(filter => {
-//                 if (filter.column && filter.condition && (filter.value || ["Blank", "Not Blank"].includes(filter.condition))) {
-//                     conditions.push(createFilterCondition(filter.column, filter.condition, filter.value));
-//                 }
-//             });
-//         }
+    return res.status(200).json({
+        nonproductionunitrate
+    });
 
-//         // Apply logicOperator to combine conditions
-//         if (conditions.length > 0) {
-//             query[logicOperator === "AND" ? "$and" : "$or"] = conditions;
-//         }
-
-//         // Search query
-//         if (searchQuery) {
-//             const regexTerms = searchQuery.split(" ").map(term => new RegExp(term, "i"));
-//             query.$or = regexTerms.map(regex => ({
-//                 $or: [
-//                     { autoid: regex }, { status: regex }, { mode: regex },
-//                     { priority: regex }, { module: regex }, { submodule: regex },
-//                     { mainpage: regex }, { subsubpage: regex }, { category: regex },
-//                     { subcategory: regex }, { createddate: regex }, { createdtime: regex },
-//                     { createdby: regex }
-//                 ]
-//             }));
-//         }
+})
 
 
-//         nonproductionunitrate = await NonProductionUnitRate.find()
-//     } catch (err) {
-//         return next(new ErrorHandler("Records not found!", 404));
-//     }
-//     if (!nonproductionunitrate) {
-//         return next(new ErrorHandler('category not found', 404));
-//     }
-
-//     return res.status(200).json({
-//         nonproductionunitrate
-//     });
-
-// })
 
 exports.getAllNonProductionUnitRateForPagination = catchAsyncErrors(async (req, res, next) => {
     const { page, pageSize, allFilters, logicOperator, searchQuery } = req.body;

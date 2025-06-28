@@ -509,16 +509,18 @@ productionRoute.route("/manageidlework/new").post(addManageidlework);
 productionRoute.route("/manageidlework/:id").delete(deleteManageidlework).get(getSingleManageidlework).put(updateManageidlework);
 
 
-const { getAllNonProductionUnitRate, addNonProductionUnitRate, getSingleNonProductionUnitRate, getAllNonProductionUnitRateForPagination, updateNonProductionUnitRate, deleteNonProductionUnitRate } = require('../controller/modules/production/nonproductionunitrate');
+const { getAllNonProductionUnitRate,getAllNonProductionUnitRateDuplicate, addNonProductionUnitRate, getSingleNonProductionUnitRate, getAllNonProductionUnitRateForPagination, updateNonProductionUnitRate, deleteNonProductionUnitRate } = require('../controller/modules/production/nonproductionunitrate');
 productionRoute.route('/nonproductionunitrate').get(getAllNonProductionUnitRate);
+productionRoute.route('/nonproductionunitrateduplicate').post(getAllNonProductionUnitRateDuplicate);
 productionRoute.route('/nonproductionunitrateforpagination').post(getAllNonProductionUnitRateForPagination);
 productionRoute.route('/nonproductionunitrate/new').post(addNonProductionUnitRate);
 productionRoute.route('/nonproductionunitrate/:id').get(getSingleNonProductionUnitRate).put(updateNonProductionUnitRate).delete(deleteNonProductionUnitRate);
 
 //for category and subcategory
-const { getAllCategoryAndSubcategory,getAllCategoryAndSubcategoryFromUnitAllot, addCategoryAndSubcategory, getSingleCategoryAndSubcategory, updateCategoryAndSubcategory, deleteCategoryAndSubcategory } = require("../controller/modules/production/categoryandsubcategory");
+const { getAllCategoryAndSubcategory,getAllCategoryAndSubcategoryFromUnitAllot,getAllCategoryAndSubcategoryBasedMode, addCategoryAndSubcategory, getSingleCategoryAndSubcategory, updateCategoryAndSubcategory, deleteCategoryAndSubcategory } = require("../controller/modules/production/categoryandsubcategory");
 productionRoute.route("/categoryandsubcategory").get(getAllCategoryAndSubcategory);
 productionRoute.route("/categoryandsubcategoryunitallot").post(getAllCategoryAndSubcategoryFromUnitAllot);
+productionRoute.route("/categoryandsubcategorybasedmode").post(getAllCategoryAndSubcategoryBasedMode);
 productionRoute.route("/categoryandsubcategory/new").post(addCategoryAndSubcategory);
 productionRoute.route("/categoryandsubcategory/:id").get(getSingleCategoryAndSubcategory).put(updateCategoryAndSubcategory).delete(deleteCategoryAndSubcategory);
 
@@ -775,8 +777,10 @@ productionRoute.route("/wavierpercentage/new").post(addWavierpercentage);
 productionRoute.route("/wavierpercentage/:id").get(getSingleWavierpercentage).put(updateWavierpercentage).delete(deleteWavierpercentage);
 
 //for non production 
-const { getAllNonproduction, deleteNonproduction, getSingleNonproduction, getAllUsersNonProductionForExports, getAllUsersNonProduction, getAllNonproductionListFilterExports, getAllNonproductionListFilterRejected, getAllNonproductionForPagination, getAllNonproductionListFilterApproved, getAllNonproductionListFilterForAssign, getAllNonproductionListFilter, updateNonproduction, addNonproduction, getAllNonProductionFilter } = require("../controller/modules/production/nonproduction/nonproduction");
+const { getAllNonproduction,getAllNonproductionOverallCheckList,getAllNonproductionOverallCheckListReject, deleteNonproduction, getSingleNonproduction, getAllUsersNonProductionForExports, getAllUsersNonProduction, getAllNonproductionListFilterExports, getAllNonproductionListFilterRejected, getAllNonproductionForPagination, getAllNonproductionListFilterApproved, getAllNonproductionListFilterForAssign, getAllNonproductionListFilter, updateNonproduction, addNonproduction, getAllNonProductionFilter } = require("../controller/modules/production/nonproduction/nonproduction");
 productionRoute.route("/nonproduction").get(getAllNonproduction);
+productionRoute.route("/nonproductionoverallchecklist").post(getAllNonproductionOverallCheckList);
+productionRoute.route("/nonproductionoverallchecklistreject").post(getAllNonproductionOverallCheckListReject);
 productionRoute.route("/nonproductionforpagination").post(getAllNonproductionForPagination);
 productionRoute.route("/alluserfornonproduction").post(getAllUsersNonProduction);
 productionRoute.route("/alluserfornonproductionforexports").post(getAllUsersNonProductionForExports);

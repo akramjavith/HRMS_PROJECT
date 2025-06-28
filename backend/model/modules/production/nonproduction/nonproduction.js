@@ -67,6 +67,10 @@ const nonproductionSchema = new Schema({
         type: Boolean,
         required: false,
     }, 
+    rejectreason: {
+        type: String,
+        required: false,
+    }, 
     company: {
         type: String,
         required: false,

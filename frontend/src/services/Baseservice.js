@@ -5874,8 +5874,13 @@ SCHEDULE_MEETING_FILTER_LIST_TEAM: `${BASE_URL}/api/schedulemeetingfilterteam`,
       
       
   NON_PRODUCTIONENTRY_UNITALLOT_CATEGORY_SUBCATEGORY: `${BASE_URL}/api/categoryandsubcategoryunitallot`,
+  CATEGORY_SUBCATEGORY_BASED_MODE: `${BASE_URL}/api/categoryandsubcategorybasedmode`,
+  NON_PRODUCTION_UNITRATE_DUPLICATE: `${BASE_URL}/api/nonproductionunitrateduplicate`,
 
-      
+      NON_PRODUCTION_APPROVE_LIST: `${BASE_URL}/api/nonproductionoverallchecklist`,
+      NON_PRODUCTION_REJECT_LIST: `${BASE_URL}/api/nonproductionoverallchecklistreject`,
+
+  
   
 
       

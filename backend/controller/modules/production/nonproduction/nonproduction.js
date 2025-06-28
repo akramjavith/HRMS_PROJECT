@@ -1382,3 +1382,35 @@ function createFilterConditionDate(column, condition, value) {
 
 
 
+
+//overall nonchecklist
+
+exports.getAllNonproductionOverallCheckList = catchAsyncErrors(async (req, res, next) => {
+  let nonproduction;
+  try {
+    nonproduction = await Nonproduction.find({mode:req.body.base,approvestatus:{$exists:false}},{});
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+
+  return res.status(200).json({
+    // count: products.length,
+    nonproduction,
+  });
+});
+
+
+exports.getAllNonproductionOverallCheckListReject = catchAsyncErrors(async (req, res, next) => {
+  let nonproduction;
+  try {
+    console.log(req.body.base,"coutnreje")
+    nonproduction = await Nonproduction.find({mode:req.body.base,approvestatus:false},{});
+  } catch (err) {
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+
+  return res.status(200).json({
+    // count: products.length,
+    nonproduction,
+  });
+});

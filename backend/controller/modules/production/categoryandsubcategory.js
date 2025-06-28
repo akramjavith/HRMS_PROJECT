@@ -1,5 +1,6 @@
 const CategoryAndSubcategory = require('../../../model/modules/production/categoryandsubcategory');
 const NonProductionunitAllot = require("../../../model/modules/production/nonproduction/NonProductionunitallotModel");
+const NonProductionUnitRate = require('../../../model/modules/production/nonproductionunitrate');
 const ErrorHandler = require('../../../utils/errorhandler');
 const catchAsyncErrors = require('../../../middleware/catchAsyncError');
 
@@ -28,6 +29,8 @@ exports.getAllCategoryAndSubcategory = catchAsyncErrors(async (req, res, next) =
 })
 
 
+
+//category subcategory dropdown
 exports.getAllCategoryAndSubcategoryFromUnitAllot = catchAsyncErrors(async (req, res, next) => {
     let categoryandsubcategory
     try {
@@ -47,6 +50,26 @@ exports.getAllCategoryAndSubcategoryFromUnitAllot = catchAsyncErrors(async (req,
 
     return res.status(200).json({
         categoryandsubcategory: allcategoryandsubcategory
+    });
+
+})
+
+//category subctegory based mode
+exports.getAllCategoryAndSubcategoryBasedMode = catchAsyncErrors(async (req, res, next) => {
+    let categoryandsubcategory
+    try {
+       const {category,subcategory} = req.body
+       
+        categoryandsubcategory = await NonProductionUnitRate.find({categoryname:category,subcategory:subcategory},{base:1,process:1})
+
+console.log(categoryandsubcategory,"cccccc")
+    } catch (err) {
+        return next(new ErrorHandler("Records not found!", 404));
+    }
+ 
+    
+    return res.status(200).json({
+        categoryandsubcategory
     });
 
 })

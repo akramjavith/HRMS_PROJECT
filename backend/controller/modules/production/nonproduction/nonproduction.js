@@ -1,4 +1,7 @@
 const Nonproduction = require("../../../../model/modules/production/nonproduction/nonproduction");
+const Hirerarchi = require("../../../../model/modules/setup/hierarchy");
+const Users = require("../../../../model/login/auth")
+const ClientUserid = require("../../../../model/modules/production/ClientUserIDModel")
 const ErrorHandler = require("../../../../utils/errorhandler");
 const catchAsyncErrors = require("../../../../middleware/catchAsyncError");
 const moment = require("moment");
@@ -1414,3 +1417,1452 @@ exports.getAllNonproductionOverallCheckListReject = catchAsyncErrors(async (req,
     nonproduction,
   });
 });
+
+
+//team nonproductionchecklist
+exports.getAllTeamNonProductionChecklistApprove = catchAsyncErrors(
+  async (req, res, next) => {
+    let result,
+      reportingtobaseduser,
+      clientuserid,
+      hierarchy,
+      resultAccessFilter,
+      secondaryhierarchyfinal,
+      tertiaryhierarchyfinal,
+      primaryhierarchyfinal,
+      hierarchyfilter,
+      filteredoverall,
+      primaryhierarchy,
+      hierarchyfilter1,
+      secondaryhierarchy,
+      hierarchyfilter2,
+      tertiaryhierarchy,
+      primaryhierarchyall,
+      secondaryhierarchyall,
+      tertiaryhierarchyall,
+      branch,
+      hierarchySecond,
+      overallMyallList,
+      hierarchyMap,
+      resulted,
+      resultedTeam,
+      myallTotalNames,
+      hierarchyFinal,
+      hierarchyDefault,
+      reportingusers, hierarchyfirstlevel;
+    let resultAccessFilterHierarchy = [];
+    let resultsectorother = []
+    let filteredoverallsectorall = []
+
+    try {
+      const { listpageaccessmode } = req.body;
+      let clientidsmap;
+      let levelFinal = req.body?.sector === "all" ? ["Primary", "Secondary", "Tertiary"] : [req.body?.sector]
+
+      let finalDataRestrictList = []
+      if (listpageaccessmode === "Reporting to Based") {
+        let usersss = await User.find(
+          {
+            enquirystatus: {
+              $nin: ["Enquiry Purpose"],
+            },
+            resonablestatus: {
+              $nin: [
+                "Not Joined",
+                "Postponed",
+                "Rejected",
+                "Closed",
+                "Releave Employee",
+                "Absconded",
+                "Hold",
+                "Terminate",
+              ],
+            },
+            reportingto: req.body.username,
+          },
+          {
+            empcode: 1,
+            companyname: 1,
+          }
+        ).lean();
+        const companyNames = usersss.map((user) => user.companyname);
+        let clientids = await ClientUserid.find(
+          {
+            empname: { $in: companyNames },
+          },
+          { userid: 1 }
+        ).lean();
+        clientidsmap = clientids.map((user) => user.userid);
+      }
+
+      let prodresult = await Nonproduction.find(
+        {
+       mode:req.body.base,
+       approvestatus:{$exists:false},
+          ...(listpageaccessmode === "Reporting to Based"
+            ? { empname: { $in: req.body.username } }
+            : {}),
+        },
+        {
+          name: 1,
+          category: 1,
+          subcategory: 1,
+          mode: 1,
+          count: 1,
+          date: 1,
+          fromtime: 1,
+          totime: 1,
+          totalhours: 1,
+          alloteddays: 1,
+          allotedhours: 1,
+          allotedminutes: 1,
+          days: 1,
+          hours: 1,
+          minutes: 1,
+          rejectreason:1,
+          createdAt: 1,
+          _id: 1,
+        }
+      );
+
+      clientuserid = await ClientUserid.find(
+        { loginallotlog: { $exists: true, $ne: [] } },
+        { empname: 1, userid: 1, loginallotlog: 1, projectvendor: 1 }
+      ).lean();
+
+      result = prodresult.map((item) => {
+        return {
+          category: item.category,
+          subcategory: item.subcategory,
+          mode: item.mode,
+          count:item.count,
+          date: item.date,
+          fromtime: item.fromtime,
+          totime:item.totime,
+          totalhours:item.totalhours,
+          alloteddays:item.alloteddays,
+          allotedhours:item.allotedhours,
+          allotedminutes:item.allotedminutes,
+          days: item.days,
+          hours: item.hours,
+          minutes:item.minutes,
+          rejectreason:item.rejectreason,
+          createdAt: item.createdAt,
+          _id: item._id,
+          companyname: item.name,
+        };
+      });
+      resultsectorother = result
+      //myhierarchy dropdown
+      if (
+        req.body.hierachy === "myhierarchy" &&
+        (listpageaccessmode === "Hierarchy Based" ||
+          listpageaccessmode === "Overall")
+      ) {
+        hierarchy = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: req.body.sector,
+        });
+        hierarchyDefault = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+        });
+
+        let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+        hierarchyFinal =
+          req.body.sector === "all"
+            ? answerDef.length > 0
+              ? [].concat(...answerDef)
+              : []
+            : hierarchy.length > 0
+              ? [].concat(...hierarchy.map((item) => item.employeename))
+              : [];
+
+        hierarchyMap = hierarchyFinal.length > 0 ? hierarchyFinal : [];
+
+        hierarchyfilter = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: "Primary",
+        });
+        primaryhierarchy = hierarchyfilter.map((item) => item.employeename[0])
+          ? hierarchyfilter.map((item) => item.employeename[0])
+          : [];
+
+        hierarchyfilter1 = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: "Secondary",
+        });
+        secondaryhierarchy = hierarchyfilter1.map(
+          (item) => item.employeename[0]
+        )
+          ? hierarchyfilter1.map((item) => item.employeename[0])
+          : [];
+
+        hierarchyfilter2 = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: "Tertiary",
+        });
+        tertiaryhierarchy = hierarchyfilter2.map((item) => item.employeename[0])
+          ? hierarchyfilter2.map((item) => item.employeename[0])
+          : [];
+
+        resulted = result
+          .map((userObj) => {
+            const matchingHierarchy = hierarchyDefault.find(
+              (hierarchyObj) =>
+                hierarchyObj.employeename[0] == userObj.companyname
+            );
+            return {
+              companyname: userObj.companyname,
+            category: userObj.category,
+          subcategory: userObj.subcategory,
+          mode: userObj.mode,
+          count:userObj.count,
+          date: userObj.date,
+          fromtime: userObj.fromtime,
+          totime:userObj.totime,
+          totalhours:userObj.totalhours,
+          alloteddays:userObj.alloteddays,
+          allotedhours:userObj.allotedhours,
+          allotedminutes:userObj.allotedminutes,
+          days: userObj.days,
+          hours: userObj.hours,
+          minutes:userObj.minutes,
+          rejectreason:userObj.rejectreason,
+              createdAt: userObj.createdAt,
+              _id: userObj._id,
+              level: matchingHierarchy ? matchingHierarchy.level : "",
+              control: matchingHierarchy ? matchingHierarchy.control : "",
+            };
+          })
+          .filter((data) => hierarchyMap.includes(data.companyname));
+      }
+
+      if (
+        req.body.hierachy === "allhierarchy" &&
+        (listpageaccessmode === "Hierarchy Based" ||
+          listpageaccessmode === "Overall")
+      ) {
+        hierarchySecond = await Hirerarchi.find(
+          {},
+          { employeename: 1, supervisorchoose: 1, level: 1, control: 1 }
+        );
+
+
+        // let sectorFinal = req.body.sector == "all"
+        //   ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+        // hierarchyDefault = await Hirerarchi.find({
+        //   supervisorchoose: req.body.username,
+        //   level: { $in: sectorFinal },
+
+        // });
+
+
+        let sectorFinal = req.body.sector == "all"
+          ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+        let FirstSuphierarchyDefaultLevel = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+        }, { level: 1 });
+
+        FirstSuphierarchyDefaultLevel = req.body.sector == "all" ? FirstSuphierarchyDefaultLevel.map(item => item.level) : [req.body.sector]
+
+        hierarchyDefault = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: { $in: FirstSuphierarchyDefaultLevel },
+        });
+
+        let answerDef = hierarchyDefault
+          .map((data) => data.employeename)
+          .flat();
+
+        function findEmployeesRecursive(
+          currentSupervisors,
+          processedSupervisors,
+          result
+        ) {
+          const filteredData = hierarchySecond.filter((item) =>
+            item.supervisorchoose.some(
+              (supervisor) =>
+                currentSupervisors.includes(supervisor) &&
+                FirstSuphierarchyDefaultLevel.includes(item.level) &&
+                !processedSupervisors.has(supervisor)
+            )
+          );
+
+          if (filteredData.length === 0) {
+            return result;
+          }
+
+          const newEmployees = filteredData.reduce((employees, item) => {
+            employees.push(...item.employeename);
+            processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+            return employees;
+          }, []);
+
+          const uniqueNewEmployees = [...new Set(newEmployees)];
+          result = [...result, ...filteredData];
+
+          return findEmployeesRecursive(
+            uniqueNewEmployees,
+            processedSupervisors,
+            result
+          );
+        }
+
+        const processedSupervisors = new Set();
+        const filteredOverallItem = findEmployeesRecursive(
+          answerDef,
+          processedSupervisors,
+          []
+        );
+        let answerDeoverall = filteredOverallItem
+          .filter((data) =>
+            FirstSuphierarchyDefaultLevel.includes(data.level)
+          )
+          .map((item) => item.employeename[0]);
+
+        resultedTeam = result
+          .map((userObj) => {
+            const matchingHierarchycontrol = filteredOverallItem.find(
+              (hierarchyObj) =>
+                hierarchyObj.employeename[0] == userObj.companyname
+            );
+            return {
+              companyname: userObj.companyname,
+              category: userObj.category,
+          subcategory: userObj.subcategory,
+          mode: userObj.mode,
+          count:userObj.count,
+          date: userObj.date,
+          fromtime: userObj.fromtime,
+          totime:userObj.totime,
+          totalhours:userObj.totalhours,
+          alloteddays:userObj.alloteddays,
+          allotedhours:userObj.allotedhours,
+          allotedminutes:userObj.allotedminutes,
+          days: userObj.days,
+          hours: userObj.hours,
+          minutes:userObj.minutes,
+           rejectreason:userObj.rejectreason,
+              _id: userObj._id,
+              level: matchingHierarchycontrol
+                ? matchingHierarchycontrol.level
+                : "",
+              control: matchingHierarchycontrol
+                ? matchingHierarchycontrol.control
+                : "",
+            };
+          })
+          .filter((data) => answerDeoverall.includes(data.companyname));
+
+        if (resultedTeam.length == 0) {
+
+          let sectorFinal = req.body.sector == "all"
+            ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+          let FirstSuphierarchyDefaultLevel = await Hirerarchi.find({
+            supervisorchoose: req.body.username,
+          }, { level: 1 });
+
+          FirstSuphierarchyDefaultLevel = req.body.sector == "all" ? FirstSuphierarchyDefaultLevel.map(item => item.level) : [req.body.sector]
+
+          hierarchyfirstlevel = await Hirerarchi.countDocuments({ supervisorchoose: req.body.username, level: { $in: FirstSuphierarchyDefaultLevel }, });
+          //  let hierarchySecond2 = await Hirerarchi.find({});
+          hierarchySecond = await Hirerarchi.find(
+            {},
+            { employeename: 1, supervisorchoose: 1, level: 1, control: 1 }
+          );
+
+          hierarchyDefault = await Hirerarchi.find({
+            supervisorchoose: req.body.username,
+            //  level: { $nin: sectorFinal },
+
+          });
+
+          console.log(hierarchySecond.length, "hierarchyDefault")
+
+          let answerDef = hierarchyDefault
+            .map((data) => data.employeename)
+            .flat();
+
+          console.log(answerDef, "answerDef")
+
+          function findEmployeesRecursive(
+            currentSupervisors,
+            processedSupervisorsallsector,
+            resultsectorother
+          ) {
+            const filteredData = hierarchySecond.filter((item) =>
+              item.supervisorchoose.some(
+                (supervisor) =>
+                  currentSupervisors.includes(supervisor) &&
+                  !processedSupervisorsallsector.has(supervisor)
+              )
+            );
+
+            if (filteredData.length === 0) {
+              return resultsectorother;
+            }
+
+            const newEmployees = filteredData.reduce((employees, item) => {
+              employees.push(...item.employeename);
+              processedSupervisorsallsector.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+              return employees;
+            }, []);
+
+            const uniqueNewEmployees = [...new Set(newEmployees)];
+            resultsectorother = [...resultsectorother, ...filteredData];
+            // console.log(result, "result")
+            return findEmployeesRecursive(
+              uniqueNewEmployees,
+              processedSupervisorsallsector,
+              resultsectorother
+            );
+          }
+
+          const processedSupervisorsallsector = new Set();
+          const filteredOverallItem = findEmployeesRecursive(
+            answerDef,
+            processedSupervisorsallsector,
+            []
+          );
+
+          console.log(processedSupervisorsallsector, "processedSupervisorsallsector");
+          //  console.log(filteredOverallItem.map((item) => item.employeename), "filteredOverallItem");
+
+          let answerDeoverall = filteredOverallItem.map((item) => item.employeename ? item.employeename[0] : "");
+
+          console.log("Count of data in other sectors:", answerDeoverall);
+
+          filteredoverallsectorall = resultsectorother.filter((data) =>
+            answerDeoverall.includes(data.companyname)
+          ).length;
+
+          console.log("filteredoverallsectorall:", filteredoverallsectorall);
+        }
+
+
+
+      }
+
+      //my + all hierarchy list dropdown
+
+      if (
+        req.body.hierachy === "myallhierarchy" &&
+        (listpageaccessmode === "Hierarchy Based" ||
+          listpageaccessmode === "Overall")
+      ) {
+        hierarchySecond = await Hirerarchi.find(
+          {},
+          { employeename: 1, supervisorchoose: 1, level: 1, control: 1 }
+        );
+
+        let sectorFinal = req.body.sector == "all"
+          ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+        let FirstSuphierarchyDefaultLevel = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+        }, { level: 1 });
+
+        FirstSuphierarchyDefaultLevel = req.body.sector == "all" ? FirstSuphierarchyDefaultLevel.map(item => item.level) : [req.body.sector]
+
+        hierarchyDefault = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: { $in: FirstSuphierarchyDefaultLevel },
+        });
+
+        let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+        function findEmployeesRecursive(
+          currentSupervisors,
+          processedSupervisors,
+          result
+        ) {
+          const filteredData = hierarchySecond.filter((item) =>
+            item.supervisorchoose.some(
+              (supervisor) =>
+                currentSupervisors.includes(supervisor) &&
+                FirstSuphierarchyDefaultLevel.includes(item.level) &&
+                !processedSupervisors.has(supervisor)
+            )
+          );
+
+          if (filteredData.length === 0) {
+            return result;
+          }
+
+          const newEmployees = filteredData.reduce((employees, item) => {
+            employees.push(...item.employeename);
+            processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+            return employees;
+          }, []);
+
+          const uniqueNewEmployees = [...new Set(newEmployees)];
+          result = [...result, ...filteredData];
+
+          return findEmployeesRecursive(
+            uniqueNewEmployees,
+            processedSupervisors,
+            result
+          );
+        }
+
+        const processedSupervisors = new Set();
+        const filteredOverallItem = findEmployeesRecursive(
+          [req.body.username],
+          processedSupervisors,
+          []
+        );
+        let answerDeoverall = filteredOverallItem
+          .filter((data) =>
+            FirstSuphierarchyDefaultLevel.includes(data.level)
+          )
+          .map((item) => item.employeename[0]);
+
+        filteredoverall = result
+          .map((userObj) => {
+            const matchingHierarchycontrol = filteredOverallItem.find(
+              (hierarchyObj) =>
+                hierarchyObj.employeename[0] == userObj.companyname
+            );
+            return {
+              companyname: userObj.companyname,
+               category: userObj.category,
+          subcategory: userObj.subcategory,
+          mode: userObj.mode,
+          count:userObj.count,
+          date: userObj.date,
+          fromtime: userObj.fromtime,
+          totime:userObj.totime,
+          totalhours:userObj.totalhours,
+          alloteddays:userObj.alloteddays,
+          allotedhours:userObj.allotedhours,
+          allotedminutes:userObj.allotedminutes,
+          days: userObj.days,
+          hours: userObj.hours,
+          minutes:userObj.minutes,
+           rejectreason:userObj.rejectreason,
+              _id: userObj._id,
+              createdAt: userObj.createdAt,
+              level: matchingHierarchycontrol
+                ? matchingHierarchycontrol.level
+                : "",
+              control: matchingHierarchycontrol
+                ? matchingHierarchycontrol.control
+                : "",
+            };
+          })
+          .filter((data) => answerDeoverall.includes(data.companyname));
+
+
+
+        //alert there is no sector
+        if (filteredoverall.length == 0) {
+
+          let hierarchySecond2 = await Hirerarchi.find();
+          hierarchyfirstlevel = await Hirerarchi.countDocuments({ supervisorchoose: req.body.username, level: req.body.sector, });
+          console.log(hierarchyfirstlevel, "hierarchyfirstlevel")
+
+          function findEmployeesRecursive(currentSupervisors, processedSupervisorsallsector, resultsectorother) {
+            const filteredData = hierarchySecond2.filter((item) =>
+              item.supervisorchoose.some(
+                (supervisor) =>
+                  currentSupervisors.includes(supervisor) &&
+                  !processedSupervisorsallsector.has(supervisor)
+              )
+            );
+
+            console.log(filteredData.length, "l;lp");
+            if (filteredData.length === 0) {
+              return resultsectorother; // No more employees to process
+            }
+
+            // Collect new employees
+            const newEmployees = filteredData.reduce((employees, item) => {
+              employees.push(...item.employeename);
+              processedSupervisorsallsector.add(item.supervisorchoose[0]); // Track processed supervisors
+              return employees;
+            }, []);
+
+            // Prevent duplicates
+            const uniqueNewEmployees = [...new Set(newEmployees)];
+
+            // **Modify `resultall` in place** instead of reassigning it
+            resultsectorother.push(...filteredData);
+
+            // console.log(result, "resultall1");
+
+            // Recursive call with new employees
+            return findEmployeesRecursive(uniqueNewEmployees, processedSupervisorsallsector, resultsectorother);
+          }
+
+          const processedSupervisorsallsector = new Set();
+          // const resultall = []; // Define `resultall` outside to maintain reference
+
+          const filteredOverallItem = findEmployeesRecursive(
+            [req.body.username],
+            processedSupervisorsallsector,
+            resultsectorother // Pass the reference instead of a new array
+          );
+
+          console.log(processedSupervisorsallsector, "processedSupervisorsallsector");
+          //   console.log(filteredOverallItem.map((item) => item.employeename), "filteredOverallItem");
+
+          let answerDeoverall = filteredOverallItem.map((item) => item.employeename ? item.employeename[0] : "");
+
+          console.log("Count of data in other sectors:", answerDeoverall);
+
+          filteredoverallsectorall = resultsectorother.filter((data) =>
+            answerDeoverall.includes(data.companyname)
+          ).length;
+
+          console.log("filteredoverallsectorall:", filteredoverallsectorall);
+        }
+
+     
+      }
+
+      if (listpageaccessmode === "Reporting to Based") {
+        reportingtobaseduser = result.map((userObj) => {
+          return {
+            companyname: userObj.companyname,
+             category: userObj.category,
+          subcategory: userObj.subcategory,
+          mode: userObj.mode,
+          count:userObj.count,
+          date: userObj.date,
+          fromtime: userObj.fromtime,
+          totime:userObj.totime,
+          totalhours:userObj.totalhours,
+          alloteddays:userObj.alloteddays,
+          allotedhours:userObj.allotedhours,
+          allotedminutes:userObj.allotedminutes,
+          days: userObj.days,
+          hours: userObj.hours,
+          minutes:userObj.minutes,
+           rejectreason:userObj.rejectreason,
+            _id: userObj._id,
+            level: "",
+            control: "",
+          };
+        });
+      }
+
+   
+
+      let finalsupervisor = req.body.hierachy == "myhierarchy" ? resulted?.map(Data => Data?.companyname) : req.body.hierachy == "allhierarchy" ? resultedTeam?.map(Data => Data?.companyname) : filteredoverall?.map(Data => Data?.companyname)
+
+      const restrictTeam = await Hirerarchi.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                supervisorchoose: { $in: finalsupervisor } // Matches if supervisorchoose field has a value in finalsupervisor
+              },
+              {
+                employeename: { $in: finalsupervisor }     // Matches if employeename field has a value in finalsupervisor
+              }
+            ],
+            level: { $in: levelFinal } // Matches if level field has a value in levelFinal
+          },
+        },
+        {
+          $lookup: {
+            from: "reportingheaders",
+            let: {
+              teamControlsArray: {
+                $ifNull: ["$pagecontrols", []]
+              }
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $in: [
+                          "$name",
+                          "$$teamControlsArray"
+                        ]
+                      }, // Check if 'name' is in 'teamcontrols' array
+                      {
+                        $in: [
+                          req?.body?.pagename,
+                          "$reportingnew" // Check if 'menuteamloginstatus' is in 'reportingnew' array
+                        ]
+                      } // Additional condition for reportingnew array
+                    ]
+                  }
+                }
+              }
+            ],
+            as: "reportData" // The resulting matched documents will be in this field
+          }
+        },
+        {
+          $project: {
+            supervisorchoose: 1,
+            employeename: 1,
+            reportData: 1
+          }
+        }
+      ]);
+      let restrictListTeam = restrictTeam?.filter(data => data?.reportData?.length > 0)?.flatMap(Data => Data?.employeename)
+      console.log(restrictListTeam, resultedTeam, "restrictListTeam")
+      resultAccessFilterHierarchy = req.body.hierachy === "myhierarchy" ? resulted : req.body.hierachy === "allhierarchy" ? resultedTeam : filteredoverall;
+      resultAccessFilter = restrictListTeam?.length > 0 ? resultAccessFilterHierarchy?.filter(data => restrictListTeam?.includes(data?.companyname)) : [];
+
+      console.log(resultAccessFilter, resultAccessFilterHierarchy.length, filteredoverallsectorall, "oooo")
+    } catch (err) {
+      return next(new ErrorHandler("Records not found!", 404));
+    }
+
+    return res.status(200).json({
+      // result
+      // resulted,
+      // resultedTeam,
+      // branch,
+      // hierarchy,
+      // overallMyallList,
+      hierarchyfirstlevel,
+      filteredoverallsectorall,
+      resultAccessFilterHierarchy: resultAccessFilterHierarchy.length,
+      resultAccessFilter,
+      // primaryhierarchy,
+      //  secondaryhierarchy,
+      //  tertiaryhierarchy,
+      //  primaryhierarchyall,
+      //  secondaryhierarchyall,
+      //  tertiaryhierarchyall,
+      //  primaryhierarchyfinal,
+      //  secondaryhierarchyfinal, tertiaryhierarchyfinal,
+    });
+  }
+);
+
+
+exports.getAllTeamNonProductionChecklistReject = catchAsyncErrors(
+  async (req, res, next) => {
+    let result,
+      reportingtobaseduser,
+      clientuserid,
+      hierarchy,
+      resultAccessFilter,
+      secondaryhierarchyfinal,
+      tertiaryhierarchyfinal,
+      primaryhierarchyfinal,
+      hierarchyfilter,
+      filteredoverall,
+      primaryhierarchy,
+      hierarchyfilter1,
+      secondaryhierarchy,
+      hierarchyfilter2,
+      tertiaryhierarchy,
+      primaryhierarchyall,
+      secondaryhierarchyall,
+      tertiaryhierarchyall,
+      branch,
+      hierarchySecond,
+      overallMyallList,
+      hierarchyMap,
+      resulted,
+      resultedTeam,
+      myallTotalNames,
+      hierarchyFinal,
+      hierarchyDefault,
+      reportingusers, hierarchyfirstlevel;
+    let resultAccessFilterHierarchy = [];
+    let resultsectorother = []
+    let filteredoverallsectorall = []
+
+    try {
+      const { listpageaccessmode } = req.body;
+      let clientidsmap;
+      let levelFinal = req.body?.sector === "all" ? ["Primary", "Secondary", "Tertiary"] : [req.body?.sector]
+
+      let finalDataRestrictList = []
+      if (listpageaccessmode === "Reporting to Based") {
+        let usersss = await User.find(
+          {
+            enquirystatus: {
+              $nin: ["Enquiry Purpose"],
+            },
+            resonablestatus: {
+              $nin: [
+                "Not Joined",
+                "Postponed",
+                "Rejected",
+                "Closed",
+                "Releave Employee",
+                "Absconded",
+                "Hold",
+                "Terminate",
+              ],
+            },
+            reportingto: req.body.username,
+          },
+          {
+            empcode: 1,
+            companyname: 1,
+          }
+        ).lean();
+        const companyNames = usersss.map((user) => user.companyname);
+        let clientids = await ClientUserid.find(
+          {
+            empname: { $in: companyNames },
+          },
+          { userid: 1 }
+        ).lean();
+        clientidsmap = clientids.map((user) => user.userid);
+      }
+
+      let prodresult = await Nonproduction.find(
+        {
+       mode:req.body.base,
+      approvestatus:false,
+          ...(listpageaccessmode === "Reporting to Based"
+            ? { empname: { $in: req.body.username } }
+            : {}),
+        },
+        {
+          name: 1,
+          category: 1,
+          subcategory: 1,
+          mode: 1,
+          count: 1,
+          date: 1,
+          fromtime: 1,
+          totime: 1,
+          totalhours: 1,
+          alloteddays: 1,
+          allotedhours: 1,
+          allotedminutes: 1,
+          days: 1,
+          hours: 1,
+          minutes: 1,
+           rejectreason:1,
+          createdAt: 1,
+          _id: 1,
+        }
+      );
+
+      clientuserid = await ClientUserid.find(
+        { loginallotlog: { $exists: true, $ne: [] } },
+        { empname: 1, userid: 1, loginallotlog: 1, projectvendor: 1 }
+      ).lean();
+
+      result = prodresult.map((item) => {
+        return {
+          category: item.category,
+          subcategory: item.subcategory,
+          mode: item.mode,
+          count:item.count,
+          date: item.date,
+          fromtime: item.fromtime,
+          totime:item.totime,
+          totalhours:item.totalhours,
+          alloteddays:item.alloteddays,
+          allotedhours:item.allotedhours,
+          allotedminutes:item.allotedminutes,
+          days: item.days,
+          hours: item.hours,
+          minutes:item.minutes,
+           rejectreason:item.rejectreason,
+          createdAt: item.createdAt,
+          _id: item._id,
+          companyname: item.name,
+        };
+      });
+      resultsectorother = result
+      //myhierarchy dropdown
+      if (
+        req.body.hierachy === "myhierarchy" &&
+        (listpageaccessmode === "Hierarchy Based" ||
+          listpageaccessmode === "Overall")
+      ) {
+        hierarchy = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: req.body.sector,
+        });
+        hierarchyDefault = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+        });
+
+        let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+        hierarchyFinal =
+          req.body.sector === "all"
+            ? answerDef.length > 0
+              ? [].concat(...answerDef)
+              : []
+            : hierarchy.length > 0
+              ? [].concat(...hierarchy.map((item) => item.employeename))
+              : [];
+
+        hierarchyMap = hierarchyFinal.length > 0 ? hierarchyFinal : [];
+
+        hierarchyfilter = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: "Primary",
+        });
+        primaryhierarchy = hierarchyfilter.map((item) => item.employeename[0])
+          ? hierarchyfilter.map((item) => item.employeename[0])
+          : [];
+
+        hierarchyfilter1 = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: "Secondary",
+        });
+        secondaryhierarchy = hierarchyfilter1.map(
+          (item) => item.employeename[0]
+        )
+          ? hierarchyfilter1.map((item) => item.employeename[0])
+          : [];
+
+        hierarchyfilter2 = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: "Tertiary",
+        });
+        tertiaryhierarchy = hierarchyfilter2.map((item) => item.employeename[0])
+          ? hierarchyfilter2.map((item) => item.employeename[0])
+          : [];
+
+        resulted = result
+          .map((userObj) => {
+            const matchingHierarchy = hierarchyDefault.find(
+              (hierarchyObj) =>
+                hierarchyObj.employeename[0] == userObj.companyname
+            );
+            return {
+              companyname: userObj.companyname,
+            category: userObj.category,
+          subcategory: userObj.subcategory,
+          mode: userObj.mode,
+          count:userObj.count,
+          date: userObj.date,
+          fromtime: userObj.fromtime,
+          totime:userObj.totime,
+          totalhours:userObj.totalhours,
+          alloteddays:userObj.alloteddays,
+          allotedhours:userObj.allotedhours,
+          allotedminutes:userObj.allotedminutes,
+          days: userObj.days,
+          hours: userObj.hours,
+          minutes:userObj.minutes,
+           rejectreason:userObj.rejectreason,
+              createdAt: userObj.createdAt,
+              _id: userObj._id,
+              level: matchingHierarchy ? matchingHierarchy.level : "",
+              control: matchingHierarchy ? matchingHierarchy.control : "",
+            };
+          })
+          .filter((data) => hierarchyMap.includes(data.companyname));
+      }
+
+      if (
+        req.body.hierachy === "allhierarchy" &&
+        (listpageaccessmode === "Hierarchy Based" ||
+          listpageaccessmode === "Overall")
+      ) {
+        hierarchySecond = await Hirerarchi.find(
+          {},
+          { employeename: 1, supervisorchoose: 1, level: 1, control: 1 }
+        );
+
+
+        // let sectorFinal = req.body.sector == "all"
+        //   ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+        // hierarchyDefault = await Hirerarchi.find({
+        //   supervisorchoose: req.body.username,
+        //   level: { $in: sectorFinal },
+
+        // });
+
+
+        let sectorFinal = req.body.sector == "all"
+          ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+        let FirstSuphierarchyDefaultLevel = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+        }, { level: 1 });
+
+        FirstSuphierarchyDefaultLevel = req.body.sector == "all" ? FirstSuphierarchyDefaultLevel.map(item => item.level) : [req.body.sector]
+
+        hierarchyDefault = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: { $in: FirstSuphierarchyDefaultLevel },
+        });
+
+        let answerDef = hierarchyDefault
+          .map((data) => data.employeename)
+          .flat();
+
+        function findEmployeesRecursive(
+          currentSupervisors,
+          processedSupervisors,
+          result
+        ) {
+          const filteredData = hierarchySecond.filter((item) =>
+            item.supervisorchoose.some(
+              (supervisor) =>
+                currentSupervisors.includes(supervisor) &&
+                FirstSuphierarchyDefaultLevel.includes(item.level) &&
+                !processedSupervisors.has(supervisor)
+            )
+          );
+
+          if (filteredData.length === 0) {
+            return result;
+          }
+
+          const newEmployees = filteredData.reduce((employees, item) => {
+            employees.push(...item.employeename);
+            processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+            return employees;
+          }, []);
+
+          const uniqueNewEmployees = [...new Set(newEmployees)];
+          result = [...result, ...filteredData];
+
+          return findEmployeesRecursive(
+            uniqueNewEmployees,
+            processedSupervisors,
+            result
+          );
+        }
+
+        const processedSupervisors = new Set();
+        const filteredOverallItem = findEmployeesRecursive(
+          answerDef,
+          processedSupervisors,
+          []
+        );
+        let answerDeoverall = filteredOverallItem
+          .filter((data) =>
+            FirstSuphierarchyDefaultLevel.includes(data.level)
+          )
+          .map((item) => item.employeename[0]);
+
+        resultedTeam = result
+          .map((userObj) => {
+            const matchingHierarchycontrol = filteredOverallItem.find(
+              (hierarchyObj) =>
+                hierarchyObj.employeename[0] == userObj.companyname
+            );
+            return {
+              companyname: userObj.companyname,
+              category: userObj.category,
+          subcategory: userObj.subcategory,
+          mode: userObj.mode,
+          count:userObj.count,
+          date: userObj.date,
+          fromtime: userObj.fromtime,
+          totime:userObj.totime,
+          totalhours:userObj.totalhours,
+          alloteddays:userObj.alloteddays,
+          allotedhours:userObj.allotedhours,
+          allotedminutes:userObj.allotedminutes,
+          days: userObj.days,
+          hours: userObj.hours,
+          minutes:userObj.minutes,
+           rejectreason:userObj.rejectreason,
+              _id: userObj._id,
+              level: matchingHierarchycontrol
+                ? matchingHierarchycontrol.level
+                : "",
+              control: matchingHierarchycontrol
+                ? matchingHierarchycontrol.control
+                : "",
+            };
+          })
+          .filter((data) => answerDeoverall.includes(data.companyname));
+
+        if (resultedTeam.length == 0) {
+
+          let sectorFinal = req.body.sector == "all"
+            ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+          let FirstSuphierarchyDefaultLevel = await Hirerarchi.find({
+            supervisorchoose: req.body.username,
+          }, { level: 1 });
+
+          FirstSuphierarchyDefaultLevel = req.body.sector == "all" ? FirstSuphierarchyDefaultLevel.map(item => item.level) : [req.body.sector]
+
+          hierarchyfirstlevel = await Hirerarchi.countDocuments({ supervisorchoose: req.body.username, level: { $in: FirstSuphierarchyDefaultLevel }, });
+          //  let hierarchySecond2 = await Hirerarchi.find({});
+          hierarchySecond = await Hirerarchi.find(
+            {},
+            { employeename: 1, supervisorchoose: 1, level: 1, control: 1 }
+          );
+
+          hierarchyDefault = await Hirerarchi.find({
+            supervisorchoose: req.body.username,
+            //  level: { $nin: sectorFinal },
+
+          });
+
+          console.log(hierarchySecond.length, "hierarchyDefault")
+
+          let answerDef = hierarchyDefault
+            .map((data) => data.employeename)
+            .flat();
+
+          console.log(answerDef, "answerDef")
+
+          function findEmployeesRecursive(
+            currentSupervisors,
+            processedSupervisorsallsector,
+            resultsectorother
+          ) {
+            const filteredData = hierarchySecond.filter((item) =>
+              item.supervisorchoose.some(
+                (supervisor) =>
+                  currentSupervisors.includes(supervisor) &&
+                  !processedSupervisorsallsector.has(supervisor)
+              )
+            );
+
+            if (filteredData.length === 0) {
+              return resultsectorother;
+            }
+
+            const newEmployees = filteredData.reduce((employees, item) => {
+              employees.push(...item.employeename);
+              processedSupervisorsallsector.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+              return employees;
+            }, []);
+
+            const uniqueNewEmployees = [...new Set(newEmployees)];
+            resultsectorother = [...resultsectorother, ...filteredData];
+            // console.log(result, "result")
+            return findEmployeesRecursive(
+              uniqueNewEmployees,
+              processedSupervisorsallsector,
+              resultsectorother
+            );
+          }
+
+          const processedSupervisorsallsector = new Set();
+          const filteredOverallItem = findEmployeesRecursive(
+            answerDef,
+            processedSupervisorsallsector,
+            []
+          );
+
+          console.log(processedSupervisorsallsector, "processedSupervisorsallsector");
+          //  console.log(filteredOverallItem.map((item) => item.employeename), "filteredOverallItem");
+
+          let answerDeoverall = filteredOverallItem.map((item) => item.employeename ? item.employeename[0] : "");
+
+          console.log("Count of data in other sectors:", answerDeoverall);
+
+          filteredoverallsectorall = resultsectorother.filter((data) =>
+            answerDeoverall.includes(data.companyname)
+          ).length;
+
+          console.log("filteredoverallsectorall:", filteredoverallsectorall);
+        }
+
+
+
+      }
+
+      //my + all hierarchy list dropdown
+
+      if (
+        req.body.hierachy === "myallhierarchy" &&
+        (listpageaccessmode === "Hierarchy Based" ||
+          listpageaccessmode === "Overall")
+      ) {
+        hierarchySecond = await Hirerarchi.find(
+          {},
+          { employeename: 1, supervisorchoose: 1, level: 1, control: 1 }
+        );
+
+        let sectorFinal = req.body.sector == "all"
+          ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector]
+
+        let FirstSuphierarchyDefaultLevel = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+        }, { level: 1 });
+
+        FirstSuphierarchyDefaultLevel = req.body.sector == "all" ? FirstSuphierarchyDefaultLevel.map(item => item.level) : [req.body.sector]
+
+        hierarchyDefault = await Hirerarchi.find({
+          supervisorchoose: req.body.username,
+          level: { $in: FirstSuphierarchyDefaultLevel },
+        });
+
+        let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+        function findEmployeesRecursive(
+          currentSupervisors,
+          processedSupervisors,
+          result
+        ) {
+          const filteredData = hierarchySecond.filter((item) =>
+            item.supervisorchoose.some(
+              (supervisor) =>
+                currentSupervisors.includes(supervisor) &&
+                FirstSuphierarchyDefaultLevel.includes(item.level) &&
+                !processedSupervisors.has(supervisor)
+            )
+          );
+
+          if (filteredData.length === 0) {
+            return result;
+          }
+
+          const newEmployees = filteredData.reduce((employees, item) => {
+            employees.push(...item.employeename);
+            processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+            return employees;
+          }, []);
+
+          const uniqueNewEmployees = [...new Set(newEmployees)];
+          result = [...result, ...filteredData];
+
+          return findEmployeesRecursive(
+            uniqueNewEmployees,
+            processedSupervisors,
+            result
+          );
+        }
+
+        const processedSupervisors = new Set();
+        const filteredOverallItem = findEmployeesRecursive(
+          [req.body.username],
+          processedSupervisors,
+          []
+        );
+        let answerDeoverall = filteredOverallItem
+          .filter((data) =>
+            FirstSuphierarchyDefaultLevel.includes(data.level)
+          )
+          .map((item) => item.employeename[0]);
+
+        filteredoverall = result
+          .map((userObj) => {
+            const matchingHierarchycontrol = filteredOverallItem.find(
+              (hierarchyObj) =>
+                hierarchyObj.employeename[0] == userObj.companyname
+            );
+            return {
+              companyname: userObj.companyname,
+               category: userObj.category,
+          subcategory: userObj.subcategory,
+          mode: userObj.mode,
+          count:userObj.count,
+          date: userObj.date,
+          fromtime: userObj.fromtime,
+          totime:userObj.totime,
+          totalhours:userObj.totalhours,
+          alloteddays:userObj.alloteddays,
+          allotedhours:userObj.allotedhours,
+          allotedminutes:userObj.allotedminutes,
+          days: userObj.days,
+          hours: userObj.hours,
+          minutes:userObj.minutes,
+           rejectreason:userObj.rejectreason,
+              _id: userObj._id,
+              createdAt: userObj.createdAt,
+              level: matchingHierarchycontrol
+                ? matchingHierarchycontrol.level
+                : "",
+              control: matchingHierarchycontrol
+                ? matchingHierarchycontrol.control
+                : "",
+            };
+          })
+          .filter((data) => answerDeoverall.includes(data.companyname));
+
+
+
+        //alert there is no sector
+        if (filteredoverall.length == 0) {
+
+          let hierarchySecond2 = await Hirerarchi.find();
+          hierarchyfirstlevel = await Hirerarchi.countDocuments({ supervisorchoose: req.body.username, level: req.body.sector, });
+          console.log(hierarchyfirstlevel, "hierarchyfirstlevel")
+
+          function findEmployeesRecursive(currentSupervisors, processedSupervisorsallsector, resultsectorother) {
+            const filteredData = hierarchySecond2.filter((item) =>
+              item.supervisorchoose.some(
+                (supervisor) =>
+                  currentSupervisors.includes(supervisor) &&
+                  !processedSupervisorsallsector.has(supervisor)
+              )
+            );
+
+            console.log(filteredData.length, "l;lp");
+            if (filteredData.length === 0) {
+              return resultsectorother; // No more employees to process
+            }
+
+            // Collect new employees
+            const newEmployees = filteredData.reduce((employees, item) => {
+              employees.push(...item.employeename);
+              processedSupervisorsallsector.add(item.supervisorchoose[0]); // Track processed supervisors
+              return employees;
+            }, []);
+
+            // Prevent duplicates
+            const uniqueNewEmployees = [...new Set(newEmployees)];
+
+            // **Modify `resultall` in place** instead of reassigning it
+            resultsectorother.push(...filteredData);
+
+            // console.log(result, "resultall1");
+
+            // Recursive call with new employees
+            return findEmployeesRecursive(uniqueNewEmployees, processedSupervisorsallsector, resultsectorother);
+          }
+
+          const processedSupervisorsallsector = new Set();
+          // const resultall = []; // Define `resultall` outside to maintain reference
+
+          const filteredOverallItem = findEmployeesRecursive(
+            [req.body.username],
+            processedSupervisorsallsector,
+            resultsectorother // Pass the reference instead of a new array
+          );
+
+          console.log(processedSupervisorsallsector, "processedSupervisorsallsector");
+          //   console.log(filteredOverallItem.map((item) => item.employeename), "filteredOverallItem");
+
+          let answerDeoverall = filteredOverallItem.map((item) => item.employeename ? item.employeename[0] : "");
+
+          console.log("Count of data in other sectors:", answerDeoverall);
+
+          filteredoverallsectorall = resultsectorother.filter((data) =>
+            answerDeoverall.includes(data.companyname)
+          ).length;
+
+          console.log("filteredoverallsectorall:", filteredoverallsectorall);
+        }
+
+     
+      }
+
+      if (listpageaccessmode === "Reporting to Based") {
+        reportingtobaseduser = result.map((userObj) => {
+          return {
+            companyname: userObj.companyname,
+             category: userObj.category,
+          subcategory: userObj.subcategory,
+          mode: userObj.mode,
+          count:userObj.count,
+          date: userObj.date,
+          fromtime: userObj.fromtime,
+          totime:userObj.totime,
+          totalhours:userObj.totalhours,
+          alloteddays:userObj.alloteddays,
+          allotedhours:userObj.allotedhours,
+          allotedminutes:userObj.allotedminutes,
+          days: userObj.days,
+          hours: userObj.hours,
+          minutes:userObj.minutes,
+           rejectreason:userObj.rejectreason,
+            _id: userObj._id,
+            level: "",
+            control: "",
+          };
+        });
+      }
+
+   
+
+      let finalsupervisor = req.body.hierachy == "myhierarchy" ? resulted?.map(Data => Data?.companyname) : req.body.hierachy == "allhierarchy" ? resultedTeam?.map(Data => Data?.companyname) : filteredoverall?.map(Data => Data?.companyname)
+
+      const restrictTeam = await Hirerarchi.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                supervisorchoose: { $in: finalsupervisor } // Matches if supervisorchoose field has a value in finalsupervisor
+              },
+              {
+                employeename: { $in: finalsupervisor }     // Matches if employeename field has a value in finalsupervisor
+              }
+            ],
+            level: { $in: levelFinal } // Matches if level field has a value in levelFinal
+          },
+        },
+        {
+          $lookup: {
+            from: "reportingheaders",
+            let: {
+              teamControlsArray: {
+                $ifNull: ["$pagecontrols", []]
+              }
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $in: [
+                          "$name",
+                          "$$teamControlsArray"
+                        ]
+                      }, // Check if 'name' is in 'teamcontrols' array
+                      {
+                        $in: [
+                          req?.body?.pagename,
+                          "$reportingnew" // Check if 'menuteamloginstatus' is in 'reportingnew' array
+                        ]
+                      } // Additional condition for reportingnew array
+                    ]
+                  }
+                }
+              }
+            ],
+            as: "reportData" // The resulting matched documents will be in this field
+          }
+        },
+        {
+          $project: {
+            supervisorchoose: 1,
+            employeename: 1,
+            reportData: 1
+          }
+        }
+      ]);
+      let restrictListTeam = restrictTeam?.filter(data => data?.reportData?.length > 0)?.flatMap(Data => Data?.employeename)
+      console.log(restrictListTeam, resultedTeam, "restrictListTeam")
+      resultAccessFilterHierarchy = req.body.hierachy === "myhierarchy" ? resulted : req.body.hierachy === "allhierarchy" ? resultedTeam : filteredoverall;
+      resultAccessFilter = restrictListTeam?.length > 0 ? resultAccessFilterHierarchy?.filter(data => restrictListTeam?.includes(data?.companyname)) : [];
+
+      console.log(resultAccessFilter, resultAccessFilterHierarchy.length, filteredoverallsectorall, "oooo")
+    
+    } catch (err) {
+      return next(new ErrorHandler("Records not found!", 404));
+    }
+
+    return res.status(200).json({
+      // result
+      // resulted,
+      // resultedTeam,
+      // branch,
+      // hierarchy,
+      // overallMyallList,
+      hierarchyfirstlevel,
+      filteredoverallsectorall,
+      resultAccessFilterHierarchy: resultAccessFilterHierarchy.length,
+      resultAccessFilter,
+      // primaryhierarchy,
+      //  secondaryhierarchy,
+      //  tertiaryhierarchy,
+      //  primaryhierarchyall,
+      //  secondaryhierarchyall,
+      //  tertiaryhierarchyall,
+      //  primaryhierarchyfinal,
+      //  secondaryhierarchyfinal, tertiaryhierarchyfinal,
+    });
+  }
+);
+

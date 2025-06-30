@@ -412,7 +412,7 @@ function Nonproductionunitrate() {
       category: nonProductionUnitRate.category,
       subcategory: nonProductionUnitRate.subcategory,
       base: nonProductionUnitRate.base,
-      process: nonProductionUnitRate.process,
+      // process: nonProductionUnitRate.process,
     });
     const isNameMatch = res?.data?.nonproductionunitrate > 0;
     if (isNameMatch) {

@@ -12,5 +12,5 @@ export const RestrictionList = ["Team Login Allot", 'Task Hierarchy Reports', 'I
     "Hierarchy Approval Employee Documents", 'Team Work From Home Verification', 'Hierarchy Disabled Users List',
     'Hierarchy Domain Users List',
     'Hierarchy Locked Users List', "Task Hierarchy Summary Reports", "Team Auto Clockout Restriction List","Team Production Base Attendance",
-    "Temp Team Production Base Attendance", "Team Dashboard"
+    "Temp Team Production Base Attendance", "Team Dashboard","Team NonProduction Check List"
 ];

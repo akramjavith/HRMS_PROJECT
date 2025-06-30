@@ -177,7 +177,7 @@ const ActionCell = ({ params, fetchBatchFilter }) => {
   );
 };
 
-function Nonproductionchecklist() {
+function TeamNonproductionchecklist() {
   const [selectedTable, setSelectedTable] = useState([]);
   const [valueTable, setValueTable] = useState([]);
   const [tableCheck, setTableCheck] = useState([]);
@@ -368,13 +368,47 @@ function Nonproductionchecklist() {
     setIsPdfFilterOpen(false);
   };
   const [searchQuery, setSearchQuery] = useState("");
-  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
+  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, buttonStyles, listPageAccessMode } = useContext(UserRoleAccessContext);
   const { auth } = useContext(AuthContext);
   const gridRef = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchQueryManage, setSearchQueryManage] = useState("");
   const [copiedData, setCopiedData] = useState("");
   const [openviewalert, setOpenviewalert] = useState(false);
+
+
+
+  let listpageaccessby =
+    listPageAccessMode?.find(
+      (data) =>
+        data.modulename === "Production" &&
+        data.submodulename === "Non Production" &&
+        data.mainpagename === "Non Production Setup" &&
+        data.subpagename === "Team NonProduction Check List" &&
+        data.subsubpagename === ""
+    )?.listpageaccessmode || "Overall";
+
+  const modeDropDowns = [
+    { label: "My Hierarchy List", value: "myhierarchy" },
+    { label: "All Hierarchy List", value: "allhierarchy" },
+    { label: "My + All Hierarchy List", value: "myallhierarchy" },
+  ];
+  const sectorDropDowns = [
+    { label: "Primary", value: "Primary" },
+    { label: "Secondary", value: "Secondary" },
+    { label: "Tertiary", value: "Tertiary" },
+    { label: "All", value: "all" },
+  ];
+  const [modeselection, setModeSelection] = useState({
+    label: "My Hierarchy List",
+    value: "myhierarchy",
+  });
+  const [sectorSelection, setSectorSelection] = useState({
+    label: "Primary",
+    value: "Primary",
+  });
+
+
 
   //completed
   const [filteredRowDatacom, setFilteredRowDatacom] = useState([]);
@@ -494,7 +528,7 @@ function Nonproductionchecklist() {
   const initialColumnVisibility = {
     serialNumber: true,
     checkbox: true,
-    name: true,
+    companyname: true,
     category: true,
     subcategory: true,
     date: true,
@@ -923,11 +957,11 @@ function Nonproductionchecklist() {
       pinned: "left",
     },
     {
-      field: "name",
+      field: "companyname",
       headerName: "Name",
       flex: 0,
       width: 200,
-      hide: !columnVisibility.name,
+      hide: !columnVisibility.companyname,
       headerClassName: "bold-header",
     },
     {
@@ -1262,23 +1296,51 @@ function Nonproductionchecklist() {
     setLoader(true);
     try {
       let [res_employee, res_completed] = await Promise.all([
-        axios.post(SERVICE.NON_PRODUCTION_APPROVE_LIST, {
+        axios.post(SERVICE.TEAM_NON_PRODUCTION_CHECKLIST_APPROVE, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
           base: selectedMode,
+          hierachy: modeselection.value,
+          sector: sectorSelection.value,
+          username: isUserRoleAccess.companyname,
+          pagename: "menuteamnonproductionchecklist",
+          listpageaccessmode: listpageaccessby,
         }),
 
-        axios.post(SERVICE.NON_PRODUCTION_REJECT_LIST, {
+        axios.post(SERVICE.TEAM_NON_PRODUCTION_CHECKLIST_REJECT, {
           headers: {
             Authorization: `Bearer ${auth.APIToken}`,
           },
           base: selectedMode,
+          hierachy: modeselection.value,
+          sector: sectorSelection.value,
+          username: isUserRoleAccess.companyname,
+          pagename: "menuteamnonproductionchecklist",
+          listpageaccessmode: listpageaccessby,
         }),
       ]);
-      console.log(res_employee?.data?.validatefinal, "de");
+      if (
+        // (   // res_employee?.data?.hierarchyfirstlevel > 0 &&
+        //     res_employee?.data?.filteredoverallsectorall > 0 &&
+        //     res_employee?.data?.resultAccessFilter?.length < 1 &&
+        //     ["myallhierarchy", "allhierarchy"]?.includes(modeselection.value))
 
-      const itemsWithSerialNumber = res_employee?.data?.nonproduction?.map((item, index) => ({
+        // ||
+
+
+        res_employee?.data?.resultAccessFilterHierarchy > 0 &&
+        res_employee?.data?.resultAccessFilter?.length == 0 &&
+        ["myallhierarchy", "allhierarchy"]?.includes(modeselection.value)
+
+
+      ) {
+
+        setLoaderList(true);
+        alert("Some employees have not been given access to this page.");
+      }
+
+      const itemsWithSerialNumber = res_employee?.data?.resultAccessFilter?.map((item, index) => ({
         ...item,
         serialNumber: index + 1,
         date: moment(item.date).format("DD-MM-YYYY"),
@@ -1289,7 +1351,27 @@ function Nonproductionchecklist() {
 
       //valid/Invalid status
 
-      const itemsWithSerialNumberstatus = res_completed?.data?.nonproduction?.map((item, index) => ({
+      if (
+        // (   // res_employee?.data?.hierarchyfirstlevel > 0 &&
+        //     res_employee?.data?.filteredoverallsectorall > 0 &&
+        //     res_employee?.data?.resultAccessFilter?.length < 1 &&
+        //     ["myallhierarchy", "allhierarchy"]?.includes(modeselection.value))
+
+        // ||
+
+
+        res_completed?.data?.resultAccessFilterHierarchy > 0 &&
+        res_completed?.data?.resultAccessFilter?.length == 0 &&
+        ["myallhierarchy", "allhierarchy"]?.includes(modeselection.value)
+
+
+      ) {
+
+        setLoaderList(true);
+        alert("Some employees have not been given access to this page.");
+      }
+
+      const itemsWithSerialNumberstatus = res_completed?.data?.resultAccessFilter?.map((item, index) => ({
         ...item,
         serialNumber: index + 1,
         date: moment(item.date).format("DD-MM-YYYY"),
@@ -1366,7 +1448,7 @@ function Nonproductionchecklist() {
     checkbox: true,
     serialNumber: true,
     checkbox: true,
-    name: true,
+    companyname: true,
     category: true,
     subcategory: true,
     date: true,
@@ -1465,11 +1547,11 @@ function Nonproductionchecklist() {
       pinned: "left",
     },
     {
-      field: "name",
+      field: "companyname",
       headerName: "Name",
       flex: 0,
       width: 200,
-      hide: !columnVisibilitycom.name,
+      hide: !columnVisibilitycom.companyname,
       headerClassName: "bold-header",
     },
     {
@@ -1714,28 +1796,64 @@ function Nonproductionchecklist() {
     <Box>
       <Headtitle title={"NonProduction Check List"} />
       <PageHeading
-        title="NonProduction Check List"
+        title="Team NonProduction Check List"
         modulename="Quality"
         submodulename="Penalty"
         mainpagename="Penalty Setup"
         subpagename="Penalty Calculation"
         subsubpagename="Validation Error Entry"
       />
-      {isUserRoleCompare?.includes("loverallnonproductionchecklist") && (
+      {isUserRoleCompare?.includes("lteamnonproductionchecklist") && (
         <>
           <Box sx={userStyle.dialogbox}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>Add NonProduction Check List</Typography>
+                  {/* <Typography sx={userStyle.importheadtext}>Add NonProduction Check List</Typography> */}
                 </Grid>
               </Grid>
               <br />
               <Grid container spacing={2}>
+                {listpageaccessby === "Reporting to Based" ? (
+                  <Grid item lg={2} md={2.5} xs={12} sm={6}>
+                    <TextField readOnly size="small" value={listpageaccessby} />
+                  </Grid>
+                ) : (
+                  <>
+                    <Grid item lg={2} md={2.5} xs={12} sm={6}>
+                      <Selects
+                        options={modeDropDowns}
+                        styles={colourStyles}
+                        value={{
+                          label: modeselection.label,
+                          value: modeselection.value,
+                        }}
+                        onChange={(e) => {
+                          setModeSelection(e);
+                        }}
+                      />
+                    </Grid>
+                    <Grid item lg={2} md={2.5} xs={12} sm={6}>
+                      <Selects
+                        options={sectorDropDowns}
+                        styles={colourStyles}
+                        value={{
+                          label: sectorSelection.label,
+                          value: sectorSelection.value,
+                        }}
+                        onChange={(e) => {
+                          setSectorSelection(e);
+                        }}
+                      />
+                    </Grid>
+                  </>
+                )}
+
+
                 <Grid item md={3} xs={12} sm={12}>
                   <FormControl fullWidth size="small">
                     <Typography>
-                      Base<b style={{ color: "red" }}>*</b>
+                      {/* Base<b style={{ color: "red" }}>*</b> */}
                     </Typography>
                     <Selects
                       labelId="mode-select-label"
@@ -1749,12 +1867,12 @@ function Nonproductionchecklist() {
                   </FormControl>
                 </Grid>
 
-                <Grid item md={1.5} xs={12} sm={12} marginTop={3}>
+                <Grid item md={1.5} xs={12} sm={12} >
                   <Button variant="contained" sx={buttonStyles.buttonsubmit} onClick={handleSubmitFilterNew}>
                     Filter
                   </Button>
                 </Grid>
-                <Grid item md={1.5} xs={12} sm={12} marginTop={3}>
+                <Grid item md={1.5} xs={12} sm={12}>
                   <Button onClick={handleClearFilterNew} sx={buttonStyles.btncancel}>
                     Clear
                   </Button>
@@ -1787,208 +1905,16 @@ function Nonproductionchecklist() {
         </Box>
       )}
 
-      {/* {isUserRoleCompare?.includes("loverallnonproductionchecklist")  ? */}
+      {isUserRoleCompare?.includes("lteamnonproductionchecklist") ?
 
-      <>
-        <Box sx={userStyle.container}>
-          {/* ******************************************************EXPORT Buttons****************************************************** */}
-          <Grid item xs={8}>
-            <Typography sx={userStyle.importheadtext}>
-              Approve List
-              {/* Penalty Total Field List */}
-            </Typography>
-          </Grid>
-          <Grid container spacing={2} style={userStyle.dataTablestyle}>
-            <Grid item md={2} xs={12} sm={12}>
-              <Box>
-                <label>Show entries:</label>
-                <Select
-                  id="pageSizeSelect"
-                  value={pageSize}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 180,
-                        width: 80,
-                      },
-                    },
-                  }}
-                  onChange={handlePageSizeChange}
-                  sx={{ width: "77px" }}
-                >
-                  <MenuItem value={1}>1</MenuItem>
-                  <MenuItem value={5}>5</MenuItem>
-                  <MenuItem value={10}>10</MenuItem>
-                  <MenuItem value={25}>25</MenuItem>
-                  <MenuItem value={50}>50</MenuItem>
-                  <MenuItem value={100}>100</MenuItem>
-                  <MenuItem value={filterList?.length}>All</MenuItem>
-                </Select>
-              </Box>
-            </Grid>
-            <Grid
-              item
-              md={8}
-              xs={12}
-              sm={12}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                {isUserRoleCompare?.includes("exceloverallnonproductionchecklist") && (
-                  <>
-                    <Button
-                      onClick={(e) => {
-                        setIsFilterOpen(true);
-                        setFormat("xl");
-                      }}
-                      sx={userStyle.buttongrp}
-                    >
-                      <FaFileExcel />
-                      &ensp;Export to Excel&ensp;
-                    </Button>
-                  </>
-                )}
-                {isUserRoleCompare?.includes("csvoverallnonproductionchecklist") && (
-                  <>
-                    <Button
-                      onClick={(e) => {
-                        setIsFilterOpen(true);
-                        setFormat("csv");
-                      }}
-                      sx={userStyle.buttongrp}
-                    >
-                      <FaFileCsv />
-                      &ensp;Export to CSV&ensp;
-                    </Button>
-                  </>
-                )}
-                {isUserRoleCompare?.includes("printoverallnonproductionchecklist") && (
-                  <>
-                    <Button sx={userStyle.buttongrp} onClick={handleprint}>
-                      &ensp;
-                      <FaPrint />
-                      &ensp;Print&ensp;
-                    </Button>
-                  </>
-                )}
-                {isUserRoleCompare?.includes("pdfoverallnonproductionchecklist") && (
-                  <>
-                    <Button
-                      sx={userStyle.buttongrp}
-                      onClick={() => {
-                        setIsPdfFilterOpen(true);
-                      }}
-                    >
-                      <FaFilePdf />
-                      &ensp;Export to PDF&ensp;
-                    </Button>
-                  </>
-                )}
-                {isUserRoleCompare?.includes("imageoverallnonproductionchecklist") && (
-                  <>
-                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                      <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;
-                    </Button>
-                  </>
-                )}
-              </Box>
-            </Grid>
-            <Grid item md={2} xs={6} sm={6}>
-              <Box>
-                <AggregatedSearchBar
-                  columnDataTable={columnDataTable}
-                  setItems={setItems}
-                  addSerialNumber={addSerialNumber}
-                  setPage={setPage}
-                  maindatas={filterList}
-                  setSearchedString={setSearchedString}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  paginated={false}
-                  totalDatas={filterList}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-          <br />
-          <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
-            Show All Columns
-          </Button>
-          &ensp;
-          <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
-            Manage Columns
-          </Button>
-          &ensp;
-          {/* {hasMoreData && !isLoading && filterList.length > 0 && (
-                            <Button variant="contained" onClick={loadMore}>
-                                Load More
-                            </Button>
-                        )} */}
-          <br />
-          {loaderList ? (
-            <>
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <ThreeDots
-                  height="80"
-                  width="80"
-                  radius="9"
-                  color="#1976d2"
-                  ariaLabel="three-dots-loading"
-                  wrapperStyle={{}}
-                  wrapperClassName=""
-                  visible={true}
-                />
-              </Box>
-            </>
-          ) : (
-            <>
-              <AggridTable
-                rowDataTable={rowDataTable}
-                columnDataTable={columnDataTable}
-                columnVisibility={columnVisibility}
-                page={page}
-                setPage={setPage}
-                pageSize={pageSize}
-                totalPages={totalPages}
-                setColumnVisibility={setColumnVisibility}
-                isHandleChange={isHandleChange}
-                items={items}
-                selectedRows={selectedRows}
-                setSelectedRows={setSelectedRows}
-                gridRefTable={gridRefTable}
-                paginated={false}
-                // pagenamecheck={"Validation Error Entry"}
-                filteredDatas={filteredDatas}
-                // totalDatas={totalDatas}
-                searchQuery={searchedString}
-                handleShowAllColumns={handleShowAllColumns}
-                setFilteredRowData={setFilteredRowData}
-                filteredRowData={filteredRowData}
-                setFilteredChanges={setFilteredChanges}
-                filteredChanges={filteredChanges}
-                gridRefTableImg={gridRefTableImg}
-                itemsList={filterList}
-                rowHeight={150}
-              />
-            </>
-          )}
-        </Box>
-      </>
-      {/* // : null} */}
-
-      <br />
-
-      {/* {isUserRoleCompare?.includes("loverallnonproductionchecklist")  ? */}
-
-      <>
-        <Box sx={userStyle.dialogbox}>
-          <>
+        <>
+          <Box sx={userStyle.container}>
+            {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
-              <Typography sx={userStyle.importheadtext}>Reject List</Typography>
+              <Typography sx={userStyle.importheadtext}>
+                Approve List
+                {/* Penalty Total Field List */}
+              </Typography>
             </Grid>
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
               <Grid item md={2} xs={12} sm={12}>
@@ -1996,7 +1922,7 @@ function Nonproductionchecklist() {
                   <label>Show entries:</label>
                   <Select
                     id="pageSizeSelect"
-                    value={pageSizecom}
+                    value={pageSize}
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -2005,7 +1931,7 @@ function Nonproductionchecklist() {
                         },
                       },
                     }}
-                    onChange={handlePageSizeChangecom}
+                    onChange={handlePageSizeChange}
                     sx={{ width: "77px" }}
                   >
                     <MenuItem value={1}>1</MenuItem>
@@ -2014,7 +1940,7 @@ function Nonproductionchecklist() {
                     <MenuItem value={25}>25</MenuItem>
                     <MenuItem value={50}>50</MenuItem>
                     <MenuItem value={100}>100</MenuItem>
-                    <MenuItem value={isusercompleted?.length}>All</MenuItem>
+                    <MenuItem value={filterList?.length}>All</MenuItem>
                   </Select>
                 </Box>
               </Grid>
@@ -2030,11 +1956,11 @@ function Nonproductionchecklist() {
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("exceloverallnonproductionchecklist") && (
+                  {isUserRoleCompare?.includes("excelteamnonproductionchecklist") && (
                     <>
                       <Button
                         onClick={(e) => {
-                          setIsFilterOpencom(true);
+                          setIsFilterOpen(true);
                           setFormat("xl");
                         }}
                         sx={userStyle.buttongrp}
@@ -2044,11 +1970,11 @@ function Nonproductionchecklist() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvoverallnonproductionchecklist") && (
+                  {isUserRoleCompare?.includes("csvteamnonproductionchecklist") && (
                     <>
                       <Button
                         onClick={(e) => {
-                          setIsFilterOpencom(true);
+                          setIsFilterOpen(true);
                           setFormat("csv");
                         }}
                         sx={userStyle.buttongrp}
@@ -2058,21 +1984,21 @@ function Nonproductionchecklist() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printoverallnonproductionchecklist") && (
+                  {isUserRoleCompare?.includes("printteamnonproductionchecklist") && (
                     <>
-                      <Button sx={userStyle.buttongrp} onClick={handleprintcom}>
+                      <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
                         <FaPrint />
                         &ensp;Print&ensp;
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfoverallnonproductionchecklist") && (
+                  {isUserRoleCompare?.includes("pdfteamnonproductionchecklist") && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
                         onClick={() => {
-                          setIsPdfFilterOpencom(true);
+                          setIsPdfFilterOpen(true);
                         }}
                       >
                         <FaFilePdf />
@@ -2080,62 +2006,46 @@ function Nonproductionchecklist() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imageoverallnonproductionchecklist") && (
-                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImagecom}>
-                      {" "}
-                      <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
-                    </Button>
+                  {isUserRoleCompare?.includes("imageteamnonproductionchecklist") && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                        <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;
+                      </Button>
+                    </>
                   )}
                 </Box>
               </Grid>
               <Grid item md={2} xs={6} sm={6}>
                 <Box>
-                  {/* <FormControl fullWidth size="small">
-                                                    <Typography>Search</Typography>
-                                                    <OutlinedInput
-                                                        id="component-outlined"
-                                                        type="text"
-                                                        value={searchQuery}
-                                                        onChange={handleSearchChange}
-                                                    />
-                                                </FormControl> */}
                   <AggregatedSearchBar
-                    columnDataTable={columnDataTablecom}
-                    setItems={setItemscom}
-                    addSerialNumber={addSerialNumbercom}
-                    setPage={setPagecom}
-                    maindatas={isusercompleted}
-                    setSearchedString={setSearchedStringcom}
-                    searchQuery={searchQuerycom}
-                    setSearchQuery={setSearchQuerycom}
+                    columnDataTable={columnDataTable}
+                    setItems={setItems}
+                    addSerialNumber={addSerialNumber}
+                    setPage={setPage}
+                    maindatas={filterList}
+                    setSearchedString={setSearchedString}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
                     paginated={false}
-                    totalDatas={isusercompleted}
+                    totalDatas={filterList}
                   />
                 </Box>
               </Grid>
             </Grid>
             <br />
-            <Button sx={userStyle.buttongrp} onClick={handleShowAllColumnscom}>
+            <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
               Show All Columns
             </Button>
             &ensp;
-            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumnscom}>
+            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
               Manage Columns
             </Button>
-            {/* Show "Load More" button if there's more data */}
-            <Popover
-              id={idcom}
-              open={isManageColumnsOpencom}
-              anchorEl={anchorElcom}
-              onClose={handleCloseManageColumnscom}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-            >
-              {manageColumnsContentcom}
-            </Popover>
-            <br />
+            &ensp;
+            {/* {hasMoreData && !isLoading && filterList.length > 0 && (
+                            <Button variant="contained" onClick={loadMore}>
+                                Load More
+                            </Button>
+                        )} */}
             <br />
             {loaderList ? (
               <>
@@ -2155,38 +2065,246 @@ function Nonproductionchecklist() {
             ) : (
               <>
                 <AggridTable
-                  rowDataTable={rowDataTablecom}
-                  columnDataTable={columnDataTablecom}
-                  columnVisibility={columnVisibilitycom}
-                  page={pagecom}
-                  setPage={setPagecom}
-                  pageSize={pageSizecom}
-                  totalPages={totalPagescom}
-                  setColumnVisibility={setColumnVisibilitycom}
+                  rowDataTable={rowDataTable}
+                  columnDataTable={columnDataTable}
+                  columnVisibility={columnVisibility}
+                  page={page}
+                  setPage={setPage}
+                  pageSize={pageSize}
+                  totalPages={totalPages}
+                  setColumnVisibility={setColumnVisibility}
                   isHandleChange={isHandleChange}
-                  items={itemscom}
+                  items={items}
                   selectedRows={selectedRows}
                   setSelectedRows={setSelectedRows}
-                  gridRefTable={gridRefTablecom}
+                  gridRefTable={gridRefTable}
                   paginated={false}
-                  filteredDatas={filteredDatascom}
+                  // pagenamecheck={"Validation Error Entry"}
+                  filteredDatas={filteredDatas}
                   // totalDatas={totalDatas}
-                  searchQuery={searchedStringcom}
-                  handleShowAllColumns={handleShowAllColumnscom}
-                  setFilteredRowData={setFilteredRowDatacom}
-                  filteredRowData={filteredRowDatacom}
-                  setFilteredChanges={setFilteredChangescom}
-                  filteredChanges={filteredChangescom}
-                  gridRefTableImg={gridRefTableImgcom}
-                  itemsList={isusercompleted}
+                  searchQuery={searchedString}
+                  handleShowAllColumns={handleShowAllColumns}
+                  setFilteredRowData={setFilteredRowData}
+                  filteredRowData={filteredRowData}
+                  setFilteredChanges={setFilteredChanges}
+                  filteredChanges={filteredChanges}
+                  gridRefTableImg={gridRefTableImg}
+                  itemsList={filterList}
+                  rowHeight={150}
                 />
               </>
             )}
-          </>
-        </Box>
-      </>
+          </Box>
+        </>
+        : null}
 
-      {/* : null} */}
+      <br />
+
+      {isUserRoleCompare?.includes("lteamnonproductionchecklist") ?
+
+        <>
+          <Box sx={userStyle.dialogbox}>
+            <>
+              <Grid item xs={8}>
+                <Typography sx={userStyle.importheadtext}>Reject List</Typography>
+              </Grid>
+              <Grid container spacing={2} style={userStyle.dataTablestyle}>
+                <Grid item md={2} xs={12} sm={12}>
+                  <Box>
+                    <label>Show entries:</label>
+                    <Select
+                      id="pageSizeSelect"
+                      value={pageSizecom}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 180,
+                            width: 80,
+                          },
+                        },
+                      }}
+                      onChange={handlePageSizeChangecom}
+                      sx={{ width: "77px" }}
+                    >
+                      <MenuItem value={1}>1</MenuItem>
+                      <MenuItem value={5}>5</MenuItem>
+                      <MenuItem value={10}>10</MenuItem>
+                      <MenuItem value={25}>25</MenuItem>
+                      <MenuItem value={50}>50</MenuItem>
+                      <MenuItem value={100}>100</MenuItem>
+                      <MenuItem value={isusercompleted?.length}>All</MenuItem>
+                    </Select>
+                  </Box>
+                </Grid>
+                <Grid
+                  item
+                  md={8}
+                  xs={12}
+                  sm={12}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box>
+                    {isUserRoleCompare?.includes("excelteamnonproductionchecklist") && (
+                      <>
+                        <Button
+                          onClick={(e) => {
+                            setIsFilterOpencom(true);
+                            setFormat("xl");
+                          }}
+                          sx={userStyle.buttongrp}
+                        >
+                          <FaFileExcel />
+                          &ensp;Export to Excel&ensp;
+                        </Button>
+                      </>
+                    )}
+                    {isUserRoleCompare?.includes("csvteamnonproductionchecklist") && (
+                      <>
+                        <Button
+                          onClick={(e) => {
+                            setIsFilterOpencom(true);
+                            setFormat("csv");
+                          }}
+                          sx={userStyle.buttongrp}
+                        >
+                          <FaFileCsv />
+                          &ensp;Export to CSV&ensp;
+                        </Button>
+                      </>
+                    )}
+                    {isUserRoleCompare?.includes("printteamnonproductionchecklist") && (
+                      <>
+                        <Button sx={userStyle.buttongrp} onClick={handleprintcom}>
+                          &ensp;
+                          <FaPrint />
+                          &ensp;Print&ensp;
+                        </Button>
+                      </>
+                    )}
+                    {isUserRoleCompare?.includes("pdfteamnonproductionchecklist") && (
+                      <>
+                        <Button
+                          sx={userStyle.buttongrp}
+                          onClick={() => {
+                            setIsPdfFilterOpencom(true);
+                          }}
+                        >
+                          <FaFilePdf />
+                          &ensp;Export to PDF&ensp;
+                        </Button>
+                      </>
+                    )}
+                    {isUserRoleCompare?.includes("imageteamnonproductionchecklist") && (
+                      <Button sx={userStyle.buttongrp} onClick={handleCaptureImagecom}>
+                        {" "}
+                        <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
+                      </Button>
+                    )}
+                  </Box>
+                </Grid>
+                <Grid item md={2} xs={6} sm={6}>
+                  <Box>
+                    {/* <FormControl fullWidth size="small">
+                                                    <Typography>Search</Typography>
+                                                    <OutlinedInput
+                                                        id="component-outlined"
+                                                        type="text"
+                                                        value={searchQuery}
+                                                        onChange={handleSearchChange}
+                                                    />
+                                                </FormControl> */}
+                    <AggregatedSearchBar
+                      columnDataTable={columnDataTablecom}
+                      setItems={setItemscom}
+                      addSerialNumber={addSerialNumbercom}
+                      setPage={setPagecom}
+                      maindatas={isusercompleted}
+                      setSearchedString={setSearchedStringcom}
+                      searchQuery={searchQuerycom}
+                      setSearchQuery={setSearchQuerycom}
+                      paginated={false}
+                      totalDatas={isusercompleted}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+              <br />
+              <Button sx={userStyle.buttongrp} onClick={handleShowAllColumnscom}>
+                Show All Columns
+              </Button>
+              &ensp;
+              <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumnscom}>
+                Manage Columns
+              </Button>
+              {/* Show "Load More" button if there's more data */}
+              <Popover
+                id={idcom}
+                open={isManageColumnsOpencom}
+                anchorEl={anchorElcom}
+                onClose={handleCloseManageColumnscom}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+              >
+                {manageColumnsContentcom}
+              </Popover>
+              <br />
+              <br />
+              {loaderList ? (
+                <>
+                  <Box sx={{ display: "flex", justifyContent: "center" }}>
+                    <ThreeDots
+                      height="80"
+                      width="80"
+                      radius="9"
+                      color="#1976d2"
+                      ariaLabel="three-dots-loading"
+                      wrapperStyle={{}}
+                      wrapperClassName=""
+                      visible={true}
+                    />
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <AggridTable
+                    rowDataTable={rowDataTablecom}
+                    columnDataTable={columnDataTablecom}
+                    columnVisibility={columnVisibilitycom}
+                    page={pagecom}
+                    setPage={setPagecom}
+                    pageSize={pageSizecom}
+                    totalPages={totalPagescom}
+                    setColumnVisibility={setColumnVisibilitycom}
+                    isHandleChange={isHandleChange}
+                    items={itemscom}
+                    selectedRows={selectedRows}
+                    setSelectedRows={setSelectedRows}
+                    gridRefTable={gridRefTablecom}
+                    paginated={false}
+                    filteredDatas={filteredDatascom}
+                    // totalDatas={totalDatas}
+                    searchQuery={searchedStringcom}
+                    handleShowAllColumns={handleShowAllColumnscom}
+                    setFilteredRowData={setFilteredRowDatacom}
+                    filteredRowData={filteredRowDatacom}
+                    setFilteredChanges={setFilteredChangescom}
+                    filteredChanges={filteredChangescom}
+                    gridRefTableImg={gridRefTableImgcom}
+                    itemsList={isusercompleted}
+                  />
+                </>
+              )}
+            </>
+          </Box>
+        </>
+
+        : null}
 
       {/* Manage Column */}
       <Popover
@@ -2252,4 +2370,4 @@ function Nonproductionchecklist() {
   );
 }
 
-export default Nonproductionchecklist;
+export default TeamNonproductionchecklist;

@@ -27,7 +27,7 @@ exports.getAllNonProductionUnitRateDuplicate = catchAsyncErrors(async (req, res,
     try {
 const {category,subcategory,base,process} = req.body
 if(base === "Time"){
-  nonproductionunitrate = await NonProductionUnitRate.countDocuments({categoryname:category,subcategory:subcategory,base:base,process:process})
+  nonproductionunitrate = await NonProductionUnitRate.countDocuments({categoryname:category,subcategory:subcategory,base:base})
 }else{
   nonproductionunitrate = await NonProductionUnitRate.countDocuments({categoryname:category,subcategory:subcategory,base:"Time"})
 }

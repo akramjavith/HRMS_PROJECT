@@ -5879,6 +5879,8 @@ SCHEDULE_MEETING_FILTER_LIST_TEAM: `${BASE_URL}/api/schedulemeetingfilterteam`,
 
       NON_PRODUCTION_APPROVE_LIST: `${BASE_URL}/api/nonproductionoverallchecklist`,
       NON_PRODUCTION_REJECT_LIST: `${BASE_URL}/api/nonproductionoverallchecklistreject`,
+      TEAM_NON_PRODUCTION_CHECKLIST_APPROVE: `${BASE_URL}/api/teamnonproductionchecklistapprove`,
+      TEAM_NON_PRODUCTION_CHECKLIST_REJECT: `${BASE_URL}/api/teamnonproductionchecklistreject`,
 
   
   

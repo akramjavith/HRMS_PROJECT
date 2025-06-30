@@ -299,6 +299,35 @@ function Nonproduction() {
   };
   //add function
   const [isBtn, setBtn] = useState(false);
+
+  function getTimeDifference(fromtime, totime) {
+  // Use today's date with the given time
+  const today = new Date().toISOString().slice(0, 10); // Get YYYY-MM-DD format
+
+  const fromDate = new Date(`${today}T${fromtime}:00`);
+  const toDate = new Date(`${today}T${totime}:00`);
+
+  // If toDate is earlier than fromDate, assume it's the next day
+  if (toDate < fromDate) {
+    toDate.setDate(toDate.getDate() + 1);
+  }
+
+  const diffMs = toDate.getTime() - fromDate.getTime(); // Milliseconds difference
+
+  const totalMinutes = Math.floor(diffMs / 60000); // Convert to minutes
+  const days = Math.floor(totalMinutes / (24 * 60));
+  const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+  const minutes = totalMinutes % 60;
+
+  return {
+    day: days,
+    hours: hours,
+    minutes: minutes,
+  };
+}
+
+
+
   const sendRequest = async () => {
     setBtn(true);
     setPageName(!pageName);
@@ -315,12 +344,12 @@ function Nonproduction() {
         fromtime: String(nonProductionState.fromtime),
         totime: String(nonProductionState.totime),
         totalhours: String(nonProductionState.totalhours),
-        alloteddays: String(catSubCatData.mindays),
-        allotedhours: String(catSubCatData.minhours),
-        allotedminutes: String(catSubCatData.minminutes),
-        days: String(catSubCatData.maxdays),
-        hours: String(catSubCatData.maxhours),
-        minutes: String(catSubCatData.maxminutes),
+        alloteddays: String(catSubCatData.maxdays),
+        allotedhours: String(catSubCatData.maxhours),
+        allotedminutes: String(catSubCatData.maxminutes),
+        days: String(getTimeDifference(nonProductionState.fromtime,nonProductionState.totime).day),
+        hours: String(getTimeDifference(nonProductionState.fromtime,nonProductionState.totime).hours),
+        minutes: String(getTimeDifference(nonProductionState.fromtime,nonProductionState.totime).minutes),
         name: isUserRoleAccess.companyname,
         company: isUserRoleAccess.company,
         branch: isUserRoleAccess.branch,

@@ -2817,6 +2817,11 @@ export const menuItems = [
                 dbname: "menuoverallnonproductionchecklist",
                 url: "/nonproduction/nonproductionchecklist",
               },
+                {
+                title: "Team NonProduction Check List",
+                dbname: "menuteamnonproductionchecklist",
+                url: "/nonproduction/teamnonproductionchecklist",
+              },
             ],
           },
         ],

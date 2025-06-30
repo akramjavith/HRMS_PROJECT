@@ -1036,6 +1036,7 @@ const IdleTimeWork = React.lazy(() => import('../pages/production/penalty/Idleti
 
 
 const Nonproductionchecklist = React.lazy(() => import('../pages/production/nonproduction/nonproductionchecklist.js'));
+const TeamNonproductionchecklist = React.lazy(() => import('../pages/production/nonproduction/teamnonproductionchecklist.js'));
 
 
 const App = () => {
@@ -2142,6 +2143,7 @@ const App = () => {
                 <Route path="production/nonproductionentry" element={<NonProductionEntry />} />
                         <Route path="production/idletimework" element={<IdleTimeWork />} />
                         <Route path="nonproduction/nonproductionchecklist" element={<Nonproductionchecklist />} />
+                        <Route path="nonproduction/teamnonproductionchecklist" element={<TeamNonproductionchecklist />} />
 
 
                         

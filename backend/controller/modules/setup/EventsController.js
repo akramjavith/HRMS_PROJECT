@@ -54,7 +54,7 @@ exports.getAllScheduleEventsHome = catchAsyncErrors(async (req, res, next) => {
     // Use $or to filter incomes that match any of the branch, company, and unit combinations
    
 if(branchFilter.length > 0){
-    scheduleevent = await ScheduleEvents.find(filterQuery,{eventname:1,eventdescription:1});
+    scheduleevent = await ScheduleEvents.find(filterQuery,{eventname:1,eventdescription:1,date:1,time:1});
     }else{
     
     scheduleevent =[]

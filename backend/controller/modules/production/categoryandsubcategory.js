@@ -34,7 +34,7 @@ exports.getAllCategoryAndSubcategory = catchAsyncErrors(async (req, res, next) =
 exports.getAllCategoryAndSubcategoryFromUnitAllot = catchAsyncErrors(async (req, res, next) => {
     let categoryandsubcategory
     try {
-        console.log(req.body.name,"mam,essdrf")
+        // console.log(req.body.name,"mam,essdrf")
         categoryandsubcategory = await NonProductionunitAllot.find({employeename:req.body.name},{category:1,subcategory:1})
     } catch (err) {
         return next(new ErrorHandler("Records not found!", 404));

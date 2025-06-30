@@ -777,8 +777,12 @@ productionRoute.route("/wavierpercentage/new").post(addWavierpercentage);
 productionRoute.route("/wavierpercentage/:id").get(getSingleWavierpercentage).put(updateWavierpercentage).delete(deleteWavierpercentage);
 
 //for non production 
-const { getAllNonproduction,getAllNonproductionOverallCheckList,getAllNonproductionOverallCheckListReject, deleteNonproduction, getSingleNonproduction, getAllUsersNonProductionForExports, getAllUsersNonProduction, getAllNonproductionListFilterExports, getAllNonproductionListFilterRejected, getAllNonproductionForPagination, getAllNonproductionListFilterApproved, getAllNonproductionListFilterForAssign, getAllNonproductionListFilter, updateNonproduction, addNonproduction, getAllNonProductionFilter } = require("../controller/modules/production/nonproduction/nonproduction");
+const { getAllNonproduction,getAllNonproductionOverallCheckList,getAllNonproductionOverallCheckListReject,
+  getAllTeamNonProductionChecklistApprove,getAllTeamNonProductionChecklistReject,
+   deleteNonproduction, getSingleNonproduction, getAllUsersNonProductionForExports, getAllUsersNonProduction, getAllNonproductionListFilterExports, getAllNonproductionListFilterRejected, getAllNonproductionForPagination, getAllNonproductionListFilterApproved, getAllNonproductionListFilterForAssign, getAllNonproductionListFilter, updateNonproduction, addNonproduction, getAllNonProductionFilter } = require("../controller/modules/production/nonproduction/nonproduction");
 productionRoute.route("/nonproduction").get(getAllNonproduction);
+productionRoute.route("/teamnonproductionchecklistapprove").post(getAllTeamNonProductionChecklistApprove);
+productionRoute.route("/teamnonproductionchecklistreject").post(getAllTeamNonProductionChecklistReject);
 productionRoute.route("/nonproductionoverallchecklist").post(getAllNonproductionOverallCheckList);
 productionRoute.route("/nonproductionoverallchecklistreject").post(getAllNonproductionOverallCheckListReject);
 productionRoute.route("/nonproductionforpagination").post(getAllNonproductionForPagination);

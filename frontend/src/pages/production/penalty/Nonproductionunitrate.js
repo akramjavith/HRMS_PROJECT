@@ -412,6 +412,7 @@ function Nonproductionunitrate() {
       category: nonProductionUnitRate.category,
       subcategory: nonProductionUnitRate.subcategory,
       base: nonProductionUnitRate.base,
+      // id: "",
       // process: nonProductionUnitRate.process,
     });
     const isNameMatch = res?.data?.nonproductionunitrate > 0;
@@ -438,7 +439,7 @@ function Nonproductionunitrate() {
           setPopupContentMalert("Please Select Process");
           setPopupSeverityMalert("info");
           handleClickOpenPopupMalert();
-        } else if (nonProductionUnitRate.process === "Days" && nonProductionUnitRate.mindays === "") {
+        } else if (nonProductionUnitRate.process === "Day" && nonProductionUnitRate.mindays === "") {
           setPopupContentMalert("Please Enter Min Days");
           setPopupSeverityMalert("info");
           handleClickOpenPopupMalert();
@@ -450,7 +451,7 @@ function Nonproductionunitrate() {
           setPopupContentMalert("Please Enter Min Minutes");
           setPopupSeverityMalert("info");
           handleClickOpenPopupMalert();
-        } else if (nonProductionUnitRate.process === "Days" && nonProductionUnitRate.maxdays === "") {
+        } else if (nonProductionUnitRate.process === "Day" && nonProductionUnitRate.maxdays === "") {
           setPopupContentMalert("Please Enter Max Days");
           setPopupSeverityMalert("info");
           handleClickOpenPopupMalert();
@@ -494,7 +495,7 @@ function Nonproductionunitrate() {
           setPopupContentMalert("Please Select Process");
           setPopupSeverityMalert("info");
           handleClickOpenPopupMalert();
-        } else if (nonProductionUnitRate.rate === "") {
+        } else if (nonProductionUnitRate.process === "Count" && nonProductionUnitRate.rate === "") {
           setPopupContentMalert("Please Enter Rate");
           setPopupSeverityMalert("info");
           handleClickOpenPopupMalert();
@@ -715,107 +716,108 @@ function Nonproductionunitrate() {
       }
     }
   };
-  const editSubmit =async (e) => {
+  const editSubmit = async (e) => {
     e.preventDefault();
-  let res = await axios.post(SERVICE.NON_PRODUCTION_UNITRATE_DUPLICATE, {
+    let res = await axios.post(SERVICE.NON_PRODUCTION_UNITRATE_DUPLICATE, {
       headers: {
         Authorization: `Bearer ${auth.APIToken}`,
       },
       category: nonProductionUnitRateEdit.category,
       subcategory: nonProductionUnitRateEdit.subcategory,
       base: nonProductionUnitRateEdit.base,
-      process: nonProductionUnitRateEdit.process,
+      // process: nonProductionUnitRateEdit.process,
+      id: nonProductionUnitRateEdit._id,
     });
     const isNameMatch = res?.data?.nonproductionunitrate > 0;
 
-   if (isNameMatch) {
+    if (isNameMatch) {
       const message = nonProductionUnitRateEdit.base === "Count" ? "Time Already Exists For This Category and Subcategory" : "Data Already Exist!";
       setPopupContentMalert(message);
       setPopupSeverityMalert("info");
       handleClickOpenPopupMalert();
     } else {
-    if (nonProductionUnitRateEdit.base === "Time") {
-      if (nonProductionUnitRateEdit.category === "" || nonProductionUnitRateEdit.category === "Please Select Category") {
-        setPopupContentMalert("Please Select Category");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.subcategory === "" || nonProductionUnitRateEdit.subcategory === "Please Select Sub Category") {
-        setPopupContentMalert("Please Select Sub Category");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.base === "" || nonProductionUnitRateEdit.base === "Please Select Base") {
-        setPopupContentMalert("Please Select Base");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.process === "" || nonProductionUnitRateEdit.process === "Please Select Process") {
-        setPopupContentMalert("Please Select Process");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.mindays === "") {
-        setPopupContentMalert("Please Enter Min Days");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.minhours === "") {
-        setPopupContentMalert("Please Enter Min Hours");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.minminutes === "") {
-        setPopupContentMalert("Please Enter Min Minutes");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.maxdays === "") {
-        setPopupContentMalert("Please Enter Max Days");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.maxhours === "") {
-        setPopupContentMalert("Please Enter Max Hours");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.maxminutes === "") {
-        setPopupContentMalert("Please Enter Max Minutes");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (Number(nonProductionUnitRateEdit.maxdays) < Number(nonProductionUnitRateEdit.mindays)) {
-        setPopupContentMalert("Max Days Should Be Greater Than Min Days");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (Number(nonProductionUnitRateEdit.maxhours) < Number(nonProductionUnitRateEdit.minhours)) {
-        setPopupContentMalert("Max Hours Should Be Greater Than Min Hours");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (Number(nonProductionUnitRateEdit.maxminutes) < Number(nonProductionUnitRateEdit.minminutes)) {
-        setPopupContentMalert("Max Minutes Should Be Greater Than Min Minutes");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
+      if (nonProductionUnitRateEdit.base === "Time") {
+        if (nonProductionUnitRateEdit.category === "" || nonProductionUnitRateEdit.category === "Please Select Category") {
+          setPopupContentMalert("Please Select Category");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.subcategory === "" || nonProductionUnitRateEdit.subcategory === "Please Select Sub Category") {
+          setPopupContentMalert("Please Select Sub Category");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.base === "" || nonProductionUnitRateEdit.base === "Please Select Base") {
+          setPopupContentMalert("Please Select Base");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.process === "" || nonProductionUnitRateEdit.process === "Please Select Process") {
+          setPopupContentMalert("Please Select Process");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.process === "Day" && nonProductionUnitRateEdit.mindays === "") {
+          setPopupContentMalert("Please Enter Min Days");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.process === "Hours" && nonProductionUnitRateEdit.minhours === "") {
+          setPopupContentMalert("Please Enter Min Hours");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.process === "Mins" && nonProductionUnitRateEdit.minminutes === "") {
+          setPopupContentMalert("Please Enter Min Minutes");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.process === "Day" && nonProductionUnitRateEdit.maxdays === "") {
+          setPopupContentMalert("Please Enter Max Days");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.process === "Hours" && nonProductionUnitRateEdit.maxhours === "") {
+          setPopupContentMalert("Please Enter Max Hours");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.process === "Mins" && nonProductionUnitRateEdit.maxminutes === "") {
+          setPopupContentMalert("Please Enter Max Minutes");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (Number(nonProductionUnitRateEdit.maxdays) < Number(nonProductionUnitRateEdit.mindays)) {
+          setPopupContentMalert("Max Days Should Be Greater Than Min Days");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (Number(nonProductionUnitRateEdit.maxhours) < Number(nonProductionUnitRateEdit.minhours)) {
+          setPopupContentMalert("Max Hours Should Be Greater Than Min Hours");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (Number(nonProductionUnitRateEdit.maxminutes) < Number(nonProductionUnitRateEdit.minminutes)) {
+          setPopupContentMalert("Max Minutes Should Be Greater Than Min Minutes");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else {
+          sendEditRequest();
+        }
       } else {
-        sendEditRequest();
-      }
-    } else {
-      if (nonProductionUnitRateEdit.category === "" || nonProductionUnitRateEdit.category === "Please Select Category") {
-        setPopupContentMalert("Please Select Category");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.subcategory === "" || nonProductionUnitRateEdit.subcategory === "Please Select Sub Category") {
-        setPopupContentMalert("Please Select Sub Category");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.base === "" || nonProductionUnitRateEdit.base === "Please Select Base") {
-        setPopupContentMalert("Please Select Base");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.process === "" || nonProductionUnitRateEdit.process === "Please Select Process") {
-        setPopupContentMalert("Please Select Process");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else if (nonProductionUnitRateEdit.rate === "") {
-        setPopupContentMalert("Please Enter Rate");
-        setPopupSeverityMalert("info");
-        handleClickOpenPopupMalert();
-      } else {
-        sendEditRequest();
+        if (nonProductionUnitRateEdit.category === "" || nonProductionUnitRateEdit.category === "Please Select Category") {
+          setPopupContentMalert("Please Select Category");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.subcategory === "" || nonProductionUnitRateEdit.subcategory === "Please Select Sub Category") {
+          setPopupContentMalert("Please Select Sub Category");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.base === "" || nonProductionUnitRateEdit.base === "Please Select Base") {
+          setPopupContentMalert("Please Select Base");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.process === "" || nonProductionUnitRateEdit.process === "Please Select Process") {
+          setPopupContentMalert("Please Select Process");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else if (nonProductionUnitRateEdit.process === "Count" && nonProductionUnitRateEdit.rate === "") {
+          setPopupContentMalert("Please Enter Rate");
+          setPopupSeverityMalert("info");
+          handleClickOpenPopupMalert();
+        } else {
+          sendEditRequest();
+        }
       }
     }
-  }
   };
   const [nonProductionUnitRateListOverall, setNonProductionUnitRateListOverall] = useState([]);
   const [exportEnable, setExportEnable] = useState([]);
@@ -1317,7 +1319,7 @@ function Nonproductionunitrate() {
                   />
                 }
                 secondary={column.field === "checkbox" ? "Checkbox" : column.headerName}
-                // secondary={column.headerName }
+              // secondary={column.headerName }
               />
             </ListItem>
           ))}
@@ -1480,6 +1482,12 @@ function Nonproductionunitrate() {
                         setNonProductionUnitRate({
                           ...nonProductionUnitRate,
                           process: e.value,
+                          mindays: "",
+                          maxdays: "",
+                          minhours: "",
+                          minminutes: "",
+                          maxhours: "",
+                          maxminutes: ""
                         });
                       }}
                     />
@@ -1995,6 +2003,12 @@ function Nonproductionunitrate() {
                           setNonProductionUnitRateEdit({
                             ...nonProductionUnitRateEdit,
                             process: e.value,
+                            mindays: "",
+                            maxdays: "",
+                            minhours: "",
+                            minminutes: "",
+                            maxhours: "",
+                            maxminutes: ""
                           });
                         }}
                       />

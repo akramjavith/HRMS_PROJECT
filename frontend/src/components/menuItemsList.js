@@ -2807,6 +2807,16 @@ export const menuItems = [
                 dbname: 'menuidletimework',
                 url: '/production/idletimework',
               },
+                {
+                title: 'Employee Idle Work',
+                dbname: 'menuemployeeidlework',
+                url: '/production/employeeidletimework',
+              },
+               {
+                title: 'Idle Work Checklist',
+                dbname: 'menuidleworkchecklist',
+                url: '/nonproduction/idleworkchecklist',
+              },
               {
                 title: 'Non Production Entry',
                 dbname: 'menunonproductionentry',

@@ -36,7 +36,7 @@ import PageHeading from '../../../components/PageHeading.js';
 import moment from "moment-timezone";
 import { getCurrentServerTime } from '../../../components/getCurrentServerTime';
 
-function IdleTimeWork() {
+function EmployeeIdleTimeWork() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [isPdfFilterOpen, setIsPdfFilterOpen] = useState(false);
     // page refersh reload
@@ -88,7 +88,7 @@ function IdleTimeWork() {
         if (gridRef.current) {
             html2canvas(gridRef.current).then((canvas) => {
                 canvas.toBlob((blob) => {
-                    saveAs(blob, 'Idle Time Work.png');
+                    saveAs(blob, 'Employee Idle Time Work.png');
                 });
             });
         }
@@ -108,63 +108,12 @@ function IdleTimeWork() {
         fetchTime();
     }, []);
 
-    const accessbranch = isUserRoleAccess?.role?.includes("Manager")
-        ? isAssignBranch?.map((data) => ({
+    const accessbranch =isAssignBranch?.map((data) => ({
             branch: data.branch,
             company: data.company,
             unit: data.unit,
         }))
-        : isAssignBranch
-            ?.filter((data) => {
-                let fetfinalurl = [];
-                if (
-                    data?.modulenameurl?.length !== 0 &&
-                    data?.submodulenameurl?.length !== 0 &&
-                    data?.mainpagenameurl?.length !== 0 &&
-                    data?.subpagenameurl?.length !== 0 &&
-                    data?.subsubpagenameurl?.length !== 0 &&
-                    data?.subsubpagenameurl?.includes(window.location.pathname)
-                ) {
-                    fetfinalurl = data.subsubpagenameurl;
-                } else if (
-                    data?.modulenameurl?.length !== 0 &&
-                    data?.submodulenameurl?.length !== 0 &&
-                    data?.mainpagenameurl?.length !== 0 &&
-                    data?.subpagenameurl?.length !== 0 &&
-                    data?.subsubpagenameurl?.includes(window.location.pathname)
-                ) {
-                    fetfinalurl = data.subpagenameurl;
-                } else if (
-                    data?.modulenameurl?.length !== 0 &&
-                    data?.submodulenameurl?.length !== 0 &&
-                    data?.mainpagenameurl?.length !== 0 &&
-                    data?.subsubpagenameurl?.includes(window.location.pathname)
-                ) {
-                    fetfinalurl = data.mainpagenameurl;
-                } else if (
-                    data?.modulenameurl?.length !== 0 &&
-                    data?.submodulenameurl?.length !== 0 &&
-                    data?.subsubpagenameurl?.includes(window.location.pathname)
-                ) {
-                    fetfinalurl = data.submodulenameurl;
-                } else if (data?.modulenameurl?.length !== 0) {
-                    fetfinalurl = data.modulenameurl;
-                } else {
-                    fetfinalurl = [];
-                }
-
-                const remove = [
-                    window.location.pathname?.substring(1),
-                    window.location.pathname,
-                ];
-                return fetfinalurl?.some((item) => remove?.includes(item));
-            })
-            ?.map((data) => ({
-                branch: data.branch,
-                company: data.company,
-                unit: data.unit,
-            }));
-
+      
     //Datatable
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -466,17 +415,15 @@ function IdleTimeWork() {
                 process: appliedFor === "Process" ? String(ManageIdleWorkState.process) : "",
                 date: String(ManageIdleWorkState.date),
                 fromtime: String(ManageIdleWorkState.fromtime),
-                aname:String(ManageIdleWorkState.appliedfor) === "Branch" ? String(ManageIdleWorkState.branch)  :
-                          String(ManageIdleWorkState.appliedfor) === "Unit" ? String(ManageIdleWorkState.unit)  :
-                          String(ManageIdleWorkState.appliedfor) === "Team" ? String(ManageIdleWorkState.team)  :
-                          String(ManageIdleWorkState.appliedfor) === "Employee" ? String(ManageIdleWorkState.employee)  :
-                          String(ManageIdleWorkState.appliedfor) === "Process" ? String(ManageIdleWorkState.process)  :
-                          String(ManageIdleWorkState.appliedfor) === "Company" ? String(ManageIdleWorkState.company) : "",
-
-
                 totime: String(ManageIdleWorkState.totime),
                 explanation: String(ManageIdleWorkState.explanation),
-                status:"Manager",
+                  aname:String(ManageIdleWorkEdit.appliedfor) === "Branch" ? String(ManageIdleWorkEdit.branch)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Unit" ? String(ManageIdleWorkEdit.unit)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Team" ? String(ManageIdleWorkEdit.team)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Employee" ? String(ManageIdleWorkEdit.employee)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Process" ? String(ManageIdleWorkEdit.process)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Company" ? String(ManageIdleWorkEdit.company) : "",
+                status:"Employee",
                 addedby: [
                     {
                         name: String(isUserRoleAccess.companyname),
@@ -714,12 +661,6 @@ function IdleTimeWork() {
                 fromtime: String(ManageIdleWorkEdit.fromtime),
                 totime: String(ManageIdleWorkEdit.totime),
                 explanation: String(ManageIdleWorkEdit.explanation),
-                  aname:String(ManageIdleWorkEdit.appliedfor) === "Branch" ? String(ManageIdleWorkEdit.branch)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Unit" ? String(ManageIdleWorkEdit.unit)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Team" ? String(ManageIdleWorkEdit.team)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Employee" ? String(ManageIdleWorkEdit.employee)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Process" ? String(ManageIdleWorkEdit.process)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Company" ? String(ManageIdleWorkEdit.company) : "",
                 updatedby: [
                     ...updateby,
                     {
@@ -860,10 +801,11 @@ function IdleTimeWork() {
     const fetchTaskcategory = async () => {
         setPageName(!pageName);
         try {
-            let res_vendor = await axios.get(SERVICE.IDLETIMEWORK, {
+            let res_vendor = await axios.post(SERVICE.IDLETIMEWORK_EMPLOYEE, {
                 headers: {
                     Authorization: `Bearer ${auth.APIToken}`,
                 },
+                empname:isUserRoleAccess?.companyname
             });
             setTaskcategorycheck(true);
             setTaskcategorys(res_vendor?.data?.idletimeworks);
@@ -891,12 +833,12 @@ function IdleTimeWork() {
     const exportRowValues = ['appliedfor', 'idlework', 'company', 'branch', 'unit', 'team',
         'employee', 'process', 'date', 'fromtime', 'totime', 'explanation'];
     // Excel
-    const fileName = 'Idle Time Work';
+    const fileName = 'Employee Idle Time Work';
     //print...
     const componentRef = useRef();
     const handleprint = useReactToPrint({
         content: () => componentRef.current,
-        documentTitle: 'Idle Time Work',
+        documentTitle: 'Employee Idle Time Work',
         pageStyle: 'print',
     });
 
@@ -907,7 +849,7 @@ function IdleTimeWork() {
             },
             empcode: String(isUserRoleAccess?.empcode),
             companyname: String(isUserRoleAccess?.companyname),
-            pagename: String('Idle Time Work'),
+            pagename: String('Employee Idle Time Work'),
             commonid: String(isUserRoleAccess?._id),
             date: String(new Date(serverTime)),
 
@@ -1057,7 +999,7 @@ function IdleTimeWork() {
             headerClassName: 'bold-header',
             renderCell: (params) => (
                 <Grid sx={{ display: 'flex' }}>
-                    {isUserRoleCompare?.includes('eidletimework') && (
+                    {isUserRoleCompare?.includes('eemployeeidlework') && (
                         <Button
                             sx={userStyle.buttonedit}
                             onClick={() => {
@@ -1067,7 +1009,7 @@ function IdleTimeWork() {
                             <EditOutlinedIcon sx={buttonStyles.buttonedit} />
                         </Button>
                     )}
-                    {isUserRoleCompare?.includes('didletimework') && (
+                    {isUserRoleCompare?.includes('demployeeidlework') && (
                         <Button
                             sx={userStyle.buttondelete}
                             onClick={(e) => {
@@ -1077,7 +1019,7 @@ function IdleTimeWork() {
                             <DeleteOutlineOutlinedIcon sx={buttonStyles.buttondelete} />{' '}
                         </Button>
                     )}
-                    {isUserRoleCompare?.includes('vidletimework') && (
+                    {isUserRoleCompare?.includes('vemployeeidlework') && (
                         <Button
                             sx={userStyle.buttonedit}
                             onClick={() => {
@@ -1087,7 +1029,7 @@ function IdleTimeWork() {
                             <VisibilityOutlinedIcon sx={buttonStyles.buttonview} />{' '}
                         </Button>
                     )}
-                    {isUserRoleCompare?.includes('iidletimework') && (
+                    {isUserRoleCompare?.includes('iemployeeidlework') && (
                         <Button
                             sx={userStyle.buttonedit}
                             onClick={() => {
@@ -1215,16 +1157,16 @@ function IdleTimeWork() {
     ];
     return (
         <Box>
-            <Headtitle title={'Idle Time Work'} />
-            <PageHeading title="Idle Time Work" modulename="Production" submodulename="Non Production" mainpagename="Non-production Setup" subpagename="Idle Time Work" subsubpagename="" />
+            <Headtitle title={'Employee Idle Time Work'} />
+            <PageHeading title="Employee Idle Time Work" modulename="Production" submodulename="Non Production" mainpagename="Non-production Setup" subpagename="Employee Idle Time Work" subsubpagename="" />
             {/* ****** Header Content ****** */}
-            {isUserRoleCompare?.includes('aidletimework') && (
+            {isUserRoleCompare?.includes('aemployeeidlework') && (
                 <>
                     <Box sx={userStyle.dialogbox}>
                         <>
                             <Grid container spacing={2}>
                                 <Grid item xs={8}>
-                                    <Typography sx={userStyle.importheadtext}>Add Idle Time Work</Typography>
+                                    <Typography sx={userStyle.importheadtext}>Add Employee Idle Time Work</Typography>
                                 </Grid>
                             </Grid>
                             <br />
@@ -1330,31 +1272,42 @@ function IdleTimeWork() {
                                                     Branch<b style={{ color: "red" }}>*</b>
                                                 </Typography>
                                                 <Selects
-                                                    options={ManageIdleWorkState.appliedfor === "Branch" ? [{
-                                                        label: "ALL",
-                                                        value: "ALL"
-                                                    }, ...accessbranch
-                                                        ?.filter((comp) => ManageIdleWorkState.company === comp.company)
+                                                    // options={ManageIdleWorkState.appliedfor === "Branch" ? [{
+                                                    //     label: "ALL",
+                                                    //     value: "ALL"
+                                                    // }, ...accessbranch
+                                                    //     ?.filter((comp) => ManageIdleWorkState.company === comp.company)
+                                                    //     ?.map((data) => ({
+                                                    //         label: data.branch,
+                                                    //         value: data.branch,
+                                                    //     }))
+                                                    //     .filter((item, index, self) =>
+                                                    //         self.findIndex((i) => i.label === item.label && i.value === item.value) === index
+                                                    //     )] : accessbranch
+                                                    //         ?.filter((comp) => ManageIdleWorkState.company === comp.company)
+                                                    //         ?.map((data) => ({
+                                                    //             label: data.branch,
+                                                    //             value: data.branch,
+                                                    //         }))
+                                                    //         .filter((item, index, self) =>
+                                                    //             self.findIndex((i) => i.label === item.label && i.value === item.value) === index
+                                                    //         )}
+
+                                                       options={accessbranch?.filter((comp) => ManageIdleWorkState.company === comp.company)
                                                         ?.map((data) => ({
-                                                            label: data.branch,
-                                                            value: data.branch,
+                                                            label: data.company,
+                                                            value: data.company,
                                                         }))
                                                         .filter((item, index, self) =>
                                                             self.findIndex((i) => i.label === item.label && i.value === item.value) === index
-                                                        )] : accessbranch
-                                                            ?.filter((comp) => ManageIdleWorkState.company === comp.company)
-                                                            ?.map((data) => ({
-                                                                label: data.branch,
-                                                                value: data.branch,
-                                                            }))
-                                                            .filter((item, index, self) =>
-                                                                self.findIndex((i) => i.label === item.label && i.value === item.value) === index
-                                                            )}
+                                                        )}
+                                                 
                                                     styles={colourStyles}
                                                     value={{
                                                         label: ManageIdleWorkState.branch,
                                                         value: ManageIdleWorkState.branch,
                                                     }}
+                                                    
                                                     onChange={(e) => {
                                                         setManageIdleWorkState({
                                                             ...ManageIdleWorkState,
@@ -1715,7 +1668,7 @@ function IdleTimeWork() {
                                 {/* <DialogContent sx={{ width: '550px', padding: '20px' }}> */}
                                 <Grid container spacing={2}>
                                     <Grid item md={12} xs={12} sm={12}>
-                                        <Typography sx={userStyle.HeaderText}>Edit Idle Time Work</Typography>
+                                        <Typography sx={userStyle.HeaderText}>Edit Employee Idle Time Work</Typography>
                                     </Grid>
                                 </Grid>
                                 <br />
@@ -2181,12 +2134,12 @@ function IdleTimeWork() {
             </Box>
             <br />
             {/* ****** Table Start ****** */}
-            {isUserRoleCompare?.includes('lidletimework') && (
+            {isUserRoleCompare?.includes('lemployeeidlework') && (
                 <>
                     <Box sx={userStyle.container}>
                         {/* ******************************************************EXPORT Buttons****************************************************** */}
                         <Grid item xs={8}>
-                            <Typography sx={userStyle.importheadtext}>Idle Time Work List</Typography>
+                            <Typography sx={userStyle.importheadtext}>Employee Idle Time Work List</Typography>
                         </Grid>
                         <Grid item md={12} xs={12} sm={12} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Grid item md={2} xs={12} sm={12}>
@@ -2220,7 +2173,7 @@ function IdleTimeWork() {
                                 <Typography>&nbsp;</Typography>
 
                                 <Box>
-                                    {isUserRoleCompare?.includes('excelidletimework') && (
+                                    {isUserRoleCompare?.includes('excelemployeeidlework') && (
                                         <>
                                             <Button
                                                 onClick={(e) => {
@@ -2235,7 +2188,7 @@ function IdleTimeWork() {
                                             </Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes('csvidletimework') && (
+                                    {isUserRoleCompare?.includes('csvemployeeidlework') && (
                                         <>
                                             <Button
                                                 onClick={(e) => {
@@ -2250,7 +2203,7 @@ function IdleTimeWork() {
                                             </Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes('printidletimework') && (
+                                    {isUserRoleCompare?.includes('printemployeeidlework') && (
                                         <>
                                             <Button sx={userStyle.buttongrp} onClick={handleprint}>
                                                 &ensp;
@@ -2259,7 +2212,7 @@ function IdleTimeWork() {
                                             </Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes('pdfidletimework') && (
+                                    {isUserRoleCompare?.includes('pdfemployeeidlework') && (
                                         <>
                                             <Button
                                                 sx={userStyle.buttongrp}
@@ -2273,7 +2226,7 @@ function IdleTimeWork() {
                                             </Button>
                                         </>
                                     )}
-                                    {isUserRoleCompare?.includes('imageidletimework') && (
+                                    {isUserRoleCompare?.includes('imageemployeeidlework') && (
                                         <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
                                             {' '}
                                             <ImageIcon sx={{ fontSize: '15px' }} /> &ensp;Image&ensp;{' '}
@@ -2299,7 +2252,7 @@ function IdleTimeWork() {
                             Manage Columns
                         </Button>
                         &ensp;
-                        {isUserRoleCompare?.includes('bdidletimework') && (
+                        {isUserRoleCompare?.includes('bdemployeeidlework') && (
                             <Button sx={buttonStyles.buttonbulkdelete} onClick={handleClickOpenalert}>
                                 Bulk Delete
                             </Button>
@@ -2390,7 +2343,7 @@ function IdleTimeWork() {
             >
                 <DialogContent sx={{ padding: '20px 50px' }}>
                     <>
-                        <Typography sx={userStyle.HeaderText}> View Idle Time Work</Typography>
+                        <Typography sx={userStyle.HeaderText}> View Employee Idle Time Work</Typography>
                         <br /> <br />
                         <Grid container spacing={2}>
                             <Grid item md={3} xs={12} sm={12}>
@@ -2568,12 +2521,12 @@ function IdleTimeWork() {
                 handleClosePdfFilterMod={handleClosePdfFilterMod}
                 filteredDataTwo={rowDataTable ?? []}
                 itemsTwo={taskcategorysOverall ?? []}
-                filename={'Idle Time Work'}
+                filename={'Employee Idle Time Work'}
                 exportColumnNames={exportColumnNames}
                 exportRowValues={exportRowValues}
                 componentRef={componentRef}
             />
-            <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Idle Time Work Info" addedby={addedby} updateby={updateby} />
+            <InfoPopup openInfo={openInfo} handleCloseinfo={handleCloseinfo} heading="Employee Idle Time Work Info" addedby={addedby} updateby={updateby} />
             <DeleteConfirmation open={isDeleteOpen} onClose={handleCloseMod} onConfirm={delTaskCategory} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
             <DeleteConfirmation open={isDeleteOpencheckbox} onClose={handleCloseModcheckbox} onConfirm={delTaskCatecheckbox} title="Are you sure?" confirmButtonText="Yes" cancelButtonText="Cancel" />
             <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
@@ -2581,4 +2534,4 @@ function IdleTimeWork() {
     );
 }
 
-export default IdleTimeWork;
+export default EmployeeIdleTimeWork;

@@ -5882,6 +5882,16 @@ SCHEDULE_MEETING_FILTER_LIST_TEAM: `${BASE_URL}/api/schedulemeetingfilterteam`,
       TEAM_NON_PRODUCTION_CHECKLIST_APPROVE: `${BASE_URL}/api/teamnonproductionchecklistapprove`,
       TEAM_NON_PRODUCTION_CHECKLIST_REJECT: `${BASE_URL}/api/teamnonproductionchecklistreject`,
 
+
+
+        // Idle time work
+  IDLETIMEWORK: `${BASE_URL}/api/idletimeworks`,
+  IDLETIMEWORK_CREATE: `${BASE_URL}/api/idletimework/new`,
+  IDLETIMEWORK_SINGLE: `${BASE_URL}/api/idletimework`,
+  IDLETIMEWORK_EMPLOYEE: `${BASE_URL}/api/idletimeworkemployee`,
+  IDLETIMEWORK_CHECK_LIST_REPORT: `${BASE_URL}/api/idletimeworkchecklisreport`,
+  IDLETIMEWORK_CHECK_LIST_REPORT_APPROVE_REJECT: `${BASE_URL}/api/idletimeworkchecklistreportapprovereject`,
+
   
   
 

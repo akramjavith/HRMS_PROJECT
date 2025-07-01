@@ -1098,6 +1098,16 @@ productionRoute.route("/nonproductionentry/new").post(addNonproductionentry);
 productionRoute.route("/nonproductionentry/:id").delete(deleteNonproductionentry).get(getSingleNonproductionentry).put(updateNonproductionentry);
 
 
+// for idle time work controller
+const { getAllIdletimework, getSingleIdletimework, updateIdletimework, addIdletimework, deleteIdletimework,getAllIdletimeworkemployee,
+  getAllIdletimeworkCheckListReport,getAllIdletimeworkCheckListReportApproveReject } = require("../controller/modules/production/idletimework");
+productionRoute.route("/idletimeworks").get(getAllIdletimework);
+productionRoute.route("/idletimeworkemployee").post(getAllIdletimeworkemployee);
+productionRoute.route("/idletimeworkchecklisreport").post(getAllIdletimeworkCheckListReport);
+productionRoute.route("/idletimeworkchecklistreportapprovereject").post(getAllIdletimeworkCheckListReportApproveReject);
+productionRoute.route("/idletimework/new").post(addIdletimework);
+productionRoute.route("/idletimework/:id").delete(deleteIdletimework).get(getSingleIdletimework).put(updateIdletimework);
+
 
 
 

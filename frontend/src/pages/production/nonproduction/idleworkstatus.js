@@ -50,259 +50,7 @@ import domtoimage from "dom-to-image";
 import { MultiSelect } from "react-multi-select-component";
 import moment from "moment-timezone";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import ViewWatiForApprove from "./viewwaitforapproveidleworkchecklist.js";
-import ViewWatiApproveReject from "./viewapprovereject.js";
 
-const ActionCell = ({ sendDataToParentUI, params, fetchBatchFilter }) => {
-  const [openPopupMalert, setOpenPopupMalert] = useState(false);
-  const [popupContentMalert, setPopupContentMalert] = useState("");
-  const [popupSeverityMalert, setPopupSeverityMalert] = useState("");
-  const handleClickOpenPopupMalert = () => {
-    setOpenPopupMalert(true);
-  };
-  const handleClosePopupMalert = () => {
-    setOpenPopupMalert(false);
-  };
-  const [openPopup, setOpenPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState("");
-  const [popupSeverity, setPopupSeverity] = useState("");
-  const handleClickOpenPopup = () => {
-    setOpenPopup(true);
-  };
-  const handleClosePopup = () => {
-    setOpenPopup(false);
-  };
-
-  const [showReject, setShowReject] = useState(false);
-  const [reason, setReason] = useState("");
-
-  // const [getview,setGetview] = useState([])
-
-  const getCodeStock = async () => {
-    try {
-      let res_status = await axios.post(SERVICE.IDLETIMEWORK_CHECK_LIST_REPORT_VIEW_WAIT_FOR_APPROVE, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-        appliedfor: params.data.appliedfor,
-        employee: params.data.employee,
-        company: params.data.company,
-        branch: params.data.branch,
-        unit: params.data.unit,
-        team: params.data.team,
-        date: params.data.olddate,
-        process: params.data.process,
-        id: params.data.id,
-      });
-      // setGetview(res?.data?.sidletimework)
-
-      // handleClickOpenviewalertwaitforapprove();
-      const data = res_status?.data?.idletimeworks.map((d) => ({
-        ...d,
-
-        employee: d.companyname,
-        date: params.data.date,
-        olddate: params.data.olddate,
-        _id: params.data.id,
-        userid: d._id,
-        explanation: params.data.explanation,
-        fromtime: params.data.fromtime,
-        totime: params.data.totime,
-        appliedfor: params.data.appliedfor,
-        idlework: params.data.idlework,
-        aname:
-          params.data.appliedfor === "Employee"
-            ? params.data.employee
-            : params.data.appliedfor === "Team"
-            ? params.data.team
-            : params.data.appliedfor === "Unit"
-            ? params.data.unit
-            : params.data.appliedfor === "Branch"
-            ? params.data.branch
-            : params.data.appliedfor === "Company"
-            ? params.data.company
-            : params.data.appliedfor === "Process"
-            ? params.data.process
-            : "",
-        companyname: d.companyname,
-      }));
-      console.log(data, "data");
-      sendDataToParentUI(data);
-    } catch (err) {
-      handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-    }
-  };
-
-  const { isUserRoleCompare, isUserRoleAccess, pageName, setPageName, buttonStyles } = useContext(UserRoleAccessContext);
-
-  const { auth } = useContext(AuthContext);
-
-  const handleUpdateStatus = async () => {
-    try {
-      let res_status = await axios.post(SERVICE.IDLETIMEWORK_CHECK_LIST_REPORT_VIEW_WAIT_FOR_APPROVE, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-        appliedfor: params.data.appliedfor,
-        employee: params.data.employee,
-        company: params.data.company,
-        branch: params.data.branch,
-        unit: params.data.unit,
-        team: params.data.team,
-        date: params.data.olddate,
-        process: params.data.process,
-        id: params.data.id,
-      });
-      // setGetview(res?.data?.sidletimework)
-
-      // handleClickOpenviewalertwaitforapprove();
-      const empnames = res_status?.data?.idletimeworks.map((d) => d.companyname);
-
-      console.log(empnames,"empnames")
-
-      let res = await axios.post(`${SERVICE.IDELTIMEWORK_APPROVE_UPDATE}`, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-        employee: empnames,
-        date: params.data.date,
-        explanation: params.data.explanation,
-        fromtime: params.data.fromtime,
-        totime: params.data.totime,
-        appliedfor: params.data.appliedfor,
-        idlework: params.data.idlework,
-        company: params.data.company,
-          aname: params.data.aname,
-        branch: params.data.branch,
-        unit: params.data.unit,
-        team: params.data.team,
-        process: params.data.process,
-        id: params.data.id,
-        name: isUserRoleAccess.companyname,
-        status: "Approved",
-        rejectreason: "Approved",
-         completed:"Completed",
-      });
-      await fetchBatchFilter();
-    } catch (err) {
-      console.log(err, "errer");
-    }
-  };
-
-  const handleRejectStatus = async (id, reasonstatus) => {
-    try {
-      let res_status = await axios.post(SERVICE.IDLETIMEWORK_CHECK_LIST_REPORT_VIEW_WAIT_FOR_APPROVE, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-        appliedfor: params.data.appliedfor,
-        employee: params.data.employee,
-        company: params.data.company,
-        branch: params.data.branch,
-        unit: params.data.unit,
-        team: params.data.team,
-        date: params.data.olddate,
-        process: params.data.process,
-        id: params.data.id,
-      });
-      const empnames = res_status?.data?.idletimeworks.map((d) => d.companyname);
-
-      let res = await axios.post(`${SERVICE.IDELTIMEWORK_APPROVE_UPDATE}`, {
-        headers: {
-          Authorization: `Bearer ${auth.APIToken}`,
-        },
-        employee: empnames,
-        date: params.data.date,
-        explanation: params.data.explanation,
-        fromtime: params.data.fromtime,
-        totime: params.data.totime,
-        appliedfor: params.data.appliedfor,
-        idlework: params.data.idlework,
-        company: params.data.company,
-          aname: params.data.aname,
-        branch: params.data.branch,
-        unit: params.data.unit,
-        team: params.data.team,
-        process: params.data.process,
-        id: params.data.id,
-        name: isUserRoleAccess.companyname,
-        status: "Rejected",
-        completed:"Completed",
-        rejectreason: reasonstatus,
-      });
-      await fetchBatchFilter();
-    } catch (err) {
-      console.log(err, "errer");
-    }
-  };
-
-  const handleRejectClick = () => {
-    setShowReject(true);
-
-    // optionally call setRejectid here if needed globally
-  };
-
-  const handleConfirmReject = () => {
-    // Handle reject logic with `params.data.id` and `reason`
-    handleRejectStatus(params.data.id, reason); // You might pass ID and reason
-    setShowReject(false);
-  };
-
-  return (
-    <Box>
-      <Grid container spacing={1}>
-        <Grid item xs={6} md={6}>
-          <Button variant="contained" size="small" onClick={() => getCodeStock(params)}>
-            View
-          </Button>
-          &ensp;&ensp;
-          <Button variant="contained" size="small" onClick={() => handleUpdateStatus(params.data.id)}>
-            Approved
-          </Button>
-          &ensp;&ensp;
-          <Button variant="contained" size="small" color="error" onClick={handleRejectClick}>
-            Reject
-          </Button>
-        </Grid>
-
-        {showReject && (
-          <>
-            <Grid item xs={12} md={12} sx={{ display: "flex" }}>
-              <TextareaAutosize
-                minRows={4}
-                placeholder="Please Enter Reason"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                style={{
-                  width: "200px",
-                  //   width: "100%",
-                  //   maxWidth: "500px",
-                }}
-              />
-              &ensp;
-              <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                <Button variant="contained" size="small" color="primary" onClick={handleConfirmReject}>
-                  Ok
-                </Button>
-                <Button variant="contained" size="small" color="error" onClick={() => setShowReject(false)}>
-                  Cancel
-                </Button>
-              </Box>
-            </Grid>
-          </>
-        )}
-      </Grid>
-      <MessageAlert
-        openPopup={openPopupMalert}
-        handleClosePopup={handleClosePopupMalert}
-        popupContent={popupContentMalert}
-        popupSeverity={popupSeverityMalert}
-      />
-      {/* SUCCESS */}
-      <AlertDialog openPopup={openPopup} handleClosePopup={handleClosePopup} popupContent={popupContent} popupSeverity={popupSeverity} />
-    </Box>
-  );
-};
 function Idleworkstatus() {
   const [selectedTable, setSelectedTable] = useState([]);
   const [valueTable, setValueTable] = useState([]);
@@ -384,46 +132,6 @@ function Idleworkstatus() {
     { label: "Last Month", value: "Last Month" },
     { label: "Custom", value: "Custom" },
   ];
-
-        //alert model for vendor details
-        const [openviewalertapprovereject, setOpenviewalertapprovereject] =
-          useState(false);
-        // view model
-        const handleClickOpenviewalertapprovereject = () => {
-          setOpenviewalertapprovereject(true);
-        };
-
-        const handleCloseOpenviewalertapprovereject= () => {
-          setOpenviewalertapprovereject(false);
-        };
-
-        const handleDataFromChildUIapprovereject = (data) => {
-      // Handle the data received from the child component
-      // setDataFromChildUIDeign(data);
-      if (data === true) {
-        fetchBatchFilter();
-      }
-    };
-  const [getviewapprovereject,setGetviewapprovereject] = useState([])
-
-      const getviewallapprovereject = async (row) => {
-        console.log(row,"row")
-        try {
-
-          let res = await axios.get(`${SERVICE.IDLETIMEWORK_SINGLE}/${row}`, {
-            headers: {
-              Authorization: `Bearer ${auth.APIToken}`,
-            },
-          });
-        setGetviewapprovereject(res?.data?.sidletimework?.data)
-
-            handleClickOpenviewalertapprovereject();
-
-        } catch (err) {
-          handleApiError(err, setPopupContentMalert, setPopupSeverityMalert, handleClickOpenPopupMalert);
-        }
-      };
-
 
   var today = new Date();
   var dd = String(today.getDate()).padStart(2, "0");
@@ -733,10 +441,17 @@ function Idleworkstatus() {
     fromtime: true,
     totime: true,
     addedby: true,
+    explanation: true,
     appliedfor: true,
+    approveby: true,
+    companyname: true,
+    employee: true,
     idlework: true,
     aname: true,
     explanation: true,
+    rejectreason: true,
+    status: true,
+    approvedate: true,
     employee: true,
     actions: true,
   };
@@ -1152,7 +867,7 @@ function Idleworkstatus() {
 
   const handleCloseOpenviewalertwaitforapprove = () => {
     setOpenviewalertwaitforapprove(false);
-   fetchBatchFilter()
+    fetchBatchFilter();
   };
   const [getview, setGetview] = useState([]);
 
@@ -1204,12 +919,21 @@ function Idleworkstatus() {
       hide: !columnVisibility.totime,
       headerClassName: "bold-header",
     },
+
     {
       field: "appliedfor",
       headerName: "Applied",
       flex: 0,
       width: 190,
       hide: !columnVisibility.appliedfor,
+      headerClassName: "bold-header",
+    },
+    {
+      field: "idlework",
+      headerName: "Work Name",
+      flex: 0,
+      width: 130,
+      hide: !columnVisibility.idlework,
       headerClassName: "bold-header",
     },
     {
@@ -1222,6 +946,14 @@ function Idleworkstatus() {
       headerClassName: "bold-header",
     },
     {
+      field: "employee",
+      headerName: "Company Name",
+      flex: 0,
+      width: 190,
+      hide: !columnVisibility.employee,
+      headerClassName: "bold-header",
+    },
+    {
       field: "explanation",
       headerName: "Explanation",
       flex: 0,
@@ -1229,24 +961,30 @@ function Idleworkstatus() {
       hide: !columnVisibility.explanation,
       headerClassName: "bold-header",
     },
+
+    // {
+    //       field: "status",
+    //       headerName: "Mode",
+    //       flex: 0,
+    //       width: 220,
+    //       hide: !columnVisibility.status,
+    //       headerClassName: "bold-header",
+    //     },
     {
-      field: "addedby",
-      headerName: "User Name",
+      field: "approveby",
+      headerName: "Approved By",
       flex: 0,
-      width: 190,
-      hide: !columnVisibility.addedby,
+      width: 220,
+      hide: !columnVisibility.approveby,
       headerClassName: "bold-header",
     },
-
     {
-      field: "actions",
-      headerName: "Action",
+      field: "approvedate",
+      headerName: "Approved Date",
       flex: 0,
-      width: 400,
-      sortable: false,
-      hide: !columnVisibility.actions,
+      width: 220,
+      hide: !columnVisibility.approvedate,
       headerClassName: "bold-header",
-      cellRenderer: (params) => <ActionCell sendDataToParentUI={handleDataFromChildUIDeign} params={params} fetchBatchFilter={fetchBatchFilter} />,
     },
   ];
 
@@ -1413,32 +1151,20 @@ function Idleworkstatus() {
     setLoaderList(true);
     setLoader(true);
     try {
-      let [res_employee, res_completed] = await Promise.all([
-        axios.post(SERVICE.IDLETIMEWORK_CHECK_LIST_REPORT, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-          fromdate: fromdate,
-          todate: todate,
-        }),
-
-        axios.post(SERVICE.IDLETIMEWORK_CHECK_LIST_REPORT_APPROVE_REJECT, {
-          headers: {
-            Authorization: `Bearer ${auth.APIToken}`,
-          },
-          fromdate: fromdate,
-          todate: todate,
-        }),
-      ]);
-      console.log(res_employee?.data?.validatefinal, "de");
-
-      const itemsWithSerialNumber = res_employee?.data?.idletimeworks?.map((item, index) => ({
+      let res_employee = await axios.post(SERVICE.IDELTIMEWORK_STATUS_LIST, {
+        headers: {
+          Authorization: `Bearer ${auth.APIToken}`,
+        },
+        fromdate: fromdate,
+        todate: todate,
+      });
+    //   console.log(res_employee?.data?.idletimeworks,"filer")
+      const result = res_employee?.data?.idletimeworks?.filter((item) => item.status === "Approved");
+      const itemsWithSerialNumber = result?.map((item, index) => ({
         ...item,
         serialNumber: index + 1,
-        addedby: item.addedby[0].name,
         id: item._id,
-        olddate: item.date,
-
+        approvedate: moment(item.approvedate).format("DD-MM-YYYY hh:mm:ss a"),
         date: moment(item.date).format("DD-MM-YYYY"),
       }));
 
@@ -1446,11 +1172,12 @@ function Idleworkstatus() {
       setTableCheck(valueTable);
 
       //valid/Invalid status
+      const result1 = res_employee?.data?.idletimeworks?.filter((item) => item.status === "Rejected");
 
-      const itemsWithSerialNumberstatus = res_completed?.data?.idletimeworks?.map((item, index) => ({
+      const itemsWithSerialNumberstatus = result1?.map((item, index) => ({
         ...item,
         serialNumber: index + 1,
-        addedby: item.addedby[0].name,
+        approvedate: moment(item.approvedate).format("DD-MM-YYYY hh:mm:ss a"),
         date: moment(item.date).format("DD-MM-YYYY"),
         id: item._id,
       }));
@@ -1521,13 +1248,19 @@ function Idleworkstatus() {
     date: true,
     fromtime: true,
     totime: true,
+    explanation: true,
+    addedby: true,
     appliedfor: true,
+    approveby: true,
+    companyname: true,
+    employee: true,
     idlework: true,
     aname: true,
     explanation: true,
-    employee: true,
     rejectreason: true,
-    addedby: true,
+    status: true,
+    approvedate: true,
+    employee: true,
     actions: true,
   };
 
@@ -1610,7 +1343,7 @@ function Idleworkstatus() {
       headerName: "SNo",
       flex: 0,
       width: 80,
-      hide: !columnVisibilitycom.serialNumber,
+      hide: !columnVisibility.serialNumber,
       headerClassName: "bold-header",
       pinned: "left",
     },
@@ -1638,21 +1371,38 @@ function Idleworkstatus() {
       hide: !columnVisibilitycom.totime,
       headerClassName: "bold-header",
     },
+
     {
       field: "appliedfor",
       headerName: "Applied",
       flex: 0,
-      width: 130,
+      width: 190,
       hide: !columnVisibilitycom.appliedfor,
+      headerClassName: "bold-header",
+    },
+    {
+      field: "idlework",
+      headerName: "Work Name",
+      flex: 0,
+      width: 130,
+      hide: !columnVisibilitycom.idlework,
       headerClassName: "bold-header",
     },
     {
       field: "aname",
       headerName: "AName",
       flex: 0,
-      width: 180,
+      width: 190,
 
       hide: !columnVisibilitycom.aname,
+      headerClassName: "bold-header",
+    },
+    {
+      field: "employee",
+      headerName: "Company Name",
+      flex: 0,
+      width: 190,
+      hide: !columnVisibilitycom.employee,
       headerClassName: "bold-header",
     },
     {
@@ -1660,38 +1410,34 @@ function Idleworkstatus() {
       headerName: "Explanation",
       flex: 0,
       width: 220,
-      hide: !columnVisibilitycom.explanation,
+      hide: !columnVisibility.explanation,
       headerClassName: "bold-header",
     },
+
+    // {
+    //       field: "status",
+    //       headerName: "Mode",
+    //       flex: 0,
+    //       width: 220,
+    //       hide: !columnVisibilitycom.status,
+    //       headerClassName: "bold-header",
+    //     },
     {
-      field: "addedby",
-      headerName: "User Name",
+      field: "approveby",
+      headerName: "Approved By",
       flex: 0,
-      width: 190,
-      hide: !columnVisibilitycom.addedby,
+      width: 220,
+      hide: !columnVisibilitycom.approveby,
       headerClassName: "bold-header",
     },
     {
-         field: 'actions',
-         headerName: 'Action',
-         flex: 0,
-         width: 200,
-         minHeight: '40px !important',
-         sortable: false,
-         hide: !columnVisibility.actions,
-         headerClassName: 'bold-header',
-         cellRenderer: (params) => (
-           <Grid sx={{ display: 'flex' }}>
-           
-    <Button variant="contained" size="small" 
-    onClick={() => getviewallapprovereject(params.data.id)}
-    >
-            View
-          </Button>
-           
-           </Grid>
-         ),
-       },
+      field: "approvedate",
+      headerName: "Approved Date",
+      flex: 0,
+      width: 220,
+      hide: !columnVisibilitycom.approvedate,
+      headerClassName: "bold-header",
+    },
   ];
 
   const exportColumnNamescom = columnDataTablecom.map((d) => d.headerName).filter((t) => t != "Action" && t != "SNo");
@@ -1818,22 +1564,22 @@ function Idleworkstatus() {
 
   return (
     <Box>
-      <Headtitle title={"Idle Check List"} />
+      <Headtitle title={"Idle Work Status"} />
       <PageHeading
-        title="Idle Check List"
+        title="Idle Work Status"
         modulename="Quality"
         submodulename="Penalty"
         mainpagename="Penalty Setup"
         subpagename="Penalty Calculation"
         subsubpagename="Validation Error Entry"
       />
-      {isUserRoleCompare?.includes("lidleworkchecklist") && (
+      {isUserRoleCompare?.includes("lidleworkstatus") && (
         <>
           <Box sx={userStyle.dialogbox}>
             <>
               <Grid container spacing={2}>
                 <Grid item xs={8}>
-                  <Typography sx={userStyle.importheadtext}>idle Check List List</Typography>
+                  <Typography sx={userStyle.importheadtext}>idle Work Status List</Typography>
                 </Grid>
               </Grid>
               <br />
@@ -1946,208 +1692,15 @@ function Idleworkstatus() {
         </Box>
       )}
 
-      {/* {isUserRoleCompare?.includes("lidleworkchecklist")  ? */}
-
-      <>
-        <Box sx={userStyle.container}>
-          {/* ******************************************************EXPORT Buttons****************************************************** */}
-          <Grid item xs={8}>
-            <Typography sx={userStyle.importheadtext}>
-              Wait For Approve List
-              {/* Penalty Total Field List */}
-            </Typography>
-          </Grid>
-          <Grid container spacing={2} style={userStyle.dataTablestyle}>
-            <Grid item md={2} xs={12} sm={12}>
-              <Box>
-                <label>Show entries:</label>
-                <Select
-                  id="pageSizeSelect"
-                  value={pageSize}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 180,
-                        width: 80,
-                      },
-                    },
-                  }}
-                  onChange={handlePageSizeChange}
-                  sx={{ width: "77px" }}
-                >
-                  <MenuItem value={1}>1</MenuItem>
-                  <MenuItem value={5}>5</MenuItem>
-                  <MenuItem value={10}>10</MenuItem>
-                  <MenuItem value={25}>25</MenuItem>
-                  <MenuItem value={50}>50</MenuItem>
-                  <MenuItem value={100}>100</MenuItem>
-                  <MenuItem value={filterList?.length}>All</MenuItem>
-                </Select>
-              </Box>
-            </Grid>
-            <Grid
-              item
-              md={8}
-              xs={12}
-              sm={12}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                {isUserRoleCompare?.includes("excelidleworkchecklist") && (
-                  <>
-                    <Button
-                      onClick={(e) => {
-                        setIsFilterOpen(true);
-                        setFormat("xl");
-                      }}
-                      sx={userStyle.buttongrp}
-                    >
-                      <FaFileExcel />
-                      &ensp;Export to Excel&ensp;
-                    </Button>
-                  </>
-                )}
-                {isUserRoleCompare?.includes("csvidleworkchecklist") && (
-                  <>
-                    <Button
-                      onClick={(e) => {
-                        setIsFilterOpen(true);
-                        setFormat("csv");
-                      }}
-                      sx={userStyle.buttongrp}
-                    >
-                      <FaFileCsv />
-                      &ensp;Export to CSV&ensp;
-                    </Button>
-                  </>
-                )}
-                {isUserRoleCompare?.includes("printidleworkchecklist") && (
-                  <>
-                    <Button sx={userStyle.buttongrp} onClick={handleprint}>
-                      &ensp;
-                      <FaPrint />
-                      &ensp;Print&ensp;
-                    </Button>
-                  </>
-                )}
-                {isUserRoleCompare?.includes("pdfidleworkchecklist") && (
-                  <>
-                    <Button
-                      sx={userStyle.buttongrp}
-                      onClick={() => {
-                        setIsPdfFilterOpen(true);
-                      }}
-                    >
-                      <FaFilePdf />
-                      &ensp;Export to PDF&ensp;
-                    </Button>
-                  </>
-                )}
-                {isUserRoleCompare?.includes("imageidleworkchecklist") && (
-                  <>
-                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
-                      <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;
-                    </Button>
-                  </>
-                )}
-              </Box>
-            </Grid>
-            <Grid item md={2} xs={6} sm={6}>
-              <Box>
-                <AggregatedSearchBar
-                  columnDataTable={columnDataTable}
-                  setItems={setItems}
-                  addSerialNumber={addSerialNumber}
-                  setPage={setPage}
-                  maindatas={filterList}
-                  setSearchedString={setSearchedString}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  paginated={false}
-                  totalDatas={filterList}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-          <br />
-          <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
-            Show All Columns
-          </Button>
-          &ensp;
-          <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
-            Manage Columns
-          </Button>
-          &ensp;
-          {/* {hasMoreData && !isLoading && filterList.length > 0 && (
-                            <Button variant="contained" onClick={loadMore}>
-                                Load More
-                            </Button>
-                        )} */}
-          <br />
-          {loaderList ? (
-            <>
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <ThreeDots
-                  height="80"
-                  width="80"
-                  radius="9"
-                  color="#1976d2"
-                  ariaLabel="three-dots-loading"
-                  wrapperStyle={{}}
-                  wrapperClassName=""
-                  visible={true}
-                />
-              </Box>
-            </>
-          ) : (
-            <>
-              <AggridTable
-                rowDataTable={rowDataTable}
-                columnDataTable={columnDataTable}
-                columnVisibility={columnVisibility}
-                page={page}
-                setPage={setPage}
-                pageSize={pageSize}
-                totalPages={totalPages}
-                setColumnVisibility={setColumnVisibility}
-                isHandleChange={isHandleChange}
-                items={items}
-                selectedRows={selectedRows}
-                setSelectedRows={setSelectedRows}
-                gridRefTable={gridRefTable}
-                paginated={false}
-                // pagenamecheck={"Validation Error Entry"}
-                filteredDatas={filteredDatas}
-                // totalDatas={totalDatas}
-                searchQuery={searchedString}
-                handleShowAllColumns={handleShowAllColumns}
-                setFilteredRowData={setFilteredRowData}
-                filteredRowData={filteredRowData}
-                setFilteredChanges={setFilteredChanges}
-                filteredChanges={filteredChanges}
-                gridRefTableImg={gridRefTableImg}
-                itemsList={filterList}
-                rowHeight={150}
-              />
-            </>
-          )}
-        </Box>
-      </>
-      {/* // : null} */}
-
-      <br />
-
-      {/* {isUserRoleCompare?.includes("lidleworkchecklist")  ? */}
-
-      <>
-        <Box sx={userStyle.dialogbox}>
-          <>
+      {isUserRoleCompare?.includes("lidleworkstatus") ? (
+        <>
+          <Box sx={userStyle.container}>
+            {/* ******************************************************EXPORT Buttons****************************************************** */}
             <Grid item xs={8}>
-              <Typography sx={userStyle.importheadtext}>Approve & Reject List All</Typography>
+              <Typography sx={userStyle.importheadtext}>
+                Approve List
+                {/* Penalty Total Field List */}
+              </Typography>
             </Grid>
             <Grid container spacing={2} style={userStyle.dataTablestyle}>
               <Grid item md={2} xs={12} sm={12}>
@@ -2155,7 +1708,7 @@ function Idleworkstatus() {
                   <label>Show entries:</label>
                   <Select
                     id="pageSizeSelect"
-                    value={pageSizecom}
+                    value={pageSize}
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -2164,7 +1717,7 @@ function Idleworkstatus() {
                         },
                       },
                     }}
-                    onChange={handlePageSizeChangecom}
+                    onChange={handlePageSizeChange}
                     sx={{ width: "77px" }}
                   >
                     <MenuItem value={1}>1</MenuItem>
@@ -2173,7 +1726,7 @@ function Idleworkstatus() {
                     <MenuItem value={25}>25</MenuItem>
                     <MenuItem value={50}>50</MenuItem>
                     <MenuItem value={100}>100</MenuItem>
-                    <MenuItem value={isusercompleted?.length}>All</MenuItem>
+                    <MenuItem value={filterList?.length}>All</MenuItem>
                   </Select>
                 </Box>
               </Grid>
@@ -2189,11 +1742,11 @@ function Idleworkstatus() {
                 }}
               >
                 <Box>
-                  {isUserRoleCompare?.includes("excelidleworkchecklist") && (
+                  {isUserRoleCompare?.includes("excelidleworkstatus") && (
                     <>
                       <Button
                         onClick={(e) => {
-                          setIsFilterOpencom(true);
+                          setIsFilterOpen(true);
                           setFormat("xl");
                         }}
                         sx={userStyle.buttongrp}
@@ -2203,11 +1756,11 @@ function Idleworkstatus() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("csvidleworkchecklist") && (
+                  {isUserRoleCompare?.includes("csvidleworkstatus") && (
                     <>
                       <Button
                         onClick={(e) => {
-                          setIsFilterOpencom(true);
+                          setIsFilterOpen(true);
                           setFormat("csv");
                         }}
                         sx={userStyle.buttongrp}
@@ -2217,21 +1770,21 @@ function Idleworkstatus() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("printidleworkchecklist") && (
+                  {isUserRoleCompare?.includes("printidleworkstatus") && (
                     <>
-                      <Button sx={userStyle.buttongrp} onClick={handleprintcom}>
+                      <Button sx={userStyle.buttongrp} onClick={handleprint}>
                         &ensp;
                         <FaPrint />
                         &ensp;Print&ensp;
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("pdfidleworkchecklist") && (
+                  {isUserRoleCompare?.includes("pdfidleworkstatus") && (
                     <>
                       <Button
                         sx={userStyle.buttongrp}
                         onClick={() => {
-                          setIsPdfFilterOpencom(true);
+                          setIsPdfFilterOpen(true);
                         }}
                       >
                         <FaFilePdf />
@@ -2239,62 +1792,46 @@ function Idleworkstatus() {
                       </Button>
                     </>
                   )}
-                  {isUserRoleCompare?.includes("imageidleworkchecklist") && (
-                    <Button sx={userStyle.buttongrp} onClick={handleCaptureImagecom}>
-                      {" "}
-                      <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
-                    </Button>
+                  {isUserRoleCompare?.includes("imageidleworkstatus") && (
+                    <>
+                      <Button sx={userStyle.buttongrp} onClick={handleCaptureImage}>
+                        <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;
+                      </Button>
+                    </>
                   )}
                 </Box>
               </Grid>
               <Grid item md={2} xs={6} sm={6}>
                 <Box>
-                  {/* <FormControl fullWidth size="small">
-                                                    <Typography>Search</Typography>
-                                                    <OutlinedInput
-                                                        id="component-outlined"
-                                                        type="text"
-                                                        value={searchQuery}
-                                                        onChange={handleSearchChange}
-                                                    />
-                                                </FormControl> */}
                   <AggregatedSearchBar
-                    columnDataTable={columnDataTablecom}
-                    setItems={setItemscom}
-                    addSerialNumber={addSerialNumbercom}
-                    setPage={setPagecom}
-                    maindatas={isusercompleted}
-                    setSearchedString={setSearchedStringcom}
-                    searchQuery={searchQuerycom}
-                    setSearchQuery={setSearchQuerycom}
+                    columnDataTable={columnDataTable}
+                    setItems={setItems}
+                    addSerialNumber={addSerialNumber}
+                    setPage={setPage}
+                    maindatas={filterList}
+                    setSearchedString={setSearchedString}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
                     paginated={false}
-                    totalDatas={isusercompleted}
+                    totalDatas={filterList}
                   />
                 </Box>
               </Grid>
             </Grid>
             <br />
-            <Button sx={userStyle.buttongrp} onClick={handleShowAllColumnscom}>
+            <Button sx={userStyle.buttongrp} onClick={handleShowAllColumns}>
               Show All Columns
             </Button>
             &ensp;
-            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumnscom}>
+            <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumns}>
               Manage Columns
             </Button>
-            {/* Show "Load More" button if there's more data */}
-            <Popover
-              id={idcom}
-              open={isManageColumnsOpencom}
-              anchorEl={anchorElcom}
-              onClose={handleCloseManageColumnscom}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-            >
-              {manageColumnsContentcom}
-            </Popover>
-            <br />
+            &ensp;
+            {/* {hasMoreData && !isLoading && filterList.length > 0 && (
+                            <Button variant="contained" onClick={loadMore}>
+                                Load More
+                            </Button>
+                        )} */}
             <br />
             {loaderList ? (
               <>
@@ -2314,38 +1851,243 @@ function Idleworkstatus() {
             ) : (
               <>
                 <AggridTable
-                  rowDataTable={rowDataTablecom}
-                  columnDataTable={columnDataTablecom}
-                  columnVisibility={columnVisibilitycom}
-                  page={pagecom}
-                  setPage={setPagecom}
-                  pageSize={pageSizecom}
-                  totalPages={totalPagescom}
-                  setColumnVisibility={setColumnVisibilitycom}
+                  rowDataTable={rowDataTable}
+                  columnDataTable={columnDataTable}
+                  columnVisibility={columnVisibility}
+                  page={page}
+                  setPage={setPage}
+                  pageSize={pageSize}
+                  totalPages={totalPages}
+                  setColumnVisibility={setColumnVisibility}
                   isHandleChange={isHandleChange}
-                  items={itemscom}
+                  items={items}
                   selectedRows={selectedRows}
                   setSelectedRows={setSelectedRows}
-                  gridRefTable={gridRefTablecom}
+                  gridRefTable={gridRefTable}
                   paginated={false}
-                  filteredDatas={filteredDatascom}
+                  // pagenamecheck={"Validation Error Entry"}
+                  filteredDatas={filteredDatas}
                   // totalDatas={totalDatas}
-                  searchQuery={searchedStringcom}
-                  handleShowAllColumns={handleShowAllColumnscom}
-                  setFilteredRowData={setFilteredRowDatacom}
-                  filteredRowData={filteredRowDatacom}
-                  setFilteredChanges={setFilteredChangescom}
-                  filteredChanges={filteredChangescom}
-                  gridRefTableImg={gridRefTableImgcom}
-                  itemsList={isusercompleted}
+                  searchQuery={searchedString}
+                  handleShowAllColumns={handleShowAllColumns}
+                  setFilteredRowData={setFilteredRowData}
+                  filteredRowData={filteredRowData}
+                  setFilteredChanges={setFilteredChanges}
+                  filteredChanges={filteredChanges}
+                  gridRefTableImg={gridRefTableImg}
+                  itemsList={filterList}
                 />
               </>
             )}
-          </>
-        </Box>
-      </>
+          </Box>
+        </>
+      ) : null}
 
-      {/* : null} */}
+      <br />
+
+      {isUserRoleCompare?.includes("lidleworkstatus") ? (
+        <>
+          <Box sx={userStyle.dialogbox}>
+            <>
+              <Grid item xs={8}>
+                <Typography sx={userStyle.importheadtext}>Reject List</Typography>
+              </Grid>
+              <Grid container spacing={2} style={userStyle.dataTablestyle}>
+                <Grid item md={2} xs={12} sm={12}>
+                  <Box>
+                    <label>Show entries:</label>
+                    <Select
+                      id="pageSizeSelect"
+                      value={pageSizecom}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 180,
+                            width: 80,
+                          },
+                        },
+                      }}
+                      onChange={handlePageSizeChangecom}
+                      sx={{ width: "77px" }}
+                    >
+                      <MenuItem value={1}>1</MenuItem>
+                      <MenuItem value={5}>5</MenuItem>
+                      <MenuItem value={10}>10</MenuItem>
+                      <MenuItem value={25}>25</MenuItem>
+                      <MenuItem value={50}>50</MenuItem>
+                      <MenuItem value={100}>100</MenuItem>
+                      <MenuItem value={isusercompleted?.length}>All</MenuItem>
+                    </Select>
+                  </Box>
+                </Grid>
+                <Grid
+                  item
+                  md={8}
+                  xs={12}
+                  sm={12}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box>
+                    {isUserRoleCompare?.includes("excelidleworkstatus") && (
+                      <>
+                        <Button
+                          onClick={(e) => {
+                            setIsFilterOpencom(true);
+                            setFormat("xl");
+                          }}
+                          sx={userStyle.buttongrp}
+                        >
+                          <FaFileExcel />
+                          &ensp;Export to Excel&ensp;
+                        </Button>
+                      </>
+                    )}
+                    {isUserRoleCompare?.includes("csvidleworkstatus") && (
+                      <>
+                        <Button
+                          onClick={(e) => {
+                            setIsFilterOpencom(true);
+                            setFormat("csv");
+                          }}
+                          sx={userStyle.buttongrp}
+                        >
+                          <FaFileCsv />
+                          &ensp;Export to CSV&ensp;
+                        </Button>
+                      </>
+                    )}
+                    {isUserRoleCompare?.includes("printidleworkstatus") && (
+                      <>
+                        <Button sx={userStyle.buttongrp} onClick={handleprintcom}>
+                          &ensp;
+                          <FaPrint />
+                          &ensp;Print&ensp;
+                        </Button>
+                      </>
+                    )}
+                    {isUserRoleCompare?.includes("pdfidleworkstatus") && (
+                      <>
+                        <Button
+                          sx={userStyle.buttongrp}
+                          onClick={() => {
+                            setIsPdfFilterOpencom(true);
+                          }}
+                        >
+                          <FaFilePdf />
+                          &ensp;Export to PDF&ensp;
+                        </Button>
+                      </>
+                    )}
+                    {isUserRoleCompare?.includes("imageidleworkstatus") && (
+                      <Button sx={userStyle.buttongrp} onClick={handleCaptureImagecom}>
+                        {" "}
+                        <ImageIcon sx={{ fontSize: "15px" }} /> &ensp;Image&ensp;{" "}
+                      </Button>
+                    )}
+                  </Box>
+                </Grid>
+                <Grid item md={2} xs={6} sm={6}>
+                  <Box>
+                    {/* <FormControl fullWidth size="small">
+                                                    <Typography>Search</Typography>
+                                                    <OutlinedInput
+                                                        id="component-outlined"
+                                                        type="text"
+                                                        value={searchQuery}
+                                                        onChange={handleSearchChange}
+                                                    />
+                                                </FormControl> */}
+                    <AggregatedSearchBar
+                      columnDataTable={columnDataTablecom}
+                      setItems={setItemscom}
+                      addSerialNumber={addSerialNumbercom}
+                      setPage={setPagecom}
+                      maindatas={isusercompleted}
+                      setSearchedString={setSearchedStringcom}
+                      searchQuery={searchQuerycom}
+                      setSearchQuery={setSearchQuerycom}
+                      paginated={false}
+                      totalDatas={isusercompleted}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+              <br />
+              <Button sx={userStyle.buttongrp} onClick={handleShowAllColumnscom}>
+                Show All Columns
+              </Button>
+              &ensp;
+              <Button sx={userStyle.buttongrp} onClick={handleOpenManageColumnscom}>
+                Manage Columns
+              </Button>
+              {/* Show "Load More" button if there's more data */}
+              <Popover
+                id={idcom}
+                open={isManageColumnsOpencom}
+                anchorEl={anchorElcom}
+                onClose={handleCloseManageColumnscom}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+              >
+                {manageColumnsContentcom}
+              </Popover>
+              <br />
+              <br />
+              {loaderList ? (
+                <>
+                  <Box sx={{ display: "flex", justifyContent: "center" }}>
+                    <ThreeDots
+                      height="80"
+                      width="80"
+                      radius="9"
+                      color="#1976d2"
+                      ariaLabel="three-dots-loading"
+                      wrapperStyle={{}}
+                      wrapperClassName=""
+                      visible={true}
+                    />
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <AggridTable
+                    rowDataTable={rowDataTablecom}
+                    columnDataTable={columnDataTablecom}
+                    columnVisibility={columnVisibilitycom}
+                    page={pagecom}
+                    setPage={setPagecom}
+                    pageSize={pageSizecom}
+                    totalPages={totalPagescom}
+                    setColumnVisibility={setColumnVisibilitycom}
+                    isHandleChange={isHandleChange}
+                    items={itemscom}
+                    selectedRows={selectedRows}
+                    setSelectedRows={setSelectedRows}
+                    gridRefTable={gridRefTablecom}
+                    paginated={false}
+                    filteredDatas={filteredDatascom}
+                    // totalDatas={totalDatas}
+                    searchQuery={searchedStringcom}
+                    handleShowAllColumns={handleShowAllColumnscom}
+                    setFilteredRowData={setFilteredRowDatacom}
+                    filteredRowData={filteredRowDatacom}
+                    setFilteredChanges={setFilteredChangescom}
+                    filteredChanges={filteredChangescom}
+                    gridRefTableImg={gridRefTableImgcom}
+                    itemsList={isusercompleted}
+                  />
+                </>
+              )}
+            </>
+          </Box>
+        </>
+      ) : null}
 
       {/* Manage Column */}
       <Popover
@@ -2382,7 +2124,7 @@ function Idleworkstatus() {
         handleClosePdfFilterMod={handleClosePdfFilterMod}
         filteredDataTwo={(filteredChanges !== null ? filteredRowData : rowDataTable) ?? []}
         itemsTwo={filterList ?? []}
-        filename={"Non Production Approve List"}
+        filename={"Approve List"}
         exportColumnNames={exportColumnNames}
         exportRowValues={exportRowValues}
         componentRef={componentRef}
@@ -2397,7 +2139,7 @@ function Idleworkstatus() {
         handleClosePdfFilterMod={handleClosePdfFilterModcom}
         filteredDataTwo={(filteredChangescom !== null ? filteredRowDatacom : rowDataTablecom) ?? []}
         itemsTwo={isusercompleted ?? []}
-        filename={"Non Production Reject List"}
+        filename={"Reject List"}
         exportColumnNames={exportColumnNamescom}
         exportRowValues={exportRowValuescom}
         componentRef={componentRefcom}
@@ -2407,58 +2149,6 @@ function Idleworkstatus() {
       {/* PLEASE SELECT ANY ROW */}
       <PleaseSelectRow open={isDeleteOpenalert} onClose={handleCloseModalert} message="Please Select any Row" iconColor="orange" buttonText="OK" />
       {/* EXTERNAL COMPONENTS -------------- END */}
-
-      <Dialog
-        open={openviewalertwaitforapprove}
-        onClose={handleCloseOpenviewalertwaitforapprove}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="lg"
-        sx={{
-          marginTop: "95px",
-        }}
-        fullWidth={true}
-      >
-        <ViewWatiForApprove
-          sendDataToParentUIManual={handleDataFromChildUIDeignnonproduction}
-          openpop={!openviewalertwaitforapprove}
-          getview={getview}
-          setGetview={setGetview}
-          handleCloseOpenviewalertwaitforapprove={handleCloseOpenviewalertwaitforapprove}
-        />
-        <DialogActions>
-          <Button variant="contained" color="primary" onClick={handleCloseOpenviewalertwaitforapprove} sx={buttonStyles.btncancel}>
-            Back
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-
-      
-       <Dialog
-              open={openviewalertapprovereject}
-              onClose={handleCloseOpenviewalertapprovereject}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-              maxWidth="lg"
-              sx={{
-                marginTop: "95px"
-              }}
-              fullWidth={true}
-            >
-              <ViewWatiApproveReject
-                sendDataToParentUIApproveReject={handleDataFromChildUIapprovereject}
-                openpop={!openviewalertapprovereject}
-                getviewapprovereject={getviewapprovereject}
-                setGetviewapprovereject={setGetviewapprovereject}
-                handleCloseOpenviewalertwaitforapprove={handleCloseOpenviewalertapprovereject}
-              />
-                <DialogActions>
-                        <Button variant="contained" color="primary" onClick={handleCloseOpenviewalertapprovereject} sx={buttonStyles.btncancel}>
-                          Back
-                        </Button>
-                      </DialogActions>
-            </Dialog>
     </Box>
   );
 }

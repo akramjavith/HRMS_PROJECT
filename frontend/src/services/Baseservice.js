@@ -5891,6 +5891,9 @@ SCHEDULE_MEETING_FILTER_LIST_TEAM: `${BASE_URL}/api/schedulemeetingfilterteam`,
   IDLETIMEWORK_EMPLOYEE: `${BASE_URL}/api/idletimeworkemployee`,
   IDLETIMEWORK_CHECK_LIST_REPORT: `${BASE_URL}/api/idletimeworkchecklisreport`,
   IDLETIMEWORK_CHECK_LIST_REPORT_APPROVE_REJECT: `${BASE_URL}/api/idletimeworkchecklistreportapprovereject`,
+  IDLETIMEWORK_CHECK_LIST_REPORT_VIEW_WAIT_FOR_APPROVE: `${BASE_URL}/api/idletimeworkchecklistreportviewwaitforapprove`,
+  IDELTIMEWORK_APPROVE_UPDATE: `${BASE_URL}/api/idletimeworkapprovedupdate`,
+  IDELTIMEWORK_STATUS_LIST: `${BASE_URL}/api/idletimeworkstatusreportlist`,
 
   
   

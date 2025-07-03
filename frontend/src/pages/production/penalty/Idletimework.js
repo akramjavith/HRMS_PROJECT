@@ -476,7 +476,7 @@ function IdleTimeWork() {
 
                 totime: String(ManageIdleWorkState.totime),
                 explanation: String(ManageIdleWorkState.explanation),
-                status:"Manager",
+                mode:"Manager",
                 addedby: [
                     {
                         name: String(isUserRoleAccess.companyname),
@@ -714,6 +714,7 @@ function IdleTimeWork() {
                 fromtime: String(ManageIdleWorkEdit.fromtime),
                 totime: String(ManageIdleWorkEdit.totime),
                 explanation: String(ManageIdleWorkEdit.explanation),
+                mode:"Manager",
                   aname:String(ManageIdleWorkEdit.appliedfor) === "Branch" ? String(ManageIdleWorkEdit.branch)  :
                           String(ManageIdleWorkEdit.appliedfor) === "Unit" ? String(ManageIdleWorkEdit.unit)  :
                           String(ManageIdleWorkEdit.appliedfor) === "Team" ? String(ManageIdleWorkEdit.team)  :

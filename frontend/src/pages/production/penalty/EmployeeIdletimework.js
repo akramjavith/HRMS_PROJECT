@@ -417,13 +417,13 @@ function EmployeeIdleTimeWork() {
                 fromtime: String(ManageIdleWorkState.fromtime),
                 totime: String(ManageIdleWorkState.totime),
                 explanation: String(ManageIdleWorkState.explanation),
-                  aname:String(ManageIdleWorkEdit.appliedfor) === "Branch" ? String(ManageIdleWorkEdit.branch)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Unit" ? String(ManageIdleWorkEdit.unit)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Team" ? String(ManageIdleWorkEdit.team)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Employee" ? String(ManageIdleWorkEdit.employee)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Process" ? String(ManageIdleWorkEdit.process)  :
-                          String(ManageIdleWorkEdit.appliedfor) === "Company" ? String(ManageIdleWorkEdit.company) : "",
-                status:"Employee",
+                  aname:String(ManageIdleWorkState.appliedfor) === "Branch" ? String(ManageIdleWorkState.branch)  :
+                          String(ManageIdleWorkState.appliedfor) === "Unit" ? String(ManageIdleWorkState.unit)  :
+                          String(ManageIdleWorkState.appliedfor) === "Team" ? String(ManageIdleWorkState.team)  :
+                          String(ManageIdleWorkState.appliedfor) === "Employee" ? String(ManageIdleWorkState.employee)  :
+                          String(ManageIdleWorkState.appliedfor) === "Process" ? String(ManageIdleWorkState.process)  :
+                          String(ManageIdleWorkState.appliedfor) === "Company" ? String(ManageIdleWorkState.company) : "",
+                mode:"Employee",
                 addedby: [
                     {
                         name: String(isUserRoleAccess.companyname),
@@ -657,10 +657,17 @@ function EmployeeIdleTimeWork() {
                 team: ["Team", "Employee"].includes(appliedFor) ? String(ManageIdleWorkEdit.team) : "",
                 employee: appliedFor === "Employee" ? String(ManageIdleWorkEdit.employee) : "",
                 process: appliedFor === "Process" ? String(ManageIdleWorkEdit.process) : "",
+                  aname:String(ManageIdleWorkEdit.appliedfor) === "Branch" ? String(ManageIdleWorkEdit.branch)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Unit" ? String(ManageIdleWorkEdit.unit)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Team" ? String(ManageIdleWorkEdit.team)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Employee" ? String(ManageIdleWorkEdit.employee)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Process" ? String(ManageIdleWorkEdit.process)  :
+                          String(ManageIdleWorkEdit.appliedfor) === "Company" ? String(ManageIdleWorkEdit.company) : "",
                 date: String(ManageIdleWorkEdit.date),
                 fromtime: String(ManageIdleWorkEdit.fromtime),
                 totime: String(ManageIdleWorkEdit.totime),
                 explanation: String(ManageIdleWorkEdit.explanation),
+                mode:"Employee",
                 updatedby: [
                     ...updateby,
                     {
@@ -1272,35 +1279,28 @@ function EmployeeIdleTimeWork() {
                                                     Branch<b style={{ color: "red" }}>*</b>
                                                 </Typography>
                                                 <Selects
-                                                    // options={ManageIdleWorkState.appliedfor === "Branch" ? [{
-                                                    //     label: "ALL",
-                                                    //     value: "ALL"
-                                                    // }, ...accessbranch
-                                                    //     ?.filter((comp) => ManageIdleWorkState.company === comp.company)
-                                                    //     ?.map((data) => ({
-                                                    //         label: data.branch,
-                                                    //         value: data.branch,
-                                                    //     }))
-                                                    //     .filter((item, index, self) =>
-                                                    //         self.findIndex((i) => i.label === item.label && i.value === item.value) === index
-                                                    //     )] : accessbranch
-                                                    //         ?.filter((comp) => ManageIdleWorkState.company === comp.company)
-                                                    //         ?.map((data) => ({
-                                                    //             label: data.branch,
-                                                    //             value: data.branch,
-                                                    //         }))
-                                                    //         .filter((item, index, self) =>
-                                                    //             self.findIndex((i) => i.label === item.label && i.value === item.value) === index
-                                                    //         )}
-
-                                                       options={accessbranch?.filter((comp) => ManageIdleWorkState.company === comp.company)
+                                                    options={ManageIdleWorkState.appliedfor === "Branch" ? [{
+                                                        label: "ALL",
+                                                        value: "ALL"
+                                                    }, ...accessbranch
+                                                        ?.filter((comp) => ManageIdleWorkState.company === comp.company)
                                                         ?.map((data) => ({
-                                                            label: data.company,
-                                                            value: data.company,
+                                                            label: data.branch,
+                                                            value: data.branch,
                                                         }))
                                                         .filter((item, index, self) =>
                                                             self.findIndex((i) => i.label === item.label && i.value === item.value) === index
-                                                        )}
+                                                        )] : accessbranch
+                                                            ?.filter((comp) => ManageIdleWorkState.company === comp.company)
+                                                            ?.map((data) => ({
+                                                                label: data.branch,
+                                                                value: data.branch,
+                                                            }))
+                                                            .filter((item, index, self) =>
+                                                                self.findIndex((i) => i.label === item.label && i.value === item.value) === index
+                                                            )}
+
+                                                       
                                                  
                                                     styles={colourStyles}
                                                     value={{

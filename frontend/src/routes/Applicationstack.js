@@ -1033,13 +1033,11 @@ const EventsListHomeTeam = React.lazy(() => import("../pages/teamDashboard/Event
 
 const NonProductionEntry = React.lazy(() => import('../pages/production/penalty/Nonproductionentry.js'));
 const IdleTimeWork = React.lazy(() => import('../pages/production/penalty/Idletimework.js'));
-
-
 const Nonproductionchecklist = React.lazy(() => import('../pages/production/nonproduction/nonproductionchecklist.js'));
 const TeamNonproductionchecklist = React.lazy(() => import('../pages/production/nonproduction/teamnonproductionchecklist.js'));
-
 const EmployeeIdleTimeWork = React.lazy(() => import('../pages/production/penalty/EmployeeIdletimework.js'));
 const Idleworkchecklist = React.lazy(() => import('../pages/production/nonproduction/idleworkchecklist.js'));
+const Idleworkstatus = React.lazy(() => import('../pages/production/nonproduction/idleworkstatus.js'));
 
 const App = () => {
   return (
@@ -2149,6 +2147,7 @@ const App = () => {
 
                 <Route path="production/employeeidletimework" element={<EmployeeIdleTimeWork />} />
                 <Route path="nonproduction/idleworkchecklist" element={<Idleworkchecklist />} />
+                <Route path="nonproduction/idleworkstatus" element={<Idleworkstatus />} />
                         
 
             

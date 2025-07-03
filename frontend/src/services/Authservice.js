@@ -1,7 +1,7 @@
 // export const BASE_URL = "http://192.168.85.100:8003";
 export const BASE_URL_TTS = "http://192.168.8.14:7000";
-export const BASE_URL = "http://192.168.85.128:7003";
-// export const BASE_URL = "http://localhost:7003";
+// export const BASE_URL = "http://192.168.85.128:7003";
+export const BASE_URL = "http://localhost:7003";
 
 export const AUTH = {
   LOGIN: `${BASE_URL}/api/authlog`,

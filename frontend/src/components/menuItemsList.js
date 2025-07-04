@@ -2823,6 +2823,11 @@ export const menuItems = [
                 url: '/nonproduction/idleworkstatus',
               },
               {
+                title: 'Individual Idle Work Status',
+                dbname: 'menuindividualidleworkstatus',
+                url: '/nonproduction/individualidleworkstatus',
+              },
+              {
                 title: 'Non Production Entry',
                 dbname: 'menunonproductionentry',
                 url: '/production/nonproductionentry',

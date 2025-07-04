@@ -394,7 +394,32 @@ exports.getAllIdletimeworkStatusListReport = catchAsyncErrors(async (req, res, n
     console.log(query,"query")
     idletimeworks = await Idletimework.find(query, {data:1});
     idletimeworks = idletimeworks.flatMap(item => item.data) 
-    console.log(idletimeworks[0],"idletimeworks")
+    // console.log(idletimeworks[0],"idletimeworks")
+  } catch (err) {
+    console.log(err,"list")
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+
+  return res.status(200).json({
+    idletimeworks,
+  });
+});
+
+
+
+
+
+exports.getAllIdletimeworkStatusListIndividualReport = catchAsyncErrors(async (req, res, next) => {
+  let idletimeworks;
+  try {
+    const { fromdate, todate } = req.body;
+    let query = {
+      date: { $gte: fromdate, $lte: todate }, 
+    };
+    // console.log(query,"query")
+    idletimeworks = await Idletimework.find(query, {data:1});
+    idletimeworks = idletimeworks.flatMap(item => item.data) 
+    // console.log(idletimeworks[0],"idletimeworks")
   } catch (err) {
     console.log(err,"list")
     return next(new ErrorHandler("Records not found!", 404));

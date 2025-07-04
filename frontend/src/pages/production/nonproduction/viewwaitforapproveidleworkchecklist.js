@@ -463,7 +463,7 @@ function ViewWaitForApprove({ sendDataToParentUIStock, handleCloseOpenviewalertw
     documentTitle: "Approve List",
     pageStyle: "print",
   });
-
+const [overalldata,setOveralldata] = useState()
   const addSerialNumber = async (datas) => {
     setItems(
       datas?.map((item, index) => ({
@@ -471,6 +471,7 @@ function ViewWaitForApprove({ sendDataToParentUIStock, handleCloseOpenviewalertw
         serialNumber: index + 1,
       }))
     );
+    setOveralldata(datas)
   };
 
   useEffect(() => {
@@ -641,6 +642,7 @@ function ViewWaitForApprove({ sendDataToParentUIStock, handleCloseOpenviewalertw
         serialNumber: index + 1,
       }))
     );
+     setOveralldata(data)
     if (status === "Approved") {
        
       setPopupContent("Approved Successfully");
@@ -735,7 +737,7 @@ function ViewWaitForApprove({ sendDataToParentUIStock, handleCloseOpenviewalertw
       sortable: false,
       hide: !columnVisibility.actions,
       headerClassName: "bold-header",
-      cellRenderer: (params) => <ActionCell params={params} length={rowDataTable.length} fetchBatchFilter={fetchBatchFilter} sendDataToParentUINonProduction={handlegetView} />,
+      cellRenderer: (params) => <ActionCell params={params} length={getview.length} fetchBatchFilter={fetchBatchFilter} sendDataToParentUINonProduction={handlegetView} />,
     },
   ];
 

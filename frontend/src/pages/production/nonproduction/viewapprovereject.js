@@ -312,9 +312,9 @@ function ViewApproveReject({ sendDataToParentUIStock, handleCloseOpenviewalertwa
       datas?.map((item, index) => ({
         ...item,
         serialNumber: index + 1,
-         approvedate: moment(item.approvedate).format(
-                      "DD-MM-YYYY hh:mm:ss a"
-                    ),
+        //  approvedate: moment(item.approvedate).format(
+        //               "DD-MM-YYYY hh:mm:ss a"
+        //             ),
       }))
     );
    

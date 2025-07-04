@@ -5899,7 +5899,14 @@ SCHEDULE_MEETING_FILTER_LIST_TEAM: `${BASE_URL}/api/schedulemeetingfilterteam`,
   
   
 
-      
+  //team nonproduction list
+
+     NONPRODUCTIONFILTERLIST_HIERARCHY: `${BASE_URL}/api/nonproductionlisthierarchyteam`,
+     NONPRODUCTIONFILTERLIST_ASSIGN_TEAM_PAGINATION: `${BASE_URL}/api/nonproductionfilterlistforpaginationteam`,
+    NONPRODUCTIONFILTERLIST_APPROVED_TEAM_PAGINATION: `${BASE_URL}/api/nonproductionfilterlistforpaginationapprovedteam`,
+    NONPRODUCTIONFILTERLIST_REJECTED_TEAM_PAGINATION: `${BASE_URL}/api/nonproductionfilterlistforpaginationrejectedteam`,
+    NONPRODUCTIONFILTERLIST_TEAM_EXPORTS: `${BASE_URL}/api/nonproductionlistteamexportsteam`,
+    NONPRODUCTIONFILTERLIST_TEAM: `${BASE_URL}/api/nonproductionfilterlistteamfilter`,
 
 
       

@@ -2751,6 +2751,105 @@ export const menuItems = [
           },
         ],
       },
+
+
+
+    //  {
+    //     title: 'Non Production',
+    //     dbname: 'menunonproduction',
+    //     url: '',
+    //     submenu: [
+    //       {
+    //         title: 'Non-production Setup',
+    //         dbname: 'menunon-productionsetup',
+    //         submenu: [
+    //           {
+    //             title: 'Category & Subcategory',
+    //             dbname: 'menucategory&subcategory',
+    //             url: '/production/nonproductioncategorysubcategory',
+    //           },
+    //           {
+    //             title: 'Non Production Unit Rate',
+    //             dbname: 'menunonproductionunitrate',
+    //             url: '/production/nonproductionunitrate',
+    //           },
+    //           // {
+    //           //   title: "Non Production Unit Rate Allot",
+    //           //   dbname: "menunonproductionunitrateallot",
+    //           //   // url: "/production/listproductionpoints",
+    //           // },
+    //           {
+    //             title: 'Non Productions',
+    //             dbname: 'menunonproductions',
+    //             url: '/production/nonproduction',
+    //           },
+    //           {
+    //             title: 'Non Production List',
+    //             dbname: 'menunonproductionlist',
+    //             url: '/production/nonproductionlist',
+    //           },
+    //           {
+    //             title: 'Non Production Filter List',
+    //             dbname: 'menunonproductionfilterlist',
+    //             url: '/production/nonproductionfilterlist',
+    //             access: true,
+    //           },
+    //           {
+    //             title: 'Non-production Unit Allot',
+    //             dbname: 'menunon-productionunitallot',
+    //             url: '/production/nonproductionunitallot',
+    //             access: true,
+    //           },
+    //           {
+    //             title: 'Idle Work Master',
+    //             dbname: 'menuidleworkmaster',
+    //             url: '/production/manageidlework',
+    //           },
+    //           {
+    //             title: 'Idle Time Work',
+    //             dbname: 'menuidletimework',
+    //             url: '/production/idletimework',
+    //           },
+    //             {
+    //             title: 'Employee Idle Work',
+    //             dbname: 'menuemployeeidlework',
+    //             url: '/production/employeeidletimework',
+    //           },
+    //            {
+    //             title: 'Idle Work Checklist',
+    //             dbname: 'menuidleworkchecklist',
+    //             url: '/nonproduction/idleworkchecklist',
+    //           },
+    //            {
+    //             title: 'Idle Work Status',
+    //             dbname: 'menuidleworkstatus',
+    //             url: '/nonproduction/idleworkstatus',
+    //           },
+    //           {
+    //             title: 'Individual Idle Work Status',
+    //             dbname: 'menuindividualidleworkstatus',
+    //             url: '/nonproduction/individualidleworkstatus',
+    //           },
+    //           {
+    //             title: 'Non Production Entry',
+    //             dbname: 'menunonproductionentry',
+    //             url: '/production/nonproductionentry',
+    //           },
+    //             {
+    //             title: "Overall NonProduction Check List",
+    //             dbname: "menuoverallnonproductionchecklist",
+    //             url: "/nonproduction/nonproductionchecklist",
+    //           },
+    //             {
+    //             title: "Team NonProduction Check List",
+    //             dbname: "menuteamnonproductionchecklist",
+    //             url: "/nonproduction/teamnonproductionchecklist",
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   },
+
      {
         title: 'Non Production',
         dbname: 'menunonproduction',
@@ -2770,11 +2869,49 @@ export const menuItems = [
                 dbname: 'menunonproductionunitrate',
                 url: '/production/nonproductionunitrate',
               },
-              // {
-              //   title: "Non Production Unit Rate Allot",
-              //   dbname: "menunonproductionunitrateallot",
-              //   // url: "/production/listproductionpoints",
-              // },
+              {
+                title: 'Idle Work Master',
+                dbname: 'menuidleworkmaster',
+                url: '/production/manageidlework',
+              },
+            ],
+          },
+          {
+            title: 'Non-Production Entry',
+            dbname: 'menunon-productionentry',
+            submenu: [
+              {
+                title: 'Non-production Unit Allot',
+                dbname: 'menunon-productionunitallot',
+                url: '/production/nonproductionunitallot',
+                access: true,
+              },
+              {
+                title: 'Non Production Entry',
+                dbname: 'menunonproductionentry',
+                url: '/production/nonproductionentry',
+              },
+              {
+                title: 'Idle Time Work',
+                dbname: 'menuidletimework',
+                url: '/production/idletimework',
+              },
+              {
+                title: 'Employee Idle Work',
+                dbname: 'menuemployeeidlework',
+                url: '/production/employeeidletimework',
+              },
+              {
+                title: 'Idle Work Checklist',
+                dbname: 'menuidleworkchecklist',
+                url: '/nonproduction/idleworkchecklist',
+              },
+            ],
+          },
+          {
+            title: 'Non-Production Reports',
+            dbname: 'menunon-productionreports',
+            submenu: [
               {
                 title: 'Non Productions',
                 dbname: 'menunonproductions',
@@ -2785,39 +2922,29 @@ export const menuItems = [
                 dbname: 'menunonproductionlist',
                 url: '/production/nonproductionlist',
               },
+                {
+                title: 'Team Non Production List',
+                dbname: 'menuteamnonproductionlist',
+                url: '/nonproduction/teamlistnonproduction',
+              },
               {
                 title: 'Non Production Filter List',
                 dbname: 'menunonproductionfilterlist',
                 url: '/production/nonproductionfilterlist',
                 access: true,
               },
+
               {
-                title: 'Non-production Unit Allot',
-                dbname: 'menunon-productionunitallot',
-                url: '/production/nonproductionunitallot',
-                access: true,
-              },
-              {
-                title: 'Idle Work Master',
-                dbname: 'menuidleworkmaster',
-                url: '/production/manageidlework',
+                title: 'Overall NonProduction Check List',
+                dbname: 'menuoverallnonproductionchecklist',
+                url: '/nonproduction/nonproductionchecklist',
               },
               {
-                title: 'Idle Time Work',
-                dbname: 'menuidletimework',
-                url: '/production/idletimework',
+                title: 'Team NonProduction Check List',
+                dbname: 'menuteamnonproductionchecklist',
+                url: '/nonproduction/teamnonproductionchecklist',
               },
-                {
-                title: 'Employee Idle Work',
-                dbname: 'menuemployeeidlework',
-                url: '/production/employeeidletimework',
-              },
-               {
-                title: 'Idle Work Checklist',
-                dbname: 'menuidleworkchecklist',
-                url: '/nonproduction/idleworkchecklist',
-              },
-               {
+              {
                 title: 'Idle Work Status',
                 dbname: 'menuidleworkstatus',
                 url: '/nonproduction/idleworkstatus',
@@ -2826,21 +2953,6 @@ export const menuItems = [
                 title: 'Individual Idle Work Status',
                 dbname: 'menuindividualidleworkstatus',
                 url: '/nonproduction/individualidleworkstatus',
-              },
-              {
-                title: 'Non Production Entry',
-                dbname: 'menunonproductionentry',
-                url: '/production/nonproductionentry',
-              },
-                {
-                title: "Overall NonProduction Check List",
-                dbname: "menuoverallnonproductionchecklist",
-                url: "/nonproduction/nonproductionchecklist",
-              },
-                {
-                title: "Team NonProduction Check List",
-                dbname: "menuteamnonproductionchecklist",
-                url: "/nonproduction/teamnonproductionchecklist",
               },
             ],
           },

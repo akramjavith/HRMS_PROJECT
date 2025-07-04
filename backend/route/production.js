@@ -779,7 +779,12 @@ productionRoute.route("/wavierpercentage/:id").get(getSingleWavierpercentage).pu
 //for non production 
 const { getAllNonproduction,getAllNonproductionOverallCheckList,getAllNonproductionOverallCheckListReject,
   getAllTeamNonProductionChecklistApprove,getAllTeamNonProductionChecklistReject,
-   deleteNonproduction, getSingleNonproduction, getAllUsersNonProductionForExports, getAllUsersNonProduction, getAllNonproductionListFilterExports, getAllNonproductionListFilterRejected, getAllNonproductionForPagination, getAllNonproductionListFilterApproved, getAllNonproductionListFilterForAssign, getAllNonproductionListFilter, updateNonproduction, addNonproduction, getAllNonProductionFilter } = require("../controller/modules/production/nonproduction/nonproduction");
+   deleteNonproduction, getSingleNonproduction, getAllUsersNonProductionForExports, getAllUsersNonProduction,
+    getAllNonproductionListFilterExports, getAllNonproductionListFilterRejected, getAllNonproductionForPagination, 
+    getAllNonproductionListFilterApproved, getAllNonproductionListFilterForAssign, getAllNonproductionListFilter, 
+    getNonProductionListTeam,getAllNonproductionListFilterForAssignTeam,getAllNonproductionListFilterApprovedTeam,getAllNonproductionListFilterRejectedTeam,
+    getAllNonproductionListFilterTeamExports,getAllNonproductionListTeamFilter,
+    updateNonproduction, addNonproduction, getAllNonProductionFilter } = require("../controller/modules/production/nonproduction/nonproduction");
 productionRoute.route("/nonproduction").get(getAllNonproduction);
 productionRoute.route("/teamnonproductionchecklistapprove").post(getAllTeamNonProductionChecklistApprove);
 productionRoute.route("/teamnonproductionchecklistreject").post(getAllTeamNonProductionChecklistReject);
@@ -794,6 +799,17 @@ productionRoute.route("/nonproductionfilterlistexports").post(getAllNonproductio
 productionRoute.route("/nonproductionfilterlistforpagination").post(getAllNonproductionListFilterForAssign);
 productionRoute.route("/nonproductionfilterlistforpaginationapproved").post(getAllNonproductionListFilterApproved);
 productionRoute.route("/nonproductionfilterlistforpaginationrejected").post(getAllNonproductionListFilterRejected);
+
+//team filter list
+productionRoute.route("/nonproductionlistteamexportsteam").post(getAllNonproductionListFilterTeamExports);
+productionRoute.route("/nonproductionlisthierarchyteam").post(getNonProductionListTeam);
+productionRoute.route("/nonproductionfilterlistforpaginationteam").post(getAllNonproductionListFilterForAssignTeam);
+productionRoute.route("/nonproductionfilterlistforpaginationapprovedteam").post(getAllNonproductionListFilterApprovedTeam);
+productionRoute.route("/nonproductionfilterlistforpaginationrejectedteam").post(getAllNonproductionListFilterRejectedTeam);
+productionRoute.route("/nonproductionfilterlistteamfilter").post(getAllNonproductionListTeamFilter);
+
+
+
 productionRoute.route("/nonproductionfilter").post(getAllNonProductionFilter);
 productionRoute.route("/nonproduction/:id").get(getSingleNonproduction).put(updateNonproduction).delete(deleteNonproduction);
 

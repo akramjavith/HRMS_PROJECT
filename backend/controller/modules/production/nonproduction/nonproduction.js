@@ -610,6 +610,8 @@ exports.getAllNonproductionListFilterExports = catchAsyncErrors(async (req, res,
   }
 });
 
+
+
 exports.getAllNonproductionListFilterForAssign = catchAsyncErrors(async (req, res, next) => {
   const {
     page,
@@ -1071,6 +1073,8 @@ exports.getAllNonproductionListFilterRejected = catchAsyncErrors(async (req, res
     return next(new ErrorHandler("Error fetching records!", 500));
   }
 });
+
+
 
 function createFilterCondition(column, condition, value) {
   console.log(column, condition, value)
@@ -2866,3 +2870,1043 @@ exports.getAllTeamNonProductionChecklistReject = catchAsyncErrors(
   }
 );
 
+
+
+
+
+
+
+//team filter list
+
+
+
+
+
+exports.getNonProductionListTeam = catchAsyncErrors(async (req, res, next) => {
+  let result,
+    hierarchy,
+    resultAccessFilter,
+    hierarchyfilter,
+    reportingtobaseduser,
+    filteredoverall,
+    hierarchySecond,
+    hierarchyMap,
+    resulted,
+    resultedTeam,
+    hierarchyFinal,
+    hierarchyDefault;
+
+  try {
+    const { listpageaccessmode } = req.body;
+
+    let levelFinal = req.body?.sector === "all" ? ["Primary", "Secondary", "Tertiary"] : [req.body?.sector];
+
+    if (listpageaccessmode === "Reporting to Based") {
+      let usersss = await Users.find(
+        {
+          enquirystatus: {
+            $nin: ["Enquiry Purpose"],
+          },
+          resonablestatus: {
+            $nin: ["Not Joined", "Postponed", "Rejected", "Closed", "Releave Employee", "Absconded", "Hold", "Terminate"],
+          },
+          reportingto: req.body.username,
+        },
+        {
+          empcode: 1,
+          companyname: 1,
+        }
+      ).lean();
+    }
+
+    result = await Users.find(
+      {
+        enquirystatus: {
+          $nin: ["Enquiry Purpose"],
+        },
+        // resonablestatus: {
+        //   $nin: ["Releave Employee", "Absconded", "Hold", "Terminate"],
+        // },
+      },
+      {
+        companyname: 1,
+        branch: 1,
+        company: 1,
+        unit: 1,
+        team: 1,
+        department: 1,
+        originalpassword: 1,
+        resonablestatus: 1,
+        username: 1,
+        // _id: 1
+      }
+    );
+
+    //myhierarchy dropdown
+    if (req.body.hierachy === "myhierarchy" && (listpageaccessmode === "Hierarchy Based" || listpageaccessmode === "Overall")) {
+      hierarchy = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+        level: req.body.sector,
+      });
+      hierarchyDefault = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+      });
+
+      let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+      hierarchyFinal =
+        req.body.sector === "all"
+          ? answerDef.length > 0
+            ? [].concat(...answerDef)
+            : []
+          : hierarchy.length > 0
+          ? [].concat(...hierarchy.map((item) => item.employeename))
+          : [];
+      hierarchyMap = hierarchyFinal.length > 0 ? hierarchyFinal : [];
+
+      hierarchyfilter = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+        level: "Primary",
+      });
+      resulted = result.filter((data) => hierarchyMap.includes(data.companyname));
+    }
+    // all hierarchy list dropdown
+    if (req.body.hierachy === "allhierarchy" && (listpageaccessmode === "Hierarchy Based" || listpageaccessmode === "Overall")) {
+      hierarchySecond = await Hirerarchi.find({}, { employeename: 1, supervisorchoose: 1, level: 1, control: 1 });
+
+      let sectorFinal = req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector];
+
+      hierarchyDefault = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+        level: { $in: sectorFinal },
+      });
+
+      let answerDef = hierarchyDefault.map((data) => data.employeename).flat();
+
+      function findEmployeesRecursive(currentSupervisors, processedSupervisors, result) {
+        const filteredData = hierarchySecond.filter((item) =>
+          item.supervisorchoose.some((supervisor) => currentSupervisors.includes(supervisor) && !processedSupervisors.has(supervisor))
+        );
+
+        if (filteredData.length === 0) {
+          return result;
+        }
+
+        const newEmployees = filteredData.reduce((employees, item) => {
+          employees.push(...item.employeename);
+          processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+          return employees;
+        }, []);
+
+        const uniqueNewEmployees = [...new Set(newEmployees)];
+        result = [...result, ...filteredData];
+
+        return findEmployeesRecursive(uniqueNewEmployees, processedSupervisors, result);
+      }
+
+      const processedSupervisors = new Set();
+      const filteredOverallItem = findEmployeesRecursive(answerDef, processedSupervisors, []);
+      let answerDeoverall = filteredOverallItem
+        .filter((data) => (req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"].includes(data.level) : data.level == req.body.sector))
+        .map((item) => item.employeename[0]);
+
+      resultedTeam = result.filter((data) => answerDeoverall.includes(data.companyname));
+
+      let hierarchyallfinal = await Hirerarchi.find({
+        employeename: { $in: answerDeoverall.map((item) => item) },
+        level: req.body.sector,
+      });
+      hierarchyFinal =
+        req.body.sector === "all"
+          ? answerDeoverall.length > 0
+            ? [].concat(...answerDeoverall)
+            : []
+          : hierarchyallfinal.length > 0
+          ? [].concat(...hierarchyallfinal.map((item) => item.employeename))
+          : [];
+    }
+    //my + all hierarchy list dropdown
+    if (req.body.hierachy === "myallhierarchy" && (listpageaccessmode === "Hierarchy Based" || listpageaccessmode === "Overall")) {
+      hierarchySecond = await Hirerarchi.find({}, { employeename: 1, supervisorchoose: 1, level: 1, control: 1 });
+
+      let sectorFinal = req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"] : [req.body.sector];
+
+      hierarchyDefault = await Hirerarchi.find({
+        supervisorchoose: req.body.username,
+        level: { $in: sectorFinal },
+      });
+
+      let answerDef = hierarchyDefault.map((data) => data.employeename);
+
+      function findEmployeesRecursive(currentSupervisors, processedSupervisors, result) {
+        const filteredData = hierarchySecond.filter((item) =>
+          item.supervisorchoose.some(
+            (supervisor) =>
+              currentSupervisors.includes(supervisor) &&
+              (req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"].includes(item.level) : req.body.sector == item.level) &&
+              !processedSupervisors.has(supervisor)
+          )
+        );
+
+        if (filteredData.length === 0) {
+          return result;
+        }
+
+        const newEmployees = filteredData.reduce((employees, item) => {
+          employees.push(...item.employeename);
+          processedSupervisors.add(item.supervisorchoose[0]); // Assuming each item has only one supervisorchoose
+          return employees;
+        }, []);
+
+        const uniqueNewEmployees = [...new Set(newEmployees)];
+        result = [...result, ...filteredData];
+
+        return findEmployeesRecursive(uniqueNewEmployees, processedSupervisors, result);
+      }
+
+      const processedSupervisors = new Set();
+      const filteredOverallItem = findEmployeesRecursive([req.body.username], processedSupervisors, []);
+      let answerDeoverall = filteredOverallItem
+        .filter((data) => (req.body.sector == "all" ? ["Primary", "Secondary", "Tertiary"].includes(data.level) : data.level == req.body.sector))
+        .map((item) => item.employeename[0]);
+
+      filteredoverall = result.filter((data) => answerDeoverall.includes(data.companyname));
+    }
+
+    if (listpageaccessmode === "Reporting to Based") {
+      reportingtobaseduser = result;
+    }
+
+    let finalsupervisor =
+      req.body.hierachy == "myhierarchy"
+        ? resulted?.map((Data) => Data?.companyname)
+        : req.body.hierachy == "allhierarchy"
+        ? resultedTeam?.map((Data) => Data?.companyname)
+        : filteredoverall?.map((Data) => Data?.companyname);
+
+    const restrictTeam = await Hirerarchi.aggregate([
+      {
+        $match: {
+          $or: [
+            {
+              supervisorchoose: { $in: finalsupervisor }, // Matches if supervisorchoose field has a value in finalsupervisor
+            },
+            {
+              employeename: { $in: finalsupervisor }, // Matches if employeename field has a value in finalsupervisor
+            },
+          ],
+          level: { $in: levelFinal }, // Matches if level field has a value in levelFinal
+        },
+      },
+      {
+        $lookup: {
+          from: "reportingheaders",
+          let: {
+            teamControlsArray: {
+              $ifNull: ["$pagecontrols", []],
+            },
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $in: ["$name", "$$teamControlsArray"],
+                    }, // Check if 'name' is in 'teamcontrols' array
+                    {
+                      $in: [
+                        req?.body?.pagename,
+                        "$reportingnew", // Check if 'menuteamloginstatus' is in 'reportingnew' array
+                      ],
+                    }, // Additional condition for reportingnew array
+                  ],
+                },
+              },
+            },
+          ],
+          as: "reportData", // The resulting matched documents will be in this field
+        },
+      },
+      {
+        $project: {
+          supervisorchoose: 1,
+          employeename: 1,
+          reportData: 1,
+        },
+      },
+    ]);
+    //  console.log(filteredoverall, "filteredoverall");
+    let restrictListTeam = restrictTeam?.filter((data) => data?.reportData?.length > 0)?.flatMap((Data) => Data?.employeename);
+    const resultAccessFilterHierarchy =
+      req.body.hierachy === "myhierarchy" ? resulted : req.body.hierachy === "allhierarchy" ? resultedTeam : filteredoverall;
+    resultAccessFilter =
+      restrictListTeam?.length > 0
+        ? resultAccessFilterHierarchy?.filter((data) => restrictListTeam?.includes(data?.companyname)).map((d) => d.companyname)
+        : [];
+    // console.log(filteredoverall.length, resultAccessFilter, "filteredoverall");
+  } catch (err) {
+    console.log(err, "err");
+    return next(new ErrorHandler("Records not found!", 404));
+  }
+  return res.status(200).json({
+    resultAccessFilter,
+  });
+});
+
+exports.getAllNonproductionListTeamFilter = catchAsyncErrors(async (req, res, next) => {
+  const {
+    page = 1,
+    pageSize = 10,
+    pageApproved = 1,
+    pageReject = 1,
+    pageSizeApprove = 10,
+    pagesizeReject = 10,
+    allFilters,
+    logicOperator,
+    searchQuery,
+    base,
+    category,
+    subcategory,
+    fromdate,
+    todate,
+    name
+  } = req.body;
+  console.log("forALL")
+
+  try {
+    // Build the base query
+    const query = {};
+    let conditions = [];
+
+    if (name?.length) query.name = { $in: name };
+
+    // Date filtering
+    if (fromdate || todate) {
+      query.date = {};
+      if (fromdate) query.date.$gte = fromdate;
+      if (todate) query.date.$lte = todate;
+    }
+
+    // Advanced search filter
+    if (allFilters && allFilters.length > 0) {
+      allFilters.forEach(filter => {
+        if (filter.column && filter.condition && (filter.value || ["Blank", "Not Blank"].includes(filter.condition))) {
+          conditions.push(createFilterCondition(filter.column, filter.condition, filter.value));
+        }
+      });
+    }
+
+    // Search query handling
+    if (searchQuery) {
+      const searchTermsArray = searchQuery.split(" ");
+      const orConditions = searchTermsArray.map((term) => {
+        const conditions = [
+          { name: new RegExp(term, "i") },
+          { category: new RegExp(term, "i") },
+          { subcategory: new RegExp(term, "i") },
+          { mode: new RegExp(term, "i") },
+          { date: new RegExp(term, "i") }
+        ];
+
+        // Add numeric field searches if term is a number
+        if (!isNaN(term)) {
+          const numTerm = parseFloat(term);
+          conditions.push(
+            { count: numTerm },
+            { totalhours: numTerm },
+            { alloteddays: numTerm },
+            { allotedhours: numTerm },
+            { allotedminutes: numTerm },
+            { days: numTerm },
+            { hours: numTerm },
+            { minutes: numTerm }
+          );
+        }
+        return { $or: conditions };
+      });
+      query.$and = orConditions;
+    }
+
+    // Apply logicOperator to combine conditions
+    if (conditions.length > 0) {
+      if (logicOperator === "AND") {
+        query.$and = [...(query.$and || []), ...conditions];
+      } else if (logicOperator === "OR") {
+        query.$or = [...(query.$or || []), ...conditions];
+      }
+    }
+
+    // Common transformation function
+    const transformItem = (item, index) => ({
+      ...item,
+      serialNumber: index + 1,
+      name: item.name,
+      category: item.category,
+      subcategory: item.subcategory,
+      mode: item.mode,
+      date: moment(item.date).format("DD-MM-YYYY"),
+      allotdays: item.alloteddays,
+      allothours: item.allotedhours,
+      allotmins: item.allotedminutes,
+      days: item.days,
+      hours: item.hours,
+      minutes: item.minutes,
+      count: item.count
+    });
+
+    // Get counts for all statuses
+    const totalCount = await Nonproduction.countDocuments(query);
+    const assignedCount = await Nonproduction.countDocuments({ ...query, approvestatus: undefined });
+    const approvedCount = await Nonproduction.countDocuments({ ...query, approvestatus: true });
+    const rejectedCount = await Nonproduction.countDocuments({ ...query, approvestatus: false });
+
+    // Fetch paginated data for each list
+    const assignQuery = { ...query, approvestatus: undefined };
+    const approvedQuery = { ...query, approvestatus: true };
+    const rejectedQuery = { ...query, approvestatus: false };
+
+    const [assignlist, approvedlist, rejectlist] = await Promise.all([
+      Nonproduction.find(assignQuery)
+        .skip((page - 1) * pageSize)
+        .limit(parseInt(pageSize))
+        .lean()
+        .then(items => items.map(transformItem)),
+
+      Nonproduction.find(approvedQuery)
+        .skip((pageApproved - 1) * pageSizeApprove)
+        .limit(parseInt(pageSizeApprove))
+        .lean()
+        .then(items => items.map(transformItem)),
+
+      Nonproduction.find(rejectedQuery)
+        .skip((pageReject - 1) * pagesizeReject)
+        .limit(parseInt(pagesizeReject))
+        .lean()
+        .then(items => items.map((item, index) => ({
+          ...transformItem(item, index),
+          rejectionReason: item.rejectionReason // Include rejection reason if available
+        })))
+    ]);
+
+    return res.status(200).json({
+      counts: {
+        total: totalCount,
+        assigned: assignedCount,
+        approved: approvedCount,
+        rejected: rejectedCount
+      },
+      pagination: {
+        assigned: {
+          currentPage: page,
+          totalPages: Math.ceil(assignedCount / pageSize),
+          pageSize: pageSize
+        },
+        approved: {
+          currentPage: pageApproved,
+          totalPages: Math.ceil(approvedCount / pageSizeApprove),
+          pageSize: pageSizeApprove
+        },
+        rejected: {
+          currentPage: pageReject,
+          totalPages: Math.ceil(rejectedCount / pagesizeReject),
+          pageSize: pagesizeReject
+        }
+      },
+      lists: {
+        assignlist,
+        approvedlist,
+        rejectlist
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return next(new ErrorHandler("Error fetching records!", 500));
+  }
+});
+
+exports.getAllNonproductionListFilterForAssignTeam = catchAsyncErrors(async (req, res, next) => {
+  const {
+    page,
+    pageSize,
+    allFilters,
+    logicOperator,
+    searchQuery,
+    base,
+    category,
+    subcategory,
+    fromdate,
+    todate,
+    name
+  } = req.body;
+
+  console.log(page, "page")
+  console.log(pageSize, "pageSize")
+  console.log(searchQuery, "searchQuery")
+
+  try {
+    // Build the base query
+    const query = {};
+    let conditions = [];
+
+   
+    // Category and subcategory filtering
+    if (name?.length) query.name = { $in: name };
+
+    // Date filtering
+    if (fromdate || todate) {
+      query.date = {};
+      if (fromdate) query.date.$gte = fromdate;
+      if (todate) query.date.$lte = todate;
+    }
+
+    // Advanced search filter
+    if (allFilters && allFilters.length > 0) {
+      allFilters.forEach(filter => {
+        if (filter.column && filter.condition && (filter.value || ["Blank", "Not Blank"].includes(filter.condition))) {
+          conditions.push(createFilterConditionDate(filter.column, filter.condition, filter.value));
+        }
+      });
+    }
+
+    // Search query handling
+    if (searchQuery) {
+      const searchTermsArray = searchQuery.split(" ");
+      const orConditions = searchTermsArray.map((term) => {
+        const conditions = [
+          { name: new RegExp(term, "i") },
+          { category: new RegExp(term, "i") },
+          { subcategory: new RegExp(term, "i") },
+          { mode: new RegExp(term, "i") }
+        ];
+
+        // Check if the term matches a date format (DD-MM-YYYY)
+        const dateMatch = term.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+        if (dateMatch) {
+          // Convert to database format (YYYY-MM-DD)
+          const dbDate = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
+          conditions.push({ date: dbDate });
+        } else {
+          // For non-date terms, keep the regex search on date as string
+          conditions.push({ date: new RegExp(term, "i") });
+        }
+
+        // Add numeric field searches if term is a number
+        if (!isNaN(term)) {
+          const numTerm = parseFloat(term);
+          conditions.push(
+            { count: numTerm },
+            { totalhours: numTerm },
+            { alloteddays: numTerm },
+            { allotedhours: numTerm },
+            { allotedminutes: numTerm },
+            { days: numTerm },
+            { hours: numTerm },
+            { minutes: numTerm }
+          );
+        }
+        return { $or: conditions };
+      });
+      query.$and = orConditions;
+    }
+
+    // Apply logicOperator to combine conditions
+    if (conditions.length > 0) {
+      if (logicOperator === "AND") {
+        query.$and = [...(query.$and || []), ...conditions];
+      } else if (logicOperator === "OR") {
+        query.$or = [...(query.$or || []), ...conditions];
+      }
+    }
+
+    // Common transformation function
+    const transformItem = (item, index) => ({
+      ...item,
+      serialNumber: index + 1,
+      name: item.name,
+      category: item.category,
+      subcategory: item.subcategory,
+      mode: item.mode,
+      date: moment(item.date).format("DD-MM-YYYY"),
+      allotdays: item.alloteddays,
+      allothours: item.allotedhours,
+      allotmins: item.allotedminutes,
+      days: item.days,
+      hours: item.hours,
+      minutes: item.minutes,
+      count: item.count
+    });
+
+    // Get counts for all statuses
+    const assignedCount = await Nonproduction.countDocuments({ ...query, approvestatus: undefined });
+
+
+    // Fetch paginated data for each list
+    const assignQuery = { ...query, approvestatus: undefined };
+
+    const [assignlist] = await Promise.all([
+      Nonproduction.find(assignQuery)
+        .skip((page - 1) * pageSize)
+        .limit(parseInt(pageSize))
+        .lean()
+        .then(items => items.map(transformItem)),
+    ]);
+
+    return res.status(200).json({
+      counts: {
+        assigned: assignedCount,
+      },
+      pagination: {
+        assigned: {
+          currentPage: page,
+          totalPages: Math.ceil(assignedCount / pageSize),
+          pageSize: pageSize
+        },
+      },
+      lists: {
+        assignlist,
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return next(new ErrorHandler("Error fetching records!", 500));
+  }
+});
+
+exports.getAllNonproductionListFilterApprovedTeam = catchAsyncErrors(async (req, res, next) => {
+  const {
+    pageApproved,
+    pageSizeApprove,
+    allFilters,
+    logicOperator,
+    searchQueryAssign,
+    base,
+    category,
+    subcategory,
+    fromdate,
+    todate,
+    name
+  } = req.body;
+  console.log("forALL")
+  console.log(searchQueryAssign, "for51ALL")
+
+  try {
+    // Build the base query
+    const query = {};
+    let conditions = [];
+
+   
+
+    // Category and subcategory filtering
+    if (name?.length) query.name = { $in: name };
+
+    // Date filtering
+    if (fromdate || todate) {
+      query.date = {};
+      if (fromdate) query.date.$gte = fromdate;
+      if (todate) query.date.$lte = todate;
+    }
+
+    // Advanced search filter
+    if (allFilters && allFilters.length > 0) {
+      allFilters.forEach(filter => {
+        if (filter.column && filter.condition && (filter.value || ["Blank", "Not Blank"].includes(filter.condition))) {
+          conditions.push(createFilterConditionDate(filter.column, filter.condition, filter.value));
+        }
+      });
+    }
+
+    // Search query handling
+    if (searchQueryAssign) {
+      const searchTermsArray = searchQueryAssign.split(" ");
+      const orConditions = searchTermsArray.map((term) => {
+        const conditions = [
+          { name: new RegExp(term, "i") },
+          { category: new RegExp(term, "i") },
+          { subcategory: new RegExp(term, "i") },
+          { mode: new RegExp(term, "i") }
+        ];
+
+        // Check if the term matches a date format (DD-MM-YYYY)
+        const dateMatch = term.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+        if (dateMatch) {
+          // Convert to database format (YYYY-MM-DD)
+          const dbDate = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
+          conditions.push({ date: dbDate });
+        } else {
+          // For non-date terms, keep the regex search on date as string
+          conditions.push({ date: new RegExp(term, "i") });
+        }
+
+        // Add numeric field searches if term is a number
+        if (!isNaN(term)) {
+          const numTerm = parseFloat(term);
+          conditions.push(
+            { count: numTerm },
+            { totalhours: numTerm },
+            { alloteddays: numTerm },
+            { allotedhours: numTerm },
+            { allotedminutes: numTerm },
+            { days: numTerm },
+            { hours: numTerm },
+            { minutes: numTerm }
+          );
+        }
+        return { $or: conditions };
+      });
+      query.$and = orConditions;
+    }
+
+    // Apply logicOperator to combine conditions
+    if (conditions.length > 0) {
+      if (logicOperator === "AND") {
+        query.$and = [...(query.$and || []), ...conditions];
+      } else if (logicOperator === "OR") {
+        query.$or = [...(query.$or || []), ...conditions];
+      }
+    }
+
+    // Common transformation function
+    const transformItem = (item, index) => ({
+      ...item,
+      serialNumber: index + 1,
+      name: item.name,
+      category: item.category,
+      subcategory: item.subcategory,
+      mode: item.mode,
+      date: moment(item.date).format("DD-MM-YYYY"),
+      allotdays: item.alloteddays,
+      allothours: item.allotedhours,
+      allotmins: item.allotedminutes,
+      days: item.days,
+      hours: item.hours,
+      minutes: item.minutes,
+      count: item.count
+    });
+
+    // Get counts for all statuses
+    const totalCount = await Nonproduction.countDocuments(query);
+    const approvedCount = await Nonproduction.countDocuments({ ...query, approvestatus: true });
+
+    // Fetch paginated data for each list
+    const approvedQuery = { ...query, approvestatus: true };
+
+    const [approvedlist] = await Promise.all([
+
+      Nonproduction.find(approvedQuery)
+        .skip((pageApproved - 1) * pageSizeApprove)
+        .limit(parseInt(pageSizeApprove))
+        .lean()
+        .then(items => items.map(transformItem)),
+
+
+    ]);
+
+    return res.status(200).json({
+      counts: {
+        total: totalCount,
+        approved: approvedCount,
+      },
+      pagination: {
+        approved: {
+          currentPage: pageApproved,
+          totalPages: Math.ceil(approvedCount / pageSizeApprove),
+          pageSize: pageSizeApprove
+        },
+      },
+      lists: {
+        approvedlist,
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return next(new ErrorHandler("Error fetching records!", 500));
+  }
+});
+
+exports.getAllNonproductionListFilterRejectedTeam = catchAsyncErrors(async (req, res, next) => {
+  const {
+    pageReject = 1,
+    pagesizeReject = 10,
+    allFilters,
+    logicOperator,
+    searchQueryall,
+    base,
+    category,
+    subcategory,
+    fromdate,
+    todate,
+    name
+  } = req.body;
+  console.log(name,"namerejected")
+
+  try {
+    // Build the base query
+    const query = {};
+    let conditions = [];
+
+   
+    if (name?.length) query.name = { $in: name };
+
+    // Date filtering
+    if (fromdate || todate) {
+      query.date = {};
+      if (fromdate) query.date.$gte = fromdate;
+      if (todate) query.date.$lte = todate;
+    }
+console.log(query,"rejectquery")
+    // Advanced search filter
+    if (allFilters && allFilters.length > 0) {
+      allFilters.forEach(filter => {
+        if (filter.column && filter.condition && (filter.value || ["Blank", "Not Blank"].includes(filter.condition))) {
+          conditions.push(createFilterConditionDate(filter.column, filter.condition, filter.value));
+        }
+      });
+    }
+
+    // Search query handling
+    if (searchQueryall) {
+      const searchTermsArray = searchQueryall.split(" ");
+      const orConditions = searchTermsArray.map((term) => {
+        const conditions = [
+          { name: new RegExp(term, "i") },
+          { category: new RegExp(term, "i") },
+          { subcategory: new RegExp(term, "i") },
+          { mode: new RegExp(term, "i") }
+        ];
+
+        // Check if the term matches a date format (DD-MM-YYYY)
+        const dateMatch = term.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+        if (dateMatch) {
+          // Convert to database format (YYYY-MM-DD)
+          const dbDate = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
+          conditions.push({ date: dbDate });
+        } else {
+          // For non-date terms, keep the regex search on date as string
+          conditions.push({ date: new RegExp(term, "i") });
+        }
+
+        // Add numeric field searches if term is a number
+        if (!isNaN(term)) {
+          const numTerm = parseFloat(term);
+          conditions.push(
+            { count: numTerm },
+            { totalhours: numTerm },
+            { alloteddays: numTerm },
+            { allotedhours: numTerm },
+            { allotedminutes: numTerm },
+            { days: numTerm },
+            { hours: numTerm },
+            { minutes: numTerm }
+          );
+        }
+        return { $or: conditions };
+      });
+      query.$and = orConditions;
+    }
+
+    // Apply logicOperator to combine conditions
+    if (conditions.length > 0) {
+      if (logicOperator === "AND") {
+        query.$and = [...(query.$and || []), ...conditions];
+      } else if (logicOperator === "OR") {
+        query.$or = [...(query.$or || []), ...conditions];
+      }
+    }
+
+    // Common transformation function
+    const transformItem = (item, index) => ({
+      ...item,
+      serialNumber: index + 1,
+      name: item.name,
+      category: item.category,
+      subcategory: item.subcategory,
+      mode: item.mode,
+      date: moment(item.date).format("DD-MM-YYYY"),
+      allotdays: item.alloteddays,
+      allothours: item.allotedhours,
+      allotmins: item.allotedminutes,
+      days: item.days,
+      hours: item.hours,
+      minutes: item.minutes,
+      count: item.count
+    });
+
+    // Get counts for all statuses
+    const totalCount = await Nonproduction.countDocuments(query);
+    const rejectedCount = await Nonproduction.countDocuments({ ...query, approvestatus: false });
+
+    // Fetch paginated data for each list
+    const rejectedQuery = { ...query, approvestatus: false };
+
+    const [rejectlist] = await Promise.all([
+      Nonproduction.find(rejectedQuery)
+        .skip((pageReject - 1) * pagesizeReject)
+        .limit(parseInt(pagesizeReject))
+        .lean()
+        .then(items => items.map((item, index) => ({
+          ...transformItem(item, index),
+          rejectionReason: item.rejectionReason // Include rejection reason if available
+        })))
+    ]);
+
+    return res.status(200).json({
+      counts: {
+        total: totalCount,
+        rejected: rejectedCount
+      },
+      pagination: {
+        rejected: {
+          currentPage: pageReject,
+          totalPages: Math.ceil(rejectedCount / pagesizeReject),
+          pageSize: pagesizeReject
+        }
+      },
+      lists: {
+        rejectlist
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return next(new ErrorHandler("Error fetching records!", 500));
+  }
+});
+
+
+
+exports.getAllNonproductionListFilterTeamExports = catchAsyncErrors(async (req, res, next) => {
+  const {
+    allFilters,
+    logicOperator,
+    searchQuery,
+    base,
+    category,
+    subcategory,
+    fromdate,
+    todate,
+    name
+  } = req.body;
+  console.log("forALL")
+
+  try {
+    // Build the base query
+    const query = {};
+    let conditions = [];
+
+  
+    // Category and subcategory filtering
+    if (name?.length) query.name = { $in: name };
+
+    // Date filtering
+    if (fromdate || todate) {
+      query.date = {};
+      if (fromdate) query.date.$gte = fromdate;
+      if (todate) query.date.$lte = todate;
+    }
+
+    // Advanced search filter
+    if (allFilters && allFilters.length > 0) {
+      allFilters.forEach(filter => {
+        if (filter.column && filter.condition && (filter.value || ["Blank", "Not Blank"].includes(filter.condition))) {
+          conditions.push(createFilterCondition(filter.column, filter.condition, filter.value));
+        }
+      });
+    }
+
+    // Search query handling
+    if (searchQuery) {
+      const searchTermsArray = searchQuery.split(" ");
+      const orConditions = searchTermsArray.map((term) => {
+        const conditions = [
+          { name: new RegExp(term, "i") },
+          { category: new RegExp(term, "i") },
+          { subcategory: new RegExp(term, "i") },
+          { mode: new RegExp(term, "i") },
+          { date: new RegExp(term, "i") }
+        ];
+
+        // Add numeric field searches if term is a number
+        if (!isNaN(term)) {
+          const numTerm = parseFloat(term);
+          conditions.push(
+            { count: numTerm },
+            { totalhours: numTerm },
+            { alloteddays: numTerm },
+            { allotedhours: numTerm },
+            { allotedminutes: numTerm },
+            { days: numTerm },
+            { hours: numTerm },
+            { minutes: numTerm }
+          );
+        }
+        return { $or: conditions };
+      });
+      query.$and = orConditions;
+    }
+
+    // Apply logicOperator to combine conditions
+    if (conditions.length > 0) {
+      if (logicOperator === "AND") {
+        query.$and = [...(query.$and || []), ...conditions];
+      } else if (logicOperator === "OR") {
+        query.$or = [...(query.$or || []), ...conditions];
+      }
+    }
+
+    // Common transformation function
+    const transformItem = (item, index) => ({
+      ...item,
+      serialNumber: index + 1,
+      name: item.name,
+      category: item.category,
+      subcategory: item.subcategory,
+      mode: item.mode,
+      date: moment(item.date).format("DD-MM-YYYY"),
+      allotdays: item.alloteddays,
+      allothours: item.allotedhours,
+      allotmins: item.allotedminutes,
+      days: item.days,
+      hours: item.hours,
+      minutes: item.minutes,
+      count: item.count
+    });
+
+    // Fetch paginated data for each list
+    const assignQuery = { ...query, approvestatus: undefined };
+    const approvedQuery = { ...query, approvestatus: true };
+    const rejectedQuery = { ...query, approvestatus: false };
+
+    const [assignlist, approvedlist, rejectlist] = await Promise.all([
+      Nonproduction.find(assignQuery)
+        .lean()
+        .then(items => items.map(transformItem)),
+
+      Nonproduction.find(approvedQuery)
+        .lean()
+        .then(items => items.map(transformItem)),
+
+      Nonproduction.find(rejectedQuery)
+        .lean()
+        .then(items => items.map((item, index) => ({
+          ...transformItem(item, index),
+          rejectionReason: item.rejectionReason // Include rejection reason if available
+        })))
+    ]);
+
+    return res.status(200).json({
+      lists: {
+        assignlist,
+        approvedlist,
+        rejectlist
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return next(new ErrorHandler("Error fetching records!", 500));
+  }
+});
